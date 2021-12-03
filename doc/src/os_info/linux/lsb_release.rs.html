@@ -468,34 +468,34 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">matcher::Matcher</span>, <span class="ident">Info</span>, <span class="ident">Type</span>, <span class="ident">Version</span>};
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">release</span> <span class="op">=</span> <span class="ident">retrieve</span>()<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">release</span>.<span class="ident">version</span>.<span class="ident">as_deref</span>() {
-        <span class="prelude-val">Some</span>(<span class="string">&quot;rolling&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Version::Rolling</span>(<span class="prelude-val">None</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Version::Custom</span>(<span class="ident">v</span>.<span class="ident">to_owned</span>()),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Version::Unknown</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;rolling&quot;</span>) =&gt; <span class="ident">Version::Rolling</span>(<span class="prelude-val">None</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">Version::Custom</span>(<span class="ident">v</span>.<span class="ident">to_owned</span>()),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">Version::Unknown</span>,
     };
 
     <span class="kw">let</span> <span class="ident">os_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">release</span>.<span class="ident">distribution</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String::as_ref</span>) {
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Amazon&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;AmazonAMI&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Amazon</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Arch&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Arch</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;CentOS&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::CentOS</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Debian&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Debian</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;EndeavourOS&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::EndeavourOS</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Fedora&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Fedora</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Linuxmint&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Mint</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;ManjaroLinux&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Manjaro</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;NixOS&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::NixOS</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;openSUSE&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::openSUSE</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;OracleServer&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::OracleLinux</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Pop&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Pop</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Raspbian&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Raspbian</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterprise&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterpriseServer&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::RedHatEnterprise</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Solus&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Solus</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;SUSE&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::SUSE</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Ubuntu&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Ubuntu</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Linux</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Amazon&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;AmazonAMI&quot;</span>) =&gt; <span class="ident">Type::Amazon</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Arch&quot;</span>) =&gt; <span class="ident">Type::Arch</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;CentOS&quot;</span>) =&gt; <span class="ident">Type::CentOS</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Debian&quot;</span>) =&gt; <span class="ident">Type::Debian</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;EndeavourOS&quot;</span>) =&gt; <span class="ident">Type::EndeavourOS</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Fedora&quot;</span>) =&gt; <span class="ident">Type::Fedora</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Linuxmint&quot;</span>) =&gt; <span class="ident">Type::Mint</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;ManjaroLinux&quot;</span>) =&gt; <span class="ident">Type::Manjaro</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;NixOS&quot;</span>) =&gt; <span class="ident">Type::NixOS</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;openSUSE&quot;</span>) =&gt; <span class="ident">Type::openSUSE</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;OracleServer&quot;</span>) =&gt; <span class="ident">Type::OracleLinux</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Pop&quot;</span>) =&gt; <span class="ident">Type::Pop</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Raspbian&quot;</span>) =&gt; <span class="ident">Type::Raspbian</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterprise&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterpriseServer&quot;</span>) =&gt; <span class="ident">Type::RedHatEnterprise</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Solus&quot;</span>) =&gt; <span class="ident">Type::Solus</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;SUSE&quot;</span>) =&gt; <span class="ident">Type::SUSE</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Ubuntu&quot;</span>) =&gt; <span class="ident">Type::Ubuntu</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Type::Linux</span>,
     };
 
     <span class="prelude-val">Some</span>(<span class="ident">Info</span> {
@@ -512,20 +512,20 @@
     <span class="kw">pub</span> <span class="ident">codename</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">retrieve</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LsbRelease</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">retrieve</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LsbRelease</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">Command::new</span>(<span class="string">&quot;lsb_release&quot;</span>).<span class="ident">arg</span>(<span class="string">&quot;-a&quot;</span>).<span class="ident">output</span>() {
-        <span class="prelude-val">Ok</span>(<span class="ident">output</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">output</span>) =&gt; {
             <span class="macro">trace!</span>(<span class="string">&quot;lsb_release command returned {:?}&quot;</span>, <span class="ident">output</span>);
             <span class="prelude-val">Some</span>(<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">output</span>.<span class="ident">stdout</span>)))
         }
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
             <span class="macro">debug!</span>(<span class="string">&quot;lsb_release command failed with {:?}&quot;</span>, <span class="ident">e</span>);
             <span class="prelude-val">None</span>
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LsbRelease</span> {
+<span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">LsbRelease</span> {
     <span class="macro">trace!</span>(<span class="string">&quot;Trying to parse {:?}&quot;</span>, <span class="ident">output</span>);
 
     <span class="kw">let</span> <span class="ident">distribution</span> <span class="op">=</span> <span class="ident">Matcher::PrefixedWord</span> {
@@ -739,7 +739,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;\nDistributor ID:	Debian\n\
          Description:	Debian GNU/Linux 7.8 (wheezy)\n\
          Release:	7.8\n\
@@ -747,7 +747,7 @@
          &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">arch_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">arch_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;\nLSB Version:	1.4\n\
          Distributor ID:	Arch\n\
          Description:	Arch Linux\n\
@@ -755,7 +755,7 @@
          Codename:	n/a&quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">fedora_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">fedora_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;\nLSB Version:    :core-4.1-amd64:core-4.1-noarch:cxx-4.1-amd64:cxx-4.1-noarch\n\
          Distributor ID: Fedora\n\
          Description:    Fedora release 26 (Twenty Six)\n\
@@ -764,21 +764,21 @@
          &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">ubuntu_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">ubuntu_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;Distributor ID: Ubuntu\n\
          Description:    Ubuntu 16.04.5 LTS\n\
          Release:        16.04\n\
          Codename:       xenial&quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">mint_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">mint_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;Distributor ID:	Linuxmint\n\
          Description:	    Linux Mint 20\n\
          Release:	        20\n\
          Codename:	        ulyana&quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">nixos_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">nixos_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;Distributor ID: NixOS\n\
          Description:    NixOS 21.05 (Okapi)\n\
          Release:        21.05pre275822.916ee862e87\n\
@@ -786,7 +786,7 @@
     }
 
     <span class="comment">// Amazon Linux 1 uses a separate Distributor ID and Release format from Amazon Linux 2</span>
-    <span class="kw">fn</span> <span class="ident">amazon1_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">amazon1_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:	:base-4.0-amd64:base-4.0-noarch:core-4.0-amd64:core-4.0-noarch\n\
          Distributor ID:	AmazonAMI\n\
          Description:	Amazon Linux AMI release 2018.03\n\
@@ -796,7 +796,7 @@
     }
 
     <span class="comment">// Amazon Linux 2 uses a separate Distributor ID and Release format from Amazon Linux 1</span>
-    <span class="kw">fn</span> <span class="ident">amazon2_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">amazon2_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:	:core-4.1-amd64:core-4.1-noarch\n\
          Distributor ID:	Amazon\n\
          Description:	Amazon Linux release 2 (Karoo)\n\
@@ -805,7 +805,7 @@
          &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">rhel8_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">rhel8_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:	:core-4.1-amd64:core-4.1-noarch\n\
          Distributor ID:	RedHatEnterprise\n\
          Description:	Red Hat Enterprise Linux release 8.1 (Ootpa)\n\
@@ -814,7 +814,7 @@
          &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">rhel7_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">rhel7_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:	:core-4.1-amd64:core-4.1-noarch\n\
          Distributor ID:	RedHatEnterpriseServer\n\
          Description:	Red Hat Enterprise Linux Server release 7.7 (Maipo)\n\
@@ -823,7 +823,7 @@
          &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">rhel6_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">rhel6_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:	:base-4.0-amd64:base-4.0-noarch:core-4.0-amd64:core-4.0-noarch:graphics-4.0-amd64:graphics-4.0-noarch:printing-4.0-amd64:printing-4.0-noarch\n\
         Distributor ID:	RedHatEnterpriseServer\n\
         Description:	Red Hat Enterprise Linux Server release 6.10 (Santiago)\n\
@@ -832,7 +832,7 @@
         &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">suse_enterprise15_1_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">suse_enterprise15_1_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:	n/a\n\
         Distributor ID:	SUSE\n\
         Description:	SUSE Linux Enterprise Server 15 SP1\n\
@@ -841,7 +841,7 @@
         &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">suse_enterprise12_5_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">suse_enterprise12_5_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:	n/a\n\
         Distributor ID:	SUSE\n\
         Description:	SUSE Linux Enterprise Server 12 SP5\n\
@@ -850,7 +850,7 @@
         &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">raspberry_os_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">raspberry_os_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:   n/a\n\
          Distributor ID: Raspbian\n\
          Description:    Raspbian GNU/Linux 10 (buster)\n\
@@ -859,7 +859,7 @@
          &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">open_suse_15_1_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">open_suse_15_1_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:	n/a\n\
         Distributor ID:	openSUSE\n\
         Description:	openSUSE Leap 15.1\n\
@@ -868,7 +868,7 @@
         &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">oracle_server_linux_7_5_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">oracle_server_linux_7_5_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:	:core-4.1-amd64:core-4.1-noarch\n\
         Distributor ID:	OracleServer\n\
         Description:	Oracle Linux Server release 7.5\n\
@@ -877,7 +877,7 @@
         &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">oracle_server_linux_8_1_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">oracle_server_linux_8_1_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:	:core-4.1-amd64:core-4.1-noarch\n\
         Distributor ID:	OracleServer\n\
         Description:	Oracle Linux Server release 8.1\n\
@@ -886,7 +886,7 @@
         &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">pop_os_20_04_lts_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">pop_os_20_04_lts_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;No LSB modules are available.\n\
         Distributor ID: Pop\n\
         Description: Pop!_OS 20.04 LTS\n\
@@ -895,7 +895,7 @@
         &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">solus_4_1_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">solus_4_1_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:	1.4\n\
         Distributor ID:	Solus\n\
         Description:	Solus\n\
@@ -904,7 +904,7 @@
         &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">manjaro_19_0_2_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">manjaro_19_0_2_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:    n/a\n\
         Distributor ID: ManjaroLinux\n\
         Description:    Manjaro Linux\n\
@@ -913,7 +913,7 @@
         &quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">endeavouros_file</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">endeavouros_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;LSB Version:	1.4\n\
         Distributor ID:	EndeavourOS\n\
         Description:	EndeavourOS Linux\n\

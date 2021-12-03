@@ -157,10 +157,10 @@
     <span class="doccomment">/// assert!(!strict.is_none());</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_strict</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_strict</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">SameSite::Strict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">SameSite::Lax</span> <span class="op">|</span> <span class="ident">SameSite::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">SameSite::Strict</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">SameSite::Lax</span> <span class="op">|</span> <span class="ident">SameSite::None</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
@@ -177,10 +177,10 @@
     <span class="doccomment">/// assert!(!lax.is_none());</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_lax</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_lax</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">SameSite::Lax</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">SameSite::Strict</span> <span class="op">|</span> <span class="ident">SameSite::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">SameSite::Lax</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">SameSite::Strict</span> <span class="op">|</span> <span class="ident">SameSite::None</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
@@ -197,20 +197,20 @@
     <span class="doccomment">/// assert!(!none.is_strict());</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_none</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_none</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">SameSite::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">SameSite::Lax</span> <span class="op">|</span> <span class="ident">SameSite::Strict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>
+            <span class="ident">SameSite::None</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">SameSite::Lax</span> <span class="op">|</span> <span class="ident">SameSite::Strict</span> =&gt; <span class="bool-val">false</span>
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SameSite</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">SameSite::Strict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Strict&quot;</span>),
-            <span class="ident">SameSite::Lax</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Lax&quot;</span>),
-            <span class="ident">SameSite::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;None&quot;</span>),
+            <span class="ident">SameSite::Strict</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Strict&quot;</span>),
+            <span class="ident">SameSite::Lax</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Lax&quot;</span>),
+            <span class="ident">SameSite::None</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;None&quot;</span>),
         }
     }
 }

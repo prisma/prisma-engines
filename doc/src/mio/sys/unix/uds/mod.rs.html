@@ -156,7 +156,7 @@
 <span class="doccomment">/// `size_of::&lt;sa_family_t&gt;()`, but some other implementations include</span>
 <span class="doccomment">/// other fields before `sun_path`, so the expression more portably</span>
 <span class="doccomment">/// describes the size of the address structure.</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::sys</span>) <span class="kw">fn</span> <span class="ident">path_offset</span>(<span class="ident">sockaddr</span>: <span class="kw-2">&amp;</span><span class="ident">libc::sockaddr_un</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::sys</span>) <span class="kw">fn</span> <span class="ident">path_offset</span>(<span class="ident">sockaddr</span>: <span class="kw-2">&amp;</span><span class="ident">libc::sockaddr_un</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">sockaddr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>;
     <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sockaddr</span>.<span class="ident">sun_path</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>;
     <span class="ident">path</span> <span class="op">-</span> <span class="ident">base</span>
@@ -173,7 +173,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">listener</span>;
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">stream</span>;
 
-    <span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::sys</span>) <span class="kw">fn</span> <span class="ident">socket_addr</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">libc::sockaddr_un</span>, <span class="ident">libc::socklen_t</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::sys</span>) <span class="kw">fn</span> <span class="ident">socket_addr</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">libc::sockaddr_un</span>, <span class="ident">libc::socklen_t</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sockaddr</span> <span class="op">=</span> <span class="ident">mem::MaybeUninit</span>::<span class="op">&lt;</span><span class="ident">libc::sockaddr_un</span><span class="op">&gt;</span><span class="ident">::zeroed</span>();
 
         <span class="comment">// This is safe to assume because a `libc::sockaddr_un` filled with `0`</span>
@@ -191,19 +191,19 @@
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_os_str</span>().<span class="ident">as_bytes</span>();
         <span class="kw">match</span> (<span class="ident">bytes</span>.<span class="ident">get</span>(<span class="number">0</span>), <span class="ident">bytes</span>.<span class="ident">len</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">sockaddr</span>.<span class="ident">sun_path</span>.<span class="ident">len</span>())) {
             <span class="comment">// Abstract paths don&#39;t need a null terminator</span>
-            (<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>), <span class="ident">Ordering::Greater</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>), <span class="ident">Ordering::Greater</span>) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                     <span class="ident">io::ErrorKind::InvalidInput</span>,
                     <span class="string">&quot;path must be no longer than libc::sockaddr_un.sun_path&quot;</span>,
                 ));
             }
-            (<span class="kw">_</span>, <span class="ident">Ordering::Greater</span>) <span class="op">|</span> (<span class="kw">_</span>, <span class="ident">Ordering::Equal</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="kw">_</span>, <span class="ident">Ordering::Greater</span>) <span class="op">|</span> (<span class="kw">_</span>, <span class="ident">Ordering::Equal</span>) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                     <span class="ident">io::ErrorKind::InvalidInput</span>,
                     <span class="string">&quot;path must be shorter than libc::sockaddr_un.sun_path&quot;</span>,
                 ));
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">_</span> =&gt; {}
         }
 
         <span class="kw">for</span> (<span class="ident">dst</span>, <span class="ident">src</span>) <span class="kw">in</span> <span class="ident">sockaddr</span>.<span class="ident">sun_path</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">bytes</span>.<span class="ident">iter</span>()) {
@@ -216,14 +216,14 @@
         <span class="kw">match</span> <span class="ident">bytes</span>.<span class="ident">get</span>(<span class="number">0</span>) {
             <span class="comment">// The struct has already been zeroes so the null byte for pathname</span>
             <span class="comment">// addresses is already there.</span>
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) <span class="op">|</span> <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">socklen</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; {}
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="ident">socklen</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
         }
 
         <span class="prelude-val">Ok</span>((<span class="ident">sockaddr</span>, <span class="ident">socklen</span> <span class="kw">as</span> <span class="ident">libc::socklen_t</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">pair</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">flags</span>: <span class="ident">libc::c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">T</span>)<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">pair</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">flags</span>: <span class="ident">libc::c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">T</span>)<span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">FromRawFd</span>,
     {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;ios&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>)))]</span>
@@ -252,11 +252,11 @@
     <span class="comment">// The following functions can&#39;t simply be replaced with a call to</span>
     <span class="comment">// `net::UnixDatagram` because of our `SocketAddr` type.</span>
 
-    <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="ident">socket</span>: <span class="ident">RawFd</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="ident">socket</span>: <span class="ident">RawFd</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
         <span class="ident">SocketAddr::new</span>(<span class="op">|</span><span class="ident">sockaddr</span>, <span class="ident">socklen</span><span class="op">|</span> <span class="macro">syscall!</span>(<span class="ident">getsockname</span>(<span class="ident">socket</span>, <span class="ident">sockaddr</span>, <span class="ident">socklen</span>)))
     }
 
-    <span class="kw">fn</span> <span class="ident">peer_addr</span>(<span class="ident">socket</span>: <span class="ident">RawFd</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">peer_addr</span>(<span class="ident">socket</span>: <span class="ident">RawFd</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
         <span class="ident">SocketAddr::new</span>(<span class="op">|</span><span class="ident">sockaddr</span>, <span class="ident">socklen</span><span class="op">|</span> <span class="macro">syscall!</span>(<span class="ident">getpeername</span>(<span class="ident">socket</span>, <span class="ident">sockaddr</span>, <span class="ident">socklen</span>)))
     }
 

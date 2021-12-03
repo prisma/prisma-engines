@@ -325,17 +325,17 @@
 
     <span class="doccomment">/// Makes a new [`DateTime`] from the number of non-leap milliseconds since</span>
     <span class="doccomment">/// January 1, 1970 0:00:00 UTC (aka &quot;UNIX timestamp&quot;).</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_millis</span>(<span class="ident">date</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_millis</span>(<span class="ident">date</span>: <span class="ident">i64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">date</span>)
     }
 
     <span class="doccomment">/// Returns a [`DateTime`] which corresponds to the current date and time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DateTime</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="ident">DateTime</span> {
         <span class="ident"><span class="self">Self</span>::from_system_time</span>(<span class="ident">SystemTime::now</span>())
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_chrono</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">chrono::TimeZone</span><span class="op">&gt;</span>(<span class="ident">dt</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_chrono</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">chrono::TimeZone</span><span class="op">&gt;</span>(<span class="ident">dt</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_millis</span>(<span class="ident">dt</span>.<span class="ident">timestamp_millis</span>())
     }
 
@@ -343,14 +343,14 @@
     <span class="doccomment">/// precision.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_chrono</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">chrono::TimeZone</span><span class="op">&gt;</span>(<span class="ident">dt</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_chrono</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">chrono::TimeZone</span><span class="op">&gt;</span>(<span class="ident">dt</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_millis</span>(<span class="ident">dt</span>.<span class="ident">timestamp_millis</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">to_chrono_private</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_chrono_private</span>(<span class="self">self</span>) -&gt; <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">Utc</span>.<span class="ident">timestamp_millis_opt</span>(<span class="self">self</span>.<span class="number">0</span>) {
-            <span class="ident">LocalResult::Single</span>(<span class="ident">dt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dt</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LocalResult::Single</span>(<span class="ident">dt</span>) =&gt; <span class="ident">dt</span>,
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="number">0</span> {
                     <span class="ident">chrono::MIN_DATETIME</span>
                 } <span class="kw">else</span> {
@@ -362,7 +362,7 @@
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_chrono</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_chrono</span>(<span class="self">self</span>) -&gt; <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">to_chrono_private</span>()
     }
 
@@ -382,7 +382,7 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_chrono</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_chrono</span>(<span class="self">self</span>) -&gt; <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">to_chrono_private</span>()
     }
 
@@ -391,9 +391,9 @@
     <span class="doccomment">/// If the provided time is too far in the future or too far in the past to be represented</span>
     <span class="doccomment">/// by a BSON datetime, either [`DateTime::MAX`] or [`DateTime::MIN`] will be</span>
     <span class="doccomment">/// returned, whichever is closer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_system_time</span>(<span class="ident">st</span>: <span class="ident">SystemTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_system_time</span>(<span class="ident">st</span>: <span class="ident">SystemTime</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">st</span>.<span class="ident">duration_since</span>(<span class="ident">SystemTime::UNIX_EPOCH</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">d</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">as_millis</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">i64::MAX</span> <span class="kw">as</span> <span class="ident">u128</span> {
                     <span class="ident"><span class="self">Self</span>::from_millis</span>(<span class="ident">d</span>.<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">i64</span>)
                 } <span class="kw">else</span> {
@@ -401,7 +401,7 @@
                 }
             }
             <span class="comment">// handle SystemTime from before the Unix Epoch</span>
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">millis</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">duration</span>().<span class="ident">as_millis</span>();
                 <span class="kw">if</span> <span class="ident">millis</span> <span class="op">&gt;</span> <span class="ident">i64::MAX</span> <span class="kw">as</span> <span class="ident">u128</span> {
                     <span class="ident"><span class="self">Self</span>::MIN</span>
@@ -413,7 +413,7 @@
     }
 
     <span class="doccomment">/// Convert this [`DateTime`] to a [`std::time::SystemTime`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_system_time</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SystemTime</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_system_time</span>(<span class="self">self</span>) -&gt; <span class="ident">SystemTime</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
             <span class="ident">SystemTime::UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">Duration::from_millis</span>(<span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u64</span>)
         } <span class="kw">else</span> {
@@ -424,19 +424,19 @@
     }
 
     <span class="doccomment">/// Returns the number of non-leap-milliseconds since January 1, 1970 UTC.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">timestamp_millis</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">timestamp_millis</span>(<span class="self">self</span>) -&gt; <span class="ident">i64</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 
     <span class="doccomment">/// Convert this [`DateTime`] to an RFC 3339 formatted string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_rfc3339_string</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_rfc3339_string</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">to_chrono</span>()
             .<span class="ident">to_rfc3339_opts</span>(<span class="ident">chrono::SecondsFormat::AutoSi</span>, <span class="bool-val">true</span>)
     }
 
     <span class="doccomment">/// Convert the given RFC 3339 formatted string to a [`DateTime`], truncating it to millisecond</span>
     <span class="doccomment">/// precision.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_rfc3339_str</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_rfc3339_str</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">chrono::DateTime</span>::<span class="op">&lt;</span><span class="ident">chrono::FixedOffset</span><span class="op">&gt;</span><span class="ident">::parse_from_rfc3339</span>(<span class="ident">s</span>.<span class="ident">as_ref</span>())
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::InvalidTimestamp</span> {
                 <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
@@ -446,33 +446,33 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tup</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;DateTime&quot;</span>);
         <span class="kw">match</span> <span class="ident">Utc</span>.<span class="ident">timestamp_millis_opt</span>(<span class="self">self</span>.<span class="number">0</span>) {
-            <span class="ident">LocalResult::Single</span>(<span class="kw-2">ref</span> <span class="ident">dt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tup</span>.<span class="ident">field</span>(<span class="ident">dt</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tup</span>.<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>),
+            <span class="ident">LocalResult::Single</span>(<span class="kw-2">ref</span> <span class="ident">dt</span>) =&gt; <span class="ident">tup</span>.<span class="ident">field</span>(<span class="ident">dt</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">tup</span>.<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>),
         };
         <span class="ident">tup</span>.<span class="ident">finish</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="ident">Utc</span>.<span class="ident">timestamp_millis_opt</span>(<span class="self">self</span>.<span class="number">0</span>) {
-            <span class="ident">LocalResult::Single</span>(<span class="kw-2">ref</span> <span class="ident">dt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Display::fmt</span>(<span class="ident">dt</span>, <span class="ident">f</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>),
+            <span class="ident">LocalResult::Single</span>(<span class="kw-2">ref</span> <span class="ident">dt</span>) =&gt; <span class="ident">Display::fmt</span>(<span class="ident">dt</span>, <span class="ident">f</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">st</span>: <span class="ident">SystemTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">st</span>: <span class="ident">SystemTime</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_system_time</span>(<span class="ident">st</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SystemTime</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">dt</span>: <span class="ident"><span class="kw">crate</span>::DateTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">dt</span>: <span class="ident"><span class="kw">crate</span>::DateTime</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">dt</span>.<span class="ident">to_system_time</span>()
     }
 }
@@ -480,7 +480,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bson_dt</span>: <span class="ident">DateTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bson_dt</span>: <span class="ident">DateTime</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">bson_dt</span>.<span class="ident">to_chrono</span>()
     }
 }
@@ -488,7 +488,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">chrono::TimeZone</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_chrono</span>(<span class="ident">x</span>)
     }
 }
@@ -506,9 +506,9 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::InvalidTimestamp</span> { <span class="ident">message</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::InvalidTimestamp</span> { <span class="ident">message</span> } =&gt; {
                 <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">message</span>)
             }
         }

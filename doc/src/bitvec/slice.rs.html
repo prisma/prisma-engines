@@ -2579,7 +2579,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// [`BitView`]: ../view/trait.BitView.html</span>
 	<span class="doccomment">/// [`.view_bits::&lt;O&gt;()`]: ../view/trait.BitView.html#method.view_bits</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_element</span>(<span class="ident">elem</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_element</span>(<span class="ident">elem</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span> {
 		<span class="kw">unsafe</span> {
 			<span class="ident">BitPtr::new_unchecked</span>(<span class="ident">elem</span>, <span class="ident">BitIdx::ZERO</span>, <span class="ident">T::Mem::BITS</span> <span class="kw">as</span> <span class="ident">usize</span>)
 		}
@@ -2619,7 +2619,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// [`.view_bits_mut::&lt;O&gt;()`]:</span>
 	<span class="doccomment">/// ../view/trait.BitView.html#method.view_bits_mut</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_element_mut</span>(<span class="ident">elem</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_element_mut</span>(<span class="ident">elem</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
 		<span class="kw">unsafe</span> {
 			<span class="ident">BitPtr::new_unchecked</span>(<span class="ident">elem</span>, <span class="ident">BitIdx::ZERO</span>, <span class="ident">T::Mem::BITS</span> <span class="kw">as</span> <span class="ident">usize</span>)
 		}
@@ -2663,7 +2663,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// [`MAX_ELTS`]: #associatedconstant.MAX_ELTS</span>
 	<span class="doccomment">/// [`.view_bits::&lt;O&gt;()`]: ../view/trait.BitView.html#method.view_bits</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="self">Self</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="self">Self</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">elts</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">len</span>();
 		<span class="comment">//  Starting at the zeroth bit makes this counter an exclusive cap, not</span>
 		<span class="comment">//  an inclusive cap.</span>
@@ -2687,7 +2687,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// [`MAX_BITS`]: #associatedconstant.MAX_BITS</span>
 	<span class="doccomment">/// [`from_slice`]: #method.from_slice</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_slice_unchecked</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_slice_unchecked</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span> {
 		<span class="comment">//  This branch could be removed by lowering the element ceiling by one,</span>
 		<span class="comment">//  but `from_slice` should not be in any tight loops, so it’s fine.</span>
 		<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">slice</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">T::Mem::BITS</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident"><span class="self">Self</span>::MAX_BITS</span>);
@@ -2755,7 +2755,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// [`.view_bits_mut::&lt;O&gt;()`]:</span>
 	<span class="doccomment">/// ../view/trait.BitView.html#method.view_bits_mut</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice_mut</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">T</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice_mut</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">T</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">elts</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">len</span>();
 		<span class="kw">if</span> <span class="ident">elts</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::MAX_ELTS</span> {
 			<span class="kw">return</span> <span class="prelude-val">None</span>;
@@ -2777,7 +2777,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// [`MAX_BITS`]: #associatedconstant.MAX_BITS</span>
 	<span class="doccomment">/// [`from_slice_mut`]: #method.from_slice_mut</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_slice_unchecked_mut</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">T</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_slice_unchecked_mut</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">T</span>]) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
 		<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">slice</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">T::Mem::BITS</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident"><span class="self">Self</span>::MAX_BITS</span>);
 		<span class="ident">BitPtr::new_unchecked</span>(<span class="ident">slice</span>.<span class="ident">as_ptr</span>(), <span class="ident">BitIdx::ZERO</span>, <span class="ident">bits</span>)
 			.<span class="ident">to_bitslice_mut</span>()
@@ -2802,7 +2802,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// assert!(bits.is_empty());</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span> {
 		<span class="ident">BitPtr::EMPTY</span>.<span class="ident">to_bitslice_ref</span>()
 	}
 
@@ -2818,7 +2818,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// assert!(bits.is_empty());</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span> {
 		<span class="ident">BitPtr::EMPTY</span>.<span class="ident">to_bitslice_mut</span>()
 	}
 
@@ -2950,9 +2950,9 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// assert!(!bits[2 ..].all());</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain</span>() {
-			<span class="ident">Domain::Enclave</span> { <span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">Domain::Enclave</span> { <span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span> } =&gt; {
 				<span class="comment">/* Due to a bug in `rustc`, calling `.value()` on the two
 				`BitMask` types, to use `T::Mem | T::Mem == T::Mem`, causes type
 				resolution failure and only discovers the
@@ -2964,14 +2964,14 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 				are at the same position in the bounds chain, making this quite
 				a strange bug.
 				*/</span>
-				<span class="op">!</span><span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="ident">tail</span>) <span class="op">|</span> <span class="ident">elem</span>.<span class="ident">load_value</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">BitMask::ALL</span>
+				<span class="op">!</span><span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="ident">tail</span>) <span class="op">|</span> <span class="ident">elem</span>.<span class="ident">load_value</span>() <span class="op">==</span> <span class="ident">BitMask::ALL</span>
 			},
-			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
 				<span class="ident">head</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span>(<span class="ident">head</span>, <span class="ident">elem</span>)<span class="op">|</span> {
-					<span class="op">!</span><span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="prelude-val">None</span>) <span class="op">|</span> <span class="ident">elem</span>.<span class="ident">load_value</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">BitMask::ALL</span>
-				}) <span class="op">&amp;&amp;</span> <span class="ident">body</span>.<span class="ident">iter</span>().<span class="ident">copied</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="ident">T::Mem::ALL</span>)
+					<span class="op">!</span><span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="prelude-val">None</span>) <span class="op">|</span> <span class="ident">elem</span>.<span class="ident">load_value</span>() <span class="op">==</span> <span class="ident">BitMask::ALL</span>
+				}) <span class="op">&amp;&amp;</span> <span class="ident">body</span>.<span class="ident">iter</span>().<span class="ident">copied</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span> <span class="op">==</span> <span class="ident">T::Mem::ALL</span>)
 					<span class="op">&amp;&amp;</span> <span class="ident">tail</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span>(<span class="ident">elem</span>, <span class="ident">tail</span>)<span class="op">|</span> {
-						<span class="op">!</span><span class="ident">O::mask</span>(<span class="prelude-val">None</span>, <span class="ident">tail</span>) <span class="op">|</span> <span class="ident">elem</span>.<span class="ident">load_value</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">BitMask::ALL</span>
+						<span class="op">!</span><span class="ident">O::mask</span>(<span class="prelude-val">None</span>, <span class="ident">tail</span>) <span class="op">|</span> <span class="ident">elem</span>.<span class="ident">load_value</span>() <span class="op">==</span> <span class="ident">BitMask::ALL</span>
 					})
 			},
 		}
@@ -3007,12 +3007,12 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// assert!(!bits[2 ..].any());</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain</span>() {
-			<span class="ident">Domain::Enclave</span> { <span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">Domain::Enclave</span> { <span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span> } =&gt; {
 				<span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="ident">tail</span>) <span class="op">&amp;</span> <span class="ident">elem</span>.<span class="ident">load_value</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">BitMask::ZERO</span>
 			},
-			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
 				<span class="ident">head</span>.<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span>(<span class="ident">head</span>, <span class="ident">elem</span>)<span class="op">|</span> {
 					<span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="prelude-val">None</span>) <span class="op">&amp;</span> <span class="ident">elem</span>.<span class="ident">load_value</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">BitMask::ZERO</span>
 				}) <span class="op">|</span><span class="op">|</span> <span class="ident">body</span>.<span class="ident">iter</span>().<span class="ident">copied</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span> <span class="op">!</span><span class="op">=</span> <span class="ident">T::Mem::ZERO</span>)
@@ -3052,7 +3052,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// assert!(bits[2 ..].not_all());</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">not_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">not_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
 		<span class="op">!</span><span class="self">self</span>.<span class="ident">all</span>()
 	}
 
@@ -3085,7 +3085,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// assert!(bits[2 ..].not_any());</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">not_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">not_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
 		<span class="op">!</span><span class="self">self</span>.<span class="ident">any</span>()
 	}
 
@@ -3128,7 +3128,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// [`.all`]: #method.all</span>
 	<span class="doccomment">/// [`.not_any`]: #method.not_any</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
 		<span class="self">self</span>.<span class="ident">any</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">not_all</span>()
 	}
 
@@ -3154,13 +3154,13 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// assert_eq!(bits[2 ..].count_ones(), 0);</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count_ones</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count_ones</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain</span>() {
-			<span class="ident">Domain::Enclave</span> { <span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span> } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="ident">tail</span>)
+			<span class="ident">Domain::Enclave</span> { <span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span> } =&gt; (<span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="ident">tail</span>)
 				<span class="op">&amp;</span> <span class="ident">elem</span>.<span class="ident">load_value</span>())
 			.<span class="ident">value</span>()
 			.<span class="ident">count_ones</span>() <span class="kw">as</span> <span class="ident">usize</span>,
-			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
 				<span class="ident">head</span>.<span class="ident">map_or</span>(<span class="number">0</span>, <span class="op">|</span>(<span class="ident">head</span>, <span class="ident">elem</span>)<span class="op">|</span> {
 					(<span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="prelude-val">None</span>) <span class="op">&amp;</span> <span class="ident">elem</span>.<span class="ident">load_value</span>())
 						.<span class="ident">value</span>()
@@ -3200,13 +3200,13 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// assert_eq!(bits[2 ..].count_zeros(), 2);</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count_zeros</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count_zeros</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain</span>() {
-			<span class="ident">Domain::Enclave</span> { <span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span> } <span class="op">=</span><span class="op">&gt;</span> (<span class="op">!</span><span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="ident">tail</span>)
+			<span class="ident">Domain::Enclave</span> { <span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span> } =&gt; (<span class="op">!</span><span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="ident">tail</span>)
 				<span class="op">|</span> <span class="ident">elem</span>.<span class="ident">load_value</span>())
 			.<span class="ident">value</span>()
 			.<span class="ident">count_zeros</span>() <span class="kw">as</span> <span class="ident">usize</span>,
-			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
 				<span class="ident">head</span>.<span class="ident">map_or</span>(<span class="number">0</span>, <span class="op">|</span>(<span class="ident">head</span>, <span class="ident">elem</span>)<span class="op">|</span> {
 					(<span class="op">!</span><span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="prelude-val">None</span>) <span class="op">|</span> <span class="ident">elem</span>.<span class="ident">load_value</span>())
 						.<span class="ident">value</span>()
@@ -3250,7 +3250,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 		<span class="comment">//  Grab the function pointers used to commit bit-masks into memory.</span>
 		<span class="kw">let</span> <span class="ident">setter</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T::Alias</span> <span class="kw">as</span> <span class="ident">BitStore</span><span class="op">&gt;</span><span class="ident">::Access</span><span class="op">&gt;</span><span class="ident">::get_writers</span>(<span class="ident">value</span>);
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain_mut</span>() {
-			<span class="ident">DomainMut::Enclave</span> { <span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">DomainMut::Enclave</span> { <span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span> } =&gt; {
 				<span class="comment">//  Step three: write the bitmask through the accessor.</span>
 				<span class="ident">setter</span>(
 					<span class="comment">//  Step one: attach an `::Access` marker to the reference</span>
@@ -3260,7 +3260,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 					<span class="ident">O::mask</span>(<span class="ident">head</span>, <span class="ident">tail</span>).<span class="ident">pipe</span>(<span class="ident">dvl::alias_mask</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>),
 				);
 			},
-			<span class="ident">DomainMut::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">DomainMut::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">elem</span>)) <span class="op">=</span> <span class="ident">head</span> {
 					<span class="ident">setter</span>(
 						<span class="ident">dvl::accessor</span>(<span class="ident">elem</span>),
@@ -3316,7 +3316,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">for_each</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">func</span>: <span class="ident">F</span>)
-	<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">usize</span>, <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+	<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">usize</span>, <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
 		<span class="kw">for</span> <span class="ident">idx</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="self">self</span>.<span class="ident">len</span>() {
 			<span class="kw">unsafe</span> {
 				<span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">idx</span>);
@@ -3358,7 +3358,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">T</span>] {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">T</span>] {
 		<span class="kw">let</span> <span class="ident">bitptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bitptr</span>();
 		<span class="kw">let</span> (<span class="ident">base</span>, <span class="ident">elts</span>) <span class="op">=</span> (<span class="ident">bitptr</span>.<span class="ident">pointer</span>().<span class="ident">to_const</span>(), <span class="ident">bitptr</span>.<span class="ident">elements</span>());
 		<span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts</span>(<span class="ident">base</span>, <span class="ident">elts</span>) }
@@ -3406,7 +3406,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// [`.domain`]: #method.domain</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">T::Mem</span>] {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">T::Mem</span>] {
 		<span class="self">self</span>.<span class="ident">domain</span>().<span class="ident">region</span>().<span class="ident">map_or</span>(<span class="kw-2">&amp;</span>[], <span class="op">|</span>(<span class="kw">_</span>, <span class="ident">b</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">b</span>)
 	}
 
@@ -3448,7 +3448,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// [`.domain_mut`]: #method.domain_mut</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw_slice_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">T::Mem</span>] {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw_slice_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">T::Mem</span>] {
 		<span class="self">self</span>.<span class="ident">domain_mut</span>().<span class="ident">region</span>().<span class="ident">map_or</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [], <span class="op">|</span>(<span class="kw">_</span>, <span class="ident">b</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">b</span>)
 	}
 
@@ -3535,7 +3535,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// [`.set_aliased`]: #method.set_aliased</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_domain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitDomain</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_domain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitDomain</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="ident">BitDomain::new</span>(<span class="self">self</span>)
 	}
 
@@ -3562,7 +3562,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// immutable.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_domain_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitDomainMut</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_domain_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">BitDomainMut</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="ident">BitDomainMut::new</span>(<span class="self">self</span>)
 	}
 
@@ -3605,7 +3605,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// [`.domain_mut`]: #method.domain_mut</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Domain</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Domain</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="ident">Domain::new</span>(<span class="self">self</span>)
 	}
 
@@ -3635,7 +3635,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// [`.domain`]: #method.domain</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DomainMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">DomainMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="ident">DomainMut::new</span>(<span class="self">self</span>)
 	}
 
@@ -3678,7 +3678,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// [`split_at`]: #method.split_at</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">split_at_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mid</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>) {
+	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">split_at_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mid</span>: <span class="ident">usize</span>) -&gt; (<span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="self">Self</span>) {
 		(<span class="self">self</span>.<span class="ident">get_unchecked</span>(.. <span class="ident">mid</span>), <span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">mid</span> ..))
 	}
 
@@ -3727,7 +3727,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">split_at_unchecked_mut</span>(
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
 		<span class="ident">mid</span>: <span class="ident">usize</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span>) {
+	) -&gt; (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span>) {
 		<span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">alias_mut</span>().<span class="ident">bitptr</span>();
 		(
 			<span class="ident">bp</span>.<span class="ident">to_bitslice_mut</span>().<span class="ident">get_unchecked_mut</span>(.. <span class="ident">mid</span>),
@@ -3752,7 +3752,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">split_at_unchecked_mut_noalias</span>(
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
 		<span class="ident">mid</span>: <span class="ident">usize</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) {
+	) -&gt; (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) {
 		<span class="comment">//  Split the slice at the requested midpoint, adding an alias layer</span>
 		<span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">tail</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split_at_unchecked_mut</span>(<span class="ident">mid</span>);
 		<span class="comment">//  Remove the new alias layer.</span>
@@ -3947,7 +3947,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// `self`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// [`::electrical_distance]`: #method.electrical_comparison</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">offset_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">isize</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">offset_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">isize</span> {
 		<span class="kw">let</span> (<span class="ident">elts</span>, <span class="ident">bits</span>) <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">bitptr</span>().<span class="ident">ptr_diff</span>(<span class="ident">other</span>.<span class="ident">bitptr</span>()) };
 		<span class="ident">elts</span>.<span class="ident">saturating_mul</span>(<span class="ident">T::Mem::BITS</span> <span class="kw">as</span> <span class="ident">isize</span>)
 			.<span class="ident">saturating_add</span>(<span class="ident">bits</span> <span class="kw">as</span> <span class="ident">isize</span>)
@@ -3971,7 +3971,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// # Returns</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// The electrical bit distance between the heads of `self` and `other`.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">electrical_distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">isize</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">electrical_distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">isize</span> {
 		<span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bitptr</span>();
 		<span class="kw">let</span> <span class="ident">that</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">bitptr</span>();
 		<span class="kw">let</span> (<span class="ident">elts</span>, <span class="ident">bits</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
@@ -3994,14 +3994,14 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="doccomment">/// Marks an immutable slice as referring to aliased memory region.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">alias</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">alias</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span> {
 		<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span>) }
 	}
 
 	<span class="doccomment">/// Marks a mutable slice as describing an aliased memory region.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">alias_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">alias_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span> {
 		<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="self">Self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span>) }
 	}
 
@@ -4016,14 +4016,14 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unalias_mut</span>(
 		<span class="ident">this</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+	) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">this</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="self">Self</span>)
 	}
 
 	<span class="doccomment">/// Type-cast the slice reference to its pointer structure.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">bitptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">bitptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="ident">BitPtr::from_bitslice_ptr</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>())
 	}
 
@@ -4034,7 +4034,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_aliased_slice_unchecked</span>(
 		<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">T::Alias</span>],
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span> {
+	) -&gt; <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Alias</span><span class="op">&gt;</span> {
 		<span class="ident">BitPtr::new_unchecked</span>(
 			<span class="ident">slice</span>.<span class="ident">as_ptr</span>(),
 			<span class="ident">BitIdx::ZERO</span>,
@@ -4067,7 +4067,7 @@ assert_eq!(vec.as_bitslice(), slice[.. 20]);
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_at_aliased_mut</span>(
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
 		<span class="ident">mid</span>: <span class="ident">usize</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) {
+	) -&gt; (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) {
 		<span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">tail</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split_at_mut</span>(<span class="ident">mid</span>);
 		<span class="kw">unsafe</span> { (<span class="ident"><span class="self">Self</span>::unalias_mut</span>(<span class="ident">head</span>), <span class="ident"><span class="self">Self</span>::unalias_mut</span>(<span class="ident">tail</span>)) }
 	}
@@ -4156,7 +4156,7 @@ shared mutation.
 	<span class="ident">addr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>,
 	<span class="ident">head</span>: <span class="ident">u8</span>,
 	<span class="ident">bits</span>: <span class="ident">usize</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span> <span class="op">+</span> <span class="ident">BitMemory</span>,
@@ -4215,7 +4215,7 @@ value.
 	<span class="ident">addr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>,
 	<span class="ident">head</span>: <span class="ident">u8</span>,
 	<span class="ident">bits</span>: <span class="ident">usize</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span> <span class="op">+</span> <span class="ident">BitMemory</span>,

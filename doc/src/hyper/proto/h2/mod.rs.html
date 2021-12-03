@@ -571,7 +571,7 @@
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">HttpBody</span>,
 {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">S</span>, <span class="ident">tx</span>: <span class="ident">SendStream</span><span class="op">&lt;</span><span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">S::Data</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PipeToSendStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">S</span>, <span class="ident">tx</span>: <span class="ident">SendStream</span><span class="op">&lt;</span><span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">S::Data</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">PipeToSendStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
         <span class="ident">PipeToSendStream</span> {
             <span class="ident">body_tx</span>: <span class="ident">tx</span>,
             <span class="ident">data_done</span>: <span class="bool-val">false</span>,
@@ -587,7 +587,7 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
         <span class="kw">loop</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="kw-2">*</span><span class="ident">me</span>.<span class="ident">data_done</span> {
@@ -596,15 +596,15 @@
                 <span class="comment">// for the actual body chunk.</span>
                 <span class="ident">me</span>.<span class="ident">body_tx</span>.<span class="ident">reserve_capacity</span>(<span class="number">1</span>);
 
-                <span class="kw">if</span> <span class="ident">me</span>.<span class="ident">body_tx</span>.<span class="ident">capacity</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">me</span>.<span class="ident">body_tx</span>.<span class="ident">capacity</span>() <span class="op">==</span> <span class="number">0</span> {
                     <span class="kw">loop</span> {
                         <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">me</span>.<span class="ident">body_tx</span>.<span class="ident">poll_capacity</span>(<span class="ident">cx</span>)) {
-                            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>)) <span class="op">=</span><span class="op">&gt;</span> {}
-                            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>)) =&gt; {}
+                            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="kw">_</span>)) =&gt; <span class="kw">break</span>,
+                            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; {
                                 <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_body_write</span>(<span class="ident">e</span>)))
                             }
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">None</span> =&gt; {
                                 <span class="comment">// None means the stream is no longer in a</span>
                                 <span class="comment">// streaming state, we either finished it</span>
                                 <span class="comment">// somehow, or the remote reset us.</span>
@@ -626,7 +626,7 @@
                 }
 
                 <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">me</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_data</span>(<span class="ident">cx</span>)) {
-                    <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">chunk</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">chunk</span>)) =&gt; {
                         <span class="kw">let</span> <span class="ident">is_eos</span> <span class="op">=</span> <span class="ident">me</span>.<span class="ident">stream</span>.<span class="ident">is_end_stream</span>();
                         <span class="macro">trace!</span>(
                             <span class="string">&quot;send body chunk: {} bytes, eos={}&quot;</span>,
@@ -643,8 +643,8 @@
                             <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
                         }
                     }
-                    <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">me</span>.<span class="ident">body_tx</span>.<span class="ident">on_user_err</span>(<span class="ident">e</span>))),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">me</span>.<span class="ident">body_tx</span>.<span class="ident">on_user_err</span>(<span class="ident">e</span>))),
+                    <span class="prelude-val">None</span> =&gt; {
                         <span class="ident">me</span>.<span class="ident">body_tx</span>.<span class="ident">reserve_capacity</span>(<span class="number">0</span>);
                         <span class="kw">let</span> <span class="ident">is_eos</span> <span class="op">=</span> <span class="ident">me</span>.<span class="ident">stream</span>.<span class="ident">is_end_stream</span>();
                         <span class="kw">if</span> <span class="ident">is_eos</span> {
@@ -668,17 +668,17 @@
                 }
 
                 <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">me</span>.<span class="ident">stream</span>.<span class="ident">poll_trailers</span>(<span class="ident">cx</span>)) {
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">trailers</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">trailers</span>)) =&gt; {
                         <span class="ident">me</span>.<span class="ident">body_tx</span>
                             .<span class="ident">send_trailers</span>(<span class="ident">trailers</span>)
                             .<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_body_write</span>)<span class="question-mark">?</span>;
                         <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
                     }
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
                         <span class="comment">// There were no trailers, so send an empty DATA frame...</span>
                         <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="ident">me</span>.<span class="ident">body_tx</span>.<span class="ident">send_eos_frame</span>());
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">me</span>.<span class="ident">body_tx</span>.<span class="ident">on_user_err</span>(<span class="ident">e</span>))),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">me</span>.<span class="ident">body_tx</span>.<span class="ident">on_user_err</span>(<span class="ident">e</span>))),
                 }
             }
         }
@@ -686,14 +686,14 @@
 }
 
 <span class="kw">trait</span> <span class="ident">SendStreamExt</span> {
-    <span class="kw">fn</span> <span class="ident">on_user_err</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Error</span>
+    <span class="kw">fn</span> <span class="ident">on_user_err</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="ident">E</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Error</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">send_eos_frame</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">send_eos_frame</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Buf</span><span class="op">&gt;</span> <span class="ident">SendStreamExt</span> <span class="kw">for</span> <span class="ident">SendStream</span><span class="op">&lt;</span><span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">on_user_err</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Error</span>
+    <span class="kw">fn</span> <span class="ident">on_user_err</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="ident">E</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Error</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -703,7 +703,7 @@
         <span class="ident">err</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">send_eos_frame</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">send_eos_frame</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">trace!</span>(<span class="string">&quot;send body eos&quot;</span>);
         <span class="self">self</span>.<span class="ident">send_data</span>(<span class="ident">SendBuf::None</span>, <span class="bool-val">true</span>)
             .<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_body_write</span>)
@@ -719,37 +719,37 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Buf</span><span class="op">&gt;</span> <span class="ident">Buf</span> <span class="kw">for</span> <span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Buf</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">remaining</span>(),
-            <span class="ident"><span class="self">Self</span>::Cursor</span>(<span class="kw-2">ref</span> <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Buf::remaining</span>(<span class="ident">c</span>),
-            <span class="ident"><span class="self">Self</span>::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
+            <span class="ident"><span class="self">Self</span>::Buf</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">remaining</span>(),
+            <span class="ident"><span class="self">Self</span>::Cursor</span>(<span class="kw-2">ref</span> <span class="ident">c</span>) =&gt; <span class="ident">Buf::remaining</span>(<span class="ident">c</span>),
+            <span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="number">0</span>,
         }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chunk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">chunk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Buf</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">chunk</span>(),
-            <span class="ident"><span class="self">Self</span>::Cursor</span>(<span class="kw-2">ref</span> <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">chunk</span>(),
-            <span class="ident"><span class="self">Self</span>::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[],
+            <span class="ident"><span class="self">Self</span>::Buf</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">chunk</span>(),
+            <span class="ident"><span class="self">Self</span>::Cursor</span>(<span class="kw-2">ref</span> <span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">chunk</span>(),
+            <span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="kw-2">&amp;</span>[],
         }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Buf</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">advance</span>(<span class="ident">cnt</span>),
-            <span class="ident"><span class="self">Self</span>::Cursor</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">advance</span>(<span class="ident">cnt</span>),
-            <span class="ident"><span class="self">Self</span>::None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="ident"><span class="self">Self</span>::Buf</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">advance</span>(<span class="ident">cnt</span>),
+            <span class="ident"><span class="self">Self</span>::Cursor</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">advance</span>(<span class="ident">cnt</span>),
+            <span class="ident"><span class="self">Self</span>::None</span> =&gt; {}
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">chunks_vectored</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">chunks_vectored</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>]) -&gt; <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Buf</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">chunks_vectored</span>(<span class="ident">dst</span>),
-            <span class="ident"><span class="self">Self</span>::Cursor</span>(<span class="kw-2">ref</span> <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">chunks_vectored</span>(<span class="ident">dst</span>),
-            <span class="ident"><span class="self">Self</span>::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
+            <span class="ident"><span class="self">Self</span>::Buf</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">chunks_vectored</span>(<span class="ident">dst</span>),
+            <span class="ident"><span class="self">Self</span>::Cursor</span>(<span class="kw-2">ref</span> <span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">chunks_vectored</span>(<span class="ident">dst</span>),
+            <span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="number">0</span>,
         }
     }
 }
@@ -772,25 +772,25 @@
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">read_buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
             <span class="self">self</span>.<span class="ident">buf</span> <span class="op">=</span> <span class="kw">loop</span> {
                 <span class="kw">match</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">recv_stream</span>.<span class="ident">poll_data</span>(<span class="ident">cx</span>)) {
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
-                    <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">buf</span>)) <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">recv_stream</span>.<span class="ident">is_end_stream</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
+                    <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">buf</span>)) <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">recv_stream</span>.<span class="ident">is_end_stream</span>() =&gt; {
                         <span class="kw">continue</span>
                     }
-                    <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">buf</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">buf</span>)) =&gt; {
                         <span class="self">self</span>.<span class="ident">ping</span>.<span class="ident">record_data</span>(<span class="ident">buf</span>.<span class="ident">len</span>());
                         <span class="kw">break</span> <span class="ident">buf</span>;
                     }
-                    <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; {
                         <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="kw">match</span> <span class="ident">e</span>.<span class="ident">reason</span>() {
-                            <span class="prelude-val">Some</span>(<span class="ident">Reason::NO_ERROR</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Reason::CANCEL</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                            <span class="prelude-val">Some</span>(<span class="ident">Reason::STREAM_CLOSED</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">Reason::NO_ERROR</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Reason::CANCEL</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+                            <span class="prelude-val">Some</span>(<span class="ident">Reason::STREAM_CLOSED</span>) =&gt; {
                                 <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::BrokenPipe</span>, <span class="ident">e</span>))
                             }
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">h2_to_io_error</span>(<span class="ident">e</span>)),
+                            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">h2_to_io_error</span>(<span class="ident">e</span>)),
                         })
                     }
                 }
@@ -812,7 +812,7 @@
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>));
         }
@@ -821,13 +821,13 @@
         <span class="comment">// We ignore all errors returned by `poll_capacity` and `write`, as we</span>
         <span class="comment">// will get the correct from `poll_reset` anyway.</span>
         <span class="kw">let</span> <span class="ident">cnt</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">send_stream</span>.<span class="ident">poll_capacity</span>(<span class="ident">cx</span>)) {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="number">0</span>),
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">cnt</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">0</span>),
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">cnt</span>)) =&gt; <span class="self">self</span>
                 .<span class="ident">send_stream</span>
                 .<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..<span class="ident">cnt</span>], <span class="bool-val">false</span>)
                 .<span class="ident">ok</span>()
                 .<span class="ident">map</span>(<span class="op">|</span>()<span class="op">|</span> <span class="ident">cnt</span>),
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cnt</span>) <span class="op">=</span> <span class="ident">cnt</span> {
@@ -836,43 +836,43 @@
 
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">h2_to_io_error</span>(
             <span class="kw">match</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">send_stream</span>.<span class="ident">poll_reset</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Ok</span>(<span class="ident">Reason::NO_ERROR</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Reason::CANCEL</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Reason::STREAM_CLOSED</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">Reason::NO_ERROR</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Reason::CANCEL</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Reason::STREAM_CLOSED</span>) =&gt; {
                     <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::ErrorKind::BrokenPipe</span>.<span class="ident">into</span>()))
                 }
-                <span class="prelude-val">Ok</span>(<span class="ident">reason</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">reason</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>,
+                <span class="prelude-val">Ok</span>(<span class="ident">reason</span>) =&gt; <span class="ident">reason</span>.<span class="ident">into</span>(),
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>,
             },
         )))
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
     }
 
     <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">send_stream</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span>[], <span class="bool-val">true</span>).<span class="ident">is_ok</span>() {
             <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
         }
 
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">h2_to_io_error</span>(
             <span class="kw">match</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">send_stream</span>.<span class="ident">poll_reset</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Ok</span>(<span class="ident">Reason::NO_ERROR</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">Reason::NO_ERROR</span>) =&gt; {
                     <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
                 }
-                <span class="prelude-val">Ok</span>(<span class="ident">Reason::CANCEL</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Reason::STREAM_CLOSED</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">Reason::CANCEL</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Reason::STREAM_CLOSED</span>) =&gt; {
                     <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::ErrorKind::BrokenPipe</span>.<span class="ident">into</span>()))
                 }
-                <span class="prelude-val">Ok</span>(<span class="ident">reason</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">reason</span>.<span class="ident">into</span>(),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>,
+                <span class="prelude-val">Ok</span>(<span class="ident">reason</span>) =&gt; <span class="ident">reason</span>.<span class="ident">into</span>(),
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>,
             },
         )))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">h2_to_io_error</span>(<span class="ident">e</span>: <span class="ident">h2::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Error</span> {
+<span class="kw">fn</span> <span class="ident">h2_to_io_error</span>(<span class="ident">e</span>: <span class="ident">h2::Error</span>) -&gt; <span class="ident">io::Error</span> {
     <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is_io</span>() {
         <span class="ident">e</span>.<span class="ident">into_io</span>().<span class="ident">unwrap</span>()
     } <span class="kw">else</span> {
@@ -886,7 +886,7 @@
 <span class="kw">where</span>
     <span class="ident">B</span>: <span class="ident">Buf</span>,
 {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">SendStream</span><span class="op">&lt;</span><span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">SendStream</span><span class="op">&lt;</span><span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_eq!</span>(<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(), <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">Neutered</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>());
         <span class="self">Self</span>(<span class="ident">mem::transmute</span>(<span class="ident">inner</span>))
     }
@@ -895,15 +895,15 @@
         <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">as_inner_unchecked</span>().<span class="ident">reserve_capacity</span>(<span class="ident">cnt</span>) }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_capacity</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">h2::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_capacity</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">h2::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">as_inner_unchecked</span>().<span class="ident">poll_capacity</span>(<span class="ident">cx</span>) }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">h2::Reason</span>, <span class="ident">h2::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">h2::Reason</span>, <span class="ident">h2::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">as_inner_unchecked</span>().<span class="ident">poll_reset</span>(<span class="ident">cx</span>) }
     }
 
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">end_of_stream</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">end_of_stream</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">send_buf</span> <span class="op">=</span> <span class="ident">SendBuf::Cursor</span>(<span class="ident">Cursor::new</span>(<span class="ident">buf</span>.<span class="ident">into</span>()));
         <span class="kw">unsafe</span> {
             <span class="self">self</span>.<span class="ident">as_inner_unchecked</span>()
@@ -912,7 +912,7 @@
         }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_inner_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SendStream</span><span class="op">&lt;</span><span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_inner_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SendStream</span><span class="op">&lt;</span><span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>)
     }
 }
@@ -928,11 +928,11 @@
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Neutered</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Buf</span> <span class="kw">for</span> <span class="ident">Neutered</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">impossible</span> {}
     }
 
-    <span class="kw">fn</span> <span class="ident">chunk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">chunk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">impossible</span> {}
     }
 

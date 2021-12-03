@@ -368,7 +368,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span> <span class="ident">ChunkedDecoder</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">R</span>, <span class="ident">trailer_sender</span>: <span class="ident">Sender</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">R</span>, <span class="ident">trailer_sender</span>: <span class="ident">Sender</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ChunkedDecoder</span> {
             <span class="ident">inner</span>,
             <span class="ident">state</span>: <span class="ident">State::ChunkSize</span>,
@@ -399,24 +399,24 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">State::ChunkSize</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::ChunkSize&quot;</span>),
-            <span class="ident">State::ChunkSizeExpectLf</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::ChunkSizeExpectLf&quot;</span>),
-            <span class="ident">State::ChunkBody</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::ChunkBody&quot;</span>),
-            <span class="ident">State::ChunkBodyExpectCr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::ChunkBodyExpectCr&quot;</span>),
-            <span class="ident">State::ChunkBodyExpectLf</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::ChunkBodyExpectLf&quot;</span>),
-            <span class="ident">State::Trailers</span>(<span class="ident">len</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::Trailers({}, _)&quot;</span>, <span class="ident">len</span>),
-            <span class="ident">State::TrailerSending</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::TrailerSending&quot;</span>),
-            <span class="ident">State::Done</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::Done&quot;</span>),
+            <span class="ident">State::ChunkSize</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::ChunkSize&quot;</span>),
+            <span class="ident">State::ChunkSizeExpectLf</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::ChunkSizeExpectLf&quot;</span>),
+            <span class="ident">State::ChunkBody</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::ChunkBody&quot;</span>),
+            <span class="ident">State::ChunkBodyExpectCr</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::ChunkBodyExpectCr&quot;</span>),
+            <span class="ident">State::ChunkBodyExpectLf</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::ChunkBodyExpectLf&quot;</span>),
+            <span class="ident">State::Trailers</span>(<span class="ident">len</span>, <span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::Trailers({}, _)&quot;</span>, <span class="ident">len</span>),
+            <span class="ident">State::TrailerSending</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::TrailerSending&quot;</span>),
+            <span class="ident">State::Done</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;State::Done&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">ChunkedDecoder</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">poll_read_byte</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_read_byte</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte</span> <span class="op">=</span> [<span class="number">0u8</span>];
-        <span class="kw">if</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">byte</span>))<span class="question-mark">?</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">byte</span>))<span class="question-mark">?</span> <span class="op">==</span> <span class="number">1</span> {
             <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">byte</span>[<span class="number">0</span>]))
         } <span class="kw">else</span> {
             <span class="ident">eof</span>()
@@ -428,9 +428,9 @@
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">expected_byte</span>: <span class="ident">u8</span>,
         <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">poll_read_byte</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">byte</span> <span class="op">=</span><span class="op">=</span> <span class="ident">expected_byte</span> {
+        <span class="kw">if</span> <span class="ident">byte</span> <span class="op">==</span> <span class="ident">expected_byte</span> {
             <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
         } <span class="kw">else</span> {
             <span class="ident">unexpected</span>(<span class="ident">byte</span>, <span class="ident">expected</span>)
@@ -447,21 +447,21 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">eof</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">eof</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
         <span class="ident">io::ErrorKind::UnexpectedEof</span>,
         <span class="string">&quot;Unexpected EOF when decoding chunked data&quot;</span>,
     )))
 }
 
-<span class="kw">fn</span> <span class="ident">unexpected</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">byte</span>: <span class="ident">u8</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">unexpected</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">byte</span>: <span class="ident">u8</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
         <span class="ident">io::ErrorKind::InvalidData</span>,
         <span class="macro">format!</span>(<span class="string">&quot;Unexpected byte {}; expected {}&quot;</span>, <span class="ident">byte</span>, <span class="ident">expected</span>),
     )))
 }
 
-<span class="kw">fn</span> <span class="ident">overflow</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Error</span> {
+<span class="kw">fn</span> <span class="ident">overflow</span>() -&gt; <span class="ident">io::Error</span> {
     <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidData</span>, <span class="string">&quot;Chunk size overflowed 64 bits&quot;</span>)
 }
 
@@ -471,22 +471,22 @@
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="self">self</span>;
 
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">state</span> {
-                <span class="ident">State::ChunkSize</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">State::ChunkSize</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">poll_read_byte</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
                     <span class="kw">let</span> <span class="ident">digit</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">byte</span> {
-                        <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">byte</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>,
-                        <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;f&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">10</span> <span class="op">+</span> <span class="ident">byte</span> <span class="op">-</span> <span class="string">b&#39;a&#39;</span>,
-                        <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;F&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">10</span> <span class="op">+</span> <span class="ident">byte</span> <span class="op">-</span> <span class="string">b&#39;A&#39;</span>,
-                        <span class="string">b&#39;\r&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> =&gt; <span class="ident">byte</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>,
+                        <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;f&#39;</span> =&gt; <span class="number">10</span> <span class="op">+</span> <span class="ident">byte</span> <span class="op">-</span> <span class="string">b&#39;a&#39;</span>,
+                        <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;F&#39;</span> =&gt; <span class="number">10</span> <span class="op">+</span> <span class="ident">byte</span> <span class="op">-</span> <span class="string">b&#39;A&#39;</span>,
+                        <span class="string">b&#39;\r&#39;</span> =&gt; {
                             <span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::ChunkSizeExpectLf</span>;
                             <span class="kw">continue</span>;
                         }
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">_</span> =&gt; {
                             <span class="kw">return</span> <span class="ident">unexpected</span>(<span class="ident">byte</span>, <span class="string">&quot;hex digit or CR&quot;</span>);
                         }
                     };
@@ -497,15 +497,15 @@
                         .<span class="ident">checked_add</span>(<span class="ident">digit</span> <span class="kw">as</span> <span class="ident">u64</span>)
                         .<span class="ident">ok_or_else</span>(<span class="ident">overflow</span>)<span class="question-mark">?</span>;
                 }
-                <span class="ident">State::ChunkSizeExpectLf</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">State::ChunkSizeExpectLf</span> =&gt; {
                     <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">expect_byte</span>(<span class="ident">cx</span>, <span class="string">b&#39;\n&#39;</span>, <span class="string">&quot;LF&quot;</span>))<span class="question-mark">?</span>;
-                    <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">chunk_size</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">chunk_size</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Trailers</span>(<span class="number">0</span>, <span class="ident">Box::new</span>([<span class="number">0u8</span>; <span class="number">8192</span>]));
                     } <span class="kw">else</span> {
                         <span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::ChunkBody</span>;
                     }
                 }
-                <span class="ident">State::ChunkBody</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">State::ChunkBody</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">max_bytes</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(
                         <span class="ident">buf</span>.<span class="ident">len</span>(),
                         <span class="ident">std::cmp::min</span>(<span class="ident">this</span>.<span class="ident">chunk_size</span>, <span class="ident">usize::MAX</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="kw">as</span> <span class="ident">usize</span>,
@@ -513,31 +513,31 @@
                     <span class="kw">let</span> <span class="ident">bytes_read</span> <span class="op">=</span>
                         <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">this</span>.<span class="ident">inner</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[..<span class="ident">max_bytes</span>]))<span class="question-mark">?</span>;
                     <span class="ident">this</span>.<span class="ident">chunk_size</span> <span class="op">-</span><span class="op">=</span> <span class="ident">bytes_read</span> <span class="kw">as</span> <span class="ident">u64</span>;
-                    <span class="kw">if</span> <span class="ident">bytes_read</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">bytes_read</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="kw">return</span> <span class="ident">eof</span>();
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">chunk_size</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">chunk_size</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::ChunkBodyExpectCr</span>;
                     }
                     <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">bytes_read</span>));
                 }
-                <span class="ident">State::ChunkBodyExpectCr</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">State::ChunkBodyExpectCr</span> =&gt; {
                     <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">expect_byte</span>(<span class="ident">cx</span>, <span class="string">b&#39;\r&#39;</span>, <span class="string">&quot;CR&quot;</span>))<span class="question-mark">?</span>;
                     <span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::ChunkBodyExpectLf</span>;
                 }
-                <span class="ident">State::ChunkBodyExpectLf</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">State::ChunkBodyExpectLf</span> =&gt; {
                     <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">expect_byte</span>(<span class="ident">cx</span>, <span class="string">b&#39;\n&#39;</span>, <span class="string">&quot;LF&quot;</span>))<span class="question-mark">?</span>;
                     <span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::ChunkSize</span>;
                 }
-                <span class="ident">State::Trailers</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">len</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">buf</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">State::Trailers</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">len</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">buf</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">bytes_read</span> <span class="op">=</span>
                         <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">this</span>.<span class="ident">inner</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[<span class="kw-2">*</span><span class="ident">len</span>..]))<span class="question-mark">?</span>;
                     <span class="kw-2">*</span><span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">bytes_read</span>;
                     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">len</span>;
-                    <span class="kw">if</span> <span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="ident">this</span>.<span class="ident">send_trailers</span>(<span class="ident">Trailers::new</span>());
                         <span class="kw">continue</span>;
                     }
-                    <span class="kw">if</span> <span class="ident">bytes_read</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">bytes_read</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="kw">return</span> <span class="ident">eof</span>();
                     }
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> [<span class="ident">httparse::EMPTY_HEADER</span>; <span class="number">16</span>];
@@ -545,14 +545,14 @@
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidData</span>, <span class="ident">e</span>))<span class="question-mark">?</span>;
                     <span class="kw">use</span> <span class="ident">httparse::Status</span>;
                     <span class="kw">match</span> <span class="ident">parse_result</span> {
-                        <span class="ident">Status::Partial</span> <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="kw">if</span> <span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>() {
+                        <span class="ident">Status::Partial</span> =&gt; {
+                            <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="ident">buf</span>.<span class="ident">len</span>() {
                                 <span class="kw">return</span> <span class="ident">eof</span>();
                             } <span class="kw">else</span> {
                                 <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
                             }
                         }
-                        <span class="ident">Status::Complete</span>((<span class="ident">offset</span>, <span class="ident">headers</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Status::Complete</span>((<span class="ident">offset</span>, <span class="ident">headers</span>)) =&gt; {
                             <span class="kw">if</span> <span class="ident">offset</span> <span class="op">!</span><span class="op">=</span> <span class="ident">len</span> {
                                 <span class="kw">return</span> <span class="ident">unexpected</span>(<span class="ident">buf</span>[<span class="ident">offset</span>], <span class="string">&quot;end of trailers&quot;</span>);
                             }
@@ -567,11 +567,11 @@
                         }
                     }
                 }
-                <span class="ident">State::TrailerSending</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fut</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">State::TrailerSending</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fut</span>) =&gt; {
                     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">fut</span>).<span class="ident">poll</span>(<span class="ident">cx</span>));
                     <span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Done</span>;
                 }
-                <span class="ident">State::Done</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>)),
+                <span class="ident">State::Done</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>)),
             }
         }
     }

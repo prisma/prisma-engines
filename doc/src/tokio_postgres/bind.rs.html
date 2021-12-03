@@ -52,7 +52,7 @@
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>,
     <span class="ident">statement</span>: <span class="ident">Statement</span>,
     <span class="ident">params</span>: <span class="ident">I</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Portal</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Portal</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">BorrowToSql</span>,
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span>,
@@ -68,8 +68,8 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">responses</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">RequestMessages::Single</span>(<span class="ident">FrontendMessage::Raw</span>(<span class="ident">buf</span>)))<span class="question-mark">?</span>;
 
     <span class="kw">match</span> <span class="ident">responses</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-        <span class="ident">Message::BindComplete</span> <span class="op">=</span><span class="op">&gt;</span> {}
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
+        <span class="ident">Message::BindComplete</span> =&gt; {}
+        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
     }
 
     <span class="prelude-val">Ok</span>(<span class="ident">Portal::new</span>(<span class="ident">client</span>, <span class="ident">name</span>, <span class="ident">statement</span>))

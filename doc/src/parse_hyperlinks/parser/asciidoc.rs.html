@@ -815,7 +815,7 @@
 
 <span class="doccomment">/// Wrapper around `adoc_text2dest()` that packs the result in</span>
 <span class="doccomment">/// `Link::Text2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adoc_text2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adoc_text2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)) <span class="op">=</span> <span class="ident">adoc_text2dest</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Text2Dest</span>(<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)))
 }
@@ -853,7 +853,7 @@
 <span class="doccomment">///   Ok((&quot; abc&quot;, (Cow::from(&quot;https://destination&quot;), Cow::from(&quot;https://destination&quot;), Cow::from(&quot;&quot;))))</span>
 <span class="doccomment">/// );</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adoc_text2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adoc_text2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">link_destination</span>, <span class="ident">link_text</span>)) <span class="op">=</span> <span class="ident">nom::sequence::preceded</span>(
         <span class="ident">space0</span>,
         <span class="ident">nom::sequence::pair</span>(
@@ -877,7 +877,7 @@
 
 <span class="doccomment">/// Wrapper around `adoc_label2dest()` that packs the result in</span>
 <span class="doccomment">/// `Link::Label2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adoc_label2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adoc_label2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)) <span class="op">=</span> <span class="ident">adoc_label2dest</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Label2Dest</span>(<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)))
 }
@@ -903,7 +903,7 @@
 <span class="doccomment">///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;label&quot;), Cow::from(&quot;https://destination&quot;), Cow::from(&quot;&quot;))))</span>
 <span class="doccomment">/// );</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adoc_label2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adoc_label2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">link_label</span>, <span class="ident">link_destination</span>)) <span class="op">=</span> <span class="ident">nom::sequence::preceded</span>(
         <span class="ident">space0</span>,
         <span class="ident">nom::sequence::pair</span>(
@@ -932,7 +932,7 @@
 
 <span class="doccomment">/// Wrapper around `adoc_text2label()` that packs the result in</span>
 <span class="doccomment">/// `Link::Text2Label`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adoc_text2label_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adoc_text2label_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">la</span>)) <span class="op">=</span> <span class="ident">adoc_text2label</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Text2Label</span>(<span class="ident">te</span>, <span class="ident">la</span>)))
 }
@@ -974,7 +974,7 @@
 <span class="doccomment">///   Ok((&quot;abc&quot;, (Cow::from(&quot;&quot;), Cow::from(&quot;link-label&quot;))))</span>
 <span class="doccomment">/// );</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adoc_text2label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adoc_text2label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">link_label</span>, <span class="ident">link_text</span>)) <span class="op">=</span> <span class="ident">alt</span>((
         <span class="ident">nom::sequence::pair</span>(<span class="ident">adoc_parse_curly_bracket_reference</span>, <span class="ident">adoc_link_text</span>),
         <span class="ident">nom::combinator::map</span>(<span class="ident">adoc_parse_curly_bracket_reference</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> (<span class="ident">s</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))),
@@ -992,7 +992,7 @@
 <span class="doccomment">/// last letter `]`. A sequence of whitespaces including newlines, will be</span>
 <span class="doccomment">/// replaced by one space. There must be not contain more than one newline</span>
 <span class="doccomment">/// per sequence. The string can contain the `\]` which is replaced by `]`.</span>
-<span class="kw">fn</span> <span class="ident">adoc_link_text</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">adoc_link_text</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">nom::sequence::delimited</span>(<span class="ident">char</span>(<span class="string">&#39;[&#39;</span>), <span class="ident">remove_newline_take_till</span>(<span class="string">&#39;]&#39;</span>), <span class="ident">char</span>(<span class="string">&#39;]&#39;</span>))(<span class="ident">i</span>)
 }
 
@@ -1003,7 +1003,7 @@
 <span class="doccomment">/// newline.</span>
 <span class="kw">fn</span> <span class="ident">remove_newline_take_till</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">pat</span>: <span class="ident">char</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">j</span> <span class="op">=</span> <span class="ident">i</span>;
@@ -1018,17 +1018,17 @@
             <span class="comment">// starting with `if let Ok...` it will advance the parser at least</span>
             <span class="comment">// one character.</span>
             <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">s</span>) <span class="op">=</span>
-                <span class="ident">nom::bytes::complete::take_till</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="ident">pat</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\n&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\\&#39;</span>)(<span class="ident">j</span>)<span class="question-mark">?</span>;
+                <span class="ident">nom::bytes::complete::take_till</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="ident">pat</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\n&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\\&#39;</span>)(<span class="ident">j</span>)<span class="question-mark">?</span>;
 
             <span class="comment">// Store the result.</span>
             <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span> {
-                <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>),
-                <span class="ident">Cow::Borrowed</span>(<span class="ident">res_str</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>) =&gt; <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>),
+                <span class="ident">Cow::Borrowed</span>(<span class="ident">res_str</span>) =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">strg</span> <span class="op">=</span> <span class="ident">res_str</span>.<span class="ident">to_string</span>();
                     <span class="ident">strg</span>.<span class="ident">push_str</span>(<span class="ident">s</span>);
                     <span class="ident">Cow::Owned</span>(<span class="ident">strg</span>)
                 }
-                <span class="ident">Cow::Owned</span>(<span class="kw-2">mut</span> <span class="ident">strg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Cow::Owned</span>(<span class="kw-2">mut</span> <span class="ident">strg</span>) =&gt; {
                     <span class="ident">strg</span>.<span class="ident">push_str</span>(<span class="ident">s</span>);
                     <span class="ident">Cow::Owned</span>(<span class="ident">strg</span>)
                 }
@@ -1042,9 +1042,9 @@
                 <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">c</span> {
                     <span class="comment">// We completed our mission and found `pat`.</span>
                     <span class="comment">// This is the only Ok exit from the while loop.</span>
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="ident">pat</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">k</span>, <span class="ident">res</span>)),
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="ident">pat</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">k</span>, <span class="ident">res</span>)),
                     <span class="comment">// We stopped at an escaped character.</span>
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\\&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\\&#39;</span> =&gt; {
                         <span class="comment">// Consume the escape `\`.</span>
                         <span class="kw">let</span> (<span class="ident">l</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">char</span>(<span class="string">&#39;\\&#39;</span>)(<span class="ident">k</span>)<span class="question-mark">?</span>;
                         <span class="comment">// `pat` is the only valid escaped character (not even `\\` is special in</span>
@@ -1061,7 +1061,7 @@
                         <span class="ident">l</span>
                     }
                     <span class="comment">// We stopped at a newline.</span>
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\n&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\n&#39;</span> =&gt; {
                         <span class="comment">// Now consume the `\n`.</span>
                         <span class="kw">let</span> (<span class="ident">l</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">char</span>(<span class="string">&#39;\n&#39;</span>)(<span class="ident">k</span>)<span class="question-mark">?</span>;
                         <span class="kw">let</span> (<span class="ident">l</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">space0</span>(<span class="ident">l</span>)<span class="question-mark">?</span>;
@@ -1076,7 +1076,7 @@
                         <span class="comment">// Advance `k`.</span>
                         <span class="ident">l</span>
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
                 };
                 <span class="ident">j</span> <span class="op">=</span> <span class="ident">m</span>;
             } <span class="kw">else</span> {
@@ -1095,7 +1095,7 @@
 <span class="doccomment">/// The parser succeeds, if one of the variants:</span>
 <span class="doccomment">/// `adoc_parse_http_link_destination()` or</span>
 <span class="doccomment">/// `adoc_parse_escaped_link_destination()` succeeds and returns its result.</span>
-<span class="kw">fn</span> <span class="ident">adoc_link_reference_definition_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">adoc_link_reference_definition_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">alt</span>((
         <span class="ident">adoc_parse_http_link_destination</span>,
         <span class="ident">adoc_parse_escaped_link_destination</span>,
@@ -1106,7 +1106,7 @@
 <span class="doccomment">/// The parser succeeds, if one of the variants:</span>
 <span class="doccomment">/// `adoc_parse_http_link_destination()`, `adoc_parse_literal_link_destination()`</span>
 <span class="doccomment">/// or `adoc_parse_escaped_link_destination()` succeeds and returns its result.</span>
-<span class="kw">fn</span> <span class="ident">adoc_inline_link_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">adoc_inline_link_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">alt</span>((
         <span class="ident">adoc_parse_http_link_destination</span>,
         <span class="ident">adoc_parse_literal_link_destination</span>,
@@ -1116,10 +1116,10 @@
 
 <span class="doccomment">/// Parses a link destination in URL form starting with `http://` or `https://`</span>
 <span class="doccomment">/// and ending with `[`. The latter is peeked, but no consumed.</span>
-<span class="kw">fn</span> <span class="ident">adoc_parse_http_link_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">adoc_parse_http_link_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">j</span>, <span class="ident">s</span>) <span class="op">=</span> <span class="ident">nom::sequence::preceded</span>(
         <span class="ident">peek</span>(<span class="ident">alt</span>((<span class="ident">tag_no_case</span>(<span class="string">&quot;http://&quot;</span>), (<span class="ident">tag_no_case</span>(<span class="string">&quot;https://&quot;</span>))))),
-        <span class="ident">nom::bytes::complete::take_till1</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;[&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\t&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\n&#39;</span>),
+        <span class="ident">nom::bytes::complete::take_till1</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;[&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\t&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\n&#39;</span>),
     )(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((<span class="ident">j</span>, <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>)))
 }
@@ -1132,7 +1132,7 @@
 <span class="doccomment">/// let res = percent_decode(&quot;https://getreu.net/?q=%5Ba%20b%5D&quot;).unwrap();</span>
 <span class="doccomment">/// assert_eq!(res, (&quot;&quot;, Cow::Owned(&quot;https://getreu.net/?q=[a b]&quot;.to_string())));</span>
 <span class="doccomment">///```</span>
-<span class="kw">fn</span> <span class="ident">percent_decode</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">percent_decode</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">percent_decode_str</span>(<span class="ident">i</span>)
         .<span class="ident">decode_utf8</span>()
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="ident">i</span>, <span class="ident">ErrorKind::EscapedTransform</span>)))<span class="question-mark">?</span>;
@@ -1142,7 +1142,7 @@
 <span class="doccomment">/// Parses a link destination starting with `link:http://` or `link:https://` ending</span>
 <span class="doccomment">/// with `]`, whitespace or newline. The later is peeked, but not consumed. The URL can contain percent</span>
 <span class="doccomment">/// encoded characters, which are decoded.</span>
-<span class="kw">fn</span> <span class="ident">adoc_parse_escaped_link_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">adoc_parse_escaped_link_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">nom::combinator::map_parser</span>(
         <span class="ident">nom::sequence::preceded</span>(
             <span class="ident">nom::sequence::pair</span>(
@@ -1150,7 +1150,7 @@
                 <span class="ident">peek</span>(<span class="ident">alt</span>((<span class="ident">tag_no_case</span>(<span class="string">&quot;http://&quot;</span>), (<span class="ident">tag_no_case</span>(<span class="string">&quot;https://&quot;</span>))))),
             ),
             <span class="ident">nom::bytes::complete::take_till1</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;[&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\t&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\r&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\n&#39;</span>
+                <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;[&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\t&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\r&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\n&#39;</span>
             }),
         ),
         <span class="ident">percent_decode</span>,
@@ -1159,7 +1159,7 @@
 
 <span class="doccomment">/// Parses a link destination starting with `link:+++` ending with `++`. Everything in</span>
 <span class="doccomment">/// between is taken as it is without any transformation.</span>
-<span class="kw">fn</span> <span class="ident">adoc_parse_literal_link_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">adoc_parse_literal_link_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">j</span>, <span class="ident">s</span>) <span class="op">=</span> <span class="ident">nom::sequence::preceded</span>(
         <span class="ident">tag</span>(<span class="string">&quot;link:&quot;</span>),
         <span class="ident">nom::sequence::delimited</span>(<span class="ident">tag</span>(<span class="string">&quot;++&quot;</span>), <span class="ident">nom::bytes::complete::take_until</span>(<span class="string">&quot;++&quot;</span>), <span class="ident">tag</span>(<span class="string">&quot;++&quot;</span>)),
@@ -1171,13 +1171,13 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The parser expects to start at the opening `{` to succeed.</span>
 <span class="doccomment">/// The result is always a borrowed reference.</span>
-<span class="kw">fn</span> <span class="ident">adoc_parse_curly_bracket_reference</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">adoc_parse_curly_bracket_reference</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">nom::combinator::map</span>(
         <span class="ident">nom::combinator::verify</span>(
             <span class="ident">nom::sequence::delimited</span>(
                 <span class="ident">char</span>(<span class="string">&#39;{&#39;</span>),
                 <span class="ident">nom::bytes::complete::take_till1</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                    <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;}&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\t&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\r&#39;</span>
+                    <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;}&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\t&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\r&#39;</span>
                 }),
                 <span class="ident">char</span>(<span class="string">&#39;}&#39;</span>),
             ),
@@ -1193,11 +1193,11 @@
 <span class="doccomment">/// succeed.</span>
 <span class="doccomment">/// The caller must guaranty, that the byte before was a newline. The parser</span>
 <span class="doccomment">/// consumes all whitespace before the first colon and after the second.</span>
-<span class="kw">fn</span> <span class="ident">adoc_parse_colon_reference</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">adoc_parse_colon_reference</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
     <span class="ident">nom::combinator::verify</span>(
         <span class="ident">nom::sequence::delimited</span>(
             <span class="ident">char</span>(<span class="string">&#39;:&#39;</span>),
-            <span class="ident">nom::bytes::complete::take_till1</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;:&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\t&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\r&#39;</span>),
+            <span class="ident">nom::bytes::complete::take_till1</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;:&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\t&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\r&#39;</span>),
             <span class="ident">char</span>(<span class="string">&#39;:&#39;</span>),
         ),
         <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">LABEL_LEN_MAX</span>,

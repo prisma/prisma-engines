@@ -65,21 +65,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Packet</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">header</span>: <span class="ident">PacketHeader</span>, <span class="ident">payload</span>: <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">header</span>: <span class="ident">PacketHeader</span>, <span class="ident">payload</span>: <span class="ident">BytesMut</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">header</span>, <span class="ident">payload</span> }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_last</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">PacketStatus::EndOfMessage</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_last</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">status</span> <span class="op">==</span> <span class="ident">PacketStatus::EndOfMessage</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">PacketHeader</span>, <span class="ident">BytesMut</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; (<span class="ident">PacketHeader</span>, <span class="ident">BytesMut</span>) {
         (<span class="self">self</span>.<span class="ident">header</span>, <span class="self">self</span>.<span class="ident">payload</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Packet</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span> <span class="op">+</span> <span class="ident">HEADER_BYTES</span> <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">to_be_bytes</span>();
 
         <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">encode</span>(<span class="ident">dst</span>)<span class="question-mark">?</span>;
@@ -93,7 +93,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Decode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Packet</span> {
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">header</span>: <span class="ident">PacketHeader::decode</span>(<span class="ident">src</span>)<span class="question-mark">?</span>,
             <span class="ident">payload</span>: <span class="ident">src</span>.<span class="ident">split</span>(),

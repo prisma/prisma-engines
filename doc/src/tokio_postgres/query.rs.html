@@ -237,7 +237,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">BorrowToSql</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_list</span>()
             .<span class="ident">entries</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">borrow_to_sql</span>()))
             .<span class="ident">finish</span>()
@@ -248,7 +248,7 @@
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">InnerClient</span>,
     <span class="ident">statement</span>: <span class="ident">Statement</span>,
     <span class="ident">params</span>: <span class="ident">I</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RowStream</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RowStream</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">BorrowToSql</span>,
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span>,
@@ -277,7 +277,7 @@
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">InnerClient</span>,
     <span class="ident">portal</span>: <span class="kw-2">&amp;</span><span class="ident">Portal</span>,
     <span class="ident">max_rows</span>: <span class="ident">i32</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RowStream</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RowStream</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">with_buf</span>(<span class="op">|</span><span class="ident">buf</span><span class="op">|</span> {
         <span class="ident">frontend::execute</span>(<span class="ident">portal</span>.<span class="ident">name</span>(), <span class="ident">max_rows</span>, <span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="ident">Error::encode</span>)<span class="question-mark">?</span>;
         <span class="ident">frontend::sync</span>(<span class="ident">buf</span>);
@@ -297,7 +297,7 @@
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">InnerClient</span>,
     <span class="ident">statement</span>: <span class="ident">Statement</span>,
     <span class="ident">params</span>: <span class="ident">I</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">BorrowToSql</span>,
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span>,
@@ -318,8 +318,8 @@
 
     <span class="kw">loop</span> {
         <span class="kw">match</span> <span class="ident">responses</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="ident">Message::DataRow</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="ident">Message::CommandComplete</span>(<span class="ident">body</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Message::DataRow</span>(<span class="kw">_</span>) =&gt; {}
+            <span class="ident">Message::CommandComplete</span>(<span class="ident">body</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">body</span>
                     .<span class="ident">tag</span>()
                     .<span class="ident">map_err</span>(<span class="ident">Error::parse</span>)<span class="question-mark">?</span>
@@ -330,24 +330,24 @@
                     .<span class="ident">unwrap_or</span>(<span class="number">0</span>);
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">rows</span>);
             }
-            <span class="ident">Message::EmptyQueryResponse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
+            <span class="ident">Message::EmptyQueryResponse</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>),
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
         }
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">InnerClient</span>, <span class="ident">buf</span>: <span class="ident">Bytes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Responses</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">InnerClient</span>, <span class="ident">buf</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Responses</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">responses</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">RequestMessages::Single</span>(<span class="ident">FrontendMessage::Raw</span>(<span class="ident">buf</span>)))<span class="question-mark">?</span>;
 
     <span class="kw">match</span> <span class="ident">responses</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-        <span class="ident">Message::BindComplete</span> <span class="op">=</span><span class="op">&gt;</span> {}
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
+        <span class="ident">Message::BindComplete</span> =&gt; {}
+        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
     }
 
     <span class="prelude-val">Ok</span>(<span class="ident">responses</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">InnerClient</span>, <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span>, <span class="ident">params</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">InnerClient</span>, <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span>, <span class="ident">params</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">BorrowToSql</span>,
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span>,
@@ -366,7 +366,7 @@
     <span class="ident">params</span>: <span class="ident">I</span>,
     <span class="ident">portal</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">BorrowToSql</span>,
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span>,
@@ -375,7 +375,7 @@
     <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">into_iter</span>();
 
     <span class="macro">assert!</span>(
-        <span class="ident">statement</span>.<span class="ident">params</span>().<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">params</span>.<span class="ident">len</span>(),
+        <span class="ident">statement</span>.<span class="ident">params</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="ident">params</span>.<span class="ident">len</span>(),
         <span class="string">&quot;expected {} parameters but got {}&quot;</span>,
         <span class="ident">statement</span>.<span class="ident">params</span>().<span class="ident">len</span>(),
         <span class="ident">params</span>.<span class="ident">len</span>()
@@ -388,9 +388,9 @@
         <span class="prelude-val">Some</span>(<span class="number">1</span>),
         <span class="ident">params</span>.<span class="ident">zip</span>(<span class="ident">statement</span>.<span class="ident">params</span>()).<span class="ident">enumerate</span>(),
         <span class="op">|</span>(<span class="ident">idx</span>, (<span class="ident">param</span>, <span class="ident">ty</span>)), <span class="ident">buf</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">param</span>.<span class="ident">borrow_to_sql</span>().<span class="ident">to_sql_checked</span>(<span class="ident">ty</span>, <span class="ident">buf</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">IsNull::No</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">postgres_protocol::IsNull::No</span>),
-            <span class="prelude-val">Ok</span>(<span class="ident">IsNull::Yes</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">postgres_protocol::IsNull::Yes</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">IsNull::No</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">postgres_protocol::IsNull::No</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">IsNull::Yes</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">postgres_protocol::IsNull::Yes</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                 <span class="ident">error_idx</span> <span class="op">=</span> <span class="ident">idx</span>;
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>)
             }
@@ -399,9 +399,9 @@
         <span class="ident">buf</span>,
     );
     <span class="kw">match</span> <span class="ident">r</span> {
-        <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-        <span class="prelude-val">Err</span>(<span class="ident">frontend::BindError::Conversion</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::to_sql</span>(<span class="ident">e</span>, <span class="ident">error_idx</span>)),
-        <span class="prelude-val">Err</span>(<span class="ident">frontend::BindError::Serialization</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::encode</span>(<span class="ident">e</span>)),
+        <span class="prelude-val">Ok</span>(()) =&gt; <span class="prelude-val">Ok</span>(()),
+        <span class="prelude-val">Err</span>(<span class="ident">frontend::BindError::Conversion</span>(<span class="ident">e</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::to_sql</span>(<span class="ident">e</span>, <span class="ident">error_idx</span>)),
+        <span class="prelude-val">Err</span>(<span class="ident">frontend::BindError::Serialization</span>(<span class="ident">e</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::encode</span>(<span class="ident">e</span>)),
     }
 }
 
@@ -418,17 +418,17 @@
 <span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">RowStream</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Row</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
         <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">responses</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>) {
-            <span class="ident">Message::DataRow</span>(<span class="ident">body</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Message::DataRow</span>(<span class="ident">body</span>) =&gt; {
                 <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">Row::new</span>(<span class="ident">this</span>.<span class="ident">statement</span>.<span class="ident">clone</span>(), <span class="ident">body</span>)<span class="question-mark">?</span>)))
             }
             <span class="ident">Message::EmptyQueryResponse</span>
             <span class="op">|</span> <span class="ident">Message::CommandComplete</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">Message::PortalSuspended</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
-            <span class="ident">Message::ErrorResponse</span>(<span class="ident">body</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::db</span>(<span class="ident">body</span>)))),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()))),
+            <span class="op">|</span> <span class="ident">Message::PortalSuspended</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+            <span class="ident">Message::ErrorResponse</span>(<span class="ident">body</span>) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::db</span>(<span class="ident">body</span>)))),
+            <span class="kw">_</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()))),
         }
     }
 }

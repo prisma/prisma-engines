@@ -183,7 +183,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Config</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dbg_struct</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Config&quot;</span>);
         <span class="ident">dbg_struct</span>
             .<span class="ident">field</span>(<span class="string">&quot;http_keep_alive&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http_keep_alive</span>)
@@ -210,7 +210,7 @@
 
 <span class="kw">impl</span> <span class="ident">Config</span> {
     <span class="doccomment">/// Construct new empty config.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">http_keep_alive</span>: <span class="bool-val">true</span>,
             <span class="ident">tcp_no_delay</span>: <span class="bool-val">false</span>,
@@ -223,32 +223,32 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Config</span> {
     <span class="doccomment">/// Set HTTP/1.1 `keep-alive` (connection pooling).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_http_keep_alive</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">keep_alive</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_http_keep_alive</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">keep_alive</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">http_keep_alive</span> <span class="op">=</span> <span class="ident">keep_alive</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set TCP `NO_DELAY`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_tcp_no_delay</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">no_delay</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_tcp_no_delay</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">no_delay</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">tcp_no_delay</span> <span class="op">=</span> <span class="ident">no_delay</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set connection timeout duration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="ident">timeout</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the maximum number of simultaneous connections that this client is allowed to keep open to individual hosts at one time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_connections_per_host</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_connections_per_host</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_connections_per_host</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_connections_per_host</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">max_connections_per_host</span> <span class="op">=</span> <span class="ident">max_connections_per_host</span>;
         <span class="self">self</span>
     }
@@ -259,7 +259,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_tls_config</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">tls_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::sync::Arc</span><span class="op">&lt;</span><span class="ident">rustls_crate::ClientConfig</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">tls_config</span> <span class="op">=</span> <span class="ident">tls_config</span>;
         <span class="self">self</span>
     }
@@ -269,7 +269,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_tls_config</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">tls_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::sync::Arc</span><span class="op">&lt;</span><span class="ident">async_native_tls::TlsConnector</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">tls_config</span> <span class="op">=</span> <span class="ident">tls_config</span>;
         <span class="self">self</span>
     }

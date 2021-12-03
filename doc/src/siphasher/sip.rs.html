@@ -646,10 +646,10 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">compress</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>:<span class="ident">expr</span>) =&gt; {{
         <span class="macro">compress!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>.<span class="ident">v0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>.<span class="ident">v1</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>.<span class="ident">v2</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>.<span class="ident">v3</span>)
     }};
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v0</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v2</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v3</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v0</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v2</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v3</span>:<span class="ident">expr</span>) =&gt; {{
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v0</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v0</span>.<span class="ident">wrapping_add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v1</span>);
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v1</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v1</span>.<span class="ident">rotate_left</span>(<span class="number">13</span>);
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v1</span> <span class="op">^</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v0</span>;
@@ -673,7 +673,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Unsafe because: unchecked indexing at `i..i+size_of(int_ty)`</span>
 <span class="macro">macro_rules!</span> <span class="ident">load_int_le</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">int_ty</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">int_ty</span>:<span class="ident">ident</span>) =&gt; {{
         <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">+</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">int_ty</span><span class="op">&gt;</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>.<span class="ident">len</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="number">0</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">int_ty</span>;
         <span class="ident">ptr::copy_nonoverlapping</span>(
@@ -691,7 +691,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Unsafe because: unchecked indexing at start..start+len</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">u8to64_le</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">u8to64_le</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
     <span class="macro">debug_assert!</span>(<span class="ident">len</span> <span class="op">&lt;</span> <span class="number">8</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>; <span class="comment">// current byte index (from LSB) in the output u64</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="number">0</span>;
@@ -714,18 +714,18 @@
 <span class="kw">impl</span> <span class="ident">SipHasher</span> {
     <span class="doccomment">/// Creates a new `SipHasher` with the two initial keys set to 0.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SipHasher</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">SipHasher</span> {
         <span class="ident">SipHasher::new_with_keys</span>(<span class="number">0</span>, <span class="number">0</span>)
     }
 
     <span class="doccomment">/// Creates a `SipHasher` that is keyed off the provided keys.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_keys</span>(<span class="ident">key0</span>: <span class="ident">u64</span>, <span class="ident">key1</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SipHasher</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_keys</span>(<span class="ident">key0</span>: <span class="ident">u64</span>, <span class="ident">key1</span>: <span class="ident">u64</span>) -&gt; <span class="ident">SipHasher</span> {
         <span class="ident">SipHasher</span>(<span class="ident">SipHasher24::new_with_keys</span>(<span class="ident">key0</span>, <span class="ident">key1</span>))
     }
 
     <span class="doccomment">/// Creates a `SipHasher` from a 16 byte key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">16</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SipHasher</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">16</span>]) -&gt; <span class="ident">SipHasher</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b0</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">8</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b1</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">8</span>];
         <span class="ident">b0</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>[<span class="number">0</span>..<span class="number">8</span>]);
@@ -736,12 +736,12 @@
     }
 
     <span class="doccomment">/// Get the keys used by this hasher</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u64</span>, <span class="ident">u64</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
         (<span class="self">self</span>.<span class="number">0</span>.<span class="ident">hasher</span>.<span class="ident">k0</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">hasher</span>.<span class="ident">k1</span>)
     }
 
     <span class="doccomment">/// Get the key used by this hasher as a 16 byte vector</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">16</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">16</span>] {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
         <span class="ident">bytes</span>[<span class="number">0</span>..<span class="number">8</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">hasher</span>.<span class="ident">k0</span>.<span class="ident">to_le_bytes</span>());
         <span class="ident">bytes</span>[<span class="number">0</span>..<span class="number">16</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">hasher</span>.<span class="ident">k1</span>.<span class="ident">to_le_bytes</span>());
@@ -752,20 +752,20 @@
 <span class="kw">impl</span> <span class="ident">SipHasher13</span> {
     <span class="doccomment">/// Creates a new `SipHasher13` with the two initial keys set to 0.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SipHasher13</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">SipHasher13</span> {
         <span class="ident">SipHasher13::new_with_keys</span>(<span class="number">0</span>, <span class="number">0</span>)
     }
 
     <span class="doccomment">/// Creates a `SipHasher13` that is keyed off the provided keys.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_keys</span>(<span class="ident">key0</span>: <span class="ident">u64</span>, <span class="ident">key1</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SipHasher13</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_keys</span>(<span class="ident">key0</span>: <span class="ident">u64</span>, <span class="ident">key1</span>: <span class="ident">u64</span>) -&gt; <span class="ident">SipHasher13</span> {
         <span class="ident">SipHasher13</span> {
             <span class="ident">hasher</span>: <span class="ident">Hasher::new_with_keys</span>(<span class="ident">key0</span>, <span class="ident">key1</span>),
         }
     }
 
     <span class="doccomment">/// Creates a `SipHasher13` from a 16 byte key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">16</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SipHasher13</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">16</span>]) -&gt; <span class="ident">SipHasher13</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b0</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">8</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b1</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">8</span>];
         <span class="ident">b0</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>[<span class="number">0</span>..<span class="number">8</span>]);
@@ -776,12 +776,12 @@
     }
 
     <span class="doccomment">/// Get the keys used by this hasher</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u64</span>, <span class="ident">u64</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
         (<span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">k0</span>, <span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">k1</span>)
     }
 
     <span class="doccomment">/// Get the key used by this hasher as a 16 byte vector</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">16</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">16</span>] {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
         <span class="ident">bytes</span>[<span class="number">0</span>..<span class="number">8</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">k0</span>.<span class="ident">to_le_bytes</span>());
         <span class="ident">bytes</span>[<span class="number">0</span>..<span class="number">16</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">k1</span>.<span class="ident">to_le_bytes</span>());
@@ -792,20 +792,20 @@
 <span class="kw">impl</span> <span class="ident">SipHasher24</span> {
     <span class="doccomment">/// Creates a new `SipHasher24` with the two initial keys set to 0.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SipHasher24</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">SipHasher24</span> {
         <span class="ident">SipHasher24::new_with_keys</span>(<span class="number">0</span>, <span class="number">0</span>)
     }
 
     <span class="doccomment">/// Creates a `SipHasher24` that is keyed off the provided keys.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_keys</span>(<span class="ident">key0</span>: <span class="ident">u64</span>, <span class="ident">key1</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SipHasher24</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_keys</span>(<span class="ident">key0</span>: <span class="ident">u64</span>, <span class="ident">key1</span>: <span class="ident">u64</span>) -&gt; <span class="ident">SipHasher24</span> {
         <span class="ident">SipHasher24</span> {
             <span class="ident">hasher</span>: <span class="ident">Hasher::new_with_keys</span>(<span class="ident">key0</span>, <span class="ident">key1</span>),
         }
     }
 
     <span class="doccomment">/// Creates a `SipHasher24` from a 16 byte key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">16</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SipHasher24</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">16</span>]) -&gt; <span class="ident">SipHasher24</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b0</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">8</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b1</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">8</span>];
         <span class="ident">b0</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>[<span class="number">0</span>..<span class="number">8</span>]);
@@ -816,12 +816,12 @@
     }
 
     <span class="doccomment">/// Get the keys used by this hasher</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u64</span>, <span class="ident">u64</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
         (<span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">k0</span>, <span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">k1</span>)
     }
 
     <span class="doccomment">/// Get the key used by this hasher as a 16 byte vector</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">16</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">16</span>] {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
         <span class="ident">bytes</span>[<span class="number">0</span>..<span class="number">8</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">k0</span>.<span class="ident">to_le_bytes</span>());
         <span class="ident">bytes</span>[<span class="number">0</span>..<span class="number">16</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">k1</span>.<span class="ident">to_le_bytes</span>());
@@ -831,7 +831,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Sip</span><span class="op">&gt;</span> <span class="ident">Hasher</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new_with_keys</span>(<span class="ident">key0</span>: <span class="ident">u64</span>, <span class="ident">key1</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Hasher</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new_with_keys</span>(<span class="ident">key0</span>: <span class="ident">u64</span>, <span class="ident">key1</span>: <span class="ident">u64</span>) -&gt; <span class="ident">Hasher</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Hasher</span> {
             <span class="ident">k0</span>: <span class="ident">key0</span>,
             <span class="ident">k1</span>: <span class="ident">key1</span>,
@@ -877,7 +877,7 @@
         <span class="self">self</span>.<span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">size</span>;
 
         <span class="comment">// The original number must be zero-extended, not sign-extended.</span>
-        <span class="macro">debug_assert!</span>(<span class="kw">if</span> <span class="ident">size</span> <span class="op">&lt;</span> <span class="number">8</span> { <span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">8</span> <span class="op">*</span> <span class="ident">size</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span> } <span class="kw">else</span> { <span class="bool-val">true</span> });
+        <span class="macro">debug_assert!</span>(<span class="kw">if</span> <span class="ident">size</span> <span class="op">&lt;</span> <span class="number">8</span> { <span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">8</span> <span class="op">*</span> <span class="ident">size</span>) <span class="op">==</span> <span class="number">0</span> } <span class="kw">else</span> { <span class="bool-val">true</span> });
 
         <span class="comment">// The number of bytes needed to fill `self.tail`.</span>
         <span class="kw">let</span> <span class="ident">needed</span> <span class="op">=</span> <span class="number">8</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">ntail</span>;
@@ -905,7 +905,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">finish</span>()
     }
 
@@ -942,7 +942,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">finish</span>()
     }
 
@@ -979,7 +979,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">finish</span>()
     }
 
@@ -1071,7 +1071,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>;
 
         <span class="kw">let</span> <span class="ident">b</span>: <span class="ident">u64</span> <span class="op">=</span> ((<span class="self">self</span>.<span class="ident">length</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">&amp;</span> <span class="number">0xff</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">56</span>) <span class="op">|</span> <span class="self">self</span>.<span class="ident">tail</span>;
@@ -1090,7 +1090,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Sip</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Hasher</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a `Hasher&lt;S&gt;` with the two initial keys set to 0.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Hasher</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Hasher</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
         <span class="ident">Hasher::new_with_keys</span>(<span class="number">0</span>, <span class="number">0</span>)
     }
 }

@@ -496,8 +496,8 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_slot</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">U</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="ident">idx</span>: <span class="ident">usize</span>,
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">page::Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
+        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">page::Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
         <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
 
@@ -509,7 +509,7 @@
         <span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>].<span class="ident">with_slot</span>(<span class="ident">addr</span>, <span class="ident">f</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tid</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tid</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total_sz</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">C::MAX_PAGES</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">page_num</span><span class="op">|</span> {
@@ -529,7 +529,7 @@
     <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
 {
     <span class="doccomment">/// Remove an item on the shard&#39;s local thread.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
         <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
 
@@ -541,7 +541,7 @@
     }
 
     <span class="doccomment">/// Remove an item, while on a different thread from the shard&#39;s local thread.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
         <span class="macro">debug_assert!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::current</span>().<span class="ident">as_usize</span>() <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">tid</span>);
 
@@ -553,7 +553,7 @@
         <span class="ident">shared</span>.<span class="ident">take</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="ident">shared</span>.<span class="ident">free_list</span>())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
         <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
 
@@ -564,7 +564,7 @@
         <span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>].<span class="ident">remove</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="self">self</span>.<span class="ident">local</span>(<span class="ident">page_index</span>))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
         <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
 
@@ -576,7 +576,7 @@
         <span class="ident">shared</span>.<span class="ident">remove</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="ident">shared</span>.<span class="ident">free_list</span>())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">page::Shared</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">std::slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">page::Shared</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">iter</span>()
     }
 }
@@ -588,8 +588,8 @@
 {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">init_with</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="kw-2">mut</span> <span class="ident">init</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">page::Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
+        <span class="kw-2">mut</span> <span class="ident">init</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">page::Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
         <span class="comment">// Can we fit the value into an exist`ing page?</span>
         <span class="kw">for</span> (<span class="ident">page_idx</span>, <span class="ident">page</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
             <span class="kw">let</span> <span class="ident">local</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">local</span>(<span class="ident">page_idx</span>);
@@ -604,7 +604,7 @@
         <span class="prelude-val">None</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_clear_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_clear_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
         <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
 
@@ -615,7 +615,7 @@
         <span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>].<span class="ident">mark_clear</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="self">self</span>.<span class="ident">local</span>(<span class="ident">page_index</span>))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_clear_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_clear_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
         <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
 
@@ -635,14 +635,14 @@
             <span class="ident">tid</span>,
             <span class="self">self</span>.<span class="ident">tid</span>
         );
-        <span class="kw">if</span> <span class="ident">tid</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">tid</span> {
+        <span class="kw">if</span> <span class="ident">tid</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">tid</span> {
             <span class="self">self</span>.<span class="ident">clear_local</span>(<span class="ident">idx</span>);
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">clear_remote</span>(<span class="ident">idx</span>);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">clear_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">clear_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
         <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
 
@@ -653,7 +653,7 @@
         <span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>].<span class="ident">clear</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="self">self</span>.<span class="ident">local</span>(<span class="ident">page_index</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">clear_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">clear_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
         <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
 
@@ -666,7 +666,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">page::Local</span> {
+    <span class="kw">fn</span> <span class="ident">local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">page::Local</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
         <span class="macro">debug_assert_eq_in_drop!</span>(
             <span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::current</span>().<span class="ident">as_usize</span>(),
@@ -679,7 +679,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Shard&quot;</span>);
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
@@ -694,7 +694,7 @@
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shards</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">C::MAX_SHARDS</span>);
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">C::MAX_SHARDS</span> {
             <span class="comment">// XXX(eliza): T_T this could be avoided with maybeuninit or something...</span>
@@ -707,13 +707,13 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; get shard={}&quot;</span>, <span class="ident">idx</span>);
         <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">idx</span>)<span class="question-mark">?</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Tid</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">Tid</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::current</span>();
         <span class="macro">test_println!</span>(<span class="string">&quot;current: {:?}&quot;</span>, <span class="ident">tid</span>);
         <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">tid</span>.<span class="ident">as_usize</span>();
@@ -726,8 +726,8 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>);
             <span class="kw">while</span> <span class="ident">max</span> <span class="op">&lt;</span> <span class="ident">idx</span> {
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">compare_exchange</span>(<span class="ident">max</span>, <span class="ident">idx</span>, <span class="ident">AcqRel</span>, <span class="ident">Acquire</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">actual</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">actual</span>,
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
+                    <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; <span class="ident">max</span> <span class="op">=</span> <span class="ident">actual</span>,
                 }
             }
             <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; highest index={}, prev={}&quot;</span>, <span class="ident">std::cmp::max</span>(<span class="ident">max</span>, <span class="ident">idx</span>), <span class="ident">max</span>);
@@ -740,7 +740,7 @@
         (<span class="ident">tid</span>, <span class="ident">shard</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
         <span class="macro">test_println!</span>(<span class="string">&quot;Array::iter_mut&quot;</span>);
         <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>);
         <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; highest index={}&quot;</span>, <span class="ident">max</span>);
@@ -770,7 +770,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Array</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_map</span>();
         <span class="kw">for</span> <span class="ident">shard</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shards</span>[<span class="number">0</span>..<span class="op">=</span><span class="ident">max</span>] {
@@ -789,12 +789,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">null</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">null</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()))
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">load</span>(<span class="ident">order</span>);
         <span class="macro">test_println!</span>(<span class="string">&quot;---&gt; loaded={:p} (order={:?})&quot;</span>, <span class="ident">ptr</span>, <span class="ident">order</span>);
         <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
@@ -832,7 +832,7 @@
     <span class="ident">C</span>: <span class="ident">cfg::Config</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="macro">test_println!</span>(<span class="string">&quot;IterMut::next&quot;</span>);
         <span class="kw">loop</span> {
             <span class="comment">// Skip over empty indices if they are less than the highest</span>

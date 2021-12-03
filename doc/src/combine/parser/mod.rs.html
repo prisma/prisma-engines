@@ -1088,7 +1088,7 @@
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">impl_parser</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>: <span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty_var</span>: <span class="ident">ident</span>),<span class="kw-2">*</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner_type</span>: <span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>: <span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty_var</span>: <span class="ident">ident</span>),<span class="kw-2">*</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner_type</span>: <span class="ident">ty</span>) =&gt; {
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span> $(,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty_var</span>)<span class="kw-2">*</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner_type</span>)
         <span class="kw">where</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>: <span class="ident">Parser</span> $(,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty_var</span> : <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">=</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span> <span class="kw">as</span> <span class="ident">Parser</span><span class="op">&gt;</span><span class="ident">::Input</span><span class="op">&gt;</span>)<span class="kw-2">*</span>;
@@ -1106,13 +1106,13 @@
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">parse_mode</span> {
-    () <span class="op">=</span><span class="op">&gt;</span> {
+    () =&gt; {
         <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
         <span class="kw">fn</span> <span class="ident">parse_partial</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
             <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
             <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">parse_mode</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::parser::PartialMode::default</span>(), <span class="ident">input</span>, <span class="ident">state</span>)
         }
 
@@ -1121,7 +1121,7 @@
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
             <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
             <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">parse_mode</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::parser::FirstMode</span>, <span class="ident">input</span>, <span class="ident">state</span>)
         }
     }
@@ -1206,7 +1206,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ParseError`]: struct.ParseError.html</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">easy_parse</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">I</span>), <span class="ident">::easy::ParseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">easy_parse</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">I</span>), <span class="ident">::easy::ParseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">Stream</span>,
         <span class="ident">::easy::Stream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>: <span class="ident">StreamOnce</span><span class="op">&lt;</span>
@@ -1237,10 +1237,10 @@
     <span class="kw">fn</span> <span class="ident">parse</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident"><span class="self">Self</span>::Input</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span>), <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span>), <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">parse_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>) {
-            <span class="prelude-val">Ok</span>((<span class="ident">v</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="ident">v</span>, <span class="ident">input</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>.<span class="ident">into_inner</span>().<span class="ident">error</span>),
+            <span class="prelude-val">Ok</span>((<span class="ident">v</span>, <span class="kw">_</span>)) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">v</span>, <span class="ident">input</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">error</span>.<span class="ident">into_inner</span>().<span class="ident">error</span>),
         }
     }
 
@@ -1253,10 +1253,10 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">parse_stream_consumed_partial</span>(<span class="ident">input</span>, <span class="ident">state</span>).<span class="ident">into</span>() {
-            <span class="prelude-val">Ok</span>((<span class="ident">v</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">v</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>.<span class="ident">into_inner</span>().<span class="ident">error</span>),
+            <span class="prelude-val">Ok</span>((<span class="ident">v</span>, <span class="kw">_</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">v</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">error</span>.<span class="ident">into_inner</span>().<span class="ident">error</span>),
         }
     }
 
@@ -1269,7 +1269,7 @@
     <span class="doccomment">/// [`Stream::uncons`]: trait.StreamOnce.html#tymethod.uncons</span>
     <span class="doccomment">/// [`Consumed`]: enum.Consumed.html</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">parse_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">parse_stream_consumed</span>(<span class="ident">input</span>).<span class="ident">into</span>()
     }
 
@@ -1286,7 +1286,7 @@
     <span class="kw">fn</span> <span class="ident">parse_stream_consumed</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_first</span>(<span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
@@ -1306,7 +1306,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_partial</span>(<span class="ident">input</span>, <span class="ident">state</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FastResult::EmptyErr</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">error</span>) <span class="op">=</span> <span class="ident">result</span> {
@@ -1341,7 +1341,7 @@
     <span class="doccomment">/// [`Error`]: trait.StreamOnce.html#associatedtype.Error</span>
     <span class="doccomment">/// [`add_error`]: trait.Parser.html#method.add_error</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">is_partial</span>() {
             <span class="comment">// If a partial parser were called from a non-partial parser (as it is here) we must</span>
             <span class="comment">// reset the input to before the partial parser were called on errors that consumed</span>
@@ -1368,7 +1368,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">parse_partial</span>(<span class="ident">input</span>, <span class="ident">state</span>)
     }
 
@@ -1379,7 +1379,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">state</span>;
         <span class="self">self</span>.<span class="ident">parse_lazy</span>(<span class="ident">input</span>)
     }
@@ -1392,7 +1392,7 @@
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
         <span class="self">Self</span>: <span class="ident">Sized</span>,
@@ -1412,7 +1412,7 @@
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
         <span class="self">Self</span>: <span class="ident">Sized</span>,
@@ -1432,7 +1432,7 @@
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
         <span class="self">Self</span>: <span class="ident">Sized</span>,
@@ -1456,7 +1456,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Internal API: This should not be implemented explicitly outside of combine.</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">parser_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ErrorOffset</span> {
+    <span class="kw">fn</span> <span class="ident">parser_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ErrorOffset</span> {
         <span class="ident">ErrorOffset</span>(<span class="number">1</span>)
     }
 
@@ -1492,7 +1492,7 @@
     <span class="doccomment">///     );</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">by_ref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">fn</span> <span class="ident">by_ref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
     {
@@ -1514,7 +1514,7 @@
     <span class="doccomment">/// assert_eq!(result, Ok(&#39;i&#39;));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">with</span><span class="op">&lt;</span><span class="ident">P2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">p</span>: <span class="ident">P2</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">With</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">P2</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">with</span><span class="op">&lt;</span><span class="ident">P2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">p</span>: <span class="ident">P2</span>) -&gt; <span class="ident">With</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">P2</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">P2</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>,
@@ -1537,7 +1537,7 @@
     <span class="doccomment">/// assert_eq!(result, Ok(&#39;9&#39;));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">skip</span><span class="op">&lt;</span><span class="ident">P2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">p</span>: <span class="ident">P2</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Skip</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">P2</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">skip</span><span class="op">&lt;</span><span class="ident">P2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">p</span>: <span class="ident">P2</span>) -&gt; <span class="ident">Skip</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">P2</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">P2</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>,
@@ -1561,7 +1561,7 @@
     <span class="doccomment">/// assert_eq!(result, Ok((&#39;9&#39;, &#39;i&#39;)));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">and</span><span class="op">&lt;</span><span class="ident">P2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">p</span>: <span class="ident">P2</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="ident">P2</span>)
+    <span class="kw">fn</span> <span class="ident">and</span><span class="op">&lt;</span><span class="ident">P2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">p</span>: <span class="ident">P2</span>) -&gt; (<span class="self">Self</span>, <span class="ident">P2</span>)
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">P2</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>,
@@ -1598,7 +1598,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`choice!`]: ../macro.choice.html</span>
-    <span class="kw">fn</span> <span class="ident">or</span><span class="op">&lt;</span><span class="ident">P2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">p</span>: <span class="ident">P2</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Or</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">P2</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">or</span><span class="op">&lt;</span><span class="ident">P2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">p</span>: <span class="ident">P2</span>) -&gt; <span class="ident">Or</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">P2</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">P2</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Input</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span>,
@@ -1635,10 +1635,10 @@
     <span class="doccomment">/// assert_eq!(result, Ok((9, &quot;&quot;)));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">then</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Then</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">then</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Then</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">N</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) -&gt; <span class="ident">N</span>,
         <span class="ident">N</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>,
     {
         <span class="ident">then</span>(<span class="self">self</span>, <span class="ident">f</span>)
@@ -1674,10 +1674,10 @@
     <span class="doccomment">/// assert_eq!(result, Ok((9, &quot;&quot;)));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">then_partial</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ThenPartial</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">then_partial</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ThenPartial</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">N</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Output</span>) -&gt; <span class="ident">N</span>,
         <span class="ident">N</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>,
     {
         <span class="ident">then_partial</span>(<span class="self">self</span>, <span class="ident">f</span>)
@@ -1697,10 +1697,10 @@
     <span class="doccomment">/// assert_eq!(result, Ok(true));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Map</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">B</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) -&gt; <span class="ident">B</span>,
     {
         <span class="ident">map</span>(<span class="self">self</span>, <span class="ident">f</span>)
     }
@@ -1719,10 +1719,10 @@
     <span class="doccomment">/// assert_eq!(result, Ok((String::from(&quot;12&quot;), &quot;cd&quot;)));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">flat_map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FlatMap</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">flat_map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FlatMap</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>,
     {
         <span class="ident">flat_map</span>(<span class="self">self</span>, <span class="ident">f</span>)
     }
@@ -1749,7 +1749,7 @@
     <span class="doccomment">/// }));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">message</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Message</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">message</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">S</span>) -&gt; <span class="ident">Message</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Item</span>, <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -1779,7 +1779,7 @@
     <span class="doccomment">/// }));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">expected</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expected</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">expected</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">S</span>) -&gt; <span class="ident">Expected</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Item</span>, <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -1809,7 +1809,7 @@
     <span class="doccomment">/// }));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">silent</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Silent</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">silent</span>(<span class="self">self</span>) -&gt; <span class="ident">Silent</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
     {
@@ -1835,10 +1835,10 @@
     <span class="doccomment">/// assert_eq!(result.unwrap_err().position, SourcePosition { line: 1, column: 1 });</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">and_then</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O</span>, <span class="ident">E</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AndThen</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">and_then</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O</span>, <span class="ident">E</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">AndThen</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span>,
         <span class="ident">I</span>: <span class="ident">Stream</span>,
         <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">I::Error</span> <span class="kw">as</span> <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::StreamError</span><span class="op">&gt;</span>,
     {
@@ -1868,7 +1868,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`many`]: ../combinator/fn.many.html</span>
-    <span class="kw">fn</span> <span class="ident">iter</span>(<span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Parser</span><span class="op">&gt;</span><span class="ident">::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::PartialState</span>, <span class="ident">FirstMode</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">iter</span>(<span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Parser</span><span class="op">&gt;</span><span class="ident">::Input</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::PartialState</span>, <span class="ident">FirstMode</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Parser</span> <span class="op">+</span> <span class="ident">Sized</span>,
     {
@@ -1903,7 +1903,7 @@
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Parser</span><span class="op">&gt;</span><span class="ident">::Input</span>,
         <span class="ident">partial_state</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>, <span class="ident">M</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>, <span class="ident">M</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Parser</span> <span class="op">+</span> <span class="ident">Sized</span>,
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
@@ -1934,7 +1934,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">boxed</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span>
+    ) -&gt; <span class="ident">Box</span><span class="op">&lt;</span>
         <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Input</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">PartialState</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::PartialState</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
     <span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -1969,7 +1969,7 @@
     <span class="doccomment">/// assert_eq!(result, Ok((&quot;&quot;.to_string(), &quot;&quot;)));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">left</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Either</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">R</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">left</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">Either</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">R</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">R</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Input</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span>,
@@ -2003,7 +2003,7 @@
     <span class="doccomment">/// assert_eq!(result, Ok((&quot;&quot;.to_string(), &quot;&quot;)));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">right</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Either</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">right</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">Either</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">L</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Input</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span>,
@@ -2013,7 +2013,7 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">forward_deref</span> {
-    () <span class="op">=</span><span class="op">&gt;</span> {
+    () =&gt; {
         <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">P::Input</span>;
         <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">P::Output</span>;
         <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="ident">P::PartialState</span>;
@@ -2023,7 +2023,7 @@
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
             <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
             <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
             (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">parse_first</span>(<span class="ident">input</span>, <span class="ident">state</span>)
         }
 
@@ -2032,7 +2032,7 @@
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
             <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
             <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
             (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">parse_partial</span>(<span class="ident">input</span>, <span class="ident">state</span>)
         }
 
@@ -2047,7 +2047,7 @@
         }
 
         <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">parser_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ErrorOffset</span> {
+        <span class="kw">fn</span> <span class="ident">parser_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ErrorOffset</span> {
             (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">parser_count</span>()
         }
     }
@@ -2074,7 +2074,7 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ParseMode</span>: <span class="ident">Copy</span> {
     <span class="doccomment">/// If `true` then the parser has no previous state to resume otherwise the parser *might* have</span>
     <span class="doccomment">/// state to resume which it must check.</span>
-    <span class="kw">fn</span> <span class="ident">is_first</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">is_first</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
     <span class="doccomment">/// Puts the mode into `first` parsing.</span>
     <span class="kw">fn</span> <span class="ident">set_first</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
 
@@ -2084,7 +2084,7 @@
         <span class="ident">parser</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">P</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">P::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">P::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">P::Output</span>, <span class="ident">P::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">P::Output</span>, <span class="ident">P::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">P</span>: <span class="ident">Parser</span>,
     {
@@ -2108,7 +2108,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FirstMode</span>;
 <span class="kw">impl</span> <span class="ident">ParseMode</span> <span class="kw">for</span> <span class="ident">FirstMode</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_first</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_first</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
@@ -2123,7 +2123,7 @@
 }
 <span class="kw">impl</span> <span class="ident">ParseMode</span> <span class="kw">for</span> <span class="ident">PartialMode</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_first</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_first</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">first</span>
     }
 

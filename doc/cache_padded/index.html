@@ -4,7 +4,7 @@ is not all placed into the same cache line. Updating an atomic value invalides t
 line it belongs to, which makes the next access to the same cache line slower for other CPU
 cores. Use <a href="struct.CachePadded.html" title="CachePadded"><code>CachePadded</code></a> to ensure updating one piece of data doesn’t invalidate other cached
 data.</p>
-<h1 id="size-and-alignment" class="section-header"><a href="#size-and-alignment">Size and alignment</a></h1>
+<h2 id="size-and-alignment" class="section-header"><a href="#size-and-alignment">Size and alignment</a></h2>
 <p>Cache lines are assumed to be N bytes long, depending on the architecture:</p>
 <ul>
 <li>On x86-64 and aarch64, N = 128.</li>
@@ -15,7 +15,7 @@ length of the machine the program is running on.</p>
 <p>The size of <code>CachePadded&lt;T&gt;</code> is the smallest multiple of N bytes large enough to accommodate
 a value of type <code>T</code>.</p>
 <p>The alignment of <code>CachePadded&lt;T&gt;</code> is the maximum of N bytes and the alignment of <code>T</code>.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>Alignment and padding:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">cache_padded::CachePadded</span>;
@@ -40,7 +40,7 @@ each other’s cache lines:</p>
     <span class="ident">buffer</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>,
 }</code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.CachePadded.html" title="cache_padded::CachePadded struct">CachePadded</a></div><div class="item-right docblock-short"><p>Pads and aligns data to the length of a cache line.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="cache_padded" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.CachePadded.html" title="cache_padded::CachePadded struct">CachePadded</a></div><div class="item-right docblock-short"><p>Pads and aligns data to the length of a cache line.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="cache_padded" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

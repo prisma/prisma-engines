@@ -616,7 +616,7 @@
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">NextResetExpire</span>;
 
 <span class="kw">impl</span> <span class="ident">Stream</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">StreamId</span>, <span class="ident">init_send_window</span>: <span class="ident">WindowSize</span>, <span class="ident">init_recv_window</span>: <span class="ident">WindowSize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">StreamId</span>, <span class="ident">init_send_window</span>: <span class="ident">WindowSize</span>, <span class="ident">init_recv_window</span>: <span class="ident">WindowSize</span>) -&gt; <span class="ident">Stream</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">send_flow</span> <span class="op">=</span> <span class="ident">FlowControl::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">recv_flow</span> <span class="op">=</span> <span class="ident">FlowControl::new</span>();
 
@@ -680,12 +680,12 @@
 
     <span class="doccomment">/// Returns true if stream is currently being held for some time because of</span>
     <span class="doccomment">/// a local reset.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_pending_reset_expiration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_pending_reset_expiration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">reset_at</span>.<span class="ident">is_some</span>()
     }
 
     <span class="doccomment">/// Returns true if frames for this stream are ready to be sent over the wire</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_send_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_send_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="comment">// Why do we check pending_open?</span>
         <span class="comment">//</span>
         <span class="comment">// We allow users to call send_request() which schedules a stream to be pending_open</span>
@@ -705,7 +705,7 @@
     }
 
     <span class="doccomment">/// Returns true if the stream is closed</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="comment">// The state has fully transitioned to closed.</span>
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">is_closed</span>() <span class="op">&amp;&amp;</span>
             <span class="comment">// Because outbound frames transition the stream state before being</span>
@@ -716,15 +716,15 @@
             <span class="comment">// queue to be rescheduled.</span>
             <span class="comment">//</span>
             <span class="comment">// Checking for additional buffered data lets us catch this case.</span>
-            <span class="self">self</span>.<span class="ident">buffered_send_data</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+            <span class="self">self</span>.<span class="ident">buffered_send_data</span> <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Returns true if the stream is no longer in use</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_released</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_released</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="comment">// The stream is closed and fully flushed</span>
         <span class="self">self</span>.<span class="ident">is_closed</span>() <span class="op">&amp;&amp;</span>
             <span class="comment">// There are no more outstanding references to the stream</span>
-            <span class="self">self</span>.<span class="ident">ref_count</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span>
+            <span class="self">self</span>.<span class="ident">ref_count</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span>
             <span class="comment">// The stream is not in any queue</span>
             <span class="op">!</span><span class="self">self</span>.<span class="ident">is_pending_send</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_pending_send_capacity</span> <span class="op">&amp;&amp;</span>
             <span class="op">!</span><span class="self">self</span>.<span class="ident">is_pending_accept</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_pending_window_update</span> <span class="op">&amp;&amp;</span>
@@ -736,8 +736,8 @@
     <span class="doccomment">/// not actually closed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// In this case, a reset should be sent.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_canceled_interest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">ref_count</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">is_closed</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_canceled_interest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ref_count</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">is_closed</span>()
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assign_capacity</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">capacity</span>: <span class="ident">WindowSize</span>) {
@@ -760,28 +760,28 @@
     }
 
     <span class="doccomment">/// Returns `Err` when the decrement cannot be completed due to overflow.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dec_content_length</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dec_content_length</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">content_length</span> {
-            <span class="ident">ContentLength::Remaining</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rem</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">rem</span>.<span class="ident">checked_sub</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u64</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">rem</span> <span class="op">=</span> <span class="ident">val</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
+            <span class="ident">ContentLength::Remaining</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rem</span>) =&gt; <span class="kw">match</span> <span class="ident">rem</span>.<span class="ident">checked_sub</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u64</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; <span class="kw-2">*</span><span class="ident">rem</span> <span class="op">=</span> <span class="ident">val</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
             },
-            <span class="ident">ContentLength::Head</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ContentLength::Head</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">len</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(());
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">_</span> =&gt; {}
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_content_length_zero</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_content_length_zero</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">content_length</span> {
-            <span class="ident">ContentLength::Remaining</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-            <span class="ident">ContentLength::Remaining</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+            <span class="ident">ContentLength::Remaining</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="ident">ContentLength::Remaining</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 
@@ -803,7 +803,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">store::Next</span> <span class="kw">for</span> <span class="ident">NextAccept</span> {
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">next_pending_accept</span>
     }
 
@@ -811,11 +811,11 @@
         <span class="ident">stream</span>.<span class="ident">next_pending_accept</span> <span class="op">=</span> <span class="ident">key</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">next_pending_accept</span>.<span class="ident">take</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">stream</span>.<span class="ident">is_pending_accept</span>
     }
 
@@ -825,7 +825,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">store::Next</span> <span class="kw">for</span> <span class="ident">NextSend</span> {
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">next_pending_send</span>
     }
 
@@ -833,11 +833,11 @@
         <span class="ident">stream</span>.<span class="ident">next_pending_send</span> <span class="op">=</span> <span class="ident">key</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">next_pending_send</span>.<span class="ident">take</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">stream</span>.<span class="ident">is_pending_send</span>
     }
 
@@ -852,7 +852,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">store::Next</span> <span class="kw">for</span> <span class="ident">NextSendCapacity</span> {
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">next_pending_send_capacity</span>
     }
 
@@ -860,11 +860,11 @@
         <span class="ident">stream</span>.<span class="ident">next_pending_send_capacity</span> <span class="op">=</span> <span class="ident">key</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">next_pending_send_capacity</span>.<span class="ident">take</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">stream</span>.<span class="ident">is_pending_send_capacity</span>
     }
 
@@ -874,7 +874,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">store::Next</span> <span class="kw">for</span> <span class="ident">NextWindowUpdate</span> {
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">next_window_update</span>
     }
 
@@ -882,11 +882,11 @@
         <span class="ident">stream</span>.<span class="ident">next_window_update</span> <span class="op">=</span> <span class="ident">key</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">next_window_update</span>.<span class="ident">take</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">stream</span>.<span class="ident">is_pending_window_update</span>
     }
 
@@ -896,7 +896,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">store::Next</span> <span class="kw">for</span> <span class="ident">NextOpen</span> {
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">next_open</span>
     }
 
@@ -904,11 +904,11 @@
         <span class="ident">stream</span>.<span class="ident">next_open</span> <span class="op">=</span> <span class="ident">key</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">next_open</span>.<span class="ident">take</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">stream</span>.<span class="ident">is_pending_open</span>
     }
 
@@ -923,7 +923,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">store::Next</span> <span class="kw">for</span> <span class="ident">NextResetExpire</span> {
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">next_reset_expire</span>
     }
 
@@ -931,11 +931,11 @@
         <span class="ident">stream</span>.<span class="ident">next_reset_expire</span> <span class="op">=</span> <span class="ident">key</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">next_reset_expire</span>.<span class="ident">take</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">stream</span>.<span class="ident">reset_at</span>.<span class="ident">is_some</span>()
     }
 
@@ -951,10 +951,10 @@
 <span class="comment">// ===== impl ContentLength =====</span>
 
 <span class="kw">impl</span> <span class="ident">ContentLength</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_head</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_head</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ContentLength::Head</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">ContentLength::Head</span> =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 }

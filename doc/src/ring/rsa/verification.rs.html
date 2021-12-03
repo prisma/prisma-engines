@@ -373,7 +373,7 @@
         <span class="ident">n_min_bits</span>: <span class="ident">bits::BitLength</span>,
         <span class="ident">n_max_bits</span>: <span class="ident">bits::BitLength</span>,
         <span class="ident">e_min_value</span>: <span class="ident">u64</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
         <span class="comment">// This is an incomplete implementation of NIST SP800-56Br1 Section</span>
         <span class="comment">// 6.4.2.2, &quot;Partial Public-Key Validation for RSA.&quot; That spec defers</span>
         <span class="comment">// to NIST SP800-89 Section 5.3.3, &quot;(Explicit) Partial Public Key</span>
@@ -426,7 +426,7 @@
         <span class="ident">public_key</span>: <span class="ident">untrusted::Input</span>,
         <span class="ident">msg</span>: <span class="ident">untrusted::Input</span>,
         <span class="ident">signature</span>: <span class="ident">untrusted::Input</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">n</span>, <span class="ident">e</span>) <span class="op">=</span> <span class="ident">parse_public_key</span>(<span class="ident">public_key</span>)<span class="question-mark">?</span>;
         <span class="ident">verify_rsa_</span>(
             <span class="self">self</span>,
@@ -444,7 +444,7 @@
 
 <span class="macro">macro_rules!</span> <span class="ident">rsa_params</span> {
     ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">VERIFY_ALGORITHM</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min_bits</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">PADDING_ALGORITHM</span>:<span class="ident">expr</span>,
-      <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc_str</span>:<span class="ident">expr</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc_str</span>:<span class="ident">expr</span> ) =&gt; {
         <span class="attribute">#[<span class="ident">doc</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc_str</span>]</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// Only available in `alloc` mode.</span>
@@ -577,7 +577,7 @@
 <span class="kw">where</span>
     <span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">core::fmt::Debug</span>,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">n</span>: <span class="self">self</span>.<span class="ident">n</span>.<span class="ident">clone</span>(),
             <span class="ident">e</span>: <span class="self">self</span>.<span class="ident">e</span>.<span class="ident">clone</span>(),
@@ -598,7 +598,7 @@
         <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">RsaParameters</span>,
         <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">signature</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">cpu::features</span>();
         <span class="ident">verify_rsa_</span>(
             <span class="ident">params</span>,
@@ -617,7 +617,7 @@
     (<span class="ident">n</span>, <span class="ident">e</span>): (<span class="ident">untrusted::Input</span>, <span class="ident">untrusted::Input</span>),
     <span class="ident">msg</span>: <span class="ident">untrusted::Input</span>,
     <span class="ident">signature</span>: <span class="ident">untrusted::Input</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">max_bits</span> <span class="op">=</span> <span class="ident">bits::BitLength::from_usize_bytes</span>(<span class="ident">PUBLIC_KEY_PUBLIC_MODULUS_MAX_LEN</span>)<span class="question-mark">?</span>;
 
     <span class="comment">// XXX: FIPS 186-4 seems to indicate that the minimum</span>
@@ -663,13 +663,13 @@
     <span class="ident">elem</span>: <span class="ident">bigint::Elem</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">Unencoded</span><span class="op">&gt;</span>,
     <span class="ident">n_bits</span>: <span class="ident">bits::BitLength</span>,
     <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>; <span class="ident">PUBLIC_KEY_PUBLIC_MODULUS_MAX_LEN</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
     <span class="kw">let</span> <span class="ident">n_bytes</span> <span class="op">=</span> <span class="ident">n_bits</span>.<span class="ident">as_usize_bytes_rounded_up</span>();
     <span class="kw">let</span> <span class="ident">n_bytes_padded</span> <span class="op">=</span> ((<span class="ident">n_bytes</span> <span class="op">+</span> (<span class="ident">LIMB_BYTES</span> <span class="op">-</span> <span class="number">1</span>)) <span class="op">/</span> <span class="ident">LIMB_BYTES</span>) <span class="op">*</span> <span class="ident">LIMB_BYTES</span>;
     <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out</span>[..<span class="ident">n_bytes_padded</span>];
     <span class="ident">elem</span>.<span class="ident">fill_be_bytes</span>(<span class="ident">out</span>);
     <span class="kw">let</span> (<span class="ident">padding</span>, <span class="ident">out</span>) <span class="op">=</span> <span class="ident">out</span>.<span class="ident">split_at</span>(<span class="ident">n_bytes_padded</span> <span class="op">-</span> <span class="ident">n_bytes</span>);
-    <span class="macro">assert!</span>(<span class="ident">padding</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>));
+    <span class="macro">assert!</span>(<span class="ident">padding</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="number">0</span>));
     <span class="ident">out</span>
 }
 </code></pre></div>

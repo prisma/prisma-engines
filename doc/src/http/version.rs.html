@@ -129,22 +129,22 @@
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Version</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Version</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Version</span> {
         <span class="ident">Version::HTTP_11</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Version</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Http</span>::<span class="kw-2">*</span>;
 
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">Http09</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;HTTP/0.9&quot;</span>,
-            <span class="ident">Http10</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;HTTP/1.0&quot;</span>,
-            <span class="ident">Http11</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;HTTP/1.1&quot;</span>,
-            <span class="ident">H2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;HTTP/2.0&quot;</span>,
-            <span class="ident">H3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;HTTP/3.0&quot;</span>,
-            <span class="ident">__NonExhaustive</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident">Http09</span> =&gt; <span class="string">&quot;HTTP/0.9&quot;</span>,
+            <span class="ident">Http10</span> =&gt; <span class="string">&quot;HTTP/1.0&quot;</span>,
+            <span class="ident">Http11</span> =&gt; <span class="string">&quot;HTTP/1.1&quot;</span>,
+            <span class="ident">H2</span> =&gt; <span class="string">&quot;HTTP/2.0&quot;</span>,
+            <span class="ident">H3</span> =&gt; <span class="string">&quot;HTTP/3.0&quot;</span>,
+            <span class="ident">__NonExhaustive</span> =&gt; <span class="macro">unreachable!</span>(),
         })
     }
 }

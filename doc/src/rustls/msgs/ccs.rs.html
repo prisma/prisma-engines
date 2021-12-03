@@ -34,10 +34,10 @@
         <span class="number">1u8</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangeCipherSpecPayload</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangeCipherSpecPayload</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">u8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">typ</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">r</span>.<span class="ident">any_left</span>() {
+        <span class="kw">if</span> <span class="ident">typ</span> <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">r</span>.<span class="ident">any_left</span>() {
             <span class="prelude-val">Some</span>(<span class="ident">ChangeCipherSpecPayload</span> {})
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
@@ -46,7 +46,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ChangeCipherSpecPayload</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="number">1</span>
     }
 }

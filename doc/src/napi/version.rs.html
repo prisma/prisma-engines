@@ -42,7 +42,7 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">sys::napi_node_version</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NodeVersion</span> {
   <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-  <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">sys::napi_node_version</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NodeVersion</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+  <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">sys::napi_node_version</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NodeVersion</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="ident">NodeVersion</span> {
       <span class="ident">major</span>: <span class="ident">value</span>.<span class="ident">major</span>,
       <span class="ident">minor</span>: <span class="ident">value</span>.<span class="ident">minor</span>,

@@ -393,7 +393,7 @@
     <span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Display</span>};
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">core::result::Result::Err</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_adhoc</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">message</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_adhoc</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">message</span>: <span class="ident">M</span>) -&gt; <span class="ident">Error</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {

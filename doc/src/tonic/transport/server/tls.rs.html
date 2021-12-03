@@ -87,7 +87,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ServerTlsConfig</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ServerTlsConfig&quot;</span>).<span class="ident">finish</span>()
     }
 }
@@ -95,7 +95,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">ServerTlsConfig</span> {
     <span class="doccomment">/// Creates a new `ServerTlsConfig`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ServerTlsConfig</span> {
             <span class="ident">identity</span>: <span class="prelude-val">None</span>,
             <span class="ident">client_ca_root</span>: <span class="prelude-val">None</span>,
@@ -104,7 +104,7 @@
     }
 
     <span class="doccomment">/// Sets the [`Identity`] of the server.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity</span>(<span class="self">self</span>, <span class="ident">identity</span>: <span class="ident">Identity</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity</span>(<span class="self">self</span>, <span class="ident">identity</span>: <span class="ident">Identity</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ServerTlsConfig</span> {
             <span class="ident">identity</span>: <span class="prelude-val">Some</span>(<span class="ident">identity</span>),
             ..<span class="self">self</span>
@@ -112,7 +112,7 @@
     }
 
     <span class="doccomment">/// Sets a certificate against which to validate client TLS certificates.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_ca_root</span>(<span class="self">self</span>, <span class="ident">cert</span>: <span class="ident">Certificate</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_ca_root</span>(<span class="self">self</span>, <span class="ident">cert</span>: <span class="ident">Certificate</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ServerTlsConfig</span> {
             <span class="ident">client_ca_root</span>: <span class="prelude-val">Some</span>(<span class="ident">cert</span>),
             ..<span class="self">self</span>
@@ -125,18 +125,18 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rustls_server_config</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">config</span>: <span class="ident">tokio_rustls::rustls::ServerConfig</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">rustls_raw</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">config</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tls_acceptor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TlsAcceptor</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tls_acceptor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TlsAcceptor</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rustls_raw</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TlsAcceptor::new_with_rustls_identity</span>(
+            <span class="prelude-val">None</span> =&gt; <span class="ident">TlsAcceptor::new_with_rustls_identity</span>(
                 <span class="self">self</span>.<span class="ident">identity</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>(),
                 <span class="self">self</span>.<span class="ident">client_ca_root</span>.<span class="ident">clone</span>(),
             ),
-            <span class="prelude-val">Some</span>(<span class="ident">config</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TlsAcceptor::new_with_rustls_raw</span>(<span class="ident">config</span>.<span class="ident">clone</span>()),
+            <span class="prelude-val">Some</span>(<span class="ident">config</span>) =&gt; <span class="ident">TlsAcceptor::new_with_rustls_raw</span>(<span class="ident">config</span>.<span class="ident">clone</span>()),
         }
     }
 }

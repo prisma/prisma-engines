@@ -203,26 +203,26 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Type</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Type::Unknown</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Type</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Type::Alpine</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Alpine Linux&quot;</span>),
-            <span class="ident">Type::Amazon</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Amazon Linux AMI&quot;</span>),
-            <span class="ident">Type::Arch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Arch Linux&quot;</span>),
-            <span class="ident">Type::DragonFly</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DragonFly BSD&quot;</span>),
-            <span class="ident">Type::Macos</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Mac OS&quot;</span>),
-            <span class="ident">Type::Mint</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Linux Mint&quot;</span>),
-            <span class="ident">Type::Pop</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Pop!_OS&quot;</span>),
-            <span class="ident">Type::Raspbian</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Raspberry Pi OS&quot;</span>),
-            <span class="ident">Type::Redhat</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Red Hat Linux&quot;</span>),
-            <span class="ident">Type::RedHatEnterprise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Red Hat Enterprise Linux&quot;</span>),
-            <span class="ident">Type::SUSE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SUSE Linux Enterprise Server&quot;</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>),
+            <span class="ident">Type::Alpine</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Alpine Linux&quot;</span>),
+            <span class="ident">Type::Amazon</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Amazon Linux AMI&quot;</span>),
+            <span class="ident">Type::Arch</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Arch Linux&quot;</span>),
+            <span class="ident">Type::DragonFly</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DragonFly BSD&quot;</span>),
+            <span class="ident">Type::Macos</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Mac OS&quot;</span>),
+            <span class="ident">Type::Mint</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Linux Mint&quot;</span>),
+            <span class="ident">Type::Pop</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Pop!_OS&quot;</span>),
+            <span class="ident">Type::Raspbian</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Raspberry Pi OS&quot;</span>),
+            <span class="ident">Type::Redhat</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Red Hat Linux&quot;</span>),
+            <span class="ident">Type::RedHatEnterprise</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Red Hat Enterprise Linux&quot;</span>),
+            <span class="ident">Type::SUSE</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SUSE Linux Enterprise Server&quot;</span>),
+            <span class="kw">_</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>),
         }
     }
 }

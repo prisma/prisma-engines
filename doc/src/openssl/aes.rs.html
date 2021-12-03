@@ -365,7 +365,7 @@
     <span class="doccomment">/// # Failure</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an error if the key is not 128, 192, or 256 bits.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_encrypt</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AesKey</span>, <span class="ident">KeyError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_encrypt</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AesKey</span>, <span class="ident">KeyError</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="macro">assert!</span>(<span class="ident">key</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">c_int::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">/</span> <span class="number">8</span>);
 
@@ -375,7 +375,7 @@
                 <span class="ident">key</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">c_int</span> <span class="op">*</span> <span class="number">8</span>,
                 <span class="ident">aes_key</span>.<span class="ident">as_mut_ptr</span>(),
             );
-            <span class="kw">if</span> <span class="ident">r</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident">AesKey</span>(<span class="ident">aes_key</span>.<span class="ident">assume_init</span>()))
             } <span class="kw">else</span> {
                 <span class="prelude-val">Err</span>(<span class="ident">KeyError</span>(()))
@@ -388,7 +388,7 @@
     <span class="doccomment">/// # Failure</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an error if the key is not 128, 192, or 256 bits.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_decrypt</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AesKey</span>, <span class="ident">KeyError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_decrypt</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AesKey</span>, <span class="ident">KeyError</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="macro">assert!</span>(<span class="ident">key</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">c_int::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">/</span> <span class="number">8</span>);
 
@@ -399,7 +399,7 @@
                 <span class="ident">aes_key</span>.<span class="ident">as_mut_ptr</span>(),
             );
 
-            <span class="kw">if</span> <span class="ident">r</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident">AesKey</span>(<span class="ident">aes_key</span>.<span class="ident">assume_init</span>()))
             } <span class="kw">else</span> {
                 <span class="prelude-val">Err</span>(<span class="ident">KeyError</span>(()))
@@ -428,13 +428,13 @@
 <span class="doccomment">/// `iv` is not at least 32 bytes.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">aes_ige</span>(<span class="ident">in_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">AesKey</span>, <span class="ident">iv</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">mode</span>: <span class="ident">Mode</span>) {
     <span class="kw">unsafe</span> {
-        <span class="macro">assert!</span>(<span class="ident">in_</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">out</span>.<span class="ident">len</span>());
-        <span class="macro">assert!</span>(<span class="ident">in_</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="ident">ffi::AES_BLOCK_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>);
+        <span class="macro">assert!</span>(<span class="ident">in_</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">out</span>.<span class="ident">len</span>());
+        <span class="macro">assert!</span>(<span class="ident">in_</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="ident">ffi::AES_BLOCK_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">==</span> <span class="number">0</span>);
         <span class="macro">assert!</span>(<span class="ident">iv</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">ffi::AES_BLOCK_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="number">2</span>);
 
         <span class="kw">let</span> <span class="ident">mode</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mode</span> {
-            <span class="ident">Mode::Encrypt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ffi::AES_ENCRYPT</span>,
-            <span class="ident">Mode::Decrypt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ffi::AES_DECRYPT</span>,
+            <span class="ident">Mode::Encrypt</span> =&gt; <span class="ident">ffi::AES_ENCRYPT</span>,
+            <span class="ident">Mode::Decrypt</span> =&gt; <span class="ident">ffi::AES_DECRYPT</span>,
         };
         <span class="ident">ffi::AES_ige_encrypt</span>(
             <span class="ident">in_</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>,
@@ -465,7 +465,7 @@
     <span class="ident">iv</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">8</span>]<span class="op">&gt;</span>,
     <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
     <span class="ident">in_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">KeyError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">KeyError</span><span class="op">&gt;</span> {
     <span class="kw">unsafe</span> {
         <span class="macro">assert!</span>(<span class="ident">out</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">in_</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">8</span>); <span class="comment">// Ciphertext is 64 bits longer (see 2.2.1)</span>
 
@@ -503,7 +503,7 @@
     <span class="ident">iv</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">8</span>]<span class="op">&gt;</span>,
     <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
     <span class="ident">in_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">KeyError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">KeyError</span><span class="op">&gt;</span> {
     <span class="kw">unsafe</span> {
         <span class="macro">assert!</span>(<span class="ident">out</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">8</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">in_</span>.<span class="ident">len</span>());
 

@@ -324,25 +324,25 @@ ORDER BY attnum
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>,
     <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">types</span>: <span class="kw-2">&amp;</span>[<span class="ident">Type</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;s{}&quot;</span>, <span class="ident">NEXT_ID</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>));
     <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">encode</span>(<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">query</span>, <span class="ident">types</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">responses</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">RequestMessages::Single</span>(<span class="ident">FrontendMessage::Raw</span>(<span class="ident">buf</span>)))<span class="question-mark">?</span>;
 
     <span class="kw">match</span> <span class="ident">responses</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-        <span class="ident">Message::ParseComplete</span> <span class="op">=</span><span class="op">&gt;</span> {}
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
+        <span class="ident">Message::ParseComplete</span> =&gt; {}
+        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
     }
 
     <span class="kw">let</span> <span class="ident">parameter_description</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">responses</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-        <span class="ident">Message::ParameterDescription</span>(<span class="ident">body</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">body</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
+        <span class="ident">Message::ParameterDescription</span>(<span class="ident">body</span>) =&gt; <span class="ident">body</span>,
+        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
     };
 
     <span class="kw">let</span> <span class="ident">row_description</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">responses</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-        <span class="ident">Message::RowDescription</span>(<span class="ident">body</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">body</span>),
-        <span class="ident">Message::NoData</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
+        <span class="ident">Message::RowDescription</span>(<span class="ident">body</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">body</span>),
+        <span class="ident">Message::NoData</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
     };
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parameters</span> <span class="op">=</span> <span class="macro">vec!</span>[];
@@ -369,11 +369,11 @@ ORDER BY attnum
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>,
     <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     <span class="ident">types</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">Type</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">Box::pin</span>(<span class="ident">prepare</span>(<span class="ident">client</span>, <span class="ident">query</span>, <span class="ident">types</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">encode</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">InnerClient</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">types</span>: <span class="kw-2">&amp;</span>[<span class="ident">Type</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">encode</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">InnerClient</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">types</span>: <span class="kw-2">&amp;</span>[<span class="ident">Type</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">types</span>.<span class="ident">is_empty</span>() {
         <span class="macro">debug!</span>(<span class="string">&quot;preparing query {}: {}&quot;</span>, <span class="ident">name</span>, <span class="ident">query</span>);
     } <span class="kw">else</span> {
@@ -388,7 +388,7 @@ ORDER BY attnum
     })
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>, <span class="ident">oid</span>: <span class="ident">Oid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Type</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>, <span class="ident">oid</span>: <span class="ident">Oid</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Type</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">type_</span>) <span class="op">=</span> <span class="ident">Type::from_oid</span>(<span class="ident">oid</span>) {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">type_</span>);
     }
@@ -403,8 +403,8 @@ ORDER BY attnum
     <span class="macro">pin_mut!</span>(<span class="ident">rows</span>);
 
     <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">rows</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">row</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">row</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
+        <span class="prelude-val">Some</span>(<span class="ident">row</span>) =&gt; <span class="ident">row</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
     };
 
     <span class="kw">let</span> <span class="ident">name</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="number">0</span>)<span class="question-mark">?</span>;
@@ -415,10 +415,10 @@ ORDER BY attnum
     <span class="kw">let</span> <span class="ident">schema</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="number">5</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">relid</span>: <span class="ident">Oid</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="number">6</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">type_</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;e&#39;</span> <span class="kw">as</span> <span class="ident">i8</span> {
+    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">type_</span> <span class="op">==</span> <span class="string">b&#39;e&#39;</span> <span class="kw">as</span> <span class="ident">i8</span> {
         <span class="kw">let</span> <span class="ident">variants</span> <span class="op">=</span> <span class="ident">get_enum_variants</span>(<span class="ident">client</span>, <span class="ident">oid</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="ident">Kind::Enum</span>(<span class="ident">variants</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">type_</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;p&#39;</span> <span class="kw">as</span> <span class="ident">i8</span> {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">type_</span> <span class="op">==</span> <span class="string">b&#39;p&#39;</span> <span class="kw">as</span> <span class="ident">i8</span> {
         <span class="ident">Kind::Pseudo</span>
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">basetype</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
         <span class="kw">let</span> <span class="ident">type_</span> <span class="op">=</span> <span class="ident">get_type_rec</span>(<span class="ident">client</span>, <span class="ident">basetype</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -445,28 +445,28 @@ ORDER BY attnum
 <span class="kw">fn</span> <span class="ident">get_type_rec</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>,
     <span class="ident">oid</span>: <span class="ident">Oid</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Type</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Type</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">Box::pin</span>(<span class="ident">get_type</span>(<span class="ident">client</span>, <span class="ident">oid</span>))
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">typeinfo_statement</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">typeinfo_statement</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stmt</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">typeinfo</span>() {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">stmt</span>);
     }
 
     <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">prepare_rec</span>(<span class="ident">client</span>, <span class="ident">TYPEINFO_QUERY</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">stmt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stmt</span>,
-        <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">SqlState::UNDEFINED_TABLE</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">stmt</span>) =&gt; <span class="ident">stmt</span>,
+        <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">SqlState::UNDEFINED_TABLE</span>) =&gt; {
             <span class="ident">prepare_rec</span>(<span class="ident">client</span>, <span class="ident">TYPEINFO_FALLBACK_QUERY</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>
         }
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
     };
 
     <span class="ident">client</span>.<span class="ident">set_typeinfo</span>(<span class="kw-2">&amp;</span><span class="ident">stmt</span>);
     <span class="prelude-val">Ok</span>(<span class="ident">stmt</span>)
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_enum_variants</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>, <span class="ident">oid</span>: <span class="ident">Oid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_enum_variants</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>, <span class="ident">oid</span>: <span class="ident">Oid</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">typeinfo_enum_statement</span>(<span class="ident">client</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="ident">query::query</span>(<span class="ident">client</span>, <span class="ident">stmt</span>, <span class="ident">slice_iter</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">oid</span>]))
@@ -476,24 +476,24 @@ ORDER BY attnum
         .<span class="kw">await</span>
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">typeinfo_enum_statement</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">typeinfo_enum_statement</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stmt</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">typeinfo_enum</span>() {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">stmt</span>);
     }
 
     <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">prepare_rec</span>(<span class="ident">client</span>, <span class="ident">TYPEINFO_ENUM_QUERY</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">stmt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stmt</span>,
-        <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">SqlState::UNDEFINED_COLUMN</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">stmt</span>) =&gt; <span class="ident">stmt</span>,
+        <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">SqlState::UNDEFINED_COLUMN</span>) =&gt; {
             <span class="ident">prepare_rec</span>(<span class="ident">client</span>, <span class="ident">TYPEINFO_ENUM_FALLBACK_QUERY</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>
         }
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
     };
 
     <span class="ident">client</span>.<span class="ident">set_typeinfo_enum</span>(<span class="kw-2">&amp;</span><span class="ident">stmt</span>);
     <span class="prelude-val">Ok</span>(<span class="ident">stmt</span>)
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_composite_fields</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>, <span class="ident">oid</span>: <span class="ident">Oid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_composite_fields</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>, <span class="ident">oid</span>: <span class="ident">Oid</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">typeinfo_composite_statement</span>(<span class="ident">client</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">query::query</span>(<span class="ident">client</span>, <span class="ident">stmt</span>, <span class="ident">slice_iter</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">oid</span>]))
@@ -512,7 +512,7 @@ ORDER BY attnum
     <span class="prelude-val">Ok</span>(<span class="ident">fields</span>)
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">typeinfo_composite_statement</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">typeinfo_composite_statement</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stmt</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">typeinfo_composite</span>() {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">stmt</span>);
     }

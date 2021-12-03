@@ -97,15 +97,15 @@
 }
 
 <span class="kw">impl</span> <span class="ident">KeyPair</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive</span>(<span class="ident">seed</span>: <span class="ident">Seed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive</span>(<span class="ident">seed</span>: <span class="ident">Seed</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">seed</span>.<span class="ident">compute_public_key</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">seed</span>, <span class="ident">public_key</span> })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">PublicKey</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">PublicKey</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">public_key</span>
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Seed</span>, <span class="ident">PublicKey</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) -&gt; (<span class="ident">Seed</span>, <span class="ident">PublicKey</span>) {
         (<span class="self">self</span>.<span class="ident">seed</span>, <span class="self">self</span>.<span class="ident">public_key</span>)
     }
 }
@@ -121,7 +121,7 @@
         <span class="ident">curve</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Curve</span>,
         <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
         <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">Self</span> {
             <span class="ident">bytes</span>: [<span class="number">0u8</span>; <span class="ident">SEED_MAX_BYTES</span>],
             <span class="ident">curve</span>,
@@ -135,7 +135,7 @@
         <span class="ident">curve</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Curve</span>,
         <span class="ident">bytes</span>: <span class="ident">untrusted::Input</span>,
         <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Seed</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Seed</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">as_slice_less_safe</span>();
         <span class="kw">if</span> <span class="ident">curve</span>.<span class="ident">elem_scalar_seed_len</span> <span class="op">!</span><span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
@@ -150,11 +150,11 @@
         <span class="prelude-val">Ok</span>(<span class="ident">r</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytes_less_safe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytes_less_safe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[..<span class="self">self</span>.<span class="ident">curve</span>.<span class="ident">elem_scalar_seed_len</span>]
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PublicKey</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PublicKey</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">PublicKey</span> {
             <span class="ident">bytes</span>: [<span class="number">0u8</span>; <span class="ident">PUBLIC_KEY_MAX_LEN</span>],
             <span class="ident">len</span>: <span class="self">self</span>.<span class="ident">curve</span>.<span class="ident">public_key_len</span>,
@@ -171,7 +171,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[..<span class="self">self</span>.<span class="ident">len</span>]
     }
 }

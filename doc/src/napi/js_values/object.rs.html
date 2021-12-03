@@ -218,7 +218,7 @@
     <span class="ident">native</span>: <span class="ident">T</span>,
     <span class="ident">finalize_hint</span>: <span class="ident">Hint</span>,
     <span class="ident">finalize_cb</span>: <span class="ident">F</span>,
-  ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+  ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">T</span>: <span class="lifetime">&#39;static</span>,
     <span class="ident">Hint</span>: <span class="lifetime">&#39;static</span>,
@@ -265,7 +265,7 @@
   <span class="kw">if</span> <span class="op">!</span><span class="ident">raw_ref</span>.<span class="ident">is_null</span>() {
     <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">sys::napi_delete_reference</span>(<span class="ident">raw_env</span>, <span class="ident">raw_ref</span>);
     <span class="macro">debug_assert!</span>(
-      <span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">sys::Status::napi_ok</span>,
+      <span class="ident">status</span> <span class="op">==</span> <span class="ident">sys::Status::napi_ok</span>,
       <span class="string">&quot;Delete reference in finalize callback failed&quot;</span>
     );
   }
@@ -281,22 +281,22 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">sys::napi_key_collection_mode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KeyCollectionMode</span> {
   <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-  <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">sys::napi_key_collection_mode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+  <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">sys::napi_key_collection_mode</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
-      <span class="ident">sys::napi_key_collection_mode::napi_key_include_prototypes</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::IncludePrototypes</span>),
-      <span class="ident">sys::napi_key_collection_mode::napi_key_own_only</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::OwnOnly</span>),
+      <span class="ident">sys::napi_key_collection_mode::napi_key_include_prototypes</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::IncludePrototypes</span>),
+      <span class="ident">sys::napi_key_collection_mode::napi_key_own_only</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::OwnOnly</span>),
     }
   }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi6&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KeyCollectionMode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">sys::napi_key_collection_mode</span> {
-  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">KeyCollectionMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">KeyCollectionMode</span>) -&gt; <span class="self">Self</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
-      <span class="ident">KeyCollectionMode::IncludePrototypes</span> <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="ident">KeyCollectionMode::IncludePrototypes</span> =&gt; {
         <span class="ident">sys::napi_key_collection_mode::napi_key_include_prototypes</span>
       }
-      <span class="ident">KeyCollectionMode::OwnOnly</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::napi_key_collection_mode::napi_key_own_only</span>,
+      <span class="ident">KeyCollectionMode::OwnOnly</span> =&gt; <span class="ident">sys::napi_key_collection_mode::napi_key_own_only</span>,
     }
   }
 }
@@ -315,28 +315,28 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">sys::napi_key_filter</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KeyFilter</span> {
   <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-  <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">sys::napi_key_filter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+  <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">sys::napi_key_filter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
-      <span class="ident">sys::napi_key_filter::napi_key_all_properties</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::AllProperties</span>),
-      <span class="ident">sys::napi_key_filter::napi_key_writable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Writable</span>),
-      <span class="ident">sys::napi_key_filter::napi_key_enumerable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Enumerable</span>),
-      <span class="ident">sys::napi_key_filter::napi_key_configurable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Configurable</span>),
-      <span class="ident">sys::napi_key_filter::napi_key_skip_strings</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SkipStrings</span>),
-      <span class="ident">sys::napi_key_filter::napi_key_skip_symbols</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SkipSymbols</span>),
+      <span class="ident">sys::napi_key_filter::napi_key_all_properties</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::AllProperties</span>),
+      <span class="ident">sys::napi_key_filter::napi_key_writable</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Writable</span>),
+      <span class="ident">sys::napi_key_filter::napi_key_enumerable</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Enumerable</span>),
+      <span class="ident">sys::napi_key_filter::napi_key_configurable</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Configurable</span>),
+      <span class="ident">sys::napi_key_filter::napi_key_skip_strings</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SkipStrings</span>),
+      <span class="ident">sys::napi_key_filter::napi_key_skip_symbols</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SkipSymbols</span>),
     }
   }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi6&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KeyFilter</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">sys::napi_key_filter</span> {
-  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">KeyFilter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">KeyFilter</span>) -&gt; <span class="self">Self</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
-      <span class="ident">KeyFilter::AllProperties</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::napi_key_all_properties</span>,
-      <span class="ident">KeyFilter::Writable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::napi_key_writable</span>,
-      <span class="ident">KeyFilter::Enumerable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::napi_key_enumerable</span>,
-      <span class="ident">KeyFilter::Configurable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::napi_key_configurable</span>,
-      <span class="ident">KeyFilter::SkipStrings</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::napi_key_skip_strings</span>,
-      <span class="ident">KeyFilter::SkipSymbols</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::napi_key_skip_symbols</span>,
+      <span class="ident">KeyFilter::AllProperties</span> =&gt; <span class="ident"><span class="self">Self</span>::napi_key_all_properties</span>,
+      <span class="ident">KeyFilter::Writable</span> =&gt; <span class="ident"><span class="self">Self</span>::napi_key_writable</span>,
+      <span class="ident">KeyFilter::Enumerable</span> =&gt; <span class="ident"><span class="self">Self</span>::napi_key_enumerable</span>,
+      <span class="ident">KeyFilter::Configurable</span> =&gt; <span class="ident"><span class="self">Self</span>::napi_key_configurable</span>,
+      <span class="ident">KeyFilter::SkipStrings</span> =&gt; <span class="ident"><span class="self">Self</span>::napi_key_skip_strings</span>,
+      <span class="ident">KeyFilter::SkipSymbols</span> =&gt; <span class="ident"><span class="self">Self</span>::napi_key_skip_symbols</span>,
     }
   }
 }
@@ -351,20 +351,20 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">sys::napi_key_conversion</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KeyConversion</span> {
   <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-  <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">sys::napi_key_conversion</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+  <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">sys::napi_key_conversion</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
-      <span class="ident">sys::napi_key_conversion::napi_key_keep_numbers</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::KeepNumbers</span>),
-      <span class="ident">sys::napi_key_conversion::napi_key_numbers_to_strings</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::NumbersToStrings</span>),
+      <span class="ident">sys::napi_key_conversion::napi_key_keep_numbers</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::KeepNumbers</span>),
+      <span class="ident">sys::napi_key_conversion::napi_key_numbers_to_strings</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::NumbersToStrings</span>),
     }
   }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi6&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KeyConversion</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">sys::napi_key_conversion</span> {
-  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">KeyConversion</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">KeyConversion</span>) -&gt; <span class="self">Self</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
-      <span class="ident">KeyConversion::KeepNumbers</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::napi_key_keep_numbers</span>,
-      <span class="ident">KeyConversion::NumbersToStrings</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::napi_key_numbers_to_strings</span>,
+      <span class="ident">KeyConversion::KeepNumbers</span> =&gt; <span class="ident"><span class="self">Self</span>::napi_key_keep_numbers</span>,
+      <span class="ident">KeyConversion::NumbersToStrings</span> =&gt; <span class="ident"><span class="self">Self</span>::napi_key_numbers_to_strings</span>,
     }
   }
 }

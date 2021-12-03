@@ -220,13 +220,13 @@
 <span class="kw">impl</span> <span class="ident">Connection</span> <span class="kw">for</span> <span class="ident">MongoDbConnection</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">connector_interface::Transaction</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">connector_interface::Transaction</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">MongoDbTransaction::new</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">tx</span> <span class="kw">as</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Transaction</span><span class="op">&gt;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">as_connection_like</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span> {
+    <span class="kw">fn</span> <span class="ident">as_connection_like</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span> {
         <span class="self">self</span>
     }
 }
@@ -237,7 +237,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::create_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">args</span>).<span class="kw">await</span> }).<span class="kw">await</span>
     }
 
@@ -246,7 +246,7 @@
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">WriteArgs</span><span class="op">&gt;</span>,
         <span class="ident">skip_duplicates</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(
             <span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::create_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">skip_duplicates</span>).<span class="kw">await</span> },
         )
@@ -258,7 +258,7 @@
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">record_filter</span>: <span class="ident">connector_interface::RecordFilter</span>,
         <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::update_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>).<span class="kw">await</span> })
             .<span class="kw">await</span>
     }
@@ -267,7 +267,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">record_filter</span>: <span class="ident">connector_interface::RecordFilter</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::delete_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>).<span class="kw">await</span> }).<span class="kw">await</span>
     }
 
@@ -276,7 +276,7 @@
         <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
         <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">RecordProjection</span>,
         <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">RecordProjection</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::m2m_connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>).<span class="kw">await</span> })
             .<span class="kw">await</span>
     }
@@ -286,7 +286,7 @@
         <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
         <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">RecordProjection</span>,
         <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">RecordProjection</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">catch</span>(
             <span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::m2m_disconnect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>).<span class="kw">await</span> },
         )
@@ -297,7 +297,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">_query</span>: <span class="ident">String</span>,
         <span class="ident">_parameters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">prisma_value::PrismaValue</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(<span class="string">&quot;Raw queries&quot;</span>.<span class="ident">to_owned</span>()).<span class="ident">into_connector_error</span>())
     }
 
@@ -305,7 +305,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">_query</span>: <span class="ident">String</span>,
         <span class="ident">_parameters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">prisma_value::PrismaValue</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(<span class="string">&quot;Raw queries&quot;</span>.<span class="ident">to_owned</span>()).<span class="ident">into_connector_error</span>())
     }
 }
@@ -318,7 +318,7 @@
         <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">connector_interface::Filter</span>,
         <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>,
         <span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SingleRecord</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SingleRecord</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">read::get_single_record</span>(
                 <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>,
@@ -339,7 +339,7 @@
         <span class="ident">query_arguments</span>: <span class="ident">connector_interface::QueryArguments</span>,
         <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>,
         <span class="ident">aggregation_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">ManyRecords</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">ManyRecords</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">read::get_many_records</span>(
                 <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>,
@@ -358,7 +358,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">from_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
         <span class="ident">from_record_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">RecordProjection</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">RecordProjection</span>, <span class="ident">RecordProjection</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">RecordProjection</span>, <span class="ident">RecordProjection</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">read::get_related_m2m_record_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">from_field</span>, <span class="ident">from_record_ids</span>).<span class="kw">await</span>
         })
@@ -372,7 +372,7 @@
         <span class="ident">selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">connector_interface::AggregationSelection</span><span class="op">&gt;</span>,
         <span class="ident">group_by</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
         <span class="ident">having</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">connector_interface::Filter</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">connector_interface::AggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">connector_interface::AggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">aggregate::aggregate</span>(
                 <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>,

@@ -102,16 +102,16 @@
 
 <span class="kw">impl</span> <span class="ident">MySqlType</span> {
     <span class="doccomment">/// The user-defined precision for timestamp columns, where applicable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp_precision</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp_precision</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">MySqlType::Time</span>(<span class="ident">n</span>) <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="ident">n</span>) <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">n</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">MySqlType::Time</span>(<span class="ident">n</span>) <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="ident">n</span>) <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="ident">n</span>) =&gt; <span class="kw-2">*</span><span class="ident">n</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident"><span class="kw">super</span>::NativeType</span> <span class="kw">for</span> <span class="ident">MySqlType</span> {
-    <span class="kw">fn</span> <span class="ident">to_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span> {
+    <span class="kw">fn</span> <span class="ident">to_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Value</span> {
         <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Serializing the native type to json failed: {:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>))
     }

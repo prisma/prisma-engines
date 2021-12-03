@@ -77,11 +77,11 @@
 <span id="77">77</span>
 </pre><pre class="rust"><code><span class="kw">const</span> <span class="ident">GF2_DIM</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
 
-<span class="kw">fn</span> <span class="ident">gf2_matrix_times</span>(<span class="ident">mat</span>: <span class="kw-2">&amp;</span>[<span class="ident">u32</span>; <span class="ident">GF2_DIM</span>], <span class="kw-2">mut</span> <span class="ident">vec</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">fn</span> <span class="ident">gf2_matrix_times</span>(<span class="ident">mat</span>: <span class="kw-2">&amp;</span>[<span class="ident">u32</span>; <span class="ident">GF2_DIM</span>], <span class="kw-2">mut</span> <span class="ident">vec</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sum</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">while</span> <span class="ident">vec</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="kw">if</span> <span class="ident">vec</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">vec</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">==</span> <span class="number">1</span> {
             <span class="ident">sum</span> <span class="op">^</span><span class="op">=</span> <span class="ident">mat</span>[<span class="ident">idx</span>];
         }
         <span class="ident">vec</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>;
@@ -96,7 +96,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">mut</span> <span class="ident">crc1</span>: <span class="ident">u32</span>, <span class="ident">crc2</span>: <span class="ident">u32</span>, <span class="kw-2">mut</span> <span class="ident">len2</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">mut</span> <span class="ident">crc1</span>: <span class="ident">u32</span>, <span class="ident">crc2</span>: <span class="ident">u32</span>, <span class="kw-2">mut</span> <span class="ident">len2</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u32</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">u32</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">even</span> <span class="op">=</span> [<span class="number">0u32</span>; <span class="ident">GF2_DIM</span>]; <span class="comment">/* even-power-of-two zeros operator */</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">odd</span> <span class="op">=</span> [<span class="number">0u32</span>; <span class="ident">GF2_DIM</span>]; <span class="comment">/* odd-power-of-two zeros operator */</span>
@@ -125,25 +125,25 @@
     <span class="kw">loop</span> {
         <span class="comment">/* apply zeros operator for this bit of len2 */</span>
         <span class="ident">gf2_matrix_square</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">even</span>, <span class="kw-2">&amp;</span><span class="ident">odd</span>);
-        <span class="kw">if</span> <span class="ident">len2</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">len2</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">==</span> <span class="number">1</span> {
             <span class="ident">crc1</span> <span class="op">=</span> <span class="ident">gf2_matrix_times</span>(<span class="kw-2">&amp;</span><span class="ident">even</span>, <span class="ident">crc1</span>);
         }
         <span class="ident">len2</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>;
 
         <span class="comment">/* if no more bits set, then done */</span>
-        <span class="kw">if</span> <span class="ident">len2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">len2</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">break</span>;
         }
 
         <span class="comment">/* another iteration of the loop with odd and even swapped */</span>
         <span class="ident">gf2_matrix_square</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">odd</span>, <span class="kw-2">&amp;</span><span class="ident">even</span>);
-        <span class="kw">if</span> <span class="ident">len2</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">len2</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">==</span> <span class="number">1</span> {
             <span class="ident">crc1</span> <span class="op">=</span> <span class="ident">gf2_matrix_times</span>(<span class="kw-2">&amp;</span><span class="ident">odd</span>, <span class="ident">crc1</span>);
         }
         <span class="ident">len2</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>;
 
         <span class="comment">/* if no more bits set, then done */</span>
-        <span class="kw">if</span> <span class="ident">len2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">len2</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">break</span>;
         }
     }

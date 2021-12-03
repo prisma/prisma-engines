@@ -268,13 +268,13 @@ When `std` is available, the `into_error` method will convert an
 <span class="kw">impl</span> <span class="ident">Error</span> {
     <span class="doccomment">/** Capture a static message as an error. */</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">msg</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">msg</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Error</span>(<span class="ident">ErrorInner::Static</span>(<span class="ident">msg</span>))
     }
 
     <span class="doccomment">/** Declare some structure as unsupported. */</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unsupported</span>(<span class="ident">operation</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unsupported</span>(<span class="ident">operation</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Error</span>(<span class="ident">ErrorInner::Unsupported</span> {
             <span class="ident">msg</span>: <span class="ident">operation</span>,
             <span class="ident">default</span>: <span class="bool-val">false</span>,
@@ -282,7 +282,7 @@ When `std` is available, the `into_error` method will convert an
     }
 
     <span class="doccomment">/** Whether or not an error is because some operation was unsupported. */</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unsupported</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unsupported</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ErrorInner::Unsupported</span> { .. } <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span> {
             <span class="bool-val">true</span>
         } <span class="kw">else</span> {
@@ -291,7 +291,7 @@ When `std` is available, the `into_error` method will convert an
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">default_unsupported</span>(<span class="ident">operation</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">default_unsupported</span>(<span class="ident">operation</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Error</span>(<span class="ident">ErrorInner::Unsupported</span> {
             <span class="ident">msg</span>: <span class="ident">operation</span>,
             <span class="ident">default</span>: <span class="bool-val">true</span>,
@@ -299,7 +299,7 @@ When `std` is available, the `into_error` method will convert an
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_default_unsupported</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_default_unsupported</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ErrorInner::Unsupported</span> { <span class="ident">default</span>: <span class="bool-val">true</span>, .. } <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span> {
             <span class="bool-val">true</span>
         } <span class="kw">else</span> {
@@ -309,19 +309,19 @@ When `std` is available, the `into_error` method will convert an
 
     <span class="doccomment">/** Convert into a `fmt::Error` */</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_fmt_error</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Error</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_fmt_error</span>(<span class="self">self</span>) -&gt; <span class="ident">fmt::Error</span> {
         <span class="ident">fmt::Error</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
@@ -344,21 +344,21 @@ When `std` is available, the `into_error` method will convert an
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ErrorInner</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ErrorInner::Unsupported</span> { <span class="ident">msg</span>: <span class="ident">op</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ErrorInner::Unsupported</span> { <span class="ident">msg</span>: <span class="ident">op</span>, .. } =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unsupported stream operation: {}&quot;</span>, <span class="ident">op</span>)
             }
-            <span class="ident">ErrorInner::Static</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">ErrorInner::Static</span>(<span class="ident">msg</span>) =&gt; <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>))]</span>
-            <span class="ident">ErrorInner::Custom</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">ErrorInner::Custom</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-            <span class="ident">ErrorInner::Owned</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">ErrorInner::Owned</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) =&gt; <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
             <span class="ident">ErrorInner::Source</span> {
                 <span class="kw-2">ref</span> <span class="ident">msg</span>,
                 <span class="kw-2">ref</span> <span class="ident">source</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>
+            } =&gt; <span class="ident">f</span>
                 .<span class="ident">debug_struct</span>(<span class="string">&quot;Error&quot;</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;msg&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;source&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">source</span>)
@@ -368,27 +368,27 @@ When `std` is available, the `into_error` method will convert an
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ErrorInner</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ErrorInner::Unsupported</span> { <span class="ident">msg</span>: <span class="ident">op</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ErrorInner::Unsupported</span> { <span class="ident">msg</span>: <span class="ident">op</span>, .. } =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unsupported stream operation: {}&quot;</span>, <span class="ident">op</span>)
             }
-            <span class="ident">ErrorInner::Static</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">ErrorInner::Static</span>(<span class="ident">msg</span>) =&gt; <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>))]</span>
-            <span class="ident">ErrorInner::Custom</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">ErrorInner::Custom</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-            <span class="ident">ErrorInner::Owned</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">ErrorInner::Owned</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) =&gt; <span class="ident">msg</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
             <span class="ident">ErrorInner::Source</span> {
                 <span class="kw-2">ref</span> <span class="ident">msg</span>,
                 <span class="kw-2">ref</span> <span class="ident">source</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{} ({})&quot;</span>, <span class="ident">msg</span>, <span class="ident">source</span>)),
+            } =&gt; <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{} ({})&quot;</span>, <span class="ident">msg</span>, <span class="ident">source</span>)),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">fmt::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident">fmt::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident">fmt::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Error::msg</span>(<span class="string">&quot;formatting failed&quot;</span>)
     }
 }
@@ -405,7 +405,7 @@ When `std` is available, the `into_error` method will convert an
         <span class="comment">// It&#39;s strictly more general than this one, but could</span>
         <span class="comment">// be confusing to users to have bounds change depending</span>
         <span class="comment">// on cargo features</span>
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">custom</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">fmt::Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">custom</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">fmt::Display</span>) -&gt; <span class="self">Self</span> {
             <span class="ident">Error</span>(<span class="ident">ErrorInner::Custom</span>(<span class="ident">err</span>))
         }
     }
@@ -419,7 +419,7 @@ When `std` is available, the `into_error` method will convert an
 
     <span class="kw">impl</span> <span class="ident">Error</span> {
         <span class="doccomment">/** Get an error from a format. */</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom</span>(<span class="ident">err</span>: <span class="kw">impl</span> <span class="ident">fmt::Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom</span>(<span class="ident">err</span>: <span class="kw">impl</span> <span class="ident">fmt::Display</span>) -&gt; <span class="self">Self</span> {
             <span class="ident">Error</span>(<span class="ident">ErrorInner::Owned</span>(<span class="ident">err</span>.<span class="ident">to_string</span>()))
         }
     }
@@ -438,13 +438,13 @@ When `std` is available, the `into_error` method will convert an
     <span class="kw">impl</span> <span class="ident">Error</span> {
         <span class="doccomment">/** Convert into an io error. */</span>
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_io_error</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Error</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_io_error</span>(<span class="self">self</span>) -&gt; <span class="ident">io::Error</span> {
             <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="self">self</span>)
         }
     }
 
     <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-        <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ErrorInner::Source</span> { <span class="kw-2">ref</span> <span class="ident">source</span>, .. } <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span> {
                 <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">source</span>)
             } <span class="kw">else</span> {
@@ -454,7 +454,7 @@ When `std` is available, the `into_error` method will convert an
     }
 
     <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>) -&gt; <span class="self">Self</span> {
             <span class="ident">Error</span>(<span class="ident">ErrorInner::Source</span> {
                 <span class="ident">msg</span>: <span class="string">&quot;failed during an IO operation&quot;</span>.<span class="ident">into</span>(),
                 <span class="ident">source</span>: <span class="ident">Box::new</span>(<span class="ident">err</span>),

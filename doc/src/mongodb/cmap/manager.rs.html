@@ -157,7 +157,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Connection</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">bson::oid::ObjectId</span>, <span class="ident">error::Error</span>, <span class="ident">runtime::AcknowledgedMessage</span>};
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">channel</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">PoolManager</span>, <span class="ident">ManagementRequestReceiver</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">channel</span>() -&gt; (<span class="ident">PoolManager</span>, <span class="ident">ManagementRequestReceiver</span>) {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded_channel</span>();
     (
         <span class="ident">PoolManager</span> { <span class="ident">sender</span> },
@@ -205,7 +205,7 @@
 
     <span class="doccomment">/// Check in the given connection to the pool.</span>
     <span class="doccomment">/// This returns an error containing the connection if the pool has been dropped already.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">Connection</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="ident">Connection</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">Connection</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">sender</span>
             .<span class="ident">send</span>(<span class="ident">PoolManagementRequest::CheckIn</span>(<span class="ident">Box::new</span>(<span class="ident">connection</span>)))
@@ -232,7 +232,7 @@
 
     <span class="doccomment">/// Create a synchronization point for the pool&#39;s worker.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">sync_worker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">oneshot::Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">sync_worker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">oneshot::Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">PoolManagementRequest::Sync</span>(<span class="ident">tx</span>));
         <span class="ident">rx</span>
@@ -245,7 +245,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ManagementRequestReceiver</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PoolManagementRequest</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PoolManagementRequest</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">recv</span>().<span class="kw">await</span>
     }
 }
@@ -280,10 +280,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PoolManagementRequest</span> {
-    <span class="kw">fn</span> <span class="ident">unwrap_check_in</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connection</span> {
+    <span class="kw">fn</span> <span class="ident">unwrap_check_in</span>(<span class="self">self</span>) -&gt; <span class="ident">Connection</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PoolManagementRequest::CheckIn</span>(<span class="ident">conn</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">conn</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;tried to unwrap checkin but got {:?}&quot;</span>, <span class="self">self</span>),
+            <span class="ident">PoolManagementRequest::CheckIn</span>(<span class="ident">conn</span>) =&gt; <span class="kw-2">*</span><span class="ident">conn</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;tried to unwrap checkin but got {:?}&quot;</span>, <span class="self">self</span>),
         }
     }
 }
@@ -295,10 +295,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectionSucceeded</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">service_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">service_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConnectionSucceeded::ForPool</span>(<span class="ident">conn</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">conn</span>.<span class="ident">generation</span>.<span class="ident">service_id</span>(),
-            <span class="ident">ConnectionSucceeded::Used</span> { <span class="ident">service_id</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">service_id</span>,
+            <span class="ident">ConnectionSucceeded::ForPool</span>(<span class="ident">conn</span>) =&gt; <span class="ident">conn</span>.<span class="ident">generation</span>.<span class="ident">service_id</span>(),
+            <span class="ident">ConnectionSucceeded::Used</span> { <span class="ident">service_id</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">service_id</span>,
         }
     }
 }

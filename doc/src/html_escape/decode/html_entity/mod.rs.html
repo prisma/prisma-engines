@@ -505,7 +505,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::functions</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Decode html entities in a given string.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_html_entities</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_html_entities</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_ref</span>();
     <span class="kw">let</span> <span class="ident">text_bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_bytes</span>();
     <span class="kw">let</span> <span class="ident">text_length</span> <span class="op">=</span> <span class="ident">text_bytes</span>.<span class="ident">len</span>();
@@ -517,35 +517,35 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
 
     <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">v</span>, <span class="kw-2">mut</span> <span class="ident">start</span>) <span class="op">=</span> <span class="kw">loop</span> {
-        <span class="kw">if</span> <span class="ident">p</span> <span class="op">=</span><span class="op">=</span> <span class="ident">text_length</span> {
+        <span class="kw">if</span> <span class="ident">p</span> <span class="op">==</span> <span class="ident">text_length</span> {
             <span class="kw">return</span> <span class="ident">Cow::from</span>(<span class="ident">text</span>);
         }
 
         <span class="ident">e</span> <span class="op">=</span> <span class="ident">text_bytes</span>[<span class="ident">p</span>];
 
         <span class="kw">match</span> <span class="ident">step</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;&amp;&#39;</span> {
+            <span class="number">0</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;&amp;&#39;</span> {
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">1</span>;
                     <span class="ident">ep</span> <span class="op">=</span> <span class="ident">p</span>;
                 }
             }
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">1</span> =&gt; {
                 <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="string">b&#39;#&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;#&#39;</span> =&gt; {
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">3</span>;
                     }
-                    <span class="string">b&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;;&#39;</span> =&gt; {
                         <span class="comment">// incorrect</span>
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; {
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">2</span>;
                     }
                 }
             }
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> {
+            <span class="number">2</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
                     <span class="comment">// named</span>
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">text_length</span>);
 
@@ -554,28 +554,28 @@
                     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">text_bytes</span>[(<span class="ident">ep</span> <span class="op">+</span> <span class="number">1</span>)..<span class="ident">p</span>];
 
                     <span class="kw">match</span> <span class="ident">NAMED_ENTITIES</span>.<span class="ident">binary_search_by</span>(<span class="op">|</span>(<span class="ident">t_name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">t_name</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>)) {
-                        <span class="prelude-val">Ok</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="ident">index</span>) =&gt; {
                             <span class="ident">v</span>.<span class="ident">extend_from_slice</span>(<span class="ident">NAMED_ENTITIES</span>[<span class="ident">index</span>].<span class="number">1</span>.<span class="ident">as_bytes</span>());
                             <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">p</span> <span class="op">+</span> <span class="number">1</span>);
                         }
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">ep</span>),
+                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">ep</span>),
                     }
                 }
             }
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">3</span> =&gt; {
                 <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="string">b&#39;x&#39;</span> <span class="op">|</span> <span class="string">b&#39;X&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;x&#39;</span> <span class="op">|</span> <span class="string">b&#39;X&#39;</span> =&gt; {
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">5</span>;
                     }
-                    <span class="string">b&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;;&#39;</span> =&gt; {
                         <span class="comment">// incorrect</span>
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">4</span>,
+                    <span class="kw">_</span> =&gt; <span class="ident">step</span> <span class="op">=</span> <span class="number">4</span>,
                 }
             }
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> {
+            <span class="number">4</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
                     <span class="comment">// numeric</span>
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">text_length</span>);
 
@@ -584,30 +584,30 @@
                     <span class="kw">let</span> <span class="ident">number</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">text</span>.<span class="ident">get_unchecked</span>((<span class="ident">ep</span> <span class="op">+</span> <span class="number">2</span>)..<span class="ident">p</span>) };
 
                     <span class="kw">match</span> <span class="ident">number</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>() {
-                        <span class="prelude-val">Ok</span>(<span class="ident">number</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="ident">number</span>) =&gt; {
                             <span class="kw">match</span> <span class="ident">char::try_from</span>(<span class="ident">number</span>) {
-                                <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; {
                                     <span class="ident">write_char_to_vec</span>(<span class="ident">c</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>);
                                     <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">p</span> <span class="op">+</span> <span class="number">1</span>);
                                 }
-                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">ep</span>),
+                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">ep</span>),
                             }
                         }
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">ep</span>),
+                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">ep</span>),
                     }
                 }
             }
-            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">5</span> =&gt; {
                 <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="string">b&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;;&#39;</span> =&gt; {
                         <span class="comment">// incorrect</span>
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">6</span>,
+                    <span class="kw">_</span> =&gt; <span class="ident">step</span> <span class="op">=</span> <span class="number">6</span>,
                 }
             }
-            <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> {
+            <span class="number">6</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
                     <span class="comment">// hex</span>
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">text_length</span>);
 
@@ -616,20 +616,20 @@
                     <span class="kw">let</span> <span class="ident">hex</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">text</span>.<span class="ident">get_unchecked</span>((<span class="ident">ep</span> <span class="op">+</span> <span class="number">3</span>)..<span class="ident">p</span>) };
 
                     <span class="kw">match</span> <span class="ident">u32::from_str_radix</span>(<span class="ident">hex</span>, <span class="number">16</span>) {
-                        <span class="prelude-val">Ok</span>(<span class="ident">number</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="ident">number</span>) =&gt; {
                             <span class="kw">match</span> <span class="ident">char::try_from</span>(<span class="ident">number</span>) {
-                                <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; {
                                     <span class="ident">write_char_to_vec</span>(<span class="ident">c</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>);
                                     <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">p</span> <span class="op">+</span> <span class="number">1</span>);
                                 }
-                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">ep</span>),
+                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">ep</span>),
                             }
                         }
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">ep</span>),
+                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span> (<span class="ident">v</span>, <span class="ident">ep</span>),
                     }
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         }
 
         <span class="ident">p</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -641,28 +641,28 @@
 
     <span class="kw">for</span> <span class="ident">e</span> <span class="kw">in</span> <span class="ident">text_bytes</span>[<span class="ident">p</span>..].<span class="ident">iter</span>().<span class="ident">copied</span>() {
         <span class="kw">match</span> <span class="ident">step</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;&amp;&#39;</span> {
+            <span class="number">0</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;&amp;&#39;</span> {
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">1</span>;
                     <span class="ident">ep</span> <span class="op">=</span> <span class="ident">p</span>;
                 }
             }
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">1</span> =&gt; {
                 <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="string">b&#39;#&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;#&#39;</span> =&gt; {
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">3</span>;
                     }
-                    <span class="string">b&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;;&#39;</span> =&gt; {
                         <span class="comment">// incorrect</span>
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; {
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">2</span>;
                     }
                 }
             }
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> {
+            <span class="number">2</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
                     <span class="comment">// named</span>
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -677,20 +677,20 @@
                     }
                 }
             }
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">3</span> =&gt; {
                 <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="string">b&#39;x&#39;</span> <span class="op">|</span> <span class="string">b&#39;X&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;x&#39;</span> <span class="op">|</span> <span class="string">b&#39;X&#39;</span> =&gt; {
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">5</span>;
                     }
-                    <span class="string">b&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;;&#39;</span> =&gt; {
                         <span class="comment">// incorrect</span>
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">4</span>,
+                    <span class="kw">_</span> =&gt; <span class="ident">step</span> <span class="op">=</span> <span class="number">4</span>,
                 }
             }
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> {
+            <span class="number">4</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
                     <span class="comment">// numeric</span>
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -705,17 +705,17 @@
                     }
                 }
             }
-            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">5</span> =&gt; {
                 <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="string">b&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;;&#39;</span> =&gt; {
                         <span class="comment">// incorrect</span>
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">6</span>,
+                    <span class="kw">_</span> =&gt; <span class="ident">step</span> <span class="op">=</span> <span class="number">6</span>,
                 }
             }
-            <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> {
+            <span class="number">6</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
                     <span class="comment">// hex</span>
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -730,7 +730,7 @@
                     }
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         }
 
         <span class="ident">p</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -742,12 +742,12 @@
 }
 
 <span class="doccomment">/// Decode html entities in a given string to a mutable `String` reference and return the decoded string slice.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_html_entities_to_string</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_html_entities_to_string</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
     <span class="kw">unsafe</span> { <span class="ident">from_utf8_unchecked</span>(<span class="ident">decode_html_entities_to_vec</span>(<span class="ident">text</span>, <span class="ident">output</span>.<span class="ident">as_mut_vec</span>())) }
 }
 
 <span class="doccomment">/// Decode html entities in a given string to a mutable `Vec&lt;u8&gt;` reference and return the decoded data slice.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_html_entities_to_vec</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_html_entities_to_vec</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
     <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_ref</span>();
     <span class="kw">let</span> <span class="ident">text_bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_bytes</span>();
     <span class="kw">let</span> <span class="ident">text_length</span> <span class="op">=</span> <span class="ident">text_bytes</span>.<span class="ident">len</span>();
@@ -764,28 +764,28 @@
 
     <span class="kw">for</span> <span class="ident">e</span> <span class="kw">in</span> <span class="ident">text_bytes</span>.<span class="ident">iter</span>().<span class="ident">copied</span>() {
         <span class="kw">match</span> <span class="ident">step</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;&amp;&#39;</span> {
+            <span class="number">0</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;&amp;&#39;</span> {
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">1</span>;
                     <span class="ident">ep</span> <span class="op">=</span> <span class="ident">end</span>;
                 }
             }
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">1</span> =&gt; {
                 <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="string">b&#39;#&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;#&#39;</span> =&gt; {
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">3</span>;
                     }
-                    <span class="string">b&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;;&#39;</span> =&gt; {
                         <span class="comment">// incorrect</span>
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; {
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">2</span>;
                     }
                 }
             }
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> {
+            <span class="number">2</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
                     <span class="comment">// named</span>
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -800,20 +800,20 @@
                     }
                 }
             }
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">3</span> =&gt; {
                 <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="string">b&#39;x&#39;</span> <span class="op">|</span> <span class="string">b&#39;X&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;x&#39;</span> <span class="op">|</span> <span class="string">b&#39;X&#39;</span> =&gt; {
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">5</span>;
                     }
-                    <span class="string">b&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;;&#39;</span> =&gt; {
                         <span class="comment">// incorrect</span>
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">4</span>,
+                    <span class="kw">_</span> =&gt; <span class="ident">step</span> <span class="op">=</span> <span class="number">4</span>,
                 }
             }
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> {
+            <span class="number">4</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
                     <span class="comment">// numeric</span>
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -828,17 +828,17 @@
                     }
                 }
             }
-            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">5</span> =&gt; {
                 <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="string">b&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;;&#39;</span> =&gt; {
                         <span class="comment">// incorrect</span>
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">6</span>,
+                    <span class="kw">_</span> =&gt; <span class="ident">step</span> <span class="op">=</span> <span class="number">6</span>,
                 }
             }
-            <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> {
+            <span class="number">6</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
                     <span class="comment">// hex</span>
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -853,7 +853,7 @@
                     }
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         }
 
         <span class="ident">end</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -869,7 +869,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_html_entities_to_writer</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(
     <span class="ident">text</span>: <span class="ident">S</span>,
     <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_ref</span>();
     <span class="kw">let</span> <span class="ident">text_bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_bytes</span>();
 
@@ -881,28 +881,28 @@
 
     <span class="kw">for</span> <span class="ident">e</span> <span class="kw">in</span> <span class="ident">text_bytes</span>.<span class="ident">iter</span>().<span class="ident">copied</span>() {
         <span class="kw">match</span> <span class="ident">step</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;&amp;&#39;</span> {
+            <span class="number">0</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;&amp;&#39;</span> {
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">1</span>;
                     <span class="ident">ep</span> <span class="op">=</span> <span class="ident">end</span>;
                 }
             }
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">1</span> =&gt; {
                 <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="string">b&#39;#&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;#&#39;</span> =&gt; {
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">3</span>;
                     }
-                    <span class="string">b&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;;&#39;</span> =&gt; {
                         <span class="comment">// incorrect</span>
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; {
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">2</span>;
                     }
                 }
             }
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> {
+            <span class="number">2</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
                     <span class="comment">// named</span>
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -917,20 +917,20 @@
                     }
                 }
             }
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">3</span> =&gt; {
                 <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="string">b&#39;x&#39;</span> <span class="op">|</span> <span class="string">b&#39;X&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;x&#39;</span> <span class="op">|</span> <span class="string">b&#39;X&#39;</span> =&gt; {
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">5</span>;
                     }
-                    <span class="string">b&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;;&#39;</span> =&gt; {
                         <span class="comment">// incorrect</span>
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">4</span>,
+                    <span class="kw">_</span> =&gt; <span class="ident">step</span> <span class="op">=</span> <span class="number">4</span>,
                 }
             }
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> {
+            <span class="number">4</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
                     <span class="comment">// numeric</span>
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -945,17 +945,17 @@
                     }
                 }
             }
-            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">5</span> =&gt; {
                 <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="string">b&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">b&#39;;&#39;</span> =&gt; {
                         <span class="comment">// incorrect</span>
                         <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">step</span> <span class="op">=</span> <span class="number">6</span>,
+                    <span class="kw">_</span> =&gt; <span class="ident">step</span> <span class="op">=</span> <span class="number">6</span>,
                 }
             }
-            <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> {
+            <span class="number">6</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">e</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
                     <span class="comment">// hex</span>
                     <span class="ident">step</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -970,7 +970,7 @@
                     }
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         }
 
         <span class="ident">end</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;

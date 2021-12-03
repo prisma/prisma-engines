@@ -135,7 +135,7 @@
 
 <span class="kw">impl</span> <span class="ident">Params</span> {
 	<span class="doccomment">/// Parse incoming `Params` into expected types.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 	<span class="kw">where</span>
 		<span class="ident">D</span>: <span class="ident">DeserializeOwned</span>,
 	{
@@ -144,21 +144,21 @@
 	}
 
 	<span class="doccomment">/// Check for no params, returns Err if any params</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expect_no_params</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expect_no_params</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident">Params::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-			<span class="ident">Params::Array</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_empty</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-			<span class="ident">p</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_params_with_details</span>(<span class="string">&quot;No parameters were expected&quot;</span>, <span class="ident">p</span>)),
+			<span class="ident">Params::None</span> =&gt; <span class="prelude-val">Ok</span>(()),
+			<span class="ident">Params::Array</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_empty</span>() =&gt; <span class="prelude-val">Ok</span>(()),
+			<span class="ident">p</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_params_with_details</span>(<span class="string">&quot;No parameters were expected&quot;</span>, <span class="ident">p</span>)),
 		}
 	}
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">params</span>: <span class="ident">Params</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">params</span>: <span class="ident">Params</span>) -&gt; <span class="ident">Value</span> {
 		<span class="kw">match</span> <span class="ident">params</span> {
-			<span class="ident">Params::Array</span>(<span class="ident">vec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="ident">vec</span>),
-			<span class="ident">Params::Map</span>(<span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Object</span>(<span class="ident">map</span>),
-			<span class="ident">Params::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Null</span>,
+			<span class="ident">Params::Array</span>(<span class="ident">vec</span>) =&gt; <span class="ident">Value::Array</span>(<span class="ident">vec</span>),
+			<span class="ident">Params::Map</span>(<span class="ident">map</span>) =&gt; <span class="ident">Value::Object</span>(<span class="ident">map</span>),
+			<span class="ident">Params::None</span> =&gt; <span class="ident">Value::Null</span>,
 		}
 	}
 }

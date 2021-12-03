@@ -2555,7 +2555,7 @@
 <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
 
 <span class="macro">macro_rules!</span> <span class="ident">check</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>: <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>: <span class="ident">expr</span>) =&gt; {
         <span class="kw">if</span> <span class="op">!</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>);
         }
@@ -2563,15 +2563,15 @@
 }
 
 <span class="kw">trait</span> <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Copy</span><span class="op">&gt;</span>: <span class="ident">Copy</span> {
-    <span class="kw">fn</span> <span class="ident">val</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>;
+    <span class="kw">fn</span> <span class="ident">val</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>;
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">define</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="kw">type</span>: <span class="macro-nonterminal">ty</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>: <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="kw">type</span>: <span class="macro-nonterminal">ty</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>: <span class="ident">expr</span>) =&gt; {
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
         <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
         <span class="kw">impl</span> <span class="ident">Static</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-            <span class="kw">fn</span> <span class="ident">val</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">type</span> {
+            <span class="kw">fn</span> <span class="ident">val</span>(<span class="self">self</span>) -&gt; <span class="macro-nonterminal">$</span><span class="kw">type</span> {
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>
             }
         }
@@ -2591,7 +2591,7 @@
 <span class="kw">struct</span> <span class="ident">On</span>;
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">Static</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">On</span> {
-    <span class="kw">fn</span> <span class="ident">val</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">val</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 }
@@ -2600,61 +2600,61 @@
 <span class="kw">struct</span> <span class="ident">Os</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">Static</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Os</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">val</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">val</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">dispatch</span> {
-    (<span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">ident</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>: <span class="ident">expr</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">ident</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>: <span class="ident">expr</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
         <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span> {
             <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">Bt</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>)
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">Bf</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>)
         }
     };
-    (<span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">ident</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>: <span class="ident">expr</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">ident</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>: <span class="ident">expr</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span> {
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">N1</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">N2</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">N3</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">N4</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
-            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">N5</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
-            <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">N6</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(),
+            <span class="number">1</span> =&gt; { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">N1</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
+            <span class="number">2</span> =&gt; { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">N2</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
+            <span class="number">3</span> =&gt; { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">N3</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
+            <span class="number">4</span> =&gt; { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">N4</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
+            <span class="number">5</span> =&gt; { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">N5</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
+            <span class="number">6</span> =&gt; { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">N6</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(),
         }
     };
-    (<span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">ident</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span>: <span class="macro-nonterminal">ty</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>: <span class="ident">expr</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">ident</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span>: <span class="macro-nonterminal">ty</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>: <span class="ident">expr</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">On</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">Os</span>(<span class="ident">x</span>); <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
+            <span class="prelude-val">None</span> =&gt; { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">On</span>; <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
+            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="ident">Os</span>(<span class="ident">x</span>); <span class="macro">dispatch!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>)<span class="kw-2">*</span>) },
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span> };
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span>) =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span> };
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">chunk_unchecked</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">n</span>: <span class="ident">usize</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">chunk_unchecked</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">n</span>: <span class="ident">usize</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
     <span class="macro">debug_assert!</span>((<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">*</span> <span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">x</span>.<span class="ident">len</span>());
     <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">as_ptr</span>().<span class="ident">add</span>(<span class="ident">n</span> <span class="op">*</span> <span class="ident">i</span>);
     <span class="ident">core::slice::from_raw_parts</span>(<span class="ident">ptr</span>, <span class="ident">n</span>)
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">chunk_mut_unchecked</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">n</span>: <span class="ident">usize</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>] {
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">chunk_mut_unchecked</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">n</span>: <span class="ident">usize</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>] {
     <span class="macro">debug_assert!</span>((<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">*</span> <span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">x</span>.<span class="ident">len</span>());
     <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">add</span>(<span class="ident">n</span> <span class="op">*</span> <span class="ident">i</span>);
     <span class="ident">core::slice::from_raw_parts_mut</span>(<span class="ident">ptr</span>, <span class="ident">n</span>)
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_array</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>] {
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_array</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>] {
     <span class="macro">debug_assert_eq!</span>(<span class="ident">x</span>.<span class="ident">len</span>(), <span class="number">256</span>);
     <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">x</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> [<span class="ident">u8</span>; <span class="number">256</span>])
 }
 
-<span class="kw">fn</span> <span class="ident">div_ceil</span>(<span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">m</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">div_ceil</span>(<span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">m</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     (<span class="ident">x</span> <span class="op">+</span> <span class="ident">m</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="ident">m</span>
 }
 
-<span class="kw">fn</span> <span class="ident">floor</span>(<span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">m</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">floor</span>(<span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">m</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">x</span> <span class="op">/</span> <span class="ident">m</span> <span class="op">*</span> <span class="ident">m</span>
 }
 
@@ -2686,12 +2686,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">core::fmt::Display</span> <span class="kw">for</span> <span class="ident">DecodeKind</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">core::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DecodeKind::Length</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;invalid length&quot;</span>,
-            <span class="ident">DecodeKind::Symbol</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;invalid symbol&quot;</span>,
-            <span class="ident">DecodeKind::Trailing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;non-zero trailing bits&quot;</span>,
-            <span class="ident">DecodeKind::Padding</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;invalid padding length&quot;</span>,
+            <span class="ident">DecodeKind::Length</span> =&gt; <span class="string">&quot;invalid length&quot;</span>,
+            <span class="ident">DecodeKind::Symbol</span> =&gt; <span class="string">&quot;invalid symbol&quot;</span>,
+            <span class="ident">DecodeKind::Trailing</span> =&gt; <span class="string">&quot;non-zero trailing bits&quot;</span>,
+            <span class="ident">DecodeKind::Padding</span> =&gt; <span class="string">&quot;invalid padding length&quot;</span>,
         };
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">description</span>)
     }
@@ -2713,7 +2713,7 @@
 <span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">DecodeError</span> {}
 
 <span class="kw">impl</span> <span class="ident">core::fmt::Display</span> <span class="kw">for</span> <span class="ident">DecodeError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">core::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} at {}&quot;</span>, <span class="self">self</span>.<span class="ident">kind</span>, <span class="self">self</span>.<span class="ident">position</span>)
     }
 }
@@ -2739,7 +2739,7 @@
 <span class="kw">const</span> <span class="ident">IGNORE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">129</span>;
 <span class="kw">const</span> <span class="ident">PADDING</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">130</span>;
 
-<span class="kw">fn</span> <span class="ident">order</span>(<span class="ident">msb</span>: <span class="ident">bool</span>, <span class="ident">n</span>: <span class="ident">usize</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">order</span>(<span class="ident">msb</span>: <span class="ident">bool</span>, <span class="ident">n</span>: <span class="ident">usize</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">if</span> <span class="ident">msb</span> {
         <span class="ident">n</span> <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">i</span>
     } <span class="kw">else</span> {
@@ -2747,21 +2747,21 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">enc</span>(<span class="ident">bit</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">enc</span>(<span class="ident">bit</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="macro">debug_assert!</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">bit</span> <span class="op">&amp;&amp;</span> <span class="ident">bit</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">6</span>);
     <span class="kw">match</span> <span class="ident">bit</span> {
-        <span class="number">1</span> <span class="op">|</span> <span class="number">2</span> <span class="op">|</span> <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-        <span class="number">3</span> <span class="op">|</span> <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-        <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="number">1</span> <span class="op">|</span> <span class="number">2</span> <span class="op">|</span> <span class="number">4</span> =&gt; <span class="number">1</span>,
+        <span class="number">3</span> <span class="op">|</span> <span class="number">6</span> =&gt; <span class="number">3</span>,
+        <span class="number">5</span> =&gt; <span class="number">5</span>,
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">dec</span>(<span class="ident">bit</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">dec</span>(<span class="ident">bit</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">enc</span>(<span class="ident">bit</span>) <span class="op">*</span> <span class="number">8</span> <span class="op">/</span> <span class="ident">bit</span>
 }
 
-<span class="kw">fn</span> <span class="ident">encode_len</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">encode_len</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">div_ceil</span>(<span class="number">8</span> <span class="op">*</span> <span class="ident">len</span>, <span class="ident">bit</span>.<span class="ident">val</span>())
 }
 
@@ -2790,9 +2790,9 @@
     <span class="kw">let</span> <span class="ident">dec</span> <span class="op">=</span> <span class="ident">dec</span>(<span class="ident">bit</span>.<span class="ident">val</span>());
     <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="ident">enc</span>;
     <span class="kw">let</span> <span class="ident">bs</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bit</span>.<span class="ident">val</span>() {
-        <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-        <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
+        <span class="number">5</span> =&gt; <span class="number">2</span>,
+        <span class="number">6</span> =&gt; <span class="number">4</span>,
+        <span class="kw">_</span> =&gt; <span class="number">1</span>,
     };
     <span class="ident">vectorize</span>(<span class="ident">n</span>, <span class="ident">bs</span>, <span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">chunk_unchecked</span>(<span class="ident">input</span>, <span class="ident">enc</span>, <span class="ident">i</span>) };
@@ -2806,7 +2806,7 @@
 <span class="comment">// lowest index of such character. The output is not written to.</span>
 <span class="kw">fn</span> <span class="ident">decode_block</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">M</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">msb</span>: <span class="ident">M</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">usize</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="macro">debug_assert!</span>(<span class="ident">output</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">enc</span>(<span class="ident">bit</span>.<span class="ident">val</span>()));
     <span class="macro">debug_assert_eq!</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">encode_len</span>(<span class="ident">bit</span>, <span class="ident">output</span>.<span class="ident">len</span>()));
     <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> <span class="ident">bit</span>.<span class="ident">val</span>();
@@ -2828,7 +2828,7 @@
 <span class="comment">// enc` excluded.</span>
 <span class="kw">fn</span> <span class="ident">decode_mut</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">M</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">msb</span>: <span class="ident">M</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">usize</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="macro">debug_assert_eq!</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">encode_len</span>(<span class="ident">bit</span>, <span class="ident">output</span>.<span class="ident">len</span>()));
     <span class="kw">let</span> <span class="ident">enc</span> <span class="op">=</span> <span class="ident">enc</span>(<span class="ident">bit</span>.<span class="ident">val</span>());
     <span class="kw">let</span> <span class="ident">dec</span> <span class="op">=</span> <span class="ident">dec</span>(<span class="ident">bit</span>.<span class="ident">val</span>());
@@ -2845,35 +2845,35 @@
 <span class="comment">// Fails if there are non-zero trailing bits.</span>
 <span class="kw">fn</span> <span class="ident">check_trail</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">M</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">msb</span>: <span class="ident">M</span>, <span class="ident">ctb</span>: <span class="ident">bool</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="number">8</span> <span class="op">%</span> <span class="ident">bit</span>.<span class="ident">val</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">ctb</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="number">8</span> <span class="op">%</span> <span class="ident">bit</span>.<span class="ident">val</span>() <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">ctb</span> {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
     }
     <span class="kw">let</span> <span class="ident">trail</span> <span class="op">=</span> <span class="ident">bit</span>.<span class="ident">val</span>() <span class="op">*</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="number">8</span>;
-    <span class="kw">if</span> <span class="ident">trail</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">trail</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
     }
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mask</span> <span class="op">=</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">trail</span>) <span class="op">-</span> <span class="number">1</span>;
     <span class="kw">if</span> <span class="op">!</span><span class="ident">msb</span>.<span class="ident">val</span>() {
         <span class="ident">mask</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="ident">bit</span>.<span class="ident">val</span>() <span class="op">-</span> <span class="ident">trail</span>;
     }
-    <span class="macro">check!</span>((), <span class="ident">values</span>[<span class="ident">input</span>[<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>] <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">&amp;</span> <span class="ident">mask</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>);
+    <span class="macro">check!</span>((), <span class="ident">values</span>[<span class="ident">input</span>[<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>] <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">&amp;</span> <span class="ident">mask</span> <span class="op">==</span> <span class="number">0</span>);
     <span class="prelude-val">Ok</span>(())
 }
 
 <span class="comment">// Fails if the padding length is invalid. The error is the index of the first</span>
 <span class="comment">// padding character.</span>
-<span class="kw">fn</span> <span class="ident">check_pad</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">usize</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">check_pad</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> <span class="ident">bit</span>.<span class="ident">val</span>();
     <span class="macro">debug_assert_eq!</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">dec</span>(<span class="ident">bit</span>));
-    <span class="kw">let</span> <span class="ident">is_pad</span> <span class="op">=</span> <span class="op">|</span><span class="ident">x</span>: <span class="op">&amp;&amp;</span><span class="ident">u8</span><span class="op">|</span> <span class="ident">values</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">PADDING</span>;
+    <span class="kw">let</span> <span class="ident">is_pad</span> <span class="op">=</span> <span class="op">|</span><span class="ident">x</span>: <span class="op">&amp;&amp;</span><span class="ident">u8</span><span class="op">|</span> <span class="ident">values</span>[<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">==</span> <span class="ident">PADDING</span>;
     <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">iter</span>().<span class="ident">rev</span>().<span class="ident">take_while</span>(<span class="ident">is_pad</span>).<span class="ident">count</span>();
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">count</span>;
     <span class="macro">check!</span>(<span class="ident">len</span>, <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">bit</span> <span class="op">*</span> <span class="ident">len</span> <span class="op">%</span> <span class="number">8</span> <span class="op">&lt;</span> <span class="ident">bit</span>);
     <span class="prelude-val">Ok</span>(<span class="ident">len</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">encode_base_len</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">encode_base_len</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">encode_len</span>(<span class="ident">bit</span>, <span class="ident">len</span>)
 }
 
@@ -2884,10 +2884,10 @@
     <span class="ident">encode_mut</span>(<span class="ident">bit</span>, <span class="ident">msb</span>, <span class="ident">symbols</span>, <span class="ident">input</span>, <span class="ident">output</span>);
 }
 
-<span class="kw">fn</span> <span class="ident">encode_pad_len</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">P</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">pad</span>: <span class="ident">P</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">encode_pad_len</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">P</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">pad</span>: <span class="ident">P</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">match</span> <span class="ident">pad</span>.<span class="ident">val</span>() {
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">encode_base_len</span>(<span class="ident">bit</span>, <span class="ident">len</span>),
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">div_ceil</span>(<span class="ident">len</span>, <span class="ident">enc</span>(<span class="ident">bit</span>.<span class="ident">val</span>())) <span class="op">*</span> <span class="ident">dec</span>(<span class="ident">bit</span>.<span class="ident">val</span>()),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">encode_base_len</span>(<span class="ident">bit</span>, <span class="ident">len</span>),
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="ident">div_ceil</span>(<span class="ident">len</span>, <span class="ident">enc</span>(<span class="ident">bit</span>.<span class="ident">val</span>())) <span class="op">*</span> <span class="ident">dec</span>(<span class="ident">bit</span>.<span class="ident">val</span>()),
     }
 }
 
@@ -2895,8 +2895,8 @@
     <span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">msb</span>: <span class="ident">M</span>, <span class="ident">symbols</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">spad</span>: <span class="ident">P</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
 ) {
     <span class="kw">let</span> <span class="ident">pad</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">spad</span>.<span class="ident">val</span>() {
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">encode_base</span>(<span class="ident">bit</span>, <span class="ident">msb</span>, <span class="ident">symbols</span>, <span class="ident">input</span>, <span class="ident">output</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">pad</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pad</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">encode_base</span>(<span class="ident">bit</span>, <span class="ident">msb</span>, <span class="ident">symbols</span>, <span class="ident">input</span>, <span class="ident">output</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">pad</span>) =&gt; <span class="ident">pad</span>,
     };
     <span class="macro">debug_assert_eq!</span>(<span class="ident">output</span>.<span class="ident">len</span>(), <span class="ident">encode_pad_len</span>(<span class="ident">bit</span>, <span class="ident">spad</span>, <span class="ident">input</span>.<span class="ident">len</span>()));
     <span class="kw">let</span> <span class="ident">olen</span> <span class="op">=</span> <span class="ident">encode_base_len</span>(<span class="ident">bit</span>, <span class="ident">input</span>.<span class="ident">len</span>());
@@ -2913,11 +2913,11 @@
     <span class="ident">W</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>])<span class="op">&gt;</span><span class="op">&gt;</span>,
 <span class="op">&gt;</span>(
     <span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">pad</span>: <span class="ident">P</span>, <span class="ident">wrap</span>: <span class="ident">W</span>, <span class="ident">ilen</span>: <span class="ident">usize</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+) -&gt; <span class="ident">usize</span> {
     <span class="kw">let</span> <span class="ident">olen</span> <span class="op">=</span> <span class="ident">encode_pad_len</span>(<span class="ident">bit</span>, <span class="ident">pad</span>, <span class="ident">ilen</span>);
     <span class="kw">match</span> <span class="ident">wrap</span>.<span class="ident">val</span>() {
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">olen</span>,
-        <span class="prelude-val">Some</span>((<span class="ident">col</span>, <span class="ident">end</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">olen</span> <span class="op">+</span> <span class="ident">end</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">div_ceil</span>(<span class="ident">olen</span>, <span class="ident">col</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">olen</span>,
+        <span class="prelude-val">Some</span>((<span class="ident">col</span>, <span class="ident">end</span>)) =&gt; <span class="ident">olen</span> <span class="op">+</span> <span class="ident">end</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">div_ceil</span>(<span class="ident">olen</span>, <span class="ident">col</span>),
     }
 }
 
@@ -2931,8 +2931,8 @@
     <span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">msb</span>: <span class="ident">M</span>, <span class="ident">symbols</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">pad</span>: <span class="ident">P</span>, <span class="ident">wrap</span>: <span class="ident">W</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
 ) {
     <span class="kw">let</span> (<span class="ident">col</span>, <span class="ident">end</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">wrap</span>.<span class="ident">val</span>() {
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">encode_pad</span>(<span class="ident">bit</span>, <span class="ident">msb</span>, <span class="ident">symbols</span>, <span class="ident">pad</span>, <span class="ident">input</span>, <span class="ident">output</span>),
-        <span class="prelude-val">Some</span>((<span class="ident">col</span>, <span class="ident">end</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">col</span>, <span class="ident">end</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">encode_pad</span>(<span class="ident">bit</span>, <span class="ident">msb</span>, <span class="ident">symbols</span>, <span class="ident">pad</span>, <span class="ident">input</span>, <span class="ident">output</span>),
+        <span class="prelude-val">Some</span>((<span class="ident">col</span>, <span class="ident">end</span>)) =&gt; (<span class="ident">col</span>, <span class="ident">end</span>),
     };
     <span class="macro">debug_assert_eq!</span>(<span class="ident">output</span>.<span class="ident">len</span>(), <span class="ident">encode_wrap_len</span>(<span class="ident">bit</span>, <span class="ident">pad</span>, <span class="ident">wrap</span>, <span class="ident">input</span>.<span class="ident">len</span>()));
     <span class="macro">debug_assert_eq!</span>(<span class="ident">col</span> <span class="op">%</span> <span class="ident">dec</span>(<span class="ident">bit</span>.<span class="ident">val</span>()), <span class="number">0</span>);
@@ -2957,7 +2957,7 @@
 <span class="comment">// Returns the longest valid input length and associated output length.</span>
 <span class="kw">fn</span> <span class="ident">decode_wrap_len</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">P</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">pad</span>: <span class="ident">P</span>, <span class="ident">len</span>: <span class="ident">usize</span>,
-) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="ident">usize</span>) {
+) -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>) {
     <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> <span class="ident">bit</span>.<span class="ident">val</span>();
     <span class="kw">if</span> <span class="ident">pad</span>.<span class="ident">val</span>() {
         (<span class="ident">floor</span>(<span class="ident">len</span>, <span class="ident">dec</span>(<span class="ident">bit</span>)), <span class="ident">len</span> <span class="op">/</span> <span class="ident">dec</span>(<span class="ident">bit</span>) <span class="op">*</span> <span class="ident">enc</span>(<span class="ident">bit</span>))
@@ -2971,15 +2971,15 @@
 <span class="comment">// length.</span>
 <span class="kw">fn</span> <span class="ident">decode_pad_len</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">P</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">pad</span>: <span class="ident">P</span>, <span class="ident">len</span>: <span class="ident">usize</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">ilen</span>, <span class="ident">olen</span>) <span class="op">=</span> <span class="ident">decode_wrap_len</span>(<span class="ident">bit</span>, <span class="ident">pad</span>, <span class="ident">len</span>);
-    <span class="macro">check!</span>(<span class="ident">DecodeError</span> { <span class="ident">position</span>: <span class="ident">ilen</span>, <span class="ident">kind</span>: <span class="ident">DecodeKind::Length</span> }, <span class="ident">ilen</span> <span class="op">=</span><span class="op">=</span> <span class="ident">len</span>);
+    <span class="macro">check!</span>(<span class="ident">DecodeError</span> { <span class="ident">position</span>: <span class="ident">ilen</span>, <span class="ident">kind</span>: <span class="ident">DecodeKind::Length</span> }, <span class="ident">ilen</span> <span class="op">==</span> <span class="ident">len</span>);
     <span class="prelude-val">Ok</span>(<span class="ident">olen</span>)
 }
 
 <span class="comment">// Fails with Length if length is invalid. The error is the largest valid</span>
 <span class="comment">// length.</span>
-<span class="kw">fn</span> <span class="ident">decode_base_len</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">decode_base_len</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span> {
     <span class="ident">decode_pad_len</span>(<span class="ident">bit</span>, <span class="ident">Bf</span>, <span class="ident">len</span>)
 }
 
@@ -2988,7 +2988,7 @@
 <span class="comment">// Fails with Trailing if there are non-zero trailing bits.</span>
 <span class="kw">fn</span> <span class="ident">decode_base_mut</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">M</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">msb</span>: <span class="ident">M</span>, <span class="ident">ctb</span>: <span class="ident">bool</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodePartial</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodePartial</span><span class="op">&gt;</span> {
     <span class="macro">debug_assert_eq!</span>(<span class="prelude-val">Ok</span>(<span class="ident">output</span>.<span class="ident">len</span>()), <span class="ident">decode_base_len</span>(<span class="ident">bit</span>, <span class="ident">input</span>.<span class="ident">len</span>()));
     <span class="kw">let</span> <span class="ident">fail</span> <span class="op">=</span> <span class="op">|</span><span class="ident">pos</span>, <span class="ident">kind</span><span class="op">|</span> <span class="ident">DecodePartial</span> {
         <span class="ident">read</span>: <span class="ident">pos</span> <span class="op">/</span> <span class="ident">dec</span>(<span class="ident">bit</span>.<span class="ident">val</span>()) <span class="op">*</span> <span class="ident">dec</span>(<span class="ident">bit</span>.<span class="ident">val</span>()),
@@ -3008,7 +3008,7 @@
 <span class="comment">// Fails with Trailing if there are non-zero trailing bits.</span>
 <span class="kw">fn</span> <span class="ident">decode_pad_mut</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">M</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">P</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">msb</span>: <span class="ident">M</span>, <span class="ident">ctb</span>: <span class="ident">bool</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">pad</span>: <span class="ident">P</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodePartial</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodePartial</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">pad</span>.<span class="ident">val</span>() {
         <span class="kw">return</span> <span class="ident">decode_base_mut</span>(<span class="ident">bit</span>, <span class="ident">msb</span>, <span class="ident">ctb</span>, <span class="ident">values</span>, <span class="ident">input</span>, <span class="ident">output</span>);
     }
@@ -3027,14 +3027,14 @@
             <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">inpos</span> ..],
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>[<span class="ident">outpos</span> .. <span class="ident">outend</span>],
         ) {
-            <span class="prelude-val">Ok</span>(<span class="ident">written</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">written</span>) =&gt; {
                 <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
                     <span class="ident">inpos</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>();
                 }
                 <span class="ident">outpos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">written</span>;
                 <span class="kw">break</span>;
             }
-            <span class="prelude-val">Err</span>(<span class="ident">partial</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">partial</span>) =&gt; {
                 <span class="ident">inpos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">partial</span>.<span class="ident">read</span>;
                 <span class="ident">outpos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">partial</span>.<span class="ident">written</span>;
             }
@@ -3076,8 +3076,8 @@
     <span class="prelude-val">Ok</span>(<span class="ident">outend</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">skip_ignore</span>(<span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw-2">mut</span> <span class="ident">inpos</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-    <span class="kw">while</span> <span class="ident">inpos</span> <span class="op">&lt;</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">values</span>[<span class="ident">input</span>[<span class="ident">inpos</span>] <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">IGNORE</span> {
+<span class="kw">fn</span> <span class="ident">skip_ignore</span>(<span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw-2">mut</span> <span class="ident">inpos</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
+    <span class="kw">while</span> <span class="ident">inpos</span> <span class="op">&lt;</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">values</span>[<span class="ident">input</span>[<span class="ident">inpos</span>] <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">==</span> <span class="ident">IGNORE</span> {
         <span class="ident">inpos</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
     }
     <span class="ident">inpos</span>
@@ -3091,7 +3091,7 @@
 <span class="comment">// Fails with Trailing if there are non-zero trailing bits.</span>
 <span class="kw">fn</span> <span class="ident">decode_wrap_block</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">M</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">P</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">msb</span>: <span class="ident">M</span>, <span class="ident">ctb</span>: <span class="ident">bool</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">pad</span>: <span class="ident">P</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>), <span class="ident">DecodeError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>), <span class="ident">DecodeError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">dec</span> <span class="op">=</span> <span class="ident">dec</span>(<span class="ident">bit</span>.<span class="ident">val</span>());
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">8</span>];
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shift</span> <span class="op">=</span> [<span class="number">0usize</span>; <span class="number">8</span>];
@@ -3099,7 +3099,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inpos</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">while</span> <span class="ident">bufpos</span> <span class="op">&lt;</span> <span class="ident">dec</span> {
         <span class="ident">inpos</span> <span class="op">=</span> <span class="ident">skip_ignore</span>(<span class="ident">values</span>, <span class="ident">input</span>, <span class="ident">inpos</span>);
-        <span class="kw">if</span> <span class="ident">inpos</span> <span class="op">=</span><span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>() {
+        <span class="kw">if</span> <span class="ident">inpos</span> <span class="op">==</span> <span class="ident">input</span>.<span class="ident">len</span>() {
             <span class="kw">break</span>;
         }
         <span class="ident">shift</span>[<span class="ident">bufpos</span>] <span class="op">=</span> <span class="ident">inpos</span>;
@@ -3130,7 +3130,7 @@
 <span class="kw">fn</span> <span class="ident">decode_wrap_mut</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">M</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">P</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">I</span>: <span class="ident">Static</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bit</span>: <span class="ident">B</span>, <span class="ident">msb</span>: <span class="ident">M</span>, <span class="ident">ctb</span>: <span class="ident">bool</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>], <span class="ident">pad</span>: <span class="ident">P</span>, <span class="ident">has_ignore</span>: <span class="ident">I</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodePartial</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodePartial</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">has_ignore</span>.<span class="ident">val</span>() {
         <span class="kw">return</span> <span class="ident">decode_pad_mut</span>(<span class="ident">bit</span>, <span class="ident">msb</span>, <span class="ident">ctb</span>, <span class="ident">values</span>, <span class="ident">pad</span>, <span class="ident">input</span>, <span class="ident">output</span>);
     }
@@ -3148,12 +3148,12 @@
             <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">inpos</span> .. <span class="ident">inpos</span> <span class="op">+</span> <span class="ident">inlen</span>],
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>[<span class="ident">outpos</span> .. <span class="ident">outpos</span> <span class="op">+</span> <span class="ident">outlen</span>],
         ) {
-            <span class="prelude-val">Ok</span>(<span class="ident">written</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">written</span>) =&gt; {
                 <span class="ident">inpos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">inlen</span>;
                 <span class="ident">outpos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">written</span>;
                 <span class="kw">break</span>;
             }
-            <span class="prelude-val">Err</span>(<span class="ident">partial</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">partial</span>) =&gt; {
                 <span class="ident">inpos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">partial</span>.<span class="ident">read</span>;
                 <span class="ident">outpos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">partial</span>.<span class="ident">written</span>;
             }
@@ -3168,7 +3168,7 @@
         <span class="ident">outpos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">opos</span>;
     }
     <span class="kw">let</span> <span class="ident">inpos</span> <span class="op">=</span> <span class="ident">skip_ignore</span>(<span class="ident">values</span>, <span class="ident">input</span>, <span class="ident">inpos</span>);
-    <span class="kw">if</span> <span class="ident">inpos</span> <span class="op">=</span><span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>() {
+    <span class="kw">if</span> <span class="ident">inpos</span> <span class="op">==</span> <span class="ident">input</span>.<span class="ident">len</span>() {
         <span class="prelude-val">Ok</span>(<span class="ident">outpos</span>)
     } <span class="kw">else</span> {
         <span class="prelude-val">Err</span>(<span class="ident">DecodePartial</span> {
@@ -3608,21 +3608,21 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Specification</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Encoding</span> {
-    <span class="kw">fn</span> <span class="ident">sym</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>] {
+    <span class="kw">fn</span> <span class="ident">sym</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>] {
         <span class="kw">unsafe</span> { <span class="ident">as_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="number">0</span> .. <span class="number">256</span>]) }
     }
 
-    <span class="kw">fn</span> <span class="ident">val</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>] {
+    <span class="kw">fn</span> <span class="ident">val</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">256</span>] {
         <span class="kw">unsafe</span> { <span class="ident">as_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="number">256</span> .. <span class="number">512</span>]) }
     }
 
-    <span class="kw">fn</span> <span class="ident">pad</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">pad</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>[<span class="number">512</span>] <span class="op">&lt;</span> <span class="number">128</span> {
             <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>[<span class="number">512</span>])
         } <span class="kw">else</span> {
@@ -3630,26 +3630,26 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">ctb</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">ctb</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="number">0</span>[<span class="number">513</span>] <span class="op">&amp;</span> <span class="number">0x10</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">msb</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">msb</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="number">0</span>[<span class="number">513</span>] <span class="op">&amp;</span> <span class="number">0x8</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">bit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">bit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         (<span class="self">self</span>.<span class="number">0</span>[<span class="number">513</span>] <span class="op">&amp;</span> <span class="number">0x7</span>) <span class="kw">as</span> <span class="ident">usize</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">wrap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>])<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">wrap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>])<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">515</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
         <span class="prelude-val">Some</span>((<span class="self">self</span>.<span class="number">0</span>[<span class="number">514</span>] <span class="kw">as</span> <span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="number">515</span> ..]))
     }
 
-    <span class="kw">fn</span> <span class="ident">has_ignore</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">has_ignore</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">515</span>
     }
 
@@ -3658,7 +3658,7 @@
     <span class="doccomment">/// See [`encode_mut`] for when to use it.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`encode_mut`]: struct.Encoding.html#method.encode_mut</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
         <span class="macro">dispatch!</span> {
             <span class="kw">let</span> <span class="ident">bit</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bit</span>();
             <span class="kw">let</span> <span class="ident">pad</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pad</span>();
@@ -3735,7 +3735,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the `alloc` feature.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="self">self</span>.<span class="ident">encode_len</span>(<span class="ident">input</span>.<span class="ident">len</span>())];
         <span class="self">self</span>.<span class="ident">encode_mut</span>(<span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>);
         <span class="kw">unsafe</span> { <span class="ident">String::from_utf8_unchecked</span>(<span class="ident">output</span>) }
@@ -3753,7 +3753,7 @@
     <span class="doccomment">/// [`decode_mut`]: struct.Encoding.html#method.decode_mut</span>
     <span class="doccomment">/// [`Length`]: enum.DecodeKind.html#variant.Length</span>
     <span class="doccomment">/// [position]: struct.DecodeError.html#structfield.position</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">ilen</span>, <span class="ident">olen</span>) <span class="op">=</span> <span class="macro">dispatch!</span> {
             <span class="kw">let</span> <span class="ident">bit</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bit</span>();
             <span class="kw">let</span> <span class="ident">pad</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pad</span>().<span class="ident">is_some</span>();
@@ -3761,7 +3761,7 @@
         };
         <span class="macro">check!</span>(
             <span class="ident">DecodeError</span> { <span class="ident">position</span>: <span class="ident">ilen</span>, <span class="ident">kind</span>: <span class="ident">DecodeKind::Length</span> },
-            <span class="self">self</span>.<span class="ident">has_ignore</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ilen</span>
+            <span class="self">self</span>.<span class="ident">has_ignore</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">len</span> <span class="op">==</span> <span class="ident">ilen</span>
         );
         <span class="prelude-val">Ok</span>(<span class="ident">olen</span>)
     }
@@ -3804,7 +3804,7 @@
     <span class="doccomment">/// [`read`]: struct.DecodePartial.html#structfield.read</span>
     <span class="doccomment">/// [`written`]: struct.DecodePartial.html#structfield.written</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::cognitive_complexity</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodePartial</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodePartial</span><span class="op">&gt;</span> {
         <span class="macro">assert_eq!</span>(<span class="prelude-val">Ok</span>(<span class="ident">output</span>.<span class="ident">len</span>()), <span class="self">self</span>.<span class="ident">decode_len</span>(<span class="ident">input</span>.<span class="ident">len</span>()));
         <span class="macro">dispatch!</span> {
             <span class="kw">let</span> <span class="ident">bit</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bit</span>();
@@ -3850,7 +3850,7 @@
     <span class="doccomment">/// [`Padding`]: enum.DecodeKind.html#variant.Padding</span>
     <span class="doccomment">/// [position]: struct.DecodeError.html#structfield.position</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="self">self</span>.<span class="ident">decode_len</span>(<span class="ident">input</span>.<span class="ident">len</span>())<span class="question-mark">?</span>];
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">decode_mut</span>(<span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">partial</span><span class="op">|</span> <span class="ident">partial</span>.<span class="ident">error</span>)<span class="question-mark">?</span>;
         <span class="ident">output</span>.<span class="ident">truncate</span>(<span class="ident">len</span>);
@@ -3858,7 +3858,7 @@
     }
 
     <span class="doccomment">/// Returns the bit-width</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">bit</span>()
     }
 
@@ -3870,7 +3870,7 @@
     <span class="doccomment">/// - padding is used</span>
     <span class="doccomment">/// - characters are ignored</span>
     <span class="doccomment">/// - characters are translated</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_canonical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_canonical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">ctb</span>() {
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
@@ -3878,7 +3878,7 @@
         <span class="kw">let</span> <span class="ident">sym</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sym</span>();
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">val</span>();
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="number">256</span> {
-            <span class="kw">if</span> <span class="ident">val</span>[<span class="ident">i</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">INVALID</span> {
+            <span class="kw">if</span> <span class="ident">val</span>[<span class="ident">i</span>] <span class="op">==</span> <span class="ident">INVALID</span> {
                 <span class="kw">continue</span>;
             }
             <span class="kw">if</span> <span class="ident">val</span>[<span class="ident">i</span>] <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">bit</span> {
@@ -3897,7 +3897,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the `alloc` feature.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">specification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Specification</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">specification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Specification</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">specification</span> <span class="op">=</span> <span class="ident">Specification::new</span>();
         <span class="ident">specification</span>
             .<span class="ident">symbols</span>
@@ -3921,12 +3921,12 @@
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="number">128u8</span> {
             <span class="kw">let</span> <span class="ident">canonical</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">val</span>()[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">&lt;</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">bit</span>() {
                 <span class="self">self</span>.<span class="ident">sym</span>()[<span class="self">self</span>.<span class="ident">val</span>()[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="ident">usize</span>]
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">val</span>()[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">PADDING</span> {
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">val</span>()[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">==</span> <span class="ident">PADDING</span> {
                 <span class="self">self</span>.<span class="ident">pad</span>().<span class="ident">unwrap</span>()
             } <span class="kw">else</span> {
                 <span class="kw">continue</span>;
             };
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="ident">canonical</span> {
+            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">canonical</span> {
                 <span class="kw">continue</span>;
             }
             <span class="ident">specification</span>.<span class="ident">translate</span>.<span class="ident">from</span>.<span class="ident">push</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">char</span>);
@@ -3936,7 +3936,7 @@
     }
 
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">internal_new</span>(<span class="ident">implementation</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Encoding</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">internal_new</span>(<span class="ident">implementation</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">Encoding</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">encoding</span> <span class="op">=</span> <span class="ident">Encoding</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">implementation</span>));
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>))]</span>
@@ -3945,7 +3945,7 @@
     }
 
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_implementation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_implementation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -3976,32 +3976,32 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">core::fmt::Display</span> <span class="kw">for</span> <span class="ident">SpecificationError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">core::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">BadSize</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid number of symbols&quot;</span>),
-            <span class="ident">NotAscii</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;non-ascii character&quot;</span>),
-            <span class="ident">Duplicate</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?} has conflicting definitions&quot;</span>, <span class="ident">c</span> <span class="kw">as</span> <span class="ident">char</span>),
-            <span class="ident">ExtraPadding</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unnecessary padding&quot;</span>),
-            <span class="ident">WrapLength</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid wrap width or separator length&quot;</span>),
-            <span class="ident">WrapWidth</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;wrap width not a multiple of {}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">FromTo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;translate from/to length mismatch&quot;</span>),
-            <span class="ident">Undefined</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?} is undefined&quot;</span>, <span class="ident">c</span> <span class="kw">as</span> <span class="ident">char</span>),
+            <span class="ident">BadSize</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid number of symbols&quot;</span>),
+            <span class="ident">NotAscii</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;non-ascii character&quot;</span>),
+            <span class="ident">Duplicate</span>(<span class="ident">c</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?} has conflicting definitions&quot;</span>, <span class="ident">c</span> <span class="kw">as</span> <span class="ident">char</span>),
+            <span class="ident">ExtraPadding</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unnecessary padding&quot;</span>),
+            <span class="ident">WrapLength</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid wrap width or separator length&quot;</span>),
+            <span class="ident">WrapWidth</span>(<span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;wrap width not a multiple of {}&quot;</span>, <span class="ident">x</span>),
+            <span class="ident">FromTo</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;translate from/to length mismatch&quot;</span>),
+            <span class="ident">Undefined</span>(<span class="ident">c</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?} is undefined&quot;</span>, <span class="ident">c</span> <span class="kw">as</span> <span class="ident">char</span>),
         }
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">SpecificationError</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">BadSize</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;invalid number of symbols&quot;</span>,
-            <span class="ident">NotAscii</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;non-ascii character&quot;</span>,
-            <span class="ident">Duplicate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;conflicting definitions&quot;</span>,
-            <span class="ident">ExtraPadding</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;unnecessary padding&quot;</span>,
-            <span class="ident">WrapLength</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;invalid wrap width or separator length&quot;</span>,
-            <span class="ident">WrapWidth</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;wrap width not a multiple&quot;</span>,
-            <span class="ident">FromTo</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;translate from/to length mismatch&quot;</span>,
-            <span class="ident">Undefined</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;undefined character&quot;</span>,
+            <span class="ident">BadSize</span> =&gt; <span class="string">&quot;invalid number of symbols&quot;</span>,
+            <span class="ident">NotAscii</span> =&gt; <span class="string">&quot;non-ascii character&quot;</span>,
+            <span class="ident">Duplicate</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;conflicting definitions&quot;</span>,
+            <span class="ident">ExtraPadding</span> =&gt; <span class="string">&quot;unnecessary padding&quot;</span>,
+            <span class="ident">WrapLength</span> =&gt; <span class="string">&quot;invalid wrap width or separator length&quot;</span>,
+            <span class="ident">WrapWidth</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;wrap width not a multiple&quot;</span>,
+            <span class="ident">FromTo</span> =&gt; <span class="string">&quot;translate from/to length mismatch&quot;</span>,
+            <span class="ident">Undefined</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;undefined character&quot;</span>,
         }
     }
 }
@@ -4009,7 +4009,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Specification</span> {
     <span class="doccomment">/// Returns a default specification</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Specification</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Specification</span> {
         <span class="ident">Specification</span> {
             <span class="ident">symbols</span>: <span class="ident">String::new</span>(),
             <span class="ident">bit_order</span>: <span class="ident">MostSignificantFirst</span>,
@@ -4026,37 +4026,37 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an error if the specification is invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Encoding</span>, <span class="ident">SpecificationError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Encoding</span>, <span class="ident">SpecificationError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">symbols</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">as_bytes</span>();
         <span class="kw">let</span> <span class="ident">bit</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">symbols</span>.<span class="ident">len</span>() {
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="number">8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-            <span class="number">16</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-            <span class="number">32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
-            <span class="number">64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">6</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SpecificationError</span>(<span class="ident">BadSize</span>)),
+            <span class="number">2</span> =&gt; <span class="number">1</span>,
+            <span class="number">4</span> =&gt; <span class="number">2</span>,
+            <span class="number">8</span> =&gt; <span class="number">3</span>,
+            <span class="number">16</span> =&gt; <span class="number">4</span>,
+            <span class="number">32</span> =&gt; <span class="number">5</span>,
+            <span class="number">64</span> =&gt; <span class="number">6</span>,
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SpecificationError</span>(<span class="ident">BadSize</span>)),
         };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> [<span class="ident">INVALID</span>; <span class="number">128</span>];
         <span class="kw">let</span> <span class="ident">set</span> <span class="op">=</span> <span class="op">|</span><span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>; <span class="number">128</span>], <span class="ident">i</span>: <span class="ident">u8</span>, <span class="ident">x</span>: <span class="ident">u8</span><span class="op">|</span> {
             <span class="macro">check!</span>(<span class="ident">SpecificationError</span>(<span class="ident">NotAscii</span>), <span class="ident">i</span> <span class="op">&lt;</span> <span class="number">128</span>);
-            <span class="kw">if</span> <span class="ident">v</span>[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">x</span> {
+            <span class="kw">if</span> <span class="ident">v</span>[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">==</span> <span class="ident">x</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }
-            <span class="macro">check!</span>(<span class="ident">SpecificationError</span>(<span class="ident">Duplicate</span>(<span class="ident">i</span>)), <span class="ident">v</span>[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">INVALID</span>);
+            <span class="macro">check!</span>(<span class="ident">SpecificationError</span>(<span class="ident">Duplicate</span>(<span class="ident">i</span>)), <span class="ident">v</span>[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">==</span> <span class="ident">INVALID</span>);
             <span class="ident">v</span>[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="ident">x</span>;
             <span class="prelude-val">Ok</span>(())
         };
         <span class="kw">for</span> (<span class="ident">v</span>, <span class="ident">symbols</span>) <span class="kw">in</span> <span class="ident">symbols</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
             <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">values</span>, <span class="kw-2">*</span><span class="ident">symbols</span>, <span class="ident">v</span> <span class="kw">as</span> <span class="ident">u8</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">let</span> <span class="ident">msb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bit_order</span> <span class="op">=</span><span class="op">=</span> <span class="ident">MostSignificantFirst</span>;
-        <span class="kw">let</span> <span class="ident">ctb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">check_trailing_bits</span> <span class="op">|</span><span class="op">|</span> <span class="number">8</span> <span class="op">%</span> <span class="ident">bit</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let</span> <span class="ident">msb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bit_order</span> <span class="op">==</span> <span class="ident">MostSignificantFirst</span>;
+        <span class="kw">let</span> <span class="ident">ctb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">check_trailing_bits</span> <span class="op">|</span><span class="op">|</span> <span class="number">8</span> <span class="op">%</span> <span class="ident">bit</span> <span class="op">==</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">pad</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">padding</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">pad</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">pad</span>) =&gt; {
                 <span class="macro">check!</span>(<span class="ident">SpecificationError</span>(<span class="ident">ExtraPadding</span>), <span class="number">8</span> <span class="op">%</span> <span class="ident">bit</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
-                <span class="macro">check!</span>(<span class="ident">SpecificationError</span>(<span class="ident">NotAscii</span>), <span class="ident">pad</span>.<span class="ident">len_utf8</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>);
+                <span class="macro">check!</span>(<span class="ident">SpecificationError</span>(<span class="ident">NotAscii</span>), <span class="ident">pad</span>.<span class="ident">len_utf8</span>() <span class="op">==</span> <span class="number">1</span>);
                 <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">values</span>, <span class="ident">pad</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">PADDING</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Some</span>(<span class="ident">pad</span> <span class="kw">as</span> <span class="ident">u8</span>)
             }
@@ -4064,21 +4064,21 @@
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">ignore</span>.<span class="ident">bytes</span>() {
             <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">values</span>, <span class="ident">i</span>, <span class="ident">IGNORE</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">let</span> <span class="ident">wrap</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">wrap</span>.<span class="ident">separator</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">wrap</span>.<span class="ident">width</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">let</span> <span class="ident">wrap</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">wrap</span>.<span class="ident">separator</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">wrap</span>.<span class="ident">width</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
             <span class="prelude-val">Some</span>((<span class="self">self</span>.<span class="ident">wrap</span>.<span class="ident">width</span>, <span class="self">self</span>.<span class="ident">wrap</span>.<span class="ident">separator</span>.<span class="ident">as_bytes</span>()))
         };
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">col</span>, <span class="ident">end</span>)) <span class="op">=</span> <span class="ident">wrap</span> {
             <span class="macro">check!</span>(<span class="ident">SpecificationError</span>(<span class="ident">WrapLength</span>), <span class="ident">col</span> <span class="op">&lt;</span> <span class="number">256</span> <span class="op">&amp;&amp;</span> <span class="ident">end</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">256</span>);
-            <span class="macro">check!</span>(<span class="ident">SpecificationError</span>(<span class="ident">WrapWidth</span>(<span class="ident">dec</span>(<span class="ident">bit</span>) <span class="kw">as</span> <span class="ident">u8</span>)), <span class="ident">col</span> <span class="op">%</span> <span class="ident">dec</span>(<span class="ident">bit</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span>);
+            <span class="macro">check!</span>(<span class="ident">SpecificationError</span>(<span class="ident">WrapWidth</span>(<span class="ident">dec</span>(<span class="ident">bit</span>) <span class="kw">as</span> <span class="ident">u8</span>)), <span class="ident">col</span> <span class="op">%</span> <span class="ident">dec</span>(<span class="ident">bit</span>) <span class="op">==</span> <span class="number">0</span>);
             <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">end</span>.<span class="ident">iter</span>() {
                 <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">values</span>, <span class="kw-2">*</span><span class="ident">i</span>, <span class="ident">IGNORE</span>)<span class="question-mark">?</span>;
             }
         }
         <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">translate</span>.<span class="ident">from</span>.<span class="ident">as_bytes</span>();
         <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">translate</span>.<span class="ident">to</span>.<span class="ident">as_bytes</span>();
-        <span class="macro">check!</span>(<span class="ident">SpecificationError</span>(<span class="ident">FromTo</span>), <span class="ident">from</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">to</span>.<span class="ident">len</span>());
+        <span class="macro">check!</span>(<span class="ident">SpecificationError</span>(<span class="ident">FromTo</span>), <span class="ident">from</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">to</span>.<span class="ident">len</span>());
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="ident">from</span>.<span class="ident">len</span>() {
             <span class="macro">check!</span>(<span class="ident">SpecificationError</span>(<span class="ident">NotAscii</span>), <span class="ident">to</span>[<span class="ident">i</span>] <span class="op">&lt;</span> <span class="number">128</span>);
             <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">values</span>[<span class="ident">to</span>[<span class="ident">i</span>] <span class="kw">as</span> <span class="ident">usize</span>];
@@ -4092,8 +4092,8 @@
         <span class="ident">encoding</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>);
         <span class="ident">encoding</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span>[<span class="ident">INVALID</span>; <span class="number">128</span>]);
         <span class="kw">match</span> <span class="ident">pad</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">encoding</span>.<span class="ident">push</span>(<span class="ident">INVALID</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">pad</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">encoding</span>.<span class="ident">push</span>(<span class="ident">pad</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">encoding</span>.<span class="ident">push</span>(<span class="ident">INVALID</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">pad</span>) =&gt; <span class="ident">encoding</span>.<span class="ident">push</span>(<span class="ident">pad</span>),
         }
         <span class="ident">encoding</span>.<span class="ident">push</span>(<span class="ident">bit</span> <span class="kw">as</span> <span class="ident">u8</span>);
         <span class="kw">if</span> <span class="ident">msb</span> {

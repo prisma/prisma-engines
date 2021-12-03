@@ -256,10 +256,10 @@
     <span class="kw">pub</span> <span class="ident">context</span>: <span class="ident">ConnectorContext</span>,
 
     <span class="doccomment">/// Internal. Stores all strong Arc refs to the input object types.</span>
-    <span class="ident">input_object_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputObjectTypeStrongRef</span><span class="op">&gt;</span>,
+    <span class="ident">_input_object_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputObjectTypeStrongRef</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Internal. Stores all strong Arc refs to the output object types.</span>
-    <span class="ident">output_object_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ObjectTypeStrongRef</span><span class="op">&gt;</span>,
+    <span class="ident">_output_object_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ObjectTypeStrongRef</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Connector meta information, to be used in query execution if necessary.</span>
@@ -280,7 +280,7 @@
         <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
         <span class="ident">features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
         <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">capabilities</span>,
             <span class="ident">features</span>,
@@ -294,54 +294,54 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">query</span>: <span class="ident">OutputTypeRef</span>,
         <span class="ident">mutation</span>: <span class="ident">OutputTypeRef</span>,
-        <span class="ident">input_object_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputObjectTypeStrongRef</span><span class="op">&gt;</span>,
-        <span class="ident">output_object_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ObjectTypeStrongRef</span><span class="op">&gt;</span>,
+        <span class="ident">_input_object_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputObjectTypeStrongRef</span><span class="op">&gt;</span>,
+        <span class="ident">_output_object_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ObjectTypeStrongRef</span><span class="op">&gt;</span>,
         <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelRef</span>,
         <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
         <span class="ident">features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
         <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="ident">QuerySchema</span> {
             <span class="ident">query</span>,
             <span class="ident">mutation</span>,
-            <span class="ident">input_object_types</span>,
-            <span class="ident">output_object_types</span>,
+            <span class="ident">_input_object_types</span>,
+            <span class="ident">_output_object_types</span>,
             <span class="ident">internal_data_model</span>,
             <span class="ident">context</span>: <span class="ident">ConnectorContext::new</span>(<span class="ident">capabilities</span>, <span class="ident">features</span>, <span class="ident">referential_integrity</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_mutation_field</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputFieldRef</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_mutation_field</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputFieldRef</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-        <span class="self">self</span>.<span class="ident">mutation</span>().<span class="ident">get_fields</span>().<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>).<span class="ident">cloned</span>()
+        <span class="self">self</span>.<span class="ident">mutation</span>().<span class="ident">get_fields</span>().<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>).<span class="ident">cloned</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_query_field</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputFieldRef</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_query_field</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputFieldRef</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-        <span class="self">self</span>.<span class="ident">query</span>().<span class="ident">get_fields</span>().<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>).<span class="ident">cloned</span>()
+        <span class="self">self</span>.<span class="ident">query</span>().<span class="ident">get_fields</span>().<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>).<span class="ident">cloned</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mutation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ObjectTypeStrongRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mutation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ObjectTypeStrongRef</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">mutation</span>.<span class="ident">borrow</span>() {
-            <span class="ident">OutputType::Object</span>(<span class="kw-2">ref</span> <span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>.<span class="ident">into_arc</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident">OutputType::Object</span>(<span class="kw-2">ref</span> <span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">into_arc</span>(),
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ObjectTypeStrongRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ObjectTypeStrongRef</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">borrow</span>() {
-            <span class="ident">OutputType::Object</span>(<span class="kw-2">ref</span> <span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>.<span class="ident">into_arc</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident">OutputType::Object</span>(<span class="kw-2">ref</span> <span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">into_arc</span>(),
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">context</span>
     }
 }
@@ -373,22 +373,22 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">QueryTag</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::FindUnique</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;findUnique&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::FindFirst</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;findFirst&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::FindMany</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;findMany&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::CreateOne</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;createOne&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::CreateMany</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;createMany&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::UpdateOne</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;updateOne&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::UpdateMany</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;updateMany&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::DeleteOne</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;deleteOne&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::DeleteMany</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;deleteMany&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::UpsertOne</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;upsertOne&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Aggregate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;aggregate&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::GroupBy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;groupBy&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::ExecuteRaw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;executeRaw&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::QueryRaw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;queryRaw&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::FindUnique</span> =&gt; <span class="string">&quot;findUnique&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::FindFirst</span> =&gt; <span class="string">&quot;findFirst&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::FindMany</span> =&gt; <span class="string">&quot;findMany&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::CreateOne</span> =&gt; <span class="string">&quot;createOne&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::CreateMany</span> =&gt; <span class="string">&quot;createMany&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::UpdateOne</span> =&gt; <span class="string">&quot;updateOne&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::UpdateMany</span> =&gt; <span class="string">&quot;updateMany&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::DeleteOne</span> =&gt; <span class="string">&quot;deleteOne&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::DeleteMany</span> =&gt; <span class="string">&quot;deleteMany&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::UpsertOne</span> =&gt; <span class="string">&quot;upsertOne&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Aggregate</span> =&gt; <span class="string">&quot;aggregate&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::GroupBy</span> =&gt; <span class="string">&quot;groupBy&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::ExecuteRaw</span> =&gt; <span class="string">&quot;executeRaw&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::QueryRaw</span> =&gt; <span class="string">&quot;queryRaw&quot;</span>,
         };
 
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">s</span>)
@@ -402,7 +402,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Identifier</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">namespace</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">namespace</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
@@ -412,17 +412,17 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">namespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">namespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">namespace</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ToString</span> <span class="kw">for</span> <span class="ident">Identifier</span> {
-    <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.<span class="ident">namespace</span>(), <span class="self">self</span>.<span class="ident">name</span>())
     }
 }

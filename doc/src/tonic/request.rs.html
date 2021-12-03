@@ -516,7 +516,7 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoRequest</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>: <span class="ident">sealed::Sealed</span> {
     <span class="doccomment">/// Wrap the input message `T` in a `tonic::Request`</span>
-    <span class="kw">fn</span> <span class="ident">into_request</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">into_request</span>(<span class="self">self</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Trait implemented by RPC streaming request types.</span>
@@ -560,7 +560,7 @@
     <span class="kw">type</span> <span class="ident">Message</span>;
 
     <span class="doccomment">/// Wrap the stream of messages in a `tonic::Request`</span>
-    <span class="kw">fn</span> <span class="ident">into_streaming_request</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Stream</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">into_streaming_request</span>(<span class="self">self</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Stream</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
@@ -575,7 +575,7 @@
     <span class="doccomment">///    name: &quot;Bob&quot;.into(),</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">message</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">message</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Request</span> {
             <span class="ident">metadata</span>: <span class="ident">MetadataMap::new</span>(),
             <span class="ident">message</span>,
@@ -584,35 +584,35 @@
     }
 
     <span class="doccomment">/// Get a reference to the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">T</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>
     }
 
     <span class="doccomment">/// Get a mutable reference to the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">message</span>
     }
 
     <span class="doccomment">/// Get a reference to the custom request metadata.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">MetadataMap</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">MetadataMap</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">metadata</span>
     }
 
     <span class="doccomment">/// Get a mutable reference to the request metadata.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">metadata_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MetadataMap</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">metadata_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MetadataMap</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">metadata</span>
     }
 
     <span class="doccomment">/// Consumes `self`, returning the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
         <span class="self">self</span>.<span class="ident">message</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">MetadataMap</span>, <span class="ident">Extensions</span>, <span class="ident">T</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; (<span class="ident">MetadataMap</span>, <span class="ident">Extensions</span>, <span class="ident">T</span>) {
         (<span class="self">self</span>.<span class="ident">metadata</span>, <span class="self">self</span>.<span class="ident">extensions</span>, <span class="self">self</span>.<span class="ident">message</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_parts</span>(<span class="ident">metadata</span>: <span class="ident">MetadataMap</span>, <span class="ident">extensions</span>: <span class="ident">Extensions</span>, <span class="ident">message</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_parts</span>(<span class="ident">metadata</span>: <span class="ident">MetadataMap</span>, <span class="ident">extensions</span>: <span class="ident">Extensions</span>, <span class="ident">message</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">metadata</span>,
             <span class="ident">extensions</span>,
@@ -620,7 +620,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_http_parts</span>(<span class="ident">parts</span>: <span class="ident">http::request::Parts</span>, <span class="ident">message</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_http_parts</span>(<span class="ident">parts</span>: <span class="ident">http::request::Parts</span>, <span class="ident">message</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Request</span> {
             <span class="ident">metadata</span>: <span class="ident">MetadataMap::from_headers</span>(<span class="ident">parts</span>.<span class="ident">headers</span>),
             <span class="ident">message</span>,
@@ -629,7 +629,7 @@
     }
 
     <span class="doccomment">/// Convert an HTTP request to a gRPC request</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_http</span>(<span class="ident">http</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_http</span>(<span class="ident">http</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> (<span class="ident">parts</span>, <span class="ident">message</span>) <span class="op">=</span> <span class="ident">http</span>.<span class="ident">into_parts</span>();
         <span class="ident">Request::from_http_parts</span>(<span class="ident">parts</span>, <span class="ident">message</span>)
     }
@@ -638,15 +638,15 @@
         <span class="self">self</span>,
         <span class="ident">uri</span>: <span class="ident">http::Uri</span>,
         <span class="ident">sanitize_headers</span>: <span class="ident">SanitizeHeaders</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">http::Request::new</span>(<span class="self">self</span>.<span class="ident">message</span>);
 
         <span class="kw-2">*</span><span class="ident">request</span>.<span class="ident">version_mut</span>() <span class="op">=</span> <span class="ident">http::Version::HTTP_2</span>;
         <span class="kw-2">*</span><span class="ident">request</span>.<span class="ident">method_mut</span>() <span class="op">=</span> <span class="ident">http::Method::POST</span>;
         <span class="kw-2">*</span><span class="ident">request</span>.<span class="ident">uri_mut</span>() <span class="op">=</span> <span class="ident">uri</span>;
         <span class="kw-2">*</span><span class="ident">request</span>.<span class="ident">headers_mut</span>() <span class="op">=</span> <span class="kw">match</span> <span class="ident">sanitize_headers</span> {
-            <span class="ident">SanitizeHeaders::Yes</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">metadata</span>.<span class="ident">into_sanitized_headers</span>(),
-            <span class="ident">SanitizeHeaders::No</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">metadata</span>.<span class="ident">into_headers</span>(),
+            <span class="ident">SanitizeHeaders::Yes</span> =&gt; <span class="self">self</span>.<span class="ident">metadata</span>.<span class="ident">into_sanitized_headers</span>(),
+            <span class="ident">SanitizeHeaders::No</span> =&gt; <span class="self">self</span>.<span class="ident">metadata</span>.<span class="ident">into_headers</span>(),
         };
         <span class="kw-2">*</span><span class="ident">request</span>.<span class="ident">extensions_mut</span>() <span class="op">=</span> <span class="self">self</span>.<span class="ident">extensions</span>.<span class="ident">into_http</span>();
 
@@ -654,9 +654,9 @@
     }
 
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">U</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">U</span>,
     {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">message</span>);
 
@@ -672,7 +672,7 @@
     <span class="doccomment">/// This will return `None` if the `IO` type used</span>
     <span class="doccomment">/// does not implement `Connected`. This currently,</span>
     <span class="doccomment">/// only works on the server side.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remote_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remote_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>)]</span>
         {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
@@ -709,7 +709,7 @@
     <span class="doccomment">/// TLS enabled connections.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peer_certs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Certificate</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peer_certs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Certificate</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
         {
             <span class="self">self</span>.<span class="ident">extensions</span>()
@@ -757,7 +757,7 @@
     }
 
     <span class="doccomment">/// Returns a reference to the associated extensions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Extensions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Extensions</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">extensions</span>
     }
 
@@ -806,19 +806,19 @@
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Extensions</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Extensions</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">extensions</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoRequest</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span> {
-    <span class="kw">fn</span> <span class="ident">into_request</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_request</span>(<span class="self">self</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">Request::new</span>(<span class="self">self</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoRequest</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_request</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_request</span>(<span class="self">self</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>
     }
 }
@@ -830,7 +830,7 @@
     <span class="kw">type</span> <span class="ident">Stream</span> <span class="op">=</span> <span class="ident">T</span>;
     <span class="kw">type</span> <span class="ident">Message</span> <span class="op">=</span> <span class="ident">T::Item</span>;
 
-    <span class="kw">fn</span> <span class="ident">into_streaming_request</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_streaming_request</span>(<span class="self">self</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">Request::new</span>(<span class="self">self</span>)
     }
 }
@@ -842,7 +842,7 @@
     <span class="kw">type</span> <span class="ident">Stream</span> <span class="op">=</span> <span class="ident">T</span>;
     <span class="kw">type</span> <span class="ident">Message</span> <span class="op">=</span> <span class="ident">T::Item</span>;
 
-    <span class="kw">fn</span> <span class="ident">into_streaming_request</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">into_streaming_request</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>
     }
 }
@@ -853,12 +853,12 @@
     <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span> {}
 }
 
-<span class="kw">fn</span> <span class="ident">duration_to_grpc_timeout</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">duration_to_grpc_timeout</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">fn</span> <span class="ident">try_format</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">duration</span>: <span class="ident">Duration</span>,
         <span class="ident">unit</span>: <span class="ident">char</span>,
-        <span class="ident">convert</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="ident">convert</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">Duration</span>) -&gt; <span class="ident">T</span>,
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// The gRPC spec specifies that the timeout most be at most 8 digits. So this is the largest a</span>
         <span class="comment">// value can be before we need to use a bigger unit.</span>
         <span class="kw">let</span> <span class="ident">max_size</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="number">99_999_999</span>; <span class="comment">// exactly 8 digits</span>

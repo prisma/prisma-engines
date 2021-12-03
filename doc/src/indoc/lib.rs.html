@@ -538,7 +538,7 @@
 <span class="doccomment">/// hello()</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="ident">expand</span>(<span class="ident">input</span>, <span class="ident">Macro::Indoc</span>)
 }
 
@@ -566,7 +566,7 @@
 <span class="doccomment">/// Accept: application/json</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">formatdoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">formatdoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="ident">expand</span>(<span class="ident">input</span>, <span class="ident">Macro::Format</span>)
 }
 
@@ -593,7 +593,7 @@
 <span class="doccomment">/// Accept: application/json</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">printdoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">printdoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="ident">expand</span>(<span class="ident">input</span>, <span class="ident">Macro::Print</span>)
 }
 
@@ -620,7 +620,7 @@
 <span class="doccomment">/// Accept: application/json</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eprintdoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eprintdoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="ident">expand</span>(<span class="ident">input</span>, <span class="ident">Macro::Eprint</span>)
 }
 
@@ -650,21 +650,21 @@
 <span class="doccomment">/// Accept: application/json</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">writedoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">writedoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="ident">expand</span>(<span class="ident">input</span>, <span class="ident">Macro::Write</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">expand</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>, <span class="ident">mode</span>: <span class="ident">Macro</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">fn</span> <span class="ident">expand</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>, <span class="ident">mode</span>: <span class="ident">Macro</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">match</span> <span class="ident">try_expand</span>(<span class="ident">input</span>, <span class="ident">mode</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">tokens</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tokens</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">to_compile_error</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">tokens</span>) =&gt; <span class="ident">tokens</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">to_compile_error</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">try_expand</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>, <span class="ident">mode</span>: <span class="ident">Macro</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">try_expand</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>, <span class="ident">mode</span>: <span class="ident">Macro</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">into_iter</span>();
 
-    <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">mode</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Macro::Write</span> {
+    <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">Macro::Write</span> {
         <span class="prelude-val">Some</span>(<span class="ident">expr::parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>)<span class="question-mark">?</span>)
     } <span class="kw">else</span> {
         <span class="prelude-val">None</span>
@@ -680,14 +680,14 @@
     <span class="kw">let</span> <span class="ident">unindented_lit</span> <span class="op">=</span> <span class="ident">lit_indoc</span>(<span class="ident">first</span>, <span class="ident">mode</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">macro_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mode</span> {
-        <span class="ident">Macro::Indoc</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Macro::Indoc</span> =&gt; {
             <span class="ident">require_empty_or_trailing_comma</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>)<span class="question-mark">?</span>;
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">TokenStream::from</span>(<span class="ident">TokenTree::Literal</span>(<span class="ident">unindented_lit</span>)));
         }
-        <span class="ident">Macro::Format</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;format&quot;</span>,
-        <span class="ident">Macro::Print</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;print&quot;</span>,
-        <span class="ident">Macro::Eprint</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;eprint&quot;</span>,
-        <span class="ident">Macro::Write</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;write&quot;</span>,
+        <span class="ident">Macro::Format</span> =&gt; <span class="string">&quot;format&quot;</span>,
+        <span class="ident">Macro::Print</span> =&gt; <span class="string">&quot;print&quot;</span>,
+        <span class="ident">Macro::Eprint</span> =&gt; <span class="string">&quot;eprint&quot;</span>,
+        <span class="ident">Macro::Write</span> =&gt; <span class="string">&quot;write&quot;</span>,
     };
 
     <span class="comment">// #macro_name! { #unindented_lit #args }</span>
@@ -706,7 +706,7 @@
     ]))
 }
 
-<span class="kw">fn</span> <span class="ident">lit_indoc</span>(<span class="ident">token</span>: <span class="ident">TokenTree</span>, <span class="ident">mode</span>: <span class="ident">Macro</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Literal</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">lit_indoc</span>(<span class="ident">token</span>: <span class="ident">TokenTree</span>, <span class="ident">mode</span>: <span class="ident">Macro</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Literal</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">repr</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">to_string</span>();
     <span class="kw">let</span> <span class="ident">repr</span> <span class="op">=</span> <span class="ident">repr</span>.<span class="ident">trim</span>();
     <span class="kw">let</span> <span class="ident">is_string</span> <span class="op">=</span> <span class="ident">repr</span>.<span class="ident">starts_with</span>(<span class="string">&#39;&quot;&#39;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">repr</span>.<span class="ident">starts_with</span>(<span class="string">&#39;r&#39;</span>);
@@ -741,22 +741,22 @@
         .<span class="ident">next</span>()
         .<span class="ident">unwrap</span>()
     {
-        <span class="ident">TokenTree::Literal</span>(<span class="kw-2">mut</span> <span class="ident">lit</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">TokenTree::Literal</span>(<span class="kw-2">mut</span> <span class="ident">lit</span>) =&gt; {
             <span class="ident">lit</span>.<span class="ident">set_span</span>(<span class="ident">token</span>.<span class="ident">span</span>());
             <span class="prelude-val">Ok</span>(<span class="ident">lit</span>)
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">require_empty_or_trailing_comma</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TokenIter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">require_empty_or_trailing_comma</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TokenIter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Punct</span>(<span class="ident">punct</span>)) <span class="kw">if</span> <span class="ident">punct</span>.<span class="ident">as_char</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&#39;,&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">second</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">second</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Punct</span>(<span class="ident">punct</span>)) <span class="kw">if</span> <span class="ident">punct</span>.<span class="ident">as_char</span>() <span class="op">==</span> <span class="string">&#39;,&#39;</span> =&gt; <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">next</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">second</span>) =&gt; <span class="ident">second</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
         },
-        <span class="prelude-val">Some</span>(<span class="ident">first</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">first</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+        <span class="prelude-val">Some</span>(<span class="ident">first</span>) =&gt; <span class="ident">first</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
     };
     <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">last</span>();
 

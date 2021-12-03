@@ -166,11 +166,11 @@
     <span class="comment">// Finds all possible comparisons between a tuple and a select. If returning</span>
     <span class="comment">// a vector of CTEs, they should be handled by the calling party.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">convert_tuple_selects_to_ctes</span>(<span class="self">self</span>, <span class="ident">level</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommonTableExpression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">convert_tuple_selects_to_ctes</span>(<span class="self">self</span>, <span class="ident">level</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommonTableExpression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="kw">fn</span> <span class="ident">convert_many</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
             <span class="ident">exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
             <span class="ident">level</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommonTableExpression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+        ) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommonTableExpression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">converted</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">exprs</span>.<span class="ident">len</span>());
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result_ctes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
@@ -185,60 +185,60 @@
         }
 
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">expr</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">expr</span>, <span class="ident">ctes</span>) <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">convert_tuple_selects_to_ctes</span>(<span class="ident">level</span>);
 
                 (<span class="ident"><span class="self">Self</span>::single</span>(<span class="ident">expr</span>), <span class="ident">ctes</span>)
             }
-            <span class="ident"><span class="self">Self</span>::Not</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Not</span>(<span class="ident">expr</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">expr</span>, <span class="ident">ctes</span>) <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">convert_tuple_selects_to_ctes</span>(<span class="ident">level</span>);
 
                 (<span class="ident">expr</span>.<span class="ident">not</span>(), <span class="ident">ctes</span>)
             }
-            <span class="ident"><span class="self">Self</span>::And</span>(<span class="ident">exprs</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::And</span>(<span class="ident">exprs</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">converted</span>, <span class="ident">ctes</span>) <span class="op">=</span> <span class="ident">convert_many</span>(<span class="ident">exprs</span>, <span class="ident">level</span>);
                 (<span class="ident"><span class="self">Self</span>::And</span>(<span class="ident">converted</span>), <span class="ident">ctes</span>)
             }
-            <span class="ident"><span class="self">Self</span>::Or</span>(<span class="ident">exprs</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Or</span>(<span class="ident">exprs</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">converted</span>, <span class="ident">ctes</span>) <span class="op">=</span> <span class="ident">convert_many</span>(<span class="ident">exprs</span>, <span class="ident">level</span>);
                 (<span class="ident"><span class="self">Self</span>::Or</span>(<span class="ident">converted</span>), <span class="ident">ctes</span>)
             }
-            <span class="ident">tree</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">tree</span>, <span class="ident">Vec::new</span>()),
+            <span class="ident">tree</span> =&gt; (<span class="ident">tree</span>, <span class="ident">Vec::new</span>()),
         }
     }
 
     <span class="doccomment">/// An `AND` statement, is true when both sides are true.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">E</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::And</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">conditions</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::And</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">conditions</span>) =&gt; {
                 <span class="ident">conditions</span>.<span class="ident">push</span>(<span class="ident">other</span>.<span class="ident">into</span>());
                 <span class="self">self</span>
             }
-            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::And</span>(<span class="macro">vec!</span>[<span class="kw-2">*</span><span class="ident">expr</span>, <span class="ident">other</span>.<span class="ident">into</span>()]),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::And</span>(<span class="macro">vec!</span>[<span class="ident">Expression::from</span>(<span class="self">self</span>), <span class="ident">other</span>.<span class="ident">into</span>()]),
+            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">expr</span>) =&gt; <span class="ident"><span class="self">Self</span>::And</span>(<span class="macro">vec!</span>[<span class="kw-2">*</span><span class="ident">expr</span>, <span class="ident">other</span>.<span class="ident">into</span>()]),
+            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::And</span>(<span class="macro">vec!</span>[<span class="ident">Expression::from</span>(<span class="self">self</span>), <span class="ident">other</span>.<span class="ident">into</span>()]),
         }
     }
 
     <span class="doccomment">/// An `OR` statement, is true when one side is true.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">E</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Or</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">conditions</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Or</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">conditions</span>) =&gt; {
                 <span class="ident">conditions</span>.<span class="ident">push</span>(<span class="ident">other</span>.<span class="ident">into</span>());
                 <span class="self">self</span>
             }
-            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Or</span>(<span class="macro">vec!</span>[<span class="kw-2">*</span><span class="ident">expr</span>, <span class="ident">other</span>.<span class="ident">into</span>()]),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Or</span>(<span class="macro">vec!</span>[<span class="ident">Expression::from</span>(<span class="self">self</span>), <span class="ident">other</span>.<span class="ident">into</span>()]),
+            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">expr</span>) =&gt; <span class="ident"><span class="self">Self</span>::Or</span>(<span class="macro">vec!</span>[<span class="kw-2">*</span><span class="ident">expr</span>, <span class="ident">other</span>.<span class="ident">into</span>()]),
+            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Or</span>(<span class="macro">vec!</span>[<span class="ident">Expression::from</span>(<span class="self">self</span>), <span class="ident">other</span>.<span class="ident">into</span>()]),
         }
     }
 
     <span class="doccomment">/// A `NOT` statement, is true when the expression is false.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">not</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">left</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">not</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">left</span>: <span class="ident">E</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -246,7 +246,7 @@
     }
 
     <span class="doccomment">/// A single leaf, is true when the expression is true.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">left</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">left</span>: <span class="ident">E</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -254,7 +254,7 @@
     }
 
     <span class="doccomment">/// Inverts the entire condition tree if condition is met.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert_if</span>(<span class="self">self</span>, <span class="ident">invert</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert_if</span>(<span class="self">self</span>, <span class="ident">invert</span>: <span class="ident">bool</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">invert</span> {
             <span class="self">self</span>.<span class="ident">not</span>()
         } <span class="kw">else</span> {
@@ -264,13 +264,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ConditionTree::NoCondition</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ct</span>: <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ct</span>: <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Expression</span> {
             <span class="ident">kind</span>: <span class="ident">ExpressionKind::ConditionTree</span>(<span class="ident">ct</span>),
             <span class="ident">alias</span>: <span class="prelude-val">None</span>,
@@ -279,7 +279,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sel</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sel</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> <span class="ident">Expression</span> {
             <span class="ident">kind</span>: <span class="ident">ExpressionKind::Value</span>(<span class="ident">Box::new</span>(<span class="ident">sel</span>.<span class="ident">into</span>())),
             <span class="ident">alias</span>: <span class="prelude-val">None</span>,

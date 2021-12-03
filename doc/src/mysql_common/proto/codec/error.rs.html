@@ -64,20 +64,20 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PacketCodecError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">io_err</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">io_err</span>: <span class="ident">io::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Io</span>(<span class="ident">io_err</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">PacketCodecError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PacketCodecError::Io</span>(<span class="ident">io_err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;IO error: `{}&#39;&quot;</span>, <span class="ident">io_err</span>)),
-            <span class="ident">PacketCodecError::PacketTooLarge</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PacketCodecError::Io</span>(<span class="ident">io_err</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;IO error: `{}&#39;&quot;</span>, <span class="ident">io_err</span>)),
+            <span class="ident">PacketCodecError::PacketTooLarge</span> =&gt; {
                 <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Packet is larger than max_allowed_packet&quot;</span>)
             }
-            <span class="ident">PacketCodecError::PacketsOutOfSync</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Packets out of sync&quot;</span>),
-            <span class="ident">PacketCodecError::BadCompressedPacketHeader</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PacketCodecError::PacketsOutOfSync</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Packets out of sync&quot;</span>),
+            <span class="ident">PacketCodecError::BadCompressedPacketHeader</span> =&gt; {
                 <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Bad compressed packet header&quot;</span>)
             }
         }
@@ -85,10 +85,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">PacketCodecError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PacketCodecError::Io</span>(<span class="ident">io_err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">io_err</span>),
-            <span class="ident">_other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">PacketCodecError::Io</span>(<span class="ident">io_err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">io_err</span>),
+            <span class="ident">_other</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }

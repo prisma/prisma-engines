@@ -348,22 +348,22 @@
 	},
 }
 
-<span class="kw">fn</span> <span class="ident">default_params</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Params</span> {
+<span class="kw">fn</span> <span class="ident">default_params</span>() -&gt; <span class="ident">Params</span> {
 	<span class="ident">Params::None</span>
 }
 
-<span class="kw">fn</span> <span class="ident">default_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Id</span> {
+<span class="kw">fn</span> <span class="ident">default_id</span>() -&gt; <span class="ident">Id</span> {
 	<span class="ident">Id::Null</span>
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MethodCall</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Call</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">mc</span>: <span class="ident">MethodCall</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">mc</span>: <span class="ident">MethodCall</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident">Call::MethodCall</span>(<span class="ident">mc</span>)
 	}
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Notification</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Call</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">n</span>: <span class="ident">Notification</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">n</span>: <span class="ident">Notification</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident">Call::Notification</span>(<span class="ident">n</span>)
 	}
 }
@@ -589,8 +589,8 @@
 		<span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Request</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">s</span>).<span class="ident">unwrap</span>();
 
 		<span class="kw">match</span> <span class="ident">deserialized</span> {
-			<span class="ident">Request::Single</span>(<span class="ident">Call::Invalid</span> { <span class="ident">id</span>: <span class="ident">Id::Num</span>(<span class="number">120</span>) }) <span class="op">=</span><span class="op">&gt;</span> {}
-			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Request wrongly deserialized: {:?}&quot;</span>, <span class="ident">deserialized</span>),
+			<span class="ident">Request::Single</span>(<span class="ident">Call::Invalid</span> { <span class="ident">id</span>: <span class="ident">Id::Num</span>(<span class="number">120</span>) }) =&gt; {}
+			<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Request wrongly deserialized: {:?}&quot;</span>, <span class="ident">deserialized</span>),
 		}
 	}
 }

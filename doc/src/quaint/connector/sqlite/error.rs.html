@@ -214,11 +214,11 @@
 <span class="kw">use</span> <span class="ident">rusqlite::types::FromSqlError</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">rusqlite::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">rusqlite::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">rusqlite::Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">rusqlite::Error::ToSqlConversionFailure</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">error</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">error</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">rusqlite::Error::ToSqlConversionFailure</span>(<span class="ident">error</span>) =&gt; <span class="kw">match</span> <span class="ident">error</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>() {
+                <span class="prelude-val">Ok</span>(<span class="ident">error</span>) =&gt; <span class="kw-2">*</span><span class="ident">error</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">error</span>));
 
                     <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="string">&quot;Could not interpret parameters in an SQLite query.&quot;</span>);
@@ -226,7 +226,7 @@
                     <span class="ident">builder</span>.<span class="ident">build</span>()
                 }
             },
-            <span class="ident">rusqlite::Error::InvalidQuery</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">rusqlite::Error::InvalidQuery</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()));
 
                 <span class="ident">builder</span>.<span class="ident">set_original_message</span>(
@@ -235,14 +235,14 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">rusqlite::Error::ExecuteReturnedResults</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">rusqlite::Error::ExecuteReturnedResults</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()));
                 <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="string">&quot;Execute returned results, which is not allowed in SQLite.&quot;</span>);
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
 
-            <span class="ident">rusqlite::Error::QueryReturnedNoRows</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::NotFound</span>).<span class="ident">build</span>(),
+            <span class="ident">rusqlite::Error::QueryReturnedNoRows</span> =&gt; <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::NotFound</span>).<span class="ident">build</span>(),
 
             <span class="ident">rusqlite::Error::SqliteFailure</span>(
                 <span class="ident">ffi::Error</span> {
@@ -250,7 +250,7 @@
                     <span class="ident">extended_code</span>: <span class="number">2067</span>,
                 },
                 <span class="prelude-val">Some</span>(<span class="ident">description</span>),
-            ) <span class="op">=</span><span class="op">&gt;</span> {
+            ) =&gt; {
                 <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">description</span>
                     .<span class="ident">split</span>(<span class="string">&quot;: &quot;</span>)
                     .<span class="ident">nth</span>(<span class="number">1</span>)
@@ -274,7 +274,7 @@
                     <span class="ident">extended_code</span>: <span class="number">1555</span>,
                 },
                 <span class="prelude-val">Some</span>(<span class="ident">description</span>),
-            ) <span class="op">=</span><span class="op">&gt;</span> {
+            ) =&gt; {
                 <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">description</span>
                     .<span class="ident">split</span>(<span class="string">&quot;: &quot;</span>)
                     .<span class="ident">nth</span>(<span class="number">1</span>)
@@ -298,7 +298,7 @@
                     <span class="ident">extended_code</span>: <span class="number">1299</span>,
                 },
                 <span class="prelude-val">Some</span>(<span class="ident">description</span>),
-            ) <span class="op">=</span><span class="op">&gt;</span> {
+            ) =&gt; {
                 <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">description</span>
                     .<span class="ident">split</span>(<span class="string">&quot;: &quot;</span>)
                     .<span class="ident">nth</span>(<span class="number">1</span>)
@@ -322,7 +322,7 @@
                     <span class="ident">extended_code</span>: <span class="number">787</span>,
                 },
                 <span class="prelude-val">Some</span>(<span class="ident">description</span>),
-            ) <span class="op">=</span><span class="op">&gt;</span> {
+            ) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ForeignKeyConstraintViolation</span> {
                     <span class="ident">constraint</span>: <span class="ident">DatabaseConstraint::ForeignKey</span>,
                 });
@@ -339,7 +339,7 @@
                     <span class="ident">extended_code</span>: <span class="number">1811</span>,
                 },
                 <span class="prelude-val">Some</span>(<span class="ident">description</span>),
-            ) <span class="op">=</span><span class="op">&gt;</span> {
+            ) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ForeignKeyConstraintViolation</span> {
                     <span class="ident">constraint</span>: <span class="ident">DatabaseConstraint::ForeignKey</span>,
                 });
@@ -356,7 +356,7 @@
                     <span class="ident">extended_code</span>,
                 },
                 <span class="ident">description</span>,
-            ) <span class="op">=</span><span class="op">&gt;</span> {
+            ) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::SocketTimeout</span>);
                 <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">extended_code</span>));
 
@@ -367,8 +367,8 @@
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
 
-            <span class="ident">rusqlite::Error::SqliteFailure</span>(<span class="ident">ffi::Error</span> { <span class="ident">extended_code</span>, .. }, <span class="kw-2">ref</span> <span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">description</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">starts_with</span>(<span class="string">&quot;no such table&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">rusqlite::Error::SqliteFailure</span>(<span class="ident">ffi::Error</span> { <span class="ident">extended_code</span>, .. }, <span class="kw-2">ref</span> <span class="ident">description</span>) =&gt; <span class="kw">match</span> <span class="ident">description</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">starts_with</span>(<span class="string">&quot;no such table&quot;</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">split</span>(<span class="string">&quot;: &quot;</span>).<span class="ident">last</span>().<span class="ident">into</span>();
                     <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::TableDoesNotExist</span> { <span class="ident">table</span> };
 
@@ -378,7 +378,7 @@
 
                     <span class="ident">builder</span>.<span class="ident">build</span>()
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">contains</span>(<span class="string">&quot;has no column named&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">contains</span>(<span class="string">&quot;has no column named&quot;</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">split</span>(<span class="string">&quot; has no column named &quot;</span>).<span class="ident">last</span>().<span class="ident">into</span>();
                     <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::ColumnNotFound</span> { <span class="ident">column</span> };
 
@@ -388,7 +388,7 @@
 
                     <span class="ident">builder</span>.<span class="ident">build</span>()
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">starts_with</span>(<span class="string">&quot;no such column: &quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">starts_with</span>(<span class="string">&quot;no such column: &quot;</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">split</span>(<span class="string">&quot;no such column: &quot;</span>).<span class="ident">last</span>().<span class="ident">into</span>();
                     <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::ColumnNotFound</span> { <span class="ident">column</span> };
 
@@ -398,7 +398,7 @@
 
                     <span class="ident">builder</span>.<span class="ident">build</span>()
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">description</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">to_string</span>());
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()));
                     <span class="ident">builder</span>.<span class="ident">set_original_code</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">extended_code</span>));
@@ -410,13 +410,13 @@
                     <span class="ident">builder</span>.<span class="ident">build</span>()
                 }
             },
-            <span class="ident">e</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
+            <span class="ident">e</span> =&gt; <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FromSqlError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">FromSqlError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">FromSqlError</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ColumnReadFailure</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>()
     }
 }

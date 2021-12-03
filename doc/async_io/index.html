@@ -6,7 +6,7 @@ async programs.</li>
 <li><a href="struct.Timer.html" title="Timer"><code>Timer</code></a>, a future or stream that emits timed events.</li>
 </ul>
 <p>For concrete async networking types built on top of this crate, see <a href="https://docs.rs/async-net"><code>async-net</code></a>.</p>
-<h1 id="implementation" class="section-header"><a href="#implementation">Implementation</a></h1>
+<h2 id="implementation" class="section-header"><a href="#implementation">Implementation</a></h2>
 <p>The first time <a href="struct.Async.html" title="Async"><code>Async</code></a> or <a href="struct.Timer.html" title="Timer"><code>Timer</code></a> is used, a thread named “async-io” will be spawned.
 The purpose of this thread is to wait for I/O events reported by the operating system, and then
 wake appropriate futures blocked on I/O or timers when they can be resumed.</p>
@@ -16,7 +16,7 @@ functionality is provided by the <a href="https://docs.rs/polling"><code>polling
 <p>However, note that you can also process I/O events and wake futures on any thread using the
 <a href="fn.block_on.html" title="block_on()"><code>block_on()</code></a> function. The “async-io” thread is therefore just a fallback mechanism
 processing I/O events in case no other threads are.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>Connect to <code>example.com:80</code>, or time out after 10 seconds.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">async_io</span>::{<span class="ident">Async</span>, <span class="ident">Timer</span>};
@@ -33,14 +33,14 @@ processing I/O events in case no other threads are.</p>
 })
 .<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Async.html" title="async_io::Async struct">Async</a></div><div class="item-right docblock-short"><p>Async adapter for I/O types.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Readable.html" title="async_io::Readable struct">Readable</a></div><div class="item-right docblock-short"><p>Future for <a href="struct.Async.html#method.readable"><code>Async::readable</code></a>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ReadableOwned.html" title="async_io::ReadableOwned struct">ReadableOwned</a></div><div class="item-right docblock-short"><p>Future for <a href="struct.Async.html#method.readable_owned"><code>Async::readable_owned</code></a>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Timer.html" title="async_io::Timer struct">Timer</a></div><div class="item-right docblock-short"><p>A future or stream that emits timed events.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Writable.html" title="async_io::Writable struct">Writable</a></div><div class="item-right docblock-short"><p>Future for <a href="struct.Async.html#method.writable"><code>Async::writable</code></a>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.WritableOwned.html" title="async_io::WritableOwned struct">WritableOwned</a></div><div class="item-right docblock-short"><p>Future for <a href="struct.Async.html#method.writable_owned"><code>Async::writable_owned</code></a>.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.block_on.html" title="async_io::block_on fn">block_on</a></div><div class="item-right docblock-short"><p>Blocks the current thread on a future, processing I/O events when idle.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="async_io" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Async.html" title="async_io::Async struct">Async</a></div><div class="item-right docblock-short"><p>Async adapter for I/O types.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Readable.html" title="async_io::Readable struct">Readable</a></div><div class="item-right docblock-short"><p>Future for <a href="struct.Async.html#method.readable"><code>Async::readable</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ReadableOwned.html" title="async_io::ReadableOwned struct">ReadableOwned</a></div><div class="item-right docblock-short"><p>Future for <a href="struct.Async.html#method.readable_owned"><code>Async::readable_owned</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Timer.html" title="async_io::Timer struct">Timer</a></div><div class="item-right docblock-short"><p>A future or stream that emits timed events.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Writable.html" title="async_io::Writable struct">Writable</a></div><div class="item-right docblock-short"><p>Future for <a href="struct.Async.html#method.writable"><code>Async::writable</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.WritableOwned.html" title="async_io::WritableOwned struct">WritableOwned</a></div><div class="item-right docblock-short"><p>Future for <a href="struct.Async.html#method.writable_owned"><code>Async::writable_owned</code></a>.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.block_on.html" title="async_io::block_on fn">block_on</a></div><div class="item-right docblock-short"><p>Blocks the current thread on a future, processing I/O events when idle.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="async_io" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

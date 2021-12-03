@@ -38,7 +38,7 @@
     <span class="doccomment">/// Returns stored cancellation token and removes this drop guard instance</span>
     <span class="doccomment">/// (i.e. it will no longer cancel token). Other guards for this token</span>
     <span class="doccomment">/// are not affected.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disarm</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CancellationToken</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disarm</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">CancellationToken</span> {
         <span class="self">self</span>.<span class="ident">inner</span>
             .<span class="ident">take</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;`inner` can be only None in a destructor&quot;</span>)

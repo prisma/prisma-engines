@@ -13,7 +13,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokio_interval_stream</span>(
     <span class="ident">period</span>: <span class="ident">std::time::Duration</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tokio_stream::wrappers::IntervalStream</span> {
+) -&gt; <span class="ident">tokio_stream::wrappers::IntervalStream</span> {
     <span class="ident">tokio_stream::wrappers::IntervalStream::new</span>(<span class="ident">tokio::time::interval</span>(<span class="ident">period</span>))
 }
 </code></pre></div>

@@ -422,7 +422,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method will attempt to capture the given value as a well-known primitive</span>
     <span class="doccomment">/// before resorting to using its `Debug` implementation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capture_debug</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capture_debug</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -438,7 +438,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method will attempt to capture the given value as a well-known primitive</span>
     <span class="doccomment">/// before resorting to using its `Display` implementation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capture_display</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capture_display</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -451,7 +451,7 @@
     }
 
     <span class="doccomment">/// Get a value from a debuggable type without capturing support.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_debug</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_debug</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Debug</span>,
     {
@@ -461,7 +461,7 @@
     }
 
     <span class="doccomment">/// Get a value from a displayable type without capturing support.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_display</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_display</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Display</span>,
     {
@@ -471,14 +471,14 @@
     }
 
     <span class="doccomment">/// Get a value from a debuggable type without capturing support.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_dyn_debug</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="kw">dyn</span> <span class="ident">Debug</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_dyn_debug</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="kw">dyn</span> <span class="ident">Debug</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ValueBag</span> {
             <span class="ident">inner</span>: <span class="ident">Internal::AnonDebug</span> { <span class="ident">value</span> },
         }
     }
 
     <span class="doccomment">/// Get a value from a displayable type without capturing support.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_dyn_display</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="kw">dyn</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_dyn_display</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="kw">dyn</span> <span class="ident">Display</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ValueBag</span> {
             <span class="ident">inner</span>: <span class="ident">Internal::AnonDisplay</span> { <span class="ident">value</span> },
         }
@@ -493,7 +493,7 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Calling more than a single `fill` method on this slot will panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill_debug</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill_debug</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Debug</span>,
     {
@@ -507,7 +507,7 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Calling more than a single `fill` method on this slot will panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill_display</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill_display</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Display</span>,
     {
@@ -518,83 +518,83 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Display</span>};
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ValueBag</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">struct</span> <span class="ident">DebugVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>);
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;v</span><span class="op">&gt;</span> <span class="ident">InternalVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DebugVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">debug</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Debug</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">debug</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Debug</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Debug::fmt</span>(<span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Display</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Display::fmt</span>(<span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">u128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">u128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u128</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">i128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">i128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i128</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">none</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">none</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">debug</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;None&quot;</span>))
             }
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;error&quot;</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Debug::fmt</span>(<span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sval1&quot;</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">sval1</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::internal::sval::v1::Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">sval1</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::internal::sval::v1::Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident"><span class="kw">crate</span>::internal::sval::v1::fmt</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">v</span>)
             }
 
@@ -602,7 +602,7 @@
             <span class="kw">fn</span> <span class="ident">serde1</span>(
                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
                 <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::internal::serde::v1::Serialize</span>,
-            ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident"><span class="kw">crate</span>::internal::serde::v1::fmt</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">v</span>)
             }
         }
@@ -615,83 +615,83 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ValueBag</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">struct</span> <span class="ident">DisplayVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>);
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;v</span><span class="op">&gt;</span> <span class="ident">InternalVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DisplayVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">debug</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Debug</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">debug</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Debug</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Debug::fmt</span>(<span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Display</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Display::fmt</span>(<span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">u128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">u128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u128</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">i128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">i128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i128</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
-            <span class="kw">fn</span> <span class="ident">none</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">none</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">debug</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;None&quot;</span>))
             }
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;error&quot;</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">Display::fmt</span>(<span class="ident">v</span>, <span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sval1&quot;</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">sval1</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::internal::sval::v1::Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">sval1</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::internal::sval::v1::Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident"><span class="kw">crate</span>::internal::sval::v1::fmt</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">v</span>)
             }
 
@@ -699,7 +699,7 @@
             <span class="kw">fn</span> <span class="ident">serde1</span>(
                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
                 <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::internal::serde::v1::Serialize</span>,
-            ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident"><span class="kw">crate</span>::internal::serde::v1::fmt</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">v</span>)
             }
         }
@@ -768,7 +768,7 @@
         <span class="kw">struct</span> <span class="ident">Timestamp</span>(<span class="ident">usize</span>);
 
         <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Timestamp</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;time is {}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
             }
         }

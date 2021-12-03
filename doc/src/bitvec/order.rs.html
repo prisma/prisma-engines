@@ -709,7 +709,7 @@ fn prove_custom() {
 	<span class="doccomment">/// This function will only ever be called with input values in the valid</span>
 	<span class="doccomment">/// `BitIdx&lt;R&gt;` range. Implementors are not required to consider any values</span>
 	<span class="doccomment">/// outside this range in their function body.</span>
-	<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span>;
 
 	<span class="doccomment">/// Converts a semantic bit index into a one-hot selector mask.</span>
@@ -745,7 +745,7 @@ fn prove_custom() {
 	<span class="doccomment">/// As with `at`, this function must produce a unique mapping from each</span>
 	<span class="doccomment">/// legal index in the `R` domain to a one-hot value of `R`.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">select</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitSel</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	<span class="kw">fn</span> <span class="ident">select</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitSel</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
 		<span class="ident"><span class="self">Self</span>::at</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>).<span class="ident">select</span>()
 	}
@@ -786,15 +786,15 @@ fn prove_custom() {
 	<span class="kw">fn</span> <span class="ident">mask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
 		<span class="ident">from</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">upto</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	) -&gt; <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span>
 		<span class="ident">R</span>: <span class="ident">BitRegister</span>,
 	{
 		<span class="kw">let</span> (<span class="ident">from</span>, <span class="ident">upto</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">from</span>.<span class="ident">into</span>(), <span class="ident">upto</span>.<span class="ident">into</span>()) {
-			(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">BitMask::ALL</span>,
-			(<span class="prelude-val">Some</span>(<span class="ident">from</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">from</span>, <span class="ident">BitTail</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::END</span>),
-			(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">upto</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">BitIdx</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::ZERO</span>, <span class="ident">upto</span>),
-			(<span class="prelude-val">Some</span>(<span class="ident">from</span>), <span class="prelude-val">Some</span>(<span class="ident">upto</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">from</span>, <span class="ident">upto</span>),
+			(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="ident">BitMask::ALL</span>,
+			(<span class="prelude-val">Some</span>(<span class="ident">from</span>), <span class="prelude-val">None</span>) =&gt; (<span class="ident">from</span>, <span class="ident">BitTail</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::END</span>),
+			(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">upto</span>)) =&gt; (<span class="ident">BitIdx</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::ZERO</span>, <span class="ident">upto</span>),
+			(<span class="prelude-val">Some</span>(<span class="ident">from</span>), <span class="prelude-val">Some</span>(<span class="ident">upto</span>)) =&gt; (<span class="ident">from</span>, <span class="ident">upto</span>),
 		};
 		<span class="ident">BitIdx</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::range</span>(<span class="ident">from</span>, <span class="ident">upto</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::select</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>).<span class="ident">sum</span>()
 	}
@@ -806,13 +806,13 @@ fn prove_custom() {
 
 <span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">BitOrder</span> <span class="kw">for</span> <span class="ident">Msb0</span> {
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-	<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
 		<span class="kw">unsafe</span> { <span class="ident">BitPos::new_unchecked</span>(<span class="ident">R::MASK</span> <span class="op">-</span> <span class="ident">index</span>.<span class="ident">value</span>()) }
 	}
 
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-	<span class="kw">fn</span> <span class="ident">select</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitSel</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	<span class="kw">fn</span> <span class="ident">select</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitSel</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
 		<span class="comment">/* Set the MSbit, then shift it down. The left expr is const-folded.
 		Note: this is not equivalent to `1 &lt;&lt; (mask - index)`, because that
@@ -826,7 +826,7 @@ fn prove_custom() {
 	<span class="kw">fn</span> <span class="ident">mask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
 		<span class="ident">from</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">upto</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	) -&gt; <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span>
 		<span class="ident">R</span>: <span class="ident">BitRegister</span>,
 	{
@@ -834,7 +834,7 @@ fn prove_custom() {
 		<span class="kw">let</span> <span class="ident">upto</span> <span class="op">=</span> <span class="ident">upto</span>.<span class="ident">into</span>().<span class="ident">unwrap_or</span>(<span class="ident">BitTail::END</span>).<span class="ident">value</span>();
 		<span class="macro">debug_assert!</span>(<span class="ident">upto</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">from</span>, <span class="string">&quot;Ranges must run from low index to high&quot;</span>);
 		<span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="ident">upto</span> <span class="op">-</span> <span class="ident">from</span>;
-		<span class="kw">if</span> <span class="ident">ct</span> <span class="op">=</span><span class="op">=</span> <span class="ident">R::BITS</span> {
+		<span class="kw">if</span> <span class="ident">ct</span> <span class="op">==</span> <span class="ident">R::BITS</span> {
 			<span class="kw">return</span> <span class="ident">BitMask::ALL</span>;
 		}
 		<span class="comment">//  1. Set all bits high.</span>
@@ -851,13 +851,13 @@ fn prove_custom() {
 
 <span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">BitOrder</span> <span class="kw">for</span> <span class="ident">Lsb0</span> {
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-	<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
 		<span class="kw">unsafe</span> { <span class="ident">BitPos::new_unchecked</span>(<span class="ident">index</span>.<span class="ident">value</span>()) }
 	}
 
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-	<span class="kw">fn</span> <span class="ident">select</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitSel</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	<span class="kw">fn</span> <span class="ident">select</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitSel</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
 		<span class="kw">unsafe</span> { <span class="ident">BitSel::new_unchecked</span>(<span class="ident">R::ONE</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">index</span>.<span class="ident">value</span>()) }
 	}
@@ -866,7 +866,7 @@ fn prove_custom() {
 	<span class="kw">fn</span> <span class="ident">mask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
 		<span class="ident">from</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">upto</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	) -&gt; <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span>
 		<span class="ident">R</span>: <span class="ident">BitRegister</span>,
 	{
@@ -874,7 +874,7 @@ fn prove_custom() {
 		<span class="kw">let</span> <span class="ident">upto</span> <span class="op">=</span> <span class="ident">upto</span>.<span class="ident">into</span>().<span class="ident">unwrap_or</span>(<span class="ident">BitTail::END</span>).<span class="ident">value</span>();
 		<span class="macro">debug_assert!</span>(<span class="ident">upto</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">from</span>, <span class="string">&quot;Ranges must run from low index to high&quot;</span>);
 		<span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="ident">upto</span> <span class="op">-</span> <span class="ident">from</span>;
-		<span class="kw">if</span> <span class="ident">ct</span> <span class="op">=</span><span class="op">=</span> <span class="ident">R::BITS</span> {
+		<span class="kw">if</span> <span class="ident">ct</span> <span class="op">==</span> <span class="ident">R::BITS</span> {
 			<span class="kw">return</span> <span class="ident">BitMask::ALL</span>;
 		}
 		<span class="comment">//  1. Set all bits high.</span>
@@ -1113,7 +1113,7 @@ for the combination of input types and index values.
 
 		<span class="kw">struct</span> <span class="ident">DefaultImpl</span>;
 		<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">BitOrder</span> <span class="kw">for</span> <span class="ident">DefaultImpl</span> {
-			<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+			<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 			<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
 				<span class="kw">unsafe</span> { <span class="ident">BitPos::new_unchecked</span>(<span class="ident">index</span>.<span class="ident">value</span>()) }
 			}

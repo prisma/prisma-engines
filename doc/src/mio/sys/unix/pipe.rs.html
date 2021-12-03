@@ -576,7 +576,7 @@
 <span class="doccomment">/// # unreachable!();</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">Sender</span>, <span class="ident">Receiver</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">Sender</span>, <span class="ident">Receiver</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fds</span>: [<span class="ident">RawFd</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="op">-</span><span class="number">1</span>, <span class="op">-</span><span class="number">1</span>];
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
@@ -645,7 +645,7 @@
 
 <span class="kw">impl</span> <span class="ident">Sender</span> {
     <span class="doccomment">/// Set the `Sender` into or out of non-blocking mode.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_nonblocking</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nonblocking</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_nonblocking</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nonblocking</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">set_nonblocking</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_raw_fd</span>(), <span class="ident">nonblocking</span>)
     }
 }
@@ -656,7 +656,7 @@
         <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">Registry</span>,
         <span class="ident">token</span>: <span class="ident">Token</span>,
         <span class="ident">interests</span>: <span class="ident">Interest</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register</span>(<span class="ident">registry</span>, <span class="ident">token</span>, <span class="ident">interests</span>)
     }
 
@@ -665,39 +665,39 @@
         <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">Registry</span>,
         <span class="ident">token</span>: <span class="ident">Token</span>,
         <span class="ident">interests</span>: <span class="ident">Interest</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">reregister</span>(<span class="ident">registry</span>, <span class="ident">token</span>, <span class="ident">interests</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">deregister</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">Registry</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">deregister</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">Registry</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">deregister</span>(<span class="ident">registry</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Write</span> <span class="kw">for</span> <span class="ident">Sender</span> {
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">do_io</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sender</span>).<span class="ident">write</span>(<span class="ident">buf</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">write_vectored</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_vectored</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">do_io</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sender</span>).<span class="ident">write_vectored</span>(<span class="ident">bufs</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">do_io</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sender</span>).<span class="ident">flush</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Write</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">Sender</span> {
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">do_io</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sender</span>).<span class="ident">write</span>(<span class="ident">buf</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">write_vectored</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_vectored</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">do_io</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sender</span>).<span class="ident">write_vectored</span>(<span class="ident">bufs</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">do_io</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sender</span>).<span class="ident">flush</span>())
     }
 }
@@ -706,14 +706,14 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The underlying pipe is **not** set to non-blocking.</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ChildStdin</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Sender</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">stdin</span>: <span class="ident">ChildStdin</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sender</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">stdin</span>: <span class="ident">ChildStdin</span>) -&gt; <span class="ident">Sender</span> {
         <span class="comment">// Safety: `ChildStdin` is guaranteed to be a valid file descriptor.</span>
         <span class="kw">unsafe</span> { <span class="ident">Sender::from_raw_fd</span>(<span class="ident">stdin</span>.<span class="ident">into_raw_fd</span>()) }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FromRawFd</span> <span class="kw">for</span> <span class="ident">Sender</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_fd</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sender</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_fd</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>) -&gt; <span class="ident">Sender</span> {
         <span class="ident">Sender</span> {
             <span class="ident">inner</span>: <span class="ident">IoSource::new</span>(<span class="ident">File::from_raw_fd</span>(<span class="ident">fd</span>)),
         }
@@ -721,13 +721,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsRawFd</span> <span class="kw">for</span> <span class="ident">Sender</span> {
-    <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawFd</span> {
+    <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_raw_fd</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">IntoRawFd</span> <span class="kw">for</span> <span class="ident">Sender</span> {
-    <span class="kw">fn</span> <span class="ident">into_raw_fd</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawFd</span> {
+    <span class="kw">fn</span> <span class="ident">into_raw_fd</span>(<span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into_inner</span>().<span class="ident">into_raw_fd</span>()
     }
 }
@@ -742,7 +742,7 @@
 
 <span class="kw">impl</span> <span class="ident">Receiver</span> {
     <span class="doccomment">/// Set the `Receiver` into or out of non-blocking mode.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_nonblocking</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nonblocking</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_nonblocking</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nonblocking</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">set_nonblocking</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_raw_fd</span>(), <span class="ident">nonblocking</span>)
     }
 }
@@ -753,7 +753,7 @@
         <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">Registry</span>,
         <span class="ident">token</span>: <span class="ident">Token</span>,
         <span class="ident">interests</span>: <span class="ident">Interest</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register</span>(<span class="ident">registry</span>, <span class="ident">token</span>, <span class="ident">interests</span>)
     }
 
@@ -762,31 +762,31 @@
         <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">Registry</span>,
         <span class="ident">token</span>: <span class="ident">Token</span>,
         <span class="ident">interests</span>: <span class="ident">Interest</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">reregister</span>(<span class="ident">registry</span>, <span class="ident">token</span>, <span class="ident">interests</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">deregister</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">Registry</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">deregister</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">Registry</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">deregister</span>(<span class="ident">registry</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="ident">Receiver</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">do_io</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sender</span>).<span class="ident">read</span>(<span class="ident">buf</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">read_vectored</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bufs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read_vectored</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bufs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">do_io</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sender</span>).<span class="ident">read_vectored</span>(<span class="ident">bufs</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">Receiver</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">do_io</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sender</span>).<span class="ident">read</span>(<span class="ident">buf</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">read_vectored</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bufs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read_vectored</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bufs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">do_io</span>(<span class="op">|</span><span class="ident">sender</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">sender</span>).<span class="ident">read_vectored</span>(<span class="ident">bufs</span>))
     }
 }
@@ -795,7 +795,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The underlying pipe is **not** set to non-blocking.</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ChildStdout</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Receiver</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">stdout</span>: <span class="ident">ChildStdout</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Receiver</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">stdout</span>: <span class="ident">ChildStdout</span>) -&gt; <span class="ident">Receiver</span> {
         <span class="comment">// Safety: `ChildStdout` is guaranteed to be a valid file descriptor.</span>
         <span class="kw">unsafe</span> { <span class="ident">Receiver::from_raw_fd</span>(<span class="ident">stdout</span>.<span class="ident">into_raw_fd</span>()) }
     }
@@ -805,14 +805,14 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The underlying pipe is **not** set to non-blocking.</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ChildStderr</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Receiver</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">stderr</span>: <span class="ident">ChildStderr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Receiver</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">stderr</span>: <span class="ident">ChildStderr</span>) -&gt; <span class="ident">Receiver</span> {
         <span class="comment">// Safety: `ChildStderr` is guaranteed to be a valid file descriptor.</span>
         <span class="kw">unsafe</span> { <span class="ident">Receiver::from_raw_fd</span>(<span class="ident">stderr</span>.<span class="ident">into_raw_fd</span>()) }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FromRawFd</span> <span class="kw">for</span> <span class="ident">Receiver</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_fd</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Receiver</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_fd</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>) -&gt; <span class="ident">Receiver</span> {
         <span class="ident">Receiver</span> {
             <span class="ident">inner</span>: <span class="ident">IoSource::new</span>(<span class="ident">File::from_raw_fd</span>(<span class="ident">fd</span>)),
         }
@@ -820,21 +820,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsRawFd</span> <span class="kw">for</span> <span class="ident">Receiver</span> {
-    <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawFd</span> {
+    <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_raw_fd</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">IntoRawFd</span> <span class="kw">for</span> <span class="ident">Receiver</span> {
-    <span class="kw">fn</span> <span class="ident">into_raw_fd</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawFd</span> {
+    <span class="kw">fn</span> <span class="ident">into_raw_fd</span>(<span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into_inner</span>().<span class="ident">into_raw_fd</span>()
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">set_nonblocking</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>, <span class="ident">nonblocking</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">set_nonblocking</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>, <span class="ident">nonblocking</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">nonblocking</span> <span class="kw">as</span> <span class="ident">libc::c_int</span>;
-    <span class="kw">if</span> <span class="kw">unsafe</span> { <span class="ident">libc::ioctl</span>(<span class="ident">fd</span>, <span class="ident">libc::FIONBIO</span>, <span class="kw-2">&amp;</span><span class="ident">value</span>) } <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span> {
+    <span class="kw">if</span> <span class="kw">unsafe</span> { <span class="ident">libc::ioctl</span>(<span class="ident">fd</span>, <span class="ident">libc::FIONBIO</span>, <span class="kw-2">&amp;</span><span class="ident">value</span>) } <span class="op">==</span> <span class="op">-</span><span class="number">1</span> {
         <span class="prelude-val">Err</span>(<span class="ident">io::Error::last_os_error</span>())
     } <span class="kw">else</span> {
         <span class="prelude-val">Ok</span>(())
@@ -842,7 +842,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">set_nonblocking</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>, <span class="ident">nonblocking</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">set_nonblocking</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>, <span class="ident">nonblocking</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">libc::fcntl</span>(<span class="ident">fd</span>, <span class="ident">libc::F_GETFL</span>) };
     <span class="kw">if</span> <span class="ident">flags</span> <span class="op">&lt;</span> <span class="number">0</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::last_os_error</span>());

@@ -87,7 +87,7 @@
 
     <span class="doccomment">/// Retrieve result and consume the hasher instance.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finalize_fixed</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GenericArray</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident"><span class="self">Self</span>::OutputSize</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">finalize_fixed</span>(<span class="self">self</span>) -&gt; <span class="ident">GenericArray</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident"><span class="self">Self</span>::OutputSize</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
     {
@@ -98,7 +98,7 @@
 
     <span class="doccomment">/// Retrieve result and reset the hasher instance.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finalize_fixed_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GenericArray</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident"><span class="self">Self</span>::OutputSize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">finalize_fixed_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">GenericArray</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident"><span class="self">Self</span>::OutputSize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Default::default</span>();
         <span class="self">self</span>.<span class="ident">finalize_into_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out</span>);
         <span class="ident">out</span>

@@ -317,8 +317,8 @@
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">frameguard</span>(<span class="kw-2">mut</span> <span class="ident">headers</span>: <span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>, <span class="ident">guard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FrameOptions</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guard</span> {
-        <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">FrameOptions::SameOrigin</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;sameorigin&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">FrameOptions::Deny</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;deny&quot;</span>,
+        <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">FrameOptions::SameOrigin</span>) =&gt; <span class="string">&quot;sameorigin&quot;</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">FrameOptions::Deny</span>) =&gt; <span class="string">&quot;deny&quot;</span>,
     };
     <span class="ident">headers</span>.<span class="ident">as_mut</span>().<span class="ident">insert</span>(<span class="string">&quot;X-Frame-Options&quot;</span>, <span class="ident">kind</span>);
 }
@@ -341,10 +341,10 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">powered_by</span>(<span class="kw-2">mut</span> <span class="ident">headers</span>: <span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">HeaderName::from_lowercase_str</span>(<span class="string">&quot;X-Powered-By&quot;</span>);
     <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; {
             <span class="ident">headers</span>.<span class="ident">as_mut</span>().<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">value</span>);
         }
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">None</span> =&gt; {
             <span class="ident">headers</span>.<span class="ident">as_mut</span>().<span class="ident">remove</span>(<span class="ident">name</span>);
         }
     };
@@ -448,14 +448,14 @@
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referrer_policy</span>(<span class="kw-2">mut</span> <span class="ident">headers</span>: <span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>, <span class="ident">referrer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferrerOptions</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">policy</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">referrer</span> {
-        <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::NoReferrer</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;no-referrer&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::NoReferrerDowngrade</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;no-referrer-when-downgrade&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::SameOrigin</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;same-origin&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::Origin</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;origin&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::StrictOrigin</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;strict-origin&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::CrossOrigin</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;origin-when-cross-origin&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::StrictCrossOrigin</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;strict-origin-when-cross-origin&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::UnsafeUrl</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;unsafe-url&quot;</span>,
+        <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::NoReferrer</span>) =&gt; <span class="string">&quot;no-referrer&quot;</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::NoReferrerDowngrade</span>) =&gt; <span class="string">&quot;no-referrer-when-downgrade&quot;</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::SameOrigin</span>) =&gt; <span class="string">&quot;same-origin&quot;</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::Origin</span>) =&gt; <span class="string">&quot;origin&quot;</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::StrictOrigin</span>) =&gt; <span class="string">&quot;strict-origin&quot;</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::CrossOrigin</span>) =&gt; <span class="string">&quot;origin-when-cross-origin&quot;</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::StrictCrossOrigin</span>) =&gt; <span class="string">&quot;strict-origin-when-cross-origin&quot;</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ReferrerOptions::UnsafeUrl</span>) =&gt; <span class="string">&quot;unsafe-url&quot;</span>,
     };
 
     <span class="comment">// We MUST allow for multiple Referrer-Policy headers to be set.</span>

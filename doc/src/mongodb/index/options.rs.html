@@ -386,30 +386,30 @@
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">IndexVersion</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Serializer</span>,
     {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">IndexVersion::V0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">0</span>),
-            <span class="ident">IndexVersion::V1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">1</span>),
-            <span class="ident">IndexVersion::V2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">2</span>),
-            <span class="ident">IndexVersion::Custom</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_helpers::serialize_u32_as_i32</span>(<span class="ident">i</span>, <span class="ident">serializer</span>),
+            <span class="ident">IndexVersion::V0</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">0</span>),
+            <span class="ident">IndexVersion::V1</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">1</span>),
+            <span class="ident">IndexVersion::V2</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">2</span>),
+            <span class="ident">IndexVersion::Custom</span>(<span class="ident">i</span>) =&gt; <span class="ident">serde_helpers::serialize_u32_as_i32</span>(<span class="ident">i</span>, <span class="ident">serializer</span>),
         }
     }
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IndexVersion</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
         <span class="kw">match</span> <span class="ident">i32::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">IndexVersion::V0</span>),
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">IndexVersion::V1</span>),
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">IndexVersion::V2</span>),
-            <span class="ident">i</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">IndexVersion::Custom</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>)),
+            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">IndexVersion::V0</span>),
+            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">IndexVersion::V1</span>),
+            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">IndexVersion::V2</span>),
+            <span class="ident">i</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">IndexVersion::Custom</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>)),
         }
     }
 }
@@ -432,29 +432,29 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">TextIndexVersion</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Serializer</span>,
     {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TextIndexVersion::V1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">1</span>),
-            <span class="ident">TextIndexVersion::V2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">2</span>),
-            <span class="ident">TextIndexVersion::V3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">3</span>),
-            <span class="ident">TextIndexVersion::Custom</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_helpers::serialize_u32_as_i32</span>(<span class="ident">i</span>, <span class="ident">serializer</span>),
+            <span class="ident">TextIndexVersion::V1</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">1</span>),
+            <span class="ident">TextIndexVersion::V2</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">2</span>),
+            <span class="ident">TextIndexVersion::V3</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">3</span>),
+            <span class="ident">TextIndexVersion::Custom</span>(<span class="ident">i</span>) =&gt; <span class="ident">serde_helpers::serialize_u32_as_i32</span>(<span class="ident">i</span>, <span class="ident">serializer</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TextIndexVersion</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
         <span class="kw">match</span> <span class="ident">i32::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span> {
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TextIndexVersion::V1</span>),
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TextIndexVersion::V2</span>),
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TextIndexVersion::V3</span>),
-            <span class="ident">i</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">TextIndexVersion::Custom</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>)),
+            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TextIndexVersion::V1</span>),
+            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TextIndexVersion::V2</span>),
+            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TextIndexVersion::V3</span>),
+            <span class="ident">i</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TextIndexVersion::Custom</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>)),
         }
     }
 }
@@ -474,27 +474,27 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Sphere2DIndexVersion</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Serializer</span>,
     {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Sphere2DIndexVersion::V2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">2</span>),
-            <span class="ident">Sphere2DIndexVersion::V3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">3</span>),
-            <span class="ident">Sphere2DIndexVersion::Custom</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_helpers::serialize_u32_as_i32</span>(<span class="ident">i</span>, <span class="ident">serializer</span>),
+            <span class="ident">Sphere2DIndexVersion::V2</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">2</span>),
+            <span class="ident">Sphere2DIndexVersion::V3</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">3</span>),
+            <span class="ident">Sphere2DIndexVersion::Custom</span>(<span class="ident">i</span>) =&gt; <span class="ident">serde_helpers::serialize_u32_as_i32</span>(<span class="ident">i</span>, <span class="ident">serializer</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Sphere2DIndexVersion</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
         <span class="kw">match</span> <span class="ident">i32::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span> {
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Sphere2DIndexVersion::V2</span>),
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Sphere2DIndexVersion::V3</span>),
-            <span class="ident">i</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Sphere2DIndexVersion::Custom</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>)),
+            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Sphere2DIndexVersion::V2</span>),
+            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Sphere2DIndexVersion::V3</span>),
+            <span class="ident">i</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Sphere2DIndexVersion::Custom</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>)),
         }
     }
 }

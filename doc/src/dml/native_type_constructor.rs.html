@@ -71,7 +71,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">NativeTypeConstructor</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">without_args</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">prisma_types</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ScalarType</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NativeTypeConstructor</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">without_args</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">prisma_types</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ScalarType</span>]) -&gt; <span class="ident">NativeTypeConstructor</span> {
         <span class="ident">NativeTypeConstructor</span> {
             <span class="ident">name</span>,
             <span class="ident">_number_of_args</span>: <span class="number">0</span>,
@@ -84,7 +84,7 @@
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
         <span class="ident">number_of_args</span>: <span class="ident">usize</span>,
         <span class="ident">prisma_types</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ScalarType</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NativeTypeConstructor</span> {
+    ) -&gt; <span class="ident">NativeTypeConstructor</span> {
         <span class="ident">NativeTypeConstructor</span> {
             <span class="ident">name</span>,
             <span class="ident">_number_of_args</span>: <span class="ident">number_of_args</span>,
@@ -97,7 +97,7 @@
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
         <span class="ident">number_of_optional_args</span>: <span class="ident">usize</span>,
         <span class="ident">prisma_types</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ScalarType</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NativeTypeConstructor</span> {
+    ) -&gt; <span class="ident">NativeTypeConstructor</span> {
         <span class="ident">NativeTypeConstructor</span> {
             <span class="ident">name</span>,
             <span class="ident">_number_of_args</span>: <span class="number">0</span>,

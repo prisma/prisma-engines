@@ -738,7 +738,7 @@ You can update all `expect![[]]` tests by running:
 To update a single test, place the cursor on `expect` token and use `run` feature of rust-analyzer.
 &quot;</span>;
 
-<span class="kw">fn</span> <span class="ident">update_expect</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">update_expect</span>() -&gt; <span class="ident">bool</span> {
     <span class="ident">env::var</span>(<span class="string">&quot;UPDATE_EXPECT&quot;</span>).<span class="ident">is_ok</span>()
 }
 
@@ -754,7 +754,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
 <span class="doccomment">/// Leading indentation is stripped.</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">expect</span> {
-    [[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">data</span>:<span class="ident">literal</span>]] <span class="op">=</span><span class="op">&gt;</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Expect</span> {
+    [[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">data</span>:<span class="ident">literal</span>]] =&gt; {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Expect</span> {
         <span class="ident">position</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Position</span> {
             <span class="ident">file</span>: <span class="macro">file!</span>(),
             <span class="ident">line</span>: <span class="macro">line!</span>(),
@@ -762,7 +762,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
         },
         <span class="ident">data</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">data</span>,
     }};
-    [[]] <span class="op">=</span><span class="op">&gt;</span> { <span class="macro-nonterminal">$</span><span class="macro">crate::expect!</span>[[<span class="string">&quot;&quot;</span>]] };
+    [[]] =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::expect!</span>[[<span class="string">&quot;&quot;</span>]] };
 }
 
 <span class="doccomment">/// Creates an instance of `ExpectFile` from relative or absolute path:</span>
@@ -773,7 +773,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="macro-nonterminal">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">expect_file</span> {
-    [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>:<span class="ident">expr</span>] <span class="op">=</span><span class="op">&gt;</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::ExpectFile</span> {
+    [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>:<span class="ident">expr</span>] =&gt; {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::ExpectFile</span> {
         <span class="ident">path</span>: <span class="ident">std::path::PathBuf::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>),
         <span class="ident">position</span>: <span class="macro">file!</span>(),
     }};
@@ -809,7 +809,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Position</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}:{}:{}&quot;</span>, <span class="self">self</span>.<span class="ident">file</span>, <span class="self">self</span>.<span class="ident">line</span>, <span class="self">self</span>.<span class="ident">column</span>)
     }
 }
@@ -818,7 +818,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
     <span class="doccomment">/// Checks if this expect is equal to `actual`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">actual</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">trimmed</span>();
-        <span class="kw">if</span> <span class="ident">trimmed</span> <span class="op">=</span><span class="op">=</span> <span class="ident">actual</span> {
+        <span class="kw">if</span> <span class="ident">trimmed</span> <span class="op">==</span> <span class="ident">actual</span> {
             <span class="kw">return</span>;
         }
         <span class="ident">Runtime::fail_expect</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">trimmed</span>, <span class="ident">actual</span>);
@@ -829,22 +829,22 @@ To update a single test, place the cursor on `expect` token and use `run` featur
         <span class="self">self</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">actual</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">trimmed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">trimmed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">contains</span>(<span class="string">&#39;\n&#39;</span>) {
             <span class="kw">return</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">to_string</span>();
         }
         <span class="ident">trim_indent</span>(<span class="self">self</span>.<span class="ident">data</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">locate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Location</span> {
+    <span class="kw">fn</span> <span class="ident">locate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Location</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">target_line</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">line_start</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">line</span>) <span class="kw">in</span> <span class="ident">lines_with_ends</span>(<span class="ident">file</span>).<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">line</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span> {
+            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">line</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span> {
                 <span class="kw">let</span> <span class="ident">pat</span> <span class="op">=</span> <span class="string">&quot;expect![[&quot;</span>;
                 <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">find</span>(<span class="ident">pat</span>).<span class="ident">unwrap</span>();
                 <span class="kw">let</span> <span class="ident">literal_start</span> <span class="op">=</span> <span class="ident">line_start</span> <span class="op">+</span> <span class="ident">offset</span> <span class="op">+</span> <span class="ident">pat</span>.<span class="ident">len</span>();
-                <span class="kw">let</span> <span class="ident">indent</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">chars</span>().<span class="ident">take_while</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">it</span><span class="op">|</span> <span class="ident">it</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39; &#39;</span>).<span class="ident">count</span>();
+                <span class="kw">let</span> <span class="ident">indent</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">chars</span>().<span class="ident">take_while</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">it</span><span class="op">|</span> <span class="ident">it</span> <span class="op">==</span> <span class="string">&#39; &#39;</span>).<span class="ident">count</span>();
                 <span class="ident">target_line</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">literal_start</span>, <span class="ident">indent</span>));
                 <span class="kw">break</span>;
             }
@@ -862,7 +862,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
     <span class="doccomment">/// Checks if file contents is equal to `actual`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">actual</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read</span>();
-        <span class="kw">if</span> <span class="ident">actual</span> <span class="op">=</span><span class="op">=</span> <span class="ident">expected</span> {
+        <span class="kw">if</span> <span class="ident">actual</span> <span class="op">==</span> <span class="ident">expected</span> {
             <span class="kw">return</span>;
         }
         <span class="ident">Runtime::fail_file</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">expected</span>, <span class="ident">actual</span>);
@@ -872,13 +872,13 @@ To update a single test, place the cursor on `expect` token and use `run` featur
         <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:#?}\n&quot;</span>, <span class="ident">actual</span>);
         <span class="self">self</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">actual</span>)
     }
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="ident">fs::read_to_string</span>(<span class="self">self</span>.<span class="ident">abs_path</span>()).<span class="ident">unwrap_or_default</span>().<span class="ident">replace</span>(<span class="string">&quot;\r\n&quot;</span>, <span class="string">&quot;\n&quot;</span>)
     }
     <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">contents</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="ident">fs::write</span>(<span class="self">self</span>.<span class="ident">abs_path</span>(), <span class="ident">contents</span>).<span class="ident">unwrap</span>()
     }
-    <span class="kw">fn</span> <span class="ident">abs_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PathBuf</span> {
+    <span class="kw">fn</span> <span class="ident">abs_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PathBuf</span> {
         <span class="kw">let</span> <span class="ident">dir</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="self">self</span>.<span class="ident">position</span>).<span class="ident">parent</span>().<span class="ident">unwrap</span>();
         <span class="ident">WORKSPACE_ROOT</span>.<span class="ident">join</span>(<span class="ident">dir</span>).<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>)
     }
@@ -957,7 +957,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
 }
 
 <span class="kw">impl</span> <span class="ident">FileRuntime</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">expect</span>: <span class="kw-2">&amp;</span><span class="ident">Expect</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FileRuntime</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">expect</span>: <span class="kw-2">&amp;</span><span class="ident">Expect</span>) -&gt; <span class="ident">FileRuntime</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">WORKSPACE_ROOT</span>.<span class="ident">join</span>(<span class="ident">expect</span>.<span class="ident">position</span>.<span class="ident">file</span>);
         <span class="kw">let</span> <span class="ident">original_text</span> <span class="op">=</span> <span class="ident">fs::read_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">patchwork</span> <span class="op">=</span> <span class="ident">Patchwork::new</span>(<span class="ident">original_text</span>.<span class="ident">clone</span>());
@@ -984,7 +984,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
 }
 
 <span class="kw">impl</span> <span class="ident">Patchwork</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">text</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Patchwork</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">text</span>: <span class="ident">String</span>) -&gt; <span class="ident">Patchwork</span> {
         <span class="ident">Patchwork</span> { <span class="ident">text</span>, <span class="ident">indels</span>: <span class="ident">Vec::new</span>() }
     }
     <span class="kw">fn</span> <span class="ident">patch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">patch</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
@@ -1007,7 +1007,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
     }
 }
 
-<span class="kw">fn</span> <span class="ident">format_patch</span>(<span class="ident">line_indent</span>: <span class="ident">usize</span>, <span class="ident">patch</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">format_patch</span>(<span class="ident">line_indent</span>: <span class="ident">usize</span>, <span class="ident">patch</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_hashes</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur_hashes</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">patch</span>.<span class="ident">bytes</span>() {
@@ -1057,7 +1057,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
         .<span class="ident">to_path_buf</span>()
 });
 
-<span class="kw">fn</span> <span class="ident">trim_indent</span>(<span class="kw-2">mut</span> <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">trim_indent</span>(<span class="kw-2">mut</span> <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">if</span> <span class="ident">text</span>.<span class="ident">starts_with</span>(<span class="string">&#39;\n&#39;</span>) {
         <span class="ident">text</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">text</span>[<span class="number">1</span>..];
     }
@@ -1081,7 +1081,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
         .<span class="ident">collect</span>()
 }
 
-<span class="kw">fn</span> <span class="ident">lines_with_ends</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LinesWithEnds</span> {
+<span class="kw">fn</span> <span class="ident">lines_with_ends</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">LinesWithEnds</span> {
     <span class="ident">LinesWithEnds</span> { <span class="ident">text</span> }
 }
 
@@ -1091,7 +1091,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">LinesWithEnds</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
@@ -1102,13 +1102,13 @@ To update a single test, place the cursor on `expect` token and use `run` featur
     }
 }
 
-<span class="kw">fn</span> <span class="ident">format_chunks</span>(<span class="ident">chunks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">dissimilar::Chunk</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">format_chunks</span>(<span class="ident">chunks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">dissimilar::Chunk</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="kw">for</span> <span class="ident">chunk</span> <span class="kw">in</span> <span class="ident">chunks</span> {
         <span class="kw">let</span> <span class="ident">formatted</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">chunk</span> {
-            <span class="ident">dissimilar::Chunk::Equal</span>(<span class="ident">text</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">text</span>.<span class="ident">into</span>(),
-            <span class="ident">dissimilar::Chunk::Delete</span>(<span class="ident">text</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;\x1b[41m{}\x1b[0m&quot;</span>, <span class="ident">text</span>),
-            <span class="ident">dissimilar::Chunk::Insert</span>(<span class="ident">text</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;\x1b[42m{}\x1b[0m&quot;</span>, <span class="ident">text</span>),
+            <span class="ident">dissimilar::Chunk::Equal</span>(<span class="ident">text</span>) =&gt; <span class="ident">text</span>.<span class="ident">into</span>(),
+            <span class="ident">dissimilar::Chunk::Delete</span>(<span class="ident">text</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;\x1b[41m{}\x1b[0m&quot;</span>, <span class="ident">text</span>),
+            <span class="ident">dissimilar::Chunk::Insert</span>(<span class="ident">text</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;\x1b[42m{}\x1b[0m&quot;</span>, <span class="ident">text</span>),
         };
         <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">formatted</span>);
     }

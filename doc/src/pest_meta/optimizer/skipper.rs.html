@@ -66,10 +66,10 @@
 
 <span class="kw">use</span> <span class="ident">ast</span>::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip</span>(<span class="ident">rule</span>: <span class="ident">Rule</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Rule</span> {
-    <span class="kw">fn</span> <span class="ident">populate_choices</span>(<span class="ident">expr</span>: <span class="ident">Expr</span>, <span class="kw-2">mut</span> <span class="ident">choices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip</span>(<span class="ident">rule</span>: <span class="ident">Rule</span>) -&gt; <span class="ident">Rule</span> {
+    <span class="kw">fn</span> <span class="ident">populate_choices</span>(<span class="ident">expr</span>: <span class="ident">Expr</span>, <span class="kw-2">mut</span> <span class="ident">choices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">expr</span> {
-            <span class="ident">Expr::Choice</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Expr::Choice</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Expr::Str</span>(<span class="ident">string</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">lhs</span> {
                     <span class="ident">choices</span>.<span class="ident">push</span>(<span class="ident">string</span>);
                     <span class="ident">populate_choices</span>(<span class="kw-2">*</span><span class="ident">rhs</span>, <span class="ident">choices</span>)
@@ -77,25 +77,25 @@
                     <span class="prelude-val">None</span>
                 }
             }
-            <span class="ident">Expr::Str</span>(<span class="ident">string</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Expr::Str</span>(<span class="ident">string</span>) =&gt; {
                 <span class="ident">choices</span>.<span class="ident">push</span>(<span class="ident">string</span>);
                 <span class="prelude-val">Some</span>(<span class="ident">Expr::Skip</span>(<span class="ident">choices</span>))
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="kw">match</span> <span class="ident">rule</span> {
-        <span class="ident">Rule</span> { <span class="ident">name</span>, <span class="ident">ty</span>, <span class="ident">expr</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Rule</span> {
+        <span class="ident">Rule</span> { <span class="ident">name</span>, <span class="ident">ty</span>, <span class="ident">expr</span> } =&gt; <span class="ident">Rule</span> {
             <span class="ident">name</span>,
             <span class="ident">ty</span>,
-            <span class="ident">expr</span>: <span class="kw">if</span> <span class="ident">ty</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RuleType::Atomic</span> {
+            <span class="ident">expr</span>: <span class="kw">if</span> <span class="ident">ty</span> <span class="op">==</span> <span class="ident">RuleType::Atomic</span> {
                 <span class="ident">expr</span>.<span class="ident">map_top_down</span>(<span class="op">|</span><span class="ident">expr</span><span class="op">|</span> {
                     <span class="comment">// TODO: Use box syntax when it gets stabilized.</span>
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Expr::Rep</span>(<span class="ident">expr</span>) <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">clone</span>() {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Expr::Seq</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">expr</span>.<span class="ident">clone</span>() {
                             <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">Expr::NegPred</span>(<span class="ident">expr</span>), <span class="ident">Expr::Ident</span>(<span class="ident">ident</span>)) <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">lhs</span>, <span class="kw-2">*</span><span class="ident">rhs</span>) {
-                                <span class="kw">if</span> <span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;ANY&quot;</span> {
+                                <span class="kw">if</span> <span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;ANY&quot;</span> {
                                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">expr</span>) <span class="op">=</span> <span class="ident">populate_choices</span>(<span class="kw-2">*</span><span class="ident">expr</span>, <span class="macro">vec!</span>[]) {
                                         <span class="kw">return</span> <span class="ident">expr</span>;
                                     }

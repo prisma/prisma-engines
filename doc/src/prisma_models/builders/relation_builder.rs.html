@@ -44,7 +44,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RelationBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>, <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelWeakRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>, <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelWeakRef</span>) -&gt; <span class="ident">RelationRef</span> {
         <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="ident">Relation</span> {
             <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>,
             <span class="ident">manifestation</span>: <span class="self">self</span>.<span class="ident">manifestation</span>,

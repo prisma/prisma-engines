@@ -178,7 +178,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Service`]: https://docs.rs/tower-service/latest/tower_service/trait.Service.html</span>
 <span class="doccomment">/// [`Layer::layer`]: crate::Layer::layer</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">layer_fn</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LayerFn</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">layer_fn</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">T</span>) -&gt; <span class="ident">LayerFn</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">LayerFn</span> { <span class="ident">f</span> }
 }
 
@@ -190,17 +190,17 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span>, <span class="ident">Out</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LayerFn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Out</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">S</span>) -&gt; <span class="ident">Out</span>,
 {
     <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">Out</span>;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inner</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Service</span> {
+    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inner</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
         (<span class="self">self</span>.<span class="ident">f</span>)(<span class="ident">inner</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">LayerFn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;LayerFn&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;f&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;&lt;{}&gt;&quot;</span>, <span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>()))
             .<span class="ident">finish</span>()

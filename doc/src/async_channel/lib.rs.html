@@ -1060,7 +1060,7 @@
     <span class="doccomment">/// Closes the channel and notifies all blocked operations.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `true` if this call has closed the channel and it was not closed already.</span>
-    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">close</span>() {
             <span class="comment">// Notify all send operations.</span>
             <span class="self">self</span>.<span class="ident">send_ops</span>.<span class="ident">notify</span>(<span class="ident">usize::MAX</span>);
@@ -1098,7 +1098,7 @@
 <span class="doccomment">/// assert_eq!(r.recv().await, Ok(10));</span>
 <span class="doccomment">/// assert_eq!(r.try_recv(), Err(TryRecvError::Empty));</span>
 <span class="doccomment">/// # });</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bounded</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">cap</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bounded</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">cap</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
     <span class="macro">assert!</span>(<span class="ident">cap</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;capacity cannot be zero&quot;</span>);
 
     <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Channel</span> {
@@ -1139,7 +1139,7 @@
 <span class="doccomment">/// assert_eq!(r.recv().await, Ok(20));</span>
 <span class="doccomment">/// assert_eq!(r.try_recv(), Err(TryRecvError::Empty));</span>
 <span class="doccomment">/// # });</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unbounded</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unbounded</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() -&gt; (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Channel</span> {
         <span class="ident">queue</span>: <span class="ident">ConcurrentQueue::unbounded</span>(),
         <span class="ident">send_ops</span>: <span class="ident">Event::new</span>(),
@@ -1188,9 +1188,9 @@
     <span class="doccomment">/// drop(r);</span>
     <span class="doccomment">/// assert_eq!(s.try_send(3), Err(TrySendError::Closed(3)));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">push</span>(<span class="ident">msg</span>) {
-            <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(()) =&gt; {
                 <span class="comment">// Notify a single blocked receive operation. If the notified operation then</span>
                 <span class="comment">// receives a message or gets canceled, it will notify another blocked receive</span>
                 <span class="comment">// operation.</span>
@@ -1201,8 +1201,8 @@
 
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="prelude-val">Err</span>(<span class="ident">PushError::Full</span>(<span class="ident">msg</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">TrySendError::Full</span>(<span class="ident">msg</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">PushError::Closed</span>(<span class="ident">msg</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">TrySendError::Closed</span>(<span class="ident">msg</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">PushError::Full</span>(<span class="ident">msg</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">TrySendError::Full</span>(<span class="ident">msg</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">PushError::Closed</span>(<span class="ident">msg</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">TrySendError::Closed</span>(<span class="ident">msg</span>)),
         }
     }
 
@@ -1225,7 +1225,7 @@
     <span class="doccomment">/// assert_eq!(s.send(2).await, Err(SendError(2)));</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Send</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="ident">Send</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Send</span> {
             <span class="ident">sender</span>: <span class="self">self</span>,
             <span class="ident">listener</span>: <span class="prelude-val">None</span>,
@@ -1253,7 +1253,7 @@
     <span class="doccomment">/// assert_eq!(r.recv().await, Err(RecvError));</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">close</span>()
     }
 
@@ -1272,7 +1272,7 @@
     <span class="doccomment">/// assert!(s.is_closed());</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">is_closed</span>()
     }
 
@@ -1291,7 +1291,7 @@
     <span class="doccomment">/// assert!(!s.is_empty());</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">is_empty</span>()
     }
 
@@ -1312,7 +1312,7 @@
     <span class="doccomment">/// assert!(s.is_full());</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">is_full</span>()
     }
 
@@ -1332,7 +1332,7 @@
     <span class="doccomment">/// assert_eq!(s.len(), 2);</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">len</span>()
     }
 
@@ -1349,7 +1349,7 @@
     <span class="doccomment">/// let (s, r) = unbounded::&lt;i32&gt;();</span>
     <span class="doccomment">/// assert_eq!(s.capacity(), None);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">capacity</span>()
     }
 
@@ -1368,7 +1368,7 @@
     <span class="doccomment">/// assert_eq!(s.receiver_count(), 2);</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receiver_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receiver_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">receiver_count</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
     }
 
@@ -1387,7 +1387,7 @@
     <span class="doccomment">/// assert_eq!(s.sender_count(), 2);</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">sender_count</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
     }
 }
@@ -1395,20 +1395,20 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="comment">// Decrement the sender count and close the channel if it drops down to zero.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">sender_count</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering::AcqRel</span>) <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">sender_count</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering::AcqRel</span>) <span class="op">==</span> <span class="number">1</span> {
             <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">close</span>();
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Sender {{ .. }}&quot;</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">sender_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
 
         <span class="comment">// Make sure the count never overflows, even if lots of sender clones are leaked.</span>
@@ -1459,17 +1459,17 @@
     <span class="doccomment">/// assert_eq!(r.try_recv(), Err(TryRecvError::Closed));</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TryRecvError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TryRecvError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">pop</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">msg</span>) =&gt; {
                 <span class="comment">// Notify a single blocked send operation. If the notified operation then sends a</span>
                 <span class="comment">// message or gets canceled, it will notify another blocked send operation.</span>
                 <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">send_ops</span>.<span class="ident">notify</span>(<span class="number">1</span>);
 
                 <span class="prelude-val">Ok</span>(<span class="ident">msg</span>)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">PopError::Empty</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Empty</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">PopError::Closed</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">PopError::Empty</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Empty</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">PopError::Closed</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>),
         }
     }
 
@@ -1495,7 +1495,7 @@
     <span class="doccomment">/// assert_eq!(r.recv().await, Err(RecvError));</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Recv</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Recv</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Recv</span> {
             <span class="ident">receiver</span>: <span class="self">self</span>,
             <span class="ident">listener</span>: <span class="prelude-val">None</span>,
@@ -1522,7 +1522,7 @@
     <span class="doccomment">/// assert_eq!(r.recv().await, Err(RecvError));</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">close</span>()
     }
 
@@ -1541,7 +1541,7 @@
     <span class="doccomment">/// assert!(r.is_closed());</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">is_closed</span>()
     }
 
@@ -1560,7 +1560,7 @@
     <span class="doccomment">/// assert!(!s.is_empty());</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">is_empty</span>()
     }
 
@@ -1581,7 +1581,7 @@
     <span class="doccomment">/// assert!(r.is_full());</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">is_full</span>()
     }
 
@@ -1601,7 +1601,7 @@
     <span class="doccomment">/// assert_eq!(r.len(), 2);</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">len</span>()
     }
 
@@ -1618,7 +1618,7 @@
     <span class="doccomment">/// let (s, r) = unbounded::&lt;i32&gt;();</span>
     <span class="doccomment">/// assert_eq!(r.capacity(), None);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">capacity</span>()
     }
 
@@ -1637,7 +1637,7 @@
     <span class="doccomment">/// assert_eq!(r.receiver_count(), 2);</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receiver_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receiver_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">receiver_count</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
     }
 
@@ -1656,7 +1656,7 @@
     <span class="doccomment">/// assert_eq!(r.sender_count(), 2);</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">sender_count</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
     }
 }
@@ -1664,20 +1664,20 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="comment">// Decrement the receiver count and close the channel if it drops down to zero.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">receiver_count</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering::AcqRel</span>) <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">receiver_count</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering::AcqRel</span>) <span class="op">==</span> <span class="number">1</span> {
             <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">close</span>();
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Receiver {{ .. }}&quot;</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">receiver_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
 
         <span class="comment">// Make sure the count never overflows, even if lots of receiver clones are leaked.</span>
@@ -1695,7 +1695,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="comment">// If this stream is listening for events, first wait for a notification.</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">listener</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">listener</span>.<span class="ident">as_mut</span>() {
@@ -1706,26 +1706,26 @@
             <span class="kw">loop</span> {
                 <span class="comment">// Attempt to receive a message.</span>
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">try_recv</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">msg</span>) =&gt; {
                         <span class="comment">// The stream is not blocked on an event - drop the listener.</span>
                         <span class="self">self</span>.<span class="ident">listener</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                         <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">msg</span>));
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>) =&gt; {
                         <span class="comment">// The stream is not blocked on an event - drop the listener.</span>
                         <span class="self">self</span>.<span class="ident">listener</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                         <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Empty</span>) <span class="op">=</span><span class="op">&gt;</span> {}
+                    <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Empty</span>) =&gt; {}
                 }
 
                 <span class="comment">// Receiving failed - now start listening for notifications or wait for one.</span>
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">listener</span>.<span class="ident">as_mut</span>() {
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">None</span> =&gt; {
                         <span class="comment">// Create a listener and try sending the message again.</span>
                         <span class="self">self</span>.<span class="ident">listener</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">stream_ops</span>.<span class="ident">listen</span>());
                     }
-                    <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
                         <span class="comment">// Go back to the outer loop to poll the listener.</span>
                         <span class="kw">break</span>;
                     }
@@ -1736,7 +1736,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">futures_core::stream::FusedStream</span> <span class="kw">for</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">is_terminated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_terminated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">is_closed</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">is_empty</span>()
     }
 }
@@ -1749,7 +1749,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Unwraps the message that couldn&#39;t be sent.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -1757,13 +1757,13 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">SendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">SendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SendError(..)&quot;</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sending into a closed channel&quot;</span>)
     }
 }
@@ -1780,26 +1780,26 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Unwraps the message that couldn&#39;t be sent.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TrySendError::Full</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>,
-            <span class="ident">TrySendError::Closed</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>,
+            <span class="ident">TrySendError::Full</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
+            <span class="ident">TrySendError::Closed</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
         }
     }
 
     <span class="doccomment">/// Returns `true` if the channel is full but not closed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TrySendError::Full</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">TrySendError::Closed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">TrySendError::Full</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="ident">TrySendError::Closed</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 
     <span class="doccomment">/// Returns `true` if the channel is closed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TrySendError::Full</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">TrySendError::Closed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">TrySendError::Full</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="ident">TrySendError::Closed</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
         }
     }
 }
@@ -1807,19 +1807,19 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">TrySendError::Full</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Full(..)&quot;</span>),
-            <span class="ident">TrySendError::Closed</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Closed(..)&quot;</span>),
+            <span class="ident">TrySendError::Full</span>(..) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Full(..)&quot;</span>),
+            <span class="ident">TrySendError::Closed</span>(..) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Closed(..)&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">TrySendError::Full</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sending into a full channel&quot;</span>),
-            <span class="ident">TrySendError::Closed</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sending into a closed channel&quot;</span>),
+            <span class="ident">TrySendError::Full</span>(..) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sending into a full channel&quot;</span>),
+            <span class="ident">TrySendError::Closed</span>(..) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sending into a closed channel&quot;</span>),
         }
     }
 }
@@ -1833,7 +1833,7 @@
 <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">RecvError</span> {}
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RecvError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;receiving from an empty and closed channel&quot;</span>)
     }
 }
@@ -1850,18 +1850,18 @@
 
 <span class="kw">impl</span> <span class="ident">TryRecvError</span> {
     <span class="doccomment">/// Returns `true` if the channel is empty but not closed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TryRecvError::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">TryRecvError::Closed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">TryRecvError::Empty</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">TryRecvError::Closed</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
     <span class="doccomment">/// Returns `true` if the channel is empty and closed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TryRecvError::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">TryRecvError::Closed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">TryRecvError::Empty</span> =&gt; <span class="bool-val">false</span>,
+            <span class="ident">TryRecvError::Closed</span> =&gt; <span class="bool-val">true</span>,
         }
     }
 }
@@ -1869,10 +1869,10 @@
 <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">TryRecvError</span> {}
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TryRecvError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">TryRecvError::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;receiving from an empty channel&quot;</span>),
-            <span class="ident">TryRecvError::Closed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;receiving from an empty and closed channel&quot;</span>),
+            <span class="ident">TryRecvError::Empty</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;receiving from an empty channel&quot;</span>),
+            <span class="ident">TryRecvError::Closed</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;receiving from an empty and closed channel&quot;</span>),
         }
     }
 }
@@ -1891,40 +1891,40 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Send</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="self">self</span>);
 
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">msg</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
             <span class="comment">// Attempt to send a message.</span>
             <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">sender</span>.<span class="ident">try_send</span>(<span class="ident">msg</span>) {
-                <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(()) =&gt; {
                     <span class="comment">// If the capacity is larger than 1, notify another blocked send operation.</span>
                     <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">sender</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">capacity</span>() {
-                        <span class="prelude-val">Some</span>(<span class="number">1</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">sender</span>.<span class="ident">channel</span>.<span class="ident">send_ops</span>.<span class="ident">notify</span>(<span class="number">1</span>),
+                        <span class="prelude-val">Some</span>(<span class="number">1</span>) =&gt; {}
+                        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="ident">this</span>.<span class="ident">sender</span>.<span class="ident">channel</span>.<span class="ident">send_ops</span>.<span class="ident">notify</span>(<span class="number">1</span>),
                     }
                     <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">TrySendError::Closed</span>(<span class="ident">msg</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">SendError</span>(<span class="ident">msg</span>))),
-                <span class="prelude-val">Err</span>(<span class="ident">TrySendError::Full</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">msg</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">TrySendError::Closed</span>(<span class="ident">msg</span>)) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">SendError</span>(<span class="ident">msg</span>))),
+                <span class="prelude-val">Err</span>(<span class="ident">TrySendError::Full</span>(<span class="ident">m</span>)) =&gt; <span class="ident">this</span>.<span class="ident">msg</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>),
             }
 
             <span class="comment">// Sending failed - now start listening for notifications or wait for one.</span>
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">this</span>.<span class="ident">listener</span> {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="comment">// Start listening and then try receiving again.</span>
                     <span class="ident">this</span>.<span class="ident">listener</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">this</span>.<span class="ident">sender</span>.<span class="ident">channel</span>.<span class="ident">send_ops</span>.<span class="ident">listen</span>());
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">l</span>) =&gt; {
                     <span class="comment">// Wait for a notification.</span>
                     <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="ident">l</span>).<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll::Ready</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Poll::Ready</span>(<span class="kw">_</span>) =&gt; {
                             <span class="ident">this</span>.<span class="ident">listener</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                             <span class="kw">continue</span>;
                         }
 
-                        <span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
+                        <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
                     }
                 }
             }
@@ -1945,41 +1945,41 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Recv</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RecvError</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="self">self</span>);
 
         <span class="kw">loop</span> {
             <span class="comment">// Attempt to receive a message.</span>
             <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">receiver</span>.<span class="ident">try_recv</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">msg</span>) =&gt; {
                     <span class="comment">// If the capacity is larger than 1, notify another blocked receive operation.</span>
                     <span class="comment">// There is no need to notify stream operations because all of them get</span>
                     <span class="comment">// notified every time a message is sent into the channel.</span>
                     <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">receiver</span>.<span class="ident">channel</span>.<span class="ident">queue</span>.<span class="ident">capacity</span>() {
-                        <span class="prelude-val">Some</span>(<span class="number">1</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">receiver</span>.<span class="ident">channel</span>.<span class="ident">recv_ops</span>.<span class="ident">notify</span>(<span class="number">1</span>),
+                        <span class="prelude-val">Some</span>(<span class="number">1</span>) =&gt; {}
+                        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="ident">this</span>.<span class="ident">receiver</span>.<span class="ident">channel</span>.<span class="ident">recv_ops</span>.<span class="ident">notify</span>(<span class="number">1</span>),
                     }
                     <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">msg</span>));
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">RecvError</span>)),
-                <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Empty</span>) <span class="op">=</span><span class="op">&gt;</span> {}
+                <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">RecvError</span>)),
+                <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Empty</span>) =&gt; {}
             }
 
             <span class="comment">// Receiving failed - now start listening for notifications or wait for one.</span>
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">this</span>.<span class="ident">listener</span> {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="comment">// Start listening and then try receiving again.</span>
                     <span class="ident">this</span>.<span class="ident">listener</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">this</span>.<span class="ident">receiver</span>.<span class="ident">channel</span>.<span class="ident">recv_ops</span>.<span class="ident">listen</span>());
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">l</span>) =&gt; {
                     <span class="comment">// Wait for a notification.</span>
                     <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="ident">l</span>).<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll::Ready</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Poll::Ready</span>(<span class="kw">_</span>) =&gt; {
                             <span class="ident">this</span>.<span class="ident">listener</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                             <span class="kw">continue</span>;
                         }
 
-                        <span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
+                        <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
                     }
                 }
             }

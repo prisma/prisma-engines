@@ -878,22 +878,22 @@
 
     <span class="doccomment">/// Returns a new `EnvFilter` from the value of the `RUST_LOG` environment</span>
     <span class="doccomment">/// variable, ignoring any invalid filter directives.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_default_env</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_default_env</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_env</span>(<span class="ident"><span class="self">Self</span>::DEFAULT_ENV</span>)
     }
 
     <span class="doccomment">/// Returns a new `EnvFilter` from the value of the given environment</span>
     <span class="doccomment">/// variable, ignoring any invalid filter directives.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_env</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">env</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_env</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">env</span>: <span class="ident">A</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">env::var</span>(<span class="ident">env</span>.<span class="ident">as_ref</span>()).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::new</span>).<span class="ident">unwrap_or_default</span>()
     }
 
     <span class="doccomment">/// Returns a new `EnvFilter` from the directives in the given string,</span>
     <span class="doccomment">/// ignoring any that are invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">dirs</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">dirs</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">directives</span> <span class="op">=</span> <span class="ident">dirs</span>.<span class="ident">as_ref</span>().<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">parse</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">d</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">d</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">d</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                 <span class="macro">eprintln!</span>(<span class="string">&quot;ignoring `{}`: {}&quot;</span>, <span class="ident">s</span>, <span class="ident">err</span>);
                 <span class="prelude-val">None</span>
             }
@@ -903,7 +903,7 @@
 
     <span class="doccomment">/// Returns a new `EnvFilter` from the directives in the given string,</span>
     <span class="doccomment">/// or an error if any are invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">dirs</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">directive::ParseError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">dirs</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">directive::ParseError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">directives</span> <span class="op">=</span> <span class="ident">dirs</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>)
@@ -915,14 +915,14 @@
     <span class="doccomment">/// Returns a new `EnvFilter` from the value of the `RUST_LOG` environment</span>
     <span class="doccomment">/// variable, or an error if the environment variable contains any invalid</span>
     <span class="doccomment">/// filter directives.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_default_env</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromEnvError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_default_env</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromEnvError</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::try_from_env</span>(<span class="ident"><span class="self">Self</span>::DEFAULT_ENV</span>)
     }
 
     <span class="doccomment">/// Returns a new `EnvFilter` from the value of the given environment</span>
     <span class="doccomment">/// variable, or an error if the environment variable is unset or contains</span>
     <span class="doccomment">/// any invalid filter directives.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_env</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">env</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromEnvError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_env</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">env</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromEnvError</span><span class="op">&gt;</span> {
         <span class="ident">env::var</span>(<span class="ident">env</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
     }
 
@@ -974,7 +974,7 @@
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_directive</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">directive</span>: <span class="ident">Directive</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_directive</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">directive</span>: <span class="ident">Directive</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stat</span>) <span class="op">=</span> <span class="ident">directive</span>.<span class="ident">to_static</span>() {
             <span class="self">self</span>.<span class="ident">statics</span>.<span class="ident">add</span>(<span class="ident">stat</span>)
         } <span class="kw">else</span> {
@@ -984,7 +984,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">from_directives</span>(<span class="ident">directives</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Directive</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from_directives</span>(<span class="ident">directives</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Directive</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">use</span> <span class="ident">tracing::level_filters::STATIC_MAX_LEVEL</span>;
         <span class="kw">use</span> <span class="ident">tracing::Level</span>;
 
@@ -1056,14 +1056,14 @@
             <span class="ident">ctx_note</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;the static max level is `{}`&quot;</span>, <span class="ident">STATIC_MAX_LEVEL</span>));
             <span class="kw">let</span> <span class="ident">help_msg</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
                 <span class="kw">let</span> (<span class="ident">feature</span>, <span class="ident">filter</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">STATIC_MAX_LEVEL</span>.<span class="ident">into_level</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">Level::TRACE</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(
+                    <span class="prelude-val">Some</span>(<span class="ident">Level::TRACE</span>) =&gt; <span class="macro">unreachable!</span>(
                         <span class="string">&quot;if the max level is trace, no static filtering features are enabled&quot;</span>
                     ),
-                    <span class="prelude-val">Some</span>(<span class="ident">Level::DEBUG</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;max_level_debug&quot;</span>, <span class="ident">Level::TRACE</span>),
-                    <span class="prelude-val">Some</span>(<span class="ident">Level::INFO</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;max_level_info&quot;</span>, <span class="ident">Level::DEBUG</span>),
-                    <span class="prelude-val">Some</span>(<span class="ident">Level::WARN</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;max_level_warn&quot;</span>, <span class="ident">Level::INFO</span>),
-                    <span class="prelude-val">Some</span>(<span class="ident">Level::ERROR</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;max_level_error&quot;</span>, <span class="ident">Level::WARN</span>),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> (<span class="string">&quot;max_level_off&quot;</span>, <span class="ident">String::new</span>()),
+                    <span class="prelude-val">Some</span>(<span class="ident">Level::DEBUG</span>) =&gt; (<span class="string">&quot;max_level_debug&quot;</span>, <span class="ident">Level::TRACE</span>),
+                    <span class="prelude-val">Some</span>(<span class="ident">Level::INFO</span>) =&gt; (<span class="string">&quot;max_level_info&quot;</span>, <span class="ident">Level::DEBUG</span>),
+                    <span class="prelude-val">Some</span>(<span class="ident">Level::WARN</span>) =&gt; (<span class="string">&quot;max_level_warn&quot;</span>, <span class="ident">Level::INFO</span>),
+                    <span class="prelude-val">Some</span>(<span class="ident">Level::ERROR</span>) =&gt; (<span class="string">&quot;max_level_error&quot;</span>, <span class="ident">Level::WARN</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> (<span class="string">&quot;max_level_off&quot;</span>, <span class="ident">String::new</span>()),
                 };
                 (<span class="ident">feature</span>, <span class="macro">format!</span>(<span class="string">&quot;{} &quot;</span>, <span class="ident">filter</span>))
             };
@@ -1090,12 +1090,12 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">cares_about_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">cares_about_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">spans</span> <span class="op">=</span> <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">by_id</span>.<span class="ident">read</span>(), <span class="kw">else</span> <span class="kw">return</span> <span class="bool-val">false</span>);
         <span class="ident">spans</span>.<span class="ident">contains_key</span>(<span class="ident">span</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">base_interest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
+    <span class="kw">fn</span> <span class="ident">base_interest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Interest</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_dynamics</span> {
             <span class="ident">Interest::sometimes</span>()
         } <span class="kw">else</span> {
@@ -1105,7 +1105,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Subscriber</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EnvFilter</span> {
-    <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
+    <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_dynamics</span> <span class="op">&amp;&amp;</span> <span class="ident">metadata</span>.<span class="ident">is_span</span>() {
             <span class="comment">// If this metadata describes a span, first, check if there is a</span>
             <span class="comment">// dynamic filter that should be constructed for it. If so, it</span>
@@ -1125,7 +1125,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">dynamics</span>.<span class="ident">has_value_filters</span>() {
             <span class="comment">// If we perform any filtering on span field *values*, we will</span>
             <span class="comment">// enable *all* spans, because their field values are not known</span>
@@ -1138,7 +1138,7 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">metadata</span>.<span class="ident">level</span>();
 
         <span class="comment">// is it possible for a dynamic filter directive to enable this event?</span>
@@ -1224,7 +1224,7 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">EnvFilter</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">directive::ParseError</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">spec</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">spec</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::try_new</span>(<span class="ident">spec</span>)
     }
 }
@@ -1233,19 +1233,19 @@
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">s</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">EnvFilter</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_directives</span>(<span class="ident">std::iter::empty</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">EnvFilter</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">statics</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">statics</span>.<span class="ident">iter</span>();
         <span class="kw">let</span> <span class="ident">wrote_statics</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="op">=</span> <span class="ident">statics</span>.<span class="ident">next</span>() {
             <span class="ident">fmt::Display::fmt</span>(<span class="ident">next</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
@@ -1274,7 +1274,7 @@
 <span class="comment">// ===== impl FromEnvError =====</span>
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">directive::ParseError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FromEnvError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">p</span>: <span class="ident">directive::ParseError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">p</span>: <span class="ident">directive::ParseError</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">kind</span>: <span class="ident">ErrorKind::Parse</span>(<span class="ident">p</span>),
         }
@@ -1282,7 +1282,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">env::VarError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FromEnvError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">env::VarError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">env::VarError</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">kind</span>: <span class="ident">ErrorKind::Env</span>(<span class="ident">v</span>),
         }
@@ -1290,19 +1290,19 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FromEnvError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">ErrorKind::Parse</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">p</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">ErrorKind::Env</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">ErrorKind::Parse</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) =&gt; <span class="ident">p</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">ErrorKind::Env</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">FromEnvError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">ErrorKind::Parse</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>),
-            <span class="ident">ErrorKind::Env</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="ident">ErrorKind::Parse</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">p</span>),
+            <span class="ident">ErrorKind::Env</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
         }
     }
 }
@@ -1316,10 +1316,10 @@
     <span class="kw">struct</span> <span class="ident">NoSubscriber</span>;
     <span class="kw">impl</span> <span class="ident">Subscriber</span> <span class="kw">for</span> <span class="ident">NoSubscriber</span> {
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">subscriber::Interest</span> {
+        <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">subscriber::Interest</span> {
             <span class="ident">subscriber::Interest::always</span>()
         }
-        <span class="kw">fn</span> <span class="ident">new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">span::Id</span> {
+        <span class="kw">fn</span> <span class="ident">new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">span::Id</span> {
             <span class="ident">span::Id::from_u64</span>(<span class="number">0xDEAD</span>)
         }
         <span class="kw">fn</span> <span class="ident">event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
@@ -1327,7 +1327,7 @@
         <span class="kw">fn</span> <span class="ident">record_follows_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">_follows</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) {}
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
             <span class="bool-val">true</span>
         }
         <span class="kw">fn</span> <span class="ident">enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) {}
@@ -1337,7 +1337,7 @@
     <span class="kw">struct</span> <span class="ident">Cs</span>;
     <span class="kw">impl</span> <span class="ident">Callsite</span> <span class="kw">for</span> <span class="ident">Cs</span> {
         <span class="kw">fn</span> <span class="ident">set_interest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_interest</span>: <span class="ident">Interest</span>) {}
-        <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
             <span class="macro">unimplemented!</span>()
         }
     }

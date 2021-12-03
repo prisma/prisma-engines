@@ -265,7 +265,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectorTestArgs</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">on_module</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">darling::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">on_module</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">darling::Error</span><span class="op">&gt;</span> {
         <span class="ident">validate_suite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">suite</span>, <span class="ident">on_module</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">on_module</span> {
@@ -278,7 +278,7 @@
     }
 
     <span class="doccomment">/// Returns all the connectors that the test is valid for.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connectors_to_test</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorTag</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connectors_to_test</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorTag</span><span class="op">&gt;</span> {
         <span class="ident">connectors_to_test</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">only</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">exclude</span>)
     }
 }
@@ -289,7 +289,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">darling::FromMeta</span> <span class="kw">for</span> <span class="ident">SchemaHandler</span> {
-    <span class="kw">fn</span> <span class="ident">from_list</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::NestedMeta</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_list</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::NestedMeta</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::unsupported_shape</span>(
                 <span class="string">&quot;Expected `schema` to contain exactly one function pointer to a schema handler.&quot;</span>,
@@ -299,11 +299,11 @@
 
         <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>();
         <span class="kw">match</span> <span class="ident">item</span> {
-            <span class="ident">syn::NestedMeta::Meta</span>(<span class="ident">Meta::Path</span>(<span class="ident">p</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+            <span class="ident">syn::NestedMeta::Meta</span>(<span class="ident">Meta::Path</span>(<span class="ident">p</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
                 <span class="comment">// Todo validate signature somehow</span>
                 <span class="ident">handler_path</span>: <span class="ident">p</span>.<span class="ident">clone</span>(),
             }),
-            <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::unsupported_shape</span>(
+            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">darling::Error::unsupported_shape</span>(
                 <span class="string">&quot;Expected `schema` to be a function pointer to a schema handler function.&quot;</span>,
             )
             .<span class="ident">with_span</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">span</span>())),
@@ -314,15 +314,15 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OnlyConnectorTags</span> {
     <span class="ident">tags</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorTag</span><span class="op">&gt;</span>,
-    <span class="ident">token_stream</span>: <span class="ident">TokenStream</span>,
+    <span class="ident">_token_stream</span>: <span class="ident">TokenStream</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">OnlyConnectorTags</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">ConnectorTag</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">ConnectorTag</span>] {
         <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">as_slice</span>()
     }
 }
@@ -333,32 +333,32 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ExcludeConnectorTags</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">ConnectorTag</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">ConnectorTag</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tags</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">darling::FromMeta</span> <span class="kw">for</span> <span class="ident">OnlyConnectorTags</span> {
-    <span class="kw">fn</span> <span class="ident">from_list</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::NestedMeta</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token_stream</span> <span class="op">=</span> <span class="macro">quote!</span> { #(#<span class="ident">items</span>),<span class="op">*</span> }.<span class="ident">into</span>();
+    <span class="kw">fn</span> <span class="ident">from_list</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::NestedMeta</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">_token_stream</span> <span class="op">=</span> <span class="macro">quote!</span> { #(#<span class="ident">items</span>),<span class="op">*</span> }.<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">tags</span> <span class="op">=</span> <span class="ident">tags_from_list</span>(<span class="ident">items</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">OnlyConnectorTags</span> { <span class="ident">tags</span>, <span class="ident">token_stream</span> })
+        <span class="prelude-val">Ok</span>(<span class="ident">OnlyConnectorTags</span> { <span class="ident">tags</span>, <span class="ident">_token_stream</span> })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">darling::FromMeta</span> <span class="kw">for</span> <span class="ident">ExcludeConnectorTags</span> {
-    <span class="kw">fn</span> <span class="ident">from_list</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::NestedMeta</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_list</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::NestedMeta</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">tags</span> <span class="op">=</span> <span class="ident">tags_from_list</span>(<span class="ident">items</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">ExcludeConnectorTags</span> { <span class="ident">tags</span> })
     }
 }
 
-<span class="kw">fn</span> <span class="ident">tags_from_list</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::NestedMeta</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorTag</span><span class="op">&gt;</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">tags_from_list</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::NestedMeta</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorTag</span><span class="op">&gt;</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::custom</span>(<span class="string">&quot;At least one connector tag is required.&quot;</span>));
     }
@@ -367,24 +367,24 @@
 
     <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">items</span> {
         <span class="kw">match</span> <span class="ident">item</span> {
-            <span class="ident">syn::NestedMeta::Meta</span>(<span class="ident">meta</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">syn::NestedMeta::Meta</span>(<span class="ident">meta</span>) =&gt; {
                 <span class="kw">match</span> <span class="ident">meta</span> {
                     <span class="comment">// A single variant without version, like `Postgres`.</span>
-                    <span class="ident">Meta::Path</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">Meta::Path</span>(<span class="ident">p</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">tag_string_from_path</span>(<span class="ident">p</span>)<span class="question-mark">?</span>;
                         <span class="ident">tags</span>.<span class="ident">push</span>(<span class="ident">ConnectorTag::try_from</span>(<span class="ident">tag</span>.<span class="ident">as_str</span>()).<span class="ident">into_darling_error</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">span</span>())<span class="question-mark">?</span>);
                     }
-                    <span class="ident">Meta::List</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">Meta::List</span>(<span class="ident">l</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">tag_string_from_path</span>(<span class="kw-2">&amp;</span><span class="ident">l</span>.<span class="ident">path</span>)<span class="question-mark">?</span>;
                         <span class="kw">for</span> <span class="ident">meta</span> <span class="kw">in</span> <span class="ident">l</span>.<span class="ident">nested</span>.<span class="ident">iter</span>() {
                             <span class="kw">match</span> <span class="ident">meta</span> {
-                                <span class="ident">syn::NestedMeta::Lit</span>(<span class="ident">literal</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="ident">syn::NestedMeta::Lit</span>(<span class="ident">literal</span>) =&gt; {
                                     <span class="kw">let</span> <span class="ident">version_str</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">literal</span> {
-                                        <span class="ident">syn::Lit::Str</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">value</span>(),
-                                        <span class="ident">syn::Lit::Char</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">value</span>().<span class="ident">to_string</span>(),
-                                        <span class="ident">syn::Lit::Int</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">to_string</span>(),
-                                        <span class="ident">syn::Lit::Float</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">to_string</span>(),
-                                        <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                        <span class="ident">syn::Lit::Str</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">value</span>(),
+                                        <span class="ident">syn::Lit::Char</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">value</span>().<span class="ident">to_string</span>(),
+                                        <span class="ident">syn::Lit::Int</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">to_string</span>(),
+                                        <span class="ident">syn::Lit::Float</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">to_string</span>(),
+                                        <span class="ident">x</span> =&gt; {
                                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::unexpected_type</span>(
                                                 <span class="string">&quot;Versions can be string, char, int and float.&quot;</span>,
                                             )
@@ -397,7 +397,7 @@
                                             .<span class="ident">into_darling_error</span>(<span class="kw-2">&amp;</span><span class="ident">l</span>.<span class="ident">span</span>())<span class="question-mark">?</span>,
                                     );
                                 }
-                                <span class="ident">syn::NestedMeta::Meta</span>(<span class="ident">meta</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="ident">syn::NestedMeta::Meta</span>(<span class="ident">meta</span>) =&gt; {
                                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::unexpected_type</span>(
                                         <span class="string">&quot;Versions can only be literals (string, char, int and float).&quot;</span>,
                                     )
@@ -406,10 +406,10 @@
                             }
                         }
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(),
+                    <span class="kw">_</span> =&gt; <span class="macro">unimplemented!</span>(),
                 }
             }
-            <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">x</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(
                     <span class="ident">darling::Error::custom</span>(<span class="string">&quot;Expected `only` or `exclude` to be a list of `ConnectorTag`.&quot;</span>)
                         .<span class="ident">with_span</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">span</span>()),
@@ -421,7 +421,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">tags</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">tag_string_from_path</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">tag_string_from_path</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="op">=</span> <span class="ident">path</span>.<span class="ident">get_ident</span>() {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">ident</span>.<span class="ident">to_string</span>();
 
@@ -439,7 +439,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">darling::FromMeta</span> <span class="kw">for</span> <span class="ident">RunOnlyForCapabilities</span> {
-    <span class="kw">fn</span> <span class="ident">from_list</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::NestedMeta</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_list</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::NestedMeta</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::custom</span>(
                 <span class="string">&quot;When specifying capabilities to run for, at least one needs to be given.&quot;</span>,
@@ -450,19 +450,19 @@
 
         <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">items</span> {
             <span class="kw">match</span> <span class="ident">item</span> {
-                <span class="ident">syn::NestedMeta::Meta</span>(<span class="ident">meta</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">syn::NestedMeta::Meta</span>(<span class="ident">meta</span>) =&gt; {
                     <span class="kw">match</span> <span class="ident">meta</span> {
                         <span class="comment">// A single variant without version, like `Postgres`.</span>
-                        <span class="ident">Meta::Path</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">p</span>.<span class="ident">get_ident</span>() {
-                            <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">idents</span>.<span class="ident">push</span>(<span class="ident">ident</span>.<span class="ident">clone</span>()),
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Meta::Path</span>(<span class="ident">p</span>) =&gt; <span class="kw">match</span> <span class="ident">p</span>.<span class="ident">get_ident</span>() {
+                            <span class="prelude-val">Some</span>(<span class="ident">ident</span>) =&gt; <span class="ident">idents</span>.<span class="ident">push</span>(<span class="ident">ident</span>.<span class="ident">clone</span>()),
+                            <span class="prelude-val">None</span> =&gt; {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::unexpected_type</span>(<span class="string">&quot;Invalid identifier&quot;</span>).<span class="ident">with_span</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">span</span>()))
                             }
                         },
-                        <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::unexpected_type</span>(<span class="string">&quot;Expected identifiers&quot;</span>).<span class="ident">with_span</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">span</span>())),
+                        <span class="ident">x</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::unexpected_type</span>(<span class="string">&quot;Expected identifiers&quot;</span>).<span class="ident">with_span</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">span</span>())),
                     }
                 }
-                <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">x</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(
                         <span class="ident">darling::Error::custom</span>(<span class="string">&quot;Expected `only` or `exclude` to be a list of `ConnectorTag`.&quot;</span>)
                             .<span class="ident">with_span</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">span</span>()),

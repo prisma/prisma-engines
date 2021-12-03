@@ -491,13 +491,13 @@
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">AdoNetString</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pairs</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">AdoNetString</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">pairs</span>
     }
 }
@@ -508,7 +508,7 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">AdoNetString</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lexer</span> <span class="op">=</span> <span class="ident">Lexer::tokenize</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
 
@@ -516,7 +516,7 @@
         <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">0</span>.. {
             <span class="comment">// [property=[value][;property=value][;]]</span>
             <span class="comment">//                                       ^</span>
-            <span class="kw">if</span> <span class="ident">lexer</span>.<span class="ident">peek</span>().<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Eof</span> {
+            <span class="kw">if</span> <span class="ident">lexer</span>.<span class="ident">peek</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Eof</span> {
                 <span class="kw">break</span>;
             }
 
@@ -524,11 +524,11 @@
             <span class="comment">//                   ^</span>
             <span class="kw">if</span> <span class="ident">n</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                 <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="string">&quot;Key-value pairs must be separated by a `;`&quot;</span>;
-                <span class="macro">ensure!</span>(<span class="ident">lexer</span>.<span class="ident">next</span>().<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Semi</span>, <span class="ident">err</span>);
+                <span class="macro">ensure!</span>(<span class="ident">lexer</span>.<span class="ident">next</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Semi</span>, <span class="ident">err</span>);
 
                 <span class="comment">// [property=value[;property=value][;]]</span>
                 <span class="comment">//                                  ^</span>
-                <span class="kw">if</span> <span class="ident">lexer</span>.<span class="ident">peek</span>().<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Eof</span> {
+                <span class="kw">if</span> <span class="ident">lexer</span>.<span class="ident">peek</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Eof</span> {
                     <span class="kw">break</span>;
                 }
             }
@@ -541,7 +541,7 @@
             <span class="comment">// [property=[value][;property=value][;]]</span>
             <span class="comment">//          ^</span>
             <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="string">&quot;key-value pairs must be joined by a `=`&quot;</span>;
-            <span class="macro">ensure!</span>(<span class="ident">lexer</span>.<span class="ident">next</span>().<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Eq</span>, <span class="ident">err</span>);
+            <span class="macro">ensure!</span>(<span class="ident">lexer</span>.<span class="ident">next</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Eq</span>, <span class="ident">err</span>);
 
             <span class="comment">// [property=[value][;property=value][;]]</span>
             <span class="comment">//           ^^^^^</span>
@@ -555,9 +555,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">AdoNetString</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="doccomment">/// Escape all non-alphanumeric characters in a string..</span>
-        <span class="kw">fn</span> <span class="ident">escape</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="kw">fn</span> <span class="ident">escape</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">s</span>.<span class="ident">len</span>());
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">escaping</span> <span class="op">=</span> <span class="bool-val">false</span>;
             <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">chars</span>() {
@@ -596,33 +596,33 @@
 }
 
 <span class="doccomment">/// Read either a valid key or value from the lexer.</span>
-<span class="kw">fn</span> <span class="ident">read_ident</span>(<span class="ident">lexer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Lexer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">read_ident</span>(<span class="ident">lexer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Lexer</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="kw">loop</span> {
         <span class="kw">let</span> <span class="ident">Token</span> { <span class="ident">kind</span>, .. } <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">peek</span>();
         <span class="kw">match</span> <span class="ident">kind</span> {
-            <span class="ident">TokenKind::Atom</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TokenKind::Atom</span>(<span class="ident">c</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">next</span>();
                 <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">c</span>);
             }
-            <span class="ident">TokenKind::Escaped</span>(<span class="ident">seq</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TokenKind::Escaped</span>(<span class="ident">seq</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">next</span>();
                 <span class="ident">output</span>.<span class="ident">extend</span>(<span class="ident">seq</span>);
             }
-            <span class="ident">TokenKind::Semi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-            <span class="ident">TokenKind::Eq</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-            <span class="ident">TokenKind::Newline</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TokenKind::Semi</span> =&gt; <span class="kw">break</span>,
+            <span class="ident">TokenKind::Eq</span> =&gt; <span class="kw">break</span>,
+            <span class="ident">TokenKind::Newline</span> =&gt; {
                 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">next</span>();
                 <span class="kw">continue</span>; <span class="comment">// NOTE(yosh): unsure if this is the correct behavior</span>
             }
-            <span class="ident">TokenKind::Whitespace</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TokenKind::Whitespace</span> =&gt; {
                 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">next</span>();
                 <span class="kw">match</span> <span class="ident">output</span>.<span class="ident">len</span>() {
-                    <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>, <span class="comment">// ignore leading whitespace</span>
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">output</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>),
+                    <span class="number">0</span> =&gt; <span class="kw">continue</span>, <span class="comment">// ignore leading whitespace</span>
+                    <span class="kw">_</span> =&gt; <span class="ident">output</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>),
                 }
             }
-            <span class="ident">TokenKind::Eof</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+            <span class="ident">TokenKind::Eof</span> =&gt; <span class="kw">break</span>,
         }
     }
     <span class="ident">output</span> <span class="op">=</span> <span class="ident">output</span>.<span class="ident">trim_end</span>().<span class="ident">to_owned</span>(); <span class="comment">// remove trailing whitespace</span>
@@ -637,11 +637,11 @@
 
 <span class="kw">impl</span> <span class="ident">Token</span> {
     <span class="doccomment">/// Create a new instance.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">TokenKind</span>, <span class="ident">loc</span>: <span class="ident">Location</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">TokenKind</span>, <span class="ident">loc</span>: <span class="ident">Location</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">kind</span>, <span class="ident">loc</span> }
     }
 
-    <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind</span> {
+    <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">TokenKind</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>
     }
 }
@@ -664,23 +664,23 @@
 
 <span class="kw">impl</span> <span class="ident">Lexer</span> {
     <span class="doccomment">/// Parse a string into a sequence of tokens.</span>
-    <span class="kw">fn</span> <span class="ident">tokenize</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">tokenize</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">Location::default</span>();
         <span class="kw">while</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_empty</span>() {
             <span class="kw">let</span> <span class="ident">old_input</span> <span class="op">=</span> <span class="ident">input</span>;
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">chars</span>();
             <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>() {
-                <span class="string">&#39;&quot;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&#39;&quot;&#39;</span> =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                     <span class="kw">loop</span> {
                         <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;unclosed double quote&quot;</span>),
+                            <span class="prelude-val">None</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;unclosed double quote&quot;</span>),
                             <span class="comment">// When we read a double quote inside a double quote</span>
                             <span class="comment">// we need to lookahead to determine whether it&#39;s an</span>
                             <span class="comment">// escape sequence or a closing delimiter.</span>
-                            <span class="prelude-val">Some</span>(<span class="string">&#39;&quot;&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">lookahead</span>(<span class="kw-2">&amp;</span><span class="ident">chars</span>) {
-                                <span class="prelude-val">Some</span>(<span class="string">&#39;&quot;&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="string">&#39;&quot;&#39;</span>) =&gt; <span class="kw">match</span> <span class="ident">lookahead</span>(<span class="kw-2">&amp;</span><span class="ident">chars</span>) {
+                                <span class="prelude-val">Some</span>(<span class="string">&#39;&quot;&#39;</span>) =&gt; {
                                     <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">is_empty</span>() {
                                         <span class="kw">break</span>;
                                     }
@@ -688,24 +688,24 @@
                                     <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;&quot;&#39;</span>);
                                     <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;&quot;&#39;</span>);
                                 }
-                                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
                             },
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">c</span>),
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;Invalid ado.net token&quot;</span>),
+                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii</span>() =&gt; <span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">c</span>),
+                            <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;Invalid ado.net token&quot;</span>),
                         }
                     }
                     <span class="ident">TokenKind::Escaped</span>(<span class="ident">buf</span>)
                 }
-                <span class="string">&#39;\&#39;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&#39;\&#39;&#39;</span> =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                     <span class="kw">loop</span> {
                         <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;unclosed single quote&quot;</span>),
+                            <span class="prelude-val">None</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;unclosed single quote&quot;</span>),
                             <span class="comment">// When we read a single quote inside a single quote</span>
                             <span class="comment">// we need to lookahead to determine whether it&#39;s an</span>
                             <span class="comment">// escape sequence or a closing delimiter.</span>
-                            <span class="prelude-val">Some</span>(<span class="string">&#39;\&#39;&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">lookahead</span>(<span class="kw-2">&amp;</span><span class="ident">chars</span>) {
-                                <span class="prelude-val">Some</span>(<span class="string">&#39;\&#39;&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="string">&#39;\&#39;&#39;</span>) =&gt; <span class="kw">match</span> <span class="ident">lookahead</span>(<span class="kw-2">&amp;</span><span class="ident">chars</span>) {
+                                <span class="prelude-val">Some</span>(<span class="string">&#39;\&#39;&#39;</span>) =&gt; {
                                     <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">is_empty</span>() {
                                         <span class="kw">break</span>;
                                     }
@@ -713,33 +713,33 @@
                                     <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;\&#39;&#39;</span>);
                                     <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;\&#39;&#39;</span>);
                                 }
-                                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
                             },
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">c</span>),
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;Invalid ado.net token `{}`&quot;</span>, <span class="ident">c</span>),
+                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii</span>() =&gt; <span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">c</span>),
+                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="macro">bail!</span>(<span class="string">&quot;Invalid ado.net token `{}`&quot;</span>, <span class="ident">c</span>),
                         }
                     }
                     <span class="ident">TokenKind::Escaped</span>(<span class="ident">buf</span>)
                 }
-                <span class="string">&#39;{&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&#39;{&#39;</span> =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                     <span class="comment">// Read alphanumeric ASCII including whitespace until we find a closing curly.</span>
                     <span class="kw">loop</span> {
                         <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;unclosed escape literal&quot;</span>),
-                            <span class="prelude-val">Some</span>(<span class="string">&#39;}&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">c</span>),
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;Invalid ado.net token `{}`&quot;</span>, <span class="ident">c</span>),
+                            <span class="prelude-val">None</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;unclosed escape literal&quot;</span>),
+                            <span class="prelude-val">Some</span>(<span class="string">&#39;}&#39;</span>) =&gt; <span class="kw">break</span>,
+                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii</span>() =&gt; <span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">c</span>),
+                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="macro">bail!</span>(<span class="string">&quot;Invalid ado.net token `{}`&quot;</span>, <span class="ident">c</span>),
                         }
                     }
                     <span class="ident">TokenKind::Escaped</span>(<span class="ident">buf</span>)
                 }
-                <span class="string">&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::Semi</span>,
-                <span class="string">&#39;=&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::Eq</span>,
-                <span class="string">&#39;\n&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::Newline</span>,
-                <span class="string">&#39; &#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::Whitespace</span>,
-                <span class="ident">char</span> <span class="kw">if</span> <span class="ident">char</span>.<span class="ident">is_ascii</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::Atom</span>(<span class="ident">char</span>),
-                <span class="ident">char</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;Invalid character found: {}&quot;</span>, <span class="ident">char</span>),
+                <span class="string">&#39;;&#39;</span> =&gt; <span class="ident">TokenKind::Semi</span>,
+                <span class="string">&#39;=&#39;</span> =&gt; <span class="ident">TokenKind::Eq</span>,
+                <span class="string">&#39;\n&#39;</span> =&gt; <span class="ident">TokenKind::Newline</span>,
+                <span class="string">&#39; &#39;</span> =&gt; <span class="ident">TokenKind::Whitespace</span>,
+                <span class="ident">char</span> <span class="kw">if</span> <span class="ident">char</span>.<span class="ident">is_ascii</span>() =&gt; <span class="ident">TokenKind::Atom</span>(<span class="ident">char</span>),
+                <span class="ident">char</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;Invalid character found: {}&quot;</span>, <span class="ident">char</span>),
             };
             <span class="ident">tokens</span>.<span class="ident">push</span>(<span class="ident">Token::new</span>(<span class="ident">kind</span>, <span class="ident">loc</span>));
             <span class="ident">input</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">as_str</span>();
@@ -753,7 +753,7 @@
 
     <span class="doccomment">/// Get the next token from the queue.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Token</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Token</span> {
         <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">pop</span>().<span class="ident">unwrap_or</span>(<span class="ident">Token</span> {
             <span class="ident">kind</span>: <span class="ident">TokenKind::Eof</span>,
             <span class="ident">loc</span>: <span class="ident">Location::default</span>(),
@@ -762,7 +762,7 @@
 
     <span class="doccomment">/// Peek at the next token in the queue.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Token</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Token</span> {
         <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">last</span>().<span class="ident">cloned</span>().<span class="ident">unwrap_or</span>(<span class="ident">Token</span> {
             <span class="ident">kind</span>: <span class="ident">TokenKind::Eof</span>,
             <span class="ident">loc</span>: <span class="ident">Location::default</span>(),
@@ -771,7 +771,7 @@
 }
 
 <span class="doccomment">/// Look at the next char in the iterator.</span>
-<span class="kw">fn</span> <span class="ident">lookahead</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;</span><span class="ident">std::str::Chars</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">lookahead</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;</span><span class="ident">std::str::Chars</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">as_str</span>();
     <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">next</span>()
 }
@@ -799,7 +799,7 @@
     <span class="comment">// Source: https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#windows-authentication-with-sqlclient</span>
     <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#windows-authentication-with-sqlclient</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">windows_auth_with_sql_client</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">windows_auth_with_sql_client</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;Persist Security Info=False;Integrated Security=true;\nInitial Catalog=AdventureWorks;Server=MSSQL1&quot;</span>;
         <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Persist Security Info&quot;</span>, <span class="string">&quot;False&quot;</span>);
@@ -811,7 +811,7 @@
 
     <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#sql-server-authentication-with-sqlclient</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sql_server_auth_with_sql_client</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sql_server_auth_with_sql_client</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;Persist Security Info=False;User ID=*****;Password=*****;Initial Catalog=AdventureWorks;Server=MySqlServer&quot;</span>;
         <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Persist Security Info&quot;</span>, <span class="string">&quot;False&quot;</span>);
@@ -824,7 +824,7 @@
 
     <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#connect-to-a-named-instance-of-sql-server</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">connect_to_named_sql_server_instance</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">connect_to_named_sql_server_instance</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;Data Source=MySqlServer\MSSQL1;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Data Source&quot;</span>, <span class="string">r#&quot;MySqlServer\MSSQL1&quot;#</span>);
@@ -833,7 +833,7 @@
 
     <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#oledb-connection-string-syntax</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">oledb_connection_string_syntax</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">oledb_connection_string_syntax</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;Provider=Microsoft.Jet.OLEDB.4.0; Data Source=d:\Northwind.mdb;User ID=Admin;Password=;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Provider&quot;</span>, <span class="string">r#&quot;Microsoft.Jet.OLEDB.4.0&quot;#</span>);
@@ -857,7 +857,7 @@
 
     <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#using-datadirectory-to-connect-to-accessjet</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">connect_to_access_jet</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">connect_to_access_jet</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;Provider=Microsoft.Jet.OLEDB.4.0;  
                        Data Source=|DataDirectory|\Northwind.mdb;  
                        Jet OLEDB:System Database=|DataDirectory|\System.mdw;&quot;#</span>;
@@ -891,7 +891,7 @@
 
     <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#data-shape-provider-connection-string-syntax</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">data_shape_provider</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">data_shape_provider</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;Provider=MSDataShape;Data Provider=SQLOLEDB;Data Source=(local);Initial Catalog=pubs;Integrated Security=SSPI;&quot;#</span>;
         <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Provider&quot;</span>, <span class="string">r#&quot;MSDataShape&quot;#</span>);
@@ -905,7 +905,7 @@
     <span class="comment">// NOTE(yosh): we do not support ODBC connection strings because the first part of the</span>
     <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#odbc-connection-strings</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">odbc_connection_strings</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">odbc_connection_strings</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;Driver={Microsoft Text Driver (*.txt; *.csv)};DBQ=d:\bin&quot;#</span>;
         <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Driver&quot;</span>, <span class="string">r#&quot;Microsoft Text Driver (*.txt; *.csv)&quot;#</span>);
@@ -915,7 +915,7 @@
 
     <span class="comment">// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-string-syntax#oracle-connection-strings</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">oracle_connection_strings</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">oracle_connection_strings</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;Data Source=Oracle9i;User ID=*****;Password=*****;&quot;</span>;
         <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="ident">assert_kv</span>(<span class="kw-2">&amp;</span><span class="ident">ado</span>, <span class="string">&quot;Data Source&quot;</span>, <span class="string">&quot;Oracle9i&quot;</span>);
@@ -925,7 +925,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">display_with_escaping</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">display_with_escaping</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;key=val{;}ue&quot;</span>;
         <span class="kw">let</span> <span class="ident">conn</span>: <span class="ident">AdoNetString</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 

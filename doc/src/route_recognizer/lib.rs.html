@@ -436,7 +436,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Metadata</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">statics</span>: <span class="number">0</span>,
             <span class="ident">dynamics</span>: <span class="number">0</span>,
@@ -447,7 +447,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Metadata</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">statics</span> <span class="op">&gt;</span> <span class="ident">other</span>.<span class="ident">statics</span> {
             <span class="ident">Ordering::Greater</span>
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">statics</span> <span class="op">&lt;</span> <span class="ident">other</span>.<span class="ident">statics</span> {
@@ -467,16 +467,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Metadata</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Metadata</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">statics</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">statics</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">dynamics</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">dynamics</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">stars</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">stars</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">statics</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">statics</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">dynamics</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">dynamics</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">stars</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">stars</span>
     }
 }
 
@@ -488,7 +488,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Params</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">map</span>: <span class="ident">BTreeMap::new</span>(),
         }
@@ -498,21 +498,21 @@
         <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">value</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">get</span>(<span class="ident">key</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[..])
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">Iter</span>(<span class="self">self</span>.<span class="ident">map</span>.<span class="ident">iter</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Params</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">String</span>;
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">String</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">get</span>(<span class="ident">index</span>) {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="macro">format!</span>(<span class="string">&quot;params[{}] did not exist&quot;</span>, <span class="ident">index</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="macro">format!</span>(<span class="string">&quot;params[{}] did not exist&quot;</span>, <span class="ident">index</span>)),
+            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
         }
     }
 }
@@ -521,7 +521,7 @@
     <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>);
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>()
     }
 }
@@ -532,11 +532,11 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>);
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">k</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">v</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">size_hint</span>()
     }
 }
@@ -547,7 +547,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Match</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">handler</span>: <span class="ident">T</span>, <span class="ident">params</span>: <span class="ident">Params</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">handler</span>: <span class="ident">T</span>, <span class="ident">params</span>: <span class="ident">Params</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">handler</span>, <span class="ident">params</span> }
     }
 }
@@ -559,7 +559,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Router</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">nfa</span>: <span class="ident">NFA::new</span>(),
             <span class="ident">handlers</span>: <span class="ident">BTreeMap::new</span>(),
@@ -567,7 +567,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">route</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">dest</span>: <span class="ident">T</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">route</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">route</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;/&#39;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">route</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">route</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>] <span class="op">==</span> <span class="string">b&#39;/&#39;</span> {
             <span class="ident">route</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">route</span>[<span class="number">1</span>..];
         }
 
@@ -580,11 +580,11 @@
                 <span class="ident">state</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">put</span>(<span class="ident">state</span>, <span class="ident">CharacterClass::valid_char</span>(<span class="string">&#39;/&#39;</span>));
             }
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">segment</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">segment</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;:&#39;</span> {
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">segment</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">segment</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>] <span class="op">==</span> <span class="string">b&#39;:&#39;</span> {
                 <span class="ident">state</span> <span class="op">=</span> <span class="ident">process_dynamic_segment</span>(<span class="ident">nfa</span>, <span class="ident">state</span>);
                 <span class="ident">metadata</span>.<span class="ident">dynamics</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">metadata</span>.<span class="ident">param_names</span>.<span class="ident">push</span>(<span class="ident">segment</span>[<span class="number">1</span>..].<span class="ident">to_string</span>());
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">segment</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">segment</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;*&#39;</span> {
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">segment</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">segment</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>] <span class="op">==</span> <span class="string">b&#39;*&#39;</span> {
                 <span class="ident">state</span> <span class="op">=</span> <span class="ident">process_star_state</span>(<span class="ident">nfa</span>, <span class="ident">state</span>);
                 <span class="ident">metadata</span>.<span class="ident">stars</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">metadata</span>.<span class="ident">param_names</span>.<span class="ident">push</span>(<span class="ident">segment</span>[<span class="number">1</span>..].<span class="ident">to_string</span>());
@@ -599,8 +599,8 @@
         <span class="self">self</span>.<span class="ident">handlers</span>.<span class="ident">insert</span>(<span class="ident">state</span>, <span class="ident">dest</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recognize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Match</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">path</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;/&#39;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recognize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Match</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">path</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>] <span class="op">==</span> <span class="string">b&#39;/&#39;</span> {
             <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">path</span>[<span class="number">1</span>..];
         }
 
@@ -608,7 +608,7 @@
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">process</span>(<span class="ident">path</span>, <span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">nfa</span>.<span class="ident">get</span>(<span class="ident">index</span>).<span class="ident">metadata</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
 
         <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">nfa_match</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">nfa_match</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Params::new</span>();
                 <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">nfa</span>.<span class="ident">get</span>(<span class="ident">nfa_match</span>.<span class="ident">state</span>);
                 <span class="kw">let</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">metadata</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
@@ -623,18 +623,18 @@
                 <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handlers</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">nfa_match</span>.<span class="ident">state</span>).<span class="ident">unwrap</span>();
                 <span class="prelude-val">Ok</span>(<span class="ident">Match::new</span>(<span class="ident">handler</span>, <span class="ident">map</span>))
             }
-            <span class="prelude-val">Err</span>(<span class="ident">str</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">str</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">str</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">str</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Router</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
 
-<span class="kw">fn</span> <span class="ident">process_static_segment</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">segment</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">nfa</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">NFA</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">process_static_segment</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">segment</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">nfa</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">NFA</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">for</span> <span class="ident">char</span> <span class="kw">in</span> <span class="ident">segment</span>.<span class="ident">chars</span>() {
         <span class="ident">state</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">put</span>(<span class="ident">state</span>, <span class="ident">CharacterClass::valid_char</span>(<span class="ident">char</span>));
     }
@@ -642,7 +642,7 @@
     <span class="ident">state</span>
 }
 
-<span class="kw">fn</span> <span class="ident">process_dynamic_segment</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">nfa</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">NFA</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">process_dynamic_segment</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">nfa</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">NFA</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">state</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">put</span>(<span class="ident">state</span>, <span class="ident">CharacterClass::invalid_char</span>(<span class="string">&#39;/&#39;</span>));
     <span class="ident">nfa</span>.<span class="ident">put_state</span>(<span class="ident">state</span>, <span class="ident">state</span>);
     <span class="ident">nfa</span>.<span class="ident">start_capture</span>(<span class="ident">state</span>);
@@ -651,7 +651,7 @@
     <span class="ident">state</span>
 }
 
-<span class="kw">fn</span> <span class="ident">process_star_state</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">nfa</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">NFA</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">process_star_state</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">nfa</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">NFA</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">state</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">put</span>(<span class="ident">state</span>, <span class="ident">CharacterClass::any</span>());
     <span class="ident">nfa</span>.<span class="ident">put_state</span>(<span class="ident">state</span>, <span class="ident">state</span>);
     <span class="ident">nfa</span>.<span class="ident">start_capture</span>(<span class="ident">state</span>);
@@ -823,13 +823,13 @@
         <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">params</span>, <span class="ident">params</span>(<span class="string">&quot;bar&quot;</span>, <span class="string">&quot;test&quot;</span>));
     }
 
-    <span class="kw">fn</span> <span class="ident">params</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Params</span> {
+    <span class="kw">fn</span> <span class="ident">params</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Params</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Params::new</span>();
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">key</span>.<span class="ident">to_string</span>(), <span class="ident">val</span>.<span class="ident">to_string</span>());
         <span class="ident">map</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">two_params</span>(<span class="ident">k1</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">v1</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">k2</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">v2</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Params</span> {
+    <span class="kw">fn</span> <span class="ident">two_params</span>(<span class="ident">k1</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">v1</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">k2</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">v2</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Params</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Params::new</span>();
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">k1</span>.<span class="ident">to_string</span>(), <span class="ident">v1</span>.<span class="ident">to_string</span>());
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">k2</span>.<span class="ident">to_string</span>(), <span class="ident">v2</span>.<span class="ident">to_string</span>());

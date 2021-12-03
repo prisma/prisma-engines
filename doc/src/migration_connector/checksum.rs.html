@@ -136,12 +136,12 @@
 
 <span class="doccomment">/// Compute the checksum for a new migration script, and render it formatted to</span>
 <span class="doccomment">/// a human readable string.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">render_checksum</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">render_checksum</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
     <span class="ident">compute_checksum</span>(<span class="ident">script</span>).<span class="ident">format_checksum</span>()
 }
 
 <span class="doccomment">/// Returns whether a migration script matches an existing checksum.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">script_matches_checksum</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">checksum</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">script_matches_checksum</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">checksum</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">use</span> <span class="ident">std::iter</span>::{<span class="ident">once</span>, <span class="ident">once_with</span>};
 
     <span class="comment">// Checksum with potentially different line endings, so checksums will match</span>
@@ -167,12 +167,12 @@
             <span class="ident">script_checksum</span>.<span class="ident">format_checksum</span>()
         };
 
-        <span class="ident">script_checksum_str</span> <span class="op">=</span><span class="op">=</span> <span class="ident">checksum</span>
+        <span class="ident">script_checksum_str</span> <span class="op">==</span> <span class="ident">checksum</span>
     })
 }
 
 <span class="doccomment">/// Checksumming implementation. This should be the single place where we do this.</span>
-<span class="kw">fn</span> <span class="ident">compute_checksum</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+<span class="kw">fn</span> <span class="ident">compute_checksum</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; [<span class="ident">u8</span>; <span class="number">32</span>] {
     <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Digest</span>, <span class="ident">Sha256</span>};
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">Sha256::new</span>();
     <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="ident">script</span>);
@@ -187,13 +187,13 @@
 <span class="doccomment">/// migration scripts with Sha256.</span>
 <span class="kw">trait</span> <span class="ident">FormatChecksum</span> {
     <span class="doccomment">/// Format a checksum to a hexadecimal string.</span>
-    <span class="kw">fn</span> <span class="ident">format_checksum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">format_checksum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span>;
     <span class="doccomment">/// Obsolete checksum method, should only be used for compatibility.</span>
-    <span class="kw">fn</span> <span class="ident">format_checksum_old</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">format_checksum_old</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">FormatChecksum</span> <span class="kw">for</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
-    <span class="kw">fn</span> <span class="ident">format_checksum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">format_checksum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">use</span> <span class="ident">std::fmt::Write</span> <span class="kw">as</span> <span class="kw">_</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">checksum_string</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">32</span> <span class="op">*</span> <span class="number">2</span>);
@@ -213,7 +213,7 @@
     <span class="comment">//</span>
     <span class="comment">// Corresponding issue:</span>
     <span class="comment">// https://github.com/prisma/prisma-engines/issues/1887</span>
-    <span class="kw">fn</span> <span class="ident">format_checksum_old</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">format_checksum_old</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">use</span> <span class="ident">std::fmt::Write</span> <span class="kw">as</span> <span class="kw">_</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">checksum_string</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">32</span> <span class="op">*</span> <span class="number">2</span>);

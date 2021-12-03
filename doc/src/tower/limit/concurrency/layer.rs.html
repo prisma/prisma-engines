@@ -73,7 +73,7 @@
 
 <span class="kw">impl</span> <span class="ident">ConcurrencyLimitLayer</span> {
     <span class="doccomment">/// Create a new concurrency limit layer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ConcurrencyLimitLayer</span> { <span class="ident">max</span> }
     }
 }
@@ -81,7 +81,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConcurrencyLimitLayer</span> {
     <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">ConcurrencyLimit</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Service</span> {
+    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
         <span class="ident">ConcurrencyLimit::new</span>(<span class="ident">service</span>, <span class="self">self</span>.<span class="ident">max</span>)
     }
 }
@@ -101,12 +101,12 @@
 
 <span class="kw">impl</span> <span class="ident">GlobalConcurrencyLimitLayer</span> {
     <span class="doccomment">/// Create a new `GlobalConcurrencyLimitLayer`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::with_semaphore</span>(<span class="ident">Arc::new</span>(<span class="ident">Semaphore::new</span>(<span class="ident">max</span>)))
     }
 
     <span class="doccomment">/// Create a new `GlobalConcurrencyLimitLayer` from a `Arc&lt;Semaphore&gt;`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_semaphore</span>(<span class="ident">semaphore</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Semaphore</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_semaphore</span>(<span class="ident">semaphore</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Semaphore</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">GlobalConcurrencyLimitLayer</span> { <span class="ident">semaphore</span> }
     }
 }
@@ -114,7 +114,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GlobalConcurrencyLimitLayer</span> {
     <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">ConcurrencyLimit</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Service</span> {
+    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
         <span class="ident">ConcurrencyLimit::with_semaphore</span>(<span class="ident">service</span>, <span class="self">self</span>.<span class="ident">semaphore</span>.<span class="ident">clone</span>())
     }
 }

@@ -100,7 +100,7 @@
 <span class="doccomment">///     println!(&quot;received ctrl-c event&quot;);</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ctrl_c</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ctrl_c</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">os_impl::ctrl_c</span>()<span class="question-mark">?</span>.<span class="ident">recv</span>().<span class="kw">await</span>;
     <span class="prelude-val">Ok</span>(())
 }

@@ -314,104 +314,104 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">unquoted_attribute</span>::<span class="kw-2">*</span>;
 
 <span class="macro">macro_rules!</span> <span class="ident">escape_impl</span> {
-    (@<span class="ident">inner</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span>:<span class="ident">tt</span>] <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (@<span class="ident">inner</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span>:<span class="ident">tt</span>] <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">macro_rules!</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span>:<span class="ident">expr</span>) =&gt; {
                 <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span> {
-                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>,)<span class="op">+</span>
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> =&gt; <span class="kw">break</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>,)<span class="op">+</span>
+                    <span class="kw">_</span> =&gt; (),
                 }
             };
-            (<span class="ident">vec</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">v</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">b</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">vec</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">v</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">b</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span>:<span class="ident">ident</span>) =&gt; {
                 <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span> {
-                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> =&gt; {
                         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">v</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">b</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span>..<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span>]);
                         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span> <span class="op">+</span> <span class="number">1</span>;
                         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">v</span>.<span class="ident">extend_from_slice</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>);
                     })<span class="op">+</span>
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                    <span class="kw">_</span> =&gt; (),
                 }
 
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             };
-            (<span class="ident">writer</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">w</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">b</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">writer</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">w</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">b</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span>:<span class="ident">ident</span>) =&gt; {
                 <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">e</span> {
-                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> =&gt; {
                         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">w</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">b</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span>..<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span>])<span class="question-mark">?</span>;
                         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span> <span class="op">+</span> <span class="number">1</span>;
                         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">w</span>.<span class="ident">write_all</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>)<span class="question-mark">?</span>;
                     })<span class="op">+</span>
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                    <span class="kw">_</span> =&gt; (),
                 }
 
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dollar</span> <span class="ident">end</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             };
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">escape_impl!</span> {
             @<span class="ident">inner</span> [$]
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
-            $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>.<span class="ident">as_ref</span>(),)<span class="op">*</span>
+            $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>.<span class="ident">as_ref</span>(),)<span class="op">*</span>
         }
     };
 }
 
 <span class="macro">escape_impl!</span> {
     <span class="ident">escape_text_minimal</span>;
-    <span class="string">b&#39;&amp;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;amp;&quot;</span>,
-    <span class="string">b&#39;&lt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;lt;&quot;</span>,
+    <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
+    <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
 }
 
 <span class="macro">escape_impl!</span> {
     <span class="ident">escape_text</span>;
-    <span class="string">b&#39;&amp;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;amp;&quot;</span>,
-    <span class="string">b&#39;&lt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;lt;&quot;</span>,
-    <span class="string">b&#39;&gt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;gt;&quot;</span>,
+    <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
+    <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
+    <span class="string">b&#39;&gt;&#39;</span> =&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
 }
 
 <span class="macro">escape_impl!</span> {
     <span class="ident">escape_double_quote</span>;
-    <span class="string">b&#39;&amp;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;amp;&quot;</span>,
-    <span class="string">b&#39;&lt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;lt;&quot;</span>,
-    <span class="string">b&#39;&gt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;gt;&quot;</span>,
-    <span class="string">b&#39;&quot;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;quot;&quot;</span>,
+    <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
+    <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
+    <span class="string">b&#39;&gt;&#39;</span> =&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
+    <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="string">b&quot;&amp;quot;&quot;</span>,
 }
 
 <span class="macro">escape_impl!</span> {
     <span class="ident">escape_single_quote</span>;
-    <span class="string">b&#39;&amp;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;amp;&quot;</span>,
-    <span class="string">b&#39;&lt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;lt;&quot;</span>,
-    <span class="string">b&#39;&gt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;gt;&quot;</span>,
-    <span class="string">b&#39;\&#39;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;#x27;&quot;</span>,
+    <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
+    <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
+    <span class="string">b&#39;&gt;&#39;</span> =&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
+    <span class="string">b&#39;\&#39;&#39;</span> =&gt; <span class="string">b&quot;&amp;#x27;&quot;</span>,
 }
 
 <span class="macro">escape_impl!</span> {
     <span class="ident">escape_quote</span>;
-    <span class="string">b&#39;&amp;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;amp;&quot;</span>,
-    <span class="string">b&#39;&lt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;lt;&quot;</span>,
-    <span class="string">b&#39;&gt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;gt;&quot;</span>,
-    <span class="string">b&#39;&quot;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;quot;&quot;</span>,
-    <span class="string">b&#39;\&#39;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;#x27;&quot;</span>,
+    <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
+    <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
+    <span class="string">b&#39;&gt;&#39;</span> =&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
+    <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="string">b&quot;&amp;quot;&quot;</span>,
+    <span class="string">b&#39;\&#39;&#39;</span> =&gt; <span class="string">b&quot;&amp;#x27;&quot;</span>,
 }
 
 <span class="macro">escape_impl!</span> {
     <span class="ident">escape_safe</span>;
-    <span class="string">b&#39;&amp;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;amp;&quot;</span>,
-    <span class="string">b&#39;&lt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;lt;&quot;</span>,
-    <span class="string">b&#39;&gt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;gt;&quot;</span>,
-    <span class="string">b&#39;&quot;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;quot;&quot;</span>,
-    <span class="string">b&#39;\&#39;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;#x27;&quot;</span>,
-    <span class="string">b&#39;/&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;&amp;#x2F;&quot;</span>,
+    <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="string">b&quot;&amp;amp;&quot;</span>,
+    <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="string">b&quot;&amp;lt;&quot;</span>,
+    <span class="string">b&#39;&gt;&#39;</span> =&gt; <span class="string">b&quot;&amp;gt;&quot;</span>,
+    <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="string">b&quot;&amp;quot;&quot;</span>,
+    <span class="string">b&#39;\&#39;&#39;</span> =&gt; <span class="string">b&quot;&amp;#x27;&quot;</span>,
+    <span class="string">b&#39;/&#39;</span> =&gt; <span class="string">b&quot;&amp;#x2F;&quot;</span>,
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">encode_impl</span> {
-    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">escape_macro</span>:<span class="ident">ident</span>; $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_name</span>: <span class="ident">ident</span>; $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_string_attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_string_name</span>: <span class="ident">ident</span>; $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_name</span>: <span class="ident">ident</span>; $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_writer_attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_writer_name</span>: <span class="ident">ident</span> $(;)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">escape_macro</span>:<span class="ident">ident</span>; $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_name</span>: <span class="ident">ident</span>; $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_string_attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_string_name</span>: <span class="ident">ident</span>; $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_name</span>: <span class="ident">ident</span>; $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_writer_attr</span>: <span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_writer_name</span>: <span class="ident">ident</span> $(;)<span class="kw-2">*</span>) =&gt; {
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_attr</span>]</span>)<span class="op">*</span>
         <span class="doccomment">///</span>
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_ref</span>();
             <span class="kw">let</span> <span class="ident">text_bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_bytes</span>();
             <span class="kw">let</span> <span class="ident">text_length</span> <span class="op">=</span> <span class="ident">text_bytes</span>.<span class="ident">len</span>();
@@ -420,7 +420,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span>;
 
             <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="kw">loop</span> {
-                <span class="kw">if</span> <span class="ident">p</span> <span class="op">=</span><span class="op">=</span> <span class="ident">text_length</span> {
+                <span class="kw">if</span> <span class="ident">p</span> <span class="op">==</span> <span class="ident">text_length</span> {
                     <span class="kw">return</span> <span class="ident">Cow::from</span>(<span class="ident">text</span>);
                 }
 
@@ -445,7 +445,7 @@
         <span class="doccomment">///</span>
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_string_name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_string_name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
             <span class="kw">unsafe</span> { <span class="ident">from_utf8_unchecked</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_name</span>(<span class="ident">text</span>, <span class="ident">output</span>.<span class="ident">as_mut_vec</span>())) }
         }
 
@@ -453,7 +453,7 @@
         <span class="doccomment">///</span>
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_vec_name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
             <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_ref</span>();
             <span class="kw">let</span> <span class="ident">text_bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_bytes</span>();
             <span class="kw">let</span> <span class="ident">text_length</span> <span class="op">=</span> <span class="ident">text_bytes</span>.<span class="ident">len</span>();
@@ -479,7 +479,7 @@
         <span class="doccomment">///</span>
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_writer_name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">encode_to_writer_name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="ident">S</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_ref</span>();
             <span class="kw">let</span> <span class="ident">text_bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">as_bytes</span>();
 

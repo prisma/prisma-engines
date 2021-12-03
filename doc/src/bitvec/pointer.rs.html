@@ -1183,7 +1183,7 @@ project.
 {
 	<span class="doccomment">/// Views a numeric address as a typed data address.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">addr</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">addr</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
 		<span class="self">Self</span> {
 			<span class="ident">addr</span>,
 			<span class="ident">_ty</span>: <span class="ident">PhantomData</span>,
@@ -1192,32 +1192,32 @@ project.
 
 	<span class="doccomment">/// Views the memory address as an access pointer.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_access</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T::Access</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_access</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T::Access</span> {
 		<span class="self">self</span>.<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T::Access</span>
 	}
 
 	<span class="doccomment">/// Views the memory address as an alias pointer.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_alias</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T::Alias</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_alias</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T::Alias</span> {
 		<span class="self">self</span>.<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T::Alias</span>
 	}
 
 	<span class="doccomment">/// Views the memory address as an immutable pointer.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_const</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_const</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span> {
 		<span class="self">self</span>.<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>
 	}
 
 	<span class="doccomment">/// Views the memory address as a mutable pointer.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_mut</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_mut</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
 		<span class="self">self</span>.<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>
 	}
 
 	<span class="doccomment">/// Gets the numeric value of the address.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">value</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">value</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
 		<span class="self">self</span>.<span class="ident">addr</span>
 	}
 }
@@ -1227,7 +1227,7 @@ project.
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
 		<span class="self">Self</span> { ..<span class="kw-2">*</span><span class="self">self</span> }
 	}
 }
@@ -1237,7 +1237,7 @@ project.
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="self">Self</span> {
 		(<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>).<span class="ident">into</span>()
 	}
 }
@@ -1247,7 +1247,7 @@ project.
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident"><span class="self">Self</span>::new</span>((<span class="ident">addr</span>) <span class="kw">as</span> <span class="ident">usize</span>)
 	}
 }
@@ -1257,7 +1257,7 @@ project.
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
 		(<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>).<span class="ident">into</span>()
 	}
 }
@@ -1267,7 +1267,7 @@ project.
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">addr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="ident">usize</span>)
 	}
 }
@@ -1277,7 +1277,7 @@ project.
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
 		<span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Pointer</span><span class="op">&gt;</span><span class="ident">::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>)
 	}
 }
@@ -1287,7 +1287,7 @@ project.
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
 		<span class="ident">Pointer::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_const</span>(), <span class="ident">fmt</span>)
 	}
 }
@@ -1509,7 +1509,7 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">/// received from the Rust allocation system are required to satisfy this</span>
 	<span class="doccomment">/// constraint.</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">uninhabited</span>(<span class="ident">addr</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">uninhabited</span>(<span class="ident">addr</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
 		<span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">into</span>();
 		<span class="macro">assert!</span>(
 			<span class="ident">addr</span>.<span class="ident">value</span>().<span class="ident">trailing_zeros</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::PTR_HEAD_BITS</span>,
@@ -1519,8 +1519,8 @@ it certainly may not be seen or observed by other crates.
 		);
 		<span class="self">Self</span> {
 			<span class="ident">ptr</span>: <span class="kw">match</span> <span class="ident">NonNull::new</span>(<span class="ident">addr</span>.<span class="ident">to_mut</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>) {
-				<span class="prelude-val">Some</span>(<span class="ident">nn</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">nn</span>,
-				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::EMPTY</span>,
+				<span class="prelude-val">Some</span>(<span class="ident">nn</span>) =&gt; <span class="ident">nn</span>,
+				<span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::EMPTY</span>,
 			},
 			<span class="ident">len</span>: <span class="number">0</span>,
 			<span class="ident">_ty</span>: <span class="ident">PhantomData</span>,
@@ -1558,7 +1558,7 @@ it certainly may not be seen or observed by other crates.
 		<span class="ident">addr</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">head</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 		<span class="ident">bits</span>: <span class="ident">usize</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+	) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">into</span>();
 
 		<span class="kw">if</span> <span class="ident">addr</span>.<span class="ident">to_const</span>().<span class="ident">is_null</span>()
@@ -1602,7 +1602,7 @@ it certainly may not be seen or observed by other crates.
 		<span class="ident">addr</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">head</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 		<span class="ident">bits</span>: <span class="ident">usize</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	) -&gt; <span class="self">Self</span> {
 		<span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">head</span>) <span class="op">=</span> (<span class="ident">addr</span>.<span class="ident">into</span>(), <span class="ident">head</span>.<span class="ident">value</span>() <span class="kw">as</span> <span class="ident">usize</span>);
 
 		<span class="kw">let</span> <span class="ident">ptr_data</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">value</span>() <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::PTR_ADDR_MASK</span>;
@@ -1632,7 +1632,7 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">/// is weakly typed so that it can be cast by call sites to the most useful</span>
 	<span class="doccomment">/// access type.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pointer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pointer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="ident">Address::new</span>(<span class="self">self</span>.<span class="ident">ptr</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::PTR_ADDR_MASK</span>)
 	}
 
@@ -1670,7 +1670,7 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// A `BitIdx` of the first live bit in the element at the `self.pointer()`</span>
 	<span class="doccomment">/// address.</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">head</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">head</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span> {
 		<span class="comment">//  Get the high part of the head counter out of the pointer.</span>
 		<span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ptr</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>;
 		<span class="kw">let</span> <span class="ident">ptr_head</span> <span class="op">=</span> (<span class="ident">ptr</span> <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::PTR_HEAD_MASK</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::LEN_HEAD_BITS</span>;
@@ -1714,7 +1714,7 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// A count of how many live bits the region pointer describes.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
 		<span class="self">self</span>.<span class="ident">len</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::LEN_HEAD_BITS</span>
 	}
 
@@ -1753,7 +1753,7 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">///   region.</span>
 	<span class="doccomment">/// - `.2`: The number of live bits in the region.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">raw_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Address</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>, <span class="ident">usize</span>) {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">raw_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">Address</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>, <span class="ident">usize</span>) {
 		(<span class="self">self</span>.<span class="ident">pointer</span>(), <span class="self">self</span>.<span class="ident">head</span>(), <span class="self">self</span>.<span class="ident">len</span>())
 	}
 
@@ -1768,7 +1768,7 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// The count of all elements, starting at `self.pointer()`, that contain</span>
 	<span class="doccomment">/// live bits included in the referent region.</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">elements</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">elements</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
 		<span class="comment">//  Find the distance of the last bit from the base address.</span>
 		<span class="kw">let</span> <span class="ident">total</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">head</span>().<span class="ident">value</span>() <span class="kw">as</span> <span class="ident">usize</span>;
 		<span class="comment">//  The element count is always the bit count divided by the bit width,</span>
@@ -1792,10 +1792,10 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// It will be zero only when `self` is empty.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">len</span>) <span class="op">=</span> (<span class="self">self</span>.<span class="ident">head</span>(), <span class="self">self</span>.<span class="ident">len</span>());
 
-		<span class="kw">if</span> <span class="ident">head</span>.<span class="ident">value</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+		<span class="kw">if</span> <span class="ident">head</span>.<span class="ident">value</span>() <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
 			<span class="kw">return</span> <span class="ident">BitTail::ZERO</span>;
 		}
 
@@ -1809,7 +1809,7 @@ it certainly may not be seen or observed by other crates.
 		*/</span>
 		<span class="kw">unsafe</span> {
 			<span class="ident">BitTail::new_unchecked</span>(
-				(((<span class="ident">tail</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">T::Mem::INDX</span>) <span class="op">|</span> <span class="ident">tail</span> <span class="kw">as</span> <span class="ident">u8</span>,
+				(((<span class="ident">tail</span> <span class="op">==</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">T::Mem::INDX</span>) <span class="op">|</span> <span class="ident">tail</span> <span class="kw">as</span> <span class="ident">u8</span>,
 			)
 		}
 	}
@@ -1865,7 +1865,7 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">/// this pointer already contains the aliasing information it needs to be</span>
 	<span class="doccomment">/// safe.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_aliased_slice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T::Alias</span>] {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_aliased_slice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T::Alias</span>] {
 		<span class="kw">unsafe</span> {
 			<span class="ident">slice::from_raw_parts</span>(<span class="self">self</span>.<span class="ident">pointer</span>().<span class="ident">to_alias</span>(), <span class="self">self</span>.<span class="ident">elements</span>())
 		}
@@ -1887,7 +1887,7 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">/// The value of the bit `index` bits away from `self.head()`, according to</span>
 	<span class="doccomment">/// the `O` ordering.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span>
 	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
 		<span class="kw">let</span> (<span class="ident">elt</span>, <span class="ident">bit</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>().<span class="ident">offset</span>(<span class="ident">index</span> <span class="kw">as</span> <span class="ident">isize</span>);
 		<span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pointer</span>().<span class="ident">to_const</span>();
@@ -1973,7 +1973,7 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">///    first bit of `A` is higher in its element than the first bit of `B`</span>
 	<span class="doccomment">///    is in its element. `A.ptr_diff(B)` thus produces negative element and</span>
 	<span class="doccomment">///    bit distances: `(-1, -5)`.</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">ptr_diff</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">isize</span>, <span class="ident">i8</span>) {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">ptr_diff</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; (<span class="ident">isize</span>, <span class="ident">i8</span>) {
 		<span class="kw">let</span> <span class="ident">self_ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pointer</span>();
 		<span class="kw">let</span> <span class="ident">other_ptr</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">pointer</span>();
 		<span class="comment">//  FIXME(myrrlyn): `core::ptr::offset_from` stabilizes in 1.47.</span>
@@ -1990,11 +1990,11 @@ it certainly may not be seen or observed by other crates.
 
 	<span class="doccomment">/// Typecasts a raw region pointer into a pointer structure.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_bitslice_ptr</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_bitslice_ptr</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
 	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
 		<span class="kw">let</span> <span class="ident">slice_nn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">NonNull::new</span>(<span class="ident">raw</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> [()] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> [()]) {
-			<span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::EMPTY</span>,
+			<span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+			<span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::EMPTY</span>,
 		};
 		<span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">dvl::nonnull_slice_to_base</span>(<span class="ident">slice_nn</span>).<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>();
 		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">slice_nn</span>.<span class="ident">as_ref</span>() }.<span class="ident">len</span>();
@@ -2008,14 +2008,14 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">/// Typecasts a raw region pointer into a pointer structure.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_bitslice_ptr_mut</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_bitslice_ptr_mut</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
 	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
 		<span class="ident"><span class="self">Self</span>::from_bitslice_ptr</span>(<span class="ident">raw</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>)
 	}
 
 	<span class="doccomment">/// Type-casts the pointer structure into a raw region pointer.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bitslice_ptr</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bitslice_ptr</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
 		<span class="ident">ptr::slice_from_raw_parts</span>(
 			<span class="self">self</span>.<span class="ident">ptr</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> (),
@@ -2025,7 +2025,7 @@ it certainly may not be seen or observed by other crates.
 
 	<span class="doccomment">/// Typecasts the pointer structure into a raw mutable-region pointer.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bitslice_ptr_mut</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bitslice_ptr_mut</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
 		<span class="self">self</span>.<span class="ident">to_bitslice_ptr</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
 	}
@@ -2043,7 +2043,7 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">/// - `&#39;a`: The minimum lifetime of the referent region, as understood by</span>
 	<span class="doccomment">///   the caller.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bitslice_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bitslice_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
 		<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">to_bitslice_ptr</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>() }
 	}
@@ -2061,7 +2061,7 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">/// - `&#39;a`: The minimum lifetime of the referent region, as understood by</span>
 	<span class="doccomment">///   the caller.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bitslice_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bitslice_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
 		<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">to_bitslice_ptr_mut</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>() }
 	}
@@ -2072,7 +2072,7 @@ it certainly may not be seen or observed by other crates.
 	<span class="doccomment">/// have any purpose in non-`alloc` programs.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_nonnull</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_nonnull</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
 	<span class="kw">where</span>
 		<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 		<span class="ident">T</span>: <span class="ident">BitStore</span>,
@@ -2114,7 +2114,7 @@ it certainly may not be seen or observed by other crates.
 		<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
 		<span class="ident">ord</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
 		<span class="ident">fields</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">Debug</span>)<span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+	) -&gt; <span class="ident">fmt::Result</span> {
 		<span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;Bit{}&lt;&quot;</span>, <span class="ident">name</span>)<span class="question-mark">?</span>;
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ord</span>) <span class="op">=</span> <span class="ident">ord</span> {
 			<span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}, &quot;</span>, <span class="ident">ord</span>)<span class="question-mark">?</span>;
@@ -2136,7 +2136,7 @@ it certainly may not be seen or observed by other crates.
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
-	<span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
 		<span class="self">Self</span> { ..<span class="kw-2">*</span><span class="self">self</span> }
 	}
 }
@@ -2146,15 +2146,15 @@ it certainly may not be seen or observed by other crates.
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
 	<span class="ident">U</span>: <span class="ident">BitStore</span>,
 {
-	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
 		<span class="kw">let</span> (<span class="ident">addr_a</span>, <span class="ident">head_a</span>, <span class="ident">bits_a</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw_parts</span>();
 		<span class="kw">let</span> (<span class="ident">addr_b</span>, <span class="ident">head_b</span>, <span class="ident">bits_b</span>) <span class="op">=</span> <span class="ident">other</span>.<span class="ident">raw_parts</span>();
 		<span class="comment">//  Since ::BITS is an associated const, the compiler will automatically</span>
 		<span class="comment">//  replace the entire function with `false` when the types don’t match.</span>
-		<span class="ident">T::Mem::BITS</span> <span class="op">=</span><span class="op">=</span> <span class="ident">U::Mem::BITS</span>
-			<span class="op">&amp;&amp;</span> <span class="ident">addr_a</span>.<span class="ident">value</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">addr_b</span>.<span class="ident">value</span>()
-			<span class="op">&amp;&amp;</span> <span class="ident">head_a</span>.<span class="ident">value</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">head_b</span>.<span class="ident">value</span>()
-			<span class="op">&amp;&amp;</span> <span class="ident">bits_a</span> <span class="op">=</span><span class="op">=</span> <span class="ident">bits_b</span>
+		<span class="ident">T::Mem::BITS</span> <span class="op">==</span> <span class="ident">U::Mem::BITS</span>
+			<span class="op">&amp;&amp;</span> <span class="ident">addr_a</span>.<span class="ident">value</span>() <span class="op">==</span> <span class="ident">addr_b</span>.<span class="ident">value</span>()
+			<span class="op">&amp;&amp;</span> <span class="ident">head_a</span>.<span class="ident">value</span>() <span class="op">==</span> <span class="ident">head_b</span>.<span class="ident">value</span>()
+			<span class="op">&amp;&amp;</span> <span class="ident">bits_a</span> <span class="op">==</span> <span class="ident">bits_b</span>
 	}
 }
 
@@ -2163,7 +2163,7 @@ it certainly may not be seen or observed by other crates.
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
 		<span class="ident"><span class="self">Self</span>::EMPTY</span>
 	}
 }
@@ -2173,7 +2173,7 @@ it certainly may not be seen or observed by other crates.
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
 		<span class="ident">Pointer::fmt</span>(<span class="self">self</span>, <span class="ident">fmt</span>)
 	}
 }
@@ -2183,7 +2183,7 @@ it certainly may not be seen or observed by other crates.
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
 		<span class="self">self</span>.<span class="ident">render</span>(<span class="ident">fmt</span>, <span class="string">&quot;Ptr&quot;</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
 	}
 }

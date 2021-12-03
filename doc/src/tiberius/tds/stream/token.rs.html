@@ -249,44 +249,44 @@
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span>,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">conn</span> }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_done</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TokenDone</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_done</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TokenDone</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_unfold</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">routing</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::Done</span>(<span class="ident">token</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">routing</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">routing</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">routing</span>),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">token</span>),
+                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::Done</span>(<span class="ident">token</span>)) =&gt; <span class="kw">match</span> <span class="ident">routing</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">routing</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">routing</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">token</span>),
                 },
-                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::EnvChange</span>(<span class="ident">TokenEnvChange::Routing</span> { <span class="ident">host</span>, <span class="ident">port</span> })) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::EnvChange</span>(<span class="ident">TokenEnvChange::Routing</span> { <span class="ident">host</span>, <span class="ident">port</span> })) =&gt; {
                     <span class="ident">routing</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Error::Routing</span> { <span class="ident">host</span>, <span class="ident">port</span> });
                 }
-                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::Protocol</span>(<span class="string">&quot;Never got DONE token.&quot;</span>.<span class="ident">into</span>())),
+                <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; (),
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::Protocol</span>(<span class="string">&quot;Never got DONE token.&quot;</span>.<span class="ident">into</span>())),
             }
         }
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">windows</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_sspi</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TokenSspi</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_sspi</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TokenSspi</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_unfold</span>();
 
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::Sspi</span>(<span class="ident">token</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">token</span>),
-                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::Protocol</span>(<span class="string">&quot;Never got SSPI token.&quot;</span>.<span class="ident">into</span>())),
+                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::Sspi</span>(<span class="ident">token</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">token</span>),
+                <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; (),
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::Protocol</span>(<span class="string">&quot;Never got SSPI token.&quot;</span>.<span class="ident">into</span>())),
             }
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_col_metadata</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_col_metadata</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">TokenColMetaData::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>);
         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">context_mut</span>().<span class="ident">set_last_meta</span>(<span class="ident">meta</span>.<span class="ident">clone</span>());
 
@@ -295,77 +295,77 @@
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::NewResultset</span>(<span class="ident">meta</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_row</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_row</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">return_value</span> <span class="op">=</span> <span class="ident">TokenRow::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">message</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">return_value</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Row</span>(<span class="ident">return_value</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_nbc_row</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_nbc_row</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">return_value</span> <span class="op">=</span> <span class="ident">TokenRow::decode_nbc</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">message</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">return_value</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Row</span>(<span class="ident">return_value</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_return_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_return_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">return_value</span> <span class="op">=</span> <span class="ident">TokenReturnValue::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">message</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">return_value</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::ReturnValue</span>(<span class="ident">return_value</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_return_status</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_return_status</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_u32_le</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::ReturnStatus</span>(<span class="ident">status</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">TokenError::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">event!</span>(<span class="ident">Level::ERROR</span>, <span class="ident">message</span> <span class="op">=</span> <span class="op">%</span><span class="ident">err</span>.<span class="ident">message</span>, <span class="ident">code</span> <span class="op">=</span> <span class="ident">err</span>.<span class="ident">code</span>);
         <span class="prelude-val">Err</span>(<span class="ident">Error::Server</span>(<span class="ident">err</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_order</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_order</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">order</span> <span class="op">=</span> <span class="ident">TokenOrder::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">message</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">order</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Order</span>(<span class="ident">order</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_done_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_done_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">done</span> <span class="op">=</span> <span class="ident">TokenDone::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">done</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Done</span>(<span class="ident">done</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_done_proc_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_done_proc_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">done</span> <span class="op">=</span> <span class="ident">TokenDone::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">done</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::DoneProc</span>(<span class="ident">done</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_done_in_proc_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_done_in_proc_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">done</span> <span class="op">=</span> <span class="ident">TokenDone::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">done</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::DoneInProc</span>(<span class="ident">done</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_env_change</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_env_change</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">change</span> <span class="op">=</span> <span class="ident">TokenEnvChange::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">change</span> {
-            <span class="ident">TokenEnvChange::PacketSize</span>(<span class="ident">new_size</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TokenEnvChange::PacketSize</span>(<span class="ident">new_size</span>, <span class="kw">_</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">context_mut</span>().<span class="ident">set_packet_size</span>(<span class="ident">new_size</span>);
             }
-            <span class="ident">TokenEnvChange::BeginTransaction</span>(<span class="ident">desc</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TokenEnvChange::BeginTransaction</span>(<span class="ident">desc</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">context_mut</span>().<span class="ident">set_transaction_descriptor</span>(<span class="ident">desc</span>);
             }
             <span class="ident">TokenEnvChange::CommitTransaction</span>
             <span class="op">|</span> <span class="ident">TokenEnvChange::RollbackTransaction</span>
-            <span class="op">|</span> <span class="ident">TokenEnvChange::DefectTransaction</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="op">|</span> <span class="ident">TokenEnvChange::DefectTransaction</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">context_mut</span>().<span class="ident">set_transaction_descriptor</span>([<span class="number">0</span>; <span class="number">8</span>]);
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="kw">_</span> =&gt; (),
         }
 
         <span class="macro">event!</span>(<span class="ident">Level::INFO</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">change</span>);
@@ -373,25 +373,25 @@
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::EnvChange</span>(<span class="ident">change</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_info</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_info</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">TokenInfo::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">event!</span>(<span class="ident">Level::INFO</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">info</span>.<span class="ident">message</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Info</span>(<span class="ident">info</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_login_ack</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_login_ack</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ack</span> <span class="op">=</span> <span class="ident">TokenLoginAck::decode</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">event!</span>(<span class="ident">Level::INFO</span>, <span class="string">&quot;{} version {}&quot;</span>, <span class="ident">ack</span>.<span class="ident">prog_name</span>, <span class="ident">ack</span>.<span class="ident">version</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::LoginAck</span>(<span class="ident">ack</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sspi</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sspi</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sspi</span> <span class="op">=</span> <span class="ident">TokenSspi::decode_async</span>(<span class="self">self</span>.<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="string">&quot;SSPI response&quot;</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">ReceivedToken::Sspi</span>(<span class="ident">sspi</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_unfold</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_unfold</span>(<span class="self">self</span>) -&gt; <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">futures::stream::try_unfold</span>(<span class="self">self</span>, <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">this</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">conn</span>.<span class="ident">is_eof</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
@@ -403,21 +403,21 @@
                 .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Protocol</span>(<span class="macro">format!</span>(<span class="string">&quot;invalid token type {:x}&quot;</span>, <span class="ident">ty_byte</span>).<span class="ident">into</span>()))<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
-                <span class="ident">TokenType::ReturnStatus</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_return_status</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::ColMetaData</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_col_metadata</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::Row</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_row</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::NbcRow</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_nbc_row</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::Done</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_done_value</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::DoneProc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_done_proc_value</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::DoneInProc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_done_in_proc_value</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::ReturnValue</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_return_value</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::Error</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_error</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::Order</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_order</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::EnvChange</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_env_change</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::Info</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_info</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::LoginAck</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_login_ack</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">TokenType::Sspi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">get_sspi</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Token {:?} unimplemented!&quot;</span>, <span class="ident">ty</span>),
+                <span class="ident">TokenType::ReturnStatus</span> =&gt; <span class="ident">this</span>.<span class="ident">get_return_status</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::ColMetaData</span> =&gt; <span class="ident">this</span>.<span class="ident">get_col_metadata</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::Row</span> =&gt; <span class="ident">this</span>.<span class="ident">get_row</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::NbcRow</span> =&gt; <span class="ident">this</span>.<span class="ident">get_nbc_row</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::Done</span> =&gt; <span class="ident">this</span>.<span class="ident">get_done_value</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::DoneProc</span> =&gt; <span class="ident">this</span>.<span class="ident">get_done_proc_value</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::DoneInProc</span> =&gt; <span class="ident">this</span>.<span class="ident">get_done_in_proc_value</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::ReturnValue</span> =&gt; <span class="ident">this</span>.<span class="ident">get_return_value</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::Error</span> =&gt; <span class="ident">this</span>.<span class="ident">get_error</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::Order</span> =&gt; <span class="ident">this</span>.<span class="ident">get_order</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::EnvChange</span> =&gt; <span class="ident">this</span>.<span class="ident">get_env_change</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::Info</span> =&gt; <span class="ident">this</span>.<span class="ident">get_info</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::LoginAck</span> =&gt; <span class="ident">this</span>.<span class="ident">get_login_ack</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">TokenType::Sspi</span> =&gt; <span class="ident">this</span>.<span class="ident">get_sspi</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Token {:?} unimplemented!&quot;</span>, <span class="ident">ty</span>),
             };
 
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">token</span>, <span class="ident">this</span>)))

@@ -80,37 +80,37 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_referential_actions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">from_connector</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ForeignKeys</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">from_connector</span>,
+            <span class="ident"><span class="self">Self</span>::ForeignKeys</span> =&gt; <span class="ident">from_connector</span>,
             <span class="comment">// The emulated modes should be listed here.</span>
-            <span class="ident"><span class="self">Self</span>::Prisma</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">NoAction</span> <span class="op">|</span> <span class="ident">Cascade</span>,
+            <span class="ident"><span class="self">Self</span>::Prisma</span> =&gt; <span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">NoAction</span> <span class="op">|</span> <span class="ident">Cascade</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_prisma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_prisma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">ReferentialIntegrity::Prisma</span>)
     }
 
     <span class="doccomment">/// True, if integrity is in database foreign keys</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uses_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uses_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::ForeignKeys</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ReferentialIntegrity</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::ForeignKeys</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ReferentialIntegrity</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ReferentialIntegrity::ForeignKeys</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;foreignKeys&quot;</span>),
-            <span class="ident">ReferentialIntegrity::Prisma</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;prisma&quot;</span>),
+            <span class="ident">ReferentialIntegrity::ForeignKeys</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;foreignKeys&quot;</span>),
+            <span class="ident">ReferentialIntegrity::Prisma</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;prisma&quot;</span>),
         }
     }
 }

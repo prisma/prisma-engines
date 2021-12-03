@@ -497,7 +497,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">QueryStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;QueryStream&quot;</span>)
             .<span class="ident">field</span>(
                 <span class="string">&quot;token_stream&quot;</span>,
@@ -508,7 +508,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">QueryStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token_stream</span>: <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token_stream</span>: <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ReceivedToken</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">token_stream</span>: <span class="ident">token_stream</span>.<span class="ident">peekable</span>(),
             <span class="ident">columns</span>: <span class="prelude-val">None</span>,
@@ -518,7 +518,7 @@
 
     <span class="doccomment">/// Moves the stream forward until having result metadata, stream end or an</span>
     <span class="doccomment">/// error.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">forward_to_metadata</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">forward_to_metadata</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">token_stream</span>)
                 .<span class="ident">peek</span>()
@@ -527,11 +527,11 @@
                 .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
             <span class="kw">match</span> <span class="ident">item</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::NewResultset</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">ReceivedToken::NewResultset</span>(<span class="kw">_</span>)) =&gt; <span class="kw">break</span>,
+                <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
                     <span class="self">self</span>.<span class="ident">token_stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span>;
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
             }
         }
 
@@ -587,7 +587,7 @@
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">ReceivedToken</span>::<span class="kw-2">*</span>;
 
         <span class="kw">loop</span> {
@@ -598,20 +598,20 @@
                 .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
             <span class="kw">match</span> <span class="ident">item</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">token</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">token</span> {
-                    <span class="ident">NewResultset</span>(<span class="ident">metadata</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">token</span>) =&gt; <span class="kw">match</span> <span class="ident">token</span> {
+                    <span class="ident">NewResultset</span>(<span class="ident">metadata</span>) =&gt; {
                         <span class="self">self</span>.<span class="ident">columns</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">metadata</span>.<span class="ident">columns</span>().<span class="ident">collect</span>()));
                         <span class="kw">break</span>;
                     }
-                    <span class="ident">Row</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">Row</span>(<span class="kw">_</span>) =&gt; {
                         <span class="kw">break</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; {
                         <span class="self">self</span>.<span class="ident">token_stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span>;
                         <span class="kw">continue</span>;
                     }
                 },
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="kw">break</span>;
                 }
             }
@@ -622,20 +622,20 @@
 
     <span class="doccomment">/// Collects results from all queries in the stream into memory in the order</span>
     <span class="doccomment">/// of querying.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">into_results</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">into_results</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="kw">match</span> (<span class="ident">item</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>) {
-                (<span class="ident">QueryItem::Row</span>(<span class="ident">row</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="ident">QueryItem::Row</span>(<span class="ident">row</span>), <span class="prelude-val">None</span>) =&gt; {
                     <span class="ident">result</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="ident">row</span>]);
                 }
-                (<span class="ident">QueryItem::Row</span>(<span class="ident">row</span>), <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">result</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">row</span>),
-                (<span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="ident">QueryItem::Row</span>(<span class="ident">row</span>), <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">result</span>)) =&gt; <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">row</span>),
+                (<span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; {
                     <span class="ident">result</span>.<span class="ident">insert</span>(<span class="ident">Vec::new</span>());
                 }
-                (<span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>), <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">previous_result</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>), <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">previous_result</span>) =&gt; {
                     <span class="ident">results</span>.<span class="ident">push</span>(<span class="ident">previous_result</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>());
                     <span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                 }
@@ -651,7 +651,7 @@
 
     <span class="doccomment">/// Collects the output of the first query, dropping any further</span>
     <span class="doccomment">/// results.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">into_first_result</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">into_first_result</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_results</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">into_iter</span>();
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">results</span>.<span class="ident">next</span>().<span class="ident">unwrap_or_else</span>(<span class="ident">Vec::new</span>);
 
@@ -660,18 +660,18 @@
 
     <span class="doccomment">/// Collects the first row from the output of the first query, dropping any</span>
     <span class="doccomment">/// further rows.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">into_row</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">into_row</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_first_result</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">into_iter</span>();
 
         <span class="prelude-val">Ok</span>(<span class="ident">results</span>.<span class="ident">next</span>())
     }
 
     <span class="doccomment">/// Convert the stream into a stream of rows, skipping metadata items.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_row_stream</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_row_stream</span>(<span class="self">self</span>) -&gt; <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_filter_map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="kw">async</span> {
             <span class="kw">match</span> <span class="ident">item</span> {
-                <span class="ident">QueryItem::Row</span>(<span class="ident">row</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">row</span>)),
-                <span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                <span class="ident">QueryItem::Row</span>(<span class="ident">row</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">row</span>)),
+                <span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             }
         });
 
@@ -688,14 +688,14 @@
 
 <span class="kw">impl</span> <span class="ident">ResultMetadata</span> {
     <span class="doccomment">/// Column info. The order is the same as in the following rows.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">Column</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Column</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">columns</span>
     }
 
     <span class="doccomment">/// The number of the result set, an incrementing value starting from zero,</span>
     <span class="doccomment">/// which gives an indication of the position of the result set in the</span>
     <span class="doccomment">/// stream.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">result_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">result_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">result_index</span>
     }
 }
@@ -710,7 +710,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">QueryItem</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">result_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">result_index</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Metadata</span>(<span class="ident">ResultMetadata</span> {
             <span class="ident">columns</span>,
             <span class="ident">result_index</span>,
@@ -718,34 +718,34 @@
     }
 
     <span class="doccomment">/// Returns a reference to the metadata, if the item is of a correct variant.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ResultMetadata</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ResultMetadata</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QueryItem::Row</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">QueryItem::Metadata</span>(<span class="kw-2">ref</span> <span class="ident">metadata</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">metadata</span>),
+            <span class="ident">QueryItem::Row</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">QueryItem::Metadata</span>(<span class="kw-2">ref</span> <span class="ident">metadata</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">metadata</span>),
         }
     }
 
     <span class="doccomment">/// Returns a reference to the row, if the item is of a correct variant.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_row</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_row</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QueryItem::Row</span>(<span class="kw-2">ref</span> <span class="ident">row</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">row</span>),
-            <span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">QueryItem::Row</span>(<span class="kw-2">ref</span> <span class="ident">row</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">row</span>),
+            <span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Returns the metadata, if the item is of a correct variant.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_metadata</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResultMetadata</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_metadata</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResultMetadata</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QueryItem::Row</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">QueryItem::Metadata</span>(<span class="ident">metadata</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">metadata</span>),
+            <span class="ident">QueryItem::Row</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">QueryItem::Metadata</span>(<span class="ident">metadata</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">metadata</span>),
         }
     }
 
     <span class="doccomment">/// Returns the row, if the item is of a correct variant.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_row</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_row</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QueryItem::Row</span>(<span class="ident">row</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">row</span>),
-            <span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">QueryItem::Row</span>(<span class="ident">row</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">row</span>),
+            <span class="ident">QueryItem::Metadata</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
@@ -753,17 +753,17 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">QueryStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">QueryItem</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>();
 
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">token_stream</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Some</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">res</span><span class="question-mark">?</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+                <span class="prelude-val">Some</span>(<span class="ident">res</span>) =&gt; <span class="ident">res</span><span class="question-mark">?</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
             };
 
             <span class="kw">return</span> <span class="kw">match</span> <span class="ident">token</span> {
-                <span class="ident">ReceivedToken::NewResultset</span>(<span class="ident">meta</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ReceivedToken::NewResultset</span>(<span class="ident">meta</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">column_meta</span> <span class="op">=</span> <span class="ident">meta</span>
                         .<span class="ident">columns</span>
                         .<span class="ident">iter</span>()
@@ -783,7 +783,7 @@
 
                     <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">query_item</span>)));
                 }
-                <span class="ident">ReceivedToken::Row</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ReceivedToken::Row</span>(<span class="ident">data</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">columns</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>();
                     <span class="kw">let</span> <span class="ident">result_index</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">result_set_index</span>.<span class="ident">unwrap</span>();
 
@@ -795,7 +795,7 @@
 
                     <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">QueryItem::Row</span>(<span class="ident">row</span>))))
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
+                <span class="kw">_</span> =&gt; <span class="kw">continue</span>,
             };
         }
     }

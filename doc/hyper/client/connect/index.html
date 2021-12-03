@@ -5,11 +5,11 @@
 connections over TCP.</li>
 <li>Types to build custom connectors.</li>
 </ul>
-<h1 id="connectors" class="section-header"><a href="#connectors">Connectors</a></h1>
+<h2 id="connectors" class="section-header"><a href="#connectors">Connectors</a></h2>
 <p>A “connector” is a <a href="../../service/trait.Service.html"><code>Service</code></a> that takes a <a href="../../struct.Uri.html"><code>Uri</code></a> destination, and
 its <code>Response</code> is some type implementing <a href="../../../tokio/io/async_read/trait.AsyncRead.html"><code>AsyncRead</code></a>, <a href="../../../tokio/io/async_write/trait.AsyncWrite.html"><code>AsyncWrite</code></a>,
 and <a href="trait.Connection.html"><code>Connection</code></a>.</p>
-<h2 id="custom-connectors" class="section-header"><a href="#custom-connectors">Custom Connectors</a></h2>
+<h3 id="custom-connectors" class="section-header"><a href="#custom-connectors">Custom Connectors</a></h3>
 <p>A simple connector that ignores the <code>Uri</code> destination and always returns
 a TCP connection to the same address could be written like this:</p>
 
@@ -33,12 +33,12 @@ a TCP connection to the same address could be written like this:</p>
         <span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Response</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>
     <span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// This connector is always ready, but others might not be.</span>
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Uri</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="ident">Box::pin</span>(<span class="ident">TcpStream::connect</span>(<span class="ident">SocketAddr::from</span>(([<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>], <span class="number">1337</span>))))
     }
 }</code></pre></div>
@@ -52,14 +52,14 @@ better starting place to extend from.</p>
 <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">hyper::Client::builder</span>()
     .<span class="ident">build</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">hyper::Body</span><span class="op">&gt;</span>(<span class="ident">connector</span>);</code></pre></div>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="dns/index.html" title="hyper::client::connect::dns mod">dns</a></div><div class="item-right docblock-short"><p>DNS Resolution used by the <code>HttpConnector</code>.</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Connected.html" title="hyper::client::connect::Connected struct">Connected</a></div><div class="item-right docblock-short"><p>Extra information about the connected transport.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.HttpConnector.html" title="hyper::client::connect::HttpConnector struct">HttpConnector</a></div><div class="item-right docblock-short"><p>A connector for the <code>http</code> scheme.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.HttpInfo.html" title="hyper::client::connect::HttpInfo struct">HttpInfo</a></div><div class="item-right docblock-short"><p>Extra information about the transport when an HttpConnector is used.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Connect.html" title="hyper::client::connect::Connect trait">Connect</a></div><div class="item-right docblock-short"><p>Connect to a destination, returning an IO transport.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Connection.html" title="hyper::client::connect::Connection trait">Connection</a></div><div class="item-right docblock-short"><p>Describes a type returned by a connector.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hyper" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="dns/index.html" title="hyper::client::connect::dns mod">dns</a></div><div class="item-right docblock-short"><p>DNS Resolution used by the <code>HttpConnector</code>.</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Connected.html" title="hyper::client::connect::Connected struct">Connected</a></div><div class="item-right docblock-short"><p>Extra information about the connected transport.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.HttpConnector.html" title="hyper::client::connect::HttpConnector struct">HttpConnector</a></div><div class="item-right docblock-short"><p>A connector for the <code>http</code> scheme.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.HttpInfo.html" title="hyper::client::connect::HttpInfo struct">HttpInfo</a></div><div class="item-right docblock-short"><p>Extra information about the transport when an HttpConnector is used.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Connect.html" title="hyper::client::connect::Connect trait">Connect</a></div><div class="item-right docblock-short"><p>Connect to a destination, returning an IO transport.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Connection.html" title="hyper::client::connect::Connection trait">Connection</a></div><div class="item-right docblock-short"><p>Describes a type returned by a connector.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hyper" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script>
 </body></html>

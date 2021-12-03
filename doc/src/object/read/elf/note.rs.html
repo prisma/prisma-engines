@@ -214,11 +214,11 @@
         <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
         <span class="ident">align</span>: <span class="ident">Elf::Word</span>,
         <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">read::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">align</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">align</span>.<span class="ident">into</span>() {
-            <span class="number">0u64</span>..<span class="op">=</span><span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-            <span class="number">8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">8</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>(<span class="string">&quot;Invalid ELF note alignment&quot;</span>)),
+            <span class="number">0u64</span>..<span class="op">=</span><span class="number">4</span> =&gt; <span class="number">4</span>,
+            <span class="number">8</span> =&gt; <span class="number">8</span>,
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>(<span class="string">&quot;Invalid ELF note alignment&quot;</span>)),
         };
         <span class="comment">// TODO: check data alignment?</span>
         <span class="prelude-val">Ok</span>(<span class="ident">NoteIterator</span> {
@@ -229,7 +229,7 @@
     }
 
     <span class="doccomment">/// Returns the next note.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">read::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Note</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Note</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>;
         <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
@@ -281,17 +281,17 @@
     <span class="doccomment">/// Return the `n_type` field of the `NoteHeader`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The meaning of this field is determined by `name`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">n_type</span>(<span class="ident">endian</span>)
     }
 
     <span class="doccomment">/// Return the `n_namesz` field of the `NoteHeader`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_namesz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_namesz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">n_namesz</span>(<span class="ident">endian</span>)
     }
 
     <span class="doccomment">/// Return the `n_descsz` field of the `NoteHeader`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_descsz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">n_descsz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">n_descsz</span>(<span class="ident">endian</span>)
     }
 
@@ -303,9 +303,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The length of this field (including any null terminator) is given by</span>
     <span class="doccomment">/// `n_namesz`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>] {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">last</span>, <span class="ident">name</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">split_last</span>() {
-            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">last</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">last</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="kw">return</span> <span class="ident">name</span>;
             }
         }
@@ -316,7 +316,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The length of this field is given by `n_descsz`. The meaning</span>
     <span class="doccomment">/// of this field is determined by `name` and `n_type`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">desc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">desc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="ident">desc</span>
     }
 }
@@ -326,26 +326,26 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NoteHeader</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Pod</span> {
     <span class="kw">type</span> <span class="ident">Endian</span>: <span class="ident">endian::Endian</span>;
 
-    <span class="kw">fn</span> <span class="ident">n_namesz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span>;
-    <span class="kw">fn</span> <span class="ident">n_descsz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span>;
-    <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span>;
+    <span class="kw">fn</span> <span class="ident">n_namesz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span>;
+    <span class="kw">fn</span> <span class="ident">n_descsz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span>;
+    <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Endian</span>: <span class="ident">endian::Endian</span><span class="op">&gt;</span> <span class="ident">NoteHeader</span> <span class="kw">for</span> <span class="ident">elf::NoteHeader32</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endian</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">n_namesz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">n_namesz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">n_namesz</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">n_descsz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">n_descsz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">n_descsz</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">n_type</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 }
@@ -354,17 +354,17 @@
     <span class="kw">type</span> <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endian</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">n_namesz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">n_namesz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">n_namesz</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">n_descsz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">n_descsz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">n_descsz</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">n_type</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 }

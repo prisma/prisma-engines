@@ -226,7 +226,7 @@
     <span class="ident">aggregator_alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">join_alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">previous_join</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AliasedJoin</span> {
+) -&gt; <span class="ident">AliasedJoin</span> {
     <span class="kw">let</span> <span class="ident">join_alias</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">join_alias</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">name</span>);
 
     <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">relation</span>().<span class="ident">is_many_to_many</span>() {
@@ -242,7 +242,7 @@
     <span class="ident">aggregator_alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">join_alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">previous_join</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AliasedJoin</span> {
+) -&gt; <span class="ident">AliasedJoin</span> {
     <span class="kw">let</span> (<span class="ident">left_fields</span>, <span class="ident">right_fields</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
         (<span class="ident">rf</span>.<span class="ident">scalar_fields</span>(), <span class="ident">rf</span>.<span class="ident">referenced_fields</span>())
     } <span class="kw">else</span> {
@@ -256,7 +256,7 @@
     <span class="comment">// + SELECT A.fk FROM A</span>
     <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">as_table</span>()).<span class="ident">columns</span>(<span class="ident">select_columns</span>);
     <span class="kw">let</span> <span class="ident">aggr_expr</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">aggregation</span> {
-        <span class="ident">AggregationType::Count</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">count</span>(<span class="ident">asterisk</span>()),
+        <span class="ident">AggregationType::Count</span> =&gt; <span class="ident">count</span>(<span class="ident">asterisk</span>()),
     };
 
     <span class="comment">// SELECT A.fk,</span>
@@ -272,8 +272,8 @@
     <span class="kw">let</span> <span class="ident">on_conditions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pairs</span>
         .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">col_a</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">previous_join</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">prev_join</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Column::from</span>((<span class="ident">prev_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>(), <span class="ident">a</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">as_column</span>(),
+                <span class="prelude-val">Some</span>(<span class="ident">prev_join</span>) =&gt; <span class="ident">Column::from</span>((<span class="ident">prev_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>(), <span class="ident">a</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">a</span>.<span class="ident">as_column</span>(),
             };
             <span class="kw">let</span> <span class="ident">col_b</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">join_alias</span>.<span class="ident">to_owned</span>(), <span class="ident">b</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>()));
 
@@ -301,7 +301,7 @@
     <span class="ident">aggregator_alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">join_alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">previous_join</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AliasedJoin</span> {
+) -&gt; <span class="ident">AliasedJoin</span> {
     <span class="kw">let</span> <span class="ident">relation_table</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">as_table</span>();
     <span class="kw">let</span> <span class="ident">model_a</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">model</span>();
     <span class="kw">let</span> <span class="ident">a_ids</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>();
@@ -312,7 +312,7 @@
     <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="ident">model_a</span>.<span class="ident">as_table</span>()).<span class="ident">columns</span>(<span class="ident">a_columns</span>.<span class="ident">clone</span>());
 
     <span class="kw">let</span> <span class="ident">aggr_expr</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">aggregation</span> {
-        <span class="ident">AggregationType::Count</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">count</span>(<span class="ident">rf</span>.<span class="ident">related_field</span>().<span class="ident">m2m_columns</span>()),
+        <span class="ident">AggregationType::Count</span> =&gt; <span class="ident">count</span>(<span class="ident">rf</span>.<span class="ident">related_field</span>().<span class="ident">m2m_columns</span>()),
     };
 
     <span class="comment">// SELECT A.id,</span>
@@ -340,8 +340,8 @@
     <span class="kw">let</span> <span class="ident">on_conditions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pairs</span>
         .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">col_a</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">previous_join</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">prev_join</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Column::from</span>((<span class="ident">prev_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>(), <span class="ident">a</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">as_column</span>(),
+                <span class="prelude-val">Some</span>(<span class="ident">prev_join</span>) =&gt; <span class="ident">Column::from</span>((<span class="ident">prev_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>(), <span class="ident">a</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">a</span>.<span class="ident">as_column</span>(),
             };
             <span class="kw">let</span> <span class="ident">col_b</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">join_alias</span>.<span class="ident">to_owned</span>(), <span class="ident">b</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>()));
 
@@ -364,7 +364,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_one2m_join</span>(<span class="ident">base_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>, <span class="ident">join_prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AliasedJoin</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_one2m_join</span>(<span class="ident">base_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>, <span class="ident">join_prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">AliasedJoin</span> {
     <span class="kw">let</span> (<span class="ident">left_fields</span>, <span class="ident">right_fields</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
         (<span class="ident">rf</span>.<span class="ident">scalar_fields</span>(), <span class="ident">rf</span>.<span class="ident">referenced_fields</span>())
     } <span class="kw">else</span> {

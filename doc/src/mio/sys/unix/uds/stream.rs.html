@@ -45,15 +45,15 @@
 <span class="kw">use</span> <span class="ident">std::os::unix::net</span>;
 <span class="kw">use</span> <span class="ident">std::path::Path</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">net::UnixStream</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">net::UnixStream</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">new_socket</span>(<span class="ident">libc::AF_UNIX</span>, <span class="ident">libc::SOCK_STREAM</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> (<span class="ident">sockaddr</span>, <span class="ident">socklen</span>) <span class="op">=</span> <span class="ident">socket_addr</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">sockaddr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sockaddr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc::sockaddr_un</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc::sockaddr</span>;
 
     <span class="kw">match</span> <span class="macro">syscall!</span>(<span class="ident">connect</span>(<span class="ident">socket</span>, <span class="ident">sockaddr</span>, <span class="ident">socklen</span>)) {
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-        <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">io::ErrorKind::WouldBlock</span> <span class="op">=</span><span class="op">&gt;</span> {}
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+        <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io::ErrorKind::WouldBlock</span> =&gt; {}
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
             <span class="comment">// Close the socket if we hit an error, ignoring the error</span>
             <span class="comment">// from closing since we can&#39;t pass back two errors.</span>
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">libc::close</span>(<span class="ident">socket</span>) };
@@ -65,15 +65,15 @@
     <span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="ident">net::UnixStream::from_raw_fd</span>(<span class="ident">socket</span>) })
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pair</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">net::UnixStream</span>, <span class="ident">net::UnixStream</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pair</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">net::UnixStream</span>, <span class="ident">net::UnixStream</span>)<span class="op">&gt;</span> {
     <span class="ident"><span class="kw">super</span>::pair</span>(<span class="ident">libc::SOCK_STREAM</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="ident">socket</span>: <span class="kw-2">&amp;</span><span class="ident">net::UnixStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="ident">socket</span>: <span class="kw-2">&amp;</span><span class="ident">net::UnixStream</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
     <span class="ident"><span class="kw">super</span>::local_addr</span>(<span class="ident">socket</span>.<span class="ident">as_raw_fd</span>())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">peer_addr</span>(<span class="ident">socket</span>: <span class="kw-2">&amp;</span><span class="ident">net::UnixStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">peer_addr</span>(<span class="ident">socket</span>: <span class="kw-2">&amp;</span><span class="ident">net::UnixStream</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
     <span class="ident"><span class="kw">super</span>::peer_addr</span>(<span class="ident">socket</span>.<span class="ident">as_raw_fd</span>())
 }
 </code></pre></div>

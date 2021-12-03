@@ -103,13 +103,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LengthMeasurement</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">len</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">LengthMeasurement</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zero</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">len</span>: <span class="number">0</span> }
     }
 }
@@ -129,7 +129,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Writer</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">LengthMeasurement</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">LengthMeasurement</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">bytes</span>: <span class="ident">Vec::with_capacity</span>(<span class="ident">capacity</span>.<span class="ident">len</span>),
             <span class="ident">requested_capacity</span>: <span class="ident">capacity</span>.<span class="ident">len</span>,
@@ -138,7 +138,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Writer</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">requested_capacity</span>, <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">len</span>());
         <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">into_boxed_slice</span>()
     }

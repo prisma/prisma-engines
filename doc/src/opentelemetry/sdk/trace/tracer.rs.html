@@ -473,7 +473,7 @@
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Tracer</span> {
     <span class="doccomment">/// Formats the `Tracer` using the given formatter.</span>
     <span class="doccomment">/// Omitting `provider` here is necessary to avoid cycles.</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Tracer&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">instrumentation_lib</span>.<span class="ident">name</span>)
             .<span class="ident">field</span>(<span class="string">&quot;version&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">instrumentation_lib</span>.<span class="ident">version</span>)
@@ -486,7 +486,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">instrumentation_lib</span>: <span class="ident">InstrumentationLibrary</span>,
         <span class="ident">provider</span>: <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">TracerProviderInner</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="ident">Tracer</span> {
             <span class="ident">instrumentation_lib</span>,
             <span class="ident">provider</span>,
@@ -494,12 +494,12 @@
     }
 
     <span class="doccomment">/// TracerProvider associated with this tracer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">provider</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TracerProvider</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">provider</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TracerProvider</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">provider</span>.<span class="ident">upgrade</span>().<span class="ident">map</span>(<span class="ident">TracerProvider::new</span>)
     }
 
     <span class="doccomment">/// instrumentation library information of this tracer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instrumentation_library</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">InstrumentationLibrary</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instrumentation_library</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">InstrumentationLibrary</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">instrumentation_lib</span>
     }
 
@@ -514,7 +514,7 @@
         <span class="ident">attributes</span>: <span class="kw-2">&amp;</span>[<span class="ident">KeyValue</span>],
         <span class="ident">links</span>: <span class="kw-2">&amp;</span>[<span class="ident">Link</span>],
         <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">TraceFlags</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>, <span class="ident">TraceState</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">TraceFlags</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>, <span class="ident">TraceState</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sampling_result</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">sampler</span>.<span class="ident">should_sample</span>(
             <span class="prelude-val">Some</span>(<span class="ident">parent_cx</span>),
             <span class="ident">trace_id</span>,
@@ -531,17 +531,17 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sampling_result</span>: <span class="ident">SamplingResult</span>,
         <span class="ident">parent_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">TraceFlags</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>, <span class="ident">TraceState</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">TraceFlags</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>, <span class="ident">TraceState</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">sampling_result</span> {
             <span class="ident">SamplingResult</span> {
                 <span class="ident">decision</span>: <span class="ident">SamplingDecision::Drop</span>,
                 ..
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            } =&gt; <span class="prelude-val">None</span>,
             <span class="ident">SamplingResult</span> {
                 <span class="ident">decision</span>: <span class="ident">SamplingDecision::RecordOnly</span>,
                 <span class="ident">attributes</span>,
                 <span class="ident">trace_state</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">let</span> <span class="ident">trace_flags</span> <span class="op">=</span> <span class="ident">parent_cx</span>.<span class="ident">span</span>().<span class="ident">span_context</span>().<span class="ident">trace_flags</span>();
                 <span class="prelude-val">Some</span>((<span class="ident">trace_flags</span>.<span class="ident">with_sampled</span>(<span class="bool-val">false</span>), <span class="ident">attributes</span>, <span class="ident">trace_state</span>))
             }
@@ -549,7 +549,7 @@
                 <span class="ident">decision</span>: <span class="ident">SamplingDecision::RecordAndSample</span>,
                 <span class="ident">attributes</span>,
                 <span class="ident">trace_state</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">let</span> <span class="ident">trace_flags</span> <span class="op">=</span> <span class="ident">parent_cx</span>.<span class="ident">span</span>().<span class="ident">span_context</span>().<span class="ident">trace_flags</span>();
                 <span class="prelude-val">Some</span>((<span class="ident">trace_flags</span>.<span class="ident">with_sampled</span>(<span class="bool-val">true</span>), <span class="ident">attributes</span>, <span class="ident">trace_state</span>))
             }
@@ -563,7 +563,7 @@
 
     <span class="doccomment">/// Returns a span with an inactive `SpanContext`. Used by functions that</span>
     <span class="doccomment">/// need to return a default span like `get_active_span` if no span is present.</span>
-    <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Span</span> {
+    <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span> {
         <span class="ident">Span::new</span>(
             <span class="ident">SpanContext::empty_context</span>(),
             <span class="prelude-val">None</span>,
@@ -579,7 +579,7 @@
     <span class="doccomment">/// trace. A span is said to be a _root span_ if it does not have a parent. Each</span>
     <span class="doccomment">/// trace includes a single root span, which is the shared ancestor of all other</span>
     <span class="doccomment">/// spans in the trace.</span>
-    <span class="kw">fn</span> <span class="ident">start_with_context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">cx</span>: <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Span</span>
+    <span class="kw">fn</span> <span class="ident">start_with_context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">cx</span>: <span class="ident">Context</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -589,7 +589,7 @@
     <span class="doccomment">/// Creates a span builder</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// An ergonomic way for attributes to be configured before the `Span` is started.</span>
-    <span class="kw">fn</span> <span class="ident">span_builder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SpanBuilder</span>
+    <span class="kw">fn</span> <span class="ident">span_builder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="ident">SpanBuilder</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -603,7 +603,7 @@
     <span class="doccomment">/// trace. A span is said to be a _root span_ if it does not have a parent. Each</span>
     <span class="doccomment">/// trace includes a single root span, which is the shared ancestor of all other</span>
     <span class="doccomment">/// spans in the trace.</span>
-    <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">builder</span>: <span class="ident">SpanBuilder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Span</span> {
+    <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">builder</span>: <span class="ident">SpanBuilder</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span> {
         <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">provider</span>();
         <span class="kw">if</span> <span class="ident">provider</span>.<span class="ident">is_none</span>() {
             <span class="kw">return</span> <span class="ident">Span::new</span>(
@@ -789,7 +789,7 @@
             <span class="ident">_span_kind</span>: <span class="kw-2">&amp;</span><span class="ident">SpanKind</span>,
             <span class="ident">_attributes</span>: <span class="kw-2">&amp;</span>[<span class="ident">KeyValue</span>],
             <span class="ident">_links</span>: <span class="kw-2">&amp;</span>[<span class="ident">Link</span>],
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SamplingResult</span> {
+        ) -&gt; <span class="ident">SamplingResult</span> {
             <span class="kw">let</span> <span class="ident">trace_state</span> <span class="op">=</span> <span class="ident">parent_context</span>
                 .<span class="ident">unwrap</span>()
                 .<span class="ident">span</span>()

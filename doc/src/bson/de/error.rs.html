@@ -159,48 +159,48 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::Io</span>(<span class="ident">Arc::new</span>(<span class="ident">err</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">string::FromUtf8Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">string::FromUtf8Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">string::FromUtf8Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::InvalidUtf8String</span>(<span class="ident">err</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::Io</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inner</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
-            <span class="ident">Error::InvalidUtf8String</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inner</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
+            <span class="ident">Error::Io</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
+            <span class="ident">Error::InvalidUtf8String</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
             <span class="ident">Error::UnrecognizedDocumentElementType</span> {
                 <span class="kw-2">ref</span> <span class="ident">key</span>,
                 <span class="ident">element_type</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+            } =&gt; <span class="macro">write!</span>(
                 <span class="ident">fmt</span>,
                 <span class="string">&quot;unrecognized element type for key \&quot;{}\&quot;: `{:#x}`&quot;</span>,
                 <span class="ident">key</span>, <span class="ident">element_type</span>
             ),
-            <span class="ident">Error::EndOfStream</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;end of stream&quot;</span>),
-            <span class="ident">Error::DeserializationError</span> { <span class="kw-2">ref</span> <span class="ident">message</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">message</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
+            <span class="ident">Error::EndOfStream</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;end of stream&quot;</span>),
+            <span class="ident">Error::DeserializationError</span> { <span class="kw-2">ref</span> <span class="ident">message</span> } =&gt; <span class="ident">message</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::Io</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">inner</span>.<span class="ident">as_ref</span>()),
-            <span class="ident">Error::InvalidUtf8String</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Error::Io</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>.<span class="ident">as_ref</span>()),
+            <span class="ident">Error::InvalidUtf8String</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">de::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">custom</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">custom</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::DeserializationError</span> {
             <span class="ident">message</span>: <span class="ident">msg</span>.<span class="ident">to_string</span>(),
         }
@@ -212,29 +212,29 @@
 
 <span class="kw">impl</span> <span class="ident">Bson</span> {
     <span class="doccomment">/// Method for converting a given `Bson` value to a `serde::de::Unexpected` for error reporting.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_unexpected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Unexpected</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_unexpected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Unexpected</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Bson::Array</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Seq</span>,
-            <span class="ident">Bson::Binary</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Bytes</span>(<span class="ident">b</span>.<span class="ident">bytes</span>.<span class="ident">as_slice</span>()),
-            <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Bool</span>(<span class="kw-2">*</span><span class="ident">b</span>),
-            <span class="ident">Bson::DbPointer</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Other</span>(<span class="string">&quot;dbpointer&quot;</span>),
-            <span class="ident">Bson::Document</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Map</span>,
-            <span class="ident">Bson::Double</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Float</span>(<span class="kw-2">*</span><span class="ident">f</span>),
-            <span class="ident">Bson::Int32</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Signed</span>(<span class="kw-2">*</span><span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>),
-            <span class="ident">Bson::Int64</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Signed</span>(<span class="kw-2">*</span><span class="ident">i</span>),
-            <span class="ident">Bson::JavaScriptCode</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Other</span>(<span class="string">&quot;javascript code&quot;</span>),
-            <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Other</span>(<span class="string">&quot;javascript code with scope&quot;</span>),
-            <span class="ident">Bson::MaxKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Other</span>(<span class="string">&quot;maxkey&quot;</span>),
-            <span class="ident">Bson::MinKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Other</span>(<span class="string">&quot;minkey&quot;</span>),
-            <span class="ident">Bson::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Unit</span>,
-            <span class="ident">Bson::Undefined</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Other</span>(<span class="string">&quot;undefined&quot;</span>),
-            <span class="ident">Bson::ObjectId</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Other</span>(<span class="string">&quot;objectid&quot;</span>),
-            <span class="ident">Bson::RegularExpression</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Other</span>(<span class="string">&quot;regex&quot;</span>),
-            <span class="ident">Bson::String</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Str</span>(<span class="ident">s</span>.<span class="ident">as_str</span>()),
-            <span class="ident">Bson::Symbol</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Other</span>(<span class="string">&quot;symbol&quot;</span>),
-            <span class="ident">Bson::Timestamp</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Other</span>(<span class="string">&quot;timestamp&quot;</span>),
-            <span class="ident">Bson::DateTime</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Other</span>(<span class="string">&quot;datetime&quot;</span>),
-            <span class="ident">Bson::Decimal128</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Unexpected::Other</span>(<span class="string">&quot;decimal128&quot;</span>),
+            <span class="ident">Bson::Array</span>(<span class="kw">_</span>) =&gt; <span class="ident">Unexpected::Seq</span>,
+            <span class="ident">Bson::Binary</span>(<span class="ident">b</span>) =&gt; <span class="ident">Unexpected::Bytes</span>(<span class="ident">b</span>.<span class="ident">bytes</span>.<span class="ident">as_slice</span>()),
+            <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>) =&gt; <span class="ident">Unexpected::Bool</span>(<span class="kw-2">*</span><span class="ident">b</span>),
+            <span class="ident">Bson::DbPointer</span>(<span class="kw">_</span>) =&gt; <span class="ident">Unexpected::Other</span>(<span class="string">&quot;dbpointer&quot;</span>),
+            <span class="ident">Bson::Document</span>(<span class="kw">_</span>) =&gt; <span class="ident">Unexpected::Map</span>,
+            <span class="ident">Bson::Double</span>(<span class="ident">f</span>) =&gt; <span class="ident">Unexpected::Float</span>(<span class="kw-2">*</span><span class="ident">f</span>),
+            <span class="ident">Bson::Int32</span>(<span class="ident">i</span>) =&gt; <span class="ident">Unexpected::Signed</span>(<span class="kw-2">*</span><span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>),
+            <span class="ident">Bson::Int64</span>(<span class="ident">i</span>) =&gt; <span class="ident">Unexpected::Signed</span>(<span class="kw-2">*</span><span class="ident">i</span>),
+            <span class="ident">Bson::JavaScriptCode</span>(<span class="kw">_</span>) =&gt; <span class="ident">Unexpected::Other</span>(<span class="string">&quot;javascript code&quot;</span>),
+            <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="kw">_</span>) =&gt; <span class="ident">Unexpected::Other</span>(<span class="string">&quot;javascript code with scope&quot;</span>),
+            <span class="ident">Bson::MaxKey</span> =&gt; <span class="ident">Unexpected::Other</span>(<span class="string">&quot;maxkey&quot;</span>),
+            <span class="ident">Bson::MinKey</span> =&gt; <span class="ident">Unexpected::Other</span>(<span class="string">&quot;minkey&quot;</span>),
+            <span class="ident">Bson::Null</span> =&gt; <span class="ident">Unexpected::Unit</span>,
+            <span class="ident">Bson::Undefined</span> =&gt; <span class="ident">Unexpected::Other</span>(<span class="string">&quot;undefined&quot;</span>),
+            <span class="ident">Bson::ObjectId</span>(<span class="kw">_</span>) =&gt; <span class="ident">Unexpected::Other</span>(<span class="string">&quot;objectid&quot;</span>),
+            <span class="ident">Bson::RegularExpression</span>(<span class="kw">_</span>) =&gt; <span class="ident">Unexpected::Other</span>(<span class="string">&quot;regex&quot;</span>),
+            <span class="ident">Bson::String</span>(<span class="ident">s</span>) =&gt; <span class="ident">Unexpected::Str</span>(<span class="ident">s</span>.<span class="ident">as_str</span>()),
+            <span class="ident">Bson::Symbol</span>(<span class="kw">_</span>) =&gt; <span class="ident">Unexpected::Other</span>(<span class="string">&quot;symbol&quot;</span>),
+            <span class="ident">Bson::Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="ident">Unexpected::Other</span>(<span class="string">&quot;timestamp&quot;</span>),
+            <span class="ident">Bson::DateTime</span>(<span class="kw">_</span>) =&gt; <span class="ident">Unexpected::Other</span>(<span class="string">&quot;datetime&quot;</span>),
+            <span class="ident">Bson::Decimal128</span>(<span class="kw">_</span>) =&gt; <span class="ident">Unexpected::Other</span>(<span class="string">&quot;decimal128&quot;</span>),
         }
     }
 }

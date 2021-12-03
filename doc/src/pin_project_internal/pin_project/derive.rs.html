@@ -1137,7 +1137,7 @@
     <span class="ident">SliceExt</span>, <span class="ident">Variants</span>,
 };
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse_derive</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse_derive</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">DeriveInput</span> <span class="op">=</span> <span class="ident">syn::parse2</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cx</span>;
@@ -1151,15 +1151,15 @@
     <span class="ident">visitor</span>.<span class="ident">visit_data_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>.<span class="ident">data</span>);
 
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">data</span> {
-        <span class="ident">Data::Struct</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Data::Struct</span>(<span class="ident">data</span>) =&gt; {
             <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Context::new</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">attrs</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">vis</span>, <span class="ident">ident</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>.<span class="ident">generics</span>, <span class="ident">Struct</span>)<span class="question-mark">?</span>;
             <span class="ident">parse_struct</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">fields</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">generate</span>)<span class="question-mark">?</span>;
         }
-        <span class="ident">Data::Enum</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Data::Enum</span>(<span class="ident">data</span>) =&gt; {
             <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Context::new</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">attrs</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">vis</span>, <span class="ident">ident</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>.<span class="ident">generics</span>, <span class="ident">Enum</span>)<span class="question-mark">?</span>;
             <span class="ident">parse_enum</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cx</span>, <span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">generate</span>)<span class="question-mark">?</span>;
         }
-        <span class="ident">Data::Union</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Data::Union</span>(<span class="kw">_</span>) =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">error!</span>(
                 <span class="ident">input</span>,
                 <span class="string">&quot;#[pin_project] attribute may only be used on structs or enums&quot;</span>
@@ -1185,7 +1185,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">into_tokens</span>(<span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">fn</span> <span class="ident">into_tokens</span>(<span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exposed</span>;
         <span class="kw">let</span> <span class="ident">scoped</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">scoped</span>;
 
@@ -1223,7 +1223,7 @@
 }
 
 <span class="doccomment">/// Returns attributes that should be applied to all generated code.</span>
-<span class="kw">fn</span> <span class="ident">global_allowed_lints</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">fn</span> <span class="ident">global_allowed_lints</span>() -&gt; <span class="ident">TokenStream</span> {
     <span class="macro">quote!</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">box_pointers</span>)]</span> <span class="comment">// This lint warns use of the `Box` type.</span>
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
@@ -1240,8 +1240,8 @@
 }
 
 <span class="doccomment">/// Returns attributes used on projected types.</span>
-<span class="kw">fn</span> <span class="ident">proj_allowed_lints</span>(<span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">TokenStream</span>, <span class="ident">TokenStream</span>, <span class="ident">TokenStream</span>) {
-    <span class="kw">let</span> <span class="ident">large_enum_variant</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">kind</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Enum</span> {
+<span class="kw">fn</span> <span class="ident">proj_allowed_lints</span>(<span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; (<span class="ident">TokenStream</span>, <span class="ident">TokenStream</span>, <span class="ident">TokenStream</span>) {
+    <span class="kw">let</span> <span class="ident">large_enum_variant</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">Enum</span> {
         <span class="prelude-val">Some</span>(<span class="macro">quote!</span> {
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">variant_size_differences</span>)]</span>
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
@@ -1301,14 +1301,14 @@
         <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Ident</span>,
         <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Generics</span>,
         <span class="ident">kind</span>: <span class="ident">TypeKind</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">Args</span> { <span class="ident">pinned_drop</span>, <span class="ident">unpin_impl</span>, <span class="ident">project</span>, <span class="ident">project_ref</span>, <span class="ident">project_replace</span> } <span class="op">=</span>
             <span class="ident">parse_args</span>(<span class="ident">attrs</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> [<span class="ident">project</span>.<span class="ident">as_ref</span>(), <span class="ident">project_ref</span>.<span class="ident">as_ref</span>(), <span class="ident">project_replace</span>.<span class="ident">ident</span>()]
             .<span class="ident">iter</span>()
             .<span class="ident">filter_map</span>(<span class="ident">Option::as_ref</span>)
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ident</span>)
+            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">name</span> <span class="op">==</span> <span class="ident">ident</span>)
         {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">error!</span>(<span class="ident">name</span>, <span class="string">&quot;name `{}` is the same as the original type name&quot;</span>, <span class="ident">name</span>));
         }
@@ -1412,7 +1412,7 @@
     <span class="ident">proj_own_fields</span>: <span class="ident">TokenStream</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">validate_struct</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">Fields</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">validate_struct</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">Fields</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">is_empty</span>() {
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;#[pin_project] attribute may not be used on structs with zero fields&quot;</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Fields::Unit</span> <span class="op">=</span> <span class="ident">fields</span> { <span class="prelude-val">Err</span>(<span class="macro">error!</span>(<span class="ident">ident</span>, <span class="ident">msg</span>)) } <span class="kw">else</span> { <span class="prelude-val">Err</span>(<span class="macro">error!</span>(<span class="ident">fields</span>, <span class="ident">msg</span>)) }
@@ -1421,7 +1421,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">validate_enum</span>(<span class="ident">brace_token</span>: <span class="ident">token::Brace</span>, <span class="ident">variants</span>: <span class="kw-2">&amp;</span><span class="ident">Variants</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">validate_enum</span>(<span class="ident">brace_token</span>: <span class="ident">token::Brace</span>, <span class="ident">variants</span>: <span class="kw-2">&amp;</span><span class="ident">Variants</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">variants</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
             <span class="ident">brace_token</span>.<span class="ident">span</span>,
@@ -1450,7 +1450,7 @@
     <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Fields</span>,
     <span class="ident">generate</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">GenerateTokens</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="comment">// Do this first for a better error message.</span>
     <span class="kw">let</span> <span class="ident">packed_check</span> <span class="op">=</span> <span class="ident">ensure_not_packed</span>(<span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">orig</span>, <span class="prelude-val">Some</span>(<span class="ident">fields</span>))<span class="question-mark">?</span>;
 
@@ -1464,9 +1464,9 @@
         <span class="ident">proj_own_fields</span>,
         <span class="ident">proj_own_body</span>,
     } <span class="op">=</span> <span class="kw">match</span> <span class="ident">fields</span> {
-        <span class="ident">Fields::Named</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">visit_fields</span>(<span class="ident">cx</span>, <span class="prelude-val">None</span>, <span class="ident">fields</span>, <span class="ident">Delimiter::Brace</span>)<span class="question-mark">?</span>,
-        <span class="ident">Fields::Unnamed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">visit_fields</span>(<span class="ident">cx</span>, <span class="prelude-val">None</span>, <span class="ident">fields</span>, <span class="ident">Delimiter::Parenthesis</span>)<span class="question-mark">?</span>,
-        <span class="ident">Fields::Unit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="ident">Fields::Named</span>(<span class="kw">_</span>) =&gt; <span class="ident">visit_fields</span>(<span class="ident">cx</span>, <span class="prelude-val">None</span>, <span class="ident">fields</span>, <span class="ident">Delimiter::Brace</span>)<span class="question-mark">?</span>,
+        <span class="ident">Fields::Unnamed</span>(<span class="kw">_</span>) =&gt; <span class="ident">visit_fields</span>(<span class="ident">cx</span>, <span class="prelude-val">None</span>, <span class="ident">fields</span>, <span class="ident">Delimiter::Parenthesis</span>)<span class="question-mark">?</span>,
+        <span class="ident">Fields::Unit</span> =&gt; <span class="macro">unreachable!</span>(),
     };
 
     <span class="kw">let</span> <span class="ident">proj_ident</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">proj</span>.<span class="ident">mut_ident</span>;
@@ -1481,17 +1481,17 @@
     <span class="comment">// For tuple structs, we need to generate `(T1, T2) where Foo: Bar`</span>
     <span class="comment">// For non-tuple structs, we need to generate `where Foo: Bar { field1: T }`</span>
     <span class="kw">let</span> (<span class="ident">where_clause_fields</span>, <span class="ident">where_clause_ref_fields</span>, <span class="ident">where_clause_own_fields</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">fields</span> {
-        <span class="ident">Fields::Named</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (
+        <span class="ident">Fields::Named</span>(<span class="kw">_</span>) =&gt; (
             <span class="macro">quote!</span>(#<span class="ident">proj_where_clause</span> #<span class="ident">proj_fields</span>),
             <span class="macro">quote!</span>(#<span class="ident">proj_where_clause</span> #<span class="ident">proj_ref_fields</span>),
             <span class="macro">quote!</span>(#<span class="ident">orig_where_clause</span> #<span class="ident">proj_own_fields</span>),
         ),
-        <span class="ident">Fields::Unnamed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (
+        <span class="ident">Fields::Unnamed</span>(<span class="kw">_</span>) =&gt; (
             <span class="macro">quote!</span>(#<span class="ident">proj_fields</span> #<span class="ident">proj_where_clause</span>;),
             <span class="macro">quote!</span>(#<span class="ident">proj_ref_fields</span> #<span class="ident">proj_where_clause</span>;),
             <span class="macro">quote!</span>(#<span class="ident">proj_own_fields</span> #<span class="ident">orig_where_clause</span>;),
         ),
-        <span class="ident">Fields::Unit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="ident">Fields::Unit</span> =&gt; <span class="macro">unreachable!</span>(),
     };
 
     <span class="kw">let</span> (<span class="ident">proj_attrs</span>, <span class="ident">proj_ref_attrs</span>, <span class="ident">proj_own_attrs</span>) <span class="op">=</span> <span class="ident">proj_allowed_lints</span>(<span class="ident">cx</span>);
@@ -1532,7 +1532,7 @@
     <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     <span class="ident">DataEnum</span> { <span class="ident">brace_token</span>, <span class="ident">variants</span>, .. }: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DataEnum</span>,
     <span class="ident">generate</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">GenerateTokens</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ProjReplace::Unnamed</span> { <span class="ident">span</span> } <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">project_replace</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
             <span class="kw-2">*</span><span class="ident">span</span>,
@@ -1613,7 +1613,7 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">visit_variants</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">variants</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Variants</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ProjectedVariants</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">visit_variants</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">variants</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Variants</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ProjectedVariants</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">proj_variants</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">proj_ref_variants</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">proj_own_variants</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
@@ -1630,9 +1630,9 @@
             <span class="ident">proj_own_fields</span>,
             <span class="ident">proj_own_body</span>,
         } <span class="op">=</span> <span class="kw">match</span> <span class="ident">fields</span> {
-            <span class="ident">Fields::Named</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">visit_fields</span>(<span class="ident">cx</span>, <span class="prelude-val">Some</span>(<span class="ident">ident</span>), <span class="ident">fields</span>, <span class="ident">Delimiter::Brace</span>)<span class="question-mark">?</span>,
-            <span class="ident">Fields::Unnamed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">visit_fields</span>(<span class="ident">cx</span>, <span class="prelude-val">Some</span>(<span class="ident">ident</span>), <span class="ident">fields</span>, <span class="ident">Delimiter::Parenthesis</span>)<span class="question-mark">?</span>,
-            <span class="ident">Fields::Unit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ProjectedFields</span> {
+            <span class="ident">Fields::Named</span>(<span class="kw">_</span>) =&gt; <span class="ident">visit_fields</span>(<span class="ident">cx</span>, <span class="prelude-val">Some</span>(<span class="ident">ident</span>), <span class="ident">fields</span>, <span class="ident">Delimiter::Brace</span>)<span class="question-mark">?</span>,
+            <span class="ident">Fields::Unnamed</span>(<span class="kw">_</span>) =&gt; <span class="ident">visit_fields</span>(<span class="ident">cx</span>, <span class="prelude-val">Some</span>(<span class="ident">ident</span>), <span class="ident">fields</span>, <span class="ident">Delimiter::Parenthesis</span>)<span class="question-mark">?</span>,
+            <span class="ident">Fields::Unit</span> =&gt; <span class="ident">ProjectedFields</span> {
                 <span class="ident">proj_own_body</span>: <span class="ident">proj_own_body</span>(<span class="ident">cx</span>, <span class="prelude-val">Some</span>(<span class="ident">ident</span>), <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>[]),
                 ..<span class="ident">ProjectedFields::default</span>()
             },
@@ -1650,13 +1650,13 @@
             #<span class="ident">ident</span> #<span class="ident">proj_own_fields</span>,
         });
         <span class="ident">proj_arms</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> {
-            <span class="self">Self</span>::#<span class="ident">ident</span> #<span class="ident">proj_pat</span> <span class="op">=</span><span class="op">&gt;</span> #<span class="ident">proj_ident</span>::#<span class="ident">ident</span> #<span class="ident">proj_body</span>,
+            <span class="self">Self</span>::#<span class="ident">ident</span> #<span class="ident">proj_pat</span> =&gt; #<span class="ident">proj_ident</span>::#<span class="ident">ident</span> #<span class="ident">proj_body</span>,
         });
         <span class="ident">proj_ref_arms</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> {
-            <span class="self">Self</span>::#<span class="ident">ident</span> #<span class="ident">proj_pat</span> <span class="op">=</span><span class="op">&gt;</span> #<span class="ident">proj_ref_ident</span>::#<span class="ident">ident</span> #<span class="ident">proj_body</span>,
+            <span class="self">Self</span>::#<span class="ident">ident</span> #<span class="ident">proj_pat</span> =&gt; #<span class="ident">proj_ref_ident</span>::#<span class="ident">ident</span> #<span class="ident">proj_body</span>,
         });
         <span class="ident">proj_own_arms</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> {
-            <span class="self">Self</span>::#<span class="ident">ident</span> #<span class="ident">proj_pat</span> <span class="op">=</span><span class="op">&gt;</span> { #<span class="ident">proj_own_body</span> }
+            <span class="self">Self</span>::#<span class="ident">ident</span> #<span class="ident">proj_pat</span> =&gt; { #<span class="ident">proj_own_body</span> }
         });
     }
 
@@ -1675,8 +1675,8 @@
     <span class="ident">variant_ident</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Ident</span><span class="op">&gt;</span>,
     <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Fields</span>,
     <span class="ident">delim</span>: <span class="ident">Delimiter</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ProjectedFields</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">surround</span>(<span class="ident">delim</span>: <span class="ident">Delimiter</span>, <span class="ident">tokens</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ProjectedFields</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">surround</span>(<span class="ident">delim</span>: <span class="ident">Delimiter</span>, <span class="ident">tokens</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="ident">Group::new</span>(<span class="ident">delim</span>, <span class="ident">tokens</span>).<span class="ident">into_token_stream</span>()
     }
 
@@ -1757,11 +1757,11 @@
     <span class="ident">variant_ident</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Ident</span><span class="op">&gt;</span>,
     <span class="ident">proj_move</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Group</span><span class="op">&gt;</span>,
     <span class="ident">pinned_fields</span>: <span class="kw-2">&amp;</span>[<span class="ident">Ident</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">proj</span>.<span class="ident">own_ident</span>;
     <span class="kw">let</span> <span class="ident">proj_own</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">variant_ident</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">variant_ident</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span>(#<span class="ident">ident</span>::#<span class="ident">variant_ident</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span>(#<span class="ident">ident</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">variant_ident</span>) =&gt; <span class="macro">quote!</span>(#<span class="ident">ident</span>::#<span class="ident">variant_ident</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="macro">quote!</span>(#<span class="ident">ident</span>),
     };
 
     <span class="comment">// The fields of the struct and the active enum variant are dropped</span>
@@ -1795,29 +1795,29 @@
 <span class="doccomment">/// * `UnpinImpl::Unsafe` - Implements `Unpin` via `UnsafeUnpin` impl.</span>
 <span class="doccomment">/// * `UnpinImpl::Negative` - Generates `Unpin` impl with bounds that will never be true.</span>
 <span class="doccomment">/// * `UnpinImpl::Default` - Generates `Unpin` impl that requires `Unpin` for all pinned fields.</span>
-<span class="kw">fn</span> <span class="ident">make_unpin_impl</span>(<span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">fn</span> <span class="ident">make_unpin_impl</span>(<span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">match</span> <span class="ident">cx</span>.<span class="ident">unpin_impl</span> {
-        <span class="ident">UnpinImpl::Unsafe</span>(<span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">UnpinImpl::Unsafe</span>(<span class="ident">span</span>) =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">proj_generics</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">proj</span>.<span class="ident">generics</span>.<span class="ident">clone</span>();
             <span class="kw">let</span> <span class="ident">orig_ident</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">orig</span>.<span class="ident">ident</span>;
             <span class="kw">let</span> <span class="ident">lifetime</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">proj</span>.<span class="ident">lifetime</span>;
 
             <span class="comment">// Make the error message highlight `UnsafeUnpin` argument.</span>
-            <span class="ident">proj_generics</span>.<span class="ident">make_where_clause</span>().<span class="ident">predicates</span>.<span class="ident">push</span>(<span class="macro">parse_quote_spanned!</span> { <span class="ident">span</span> <span class="op">=</span><span class="op">&gt;</span>
+            <span class="ident">proj_generics</span>.<span class="ident">make_where_clause</span>().<span class="ident">predicates</span>.<span class="ident">push</span>(<span class="macro">parse_quote_spanned!</span> { <span class="ident">span</span> =&gt;
                 <span class="ident">::pin_project::__private::Wrapper</span><span class="op">&lt;</span>#<span class="ident">lifetime</span>, <span class="self">Self</span><span class="op">&gt;</span>: <span class="ident">::pin_project::UnsafeUnpin</span>
             });
 
             <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="kw">_</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">proj_generics</span>.<span class="ident">split_for_impl</span>();
             <span class="kw">let</span> <span class="ident">ty_generics</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">orig</span>.<span class="ident">generics</span>.<span class="ident">split_for_impl</span>().<span class="number">1</span>;
 
-            <span class="macro">quote_spanned!</span> { <span class="ident">span</span> <span class="op">=</span><span class="op">&gt;</span>
+            <span class="macro">quote_spanned!</span> { <span class="ident">span</span> =&gt;
                 <span class="kw">impl</span> #<span class="ident">impl_generics</span> <span class="ident">::pin_project::__private::Unpin</span> <span class="kw">for</span> #<span class="ident">orig_ident</span> #<span class="ident">ty_generics</span>
                 #<span class="ident">where_clause</span>
                 {
                 }
             }
         }
-        <span class="ident">UnpinImpl::Negative</span>(<span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">UnpinImpl::Negative</span>(<span class="ident">span</span>) =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">proj_generics</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">proj</span>.<span class="ident">generics</span>.<span class="ident">clone</span>();
             <span class="kw">let</span> <span class="ident">orig_ident</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">orig</span>.<span class="ident">ident</span>;
             <span class="kw">let</span> <span class="ident">lifetime</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">proj</span>.<span class="ident">lifetime</span>;
@@ -1834,7 +1834,7 @@
             <span class="comment">// For interoperability with `forbid(unsafe_code)`, `unsafe` token should be</span>
             <span class="comment">// call-site span.</span>
             <span class="kw">let</span> <span class="ident">unsafety</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro">Token!</span>[<span class="kw">unsafe</span>]<span class="op">&gt;</span><span class="ident">::default</span>();
-            <span class="macro">quote_spanned!</span> { <span class="ident">span</span> <span class="op">=</span><span class="op">&gt;</span>
+            <span class="macro">quote_spanned!</span> { <span class="ident">span</span> =&gt;
                 <span class="kw">impl</span> #<span class="ident">proj_impl_generics</span> <span class="ident">::pin_project::__private::Unpin</span>
                     <span class="kw">for</span> #<span class="ident">orig_ident</span> #<span class="ident">ty_generics</span>
                 #<span class="ident">proj_where_clause</span>
@@ -1855,7 +1855,7 @@
                 }
             }
         }
-        <span class="ident">UnpinImpl::Default</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">UnpinImpl::Default</span> =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">full_where_clause</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">orig</span>.<span class="ident">generics</span>.<span class="ident">where_clause</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>();
 
             <span class="comment">// Generate a field in our new struct for every</span>
@@ -1956,7 +1956,7 @@
 <span class="doccomment">/// * `Some` - implements `Drop` via `PinnedDrop` impl.</span>
 <span class="doccomment">/// * `None` - generates code that ensures that `Drop` trait is not implemented,</span>
 <span class="doccomment">///            instead of generating `Drop` impl.</span>
-<span class="kw">fn</span> <span class="ident">make_drop_impl</span>(<span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">fn</span> <span class="ident">make_drop_impl</span>(<span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">orig</span>.<span class="ident">ident</span>;
     <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">orig</span>.<span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
 
@@ -1964,7 +1964,7 @@
         <span class="comment">// For interoperability with `forbid(unsafe_code)`, `unsafe` token should be</span>
         <span class="comment">// call-site span.</span>
         <span class="kw">let</span> <span class="ident">unsafety</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro">Token!</span>[<span class="kw">unsafe</span>]<span class="op">&gt;</span><span class="ident">::default</span>();
-        <span class="macro">quote_spanned!</span> { <span class="ident">span</span> <span class="op">=</span><span class="op">&gt;</span>
+        <span class="macro">quote_spanned!</span> { <span class="ident">span</span> =&gt;
             <span class="kw">impl</span> #<span class="ident">impl_generics</span> <span class="ident">::pin_project::__private::Drop</span> <span class="kw">for</span> #<span class="ident">ident</span> #<span class="ident">ty_generics</span>
             #<span class="ident">where_clause</span>
             {
@@ -2042,7 +2042,7 @@
     <span class="ident">proj_body</span>: <span class="kw-2">&amp;</span><span class="ident">TokenStream</span>,
     <span class="ident">proj_ref_body</span>: <span class="kw-2">&amp;</span><span class="ident">TokenStream</span>,
     <span class="ident">proj_own_body</span>: <span class="kw-2">&amp;</span><span class="ident">TokenStream</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">vis</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">proj</span>.<span class="ident">vis</span>;
     <span class="kw">let</span> <span class="ident">lifetime</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">proj</span>.<span class="ident">lifetime</span>;
     <span class="kw">let</span> <span class="ident">orig_ident</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">orig</span>.<span class="ident">ident</span>;
@@ -2057,7 +2057,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">project</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">quote!</span> {
         #<span class="ident">vis</span> <span class="kw">fn</span> <span class="ident">project</span><span class="op">&lt;</span>#<span class="ident">lifetime</span><span class="op">&gt;</span>(
             <span class="self">self</span>: <span class="ident">::pin_project::__private::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>#<span class="ident">lifetime</span> <span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> #<span class="ident">proj_ident</span> #<span class="ident">proj_ty_generics</span> {
+        ) -&gt; #<span class="ident">proj_ident</span> #<span class="ident">proj_ty_generics</span> {
             <span class="kw">unsafe</span> {
                 #<span class="ident">proj_body</span>
             }
@@ -2067,7 +2067,7 @@
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_const_for_fn</span>)]</span>
         #<span class="ident">vis</span> <span class="kw">fn</span> <span class="ident">project_ref</span><span class="op">&lt;</span>#<span class="ident">lifetime</span><span class="op">&gt;</span>(
             <span class="self">self</span>: <span class="ident">::pin_project::__private::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>#<span class="ident">lifetime</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> #<span class="ident">proj_ref_ident</span> #<span class="ident">proj_ty_generics</span> {
+        ) -&gt; #<span class="ident">proj_ref_ident</span> #<span class="ident">proj_ty_generics</span> {
             <span class="kw">unsafe</span> {
                 #<span class="ident">proj_ref_body</span>
             }
@@ -2075,11 +2075,11 @@
     });
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">project_replace</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">project_replace</span>.<span class="ident">span</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">span</span><span class="op">|</span> {
         <span class="comment">// It is enough to only set the span of the signature.</span>
-        <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="macro">quote_spanned!</span> { <span class="ident">span</span> <span class="op">=</span><span class="op">&gt;</span>
+        <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="macro">quote_spanned!</span> { <span class="ident">span</span> =&gt;
             #<span class="ident">vis</span> <span class="kw">fn</span> <span class="ident">project_replace</span>(
                 <span class="self">self</span>: <span class="ident">::pin_project::__private::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
                 <span class="ident">__replacement</span>: <span class="self">Self</span>,
-            ) <span class="op">-</span><span class="op">&gt;</span> #<span class="ident">proj_own_ident</span> #<span class="ident">orig_ty_generics</span>
+            ) -&gt; #<span class="ident">proj_own_ident</span> #<span class="ident">orig_ty_generics</span>
         };
         <span class="macro">quote!</span> {
             #<span class="ident">sig</span> {
@@ -2099,7 +2099,7 @@
         }
     });
 
-    <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">kind</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Enum</span> {
+    <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">Enum</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">cx</span>.<span class="ident">project</span> {
             <span class="ident">project</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         }
@@ -2126,7 +2126,7 @@
 <span class="doccomment">/// * Checks the attributes of structs to ensure there is no `[repr(packed)]`.</span>
 <span class="doccomment">/// * Generates a function that borrows fields without an unsafe block and</span>
 <span class="doccomment">///   forbidding `unaligned_references` lint.</span>
-<span class="kw">fn</span> <span class="ident">ensure_not_packed</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">OriginalType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">fields</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Fields</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">ensure_not_packed</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">OriginalType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">fields</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Fields</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
     <span class="kw">for</span> <span class="ident">meta</span> <span class="kw">in</span> <span class="ident">orig</span>.<span class="ident">attrs</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">parse_meta</span>().<span class="ident">ok</span>()) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Meta::List</span>(<span class="ident">list</span>) <span class="op">=</span> <span class="ident">meta</span> {
             <span class="kw">if</span> <span class="ident">list</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;repr&quot;</span>) {
@@ -2134,7 +2134,7 @@
                     <span class="kw">match</span> <span class="ident">repr</span> {
                         <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::Path</span>(<span class="ident">path</span>))
                         <span class="op">|</span> <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::List</span>(<span class="ident">MetaList</span> { <span class="ident">path</span>, .. }))
-                        <span class="op">|</span> <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::NameValue</span>(<span class="ident">MetaNameValue</span> { <span class="ident">path</span>, .. })) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="op">|</span> <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::NameValue</span>(<span class="ident">MetaNameValue</span> { <span class="ident">path</span>, .. })) =&gt; {
                             <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;packed&quot;</span>) {
                                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">is_none</span>() {
                                     <span class="comment">// #[repr(packed)] cannot be apply on enums and will be rejected by rustc.</span>
@@ -2153,7 +2153,7 @@
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">error!</span>(<span class="ident">repr</span>, <span class="ident">msg</span>));
                             }
                         }
-                        <span class="ident">NestedMeta::Lit</span>(..) <span class="op">=</span><span class="op">&gt;</span> {}
+                        <span class="ident">NestedMeta::Lit</span>(..) =&gt; {}
                     }
                 }
             }
@@ -2161,8 +2161,8 @@
     }
 
     <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">fields</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fields</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">TokenStream::new</span>()),
+        <span class="prelude-val">Some</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">TokenStream::new</span>()),
     };
 
     <span class="comment">// Workaround for https://github.com/taiki-e/pin-project/issues/32</span>
@@ -2219,18 +2219,18 @@
     <span class="comment">//   https://github.com/rust-lang/rust/pull/82525</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_refs</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">match</span> <span class="ident">fields</span> {
-        <span class="ident">Fields::Named</span>(<span class="ident">FieldsNamed</span> { <span class="ident">named</span>, .. }) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Fields::Named</span>(<span class="ident">FieldsNamed</span> { <span class="ident">named</span>, .. }) =&gt; {
             <span class="kw">for</span> <span class="ident">Field</span> { <span class="ident">ident</span>, .. } <span class="kw">in</span> <span class="ident">named</span> {
                 <span class="ident">field_refs</span>.<span class="ident">push</span>(<span class="macro">quote!</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>.#<span class="ident">ident</span>));
             }
         }
-        <span class="ident">Fields::Unnamed</span>(<span class="ident">FieldsUnnamed</span> { <span class="ident">unnamed</span>, .. }) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Fields::Unnamed</span>(<span class="ident">FieldsUnnamed</span> { <span class="ident">unnamed</span>, .. }) =&gt; {
             <span class="kw">for</span> (<span class="ident">index</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">unnamed</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
                 <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">Index::from</span>(<span class="ident">index</span>);
                 <span class="ident">field_refs</span>.<span class="ident">push</span>(<span class="macro">quote!</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>.#<span class="ident">index</span>));
             }
         }
-        <span class="ident">Fields::Unit</span> <span class="op">=</span><span class="op">&gt;</span> {}
+        <span class="ident">Fields::Unit</span> =&gt; {}
     }
 
     <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">orig</span>.<span class="ident">generics</span>.<span class="ident">split_for_impl</span>();

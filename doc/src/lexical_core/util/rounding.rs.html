@@ -121,13 +121,13 @@
 
 <span class="doccomment">/// Determine if we are rounding to the nearest value, then tying away.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_nearest</span>(<span class="ident">kind</span>: <span class="ident">RoundingKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">kind</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RoundingKind::NearestTieEven</span> <span class="op">|</span><span class="op">|</span> <span class="ident">kind</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RoundingKind::NearestTieAwayZero</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_nearest</span>(<span class="ident">kind</span>: <span class="ident">RoundingKind</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">kind</span> <span class="op">==</span> <span class="ident">RoundingKind::NearestTieEven</span> <span class="op">|</span><span class="op">|</span> <span class="ident">kind</span> <span class="op">==</span> <span class="ident">RoundingKind::NearestTieAwayZero</span>
 }
 
 <span class="doccomment">/// Determine if we are rounding to the nearest value, then tying away.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_toward</span>(<span class="ident">kind</span>: <span class="ident">RoundingKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_toward</span>(<span class="ident">kind</span>: <span class="ident">RoundingKind</span>) -&gt; <span class="ident">bool</span> {
     <span class="op">!</span><span class="ident">is_nearest</span>(<span class="ident">kind</span>)
 }
 </code></pre></div>

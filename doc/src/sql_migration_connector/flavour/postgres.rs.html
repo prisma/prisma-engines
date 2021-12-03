@@ -506,17 +506,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">PostgresFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;PostgresFlavour&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;url&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;&lt;REDACTED&gt;&quot;</span>).<span class="ident">finish</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PostgresFlavour</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">url</span>: <span class="ident">PostgresUrl</span>, <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">url</span>: <span class="ident">PostgresUrl</span>, <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">url</span>, <span class="ident">preview_features</span> }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">schema_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">schema_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">url</span>.<span class="ident">schema</span>()
     }
 
@@ -525,7 +525,7 @@
         <span class="ident">main_connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="ident">SqlMigrationConnector</span>,
         <span class="ident">shadow_database_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shadow_database_connection_string</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">connector</span>.<span class="ident">shadow_database_connection_string</span> {
             <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::connect</span>(<span class="ident">shadow_database_connection_string</span>).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">shadow_conninfo</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">connection_info</span>();
@@ -573,7 +573,7 @@
 
 <span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">SqlFlavour</span> <span class="kw">for</span> <span class="ident">PostgresFlavour</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">acquire_lock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">acquire_lock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS</span>
 
         <span class="comment">// 72707369 is a unique number we chose to identify Migrate. It does not</span>
@@ -600,7 +600,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_query_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_query_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
@@ -609,13 +609,13 @@
         <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">client</span>, <span class="ident">_url</span>) <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">unwrap_postgres</span>();
         <span class="kw">let</span> <span class="ident">inner_client</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">client</span>();
 
         <span class="kw">match</span> <span class="ident">inner_client</span>.<span class="ident">simple_query</span>(<span class="ident">script</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">database_error_code</span>, <span class="ident">database_error</span>): (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">db_error</span>) <span class="op">=</span> <span class="ident">err</span>.<span class="ident">as_db_error</span>()
                 {
                     <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ErrorPosition::Original</span>(<span class="ident">position</span>)) <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">position</span>() {
@@ -685,7 +685,7 @@
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">database_str</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">database_str</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">url</span>.<span class="ident">dbname</span>();
 
@@ -698,14 +698,14 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">database_already_exists_error</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::common::DatabaseAlreadyExists</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::common::DatabaseAlreadyExists</span><span class="op">&gt;</span>() =&gt; {
                 <span class="ident">database_already_exists_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::query_engine::UniqueKeyViolation</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::query_engine::UniqueKeyViolation</span><span class="op">&gt;</span>() =&gt; {
                 <span class="ident">database_already_exists_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
         };
 
         <span class="comment">// Now create the schema</span>
@@ -724,7 +724,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">db_name</span>.<span class="ident">to_owned</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">r#&quot;
             CREATE TABLE _prisma_migrations (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -741,7 +741,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">database_str</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">path</span>().<span class="ident">trim_start_matches</span>(<span class="string">&#39;/&#39;</span>).<span class="ident">to_owned</span>();
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">db_name</span>.<span class="ident">is_empty</span>(), <span class="string">&quot;Database name should not be empty.&quot;</span>);
@@ -754,14 +754,14 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;DROP TABLE _prisma_migrations&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">schema_name</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>();
         <span class="kw">let</span> <span class="ident">schema_exists_result</span> <span class="op">=</span> <span class="ident">connection</span>
             .<span class="ident">query_raw</span>(
@@ -789,7 +789,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">qe_setup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">qe_setup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">database_str</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
 
         <span class="ident">strip_schema_param_from_url</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">url</span>);
@@ -814,7 +814,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">qe_teardown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">qe_teardown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">database_str</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
         <span class="ident">strip_schema_param_from_url</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">url</span>);
 
@@ -827,7 +827,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">schema_name</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>();
 
         <span class="ident">connection</span>
@@ -841,7 +841,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">preview_features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">preview_features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">preview_features</span>
     }
 
@@ -851,7 +851,7 @@
         <span class="ident">migrations</span>: <span class="kw-2">&amp;</span>[<span class="ident">MigrationDirectory</span>],
         <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="ident">SqlMigrationConnector</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">shadow_database_name</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">shadow_database_name</span>();
 
         <span class="comment">// We go through the whole process without early return, then clean up</span>
@@ -907,7 +907,7 @@
 
 <span class="doccomment">/// Try to connect as an admin to a postgres database. We try to pick a default database from which</span>
 <span class="doccomment">/// we can create another database.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_postgres_admin_conn</span>(<span class="kw-2">mut</span> <span class="ident">url</span>: <span class="ident">Url</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_postgres_admin_conn</span>(<span class="kw-2">mut</span> <span class="ident">url</span>: <span class="ident">Url</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
     <span class="comment">// &quot;postgres&quot; is the default database on most postgres installations,</span>
     <span class="comment">// &quot;template1&quot; is guaranteed to exist, and &quot;defaultdb&quot; is the only working</span>
     <span class="comment">// option on DigitalOcean managed postgres databases.</span>
@@ -919,16 +919,16 @@
         <span class="ident">url</span>.<span class="ident">set_path</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, <span class="ident">database_name</span>));
         <span class="kw">match</span> <span class="ident">connect</span>(<span class="ident">url</span>.<span class="ident">as_str</span>()).<span class="kw">await</span> {
             <span class="comment">// If the database does not exist, try the next one.</span>
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">err</span>.<span class="ident">error_code</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">DatabaseDoesNotExist::ERROR_CODE</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="prelude-val">Some</span>(<span class="ident">DatabaseAccessDenied::ERROR_CODE</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">err</span>.<span class="ident">error_code</span>() {
+                <span class="prelude-val">Some</span>(<span class="ident">DatabaseDoesNotExist::ERROR_CODE</span>) =&gt; (),
+                <span class="prelude-val">Some</span>(<span class="ident">DatabaseAccessDenied::ERROR_CODE</span>) =&gt; (),
+                <span class="kw">_</span> =&gt; {
                     <span class="ident">conn</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>));
                     <span class="kw">break</span>;
                 }
             },
             <span class="comment">// If the outcome is anything else, use this.</span>
-            <span class="ident">other_outcome</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">other_outcome</span> =&gt; {
                 <span class="ident">conn</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">other_outcome</span>);
                 <span class="kw">break</span>;
             }

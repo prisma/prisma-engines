@@ -22,13 +22,13 @@
   <span class="kw">type</span> <span class="ident">JsValue</span>: <span class="ident">NapiValue</span>;
 
   <span class="doccomment">/// Compute logic in libuv thread</span>
-  <span class="kw">fn</span> <span class="ident">compute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span>;
+  <span class="kw">fn</span> <span class="ident">compute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span>;
 
   <span class="doccomment">/// Into this method if `compute` return `Ok`</span>
-  <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="self">self</span>, <span class="ident">env</span>: <span class="ident">Env</span>, <span class="ident">output</span>: <span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::JsValue</span><span class="op">&gt;</span>;
+  <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="self">self</span>, <span class="ident">env</span>: <span class="ident">Env</span>, <span class="ident">output</span>: <span class="ident"><span class="self">Self</span>::Output</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::JsValue</span><span class="op">&gt;</span>;
 
   <span class="doccomment">/// Into this method if `compute` return `Err`</span>
-  <span class="kw">fn</span> <span class="ident">reject</span>(<span class="self">self</span>, <span class="ident">_env</span>: <span class="ident">Env</span>, <span class="ident">err</span>: <span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::JsValue</span><span class="op">&gt;</span> {
+  <span class="kw">fn</span> <span class="ident">reject</span>(<span class="self">self</span>, <span class="ident">_env</span>: <span class="ident">Env</span>, <span class="ident">err</span>: <span class="ident">Error</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::JsValue</span><span class="op">&gt;</span> {
     <span class="prelude-val">Err</span>(<span class="ident">err</span>)
   }
 }

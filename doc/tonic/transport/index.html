@@ -3,7 +3,7 @@
 fast set of HTTP/2 server and client’s. These components each provide a or
 <code>rustls</code> tls backend when the respective feature flag is enabled, and
 provides builders to configure transport behavior.</p>
-<h1 id="features" class="section-header"><a href="#features">Features</a></h1>
+<h2 id="features" class="section-header"><a href="#features">Features</a></h2>
 <ul>
 <li>TLS support via <a href="https://docs.rs/rustls/0.16.0/rustls/">rustls</a>.</li>
 <li>Load balancing</li>
@@ -11,7 +11,7 @@ provides builders to configure transport behavior.</p>
 <li>Concurrency Limits</li>
 <li>Rate limiting</li>
 </ul>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1><h2 id="client" class="section-header"><a href="#client">Client</a></h2>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2><h3 id="client" class="section-header"><a href="#client">Client</a></h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">cert</span> <span class="op">=</span> <span class="ident">std::fs::read_to_string</span>(<span class="string">&quot;ca.pem&quot;</span>)<span class="question-mark">?</span>;
 
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">Channel::from_static</span>(<span class="string">&quot;https://example.com&quot;</span>)
@@ -25,7 +25,7 @@ provides builders to configure transport behavior.</p>
     .<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="ident">channel</span>.<span class="ident">call</span>(<span class="ident">Request::new</span>(<span class="ident">BoxBody::empty</span>())).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
-<h2 id="server" class="section-header"><a href="#server">Server</a></h2>
+<h3 id="server" class="section-header"><a href="#server">Server</a></h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">cert</span> <span class="op">=</span> <span class="ident">std::fs::read_to_string</span>(<span class="string">&quot;server.pem&quot;</span>)<span class="question-mark">?</span>;
 <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">std::fs::read_to_string</span>(<span class="string">&quot;server.key&quot;</span>)<span class="question-mark">?</span>;
 
@@ -40,23 +40,23 @@ provides builders to configure transport behavior.</p>
     .<span class="kw">await</span><span class="question-mark">?</span>;
 </code></pre></div>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="channel/index.html" title="tonic::transport::channel mod">channel</a></div><div class="item-right docblock-short"><p>Client implementation and builder.</p>
-</div><div class="item-left module-item"><a class="mod" href="server/index.html" title="tonic::transport::server mod">server</a></div><div class="item-right docblock-short"><p>Server implementation and builder.</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Body.html" title="tonic::transport::Body struct">Body</a></div><div class="item-right docblock-short"><p>A stream of <code>Bytes</code>, used when receiving bodies.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Certificate.html" title="tonic::transport::Certificate struct">Certificate</a></div><div class="item-right docblock-short"><p>Represents a X509 certificate.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Channel.html" title="tonic::transport::Channel struct">Channel</a></div><div class="item-right docblock-short"><p>A default batteries included <code>transport</code> channel.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ClientTlsConfig.html" title="tonic::transport::ClientTlsConfig struct">ClientTlsConfig</a></div><div class="item-right docblock-short"><p>Configures TLS settings for endpoints.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Endpoint.html" title="tonic::transport::Endpoint struct">Endpoint</a></div><div class="item-right docblock-short"><p>Channel builder.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Error.html" title="tonic::transport::Error struct">Error</a></div><div class="item-right docblock-short"><p>Error’s that originate from the client or server;</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Identity.html" title="tonic::transport::Identity struct">Identity</a></div><div class="item-right docblock-short"><p>Represents a private key and X509 certificate.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Server.html" title="tonic::transport::Server struct">Server</a></div><div class="item-right docblock-short"><p>A default batteries included <code>transport</code> server.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ServerTlsConfig.html" title="tonic::transport::ServerTlsConfig struct">ServerTlsConfig</a></div><div class="item-right docblock-short"><p>Configures TLS settings for servers.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.TimeoutExpired.html" title="tonic::transport::TimeoutExpired struct">TimeoutExpired</a></div><div class="item-right docblock-short"><p>Error returned if a request didn’t complete within the configured timeout.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Uri.html" title="tonic::transport::Uri struct">Uri</a></div><div class="item-right docblock-short"><p>The URI component of a request.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.NamedService.html" title="tonic::transport::NamedService trait">NamedService</a></div><div class="item-right docblock-short"><p>A trait to provide a static reference to the service’s
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="channel/index.html" title="tonic::transport::channel mod">channel</a></div><div class="item-right docblock-short"><p>Client implementation and builder.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="server/index.html" title="tonic::transport::server mod">server</a></div><div class="item-right docblock-short"><p>Server implementation and builder.</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Body.html" title="tonic::transport::Body struct">Body</a></div><div class="item-right docblock-short"><p>A stream of <code>Bytes</code>, used when receiving bodies.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Certificate.html" title="tonic::transport::Certificate struct">Certificate</a></div><div class="item-right docblock-short"><p>Represents a X509 certificate.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Channel.html" title="tonic::transport::Channel struct">Channel</a></div><div class="item-right docblock-short"><p>A default batteries included <code>transport</code> channel.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ClientTlsConfig.html" title="tonic::transport::ClientTlsConfig struct">ClientTlsConfig</a></div><div class="item-right docblock-short"><p>Configures TLS settings for endpoints.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Endpoint.html" title="tonic::transport::Endpoint struct">Endpoint</a></div><div class="item-right docblock-short"><p>Channel builder.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Error.html" title="tonic::transport::Error struct">Error</a></div><div class="item-right docblock-short"><p>Error’s that originate from the client or server;</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Identity.html" title="tonic::transport::Identity struct">Identity</a></div><div class="item-right docblock-short"><p>Represents a private key and X509 certificate.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Server.html" title="tonic::transport::Server struct">Server</a></div><div class="item-right docblock-short"><p>A default batteries included <code>transport</code> server.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ServerTlsConfig.html" title="tonic::transport::ServerTlsConfig struct">ServerTlsConfig</a></div><div class="item-right docblock-short"><p>Configures TLS settings for servers.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.TimeoutExpired.html" title="tonic::transport::TimeoutExpired struct">TimeoutExpired</a></div><div class="item-right docblock-short"><p>Error returned if a request didn’t complete within the configured timeout.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Uri.html" title="tonic::transport::Uri struct">Uri</a></div><div class="item-right docblock-short"><p>The URI component of a request.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.NamedService.html" title="tonic::transport::NamedService trait">NamedService</a></div><div class="item-right docblock-short"><p>A trait to provide a static reference to the service’s
 name. This is used for routing service’s within the router.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tonic" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tonic" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

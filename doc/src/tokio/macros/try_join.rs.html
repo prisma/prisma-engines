@@ -202,7 +202,7 @@
         <span class="comment">// Normalized try_join! branches</span>
         $( ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">skip</span>:<span class="ident">tt</span>)<span class="op">*</span> ) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>, )<span class="op">*</span>
 
-    }) <span class="op">=</span><span class="op">&gt;</span> {{
+    }) =&gt; {{
         <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::macros::support</span>::{<span class="ident">maybe_done</span>, <span class="ident">poll_fn</span>, <span class="ident">Future</span>, <span class="ident">Pin</span>};
         <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::macros::support::Poll</span>::{<span class="ident">Ready</span>, <span class="ident">Pending</span>};
 
@@ -252,13 +252,13 @@
 
     <span class="comment">// ===== Normalize =====</span>
 
-    (@ { ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">tt</span>)<span class="op">*</span> ) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>)<span class="op">*</span> } <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">tt</span>)<span class="op">*</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    (@ { ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">tt</span>)<span class="op">*</span> ) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>)<span class="op">*</span> } <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">tt</span>)<span class="op">*</span> ) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::try_join!</span>(@{ ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>)<span class="op">*</span> <span class="kw">_</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="op">*</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>)<span class="kw-2">*</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>, } $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>)<span class="kw-2">*</span>)
     };
 
     <span class="comment">// ===== Entry point =====</span>
 
-    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::try_join!</span>(@{ () } $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>,)<span class="kw-2">*</span>)
     };
 }

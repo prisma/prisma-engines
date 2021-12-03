@@ -294,10 +294,10 @@
 </pre><pre class="rust"><code><span class="doccomment">//! Asynchronous TLS/SSL streams for Tokio using [Rustls](https://github.com/ctz/rustls).</span>
 
 <span class="macro">macro_rules!</span> <span class="ident">ready</span> {
-    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span> ) =&gt; {
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> {
-            <span class="ident">std::task::Poll::Ready</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>,
-            <span class="ident">std::task::Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">std::task::Poll::Pending</span>,
+            <span class="ident">std::task::Poll::Ready</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
+            <span class="ident">std::task::Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">std::task::Poll::Pending</span>,
         }
     };
 }
@@ -334,7 +334,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TlsConnector</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TlsConnector</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>) -&gt; <span class="ident">TlsConnector</span> {
         <span class="ident">TlsConnector</span> {
             <span class="ident">inner</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;early-data&quot;</span>)]</span>
@@ -344,7 +344,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ServerConfig</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TlsAcceptor</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ServerConfig</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TlsAcceptor</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ServerConfig</span><span class="op">&gt;</span>) -&gt; <span class="ident">TlsAcceptor</span> {
         <span class="ident">TlsAcceptor</span> { <span class="ident">inner</span> }
     }
 }
@@ -355,20 +355,20 @@
     <span class="doccomment">/// If you want to use 0-RTT,</span>
     <span class="doccomment">/// You must also set `ClientConfig.enable_early_data` to `true`.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;early-data&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">early_data</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TlsConnector</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">early_data</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="ident">TlsConnector</span> {
         <span class="self">self</span>.<span class="ident">early_data</span> <span class="op">=</span> <span class="ident">flag</span>;
         <span class="self">self</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">domain</span>: <span class="ident">DNSNameRef</span>, <span class="ident">stream</span>: <span class="ident">IO</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">domain</span>: <span class="ident">DNSNameRef</span>, <span class="ident">stream</span>: <span class="ident">IO</span>) -&gt; <span class="ident">Connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
     {
         <span class="self">self</span>.<span class="ident">connect_with</span>(<span class="ident">domain</span>, <span class="ident">stream</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect_with</span><span class="op">&lt;</span><span class="ident">IO</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">domain</span>: <span class="ident">DNSNameRef</span>, <span class="ident">stream</span>: <span class="ident">IO</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect_with</span><span class="op">&lt;</span><span class="ident">IO</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">domain</span>: <span class="ident">DNSNameRef</span>, <span class="ident">stream</span>: <span class="ident">IO</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>),
@@ -396,14 +396,14 @@
 
 <span class="kw">impl</span> <span class="ident">TlsAcceptor</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">IO</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">IO</span>) -&gt; <span class="ident">Accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
     {
         <span class="self">self</span>.<span class="ident">accept_with</span>(<span class="ident">stream</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept_with</span><span class="op">&lt;</span><span class="ident">IO</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">IO</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept_with</span><span class="op">&lt;</span><span class="ident">IO</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">IO</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSession</span>),
@@ -435,14 +435,14 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> <span class="ident">Connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_failable</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FailableConnect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_failable</span>(<span class="self">self</span>) -&gt; <span class="ident">FailableConnect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
         <span class="ident">FailableConnect</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> <span class="ident">Accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_failable</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FailableAccept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_failable</span>(<span class="self">self</span>) -&gt; <span class="ident">FailableAccept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
         <span class="ident">FailableAccept</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -451,7 +451,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">client::TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="op">|</span>(<span class="ident">err</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">err</span>)
     }
 }
@@ -460,7 +460,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">server::TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="op">|</span>(<span class="ident">err</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">err</span>)
     }
 }
@@ -469,7 +469,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">client::TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>, (<span class="ident">io::Error</span>, <span class="ident">IO</span>)<span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll</span>(<span class="ident">cx</span>)
     }
 }
@@ -478,7 +478,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">server::TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>, (<span class="ident">io::Error</span>, <span class="ident">IO</span>)<span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll</span>(<span class="ident">cx</span>)
     }
 }
@@ -494,28 +494,28 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Session</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Session</span>) {
         <span class="kw">use</span> <span class="ident">TlsStream</span>::<span class="kw-2">*</span>;
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Client</span>(<span class="ident">io</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Client</span>(<span class="ident">io</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">io</span>.<span class="ident">get_ref</span>();
                 (<span class="ident">io</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">session</span>)
             }
-            <span class="ident">Server</span>(<span class="ident">io</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Server</span>(<span class="ident">io</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">io</span>.<span class="ident">get_ref</span>();
                 (<span class="ident">io</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">session</span>)
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Session</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Session</span>) {
         <span class="kw">use</span> <span class="ident">TlsStream</span>::<span class="kw-2">*</span>;
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Client</span>(<span class="ident">io</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Client</span>(<span class="ident">io</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">io</span>.<span class="ident">get_mut</span>();
                 (<span class="ident">io</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">session</span>)
             }
-            <span class="ident">Server</span>(<span class="ident">io</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Server</span>(<span class="ident">io</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">io</span>.<span class="ident">get_mut</span>();
                 (<span class="ident">io</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">session</span>)
             }
@@ -524,13 +524,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">client::TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">client::TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Client</span>(<span class="ident">s</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">server::TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">server::TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">server::TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Server</span>(<span class="ident">s</span>)
     }
 }
@@ -544,10 +544,10 @@
         <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">TlsStream::Client</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
-            <span class="ident">TlsStream::Server</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+            <span class="ident">TlsStream::Client</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+            <span class="ident">TlsStream::Server</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
         }
     }
 }
@@ -561,26 +561,26 @@
         <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">TlsStream::Client</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
-            <span class="ident">TlsStream::Server</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+            <span class="ident">TlsStream::Client</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+            <span class="ident">TlsStream::Server</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
         }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">TlsStream::Client</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
-            <span class="ident">TlsStream::Server</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
+            <span class="ident">TlsStream::Client</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
+            <span class="ident">TlsStream::Server</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
         }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">TlsStream::Client</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>),
-            <span class="ident">TlsStream::Server</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>),
+            <span class="ident">TlsStream::Client</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>),
+            <span class="ident">TlsStream::Server</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>),
         }
     }
 }

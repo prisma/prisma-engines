@@ -734,30 +734,30 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SecretKind</span> {
-    <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>] {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SecretKind::ResumptionPSKBinderKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;res binder&quot;</span>,
-            <span class="ident">SecretKind::ClientEarlyTrafficSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;c e traffic&quot;</span>,
-            <span class="ident">SecretKind::ClientHandshakeTrafficSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;c hs traffic&quot;</span>,
-            <span class="ident">SecretKind::ServerHandshakeTrafficSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;s hs traffic&quot;</span>,
-            <span class="ident">SecretKind::ClientApplicationTrafficSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;c ap traffic&quot;</span>,
-            <span class="ident">SecretKind::ServerApplicationTrafficSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;s ap traffic&quot;</span>,
-            <span class="ident">SecretKind::ExporterMasterSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;exp master&quot;</span>,
-            <span class="ident">SecretKind::ResumptionMasterSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;res master&quot;</span>,
-            <span class="ident">SecretKind::DerivedSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&quot;derived&quot;</span>,
+            <span class="ident">SecretKind::ResumptionPSKBinderKey</span> =&gt; <span class="string">b&quot;res binder&quot;</span>,
+            <span class="ident">SecretKind::ClientEarlyTrafficSecret</span> =&gt; <span class="string">b&quot;c e traffic&quot;</span>,
+            <span class="ident">SecretKind::ClientHandshakeTrafficSecret</span> =&gt; <span class="string">b&quot;c hs traffic&quot;</span>,
+            <span class="ident">SecretKind::ServerHandshakeTrafficSecret</span> =&gt; <span class="string">b&quot;s hs traffic&quot;</span>,
+            <span class="ident">SecretKind::ClientApplicationTrafficSecret</span> =&gt; <span class="string">b&quot;c ap traffic&quot;</span>,
+            <span class="ident">SecretKind::ServerApplicationTrafficSecret</span> =&gt; <span class="string">b&quot;s ap traffic&quot;</span>,
+            <span class="ident">SecretKind::ExporterMasterSecret</span> =&gt; <span class="string">b&quot;exp master&quot;</span>,
+            <span class="ident">SecretKind::ResumptionMasterSecret</span> =&gt; <span class="string">b&quot;res master&quot;</span>,
+            <span class="ident">SecretKind::DerivedSecret</span> =&gt; <span class="string">b&quot;derived&quot;</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">log_label</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">log_label</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::SecretKind</span>::<span class="kw-2">*</span>;
         <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ClientEarlyTrafficSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;CLIENT_EARLY_TRAFFIC_SECRET&quot;</span>,
-            <span class="ident">ClientHandshakeTrafficSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;CLIENT_HANDSHAKE_TRAFFIC_SECRET&quot;</span>,
-            <span class="ident">ServerHandshakeTrafficSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SERVER_HANDSHAKE_TRAFFIC_SECRET&quot;</span>,
-            <span class="ident">ClientApplicationTrafficSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;CLIENT_TRAFFIC_SECRET_0&quot;</span>,
-            <span class="ident">ServerApplicationTrafficSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SERVER_TRAFFIC_SECRET_0&quot;</span>,
-            <span class="ident">ExporterMasterSecret</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;EXPORTER_SECRET&quot;</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ClientEarlyTrafficSecret</span> =&gt; <span class="string">&quot;CLIENT_EARLY_TRAFFIC_SECRET&quot;</span>,
+            <span class="ident">ClientHandshakeTrafficSecret</span> =&gt; <span class="string">&quot;CLIENT_HANDSHAKE_TRAFFIC_SECRET&quot;</span>,
+            <span class="ident">ServerHandshakeTrafficSecret</span> =&gt; <span class="string">&quot;SERVER_HANDSHAKE_TRAFFIC_SECRET&quot;</span>,
+            <span class="ident">ClientApplicationTrafficSecret</span> =&gt; <span class="string">&quot;CLIENT_TRAFFIC_SECRET_0&quot;</span>,
+            <span class="ident">ServerApplicationTrafficSecret</span> =&gt; <span class="string">&quot;SERVER_TRAFFIC_SECRET_0&quot;</span>,
+            <span class="ident">ExporterMasterSecret</span> =&gt; <span class="string">&quot;EXPORTER_SECRET&quot;</span>,
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
         })
@@ -784,7 +784,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">KeyScheduleEarly</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="ident">hkdf::Algorithm</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeyScheduleEarly</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="ident">hkdf::Algorithm</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">KeyScheduleEarly</span> {
         <span class="ident">KeyScheduleEarly</span> {
             <span class="ident">ks</span>: <span class="ident">KeySchedule::new</span>(<span class="ident">algorithm</span>, <span class="ident">secret</span>),
         }
@@ -795,7 +795,7 @@
         <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">key_log</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">KeyLog</span>,
         <span class="ident">client_random</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hkdf::Prk</span> {
+    ) -&gt; <span class="ident">hkdf::Prk</span> {
         <span class="self">self</span>.<span class="ident">ks</span>.<span class="ident">derive_logged_secret</span>(
             <span class="ident">SecretKind::ClientEarlyTrafficSecret</span>,
             <span class="ident">hs_hash</span>,
@@ -804,7 +804,7 @@
         )
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resumption_psk_binder_key_and_sign_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resumption_psk_binder_key_and_sign_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">resumption_psk_binder_key</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">ks</span>
             .<span class="ident">derive_for_empty_hash</span>(<span class="ident">SecretKind::ResumptionPSKBinderKey</span>);
@@ -812,7 +812,7 @@
             .<span class="ident">sign_verify_data</span>(<span class="kw-2">&amp;</span><span class="ident">resumption_psk_binder_key</span>, <span class="ident">hs_hash</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_handshake</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeyScheduleHandshake</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_handshake</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">KeyScheduleHandshake</span> {
         <span class="self">self</span>.<span class="ident">ks</span>.<span class="ident">input_secret</span>(<span class="ident">secret</span>);
         <span class="ident">KeyScheduleHandshake</span> {
             <span class="ident">ks</span>: <span class="self">self</span>.<span class="ident">ks</span>,
@@ -829,13 +829,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">KeyScheduleNonSecret</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="ident">hkdf::Algorithm</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeyScheduleNonSecret</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="ident">hkdf::Algorithm</span>) -&gt; <span class="ident">KeyScheduleNonSecret</span> {
         <span class="ident">KeyScheduleNonSecret</span> {
             <span class="ident">ks</span>: <span class="ident">KeySchedule::new_with_empty_secret</span>(<span class="ident">algorithm</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_handshake</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeyScheduleHandshake</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_handshake</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">KeyScheduleHandshake</span> {
         <span class="self">self</span>.<span class="ident">ks</span>.<span class="ident">input_secret</span>(<span class="ident">secret</span>);
         <span class="ident">KeyScheduleHandshake</span> {
             <span class="ident">ks</span>: <span class="self">self</span>.<span class="ident">ks</span>,
@@ -858,7 +858,7 @@
         <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">key_log</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">KeyLog</span>,
         <span class="ident">client_random</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hkdf::Prk</span> {
+    ) -&gt; <span class="ident">hkdf::Prk</span> {
         <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ks</span>.<span class="ident">derive_logged_secret</span>(
             <span class="ident">SecretKind::ClientHandshakeTrafficSecret</span>,
             <span class="ident">hs_hash</span>,
@@ -874,7 +874,7 @@
         <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">key_log</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">KeyLog</span>,
         <span class="ident">client_random</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hkdf::Prk</span> {
+    ) -&gt; <span class="ident">hkdf::Prk</span> {
         <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ks</span>.<span class="ident">derive_logged_secret</span>(
             <span class="ident">SecretKind::ServerHandshakeTrafficSecret</span>,
             <span class="ident">hs_hash</span>,
@@ -885,7 +885,7 @@
         <span class="ident">secret</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign_server_finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign_server_finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">ks</span>.<span class="ident">sign_finish</span>(
             <span class="self">self</span>.<span class="ident">current_server_traffic_secret</span>
                 .<span class="ident">as_ref</span>()
@@ -896,7 +896,7 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_traffic_with_client_finished_pending</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeyScheduleTrafficWithClientFinishedPending</span> {
+    ) -&gt; <span class="ident">KeyScheduleTrafficWithClientFinishedPending</span> {
         <span class="self">self</span>.<span class="ident">ks</span>.<span class="ident">input_empty</span>();
         <span class="ident">KeyScheduleTrafficWithClientFinishedPending</span> {
             <span class="ident">ks</span>: <span class="self">self</span>.<span class="ident">ks</span>,
@@ -921,7 +921,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">KeyScheduleTrafficWithClientFinishedPending</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign_client_finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign_client_finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">ks</span>
             .<span class="ident">sign_finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">handshake_client_traffic_secret</span>, <span class="ident">hs_hash</span>)
     }
@@ -931,7 +931,7 @@
         <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">key_log</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">KeyLog</span>,
         <span class="ident">client_random</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hkdf::Prk</span> {
+    ) -&gt; <span class="ident">hkdf::Prk</span> {
         <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ks</span>.<span class="ident">derive_logged_secret</span>(
             <span class="ident">SecretKind::ServerApplicationTrafficSecret</span>,
             <span class="ident">hs_hash</span>,
@@ -947,7 +947,7 @@
         <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">key_log</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">KeyLog</span>,
         <span class="ident">client_random</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hkdf::Prk</span> {
+    ) -&gt; <span class="ident">hkdf::Prk</span> {
         <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ks</span>.<span class="ident">derive_logged_secret</span>(
             <span class="ident">SecretKind::ClientApplicationTrafficSecret</span>,
             <span class="ident">hs_hash</span>,
@@ -973,7 +973,7 @@
         <span class="self">self</span>.<span class="ident">current_exporter_secret</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">secret</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_traffic</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeyScheduleTraffic</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_traffic</span>(<span class="self">self</span>) -&gt; <span class="ident">KeyScheduleTraffic</span> {
         <span class="ident">KeyScheduleTraffic</span> {
             <span class="ident">ks</span>: <span class="self">self</span>.<span class="ident">ks</span>,
             <span class="ident">current_client_traffic_secret</span>: <span class="self">self</span>
@@ -997,7 +997,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">KeyScheduleTraffic</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_server_application_traffic_secret</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hkdf::Prk</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_server_application_traffic_secret</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">hkdf::Prk</span> {
         <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">ks</span>
             .<span class="ident">derive_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">current_server_traffic_secret</span>);
@@ -1005,7 +1005,7 @@
         <span class="ident">secret</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_client_application_traffic_secret</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hkdf::Prk</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_client_application_traffic_secret</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">hkdf::Prk</span> {
         <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">ks</span>
             .<span class="ident">derive_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">current_client_traffic_secret</span>);
@@ -1017,7 +1017,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">resumption_master_secret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ks</span>.<span class="ident">derive</span>(
             <span class="self">self</span>.<span class="ident">ks</span>.<span class="ident">algorithm</span>(),
             <span class="ident">SecretKind::ResumptionMasterSecret</span>,
@@ -1032,14 +1032,14 @@
         <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">ks</span>
             .<span class="ident">export_keying_material</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">current_exporter_secret</span>, <span class="ident">out</span>, <span class="ident">label</span>, <span class="ident">context</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">KeySchedule</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="ident">hkdf::Algorithm</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeySchedule</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="ident">hkdf::Algorithm</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">KeySchedule</span> {
         <span class="kw">let</span> <span class="ident">zeroes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">digest::MAX_OUTPUT_LEN</span>];
         <span class="kw">let</span> <span class="ident">zeroes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">zeroes</span>[..<span class="ident">algorithm</span>.<span class="ident">len</span>()];
         <span class="kw">let</span> <span class="ident">salt</span> <span class="op">=</span> <span class="ident">hkdf::Salt::new</span>(<span class="ident">algorithm</span>, <span class="kw-2">&amp;</span><span class="ident">zeroes</span>);
@@ -1050,11 +1050,11 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hkdf::Algorithm</span> {
+    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">hkdf::Algorithm</span> {
         <span class="self">self</span>.<span class="ident">algorithm</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">new_with_empty_secret</span>(<span class="ident">algorithm</span>: <span class="ident">hkdf::Algorithm</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeySchedule</span> {
+    <span class="kw">fn</span> <span class="ident">new_with_empty_secret</span>(<span class="ident">algorithm</span>: <span class="ident">hkdf::Algorithm</span>) -&gt; <span class="ident">KeySchedule</span> {
         <span class="kw">let</span> <span class="ident">zeroes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">digest::MAX_OUTPUT_LEN</span>];
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">algorithm</span>, <span class="kw-2">&amp;</span><span class="ident">zeroes</span>[..<span class="ident">algorithm</span>.<span class="ident">len</span>()])
     }
@@ -1072,7 +1072,7 @@
     }
 
     <span class="doccomment">/// Derive a secret of given `kind`, using current handshake hash `hs_hash`.</span>
-    <span class="kw">fn</span> <span class="ident">derive</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">L</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_type</span>: <span class="ident">L</span>, <span class="ident">kind</span>: <span class="ident">SecretKind</span>, <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+    <span class="kw">fn</span> <span class="ident">derive</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">L</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_type</span>: <span class="ident">L</span>, <span class="ident">kind</span>: <span class="ident">SecretKind</span>, <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">T</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">L</span>: <span class="ident">hkdf::KeyType</span>,
@@ -1086,7 +1086,7 @@
         <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">key_log</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">KeyLog</span>,
         <span class="ident">client_random</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hkdf::Prk</span> {
+    ) -&gt; <span class="ident">hkdf::Prk</span> {
         <span class="kw">let</span> <span class="ident">log_label</span> <span class="op">=</span> <span class="ident">kind</span>
             .<span class="ident">log_label</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;not a loggable secret&quot;</span>);
@@ -1103,7 +1103,7 @@
     <span class="doccomment">/// for the handshake hash.  Useful only for</span>
     <span class="doccomment">/// `SecretKind::ResumptionPSKBinderKey` and</span>
     <span class="doccomment">/// `SecretKind::DerivedSecret`.</span>
-    <span class="kw">fn</span> <span class="ident">derive_for_empty_hash</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">SecretKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+    <span class="kw">fn</span> <span class="ident">derive_for_empty_hash</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">SecretKind</span>) -&gt; <span class="ident">T</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">hkdf::Algorithm</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -1117,13 +1117,13 @@
 
     <span class="doccomment">/// Sign the finished message consisting of `hs_hash` using a current</span>
     <span class="doccomment">/// traffic secret.</span>
-    <span class="kw">fn</span> <span class="ident">sign_finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">base_key</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>, <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sign_finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">base_key</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>, <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">sign_verify_data</span>(<span class="ident">base_key</span>, <span class="ident">hs_hash</span>)
     }
 
     <span class="doccomment">/// Sign the finished message consisting of `hs_hash` using the key material</span>
     <span class="doccomment">/// `base_key`.</span>
-    <span class="kw">fn</span> <span class="ident">sign_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">base_key</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>, <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sign_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">base_key</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>, <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">hmac_alg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">hmac_algorithm</span>();
         <span class="kw">let</span> <span class="ident">hmac_key</span> <span class="op">=</span> <span class="ident">hkdf_expand</span>(<span class="ident">base_key</span>, <span class="ident">hmac_alg</span>, <span class="string">b&quot;finished&quot;</span>, <span class="kw-2">&amp;</span>[]);
         <span class="ident">hmac::sign</span>(<span class="kw-2">&amp;</span><span class="ident">hmac_key</span>, <span class="ident">hs_hash</span>)
@@ -1132,13 +1132,13 @@
     }
 
     <span class="doccomment">/// Derive the next application traffic secret, returning it.</span>
-    <span class="kw">fn</span> <span class="ident">derive_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">base_key</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hkdf::Prk</span> {
+    <span class="kw">fn</span> <span class="ident">derive_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">base_key</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>) -&gt; <span class="ident">hkdf::Prk</span> {
         <span class="ident">hkdf_expand</span>(<span class="kw-2">&amp;</span><span class="ident">base_key</span>, <span class="self">self</span>.<span class="ident">algorithm</span>, <span class="string">b&quot;traffic upd&quot;</span>, <span class="kw-2">&amp;</span>[])
     }
 
     <span class="doccomment">/// Derive the PSK to use given a resumption_master_secret and</span>
     <span class="doccomment">/// ticket_nonce.</span>
-    <span class="kw">fn</span> <span class="ident">derive_ticket_psk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rms</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>, <span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">derive_ticket_psk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rms</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>, <span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">payload</span>: <span class="ident">PayloadU8</span> <span class="op">=</span> <span class="ident">hkdf_expand</span>(
             <span class="ident">rms</span>,
             <span class="ident">PayloadU8Len</span>(<span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">len</span>()),
@@ -1154,7 +1154,7 @@
         <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">digest_alg</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">algorithm</span>
             .<span class="ident">hmac_algorithm</span>()
@@ -1182,7 +1182,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">hkdf_expand</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">L</span><span class="op">&gt;</span>(<span class="ident">secret</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>, <span class="ident">key_type</span>: <span class="ident">L</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">context</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">hkdf_expand</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">L</span><span class="op">&gt;</span>(<span class="ident">secret</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>, <span class="ident">key_type</span>: <span class="ident">L</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">context</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">T</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">L</span>: <span class="ident">hkdf::KeyType</span>,
@@ -1196,9 +1196,9 @@
     <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     <span class="ident">context</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     <span class="ident">f</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+) -&gt; <span class="ident">T</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">L</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>,
+    <span class="ident">F</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">L</span><span class="op">&gt;</span>) -&gt; <span class="ident">T</span>,
     <span class="ident">L</span>: <span class="ident">hkdf::KeyType</span>,
 {
     <span class="kw">const</span> <span class="ident">LABEL_PREFIX</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;tls13 &quot;</span>;
@@ -1222,13 +1222,13 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">PayloadU8Len</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">usize</span>);
 <span class="kw">impl</span> <span class="ident">hkdf::KeyType</span> <span class="kw">for</span> <span class="ident">PayloadU8Len</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">PayloadU8Len</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PayloadU8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="ident">PayloadU8Len</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="ident">PayloadU8Len</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">okm</span>.<span class="ident">len</span>().<span class="number">0</span>];
         <span class="ident">okm</span>.<span class="ident">fill</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>[..]).<span class="ident">unwrap</span>();
         <span class="ident">PayloadU8::new</span>(<span class="ident">r</span>)
@@ -1238,11 +1238,11 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_traffic_key</span>(
     <span class="ident">secret</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>,
     <span class="ident">aead_algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">aead::Algorithm</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">aead::UnboundKey</span> {
+) -&gt; <span class="ident">aead::UnboundKey</span> {
     <span class="ident">hkdf_expand</span>(<span class="ident">secret</span>, <span class="ident">aead_algorithm</span>, <span class="string">b&quot;key&quot;</span>, <span class="kw-2">&amp;</span>[])
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">derive_traffic_iv</span>(<span class="ident">secret</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Iv</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">derive_traffic_iv</span>(<span class="ident">secret</span>: <span class="kw-2">&amp;</span><span class="ident">hkdf::Prk</span>) -&gt; <span class="ident">Iv</span> {
     <span class="ident">hkdf_expand</span>(<span class="ident">secret</span>, <span class="ident">IvLen</span>, <span class="string">b&quot;iv&quot;</span>, <span class="kw-2">&amp;</span>[])
 }
 
@@ -1406,7 +1406,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">iv</span>.<span class="ident">value</span>(), <span class="ident">expected_iv</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">seal_zeroes</span>(<span class="ident">key</span>: <span class="ident">aead::UnboundKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">seal_zeroes</span>(<span class="ident">key</span>: <span class="ident">aead::UnboundKey</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">aead::LessSafeKey::new</span>(<span class="ident">key</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seal_output</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">32</span>];
         <span class="ident">key</span>.<span class="ident">seal_in_place_append_tag</span>(

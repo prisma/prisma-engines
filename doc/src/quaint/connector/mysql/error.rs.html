@@ -226,20 +226,20 @@
 <span class="kw">use</span> <span class="ident">mysql_async</span> <span class="kw">as</span> <span class="ident">my</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">my::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">my::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">my::Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="kw">use</span> <span class="ident">my::ServerError</span>;
 
         <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">my::Error::Io</span>(<span class="ident">my::IoError::Tls</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::TlsError</span> {
+            <span class="ident">my::Error::Io</span>(<span class="ident">my::IoError::Tls</span>(<span class="ident">err</span>)) =&gt; <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::TlsError</span> {
                 <span class="ident">message</span>: <span class="ident">err</span>.<span class="ident">to_string</span>(),
             })
             .<span class="ident">build</span>(),
-            <span class="ident">my::Error::Io</span>(<span class="ident">my::IoError::Io</span>(<span class="ident">err</span>)) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">std::io::ErrorKind::UnexpectedEof</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">my::Error::Io</span>(<span class="ident">my::IoError::Io</span>(<span class="ident">err</span>)) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">std::io::ErrorKind::UnexpectedEof</span> =&gt; {
                 <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ConnectionClosed</span>).<span class="ident">build</span>()
             }
-            <span class="ident">my::Error::Io</span>(<span class="ident">io_error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ConnectionError</span>(<span class="ident">io_error</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
-            <span class="ident">my::Error::Driver</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
-            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1062</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">my::Error::Io</span>(<span class="ident">io_error</span>) =&gt; <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ConnectionError</span>(<span class="ident">io_error</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
+            <span class="ident">my::Error::Driver</span>(<span class="ident">e</span>) =&gt; <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
+            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1062</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">message</span>
                     .<span class="ident">split_whitespace</span>()
                     .<span class="ident">last</span>()
@@ -257,7 +257,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1451</span> <span class="op">|</span><span class="op">|</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1452</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1451</span> <span class="op">|</span><span class="op">|</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1452</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">message</span>
                     .<span class="ident">split_whitespace</span>()
                     .<span class="ident">nth</span>(<span class="number">17</span>)
@@ -273,7 +273,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1263</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1263</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">message</span>
                     .<span class="ident">split_whitespace</span>()
                     .<span class="ident">last</span>()
@@ -290,7 +290,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1264</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1264</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ValueOutOfRange</span> {
                     <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">clone</span>(),
                 });
@@ -300,7 +300,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1364</span> <span class="op">|</span><span class="op">|</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1048</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1364</span> <span class="op">|</span><span class="op">|</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1048</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">message</span>
                     .<span class="ident">split_whitespace</span>()
                     .<span class="ident">nth</span>(<span class="number">1</span>)
@@ -316,7 +316,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1049</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1049</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">message</span>
                     .<span class="ident">split_whitespace</span>()
                     .<span class="ident">last</span>()
@@ -331,7 +331,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1007</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1007</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">message</span>
                     .<span class="ident">split_whitespace</span>()
                     .<span class="ident">nth</span>(<span class="number">3</span>)
@@ -346,7 +346,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1044</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1044</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">message</span>
                     .<span class="ident">split_whitespace</span>()
                     .<span class="ident">last</span>()
@@ -361,7 +361,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1045</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1045</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">message</span>
                     .<span class="ident">split_whitespace</span>()
                     .<span class="ident">nth</span>(<span class="number">4</span>)
@@ -377,7 +377,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1146</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1146</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">message</span>
                     .<span class="ident">split_whitespace</span>()
                     .<span class="ident">nth</span>(<span class="number">1</span>)
@@ -393,7 +393,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1054</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> { <span class="kw-2">ref</span> <span class="ident">message</span>, <span class="ident">code</span>, .. }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1054</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">message</span>
                     .<span class="ident">split_whitespace</span>()
                     .<span class="ident">nth</span>(<span class="number">2</span>)
@@ -411,7 +411,7 @@
                 <span class="kw-2">ref</span> <span class="ident">message</span>,
                 <span class="ident">code</span>,
                 <span class="ident">state</span>: <span class="kw">_</span>,
-            }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">1406</span> <span class="op">=</span><span class="op">&gt;</span> {
+            }) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">1406</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">split_whitespace</span>().<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;\&#39;&#39;</span>)).<span class="ident">nth</span>(<span class="number">6</span>).<span class="ident">into</span>();
 
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::LengthMismatch</span> { <span class="ident">column</span> };
@@ -426,7 +426,7 @@
                 <span class="kw-2">ref</span> <span class="ident">message</span>,
                 <span class="ident">code</span>,
                 <span class="kw-2">ref</span> <span class="ident">state</span>,
-            }) <span class="op">=</span><span class="op">&gt;</span> {
+            }) =&gt; {
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::QueryError</span>(
                     <span class="ident">my::Error::Server</span>(<span class="ident">ServerError</span> {
                         <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">clone</span>(),
@@ -442,7 +442,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">e</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
+            <span class="ident">e</span> =&gt; <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
         }
     }
 }

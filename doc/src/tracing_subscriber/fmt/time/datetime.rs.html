@@ -631,7 +631,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">year</span> <span class="op">&gt;</span> <span class="number">9999</span> {
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;+{}&quot;</span>, <span class="self">self</span>.<span class="ident">year</span>)<span class="question-mark">?</span>;
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">year</span> <span class="op">&lt;</span> <span class="number">0</span> {
@@ -654,17 +654,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">std::time::SystemTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">timestamp</span>: <span class="ident">std::time::SystemTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DateTime</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">timestamp</span>: <span class="ident">std::time::SystemTime</span>) -&gt; <span class="ident">DateTime</span> {
         <span class="kw">let</span> (<span class="ident">t</span>, <span class="ident">nanos</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">timestamp</span>.<span class="ident">duration_since</span>(<span class="ident">std::time::UNIX_EPOCH</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">duration</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">duration</span>) =&gt; {
                 <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">std::i64::MAX</span> <span class="kw">as</span> <span class="ident">u64</span>);
                 (<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">i64</span>, <span class="ident">duration</span>.<span class="ident">subsec_nanos</span>())
             }
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">error</span>.<span class="ident">duration</span>();
                 <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">std::i64::MAX</span> <span class="kw">as</span> <span class="ident">u64</span>);
                 <span class="kw">let</span> (<span class="ident">secs</span>, <span class="ident">nanos</span>) <span class="op">=</span> (<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">i64</span>, <span class="ident">duration</span>.<span class="ident">subsec_nanos</span>());
-                <span class="kw">if</span> <span class="ident">nanos</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">nanos</span> <span class="op">==</span> <span class="number">0</span> {
                     (<span class="op">-</span><span class="ident">secs</span>, <span class="number">0</span>)
                 } <span class="kw">else</span> {
                     (<span class="op">-</span><span class="ident">secs</span> <span class="op">-</span> <span class="number">1</span>, <span class="number">1_000_000_000</span> <span class="op">-</span> <span class="ident">nanos</span>)
@@ -695,19 +695,19 @@
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c_cycles</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">remdays</span> <span class="op">/</span> <span class="ident">DAYS_PER_100Y</span>;
-        <span class="kw">if</span> <span class="ident">c_cycles</span> <span class="op">=</span><span class="op">=</span> <span class="number">4</span> {
+        <span class="kw">if</span> <span class="ident">c_cycles</span> <span class="op">==</span> <span class="number">4</span> {
             <span class="ident">c_cycles</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
         }
         <span class="ident">remdays</span> <span class="op">-</span><span class="op">=</span> <span class="ident">c_cycles</span> <span class="op">*</span> <span class="ident">DAYS_PER_100Y</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q_cycles</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">remdays</span> <span class="op">/</span> <span class="ident">DAYS_PER_4Y</span>;
-        <span class="kw">if</span> <span class="ident">q_cycles</span> <span class="op">=</span><span class="op">=</span> <span class="number">25</span> {
+        <span class="kw">if</span> <span class="ident">q_cycles</span> <span class="op">==</span> <span class="number">25</span> {
             <span class="ident">q_cycles</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
         }
         <span class="ident">remdays</span> <span class="op">-</span><span class="op">=</span> <span class="ident">q_cycles</span> <span class="op">*</span> <span class="ident">DAYS_PER_4Y</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remyears</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">remdays</span> <span class="op">/</span> <span class="number">365</span>;
-        <span class="kw">if</span> <span class="ident">remyears</span> <span class="op">=</span><span class="op">=</span> <span class="number">4</span> {
+        <span class="kw">if</span> <span class="ident">remyears</span> <span class="op">==</span> <span class="number">4</span> {
             <span class="ident">remyears</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
         }
         <span class="ident">remdays</span> <span class="op">-</span><span class="op">=</span> <span class="ident">remyears</span> <span class="op">*</span> <span class="number">365</span>;

@@ -395,14 +395,14 @@
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Format a document according to style</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">style</span>: <span class="kw-2">&amp;</span><span class="ident">Style</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">style</span>: <span class="kw-2">&amp;</span><span class="ident">Style</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">formatter</span> <span class="op">=</span> <span class="ident">Formatter::new</span>(<span class="ident">style</span>);
         <span class="self">self</span>.<span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">formatter</span>);
         <span class="ident">formatter</span>.<span class="ident">into_string</span>()
     }
 }
 
-<span class="kw">fn</span> <span class="ident">to_string</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Displayable</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">to_string</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Displayable</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">style</span> <span class="op">=</span> <span class="ident">Style::default</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">formatter</span> <span class="op">=</span> <span class="ident">Formatter::new</span>(<span class="kw-2">&amp;</span><span class="ident">style</span>);
     <span class="ident">v</span>.<span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">formatter</span>);
@@ -424,8 +424,8 @@
 {
     <span class="kw">fn</span> <span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Definition::Operation</span>(<span class="kw-2">ref</span> <span class="ident">op</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">op</span>.<span class="ident">display</span>(<span class="ident">f</span>),
-            <span class="ident">Definition::Fragment</span>(<span class="kw-2">ref</span> <span class="ident">frag</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">frag</span>.<span class="ident">display</span>(<span class="ident">f</span>),
+            <span class="ident">Definition::Operation</span>(<span class="kw-2">ref</span> <span class="ident">op</span>) =&gt; <span class="ident">op</span>.<span class="ident">display</span>(<span class="ident">f</span>),
+            <span class="ident">Definition::Fragment</span>(<span class="kw-2">ref</span> <span class="ident">frag</span>) =&gt; <span class="ident">frag</span>.<span class="ident">display</span>(<span class="ident">f</span>),
         }
     }
 }
@@ -435,10 +435,10 @@
 {
     <span class="kw">fn</span> <span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">OperationDefinition::SelectionSet</span>(<span class="kw-2">ref</span> <span class="ident">set</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">set</span>.<span class="ident">display</span>(<span class="ident">f</span>),
-            <span class="ident">OperationDefinition::Query</span>(<span class="kw-2">ref</span> <span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">display</span>(<span class="ident">f</span>),
-            <span class="ident">OperationDefinition::Mutation</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>.<span class="ident">display</span>(<span class="ident">f</span>),
-            <span class="ident">OperationDefinition::Subscription</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">display</span>(<span class="ident">f</span>),
+            <span class="ident">OperationDefinition::SelectionSet</span>(<span class="kw-2">ref</span> <span class="ident">set</span>) =&gt; <span class="ident">set</span>.<span class="ident">display</span>(<span class="ident">f</span>),
+            <span class="ident">OperationDefinition::Query</span>(<span class="kw-2">ref</span> <span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">display</span>(<span class="ident">f</span>),
+            <span class="ident">OperationDefinition::Mutation</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) =&gt; <span class="ident">m</span>.<span class="ident">display</span>(<span class="ident">f</span>),
+            <span class="ident">OperationDefinition::Subscription</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">display</span>(<span class="ident">f</span>),
         }
     }
 }
@@ -482,9 +482,9 @@
 {
     <span class="kw">fn</span> <span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Selection::Field</span>(<span class="kw-2">ref</span> <span class="ident">fld</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fld</span>.<span class="ident">display</span>(<span class="ident">f</span>),
-            <span class="ident">Selection::InlineFragment</span>(<span class="kw-2">ref</span> <span class="ident">frag</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">frag</span>.<span class="ident">display</span>(<span class="ident">f</span>),
-            <span class="ident">Selection::FragmentSpread</span>(<span class="kw-2">ref</span> <span class="ident">frag</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">frag</span>.<span class="ident">display</span>(<span class="ident">f</span>),
+            <span class="ident">Selection::Field</span>(<span class="kw-2">ref</span> <span class="ident">fld</span>) =&gt; <span class="ident">fld</span>.<span class="ident">display</span>(<span class="ident">f</span>),
+            <span class="ident">Selection::InlineFragment</span>(<span class="kw-2">ref</span> <span class="ident">frag</span>) =&gt; <span class="ident">frag</span>.<span class="ident">display</span>(<span class="ident">f</span>),
+            <span class="ident">Selection::FragmentSpread</span>(<span class="kw-2">ref</span> <span class="ident">frag</span>) =&gt; <span class="ident">frag</span>.<span class="ident">display</span>(<span class="ident">f</span>),
         }
     }
 }
@@ -638,13 +638,13 @@
 {
     <span class="kw">fn</span> <span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Type::NamedType</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()),
-            <span class="ident">Type::ListType</span>(<span class="kw-2">ref</span> <span class="ident">typ</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Type::NamedType</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="ident">f</span>.<span class="ident">write</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()),
+            <span class="ident">Type::ListType</span>(<span class="kw-2">ref</span> <span class="ident">typ</span>) =&gt; {
                 <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;[&quot;</span>);
                 <span class="ident">typ</span>.<span class="ident">display</span>(<span class="ident">f</span>);
                 <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;]&quot;</span>);
             }
-            <span class="ident">Type::NonNullType</span>(<span class="kw-2">ref</span> <span class="ident">typ</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Type::NonNullType</span>(<span class="kw-2">ref</span> <span class="ident">typ</span>) =&gt; {
                 <span class="ident">typ</span>.<span class="ident">display</span>(<span class="ident">f</span>);
                 <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;!&quot;</span>);
             }
@@ -657,15 +657,15 @@
 {
     <span class="kw">fn</span> <span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Value::Variable</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;$&quot;</span>); <span class="ident">f</span>.<span class="ident">write</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()); },
-            <span class="ident">Value::Int</span>(<span class="kw-2">ref</span> <span class="ident">num</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">num</span>.<span class="number">0</span>)),
-            <span class="ident">Value::Float</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>)),
-            <span class="ident">Value::String</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_quoted</span>(<span class="ident">val</span>),
-            <span class="ident">Value::Boolean</span>(<span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;true&quot;</span>),
-            <span class="ident">Value::Boolean</span>(<span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;false&quot;</span>),
-            <span class="ident">Value::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;null&quot;</span>),
-            <span class="ident">Value::Enum</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()),
-            <span class="ident">Value::List</span>(<span class="kw-2">ref</span> <span class="ident">items</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Variable</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; { <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;$&quot;</span>); <span class="ident">f</span>.<span class="ident">write</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()); },
+            <span class="ident">Value::Int</span>(<span class="kw-2">ref</span> <span class="ident">num</span>) =&gt; <span class="ident">f</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">num</span>.<span class="number">0</span>)),
+            <span class="ident">Value::Float</span>(<span class="ident">val</span>) =&gt; <span class="ident">f</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>)),
+            <span class="ident">Value::String</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_quoted</span>(<span class="ident">val</span>),
+            <span class="ident">Value::Boolean</span>(<span class="bool-val">true</span>) =&gt; <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;true&quot;</span>),
+            <span class="ident">Value::Boolean</span>(<span class="bool-val">false</span>) =&gt; <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;false&quot;</span>),
+            <span class="ident">Value::Null</span> =&gt; <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;null&quot;</span>),
+            <span class="ident">Value::Enum</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="ident">f</span>.<span class="ident">write</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()),
+            <span class="ident">Value::List</span>(<span class="kw-2">ref</span> <span class="ident">items</span>) =&gt; {
                 <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;[&quot;</span>);
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">items</span>.<span class="ident">is_empty</span>() {
                     <span class="ident">items</span>[<span class="number">0</span>].<span class="ident">display</span>(<span class="ident">f</span>);
@@ -676,7 +676,7 @@
                 }
                 <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;]&quot;</span>);
             }
-            <span class="ident">Value::Object</span>(<span class="kw-2">ref</span> <span class="ident">items</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Object</span>(<span class="kw-2">ref</span> <span class="ident">items</span>) =&gt; {
                 <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;{&quot;</span>);
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">items</span>.<span class="ident">iter</span>() {
@@ -720,7 +720,7 @@
 {
     <span class="kw">fn</span> <span class="ident">display</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">TypeCondition::On</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TypeCondition::On</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; {
                 <span class="ident">f</span>.<span class="ident">write</span>(<span class="string">&quot;on &quot;</span>);
                 <span class="ident">f</span>.<span class="ident">write</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>());
             }

@@ -99,7 +99,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TokenDone</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
     {
@@ -110,9 +110,9 @@
         <span class="kw">let</span> <span class="ident">done_row_count_bytes</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">context</span>().<span class="ident">version</span>().<span class="ident">done_row_count_bytes</span>();
 
         <span class="kw">let</span> <span class="ident">done_rows</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">done_row_count_bytes</span> {
-            <span class="number">8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">src</span>.<span class="ident">read_u64_le</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">src</span>.<span class="ident">read_u32_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">u64</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="number">8</span> =&gt; <span class="ident">src</span>.<span class="ident">read_u64_le</span>().<span class="kw">await</span><span class="question-mark">?</span>,
+            <span class="number">4</span> =&gt; <span class="ident">src</span>.<span class="ident">read_u32_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">u64</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">TokenDone</span> {
@@ -122,20 +122,20 @@
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_final</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_final</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">status</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">rows</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">rows</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">done_rows</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TokenDone</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">done_rows</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">done_rows</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Done with status {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">status</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">done_rows</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">done_rows</span> <span class="op">==</span> <span class="number">1</span> {
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Done with status {:?} (1 row left)&quot;</span>, <span class="self">self</span>.<span class="ident">status</span>)
         } <span class="kw">else</span> {
             <span class="macro">write!</span>(

@@ -458,7 +458,7 @@
 <span class="comment">// region: macros</span>
 <span class="doccomment">/// Helper macro for easily implementing `OpAssign`.</span>
 <span class="macro">macro_rules!</span> <span class="ident">__impl_assign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">sym</span>:<span class="ident">tt</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {$(
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">sym</span>:<span class="ident">tt</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span>) =&gt; {$(
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_qualifications</span>)]</span>
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
         <span class="kw">impl</span> <span class="ident">core::ops</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> {
@@ -471,35 +471,35 @@
 
 <span class="doccomment">/// Implement `AddAssign` for the provided types.</span>
 <span class="macro">macro_rules!</span> <span class="ident">impl_add_assign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="macro">__impl_assign!</span>(<span class="op">+</span> <span class="ident">AddAssign</span> <span class="ident">add_assign</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="op">+</span>);
     };
 }
 
 <span class="doccomment">/// Implement `SubAssign` for the provided types.</span>
 <span class="macro">macro_rules!</span> <span class="ident">impl_sub_assign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="macro">__impl_assign!</span>(<span class="op">-</span> <span class="ident">SubAssign</span> <span class="ident">sub_assign</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="op">+</span>);
     };
 }
 
 <span class="doccomment">/// Implement `MulAssign` for the provided types.</span>
 <span class="macro">macro_rules!</span> <span class="ident">impl_mul_assign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="macro">__impl_assign!</span>(<span class="op">*</span> <span class="ident">MulAssign</span> <span class="ident">mul_assign</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="op">+</span>);
     };
 }
 
 <span class="doccomment">/// Implement `DivAssign` for the provided types.</span>
 <span class="macro">macro_rules!</span> <span class="ident">impl_div_assign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="macro">__impl_assign!</span>(<span class="op">/</span> <span class="ident">DivAssign</span> <span class="ident">div_assign</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="op">+</span>);
     };
 }
 
 <span class="doccomment">/// Division of integers, rounding the resulting value towards negative infinity.</span>
 <span class="macro">macro_rules!</span> <span class="ident">div_floor</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>) =&gt; {{
         <span class="kw">let</span> <span class="ident">_a</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>;
         <span class="kw">let</span> <span class="ident">_b</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>;
 
@@ -515,7 +515,7 @@
 
 <span class="doccomment">/// Euclidean remainder. Useful for `const` contexts.</span>
 <span class="macro">macro_rules!</span> <span class="ident">rem_euclid</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>) =&gt; {{
         <span class="kw">let</span> <span class="ident">_a</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>;
         <span class="kw">let</span> <span class="ident">_b</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>;
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">_a</span> <span class="op">%</span> <span class="ident">_b</span>;
@@ -529,11 +529,11 @@
 
 <span class="doccomment">/// Cascade an out-of-bounds value.</span>
 <span class="macro">macro_rules!</span> <span class="ident">cascade</span> {
-    (@<span class="ident">ordinal</span> <span class="ident">ordinal</span>) <span class="op">=</span><span class="op">&gt;</span> {};
-    (@<span class="ident">year</span> <span class="ident">year</span>) <span class="op">=</span><span class="op">&gt;</span> {};
+    (@<span class="ident">ordinal</span> <span class="ident">ordinal</span>) =&gt; {};
+    (@<span class="ident">year</span> <span class="ident">year</span>) =&gt; {};
 
     <span class="comment">// Cascade an out-of-bounds value from &quot;from&quot; to &quot;to&quot;.</span>
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min</span>:<span class="ident">literal</span>.. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span>:<span class="ident">literal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span>:<span class="ident">tt</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min</span>:<span class="ident">literal</span>.. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span>:<span class="ident">literal</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span>:<span class="ident">tt</span>) =&gt; {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_comparisons</span>, <span class="ident">unused_assignments</span>)]</span>
         <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span> {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span> <span class="op">-</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span> <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min</span>;
@@ -545,7 +545,7 @@
     };
 
     <span class="comment">// Special case the ordinal-to-year cascade, as it has different behavior.</span>
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span>:<span class="ident">ident</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span>:<span class="ident">ident</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>:<span class="ident">ident</span>) =&gt; {
         <span class="comment">// We need to actually capture the idents. Without this, macro hygiene causes errors.</span>
         <span class="macro">cascade!</span>(@<span class="ident">ordinal</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span>);
         <span class="macro">cascade!</span>(@<span class="ident">year</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>);
@@ -553,7 +553,7 @@
         <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::util::days_in_year</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>) {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">=</span> <span class="number">1</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::util::days_in_year</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>);
         }
@@ -562,7 +562,7 @@
 
 <span class="doccomment">/// Returns `Err(error::ComponentRange)` if the value is not in range.</span>
 <span class="macro">macro_rules!</span> <span class="ident">ensure_value_in_range</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">expr</span>) =&gt; {{
         <span class="kw">let</span> <span class="ident">_start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>;
         <span class="kw">let</span> <span class="ident">_end</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>;
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">trivial_numeric_casts</span>, <span class="ident">unused_comparisons</span>)]</span>
@@ -577,7 +577,7 @@
         }
     }};
 
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span> <span class="ident">conditionally</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span> <span class="ident">conditionally</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">expr</span>) =&gt; {{
         <span class="kw">let</span> <span class="ident">_start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>;
         <span class="kw">let</span> <span class="ident">_end</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>;
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">trivial_numeric_casts</span>, <span class="ident">unused_comparisons</span>)]</span>
@@ -598,10 +598,10 @@
 <span class="doccomment">/// This is similar to the `?` operator, but does not perform `.into()`. Because of this, it is</span>
 <span class="doccomment">/// usable in `const` contexts.</span>
 <span class="macro">macro_rules!</span> <span class="ident">const_try</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; {
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>),
         }
     };
 }
@@ -610,10 +610,10 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is similar to the `?` operator, but is usable in `const` contexts.</span>
 <span class="macro">macro_rules!</span> <span class="ident">const_try_opt</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; {
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
         }
     };
 }

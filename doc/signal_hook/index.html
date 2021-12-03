@@ -10,7 +10,7 @@ interrupt a thread at any time, making most handling race-prone.</li>
 limited to very few of them. To highlight, mutexes (or other locking mechanisms) and memory
 allocation and deallocation is <em>not</em> allowed.</li>
 </ul>
-<h1 id="the-goal-of-the-library" class="section-header"><a href="#the-goal-of-the-library">The goal of the library</a></h1>
+<h2 id="the-goal-of-the-library" class="section-header"><a href="#the-goal-of-the-library">The goal of the library</a></h2>
 <p>The aim is to subscriptions to signals a „structured“ resource, in a similar way memory
 allocation is ‒ parts of the program can independently subscribe and it’s the same part of the
 program that can give them up, independently of what the other parts do. Therefore, it is
@@ -26,7 +26,7 @@ safe Rust, without the application author needing to learn about <em>all</em> th
 <p>Note that despite everything, there are still some quirks around signal handling that are not
 possible to paper over and need to be considered. Also, there are some signal use cases that
 are inherently unsafe and they are not covered by this crate.</p>
-<h1 id="anatomy-of-the-crate" class="section-header"><a href="#anatomy-of-the-crate">Anatomy of the crate</a></h1>
+<h2 id="anatomy-of-the-crate" class="section-header"><a href="#anatomy-of-the-crate">Anatomy of the crate</a></h2>
 <p>The crate is split into several modules.</p>
 <p>The easiest way to handle signals is using the <a href="iterator/type.Signals.html" title="crate::iterator::Signals"><code>Signals</code></a> iterator
 thing. It can register for a set of signals and produce them one by one, in a blocking manner.
@@ -52,7 +52,7 @@ other utilities that are more suited to build other abstractions with than to us
 <li><code>extended-sig-info</code>: Support for providing more information in the iterators or from the
 async adaptor crates. This is off by default.</li>
 </ul>
-<h1 id="limitations" class="section-header"><a href="#limitations">Limitations</a></h1>
+<h2 id="limitations" class="section-header"><a href="#limitations">Limitations</a></h2>
 <ul>
 <li>OS limitations still apply. Certain signals are not possible to override or subscribe to ‒
 <code>SIGKILL</code> or <code>SIGSTOP</code>.</li>
@@ -83,8 +83,8 @@ default handlers:
 <ul>
 <li>Ignore. This is easy to emulate.</li>
 <li>Abort. Depending on if you call it from within a signal handler of from outside, the
-<a href="low_level/fn.abort.html" title="low_level::abort"><code>low_level::abort</code></a> or <a href="https://doc.rust-lang.org/1.56.1/std/process/fn.abort.html" title="std::process::abort"><code>std::process::abort</code></a> can be used.</li>
-<li>Terminate. This can be done with <code>exit</code> (<a href="low_level/fn.exit.html" title="low_level::exit"><code>low_level::exit</code></a> or <a href="https://doc.rust-lang.org/1.56.1/std/process/fn.exit.html" title="std::process::exit"><code>std::process::exit</code></a>).</li>
+<a href="low_level/fn.abort.html" title="low_level::abort"><code>low_level::abort</code></a> or <a href="https://doc.rust-lang.org/1.57.0/std/process/fn.abort.html" title="std::process::abort"><code>std::process::abort</code></a> can be used.</li>
+<li>Terminate. This can be done with <code>exit</code> (<a href="low_level/fn.exit.html" title="low_level::exit"><code>low_level::exit</code></a> or <a href="https://doc.rust-lang.org/1.57.0/std/process/fn.exit.html" title="std::process::exit"><code>std::process::exit</code></a>).</li>
 <li>Stop. It is possible to <a href="low_level/fn.raise.html" title="low_level::raise"><code>raise</code></a> the <a href="consts/signal/constant.SIGSTOP.html" title="consts::SIGSTOP"><code>SIGSTOP</code></a> signal.
 That one can’t be replaced and always stops the application.</li>
 </ul>
@@ -94,7 +94,7 @@ instances, if the application doesn’t consume them fast enough. This is consis
 the kernel does if the application doesn’t keep up with them, so it is something one needs to
 deal with anyway.</li>
 </ul>
-<h1 id="signal-masks" class="section-header"><a href="#signal-masks">Signal masks</a></h1>
+<h2 id="signal-masks" class="section-header"><a href="#signal-masks">Signal masks</a></h2>
 <p>As the library uses <code>sigaction</code> under the hood, signal masking works as expected (eg. with
 <code>pthread_sigmask</code>). This means, signals will <em>not</em> be delivered if the signal is masked in all
 program’s threads.</p>
@@ -102,7 +102,7 @@ program’s threads.</p>
 <a href="https://lib.rs/crates/nix">nix</a> crate offers safe interface to many low-level functions,
 including
 <a href="https://docs.rs/nix/0.11.0/nix/sys/signal/fn.pthread_sigmask.html"><code>pthread_sigmask</code></a>.</p>
-<h1 id="portability" class="section-header"><a href="#portability">Portability</a></h1>
+<h2 id="portability" class="section-header"><a href="#portability">Portability</a></h2>
 <p>It should work on any POSIX.1-2001 system, which are all the major big OSes with the notable
 exception of Windows.</p>
 <p>Non-standard signals are also supported. Pass the signal value directly from <code>libc</code> or use
@@ -131,7 +131,7 @@ the default handler, nevertheless you certainly have registered the handler.</li
 <p>Moreover, signals won’t work as you expected. <code>SIGTERM</code> isn’t actually used and
 not all <code>Ctrl-C</code>s are turned into <code>SIGINT</code>.</p>
 <p>Patches to improve Windows support in this library are welcome.</p>
-<h1 id="features" class="section-header"><a href="#features">Features</a></h1>
+<h2 id="features" class="section-header"><a href="#features">Features</a></h2>
 <p>There are several feature flags that control how much is available as part of the crate, some
 enabled by default.</p>
 <ul>
@@ -142,12 +142,12 @@ provides a convenient interface for receiving signals in rust-friendly way.</li>
 <li><code>extended-siginfo</code> adds support for providing extra information as part of the iterator
 interface.</li>
 </ul>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1><h2 id="using-a-flag-to-terminate-a-loop-based-application" class="section-header"><a href="#using-a-flag-to-terminate-a-loop-based-application">Using a flag to terminate a loop-based application</a></h2>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2><h3 id="using-a-flag-to-terminate-a-loop-based-application" class="section-header"><a href="#using-a-flag-to-terminate-a-loop-based-application">Using a flag to terminate a loop-based application</a></h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::io::Error</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
 
-<span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">term</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>));
     <span class="ident">signal_hook::flag::register</span>(<span class="ident">signal_hook::consts::SIGTERM</span>, <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">term</span>))<span class="question-mark">?</span>;
     <span class="kw">while</span> <span class="op">!</span><span class="ident">term</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) {
@@ -157,7 +157,7 @@ interface.</li>
     }
     <span class="prelude-val">Ok</span>(())
 }</code></pre></div>
-<h2 id="a-complex-signal-handling-with-a-background-thread" class="section-header"><a href="#a-complex-signal-handling-with-a-background-thread">A complex signal handling with a background thread</a></h2>
+<h3 id="a-complex-signal-handling-with-a-background-thread" class="section-header"><a href="#a-complex-signal-handling-with-a-background-thread">A complex signal handling with a background thread</a></h3>
 <p>This also handles the double CTRL+C situation (eg. the second CTRL+C kills) and resetting the
 terminal on <code>SIGTSTP</code> (CTRL+Z, curses-based applications should do something like this).</p>
 
@@ -174,7 +174,7 @@ terminal on <code>SIGTSTP</code> (CTRL+Z, curses-based applications should do so
 <span class="kw">use</span> <span class="ident">signal_hook::iterator::exfiltrator::WithOrigin</span>;
 <span class="kw">use</span> <span class="ident">signal_hook::low_level</span>;
 
-<span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="comment">// Make sure double CTRL+C and similar kills</span>
     <span class="kw">let</span> <span class="ident">term_now</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>));
     <span class="kw">for</span> <span class="ident">sig</span> <span class="kw">in</span> <span class="ident">TERM_SIGNALS</span> {
@@ -218,7 +218,7 @@ terminal on <code>SIGTSTP</code> (CTRL+Z, curses-based applications should do so
         <span class="comment">// Will print info about signal + where it comes from.</span>
         <span class="macro">eprintln!</span>(<span class="string">&quot;Received a signal {:?}&quot;</span>, <span class="ident">info</span>);
         <span class="kw">match</span> <span class="ident">info</span>.<span class="ident">signal</span> {
-            <span class="ident">SIGTSTP</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SIGTSTP</span> =&gt; {
                 <span class="comment">// Restore the terminal to non-TUI mode</span>
                 <span class="kw">if</span> <span class="ident">has_terminal</span> {
                     <span class="ident">app</span>.<span class="ident">restore_term</span>();
@@ -227,16 +227,16 @@ terminal on <code>SIGTSTP</code> (CTRL+Z, curses-based applications should do so
                     <span class="ident">low_level::emulate_default_handler</span>(<span class="ident">SIGTSTP</span>)<span class="question-mark">?</span>;
                 }
             }
-            <span class="ident">SIGCONT</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SIGCONT</span> =&gt; {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">has_terminal</span> {
                     <span class="ident">app</span>.<span class="ident">claim_term</span>();
                     <span class="ident">has_terminal</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 }
             }
-            <span class="ident">SIGWINCH</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">app</span>.<span class="ident">resize_term</span>(),
-            <span class="ident">SIGHUP</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">app</span>.<span class="ident">reload_config</span>(),
-            <span class="ident">SIGUSR1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">app</span>.<span class="ident">print_stats</span>(),
-            <span class="ident">term_sig</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="comment">// These are all the ones left</span>
+            <span class="ident">SIGWINCH</span> =&gt; <span class="ident">app</span>.<span class="ident">resize_term</span>(),
+            <span class="ident">SIGHUP</span> =&gt; <span class="ident">app</span>.<span class="ident">reload_config</span>(),
+            <span class="ident">SIGUSR1</span> =&gt; <span class="ident">app</span>.<span class="ident">print_stats</span>(),
+            <span class="ident">term_sig</span> =&gt; { <span class="comment">// These are all the ones left</span>
                 <span class="macro">eprintln!</span>(<span class="string">&quot;Terminating&quot;</span>);
                 <span class="macro">assert!</span>(<span class="ident">TERM_SIGNALS</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">term_sig</span>));
                 <span class="kw">break</span>;
@@ -250,7 +250,7 @@ terminal on <code>SIGTSTP</code> (CTRL+Z, curses-based applications should do so
 
     <span class="prelude-val">Ok</span>(())
 }</code></pre></div>
-<h1 id="asynchronous-runtime-support" class="section-header"><a href="#asynchronous-runtime-support">Asynchronous runtime support</a></h1>
+<h2 id="asynchronous-runtime-support" class="section-header"><a href="#asynchronous-runtime-support">Asynchronous runtime support</a></h2>
 <p>If you are looking for integration with an asynchronous runtime take a look at one of the
 following adapter crates:</p>
 <ul>
@@ -259,7 +259,7 @@ following adapter crates:</p>
 <li><a href="https://docs.rs/signal-hook-tokio"><code>signal-hook-tokio</code></a> for Tokio support</li>
 </ul>
 <p>Feel free to open a pull requests if you want to add support for runtimes not mentioned above.</p>
-<h1 id="porting-from-previous-versions" class="section-header"><a href="#porting-from-previous-versions">Porting from previous versions</a></h1>
+<h2 id="porting-from-previous-versions" class="section-header"><a href="#porting-from-previous-versions">Porting from previous versions</a></h2>
 <p>There were some noisy changes when going from 0.2 version to the 0.3 version. In particular:</p>
 <ul>
 <li>A lot of things moved around to make the structure of the crate a bit more understandable.
@@ -279,12 +279,12 @@ CTRL+C is now supported by a pattern described in the <a href="flag/index.html" 
 needs, refer above for emulating default handlers.</li>
 </ul>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="consts/index.html" title="signal_hook::consts mod">consts</a></div><div class="item-right docblock-short"><p>The low-level constants.</p>
-</div><div class="item-left module-item"><a class="mod" href="flag/index.html" title="signal_hook::flag mod">flag</a></div><div class="item-right docblock-short"><p>Module for actions setting flags.</p>
-</div><div class="item-left module-item"><a class="mod" href="iterator/index.html" title="signal_hook::iterator mod">iterator</a></div><div class="item-right docblock-short"><p>An iterator over incoming signals.</p>
-</div><div class="item-left module-item"><a class="mod" href="low_level/index.html" title="signal_hook::low_level mod">low_level</a></div><div class="item-right docblock-short"><p>Some low level utilities</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.SigId.html" title="signal_hook::SigId struct">SigId</a></div><div class="item-right docblock-short"><p>An ID of registered action.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="signal_hook" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="consts/index.html" title="signal_hook::consts mod">consts</a></div><div class="item-right docblock-short"><p>The low-level constants.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="flag/index.html" title="signal_hook::flag mod">flag</a></div><div class="item-right docblock-short"><p>Module for actions setting flags.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="iterator/index.html" title="signal_hook::iterator mod">iterator</a></div><div class="item-right docblock-short"><p>An iterator over incoming signals.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="low_level/index.html" title="signal_hook::low_level mod">low_level</a></div><div class="item-right docblock-short"><p>Some low level utilities</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SigId.html" title="signal_hook::SigId struct">SigId</a></div><div class="item-right docblock-short"><p>An ID of registered action.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="signal_hook" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

@@ -42,7 +42,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">tokio_crate</span> <span class="kw">as</span> <span class="ident">tokio</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">enter</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tokio::runtime::EnterGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">enter</span>() -&gt; <span class="ident">tokio::runtime::EnterGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="ident">RUNTIME</span>.<span class="ident">enter</span>()
 }
 
@@ -64,7 +64,7 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">compute</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">compute</span>() -&gt; <span class="ident">u8</span> {
         <span class="ident">tokio::spawn</span>(<span class="kw">async</span> { <span class="number">1</span> <span class="op">+</span> <span class="number">2</span> }).<span class="kw">await</span>.<span class="ident">unwrap</span>()
     }
 

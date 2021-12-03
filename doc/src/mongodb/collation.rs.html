@@ -378,13 +378,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CollationStrength</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u32</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">strength</span>: <span class="ident">CollationStrength</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">strength</span>: <span class="ident">CollationStrength</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">strength</span> {
-            <span class="ident">CollationStrength::Primary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">CollationStrength::Secondary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">CollationStrength::Tertiary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-            <span class="ident">CollationStrength::Quaternary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-            <span class="ident">CollationStrength::Identical</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
+            <span class="ident">CollationStrength::Primary</span> =&gt; <span class="number">1</span>,
+            <span class="ident">CollationStrength::Secondary</span> =&gt; <span class="number">2</span>,
+            <span class="ident">CollationStrength::Tertiary</span> =&gt; <span class="number">3</span>,
+            <span class="ident">CollationStrength::Quaternary</span> =&gt; <span class="number">4</span>,
+            <span class="ident">CollationStrength::Identical</span> =&gt; <span class="number">5</span>,
         }
     }
 }
@@ -392,14 +392,14 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CollationStrength</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">level</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">level</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">level</span> {
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CollationStrength::Primary</span>,
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CollationStrength::Secondary</span>,
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CollationStrength::Tertiary</span>,
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CollationStrength::Quaternary</span>,
-            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CollationStrength::Identical</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">1</span> =&gt; <span class="ident">CollationStrength::Primary</span>,
+            <span class="number">2</span> =&gt; <span class="ident">CollationStrength::Secondary</span>,
+            <span class="number">3</span> =&gt; <span class="ident">CollationStrength::Tertiary</span>,
+            <span class="number">4</span> =&gt; <span class="ident">CollationStrength::Quaternary</span>,
+            <span class="number">5</span> =&gt; <span class="ident">CollationStrength::Identical</span>,
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: (<span class="macro">format!</span>(<span class="string">&quot;invalid collation strength: {}&quot;</span>, <span class="ident">level</span>)),
                 }
@@ -410,7 +410,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">CollationStrength</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
     {
@@ -420,7 +420,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CollationStrength</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -430,7 +430,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">CollationStrength</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">std::fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">u32::from</span>(<span class="kw-2">*</span><span class="self">self</span>), <span class="ident">f</span>)
     }
 }
@@ -455,12 +455,12 @@
 <span class="kw">impl</span> <span class="ident">std::str::FromStr</span> <span class="kw">for</span> <span class="ident">CollationCaseFirst</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;upper&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CollationCaseFirst::Upper</span>),
-            <span class="string">&quot;lower&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CollationCaseFirst::Lower</span>),
-            <span class="string">&quot;off&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CollationCaseFirst::Off</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
+            <span class="string">&quot;upper&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationCaseFirst::Upper</span>),
+            <span class="string">&quot;lower&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationCaseFirst::Lower</span>),
+            <span class="string">&quot;off&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationCaseFirst::Off</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                 <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid CollationCaseFirst: {}&quot;</span>, <span class="ident">s</span>),
             }
             .<span class="ident">into</span>()),
@@ -470,17 +470,17 @@
 
 <span class="kw">impl</span> <span class="ident">CollationCaseFirst</span> {
     <span class="doccomment">/// Returns this [`CollationCaseFirst`] as a `&amp;&#39;static str`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CollationCaseFirst::Upper</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;upper&quot;</span>,
-            <span class="ident">CollationCaseFirst::Lower</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;lower&quot;</span>,
-            <span class="ident">CollationCaseFirst::Off</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;off&quot;</span>,
+            <span class="ident">CollationCaseFirst::Upper</span> =&gt; <span class="string">&quot;upper&quot;</span>,
+            <span class="ident">CollationCaseFirst::Lower</span> =&gt; <span class="string">&quot;lower&quot;</span>,
+            <span class="ident">CollationCaseFirst::Off</span> =&gt; <span class="string">&quot;off&quot;</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">CollationCaseFirst</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>.<span class="ident">as_str</span>(), <span class="ident">f</span>)
     }
 }
@@ -502,11 +502,11 @@
 <span class="kw">impl</span> <span class="ident">std::str::FromStr</span> <span class="kw">for</span> <span class="ident">CollationAlternate</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;non-ignorable&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CollationAlternate::NonIgnorable</span>),
-            <span class="string">&quot;shifted&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CollationAlternate::Shifted</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
+            <span class="string">&quot;non-ignorable&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationAlternate::NonIgnorable</span>),
+            <span class="string">&quot;shifted&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationAlternate::Shifted</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                 <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid collation alternate: {}&quot;</span>, <span class="ident">s</span>),
             }
             .<span class="ident">into</span>()),
@@ -516,16 +516,16 @@
 
 <span class="kw">impl</span> <span class="ident">CollationAlternate</span> {
     <span class="doccomment">/// Returns this [`CollationAlternate`] as a `&amp;&#39;static str`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CollationAlternate::NonIgnorable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;non-ignorable&quot;</span>,
-            <span class="ident">CollationAlternate::Shifted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;shifted&quot;</span>,
+            <span class="ident">CollationAlternate::NonIgnorable</span> =&gt; <span class="string">&quot;non-ignorable&quot;</span>,
+            <span class="ident">CollationAlternate::Shifted</span> =&gt; <span class="string">&quot;shifted&quot;</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">CollationAlternate</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>.<span class="ident">as_str</span>(), <span class="ident">f</span>)
     }
 }
@@ -545,11 +545,11 @@
 <span class="kw">impl</span> <span class="ident">std::str::FromStr</span> <span class="kw">for</span> <span class="ident">CollationMaxVariable</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;punct&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CollationMaxVariable::Punct</span>),
-            <span class="string">&quot;space&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CollationMaxVariable::Space</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
+            <span class="string">&quot;punct&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationMaxVariable::Punct</span>),
+            <span class="string">&quot;space&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CollationMaxVariable::Space</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                 <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid collation max variable: {}&quot;</span>, <span class="ident">s</span>),
             }
             .<span class="ident">into</span>()),
@@ -559,16 +559,16 @@
 
 <span class="kw">impl</span> <span class="ident">CollationMaxVariable</span> {
     <span class="doccomment">/// Returns this [`CollationMaxVariable`] as a `&amp;&#39;static str`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CollationMaxVariable::Punct</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;punct&quot;</span>,
-            <span class="ident">CollationMaxVariable::Space</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;space&quot;</span>,
+            <span class="ident">CollationMaxVariable::Punct</span> =&gt; <span class="string">&quot;punct&quot;</span>,
+            <span class="ident">CollationMaxVariable::Space</span> =&gt; <span class="string">&quot;space&quot;</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">CollationMaxVariable</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>.<span class="ident">as_str</span>(), <span class="ident">f</span>)
     }
 }

@@ -1292,7 +1292,7 @@
 
 <span class="doccomment">/// Wrapper around `rst_text2dest()` that packs the result in</span>
 <span class="doccomment">/// `Link::Text2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)) <span class="op">=</span> <span class="ident">rst_text2dest</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Text2Dest</span>(<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)))
 }
@@ -1320,7 +1320,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// The bracketed URI must be preceded by whitespace and be the last text</span>
 <span class="doccomment">/// before the end string.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">ln</span>, <span class="ident">ld</span>)) <span class="op">=</span> <span class="ident">rst_parse_text2target</span>(<span class="bool-val">true</span>, <span class="bool-val">false</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">ln</span> <span class="op">=</span> <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">ln</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
     <span class="kw">let</span> <span class="ident">ld</span> <span class="op">=</span> <span class="ident">rst_escaped_link_destination_transform</span>(<span class="ident">ld</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
@@ -1330,7 +1330,7 @@
 
 <span class="doccomment">/// Wrapper around `rst_textlabel2dest()` that packs the result in</span>
 <span class="doccomment">/// `Link::TextLabel2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text_label2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text_label2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)) <span class="op">=</span> <span class="ident">rst_text_label2dest</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::TextLabel2Dest</span>(<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)))
 }
@@ -1358,7 +1358,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// The bracketed URI must be preceded by whitespace and be the last text</span>
 <span class="doccomment">/// before the end string.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text_label2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text_label2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">ln</span>, <span class="ident">ld</span>)) <span class="op">=</span> <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">false</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">ln</span> <span class="op">=</span> <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">ln</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
     <span class="kw">let</span> <span class="ident">ld</span> <span class="op">=</span> <span class="ident">rst_escaped_link_destination_transform</span>(<span class="ident">ld</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
@@ -1384,7 +1384,7 @@
 <span class="kw">fn</span> <span class="ident">rst_parse_text2target</span>(
     <span class="ident">anonym</span>: <span class="ident">bool</span>,
     <span class="ident">label</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
     <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
         <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">i</span>, <span class="ident">inner</span>) <span class="op">=</span> <span class="ident">nom::sequence::delimited</span>(
             <span class="ident">tag</span>(<span class="string">&quot;`&quot;</span>),
@@ -1437,7 +1437,7 @@
 
         <span class="comment">// Get last char.</span>
         <span class="kw">let</span> <span class="ident">last_char_is_</span> <span class="op">=</span> <span class="ident">link_dest_label</span>.<span class="ident">is_char_boundary</span>(<span class="ident">link_dest_label</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)
-            <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">link_dest_label</span>[<span class="ident">link_dest_label</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>..] <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_&quot;</span>;
+            <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">link_dest_label</span>[<span class="ident">link_dest_label</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>..] <span class="op">==</span> <span class="string">&quot;_&quot;</span>;
         <span class="comment">// If (`label==true`), we expect trailing `_`, fail otherwise.</span>
         <span class="comment">// If (`label==false`), we fail when there is a trailing `_`.</span>
         <span class="kw">if</span> (<span class="ident">label</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">last_char_is_</span>) <span class="op">|</span><span class="op">|</span> (<span class="op">!</span><span class="ident">label</span> <span class="op">&amp;&amp;</span> <span class="ident">last_char_is_</span>) {
@@ -1457,7 +1457,7 @@
 
 <span class="doccomment">/// Wrapper around `rst_text2dest()` that packs the result in</span>
 <span class="doccomment">/// `Link::Text2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text2label_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text2label_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">la</span>)) <span class="op">=</span> <span class="ident">rst_text2label</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Text2Label</span>(<span class="ident">te</span>, <span class="ident">la</span>)))
 }
@@ -1491,7 +1491,7 @@
 <span class="doccomment">/// );</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text2label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_text2label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">la</span>)) <span class="op">=</span> <span class="ident">rst_parse_text2label</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">te</span> <span class="op">=</span> <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">te</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
     <span class="kw">let</span> <span class="ident">la</span> <span class="op">=</span> <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">la</span>)<span class="question-mark">?</span>.<span class="number">1</span>;
@@ -1525,7 +1525,7 @@
 <span class="doccomment">/// The parser checks that this _reference link_ is followed by a whitespace</span>
 <span class="doccomment">/// without consuming it.</span>
 <span class="doccomment">///</span>
-<span class="kw">fn</span> <span class="ident">rst_parse_text2label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">rst_parse_text2label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">i</span>, (<span class="ident">link_text</span>, <span class="kw-2">mut</span> <span class="ident">link_label</span>)) <span class="op">=</span> <span class="ident">alt</span>((
         <span class="ident">rst_parse_text2target</span>(<span class="bool-val">false</span>, <span class="bool-val">true</span>),
         <span class="ident">nom::combinator::map</span>(<span class="ident">rst_parse_simple_label</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> (<span class="ident">s</span>, <span class="ident">s</span>)),
@@ -1542,7 +1542,7 @@
 
 <span class="doccomment">/// Wrapper around `rst_label2dest()` that packs the result in</span>
 <span class="doccomment">/// `Link::Label2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_label2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_label2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">l</span>, <span class="ident">d</span>, <span class="ident">t</span>)) <span class="op">=</span> <span class="ident">rst_label2dest</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Label2Dest</span>(<span class="ident">l</span>, <span class="ident">d</span>, <span class="ident">t</span>)))
 }
@@ -1575,14 +1575,14 @@
 <span class="doccomment">/// .. _`Python: home page`: http://www.python.org</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// See unit test `test_rst_label2dest()` for more examples.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_label2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_label2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">l</span>, <span class="ident">d</span>)) <span class="op">=</span> <span class="ident">rst_label2target</span>(<span class="bool-val">false</span>, <span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">l</span>, <span class="ident">d</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))))
 }
 
 <span class="doccomment">/// Wrapper around `rst_label2label()` that packs the result in</span>
 <span class="doccomment">/// `Link::Label2Label`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_label2label_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_label2label_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">l1</span>, <span class="ident">l2</span>)) <span class="op">=</span> <span class="ident">rst_label2label</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Label2Label</span>(<span class="ident">l1</span>, <span class="ident">l2</span>)))
 }
@@ -1607,14 +1607,14 @@
 <span class="doccomment">///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;_&quot;), Cow::from(&quot;label&quot;))))</span>
 <span class="doccomment">/// );</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_label2label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rst_label2label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="ident">rst_label2target</span>(<span class="bool-val">true</span>, <span class="ident">i</span>)
 }
 
 <span class="doccomment">/// Parser for _link_reference_definitions_:</span>
 <span class="doccomment">/// * `label==false`:  the link is of type `Label2Dest`</span>
 <span class="doccomment">/// * `label==true`: the link is of type `Label2Label`</span>
-<span class="kw">fn</span> <span class="ident">rst_label2target</span>(<span class="ident">label</span>: <span class="ident">bool</span>, <span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">rst_label2target</span>(<span class="ident">label</span>: <span class="ident">bool</span>, <span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">my_err</span> <span class="op">=</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
         <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
             <span class="ident">i</span>,
@@ -1632,7 +1632,7 @@
         };
 
     <span class="kw">let</span> (<span class="ident">source</span>, <span class="ident">target</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>) =&gt; {
             <span class="kw">let</span> (<span class="kw">_</span>, (<span class="ident">ls</span>, <span class="ident">lt</span>)) <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">block_header_is__</span> {
                 <span class="ident">rst_parse_label2target</span>(<span class="ident">label</span>)(<span class="ident">s</span>)<span class="question-mark">?</span>
             } <span class="kw">else</span> {
@@ -1654,7 +1654,7 @@
             )
         }
 
-        <span class="ident">Cow::Owned</span>(<span class="ident">strg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Cow::Owned</span>(<span class="ident">strg</span>) =&gt; {
             <span class="kw">let</span> (<span class="kw">_</span>, (<span class="ident">ls</span>, <span class="ident">lt</span>)) <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">block_header_is__</span> {
                 <span class="ident">rst_parse_label2target</span>(<span class="ident">label</span>)(<span class="kw-2">&amp;</span><span class="ident">strg</span>).<span class="ident">map_err</span>(<span class="ident">my_err</span>)<span class="question-mark">?</span>
             } <span class="kw">else</span> {
@@ -1699,7 +1699,7 @@
 <span class="doccomment">/// or `Label2Label` links (`label==true):</span>
 <span class="doccomment">///     _alt_label: label_</span>
 <span class="doccomment">/// It does not perform any escape character transformation.</span>
-<span class="kw">fn</span> <span class="ident">rst_parse_label2target</span>(<span class="ident">label</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">rst_parse_label2target</span>(<span class="ident">label</span>: <span class="ident">bool</span>) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
     <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
         <span class="kw">let</span> (<span class="ident">i</span>, <span class="ident">link_text</span>) <span class="op">=</span> <span class="ident">alt</span>((
             <span class="ident">nom::sequence::delimited</span>(
@@ -1739,22 +1739,22 @@
 <span class="doccomment">///     one_word_label_</span>
 <span class="doccomment">/// or</span>
 <span class="doccomment">///     `more words label`_</span>
-<span class="kw">fn</span> <span class="ident">rst_parse_simple_label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">rst_parse_simple_label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
     <span class="comment">// Consumes and returns a word ending with `_`.</span>
     <span class="comment">// Strips off one the trailing `_` before returning the result.</span>
-    <span class="kw">fn</span> <span class="ident">take_word_consume_first_ending_underscore</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">take_word_consume_first_ending_underscore</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">i</span>;
         <span class="kw">let</span> (<span class="ident">k</span>, <span class="kw-2">mut</span> <span class="ident">r</span>) <span class="op">=</span> <span class="ident">nom::bytes::complete::take_till1</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> {
-            <span class="op">!</span>(<span class="ident">c</span>.<span class="ident">is_alphanumeric</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;-&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;_&#39;</span>)
+            <span class="op">!</span>(<span class="ident">c</span>.<span class="ident">is_alphanumeric</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;-&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;_&#39;</span>)
         })(<span class="ident">i</span>)<span class="question-mark">?</span>;
         <span class="comment">// Is `r` ending with `__`? There should be at least 2 bytes: `&quot;__&quot;.len()`</span>
-        <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">3</span> <span class="op">&amp;&amp;</span> <span class="ident">r</span>.<span class="ident">is_char_boundary</span>(<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>) <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>[<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>..] <span class="op">=</span><span class="op">=</span> <span class="string">&quot;__&quot;</span> {
+        <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">3</span> <span class="op">&amp;&amp;</span> <span class="ident">r</span>.<span class="ident">is_char_boundary</span>(<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>) <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>[<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>..] <span class="op">==</span> <span class="string">&quot;__&quot;</span> {
             <span class="comment">// Consume one `_`, but keep one `_` in remaining bytes.</span>
             <span class="ident">i</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">i</span>[<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>..];
             <span class="comment">// Strip two `__` from result.</span>
             <span class="ident">r</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">r</span>[..<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>];
         <span class="comment">// Is `r` ending with `_`? There should be at least 1 byte: `&quot;_&quot;.len()`.</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">r</span>.<span class="ident">is_char_boundary</span>(<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>) <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>[<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>..] <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_&quot;</span> {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">r</span>.<span class="ident">is_char_boundary</span>(<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>) <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>[<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>..] <span class="op">==</span> <span class="string">&quot;_&quot;</span> {
             <span class="comment">// Remaining bytes.</span>
             <span class="ident">i</span> <span class="op">=</span> <span class="ident">k</span>;
             <span class="comment">// Strip `_` from result.</span>
@@ -1814,9 +1814,9 @@
 <span class="doccomment">/// the lines are joined with whitespace before being normalized.</span>
 <span class="kw">fn</span> <span class="ident">rst_explicit_markup_block</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">block_header</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">|</span> {
-        <span class="kw">fn</span> <span class="ident">indent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">wsp1</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">wsp2</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, ()<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">indent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">wsp1</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">wsp2</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, ()<span class="op">&gt;</span> {
             <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
                 <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::character::complete::line_ending</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::bytes::complete::tag</span>(<span class="ident">wsp1</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
@@ -1836,7 +1836,7 @@
         )(<span class="ident">i</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// If the block consists of only one line return now.</span>
-        <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">j</span>, <span class="ident">Cow::Borrowed</span>(<span class="ident">v</span>[<span class="number">0</span>].<span class="ident">clone</span>())));
         };
 
@@ -1860,7 +1860,7 @@
 <span class="doccomment">/// with:</span>
 <span class="doccomment">///     \`:&lt;&gt;</span>
 <span class="doccomment">/// Preserves usual whitespace, but removes `\ `.</span>
-<span class="kw">fn</span> <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">rst_escaped_link_text_transform</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">nom::combinator::map</span>(
         <span class="ident">nom::bytes::complete::escaped_transform</span>(
             <span class="ident">nom::bytes::complete::is_not</span>(<span class="string">&quot;\\&quot;</span>),
@@ -1876,12 +1876,12 @@
                 <span class="ident">value</span>(<span class="string">&quot;&quot;</span>, <span class="ident">tag</span>(<span class="string">&quot; &quot;</span>)),
             )),
         ),
-        <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">s</span> <span class="op">=</span><span class="op">=</span> <span class="ident">i</span> { <span class="ident">Cow::from</span>(<span class="ident">i</span>) } <span class="kw">else</span> { <span class="ident">Cow::from</span>(<span class="ident">s</span>) },
+        <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="ident">i</span> { <span class="ident">Cow::from</span>(<span class="ident">i</span>) } <span class="kw">else</span> { <span class="ident">Cow::from</span>(<span class="ident">s</span>) },
     )(<span class="ident">i</span>)
 }
 
 <span class="doccomment">/// Deletes all whitespace, but keeps one space for each `\ `.</span>
-<span class="kw">fn</span> <span class="ident">remove_whitespace</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">remove_whitespace</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">j</span> <span class="op">=</span> <span class="ident">i</span>;
     <span class="kw">while</span> <span class="ident">j</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;&quot;</span> {
@@ -1892,13 +1892,13 @@
             <span class="ident">nom::character::complete::one_of</span>(<span class="string">r#&quot; :`&lt;&gt;\&quot;#</span>),
         )(<span class="ident">k</span>)<span class="question-mark">?</span>;
         <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">res</span> {
-            <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>),
-            <span class="ident">Cow::Borrowed</span>(<span class="ident">res_str</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>) =&gt; <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>),
+            <span class="ident">Cow::Borrowed</span>(<span class="ident">res_str</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">strg</span> <span class="op">=</span> <span class="ident">res_str</span>.<span class="ident">to_string</span>();
                 <span class="ident">strg</span>.<span class="ident">push_str</span>(<span class="ident">s</span>);
                 <span class="ident">Cow::Owned</span>(<span class="ident">strg</span>)
             }
-            <span class="ident">Cow::Owned</span>(<span class="kw-2">mut</span> <span class="ident">strg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Cow::Owned</span>(<span class="kw-2">mut</span> <span class="ident">strg</span>) =&gt; {
                 <span class="ident">strg</span>.<span class="ident">push_str</span>(<span class="ident">s</span>);
                 <span class="ident">Cow::Owned</span>(<span class="ident">strg</span>)
             }
@@ -1913,7 +1913,7 @@
 <span class="doccomment">///     \\\`\ \:\&lt;\&gt;</span>
 <span class="doccomment">/// with:</span>
 <span class="doccomment">///     \` :&lt;&gt;</span>
-<span class="kw">fn</span> <span class="ident">rst_escaped_link_destination_transform</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">rst_escaped_link_destination_transform</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">my_err</span> <span class="op">=</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
         <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
             <span class="ident">i</span>,
@@ -1932,7 +1932,7 @@
     .<span class="number">1</span>;
 
     <span class="comment">// When nothing was changed we can continue with `Borrowed`.</span>
-    <span class="kw">if</span> <span class="ident">s</span> <span class="op">=</span><span class="op">=</span> <span class="ident">i</span> {
+    <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="ident">i</span> {
         <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Borrowed</span>(<span class="ident">i</span>)))
     } <span class="kw">else</span> {
         <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::Owned</span>(<span class="ident">s</span>.<span class="ident">to_owned</span>())))

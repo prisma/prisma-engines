@@ -155,7 +155,7 @@
         <span class="ident">namespace</span>: <span class="ident">Namespace</span>,
         <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CountOptions</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pipeline</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">doc!</span> {
             <span class="string">&quot;$match&quot;</span>: <span class="ident">filter</span>.<span class="ident">unwrap_or_default</span>(),
         }];
@@ -212,7 +212,7 @@
 
     <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="ident">Aggregate::NAME</span>;
 
-    <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">aggregate</span>.<span class="ident">build</span>(<span class="ident">description</span>)
     }
 
@@ -220,15 +220,15 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">response</span>: <span class="ident">CursorBody</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
         <span class="ident">_description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::O</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::O</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">result_doc</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">cursor</span>.<span class="ident">first_batch</span>.<span class="ident">pop_front</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">doc</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">doc</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">doc</span>) =&gt; <span class="ident">doc</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>),
         };
 
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">result_doc</span>.<span class="ident">get</span>(<span class="string">&quot;n&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>,
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
                     <span class="ident">message</span>: <span class="string">&quot;server response to count_documents aggregate did not contain the \
                               &#39;n&#39; field&quot;</span>
@@ -250,11 +250,11 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">selection_criteria</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">selection_criteria</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">aggregate</span>.<span class="ident">selection_criteria</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">retryability</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Retryability</span> {
+    <span class="kw">fn</span> <span class="ident">retryability</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Retryability</span> {
         <span class="ident">Retryability::Read</span>
     }
 }

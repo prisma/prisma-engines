@@ -290,7 +290,7 @@
 
 <span class="kw">impl</span> <span class="ident">State</span> {
     <span class="doccomment">/// Create a new instance of `State`.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cx</span>: <span class="ident">PrismaContext</span>, <span class="ident">enable_playground</span>: <span class="ident">bool</span>, <span class="ident">enable_debug_mode</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cx</span>: <span class="ident">PrismaContext</span>, <span class="ident">enable_playground</span>: <span class="ident">bool</span>, <span class="ident">enable_debug_mode</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">cx</span>: <span class="ident">Arc::new</span>(<span class="ident">cx</span>),
             <span class="ident">enable_playground</span>,
@@ -300,7 +300,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">cx</span>: <span class="self">self</span>.<span class="ident">cx</span>.<span class="ident">clone</span>(),
             <span class="ident">enable_playground</span>: <span class="self">self</span>.<span class="ident">enable_playground</span>,
@@ -311,7 +311,7 @@
 
 <span class="doccomment">/// Create a new server and listen.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">opts</span>))]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">listen</span>(<span class="ident">opts</span>: <span class="ident">PrismaOpt</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">listen</span>(<span class="ident">opts</span>: <span class="ident">PrismaOpt</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">configuration</span>(<span class="bool-val">false</span>)<span class="question-mark">?</span>.<span class="ident">subject</span>;
     <span class="ident">config</span>.<span class="ident">validate_that_one_datasource_is_provided</span>()<span class="question-mark">?</span>;
 
@@ -350,8 +350,8 @@
     <span class="comment">// Start the Tide server and log the server details.</span>
     <span class="comment">// NOTE: The `info!` statement is essential for the correct working of the client.</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">listener</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">opts</span>.<span class="ident">unix_path</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">app</span>.<span class="ident">bind</span>(<span class="macro">format!</span>(<span class="string">&quot;http+unix://{}&quot;</span>, <span class="ident">path</span>)).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">app</span>.<span class="ident">bind</span>(<span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="ident">opts</span>.<span class="ident">host</span>.<span class="ident">as_str</span>(), <span class="ident">opts</span>.<span class="ident">port</span>)).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">path</span>) =&gt; <span class="ident">app</span>.<span class="ident">bind</span>(<span class="macro">format!</span>(<span class="string">&quot;http+unix://{}&quot;</span>, <span class="ident">path</span>)).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="ident">app</span>.<span class="ident">bind</span>(<span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="ident">opts</span>.<span class="ident">host</span>.<span class="ident">as_str</span>(), <span class="ident">opts</span>.<span class="ident">port</span>)).<span class="kw">await</span><span class="question-mark">?</span>,
     };
 
     <span class="macro">info!</span>(<span class="string">&quot;Started http server on {}&quot;</span>, <span class="ident">listener</span>);
@@ -361,7 +361,7 @@
 
 <span class="doccomment">/// The main query handler. This handles incoming GraphQL queries and passes it</span>
 <span class="doccomment">/// to the query engine.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">graphql_handler</span>(<span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tide::Result</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">graphql_handler</span>(<span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span> {
     <span class="comment">// Check for debug headers if enabled.</span>
     <span class="kw">if</span> <span class="ident">req</span>.<span class="ident">state</span>().<span class="ident">enable_debug_mode</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">res</span>) <span class="op">=</span> <span class="ident">handle_debug_headers</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span> {
@@ -400,7 +400,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// In production exposing the playground is equivalent to exposing the database</span>
 <span class="doccomment">/// on a port. This should never be enabled on production servers.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">playground_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tide::Result</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">playground_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">req</span>.<span class="ident">state</span>().<span class="ident">enable_playground</span> {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Response::new</span>(<span class="ident">StatusCode::NotFound</span>));
     }
@@ -413,14 +413,14 @@
 
 <span class="doccomment">/// Handler for the playground to work with the SDL-rendered query schema.</span>
 <span class="doccomment">/// Serves a raw SDL string created from the query schema.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sdl_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sdl_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">state</span>().<span class="ident">cx</span>.<span class="ident">query_schema</span>());
     <span class="prelude-val">Ok</span>(<span class="ident">GraphQLSchemaRenderer::render</span>(<span class="ident">schema</span>))
 }
 
 <span class="doccomment">/// Renders the Data Model Meta Format.</span>
 <span class="doccomment">/// Only callable if prisma was initialized using a v2 data model.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dmmf_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tide::Result</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dmmf_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span> {
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">dmmf::render_dmmf</span>(<span class="ident">req</span>.<span class="ident">state</span>().<span class="ident">cx</span>.<span class="ident">datamodel</span>(), <span class="ident">Arc::clone</span>(<span class="ident">req</span>.<span class="ident">state</span>().<span class="ident">cx</span>.<span class="ident">query_schema</span>()));
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::new</span>(<span class="ident">StatusCode::Ok</span>);
 
@@ -429,7 +429,7 @@
 }
 
 <span class="doccomment">/// Simple status endpoint</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">server_info_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">server_info_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="macro">json!</span>({
         <span class="string">&quot;commit&quot;</span>: <span class="macro">env!</span>(<span class="string">&quot;GIT_HASH&quot;</span>),
         <span class="string">&quot;version&quot;</span>: <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>),
@@ -437,38 +437,38 @@
     }))
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_start_handler</span>(<span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_start_handler</span>(<span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">TxInput</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">body_json</span>().<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">state</span>();
 
     <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>.<span class="ident">start_tx</span>(<span class="ident">input</span>.<span class="ident">max_wait</span>, <span class="ident">input</span>.<span class="ident">timeout</span>).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">tx_id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">json!</span>({ <span class="string">&quot;id&quot;</span>: <span class="ident">tx_id</span>.<span class="ident">to_string</span>() }).<span class="ident">into</span>()),
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>),
+        <span class="prelude-val">Ok</span>(<span class="ident">tx_id</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">json!</span>({ <span class="string">&quot;id&quot;</span>: <span class="ident">tx_id</span>.<span class="ident">to_string</span>() }).<span class="ident">into</span>()),
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>),
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_commit_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_commit_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">tx_id</span> <span class="op">=</span> <span class="ident">TxId::from</span>(<span class="ident">req</span>.<span class="ident">param</span>(<span class="string">&quot;id&quot;</span>)<span class="question-mark">?</span>);
     <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">state</span>();
 
     <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>.<span class="ident">commit_tx</span>(<span class="ident">tx_id</span>).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">json!</span>({}).<span class="ident">into</span>()),
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>),
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">json!</span>({}).<span class="ident">into</span>()),
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>),
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_rollback_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_rollback_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">tx_id</span> <span class="op">=</span> <span class="ident">TxId::from</span>(<span class="ident">req</span>.<span class="ident">param</span>(<span class="string">&quot;id&quot;</span>)<span class="question-mark">?</span>);
     <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">state</span>();
 
     <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>.<span class="ident">rollback_tx</span>(<span class="ident">tx_id</span>).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">json!</span>({}).<span class="ident">into</span>()),
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>),
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">json!</span>({}).<span class="ident">into</span>()),
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>),
     }
 }
 
 <span class="doccomment">/// Handle debug headers inside the main GraphQL endpoint.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_debug_headers</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_debug_headers</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Debug header that triggers a panic in the request thread.</span>
     <span class="kw">static</span> <span class="ident">DEBUG_NON_FATAL_HEADER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;x-debug-non-fatal&quot;</span>;
 
@@ -491,7 +491,7 @@
 
 <span class="doccomment">/// If the client sends us a trace and span id, extracting a new context if the</span>
 <span class="doccomment">/// headers are set. If not, returns current context.</span>
-<span class="kw">fn</span> <span class="ident">get_parent_span_context</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Context</span> {
+<span class="kw">fn</span> <span class="ident">get_parent_span_context</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">Context</span> {
     <span class="kw">let</span> <span class="ident">headers</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">req</span>
         .<span class="ident">iter</span>()
         .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">hn</span>, <span class="ident">hvs</span>)<span class="op">|</span> <span class="ident">hvs</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">hv</span><span class="op">|</span> (<span class="ident">hn</span>.<span class="ident">as_str</span>().<span class="ident">into</span>(), <span class="ident">hv</span>.<span class="ident">as_str</span>().<span class="ident">into</span>())))
@@ -500,17 +500,17 @@
     <span class="ident">global::get_text_map_propagator</span>(<span class="op">|</span><span class="ident">propagator</span><span class="op">|</span> <span class="ident">propagator</span>.<span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="ident">headers</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>: <span class="ident">query_core::CoreError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>: <span class="ident">query_core::CoreError</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">err</span> {
-        <span class="ident">query_core::CoreError::TransactionError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">query_core::TransactionError::AcquisitionTimeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">504</span>,
-            <span class="ident">query_core::TransactionError::AlreadyStarted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">todo!</span>(),
-            <span class="ident">query_core::TransactionError::NotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">404</span>,
-            <span class="ident">query_core::TransactionError::Closed</span> { <span class="ident">reason</span>: <span class="kw">_</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="number">422</span>,
+        <span class="ident">query_core::CoreError::TransactionError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="kw">match</span> <span class="ident">err</span> {
+            <span class="ident">query_core::TransactionError::AcquisitionTimeout</span> =&gt; <span class="number">504</span>,
+            <span class="ident">query_core::TransactionError::AlreadyStarted</span> =&gt; <span class="macro">todo!</span>(),
+            <span class="ident">query_core::TransactionError::NotFound</span> =&gt; <span class="number">404</span>,
+            <span class="ident">query_core::TransactionError::Closed</span> { <span class="ident">reason</span>: <span class="kw">_</span> } =&gt; <span class="number">422</span>,
         },
 
         <span class="comment">// All other errors are treated as 500s, most of these paths should never be hit, only connector errors may occur.</span>
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">500</span>,
+        <span class="kw">_</span> =&gt; <span class="number">500</span>,
     };
 
     <span class="kw">let</span> <span class="ident">user_error</span>: <span class="ident">user_facing_errors::Error</span> <span class="op">=</span> <span class="ident">err</span>.<span class="ident">into</span>();

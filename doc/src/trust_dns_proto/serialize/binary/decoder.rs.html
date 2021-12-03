@@ -372,7 +372,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `buffer` - buffer from which all data will be read</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
         <span class="ident">BinDecoder</span> {
             <span class="ident">buffer</span>,
             <span class="ident">remaining</span>: <span class="ident">buffer</span>,
@@ -380,7 +380,7 @@
     }
 
     <span class="doccomment">/// Pop one byte from the buffer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">first</span>, <span class="ident">remaining</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">split_first</span>() {
             <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">=</span> <span class="ident">remaining</span>;
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Restrict::new</span>(<span class="kw-2">*</span><span class="ident">first</span>));
@@ -399,28 +399,28 @@
     <span class="doccomment">/// decoder.read_slice(7).unwrap();</span>
     <span class="doccomment">/// assert_eq!(decoder.len(), 1);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// Returns `true` if the buffer is empty</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Peed one byte forward, without moving the current index forward</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="ident">Restrict::new</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">get</span>(<span class="number">0</span>)<span class="question-mark">?</span>))
     }
 
     <span class="doccomment">/// Returns the current index in the buffer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// This is a pretty efficient clone, as the buffer is never cloned, and only the index is set</span>
     <span class="doccomment">///  to the value passed in</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index_at</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index_at</span>: <span class="ident">u16</span>) -&gt; <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">BinDecoder</span> {
             <span class="ident">buffer</span>: <span class="self">self</span>.<span class="ident">buffer</span>,
             <span class="ident">remaining</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buffer</span>[<span class="ident">index_at</span> <span class="kw">as</span> <span class="ident">usize</span>..],
@@ -439,7 +439,7 @@
     <span class="doccomment">/// # Returns</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A String version of the character data</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_character_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_character_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pop</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>() <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="self">self</span>.<span class="ident">read_slice</span>(<span class="ident">length</span>)
     }
@@ -453,7 +453,7 @@
     <span class="doccomment">/// # Returns</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The Vec of the specified length, otherwise an error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_vec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_vec</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">read_slice</span>(<span class="ident">len</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>))
     }
 
@@ -466,7 +466,7 @@
     <span class="doccomment">/// # Returns</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The slice of the specified length, otherwise an error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">len</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DecodeError::InsufficientBytes</span>);
         }
@@ -476,7 +476,7 @@
     }
 
     <span class="doccomment">/// Reads a slice from a previous index to the current</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slice_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slice_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">index</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DecodeError::InvalidPreviousIndex</span>);
         }
@@ -485,7 +485,7 @@
     }
 
     <span class="doccomment">/// Reads a byte from the buffer, equivalent to `Self::pop()`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">pop</span>()
     }
 
@@ -497,7 +497,7 @@
     <span class="doccomment">/// # Return</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Return the u16 from the buffer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_u16</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_u16</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">read_slice</span>(<span class="number">2</span>)<span class="question-mark">?</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">u16::from_be_bytes</span>([<span class="ident">s</span>[<span class="number">0</span>], <span class="ident">s</span>[<span class="number">1</span>]])))
@@ -511,9 +511,9 @@
     <span class="doccomment">/// # Return</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Return the i32 from the buffer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">read_slice</span>(<span class="number">4</span>)<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="macro">assert!</span>(<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">4</span>);
+            <span class="macro">assert!</span>(<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">4</span>);
             <span class="ident">i32::from_be_bytes</span>([<span class="ident">s</span>[<span class="number">0</span>], <span class="ident">s</span>[<span class="number">1</span>], <span class="ident">s</span>[<span class="number">2</span>], <span class="ident">s</span>[<span class="number">3</span>]])
         }))
     }
@@ -526,9 +526,9 @@
     <span class="doccomment">/// # Return</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Return the u32 from the buffer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">DecodeResult</span><span class="op">&lt;</span><span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">read_slice</span>(<span class="number">4</span>)<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="macro">assert!</span>(<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">4</span>);
+            <span class="macro">assert!</span>(<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">4</span>);
             <span class="ident">u32::from_be_bytes</span>([<span class="ident">s</span>[<span class="number">0</span>], <span class="ident">s</span>[<span class="number">1</span>], <span class="ident">s</span>[<span class="number">2</span>], <span class="ident">s</span>[<span class="number">3</span>]])
         }))
     }

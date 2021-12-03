@@ -257,7 +257,7 @@
 <span class="kw">struct</span> <span class="ident">U32X4</span>([<span class="ident">u32</span>; <span class="number">4</span>]);
 
 <span class="kw">impl</span> <span class="ident">U32X4</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
         <span class="ident">U32X4</span>([
             <span class="ident">u32::from</span>(<span class="ident">bytes</span>[<span class="number">0</span>]),
             <span class="ident">u32::from</span>(<span class="ident">bytes</span>[<span class="number">1</span>]),

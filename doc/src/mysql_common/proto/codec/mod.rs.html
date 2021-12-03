@@ -792,12 +792,12 @@
 <span class="doccomment">/// Chunk ids will start with given `seq_id`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Resulting sequence id will be returned.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">packet_to_chunks</span>(<span class="kw-2">mut</span> <span class="ident">seq_id</span>: <span class="ident">u8</span>, <span class="ident">packet</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">packet_to_chunks</span>(<span class="kw-2">mut</span> <span class="ident">seq_id</span>: <span class="ident">u8</span>, <span class="ident">packet</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">u8</span> {
     <span class="ident">dst</span>.<span class="ident">reserve</span>(<span class="ident">packet</span>.<span class="ident">len</span>() <span class="op">+</span> (<span class="ident">packet</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="ident">MAX_PAYLOAD_LEN</span>) <span class="op">*</span> <span class="number">4</span> <span class="op">+</span> <span class="number">4</span>);
 
     <span class="kw">let</span> <span class="ident">chunks</span> <span class="op">=</span> <span class="ident">packet</span>
         .<span class="ident">chunks</span>(<span class="ident">MAX_PAYLOAD_LEN</span>)
-        .<span class="ident">chain</span>(<span class="kw">if</span> <span class="ident">packet</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        .<span class="ident">chain</span>(<span class="kw">if</span> <span class="ident">packet</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[][..])
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
@@ -821,7 +821,7 @@
     <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
     <span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
     <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>);
     }
@@ -840,8 +840,8 @@
                         <span class="ident">dst_buf</span>.<span class="ident">as_mut_ptr</span>(),
                         <span class="ident">dst_buf</span>.<span class="ident">len</span>(),
                     ))<span class="question-mark">?</span> {
-                        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                        <span class="ident">count</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">read</span> <span class="op">+</span><span class="op">=</span> <span class="ident">count</span>,
+                        <span class="number">0</span> =&gt; <span class="kw">break</span>,
+                        <span class="ident">count</span> =&gt; <span class="ident">read</span> <span class="op">+</span><span class="op">=</span> <span class="ident">count</span>,
                     }
                 }
 
@@ -879,9 +879,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ChunkInfo</span> {
-    <span class="kw">fn</span> <span class="ident">seq_id</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">seq_id</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ChunkInfo::Middle</span>(<span class="ident">x</span>) <span class="op">|</span> <span class="ident">ChunkInfo::Last</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
+            <span class="ident">ChunkInfo::Middle</span>(<span class="ident">x</span>) <span class="op">|</span> <span class="ident">ChunkInfo::Last</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
         }
     }
 }
@@ -911,9 +911,9 @@
         <span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChunkInfo</span><span class="op">&gt;</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChunkInfo</span><span class="op">&gt;</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ChunkDecoder::Idle</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ChunkDecoder::Idle</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
                     <span class="comment">// We need at least 4 bytes to read chunk length and sequence id.</span>
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
@@ -922,7 +922,7 @@
                     <span class="kw">let</span> <span class="ident">seq_id</span> <span class="op">=</span> <span class="ident">src</span>[<span class="number">3</span>];
 
                     <span class="kw">match</span> <span class="ident">NonZeroUsize::new</span>(<span class="ident">raw_chunk_len</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">chunk_len</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">chunk_len</span>) =&gt; {
                             <span class="kw">if</span> <span class="ident">dst</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">chunk_len</span>.<span class="ident">get</span>() <span class="op">&gt;</span> <span class="ident">max_allowed_packet</span> {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PacketCodecError::PacketTooLarge</span>);
                             }
@@ -940,14 +940,14 @@
                                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
                             }
                         }
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">None</span> =&gt; {
                             <span class="ident">src</span>.<span class="ident">advance</span>(<span class="number">4</span>);
                             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ChunkInfo::Last</span>(<span class="ident">seq_id</span>)))
                         }
                     }
                 }
             }
-            <span class="ident">ChunkDecoder::Chunk</span> { <span class="ident">seq_id</span>, <span class="ident">needed</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ChunkDecoder::Chunk</span> { <span class="ident">seq_id</span>, <span class="ident">needed</span> } =&gt; {
                 <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> <span class="op">+</span> <span class="ident">needed</span>.<span class="ident">get</span>() {
                     <span class="ident">src</span>.<span class="ident">advance</span>(<span class="number">4</span>);
                     <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">split_to</span>(<span class="ident">needed</span>.<span class="ident">get</span>());
@@ -955,7 +955,7 @@
 
                     <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">ChunkDecoder::Idle</span>;
 
-                    <span class="kw">if</span> <span class="ident">dst</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">dst</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ChunkInfo::Middle</span>(<span class="ident">seq_id</span>)))
                     } <span class="kw">else</span> {
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ChunkInfo::Last</span>(<span class="ident">seq_id</span>)))
@@ -969,7 +969,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ChunkDecoder</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ChunkDecoder::Idle</span>
     }
 }
@@ -989,7 +989,7 @@
         <span class="ident">compressed_len</span>: <span class="ident">usize</span>,
         <span class="ident">uncompressed_len</span>: <span class="ident">usize</span>,
         <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="comment">// max_allowed_packet will be an upper boundary</span>
         <span class="kw">if</span> <span class="ident">max</span>(<span class="ident">compressed_len</span>, <span class="ident">uncompressed_len</span>) <span class="op">&gt;</span> <span class="ident">max_allowed_packet</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PacketCodecError::PacketTooLarge</span>);
@@ -999,21 +999,21 @@
         <span class="kw">let</span> <span class="ident">uncompressed_len</span> <span class="op">=</span> <span class="ident">NonZeroUsize::new</span>(<span class="ident">uncompressed_len</span>);
 
         <span class="kw">match</span> (<span class="ident">compressed_len</span>, <span class="ident">uncompressed_len</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">needed</span>), <span class="prelude-val">Some</span>(<span class="ident">plain_len</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CompData::Compressed</span>(<span class="ident">needed</span>, <span class="ident">plain_len</span>))),
-            (<span class="prelude-val">Some</span>(<span class="ident">needed</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CompData::Uncompressed</span>(<span class="ident">needed</span>))),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">Some</span>(<span class="ident">needed</span>), <span class="prelude-val">Some</span>(<span class="ident">plain_len</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CompData::Compressed</span>(<span class="ident">needed</span>, <span class="ident">plain_len</span>))),
+            (<span class="prelude-val">Some</span>(<span class="ident">needed</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CompData::Uncompressed</span>(<span class="ident">needed</span>))),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; {
                 <span class="comment">// Zero bytes of compressed data that stores</span>
                 <span class="comment">// non-zero bytes of plain data? Absurd.</span>
                 <span class="prelude-val">Err</span>(<span class="ident">PacketCodecError::BadCompressedPacketHeader</span>)
             }
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
 
     <span class="doccomment">/// Returns number of bytes needed to decode packet.</span>
-    <span class="kw">fn</span> <span class="ident">needed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">needed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">CompData::Compressed</span>(<span class="ident">needed</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">CompData::Uncompressed</span>(<span class="ident">needed</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">needed</span>.<span class="ident">get</span>(),
+            <span class="ident">CompData::Compressed</span>(<span class="ident">needed</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">CompData::Uncompressed</span>(<span class="ident">needed</span>) =&gt; <span class="ident">needed</span>.<span class="ident">get</span>(),
         }
     }
 }
@@ -1041,9 +1041,9 @@
         <span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
         <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChunkInfo</span><span class="op">&gt;</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChunkInfo</span><span class="op">&gt;</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">CompDecoder::Idle</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CompDecoder::Idle</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">7</span> {
                     <span class="comment">// We need at least 7 bytes to read compressed packet header.</span>
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
@@ -1053,25 +1053,25 @@
                     <span class="kw">let</span> <span class="ident">uncompressed_len</span> <span class="op">=</span> <span class="ident">LittleEndian::read_u24</span>(<span class="kw-2">&amp;</span><span class="ident">src</span>[<span class="number">4</span>..]) <span class="kw">as</span> <span class="ident">usize</span>;
 
                     <span class="kw">match</span> <span class="ident">CompData::new</span>(<span class="ident">compressed_len</span>, <span class="ident">uncompressed_len</span>, <span class="ident">max_allowed_packet</span>)<span class="question-mark">?</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">needed</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">needed</span>) =&gt; {
                             <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">CompDecoder::Packet</span> { <span class="ident">seq_id</span>, <span class="ident">needed</span> };
                             <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>)
                         }
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">None</span> =&gt; {
                             <span class="ident">src</span>.<span class="ident">advance</span>(<span class="number">7</span>);
                             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ChunkInfo::Last</span>(<span class="ident">seq_id</span>)))
                         }
                     }
                 }
             }
-            <span class="ident">CompDecoder::Packet</span> { <span class="ident">seq_id</span>, <span class="ident">needed</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CompDecoder::Packet</span> { <span class="ident">seq_id</span>, <span class="ident">needed</span> } =&gt; {
                 <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">7</span> <span class="op">+</span> <span class="ident">needed</span>.<span class="ident">needed</span>() {
                     <span class="ident">src</span>.<span class="ident">advance</span>(<span class="number">7</span>);
                     <span class="kw">match</span> <span class="ident">needed</span> {
-                        <span class="ident">CompData::Uncompressed</span>(<span class="ident">needed</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">CompData::Uncompressed</span>(<span class="ident">needed</span>) =&gt; {
                             <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">src</span>[..<span class="ident">needed</span>.<span class="ident">get</span>()]);
                         }
-                        <span class="ident">CompData::Compressed</span>(<span class="ident">needed</span>, <span class="ident">plain_len</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">CompData::Compressed</span>(<span class="ident">needed</span>, <span class="ident">plain_len</span>) =&gt; {
                             <span class="ident">dst</span>.<span class="ident">reserve</span>(<span class="ident">plain_len</span>.<span class="ident">get</span>());
                             <span class="kw">unsafe</span> {
                                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">ZlibDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">src</span>[..<span class="ident">needed</span>.<span class="ident">get</span>()]);
@@ -1125,7 +1125,7 @@
     }
 
     <span class="doccomment">/// Will try to decode packet from `src`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>
             .<span class="ident">inner</span>
             .<span class="ident">decode</span>(<span class="ident">src</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>, <span class="self">self</span>.<span class="ident">max_allowed_packet</span>)<span class="question-mark">?</span>
@@ -1137,13 +1137,13 @@
     }
 
     <span class="doccomment">/// Will encode packets into `dst`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">encode</span>(<span class="ident">item</span>, <span class="ident">dst</span>, <span class="self">self</span>.<span class="ident">max_allowed_packet</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PacketCodec</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">max_allowed_packet</span>: <span class="ident">DEFAULT_MAX_ALLOWED_PACKET</span>,
             <span class="ident">buffer</span>: <span class="macro">vec!</span>[],
@@ -1165,23 +1165,23 @@
     <span class="doccomment">/// Sets sequence id to `0`.</span>
     <span class="kw">fn</span> <span class="ident">reset_seq_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">reset_seq_id</span>(),
-            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">reset_seq_id</span>(),
+            <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">reset_seq_id</span>(),
+            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">reset_seq_id</span>(),
         }
     }
 
     <span class="doccomment">/// Overwrites plain sequence id with compressed sequence id.</span>
     <span class="kw">fn</span> <span class="ident">sync_seq_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PacketCodecInner::Plain</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">sync_seq_id</span>(),
+            <span class="ident">PacketCodecInner::Plain</span>(<span class="kw">_</span>) =&gt; (),
+            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">sync_seq_id</span>(),
         }
     }
 
     <span class="doccomment">/// Turns compression on.</span>
     <span class="kw">fn</span> <span class="ident">compress</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="ident">Compression</span>) {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">c</span>) =&gt; {
                 <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">CompPacketCodec</span> {
                     <span class="ident">level</span>,
                     <span class="ident">comp_seq_id</span>: <span class="number">0</span>,
@@ -1191,7 +1191,7 @@
                     <span class="ident">plain_codec</span>: <span class="ident">mem::take</span>(<span class="ident">c</span>),
                 })
             }
-            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">level</span> <span class="op">=</span> <span class="ident">level</span>,
+            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">level</span> <span class="op">=</span> <span class="ident">level</span>,
         }
     }
 
@@ -1203,10 +1203,10 @@
         <span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">codec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">codec</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>),
-            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">codec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">codec</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>),
+            <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">codec</span>) =&gt; <span class="ident">codec</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>),
+            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">codec</span>) =&gt; <span class="ident">codec</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>),
         }
     }
 
@@ -1216,16 +1216,16 @@
         <span class="ident">packet</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
         <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">codec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">codec</span>.<span class="ident">encode</span>(<span class="ident">packet</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>),
-            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">codec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">codec</span>.<span class="ident">encode</span>(<span class="ident">packet</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>),
+            <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">codec</span>) =&gt; <span class="ident">codec</span>.<span class="ident">encode</span>(<span class="ident">packet</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>),
+            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">codec</span>) =&gt; <span class="ident">codec</span>.<span class="ident">encode</span>(<span class="ident">packet</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PacketCodecInner</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">Default::default</span>())
     }
 }
@@ -1253,9 +1253,9 @@
         <span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">chunk_decoder</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>)<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">chunk_info</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">chunk_info</span>) =&gt; {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">seq_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">chunk_info</span>.<span class="ident">seq_id</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PacketCodecError::PacketsOutOfSync</span>);
                 }
@@ -1263,17 +1263,17 @@
                 <span class="self">self</span>.<span class="ident">seq_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">seq_id</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
 
                 <span class="kw">match</span> <span class="ident">chunk_info</span> {
-                    <span class="ident">ChunkInfo::Middle</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">ChunkInfo::Middle</span>(<span class="kw">_</span>) =&gt; {
                         <span class="kw">if</span> <span class="op">!</span><span class="ident">src</span>.<span class="ident">is_empty</span>() {
                             <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>)
                         } <span class="kw">else</span> {
                             <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
                         }
                     }
-                    <span class="ident">ChunkInfo::Last</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+                    <span class="ident">ChunkInfo::Last</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
                 }
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
         }
     }
 
@@ -1283,7 +1283,7 @@
         <span class="ident">packet</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
         <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">packet</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">max_allowed_packet</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PacketCodecError::PacketTooLarge</span>);
         }
@@ -1334,7 +1334,7 @@
         <span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">in_buf</span>.<span class="ident">is_empty</span>()
             <span class="op">&amp;&amp;</span> <span class="self">self</span>
                 .<span class="ident">plain_codec</span>
@@ -1347,7 +1347,7 @@
             .<span class="ident">comp_decoder</span>
             .<span class="ident">decode</span>(<span class="ident">src</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">in_buf</span>, <span class="ident">max_allowed_packet</span>)<span class="question-mark">?</span>
         {
-            <span class="prelude-val">Some</span>(<span class="ident">chunk_info</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">chunk_info</span>) =&gt; {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">comp_seq_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">chunk_info</span>.<span class="ident">seq_id</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PacketCodecError::PacketsOutOfSync</span>);
                 }
@@ -1356,7 +1356,7 @@
 
                 <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
         }
     }
 
@@ -1366,7 +1366,7 @@
         <span class="ident">packet</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
         <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">plain_codec</span>
             .<span class="ident">encode</span>(<span class="ident">packet</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">out_buf</span>, <span class="ident">max_allowed_packet</span>)<span class="question-mark">?</span>;
 
@@ -1403,7 +1403,7 @@
     ];
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">zero_len_packet</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::PacketCodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">zero_len_packet</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::PacketCodecError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
         <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="macro">vec!</span>[], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">src</span>)<span class="question-mark">?</span>;
@@ -1416,7 +1416,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">regular_packet</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::PacketCodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">regular_packet</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::PacketCodecError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
         <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="macro">vec!</span>[<span class="number">0x31</span>, <span class="number">0x32</span>, <span class="number">0x33</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">src</span>)<span class="question-mark">?</span>;
@@ -1429,7 +1429,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">packet_sequence</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::PacketCodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">packet_sequence</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::PacketCodecError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
@@ -1444,7 +1444,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">large_packets</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::PacketCodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">large_packets</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::PacketCodecError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">lengths</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">MAX_PAYLOAD_LEN</span>, <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">*</span> <span class="number">2</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();

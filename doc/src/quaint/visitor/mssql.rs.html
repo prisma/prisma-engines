@@ -1798,7 +1798,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Mssql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="comment">// TODO: figure out that merge shit</span>
-    <span class="kw">fn</span> <span class="ident">visit_returning</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_returning</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">let</span> <span class="ident">cols</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">table</span>(<span class="string">&quot;Inserted&quot;</span>)).<span class="ident">collect</span>();
 
         <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; OUTPUT &quot;</span>)<span class="question-mark">?</span>;
@@ -1818,48 +1818,48 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_type_family</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">type_family</span>: <span class="ident">TypeFamily</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_type_family</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">type_family</span>: <span class="ident">TypeFamily</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">match</span> <span class="ident">type_family</span> {
-            <span class="ident">TypeFamily::Text</span>(<span class="ident">len</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TypeFamily::Text</span>(<span class="ident">len</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;NVARCHAR(&quot;</span>)<span class="question-mark">?</span>;
                 <span class="kw">match</span> <span class="ident">len</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Constant</span>(<span class="ident">len</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">len</span>)<span class="question-mark">?</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Maximum</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;MAX&quot;</span>)<span class="question-mark">?</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="number">4000</span>)<span class="question-mark">?</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Constant</span>(<span class="ident">len</span>)) =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">len</span>)<span class="question-mark">?</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Maximum</span>) =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;MAX&quot;</span>)<span class="question-mark">?</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="number">4000</span>)<span class="question-mark">?</span>,
                 }
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;)&quot;</span>)
             }
-            <span class="ident">TypeFamily::Int</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;BIGINT&quot;</span>),
-            <span class="ident">TypeFamily::Float</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;FLOAT(24)&quot;</span>),
-            <span class="ident">TypeFamily::Double</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;FLOAT(53)&quot;</span>),
-            <span class="ident">TypeFamily::Decimal</span>(<span class="ident">size</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TypeFamily::Int</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;BIGINT&quot;</span>),
+            <span class="ident">TypeFamily::Float</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;FLOAT(24)&quot;</span>),
+            <span class="ident">TypeFamily::Double</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;FLOAT(53)&quot;</span>),
+            <span class="ident">TypeFamily::Decimal</span>(<span class="ident">size</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;DECIMAL(&quot;</span>)<span class="question-mark">?</span>;
                 <span class="kw">match</span> <span class="ident">size</span> {
-                    <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>)) =&gt; {
                         <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">p</span>)<span class="question-mark">?</span>;
                         <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;,&quot;</span>)<span class="question-mark">?</span>;
                         <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;32,16&quot;</span>)<span class="question-mark">?</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;32,16&quot;</span>)<span class="question-mark">?</span>,
                 }
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;)&quot;</span>)
             }
-            <span class="ident">TypeFamily::Boolean</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;BIT&quot;</span>),
-            <span class="ident">TypeFamily::Uuid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;UNIQUEIDENTIFIER&quot;</span>),
-            <span class="ident">TypeFamily::DateTime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;DATETIMEOFFSET&quot;</span>),
-            <span class="ident">TypeFamily::Bytes</span>(<span class="ident">len</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TypeFamily::Boolean</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;BIT&quot;</span>),
+            <span class="ident">TypeFamily::Uuid</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;UNIQUEIDENTIFIER&quot;</span>),
+            <span class="ident">TypeFamily::DateTime</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;DATETIMEOFFSET&quot;</span>),
+            <span class="ident">TypeFamily::Bytes</span>(<span class="ident">len</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;VARBINARY(&quot;</span>)<span class="question-mark">?</span>;
                 <span class="kw">match</span> <span class="ident">len</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Constant</span>(<span class="ident">len</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">len</span>)<span class="question-mark">?</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Maximum</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;MAX&quot;</span>)<span class="question-mark">?</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="number">8000</span>)<span class="question-mark">?</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Constant</span>(<span class="ident">len</span>)) =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">len</span>)<span class="question-mark">?</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Maximum</span>) =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;MAX&quot;</span>)<span class="question-mark">?</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="number">8000</span>)<span class="question-mark">?</span>,
                 }
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;)&quot;</span>)
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">create_generated_keys</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">create_generated_keys</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;DECLARE &quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">GENERATED_KEYS</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; table&quot;</span>)<span class="question-mark">?</span>;
@@ -1872,8 +1872,8 @@
                 <span class="ident">this</span>.<span class="ident">write</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">match</span> <span class="ident">column</span>.<span class="ident">type_family</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">type_family</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">visit_type_family</span>(<span class="ident">type_family</span>)<span class="question-mark">?</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">this</span>.<span class="ident">write</span>(<span class="string">&quot;NVARCHAR(255)&quot;</span>)<span class="question-mark">?</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">type_family</span>) =&gt; <span class="ident">this</span>.<span class="ident">visit_type_family</span>(<span class="ident">type_family</span>)<span class="question-mark">?</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">this</span>.<span class="ident">write</span>(<span class="string">&quot;NVARCHAR(255)&quot;</span>)<span class="question-mark">?</span>,
                 }
 
                 <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> (<span class="ident">columns_len</span> <span class="op">-</span> <span class="number">1</span>) {
@@ -1887,7 +1887,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">select_generated_keys</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">target_table</span>: <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">select_generated_keys</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">target_table</span>: <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">let</span> <span class="ident">col_len</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">len</span>();
 
         <span class="kw">let</span> <span class="ident">join</span> <span class="op">=</span> <span class="ident">columns</span>
@@ -1926,7 +1926,7 @@
     <span class="kw">const</span> <span class="ident">C_WILDCARD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;%&quot;</span>;
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;render_sql&quot;</span>, <span class="ident">skip</span>(<span class="ident">query</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">build</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="ident">query</span>: <span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">build</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="ident">query</span>: <span class="ident">Q</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Q</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -1941,7 +1941,7 @@
         <span class="prelude-val">Ok</span>((<span class="ident">this</span>.<span class="ident">query</span>, <span class="ident">this</span>.<span class="ident">parameters</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">write</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">std::fmt::Display</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">write</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">std::fmt::Display</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="ident">D</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">write!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">query</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">s</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
@@ -1952,30 +1952,30 @@
 
     <span class="doccomment">/// A point to modify an incoming query to make it compatible with the</span>
     <span class="doccomment">/// SQL Server.</span>
-    <span class="kw">fn</span> <span class="ident">compatibility_modifications</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">compatibility_modifications</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">query</span> {
             <span class="comment">// Finding possible `(a, b) (NOT) IN (SELECT x, y ...)` comparisons,</span>
             <span class="comment">// and replacing them with common table expressions.</span>
-            <span class="ident">Query::Select</span>(<span class="ident">select</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">select</span>
+            <span class="ident">Query::Select</span>(<span class="ident">select</span>) =&gt; <span class="ident">select</span>
                 .<span class="ident">convert_tuple_selects_to_ctes</span>(<span class="bool-val">true</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="number">0</span>)
                 .<span class="ident">expect_left</span>(<span class="string">&quot;Top-level query was right&quot;</span>)
                 .<span class="ident">into</span>(),
             <span class="comment">// Replacing the `ON CONFLICT DO NOTHING` clause with a `MERGE` statement.</span>
-            <span class="ident">Query::Insert</span>(<span class="ident">insert</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">insert</span>.<span class="ident">on_conflict</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">OnConflict::DoNothing</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Merge::try_from</span>(<span class="kw-2">*</span><span class="ident">insert</span>).<span class="ident">unwrap</span>().<span class="ident">into</span>(),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Query::Insert</span>(<span class="ident">insert</span>),
+            <span class="ident">Query::Insert</span>(<span class="ident">insert</span>) =&gt; <span class="kw">match</span> <span class="ident">insert</span>.<span class="ident">on_conflict</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">OnConflict::DoNothing</span>) =&gt; <span class="ident">Merge::try_from</span>(<span class="kw-2">*</span><span class="ident">insert</span>).<span class="ident">unwrap</span>().<span class="ident">into</span>(),
+                <span class="kw">_</span> =&gt; <span class="ident">Query::Insert</span>(<span class="ident">insert</span>),
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">query</span>,
+            <span class="kw">_</span> =&gt; <span class="ident">query</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_equals</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_equals</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">match</span> (<span class="ident">left</span>.<span class="ident">kind</span>, <span class="ident">right</span>.<span class="ident">kind</span>) {
             <span class="comment">// we can&#39;t compare with tuples, so we&#39;ll convert it to an AND</span>
-            (<span class="ident">ExpressionKind::Row</span>(<span class="ident">left</span>), <span class="ident">ExpressionKind::Row</span>(<span class="ident">right</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">ExpressionKind::Row</span>(<span class="ident">left</span>), <span class="ident">ExpressionKind::Row</span>(<span class="ident">right</span>)) =&gt; {
                 <span class="self">self</span>.<span class="ident">visit_multiple_tuple_comparison</span>(<span class="ident">left</span>, <span class="ident">Values::from</span>(<span class="ident">iter::once</span>(<span class="ident">right</span>)), <span class="bool-val">false</span>)<span class="question-mark">?</span>;
             }
-            (<span class="ident">left_kind</span>, <span class="ident">right_kind</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">left_kind</span>, <span class="ident">right_kind</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">l_alias</span>, <span class="ident">r_alias</span>) <span class="op">=</span> (<span class="ident">left</span>.<span class="ident">alias</span>, <span class="ident">right</span>.<span class="ident">alias</span>);
                 <span class="kw">let</span> (<span class="ident">left_xml</span>, <span class="ident">right_xml</span>) <span class="op">=</span> (<span class="ident">left_kind</span>.<span class="ident">is_xml_value</span>(), <span class="ident">right_kind</span>.<span class="ident">is_xml_value</span>());
 
@@ -2010,13 +2010,13 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_not_equals</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_not_equals</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">match</span> (<span class="ident">left</span>.<span class="ident">kind</span>, <span class="ident">right</span>.<span class="ident">kind</span>) {
             <span class="comment">// we can&#39;t compare with tuples, so we&#39;ll convert it to an AND</span>
-            (<span class="ident">ExpressionKind::Row</span>(<span class="ident">left</span>), <span class="ident">ExpressionKind::Row</span>(<span class="ident">right</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">ExpressionKind::Row</span>(<span class="ident">left</span>), <span class="ident">ExpressionKind::Row</span>(<span class="ident">right</span>)) =&gt; {
                 <span class="self">self</span>.<span class="ident">visit_multiple_tuple_comparison</span>(<span class="ident">left</span>, <span class="ident">Values::from</span>(<span class="ident">iter::once</span>(<span class="ident">right</span>)), <span class="bool-val">true</span>)<span class="question-mark">?</span>;
             }
-            (<span class="ident">left_kind</span>, <span class="ident">right_kind</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">left_kind</span>, <span class="ident">right_kind</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">l_alias</span>, <span class="ident">r_alias</span>) <span class="op">=</span> (<span class="ident">left</span>.<span class="ident">alias</span>, <span class="ident">right</span>.<span class="ident">alias</span>);
                 <span class="kw">let</span> (<span class="ident">left_xml</span>, <span class="ident">right_xml</span>) <span class="op">=</span> (<span class="ident">left_kind</span>.<span class="ident">is_xml_value</span>(), <span class="ident">right_kind</span>.<span class="ident">is_xml_value</span>());
 
@@ -2051,27 +2051,27 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_raw_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_raw_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">Value::Integer</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">i</span>)),
-            <span class="ident">Value::Float</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
-                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_nan</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
-                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">=</span><span class="op">=</span> <span class="ident">f32::INFINITY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
-                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">=</span><span class="op">=</span> <span class="ident">f32::NEG_INFINITY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;-Infinity&quot;</span>),
-                <span class="ident">v</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">v</span>)),
+            <span class="ident">Value::Integer</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">i</span>)),
+            <span class="ident">Value::Float</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
+                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_nan</span>() =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
+                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">==</span> <span class="ident">f32::INFINITY</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
+                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">==</span> <span class="ident">f32::NEG_INFINITY</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;-Infinity&quot;</span>),
+                <span class="ident">v</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">v</span>)),
             }),
-            <span class="ident">Value::Double</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
-                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_nan</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
-                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">=</span><span class="op">=</span> <span class="ident">f64::INFINITY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
-                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">=</span><span class="op">=</span> <span class="ident">f64::NEG_INFINITY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;-Infinity&quot;</span>),
-                <span class="ident">v</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">v</span>)),
+            <span class="ident">Value::Double</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
+                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_nan</span>() =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
+                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">==</span> <span class="ident">f64::INFINITY</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
+                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">==</span> <span class="ident">f64::NEG_INFINITY</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;-Infinity&quot;</span>),
+                <span class="ident">v</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">v</span>)),
             }),
-            <span class="ident">Value::Text</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">t</span>))),
-            <span class="ident">Value::Enum</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">e</span>)),
-            <span class="ident">Value::Bytes</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;0x{}&quot;</span>, <span class="ident">hex::encode</span>(<span class="ident">b</span>)))),
-            <span class="ident">Value::Boolean</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="kw">if</span> <span class="ident">b</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> })),
-            <span class="ident">Value::Char</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">c</span>))),
-            <span class="ident">Value::Array</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Text</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">t</span>))),
+            <span class="ident">Value::Enum</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">e</span>)),
+            <span class="ident">Value::Bytes</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;0x{}&quot;</span>, <span class="ident">hex::encode</span>(<span class="ident">b</span>)))),
+            <span class="ident">Value::Boolean</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="kw">if</span> <span class="ident">b</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> })),
+            <span class="ident">Value::Char</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">c</span>))),
+            <span class="ident">Value::Array</span>(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Arrays are not supported in T-SQL.&quot;</span>;
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::conversion</span>(<span class="ident">msg</span>);
 
@@ -2081,41 +2081,41 @@
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">builder</span>.<span class="ident">build</span>());
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
-            <span class="ident">Value::Json</span>(<span class="ident">j</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">j</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">j</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">j</span>).<span class="ident">unwrap</span>()))),
+            <span class="ident">Value::Json</span>(<span class="ident">j</span>) =&gt; <span class="ident">j</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">j</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">j</span>).<span class="ident">unwrap</span>()))),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            <span class="ident">Value::Numeric</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">r</span>)),
+            <span class="ident">Value::Numeric</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">r</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-            <span class="ident">Value::Uuid</span>(<span class="ident">uuid</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">uuid</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">uuid</span><span class="op">|</span> {
+            <span class="ident">Value::Uuid</span>(<span class="ident">uuid</span>) =&gt; <span class="ident">uuid</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">uuid</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CONVERT(uniqueidentifier, N&#39;{}&#39;)&quot;</span>, <span class="ident">uuid</span>.<span class="ident">to_hyphenated</span>().<span class="ident">to_string</span>());
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">s</span>)
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            <span class="ident">Value::DateTime</span>(<span class="ident">dt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> {
+            <span class="ident">Value::DateTime</span>(<span class="ident">dt</span>) =&gt; <span class="ident">dt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CONVERT(datetimeoffset, N&#39;{}&#39;)&quot;</span>, <span class="ident">dt</span>.<span class="ident">to_rfc3339</span>());
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">s</span>)
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            <span class="ident">Value::Date</span>(<span class="ident">date</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">date</span><span class="op">|</span> {
+            <span class="ident">Value::Date</span>(<span class="ident">date</span>) =&gt; <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">date</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CONVERT(date, N&#39;{}&#39;)&quot;</span>, <span class="ident">date</span>);
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">s</span>)
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            <span class="ident">Value::Time</span>(<span class="ident">time</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> {
+            <span class="ident">Value::Time</span>(<span class="ident">time</span>) =&gt; <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CONVERT(time, N&#39;{}&#39;)&quot;</span>, <span class="ident">time</span>);
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">s</span>)
             }),
             <span class="comment">// Style 3 is keep all whitespace + internal DTD processing:</span>
             <span class="comment">// https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?redirectedfrom=MSDN&amp;view=sql-server-ver15#xml-styles</span>
-            <span class="ident">Value::Xml</span>(<span class="ident">cow</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cow</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">cow</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;CONVERT(XML, N&#39;{}&#39;, 3)&quot;</span>, <span class="ident">cow</span>))),
+            <span class="ident">Value::Xml</span>(<span class="ident">cow</span>) =&gt; <span class="ident">cow</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">cow</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;CONVERT(XML, N&#39;{}&#39;, 3)&quot;</span>, <span class="ident">cow</span>))),
         };
 
         <span class="kw">match</span> <span class="ident">res</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">res</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;null&quot;</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">res</span>) =&gt; <span class="ident">res</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;null&quot;</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_limit_and_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_limit_and_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">let</span> <span class="ident">add_ordering</span> <span class="op">=</span> <span class="op">|</span><span class="ident">this</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">|</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">this</span>.<span class="ident">order_by_set</span> {
                 <span class="ident">this</span>.<span class="ident">write</span>(<span class="string">&quot; ORDER BY &quot;</span>)<span class="question-mark">?</span>;
@@ -2126,7 +2126,7 @@
         };
 
         <span class="kw">match</span> (<span class="ident">limit</span>, <span class="ident">offset</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">limit</span>), <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">Some</span>(<span class="ident">limit</span>), <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) =&gt; {
                 <span class="ident">add_ordering</span>(<span class="self">self</span>)<span class="question-mark">?</span>;
 
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; OFFSET &quot;</span>)<span class="question-mark">?</span>;
@@ -2135,14 +2135,14 @@
                 <span class="self">self</span>.<span class="ident">visit_parameterized</span>(<span class="ident">limit</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; ROWS ONLY&quot;</span>)
             }
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">order_by_set</span> <span class="op">|</span><span class="op">|</span> <span class="ident">offset</span>.<span class="ident">as_i64</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">order_by_set</span> <span class="op">|</span><span class="op">|</span> <span class="ident">offset</span>.<span class="ident">as_i64</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) =&gt; {
                 <span class="ident">add_ordering</span>(<span class="self">self</span>)<span class="question-mark">?</span>;
 
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; OFFSET &quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">visit_parameterized</span>(<span class="ident">offset</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; ROWS&quot;</span>)
             }
-            (<span class="prelude-val">Some</span>(<span class="ident">limit</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">Some</span>(<span class="ident">limit</span>), <span class="prelude-val">None</span>) =&gt; {
                 <span class="ident">add_ordering</span>(<span class="self">self</span>)<span class="question-mark">?</span>;
 
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; OFFSET &quot;</span>)<span class="question-mark">?</span>;
@@ -2151,11 +2151,11 @@
                 <span class="self">self</span>.<span class="ident">visit_parameterized</span>(<span class="ident">limit</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; ROWS ONLY&quot;</span>)
             }
-            (<span class="prelude-val">None</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+            (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">insert</span>: <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">insert</span>: <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">returning</span>) <span class="op">=</span> <span class="ident">insert</span>.<span class="ident">returning</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>() {
             <span class="self">self</span>.<span class="ident">create_generated_keys</span>(<span class="ident">returning</span>)<span class="question-mark">?</span>;
             <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
@@ -2172,7 +2172,7 @@
             <span class="ident">Expression</span> {
                 <span class="ident">kind</span>: <span class="ident">ExpressionKind::Row</span>(<span class="ident">row</span>),
                 ..
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">values</span>.<span class="ident">is_empty</span>() {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">returning</span>) <span class="op">=</span> <span class="ident">insert</span>.<span class="ident">returning</span> {
                         <span class="self">self</span>.<span class="ident">visit_returning</span>(<span class="ident">returning</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
@@ -2194,7 +2194,7 @@
             <span class="ident">Expression</span> {
                 <span class="ident">kind</span>: <span class="ident">ExpressionKind::Values</span>(<span class="ident">values</span>),
                 ..
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">visit_row</span>(<span class="ident">Row::from</span>(<span class="ident">insert</span>.<span class="ident">columns</span>))<span class="question-mark">?</span>;
 
@@ -2213,7 +2213,7 @@
                     }
                 }
             }
-            <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">surround_with</span>(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, <span class="op">|</span><span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">visit_expression</span>(<span class="ident">expr</span>))<span class="question-mark">?</span>,
+            <span class="ident">expr</span> =&gt; <span class="self">self</span>.<span class="ident">surround_with</span>(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, <span class="op">|</span><span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">visit_expression</span>(<span class="ident">expr</span>))<span class="question-mark">?</span>,
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">returning</span>) <span class="op">=</span> <span class="ident">insert</span>.<span class="ident">returning</span> {
@@ -2230,7 +2230,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_merge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">merge</span>: <span class="ident">Merge</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_merge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">merge</span>: <span class="ident">Merge</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">returning</span>) <span class="op">=</span> <span class="ident">merge</span>.<span class="ident">returning</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>() {
             <span class="self">self</span>.<span class="ident">create_generated_keys</span>(<span class="ident">returning</span>)<span class="question-mark">?</span>;
             <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
@@ -2268,12 +2268,12 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">parameter_substitution</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">parameter_substitution</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;@P&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">write</span>(<span class="self">self</span>.<span class="ident">parameters</span>.<span class="ident">len</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_aggregate_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="kw">crate</span>::ast::Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_aggregate_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="kw">crate</span>::ast::Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;STRING_AGG&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">surround_with</span>(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, <span class="op">|</span><span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">se</span><span class="op">|</span> {
             <span class="ident">se</span>.<span class="ident">visit_expression</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
@@ -2283,7 +2283,7 @@
     }
 
     <span class="comment">// MSSQL doesn&#39;t support tuples, we do AND/OR.</span>
-    <span class="kw">fn</span> <span class="ident">visit_multiple_tuple_comparison</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">negate</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_multiple_tuple_comparison</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">left</span>: <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">right</span>: <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">negate</span>: <span class="ident">bool</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">let</span> <span class="ident">row_len</span> <span class="op">=</span> <span class="ident">left</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">values_len</span> <span class="op">=</span> <span class="ident">right</span>.<span class="ident">len</span>();
 
@@ -2318,13 +2318,13 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_ordering</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ordering</span>: <span class="ident">Ordering</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_ordering</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ordering</span>: <span class="ident">Ordering</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">ordering</span>.<span class="number">0</span>.<span class="ident">len</span>();
 
         <span class="kw">for</span> (<span class="ident">i</span>, (<span class="ident">value</span>, <span class="ident">ordering</span>)) <span class="kw">in</span> <span class="ident">ordering</span>.<span class="number">0</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
             <span class="kw">let</span> <span class="ident">direction</span> <span class="op">=</span> <span class="ident">ordering</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dir</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">dir</span> {
-                <span class="ident">Order::Asc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot; ASC&quot;</span>,
-                <span class="ident">Order::Desc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot; DESC&quot;</span>,
+                <span class="ident">Order::Asc</span> =&gt; <span class="string">&quot; ASC&quot;</span>,
+                <span class="ident">Order::Desc</span> =&gt; <span class="string">&quot; DESC&quot;</span>,
             });
 
             <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
@@ -2340,7 +2340,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_average</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">avg</span>: <span class="ident">Average</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_average</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">avg</span>: <span class="ident">Average</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;AVG&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// SQL Server will average as an integer, so average of 0 an 1 would be</span>
@@ -2358,7 +2358,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">visit_json_extract</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_json_extract</span>: <span class="ident">JsonExtract</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_json_extract</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_json_extract</span>: <span class="ident">JsonExtract</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on MSSQL&quot;</span>)
     }
 
@@ -2368,17 +2368,17 @@
         <span class="ident">_left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">_right</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">_not</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    ) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on MSSQL&quot;</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">visit_json_type_equals</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">_json_type</span>: <span class="ident">JsonType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_json_type_equals</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">_json_type</span>: <span class="ident">JsonType</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON_TYPE is not yet supported on MSSQL&quot;</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">visit_text_search</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_text_search</span>: <span class="ident"><span class="kw">crate</span>::prelude::TextSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_text_search</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_text_search</span>: <span class="ident"><span class="kw">crate</span>::prelude::TextSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;Full-text search is not yet supported on MSSQL&quot;</span>)
     }
 
@@ -2388,7 +2388,7 @@
         <span class="ident">_left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">_right</span>: <span class="ident">std::borrow::Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">_not</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    ) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;Full-text search is not yet supported on MSSQL&quot;</span>)
     }
 
@@ -2396,7 +2396,7 @@
     <span class="kw">fn</span> <span class="ident">visit_json_extract_last_array_item</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">_extract</span>: <span class="ident"><span class="kw">crate</span>::prelude::JsonExtractLastArrayElem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    ) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on MSSQL&quot;</span>)
     }
 
@@ -2404,7 +2404,7 @@
     <span class="kw">fn</span> <span class="ident">visit_json_extract_first_array_item</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">_extract</span>: <span class="ident"><span class="kw">crate</span>::prelude::JsonExtractFirstArrayElem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    ) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on MSSQL&quot;</span>)
     }
 }
@@ -2418,14 +2418,14 @@
     };
     <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 
-    <span class="kw">fn</span> <span class="ident">expected_values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>)
+    <span class="kw">fn</span> <span class="ident">expected_values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; (<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>)
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
         (<span class="ident">String::from</span>(<span class="ident">sql</span>), <span class="ident">params</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">into</span>()).<span class="ident">collect</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">default_params</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">additional</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default_params</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">additional</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">for</span> <span class="ident">param</span> <span class="kw">in</span> <span class="ident">additional</span>.<span class="ident">drain</span>(<span class="number">0</span>..) {

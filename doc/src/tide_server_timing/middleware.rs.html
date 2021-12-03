@@ -76,14 +76,14 @@
 
 <span class="kw">impl</span> <span class="ident">TimingMiddleware</span> {
     <span class="doccomment">/// Create a new instance of `Timing`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">_priv</span>: () }
     }
 }
 
 <span class="attribute">#[<span class="ident">tide::utils::async_trait</span>]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">State</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">tide::Middleware</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TimingMiddleware</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>, <span class="ident">next</span>: <span class="ident">Next</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tide::Result</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>, <span class="ident">next</span>: <span class="ident">Next</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span> {
         <span class="comment">// Create a fake span to guarantee we&#39;re always operating in a unique span.</span>
         <span class="comment">// TODO: We may not need this.</span>
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
@@ -104,8 +104,8 @@
 
                 <span class="kw">for</span> <span class="ident">timing</span> <span class="kw">in</span> <span class="ident">raw_timings</span> {
                     <span class="kw">let</span> <span class="ident">dur</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">timing</span>.<span class="ident">end_time</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">end_time</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">end_time</span>.<span class="ident">duration_since</span>(<span class="ident">timing</span>.<span class="ident">start_time</span>),
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>, <span class="comment">// This would be the active span, which we ignore.</span>
+                        <span class="prelude-val">Some</span>(<span class="ident">end_time</span>) =&gt; <span class="ident">end_time</span>.<span class="ident">duration_since</span>(<span class="ident">timing</span>.<span class="ident">start_time</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>, <span class="comment">// This would be the active span, which we ignore.</span>
                     };
 
                     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">timing</span>.<span class="ident">id</span>.<span class="ident">into_u64</span>().<span class="ident">to_string</span>();

@@ -801,11 +801,11 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">TestCase</span> {
     <span class="doccomment">/// Maps the string &quot;true&quot; to true and the string &quot;false&quot; to false.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>).<span class="ident">as_ref</span>() {
-            <span class="string">&quot;true&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="string">&quot;false&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">s</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Invalid bool value: {}&quot;</span>, <span class="ident">s</span>),
+            <span class="string">&quot;true&quot;</span> =&gt; <span class="bool-val">true</span>,
+            <span class="string">&quot;false&quot;</span> =&gt; <span class="bool-val">false</span>,
+            <span class="ident">s</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid bool value: {}&quot;</span>, <span class="ident">s</span>),
         }
     }
 
@@ -814,23 +814,23 @@
     <span class="doccomment">/// inputs. &quot;SHA224&quot; is mapped to None because *ring* intentionally does</span>
     <span class="doccomment">/// not support SHA224, but we need to consume test vectors from NIST that</span>
     <span class="doccomment">/// have SHA224 vectors in them.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_digest_alg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_digest_alg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>);
         <span class="kw">match</span> <span class="ident">name</span>.<span class="ident">as_ref</span>() {
-            <span class="string">&quot;SHA1&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA1_FOR_LEGACY_USE_ONLY</span>),
-            <span class="string">&quot;SHA224&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>, <span class="comment">// We actively skip SHA-224 support.</span>
-            <span class="string">&quot;SHA256&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>),
-            <span class="string">&quot;SHA384&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span>),
-            <span class="string">&quot;SHA512&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA512</span>),
-            <span class="string">&quot;SHA512_256&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA512_256</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unsupported digest algorithm: {}&quot;</span>, <span class="ident">name</span>),
+            <span class="string">&quot;SHA1&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA1_FOR_LEGACY_USE_ONLY</span>),
+            <span class="string">&quot;SHA224&quot;</span> =&gt; <span class="prelude-val">None</span>, <span class="comment">// We actively skip SHA-224 support.</span>
+            <span class="string">&quot;SHA256&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>),
+            <span class="string">&quot;SHA384&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span>),
+            <span class="string">&quot;SHA512&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA512</span>),
+            <span class="string">&quot;SHA512_256&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA512_256</span>),
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported digest algorithm: {}&quot;</span>, <span class="ident">name</span>),
         }
     }
 
     <span class="doccomment">/// Returns the value of an attribute that is encoded as a sequence of an</span>
     <span class="doccomment">/// even number of hex digits, or as a double-quoted UTF-8 string. The</span>
     <span class="doccomment">/// empty (zero-length) value is represented as &quot;&quot;.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>);
         <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;\&quot;&#39;</span>) {
             <span class="comment">// The value is a quoted UTF-8 string.</span>
@@ -839,14 +839,14 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>().<span class="ident">skip</span>(<span class="number">1</span>);
             <span class="kw">loop</span> {
                 <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">next</span>() {
-                    <span class="prelude-val">Some</span>(<span class="string">b&#39;\\&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="string">b&#39;\\&#39;</span>) =&gt; {
                         <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">next</span>() {
                             <span class="comment">// We don&#39;t allow all octal escape sequences, only &quot;\0&quot; for null.</span>
-                            <span class="prelude-val">Some</span>(<span class="string">b&#39;0&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">0u8</span>,
-                            <span class="prelude-val">Some</span>(<span class="string">b&#39;t&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&#39;\t&#39;</span>,
-                            <span class="prelude-val">Some</span>(<span class="string">b&#39;n&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">b&#39;\n&#39;</span>,
+                            <span class="prelude-val">Some</span>(<span class="string">b&#39;0&#39;</span>) =&gt; <span class="number">0u8</span>,
+                            <span class="prelude-val">Some</span>(<span class="string">b&#39;t&#39;</span>) =&gt; <span class="string">b&#39;\t&#39;</span>,
+                            <span class="prelude-val">Some</span>(<span class="string">b&#39;n&#39;</span>) =&gt; <span class="string">b&#39;\n&#39;</span>,
                             <span class="comment">// &quot;\xHH&quot;</span>
-                            <span class="prelude-val">Some</span>(<span class="string">b&#39;x&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="string">b&#39;x&#39;</span>) =&gt; {
                                 <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;Invalid hex escape sequence in string.&quot;</span>);
                                 <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;Invalid hex escape sequence in string.&quot;</span>);
                                 <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Ok</span>(<span class="ident">hi</span>), <span class="prelude-val">Ok</span>(<span class="ident">lo</span>)) <span class="op">=</span> (<span class="ident">from_hex_digit</span>(<span class="kw-2">*</span><span class="ident">hi</span>), <span class="ident">from_hex_digit</span>(<span class="kw-2">*</span><span class="ident">lo</span>))
@@ -856,19 +856,19 @@
                                     <span class="macro">panic!</span>(<span class="string">&quot;Invalid hex escape sequence in string.&quot;</span>);
                                 }
                             }
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw">_</span> =&gt; {
                                 <span class="macro">panic!</span>(<span class="string">&quot;Invalid hex escape sequence in string.&quot;</span>);
                             }
                         }
                     }
-                    <span class="prelude-val">Some</span>(<span class="string">b&#39;&quot;&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="string">b&#39;&quot;&#39;</span>) =&gt; {
                         <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
                             <span class="macro">panic!</span>(<span class="string">&quot;characters after the closing quote of a quoted string.&quot;</span>);
                         }
                         <span class="kw">break</span>;
                     }
-                    <span class="prelude-val">Some</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">b</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Missing terminating &#39;\&quot;&#39; in string literal.&quot;</span>),
+                    <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; <span class="kw-2">*</span><span class="ident">b</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Missing terminating &#39;\&quot;&#39; in string literal.&quot;</span>),
                 };
                 <span class="ident">bytes</span>.<span class="ident">push</span>(<span class="ident">b</span>);
             }
@@ -876,8 +876,8 @@
         } <span class="kw">else</span> {
             <span class="comment">// The value is hex encoded.</span>
             <span class="kw">match</span> <span class="ident">from_hex</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">err_str</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">err_str</span>) =&gt; {
                     <span class="macro">panic!</span>(<span class="string">&quot;{} in {}&quot;</span>, <span class="ident">err_str</span>, <span class="ident">s</span>);
                 }
             }
@@ -886,7 +886,7 @@
 
     <span class="doccomment">/// Returns the value of an attribute that is an integer, in decimal</span>
     <span class="doccomment">/// notation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_usize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_usize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>);
         <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>()
     }
@@ -894,7 +894,7 @@
     <span class="doccomment">/// Returns the value of an attribute that is an integer, in decimal</span>
     <span class="doccomment">/// notation, as a bit length.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_usize_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bits::BitLength</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_usize_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bits::BitLength</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>);
         <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>();
         <span class="ident">bits::BitLength::from_usize_bits</span>(<span class="ident">bits</span>)
@@ -902,16 +902,16 @@
 
     <span class="doccomment">/// Returns the raw value of an attribute, without any unquoting or</span>
     <span class="doccomment">/// other interpretation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">consume_optional_string</span>(<span class="ident">key</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;No attribute named \&quot;{}\&quot;&quot;</span>, <span class="ident">key</span>))
     }
 
     <span class="doccomment">/// Like `consume_string()` except it returns `None` if the test case</span>
     <span class="doccomment">/// doesn&#39;t have the attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_optional_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_optional_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">value</span>, <span class="ident">consumed</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">attributes</span> {
-            <span class="kw">if</span> <span class="ident">key</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span> {
+            <span class="kw">if</span> <span class="ident">key</span> <span class="op">==</span> <span class="ident">name</span> {
                 <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">consumed</span> {
                     <span class="macro">panic!</span>(<span class="string">&quot;Attribute {} was already consumed&quot;</span>, <span class="ident">key</span>);
                 }
@@ -927,7 +927,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">test_file</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>:<span class="ident">expr</span>) =&gt; {
         <span class="ident"><span class="kw">crate</span>::test::File</span> {
             <span class="ident">file_name</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>,
             <span class="ident">contents</span>: <span class="macro">include_str!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>),
@@ -953,7 +953,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">test_file</span>: <span class="ident">File</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>)
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TestCase</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TestCase</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="ident">lines</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test_file</span>.<span class="ident">contents</span>.<span class="ident">lines</span>();
 
@@ -962,7 +962,7 @@
 
     <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">test_case</span>) <span class="op">=</span> <span class="ident">parse_test_case</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">current_section</span>, <span class="ident">lines</span>) {
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">current_section</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test_case</span>) {
-            <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(()) =&gt; {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">test_case</span>
                     .<span class="ident">attributes</span>
                     .<span class="ident">iter</span>()
@@ -974,7 +974,7 @@
                     <span class="prelude-val">Err</span>(<span class="string">&quot;Test didn&#39;t consume all attributes.&quot;</span>)
                 }
             }
-            <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Test returned Err(error::Unspecified).&quot;</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>) =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Test returned Err(error::Unspecified).&quot;</span>),
         };
 
         <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_err</span>() {
@@ -1002,7 +1002,7 @@
 <span class="doccomment">/// Decode an string of hex digits into a sequence of bytes. The input must</span>
 <span class="doccomment">/// have an even number of digits.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_hex</span>(<span class="ident">hex_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_hex</span>(<span class="ident">hex_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">hex_str</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="number">2</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">String::from</span>(
             <span class="string">&quot;Hex string does not have an even number of digits&quot;</span>,
@@ -1019,7 +1019,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">from_hex_digit</span>(<span class="ident">d</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">from_hex_digit</span>(<span class="ident">d</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">core::ops::RangeInclusive</span>;
     <span class="kw">const</span> <span class="ident">DECIMAL</span>: (<span class="ident">u8</span>, <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">=</span> (<span class="number">0</span>, <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span>);
     <span class="kw">const</span> <span class="ident">HEX_LOWER</span>: (<span class="ident">u8</span>, <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">=</span> (<span class="number">10</span>, <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;f&#39;</span>);
@@ -1036,7 +1036,7 @@
 <span class="kw">fn</span> <span class="ident">parse_test_case</span>(
     <span class="ident">current_section</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>,
     <span class="ident">lines</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TestCase</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TestCase</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_first_line</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -1053,17 +1053,17 @@
         <span class="kw">match</span> <span class="ident">line</span> {
             <span class="comment">// If we get to EOF when we&#39;re not in the middle of a test case,</span>
             <span class="comment">// then we&#39;re done.</span>
-            <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">is_first_line</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">is_first_line</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
 
             <span class="comment">// End of the file on a non-empty test cases ends the test case.</span>
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">TestCase</span> { <span class="ident">attributes</span> });
             }
 
             <span class="comment">// A blank line ends a test case if the test case isn&#39;t empty.</span>
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">line</span>) <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">is_empty</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">line</span>) <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">is_empty</span>() =&gt; {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">is_first_line</span> {
                     <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">TestCase</span> { <span class="ident">attributes</span> });
                 }
@@ -1071,9 +1071,9 @@
             }
 
             <span class="comment">// Comments start with &#39;#&#39;; ignore them.</span>
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">line</span>) <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">starts_with</span>(<span class="string">&#39;#&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">line</span>) <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">starts_with</span>(<span class="string">&#39;#&#39;</span>) =&gt; (),
 
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">line</span>) <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">starts_with</span>(<span class="string">&#39;[&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">line</span>) <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">starts_with</span>(<span class="string">&#39;[&#39;</span>) =&gt; {
                 <span class="macro">assert!</span>(<span class="ident">is_first_line</span>);
                 <span class="macro">assert!</span>(<span class="ident">line</span>.<span class="ident">ends_with</span>(<span class="string">&#39;]&#39;</span>));
                 <span class="ident">current_section</span>.<span class="ident">truncate</span>(<span class="number">0</span>);
@@ -1082,7 +1082,7 @@
                 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">current_section</span>.<span class="ident">remove</span>(<span class="number">0</span>);
             }
 
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">line</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">line</span>) =&gt; {
                 <span class="ident">is_first_line</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
                 <span class="kw">let</span> <span class="ident">parts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&quot; = &quot;</span>).<span class="ident">collect</span>();
@@ -1122,7 +1122,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">rand::sealed::SecureRandom</span> <span class="kw">for</span> <span class="ident">FixedByteRandom</span> {
-        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
             <span class="ident">polyfill::slice::fill</span>(<span class="ident">dest</span>, <span class="self">self</span>.<span class="ident">byte</span>);
             <span class="prelude-val">Ok</span>(())
         }
@@ -1137,7 +1137,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">rand::sealed::SecureRandom</span> <span class="kw">for</span> <span class="ident">FixedSliceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
             <span class="ident">dest</span>.<span class="ident">copy_from_slice</span>(<span class="self">self</span>.<span class="ident">bytes</span>);
             <span class="prelude-val">Ok</span>(())
         }
@@ -1160,7 +1160,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">rand::sealed::SecureRandom</span> <span class="kw">for</span> <span class="ident">FixedSliceSequenceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">current</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">current</span>.<span class="ident">get</span>() };
             <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>[<span class="ident">current</span>];
             <span class="ident">dest</span>.<span class="ident">copy_from_slice</span>(<span class="ident">bytes</span>);
@@ -1264,7 +1264,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="ident">test::run</span>(<span class="macro">test_file!</span>(<span class="string">&quot;test_3_tests.txt&quot;</span>), <span class="op">|</span><span class="kw">_</span>, <span class="ident">test_case</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Key&quot;</span>);
-            <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="ident">test_to_fail</span> {
+            <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">test_to_fail</span> {
                 <span class="macro">panic!</span>(<span class="string">&quot;Oh Noes!&quot;</span>);
             };
             <span class="ident">n</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;

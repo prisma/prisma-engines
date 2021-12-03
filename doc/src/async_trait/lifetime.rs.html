@@ -74,7 +74,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CollectLifetimes</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">default_span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">default_span</span>: <span class="ident">Span</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">CollectLifetimes</span> {
             <span class="ident">elided</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">explicit</span>: <span class="ident">Vec::new</span>(),
@@ -85,20 +85,20 @@
 
     <span class="kw">fn</span> <span class="ident">visit_opt_lifetime</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">lifetime</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Lifetime</span><span class="op">&gt;</span>) {
         <span class="kw">match</span> <span class="ident">lifetime</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">lifetime</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">next_lifetime</span>(<span class="prelude-val">None</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">lifetime</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">visit_lifetime</span>(<span class="ident">lifetime</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="kw-2">*</span><span class="ident">lifetime</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">next_lifetime</span>(<span class="prelude-val">None</span>)),
+            <span class="prelude-val">Some</span>(<span class="ident">lifetime</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_lifetime</span>(<span class="ident">lifetime</span>),
         }
     }
 
     <span class="kw">fn</span> <span class="ident">visit_lifetime</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">lifetime</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Lifetime</span>) {
-        <span class="kw">if</span> <span class="ident">lifetime</span>.<span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_&quot;</span> {
+        <span class="kw">if</span> <span class="ident">lifetime</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;_&quot;</span> {
             <span class="kw-2">*</span><span class="ident">lifetime</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_lifetime</span>(<span class="ident">lifetime</span>.<span class="ident">span</span>());
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">explicit</span>.<span class="ident">push</span>(<span class="ident">lifetime</span>.<span class="ident">clone</span>());
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">next_lifetime</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">span</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Lifetime</span> {
+    <span class="kw">fn</span> <span class="ident">next_lifetime</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">span</span>: <span class="ident">S</span>) -&gt; <span class="ident">Lifetime</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>, <span class="self">self</span>.<span class="ident">elided</span>.<span class="ident">len</span>());
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">into</span>().<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">default_span</span>);
         <span class="kw">let</span> <span class="ident">life</span> <span class="op">=</span> <span class="ident">Lifetime::new</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">span</span>);

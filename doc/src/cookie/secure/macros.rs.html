@@ -49,7 +49,7 @@
 <span id="49">49</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">assert_simple_behaviour</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">clear</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> ({
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">clear</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>:<span class="ident">expr</span>) =&gt; ({
         <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">clear</span>.<span class="ident">iter</span>().<span class="ident">count</span>(), <span class="number">0</span>);
 
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>.<span class="ident">add</span>(<span class="ident">Cookie::new</span>(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;val&quot;</span>));
@@ -70,10 +70,10 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">assert_secure_behaviour</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">clear</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> ({
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">clear</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>:<span class="ident">expr</span>) =&gt; ({
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>.<span class="ident">add</span>(<span class="ident">Cookie::new</span>(<span class="string">&quot;secure&quot;</span>, <span class="string">&quot;secure&quot;</span>));
         <span class="macro">assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">clear</span>.<span class="ident">get</span>(<span class="string">&quot;secure&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">value</span>() <span class="op">!</span><span class="op">=</span> <span class="string">&quot;secure&quot;</span>);
-        <span class="macro">assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>.<span class="ident">get</span>(<span class="string">&quot;secure&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">value</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;secure&quot;</span>);
+        <span class="macro">assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>.<span class="ident">get</span>(<span class="string">&quot;secure&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">value</span>() <span class="op">==</span> <span class="string">&quot;secure&quot;</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cookie</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">clear</span>.<span class="ident">get</span>(<span class="string">&quot;secure&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">new_val</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}l&quot;</span>, <span class="ident">cookie</span>.<span class="ident">value</span>());
@@ -91,7 +91,7 @@
 <span class="comment">// This is courtesty of `static_assertions`. That library is Copyright (c) 2017</span>
 <span class="comment">// Nikolai Vazquez. See https://github.com/nvzqz/static-assertions-rs for more.</span>
 <span class="macro">macro_rules!</span> <span class="ident">const_assert</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unknown_lints</span>, <span class="ident">eq_op</span>)]</span>
         <span class="kw">const</span> <span class="kw">_</span>: [(); <span class="number">0</span> <span class="op">-</span> <span class="op">!</span>{ <span class="kw">const</span> <span class="ident">ASSERT</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>; <span class="ident">ASSERT</span> } <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> [];
     };

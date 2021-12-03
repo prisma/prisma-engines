@@ -252,7 +252,7 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">values</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> (
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) =&gt; (
         <span class="ident">Values::from</span>(<span class="ident">std::iter::empty</span>() $(.<span class="ident">chain</span>(<span class="ident">std::iter::once</span>(<span class="ident">Row::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>))))<span class="kw-2">*</span>)
     );
 }
@@ -281,11 +281,11 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">col</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e1</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e1</span>:<span class="ident">expr</span>) =&gt; {
         <span class="ident">Expression::from</span>(<span class="ident">Column::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e1</span>))
     };
 
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e2</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e2</span>:<span class="ident">expr</span>) =&gt; {
         <span class="ident">Expression::from</span>(<span class="ident">Column::from</span>((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e1</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e2</span>)))
     };
 }
@@ -314,25 +314,25 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">val</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>) =&gt; {
         <span class="ident">Expression::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>)
     };
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">value</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>:<span class="ident">ty</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>:<span class="ident">ident</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">that</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>:<span class="ident">ty</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>:<span class="ident">ident</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">that</span>:<span class="ident">expr</span>) =&gt; {
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::ast::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">that</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">that</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>) -&gt; <span class="self">Self</span> {
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> <span class="op">=</span> <span class="ident">that</span>;
                 <span class="ident"><span class="kw">crate</span>::ast::Value</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>(<span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">that</span>))
             }
         }
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::ast::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">that</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">that</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
                 <span class="kw">match</span> <span class="ident">that</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::ast::Value::from</span>(<span class="ident">val</span>),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::ast::Value</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; <span class="ident"><span class="kw">crate</span>::ast::Value::from</span>(<span class="ident">val</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident"><span class="kw">crate</span>::ast::Value</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>(<span class="prelude-val">None</span>),
                 }
             }
         }
@@ -340,12 +340,12 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">aliasable</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>:<span class="ident">ty</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> (
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>:<span class="ident">ty</span>),<span class="kw-2">*</span>) =&gt; (
         $(
             <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Aliasable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span> {
                 <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
 
-                <span class="kw">fn</span> <span class="ident">alias</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Target</span>
+                <span class="kw">fn</span> <span class="ident">alias</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="ident">T</span>) -&gt; <span class="ident"><span class="self">Self</span>::Target</span>
                 <span class="kw">where</span>
                     <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
                 {
@@ -358,10 +358,10 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">function</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>:<span class="ident">ident</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> (
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>:<span class="ident">ident</span>),<span class="kw-2">*</span>) =&gt; (
         $(
             <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Function</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
                     <span class="ident">Function</span> {
                         <span class="ident">typ_</span>: <span class="ident">FunctionType</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>(<span class="ident">f</span>),
                         <span class="ident">alias</span>: <span class="prelude-val">None</span>,
@@ -370,7 +370,7 @@
             }
 
             <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
                     <span class="ident">Function::from</span>(<span class="ident">f</span>).<span class="ident">into</span>()
                 }
             }
@@ -379,9 +379,9 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">expression</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>:<span class="ident">ident</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>:<span class="ident">ident</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>:<span class="ident">ident</span>) =&gt; {
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">that</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">that</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
                 <span class="ident">Expression</span> {
                     <span class="ident">kind</span>: <span class="ident">ExpressionKind</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>(<span class="ident">that</span>),
                     <span class="ident">alias</span>: <span class="prelude-val">None</span>,
@@ -394,10 +394,10 @@
 <span class="doccomment">/// A test-generator to test types in the defined database.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">test_type</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">db</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sql_type</span>:<span class="ident">literal</span>, $((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>:<span class="ident">expr</span>)),<span class="op">+</span> $(,)<span class="question-mark">?</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">db</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sql_type</span>:<span class="ident">literal</span>, $((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>:<span class="ident">expr</span>)),<span class="op">+</span> $(,)<span class="question-mark">?</span>)) =&gt; {
         <span class="macro">paste::item!</span> {
             <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="kw">fn</span> [<span class="op">&lt;</span> <span class="ident">test_type_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">&gt;</span>] () <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+            <span class="kw">fn</span> [<span class="op">&lt;</span> <span class="ident">test_type_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">&gt;</span>] () -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
                 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::<span class="kw-2">*</span>;
                 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector::Queryable</span>;
                 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tests::test_api::TestApi</span>;
@@ -430,10 +430,10 @@
         }
     };
 
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">db</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sql_type</span>:<span class="ident">literal</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">db</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sql_type</span>:<span class="ident">literal</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>)) =&gt; {
         <span class="macro">paste::item!</span> {
             <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="kw">fn</span> [<span class="op">&lt;</span> <span class="ident">test_type_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">&gt;</span>] () <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+            <span class="kw">fn</span> [<span class="op">&lt;</span> <span class="ident">test_type_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">&gt;</span>] () -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
                 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::<span class="kw-2">*</span>;
                 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector::Queryable</span>;
                 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tests::test_api::TestApi</span>;

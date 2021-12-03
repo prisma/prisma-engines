@@ -78,29 +78,29 @@
 <span class="doccomment">/// Types of this trait will can be attempted for conversion to an IP address</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TryParseIp</span> {
     <span class="doccomment">/// Attempts to parse self into an RData::A or RData::AAAA, None is returned if not possible</span>
-    <span class="kw">fn</span> <span class="ident">try_parse_ip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">try_parse_ip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">TryParseIp</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">try_parse_ip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_parse_ip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">IpAddr::V4</span>(<span class="ident">ip4</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RData::A</span>(<span class="ident">ip4</span>)),
-            <span class="prelude-val">Ok</span>(<span class="ident">IpAddr::V6</span>(<span class="ident">ip6</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RData::AAAA</span>(<span class="ident">ip6</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">IpAddr::V4</span>(<span class="ident">ip4</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RData::A</span>(<span class="ident">ip4</span>)),
+            <span class="prelude-val">Ok</span>(<span class="ident">IpAddr::V6</span>(<span class="ident">ip6</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RData::AAAA</span>(<span class="ident">ip6</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
         }
         .<span class="ident">ok</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">TryParseIp</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="kw">fn</span> <span class="ident">try_parse_ip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_parse_ip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span> {
         (<span class="kw-2">&amp;</span><span class="self">self</span>[..]).<span class="ident">try_parse_ip</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">TryParseIp</span> <span class="kw">for</span> <span class="ident">Name</span> {
     <span class="doccomment">/// Always returns none for Name, it assumes something that is already a name, wants to be a name</span>
-    <span class="kw">fn</span> <span class="ident">try_parse_ip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_parse_ip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 }
@@ -109,7 +109,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">TryParseIp</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
 {
-    <span class="kw">fn</span> <span class="ident">try_parse_ip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_parse_ip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span> {
         <span class="ident">TryParseIp::try_parse_ip</span>(<span class="kw-2">*</span><span class="self">self</span>)
     }
 }

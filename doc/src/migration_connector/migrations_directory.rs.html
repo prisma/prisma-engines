@@ -268,7 +268,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_migration_directory</span>(
     <span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
     <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">MigrationDirectory</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">MigrationDirectory</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">chrono::Utc::now</span>().<span class="ident">format</span>(<span class="string">&quot;%Y%m%d%H%M%S&quot;</span>);
     <span class="kw">let</span> <span class="ident">directory_name</span> <span class="op">=</span> <span class="macro">format!</span>(
         <span class="string">&quot;{timestamp}_{migration_name}&quot;</span>,
@@ -294,7 +294,7 @@
 
 <span class="doccomment">/// Write the migration_lock file to the directory.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_migration_lock_file</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_migration_lock_file</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">directory_path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">migrations_directory_path</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file_path</span> <span class="op">=</span> <span class="ident">directory_path</span>.<span class="ident">join</span>(<span class="ident">MIGRATION_LOCK_FILENAME</span>);
 
@@ -317,20 +317,20 @@ provider = &quot;{}&quot;&quot;##</span>,
 
 <span class="doccomment">/// Error if the provider in the schema does not match the one in the schema_lock.toml</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_on_changed_provider</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_on_changed_provider</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">match_provider_in_lock_file</span>(<span class="ident">migrations_directory_path</span>, <span class="ident">provider</span>) {
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-        <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">expected_provider</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::user_facing</span>(<span class="ident">ProviderSwitchedError</span> {
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(()),
+        <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">expected_provider</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::user_facing</span>(<span class="ident">ProviderSwitchedError</span> {
             <span class="ident">provider</span>: <span class="ident">provider</span>.<span class="ident">into</span>(),
             <span class="ident">expected_provider</span>,
         })),
-        <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+        <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(())) =&gt; <span class="prelude-val">Ok</span>(()),
     }
 }
 
 <span class="doccomment">/// Check whether provider matches.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-<span class="kw">fn</span> <span class="ident">match_provider_in_lock_file</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">match_provider_in_lock_file</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">directory_path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">migrations_directory_path</span>);
     <span class="kw">let</span> <span class="ident">file_path</span> <span class="op">=</span> <span class="ident">directory_path</span>.<span class="ident">join</span>(<span class="string">&quot;migration_lock.toml&quot;</span>);
 
@@ -341,7 +341,7 @@ provider = &quot;{}&quot;&quot;##</span>,
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">line</span><span class="op">|</span> <span class="ident">line</span>.<span class="ident">trim_start_matches</span>(<span class="string">&quot;provider = &quot;</span>).<span class="ident">trim_matches</span>(<span class="string">&#39;&quot;&#39;</span>))
             .<span class="ident">unwrap_or</span>(<span class="string">&quot;&lt;PROVIDER NOT FOUND&gt;&quot;</span>);
 
-        <span class="kw">if</span> <span class="ident">found_provider</span> <span class="op">=</span><span class="op">=</span> <span class="ident">provider</span> {
+        <span class="kw">if</span> <span class="ident">found_provider</span> <span class="op">==</span> <span class="ident">provider</span> {
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="ident">found_provider</span>.<span class="ident">to_owned</span>())
@@ -354,19 +354,19 @@ provider = &quot;{}&quot;&quot;##</span>,
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ListMigrationsError</span>(<span class="ident">io::Error</span>);
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ListMigrationsError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;An error occurred when reading the migrations directory.&quot;</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">ListMigrationsError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ListMigrationsError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ListMigrationsError</span>(<span class="ident">err</span>)
     }
 }
@@ -374,13 +374,13 @@ provider = &quot;{}&quot;&quot;##</span>,
 <span class="doccomment">/// List the migrations present in the migration directory, lexicographically sorted by name.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// If the migrations directory does not exist, it will not error but return an empty Vec.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list_migrations</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MigrationDirectory</span><span class="op">&gt;</span>, <span class="ident">ListMigrationsError</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list_migrations</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MigrationDirectory</span><span class="op">&gt;</span>, <span class="ident">ListMigrationsError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">entries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MigrationDirectory</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
     <span class="kw">let</span> <span class="ident">read_dir_entries</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">read_dir</span>(<span class="ident">migrations_directory_path</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">read_dir_entries</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">read_dir_entries</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">err</span>.<span class="ident">kind</span>(), <span class="ident">std::io::ErrorKind::NotFound</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">entries</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
+        <span class="prelude-val">Ok</span>(<span class="ident">read_dir_entries</span>) =&gt; <span class="ident">read_dir_entries</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">err</span>.<span class="ident">kind</span>(), <span class="ident">std::io::ErrorKind::NotFound</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">entries</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
     };
 
     <span class="kw">for</span> <span class="ident">entry</span> <span class="kw">in</span> <span class="ident">read_dir_entries</span> {
@@ -408,20 +408,20 @@ provider = &quot;{}&quot;&quot;##</span>,
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReadMigrationScriptError</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">io::Error</span>, <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">SpanTrace</span>, <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">String</span>);
 
 <span class="kw">impl</span> <span class="ident">ReadMigrationScriptError</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>, <span class="ident">file_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>, <span class="ident">file_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ReadMigrationScriptError</span>(<span class="ident">err</span>, <span class="ident">SpanTrace::capture</span>(), <span class="ident">file_path</span>.<span class="ident">to_string_lossy</span>().<span class="ident">into_owned</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ReadMigrationScriptError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Failed to read migration script at &quot;</span>)<span class="question-mark">?</span>;
         <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">2</span>, <span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">ReadMigrationScriptError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -429,12 +429,12 @@ provider = &quot;{}&quot;&quot;##</span>,
 <span class="kw">impl</span> <span class="ident">MigrationDirectory</span> {
     <span class="doccomment">/// Initialize a MigrationDirectory at the provided path. This will not</span>
     <span class="doccomment">/// validate that the path is valid and exists.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">path</span>: <span class="ident">PathBuf</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MigrationDirectory</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">path</span>: <span class="ident">PathBuf</span>) -&gt; <span class="ident">MigrationDirectory</span> {
         <span class="ident">MigrationDirectory</span> { <span class="ident">path</span> }
     }
 
     <span class="doccomment">/// The `{timestamp}_{name}` formatted migration name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">path</span>
             .<span class="ident">file_name</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;MigrationDirectory::migration_id&quot;</span>)
@@ -444,14 +444,14 @@ provider = &quot;{}&quot;&quot;##</span>,
 
     <span class="doccomment">/// Check whether the checksum of the migration script matches the provided one.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">matches_checksum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">checksum_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">ReadMigrationScriptError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">matches_checksum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">checksum_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">ReadMigrationScriptError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">filesystem_script</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_migration_script</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">checksum::script_matches_checksum</span>(<span class="kw-2">&amp;</span><span class="ident">filesystem_script</span>, <span class="ident">checksum_str</span>))
     }
 
     <span class="doccomment">/// Write the migration script to the directory.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_migration_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">extension</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_migration_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">extension</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">join</span>(<span class="ident">MIGRATION_SCRIPT_FILENAME</span>);
 
         <span class="ident">path</span>.<span class="ident">set_extension</span>(<span class="ident">extension</span>);
@@ -466,19 +466,19 @@ provider = &quot;{}&quot;&quot;##</span>,
 
     <span class="doccomment">/// Read the migration script to a string.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_migration_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ReadMigrationScriptError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_migration_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ReadMigrationScriptError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">join</span>(<span class="string">&quot;migration.sql&quot;</span>); <span class="comment">// todo why is it hardcoded here?</span>
         <span class="ident">std::fs::read_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">ioerr</span><span class="op">|</span> <span class="ident">ReadMigrationScriptError::new</span>(<span class="ident">ioerr</span>, <span class="kw-2">&amp;</span><span class="ident">path</span>))
     }
 
     <span class="doccomment">/// The filesystem path to the directory.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Path</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Path</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DirEntry</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MigrationDirectory</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">entry</span>: <span class="ident">DirEntry</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MigrationDirectory</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">entry</span>: <span class="ident">DirEntry</span>) -&gt; <span class="ident">MigrationDirectory</span> {
         <span class="ident">MigrationDirectory</span> { <span class="ident">path</span>: <span class="ident">entry</span>.<span class="ident">path</span>() }
     }
 }

@@ -295,7 +295,7 @@
 
 <span class="macro">cfg_not_docs!</span> {
     <span class="macro">macro_rules!</span> <span class="ident">ret</span> {
-        (<span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">out</span>:<span class="ident">ty</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fut</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fut</span>);
+        (<span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">out</span>:<span class="ident">ty</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fut</span>:<span class="ident">ty</span>) =&gt; (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fut</span>);
     }
 }
 
@@ -304,7 +304,7 @@
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ImplFuture</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">std::marker::PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
 
     <span class="macro">macro_rules!</span> <span class="ident">ret</span> {
-        (<span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">out</span>:<span class="ident">ty</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fut</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">ImplFuture</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">out</span><span class="op">&gt;</span>);
+        (<span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">out</span>:<span class="ident">ty</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fut</span>:<span class="ident">ty</span>) =&gt; (<span class="ident">ImplFuture</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">out</span><span class="op">&gt;</span>);
     }
 }
 
@@ -339,7 +339,7 @@
     <span class="doccomment">/// Note that this function may block a backend thread while resolution is performed.</span>
     <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro">ret!</span>(
+    ) -&gt; <span class="macro">ret!</span>(
         <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>,
         <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>
     );
@@ -360,10 +360,10 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Keeps the original error kind and stores the original I/O error as `source`.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ErrorContext</span> <span class="kw">for</span> <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">context</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">Fn</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">context</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">Fn</span>() -&gt; <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ToSocketAddrsFuture::Ready</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ToSocketAddrsFuture::Ready</span>(<span class="ident">res</span>.<span class="ident">context</span>(<span class="ident">message</span>)),
-            <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
+            <span class="ident">ToSocketAddrsFuture::Ready</span>(<span class="ident">res</span>) =&gt; <span class="ident">ToSocketAddrsFuture::Ready</span>(<span class="ident">res</span>.<span class="ident">context</span>(<span class="ident">message</span>)),
+            <span class="ident">x</span> =&gt; <span class="ident">x</span>,
         }
     }
 }
@@ -371,20 +371,20 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">SocketAddr</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>();
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="ident">this</span>, <span class="ident">ToSocketAddrsFuture::Done</span>);
 
         <span class="kw">match</span> <span class="ident">state</span> {
-            <span class="ident">ToSocketAddrsFuture::Resolving</span>(<span class="kw-2">mut</span> <span class="ident">task</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ToSocketAddrsFuture::Resolving</span>(<span class="kw-2">mut</span> <span class="ident">task</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">poll</span> <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>).<span class="ident">poll</span>(<span class="ident">cx</span>);
                 <span class="kw">if</span> <span class="ident">poll</span>.<span class="ident">is_pending</span>() {
                     <span class="kw-2">*</span><span class="ident">this</span> <span class="op">=</span> <span class="ident">ToSocketAddrsFuture::Resolving</span>(<span class="ident">task</span>);
                 }
                 <span class="ident">poll</span>
             }
-            <span class="ident">ToSocketAddrsFuture::Ready</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="ident">res</span>),
-            <span class="ident">ToSocketAddrsFuture::Done</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;polled a completed future&quot;</span>),
+            <span class="ident">ToSocketAddrsFuture::Ready</span>(<span class="ident">res</span>) =&gt; <span class="ident">Poll::Ready</span>(<span class="ident">res</span>),
+            <span class="ident">ToSocketAddrsFuture::Done</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;polled a completed future&quot;</span>),
         }
     }
 }
@@ -394,7 +394,7 @@
 
     <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro">ret!</span>(
+    ) -&gt; <span class="macro">ret!</span>(
         <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>,
         <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>
     ) {
@@ -407,7 +407,7 @@
 
     <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro">ret!</span>(
+    ) -&gt; <span class="macro">ret!</span>(
         <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>,
         <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>
     ) {
@@ -422,7 +422,7 @@
 
     <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro">ret!</span>(
+    ) -&gt; <span class="macro">ret!</span>(
         <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>,
         <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>
     ) {
@@ -437,14 +437,14 @@
 
     <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro">ret!</span>(
+    ) -&gt; <span class="macro">ret!</span>(
         <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>,
         <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>
     ) {
         <span class="kw">let</span> (<span class="ident">ip</span>, <span class="ident">port</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
         <span class="kw">match</span> <span class="ident">ip</span> {
-            <span class="ident">IpAddr::V4</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">a</span>, <span class="ident">port</span>).<span class="ident">to_socket_addrs</span>(),
-            <span class="ident">IpAddr::V6</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">a</span>, <span class="ident">port</span>).<span class="ident">to_socket_addrs</span>(),
+            <span class="ident">IpAddr::V4</span>(<span class="ident">a</span>) =&gt; (<span class="ident">a</span>, <span class="ident">port</span>).<span class="ident">to_socket_addrs</span>(),
+            <span class="ident">IpAddr::V6</span>(<span class="ident">a</span>) =&gt; (<span class="ident">a</span>, <span class="ident">port</span>).<span class="ident">to_socket_addrs</span>(),
         }
     }
 }
@@ -454,7 +454,7 @@
 
     <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro">ret!</span>(
+    ) -&gt; <span class="macro">ret!</span>(
         <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>,
         <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>
     ) {
@@ -468,7 +468,7 @@
 
     <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro">ret!</span>(
+    ) -&gt; <span class="macro">ret!</span>(
         <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>,
         <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>
     ) {
@@ -482,7 +482,7 @@
 
     <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro">ret!</span>(
+    ) -&gt; <span class="macro">ret!</span>(
         <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>,
         <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>
     ) {
@@ -513,7 +513,7 @@
 
     <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro">ret!</span>(
+    ) -&gt; <span class="macro">ret!</span>(
         <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>,
         <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>
     ) {
@@ -535,7 +535,7 @@
 
     <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro">ret!</span>(
+    ) -&gt; <span class="macro">ret!</span>(
         <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>,
         <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>
     ) {
@@ -548,7 +548,7 @@
 
     <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro">ret!</span>(
+    ) -&gt; <span class="macro">ret!</span>(
         <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>,
         <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>
     ) {
@@ -561,7 +561,7 @@
 
     <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro">ret!</span>(
+    ) -&gt; <span class="macro">ret!</span>(
         <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>,
         <span class="ident">ToSocketAddrsFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>
     ) {

@@ -91,13 +91,13 @@
     }
 
     <span class="kw">impl</span> <span class="ident">AtomicU64</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">val</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">val</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
             <span class="self">Self</span> {
                 <span class="ident">inner</span>: <span class="ident">Mutex::new</span>(<span class="ident">val</span>),
             }
         }
 
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">u64</span> {
             <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>()
         }
 
@@ -105,7 +105,7 @@
             <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>() <span class="op">=</span> <span class="ident">val</span>;
         }
 
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u64</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u64</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">u64</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>();
             <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">lock</span>;
             <span class="kw-2">*</span><span class="ident">lock</span> <span class="op">=</span> <span class="ident">prev</span> <span class="op">|</span> <span class="ident">val</span>;
@@ -118,10 +118,10 @@
             <span class="ident">new</span>: <span class="ident">u64</span>,
             <span class="ident">_success</span>: <span class="ident">Ordering</span>,
             <span class="ident">_failure</span>: <span class="ident">Ordering</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">u64</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">u64</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>();
 
-            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">lock</span> <span class="op">=</span><span class="op">=</span> <span class="ident">current</span> {
+            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">lock</span> <span class="op">==</span> <span class="ident">current</span> {
                 <span class="kw-2">*</span><span class="ident">lock</span> <span class="op">=</span> <span class="ident">new</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">current</span>)
             } <span class="kw">else</span> {
@@ -135,7 +135,7 @@
             <span class="ident">new</span>: <span class="ident">u64</span>,
             <span class="ident">success</span>: <span class="ident">Ordering</span>,
             <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">u64</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">u64</span><span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">compare_exchange</span>(<span class="ident">current</span>, <span class="ident">new</span>, <span class="ident">success</span>, <span class="ident">failure</span>)
         }
     }

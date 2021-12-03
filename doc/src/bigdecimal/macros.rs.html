@@ -271,12 +271,12 @@ macro_rules! forward_val_val_binop {
 
 */</span>
 <span class="macro">macro_rules!</span> <span class="ident">forward_ref_val_binop</span> {
-    (<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>:<span class="ident">ident</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>:<span class="ident">ident</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span>) =&gt; {
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
                 <span class="comment">// forward to ref-ref</span>
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>)
             }
@@ -310,7 +310,7 @@ macro_rules! forward_all_binop_to_ref_ref {
 */</span>
 
 <span class="macro">macro_rules!</span> <span class="ident">forward_val_assignop</span> {
-    (<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>:<span class="ident">ident</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>:<span class="ident">ident</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span>) =&gt; {
         <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) {
@@ -323,15 +323,15 @@ macro_rules! forward_all_binop_to_ref_ref {
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_div_for_uint_primitive</span> {
     <span class="comment">// (impl $imp:ident for $res:ty, $method:ident) =&gt; {</span>
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>) =&gt; {
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigDecimal</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigDecimal</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
-                <span class="kw">if</span> <span class="ident">den</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
+                <span class="kw">if</span> <span class="ident">den</span> <span class="op">==</span> <span class="number">1</span> {
                     <span class="self">self</span>.<span class="ident">clone</span>()
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">=</span><span class="op">=</span> <span class="number">2</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">==</span> <span class="number">2</span> {
                     <span class="self">self</span>.<span class="ident">half</span>()
                 } <span class="kw">else</span> {
                     <span class="self">self</span> <span class="op">/</span> <span class="ident">BigDecimal::from</span>(<span class="ident">den</span>)
@@ -343,7 +343,7 @@ macro_rules! forward_all_binop_to_ref_ref {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigDecimal</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigDecimal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigDecimal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
                 <span class="ident">BigDecimal::from</span>(<span class="self">self</span>) <span class="op">/</span> <span class="ident">den</span>
             }
         }
@@ -352,7 +352,7 @@ macro_rules! forward_all_binop_to_ref_ref {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigDecimal</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="ident">BigDecimal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="ident">BigDecimal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
                 <span class="ident">BigDecimal::from</span>(<span class="self">self</span>) <span class="op">/</span> <span class="ident">den</span>
             }
         }
@@ -361,17 +361,17 @@ macro_rules! forward_all_binop_to_ref_ref {
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_div_for_int_primitive</span> {
     <span class="comment">// (impl $imp:ident for $res:ty, $method:ident) =&gt; {</span>
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>) =&gt; {
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigDecimal</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigDecimal</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
                 <span class="kw">if</span> <span class="ident">den</span> <span class="op">&lt;</span> <span class="number">0</span> {
                     <span class="op">-</span><span class="ident">Div::div</span>(<span class="self">self</span>, <span class="op">-</span><span class="ident">den</span>)
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">==</span> <span class="number">1</span> {
                     <span class="self">self</span>
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">=</span><span class="op">=</span> <span class="number">2</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">==</span> <span class="number">2</span> {
                     <span class="self">self</span>.<span class="ident">half</span>()
                 } <span class="kw">else</span> {
                     <span class="self">self</span> <span class="op">/</span> <span class="ident">BigDecimal::from</span>(<span class="ident">den</span>)
@@ -383,12 +383,12 @@ macro_rules! forward_all_binop_to_ref_ref {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigDecimal</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
                 <span class="kw">if</span> <span class="ident">den</span> <span class="op">&lt;</span> <span class="number">0</span> {
                     <span class="op">-</span><span class="ident">Div::div</span>(<span class="self">self</span>, <span class="op">-</span><span class="ident">den</span>)
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">==</span> <span class="number">1</span> {
                     <span class="self">self</span>.<span class="ident">clone</span>()
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">=</span><span class="op">=</span> <span class="number">2</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">==</span> <span class="number">2</span> {
                     <span class="self">self</span>.<span class="ident">half</span>()
                 } <span class="kw">else</span> {
                     <span class="self">self</span> <span class="op">/</span> <span class="ident">BigDecimal::from</span>(<span class="ident">den</span>)
@@ -400,12 +400,12 @@ macro_rules! forward_all_binop_to_ref_ref {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigDecimal</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigDecimal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigDecimal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
                 <span class="kw">match</span> (<span class="self">self</span> <span class="op">&lt;</span> <span class="number">0</span>, <span class="ident">den</span>.<span class="ident">is_negative</span>()) {
-                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="self">self</span> <span class="op">/</span> <span class="op">-</span><span class="ident">den</span>,
-                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="op">-</span><span class="self">self</span> <span class="op">/</span> <span class="ident">den</span>).<span class="ident">neg</span>(),
-                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="op">-</span><span class="self">self</span> <span class="op">/</span> <span class="ident">den</span>.<span class="ident">abs</span>()),
-                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BigDecimal::from</span>(<span class="self">self</span>) <span class="op">/</span> <span class="ident">den</span>,
+                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="op">-</span><span class="self">self</span> <span class="op">/</span> <span class="op">-</span><span class="ident">den</span>,
+                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; (<span class="op">-</span><span class="self">self</span> <span class="op">/</span> <span class="ident">den</span>).<span class="ident">neg</span>(),
+                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; (<span class="op">-</span><span class="self">self</span> <span class="op">/</span> <span class="ident">den</span>.<span class="ident">abs</span>()),
+                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">BigDecimal::from</span>(<span class="self">self</span>) <span class="op">/</span> <span class="ident">den</span>,
                 }
             }
         }
@@ -414,12 +414,12 @@ macro_rules! forward_all_binop_to_ref_ref {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigDecimal</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="ident">BigDecimal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="ident">BigDecimal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
                 <span class="kw">match</span> (<span class="self">self</span> <span class="op">&lt;</span> <span class="number">0</span>, <span class="ident">den</span>.<span class="ident">is_negative</span>()) {
-                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="self">self</span> <span class="op">/</span> <span class="op">-</span><span class="ident">den</span>,
-                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="op">-</span><span class="self">self</span> <span class="op">/</span> <span class="ident">den</span>).<span class="ident">neg</span>(),
-                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="op">-</span><span class="self">self</span> <span class="op">/</span> <span class="ident">den</span>.<span class="ident">abs</span>()),
-                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BigDecimal::from</span>(<span class="self">self</span>) <span class="op">/</span> <span class="ident">den</span>,
+                    (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="op">-</span><span class="self">self</span> <span class="op">/</span> <span class="op">-</span><span class="ident">den</span>,
+                    (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; (<span class="op">-</span><span class="self">self</span> <span class="op">/</span> <span class="ident">den</span>).<span class="ident">neg</span>(),
+                    (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; (<span class="op">-</span><span class="self">self</span> <span class="op">/</span> <span class="ident">den</span>.<span class="ident">abs</span>()),
+                    (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">BigDecimal::from</span>(<span class="self">self</span>) <span class="op">/</span> <span class="ident">den</span>,
                 }
             }
         }
@@ -428,22 +428,22 @@ macro_rules! forward_all_binop_to_ref_ref {
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_div_for_float_primitive</span> {
     <span class="comment">// (impl $imp:ident for $res:ty, $method:ident) =&gt; {</span>
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>) =&gt; {
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigDecimal</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigDecimal</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::float_cmp</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
                 <span class="kw">if</span> <span class="ident">den</span>.<span class="ident">is_nan</span>() {
                     <span class="ident">BigDecimal::zero</span>()
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">=</span><span class="op">=</span> <span class="number">1.0</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">==</span> <span class="number">1.0</span> {
                     <span class="self">self</span>.<span class="ident">clone</span>()
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.5</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">==</span> <span class="number">0.5</span> {
                     <span class="self">self</span>.<span class="ident">double</span>()
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">=</span><span class="op">=</span> <span class="number">2.0</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">==</span> <span class="number">2.0</span> {
                     <span class="self">self</span>.<span class="ident">half</span>()
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="number">1.0</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">==</span> <span class="op">-</span><span class="number">1.0</span> {
                     <span class="op">-</span><span class="self">self</span>
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">den</span> <span class="op">&lt;</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_positive</span>() {
                     <span class="op">-</span>(<span class="self">self</span> <span class="op">/</span> <span class="op">-</span><span class="ident">den</span>)
@@ -457,7 +457,7 @@ macro_rules! forward_all_binop_to_ref_ref {
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigDecimal</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigDecimal</span>;
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigDecimal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigDecimal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_nan</span>() {
                     <span class="ident">BigDecimal::zero</span>()
                 } <span class="kw">else</span> {
@@ -469,7 +469,7 @@ macro_rules! forward_all_binop_to_ref_ref {
         <span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">BigDecimal</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigDecimal</span>;
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="ident">BigDecimal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">den</span>: <span class="ident">BigDecimal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_nan</span>() {
                     <span class="ident">BigDecimal::zero</span>()
                 } <span class="kw">else</span> {
@@ -481,17 +481,17 @@ macro_rules! forward_all_binop_to_ref_ref {
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">forward_primitive_types</span> {
-    (<span class="ident">floats</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">floats</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span>(<span class="macro-nonterminal">f32</span>);
         <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span>(<span class="macro-nonterminal">f64</span>);
     };
-    (<span class="ident">ints</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">ints</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span>(<span class="macro-nonterminal">i8</span>);
         <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span>(<span class="macro-nonterminal">i16</span>);
         <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span>(<span class="macro-nonterminal">i32</span>);
         <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span>(<span class="macro-nonterminal">i64</span>);
     };
-    (<span class="ident">uints</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">uints</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span>(<span class="macro-nonterminal">u8</span>);
         <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span>(<span class="macro-nonterminal">u16</span>);
         <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span>(<span class="macro-nonterminal">u32</span>);
@@ -500,10 +500,10 @@ macro_rules! forward_all_binop_to_ref_ref {
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_div_for_primitives</span> {
-    () <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">forward_primitive_types!</span>(<span class="ident">floats</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">impl_div_for_float_primitive</span>);
-        <span class="macro">forward_primitive_types!</span>(<span class="ident">ints</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">impl_div_for_int_primitive</span>);
-        <span class="macro">forward_primitive_types!</span>(<span class="ident">uints</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">impl_div_for_uint_primitive</span>);
+    () =&gt; {
+        <span class="macro">forward_primitive_types!</span>(<span class="ident">floats</span> =&gt; <span class="ident">impl_div_for_float_primitive</span>);
+        <span class="macro">forward_primitive_types!</span>(<span class="ident">ints</span> =&gt; <span class="ident">impl_div_for_int_primitive</span>);
+        <span class="macro">forward_primitive_types!</span>(<span class="ident">uints</span> =&gt; <span class="ident">impl_div_for_uint_primitive</span>);
     };
 }
 </code></pre></div>

@@ -123,11 +123,11 @@
 
     <span class="doccomment">/// Parse the stream ID</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">StreamId</span>, <span class="ident">bool</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="ident">StreamId</span>, <span class="ident">bool</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ubuf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
         <span class="ident">ubuf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="number">0</span>..<span class="number">4</span>]);
         <span class="kw">let</span> <span class="ident">unpacked</span> <span class="op">=</span> <span class="ident">u32::from_be_bytes</span>(<span class="ident">ubuf</span>);
-        <span class="kw">let</span> <span class="ident">flag</span> <span class="op">=</span> <span class="ident">unpacked</span> <span class="op">&amp;</span> <span class="ident">STREAM_ID_MASK</span> <span class="op">=</span><span class="op">=</span> <span class="ident">STREAM_ID_MASK</span>;
+        <span class="kw">let</span> <span class="ident">flag</span> <span class="op">=</span> <span class="ident">unpacked</span> <span class="op">&amp;</span> <span class="ident">STREAM_ID_MASK</span> <span class="op">==</span> <span class="ident">STREAM_ID_MASK</span>;
 
         <span class="comment">// Now clear the most significant bit, as that is reserved and MUST be</span>
         <span class="comment">// ignored when received.</span>
@@ -136,33 +136,33 @@
 
     <span class="doccomment">/// Returns true if this stream ID corresponds to a stream that</span>
     <span class="doccomment">/// was initiated by the client.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_client_initiated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_client_initiated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
-        <span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">id</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span>
+        <span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">id</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">1</span>
     }
 
     <span class="doccomment">/// Returns true if this stream ID corresponds to a stream that</span>
     <span class="doccomment">/// was initiated by the server.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_server_initiated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_server_initiated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
-        <span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">id</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+        <span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">id</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Return a new `StreamId` for stream 0.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StreamId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zero</span>() -&gt; <span class="ident">StreamId</span> {
         <span class="ident">StreamId::ZERO</span>
     }
 
     <span class="doccomment">/// Returns true if this stream ID is zero.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_zero</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_zero</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Returns the next stream ID initiated by the same peer as this stream</span>
     <span class="doccomment">/// ID, or an error if incrementing this stream ID would overflow the</span>
     <span class="doccomment">/// maximum.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StreamId</span>, <span class="ident">StreamIdOverflow</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StreamId</span>, <span class="ident">StreamIdOverflow</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">+</span> <span class="number">2</span>;
         <span class="kw">if</span> <span class="ident">next</span> <span class="op">&gt;</span> <span class="ident">StreamId::MAX</span>.<span class="number">0</span> {
             <span class="prelude-val">Err</span>(<span class="ident">StreamIdOverflow</span>)
@@ -173,21 +173,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StreamId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_eq!</span>(<span class="ident">src</span> <span class="op">&amp;</span> <span class="ident">STREAM_ID_MASK</span>, <span class="number">0</span>, <span class="string">&quot;invalid stream ID -- MSB is set&quot;</span>);
         <span class="ident">StreamId</span>(<span class="ident">src</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StreamId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u32</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">StreamId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">StreamId</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">src</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StreamId</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">other</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">u32</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span>
     }
 }
 </code></pre></div>

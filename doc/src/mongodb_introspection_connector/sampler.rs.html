@@ -79,7 +79,7 @@
     <span class="ident">database</span>: <span class="ident">Database</span>,
     <span class="ident">composite_type_depth</span>: <span class="ident">CompositeTypeDepth</span>,
     <span class="ident">schema</span>: <span class="ident">MongoSchema</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">statistics</span> <span class="op">=</span> <span class="ident">Statistics::new</span>(<span class="ident">composite_type_depth</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">warnings</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 

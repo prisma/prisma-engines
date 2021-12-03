@@ -82,10 +82,10 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="prelude-ty">Result</span>(<span class="ident">c::int</span>);
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">core::result::Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ret</span>: <span class="prelude-ty">Result</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ret</span>: <span class="prelude-ty">Result</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">ret</span>.<span class="number">0</span> {
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-            <span class="ident">c</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="ident">c</span> =&gt; {
                 <span class="macro">debug_assert_eq!</span>(<span class="ident">c</span>, <span class="number">0</span>, <span class="string">&quot;`bssl::Result` value must be 0 or 1&quot;</span>);
                 <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>)
             }

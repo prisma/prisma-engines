@@ -3,14 +3,14 @@
 
     fn <a href="#method.select" class="fnname">select</a>&lt;R&gt;(index: <a class="struct" href="../index/struct.BitIdx.html" title="struct bitvec::index::BitIdx">BitIdx</a>&lt;R&gt;) -&gt; <a class="struct" href="../index/struct.BitSel.html" title="struct bitvec::index::BitSel">BitSel</a>&lt;R&gt;<br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href="../index/trait.BitRegister.html" title="trait bitvec::index::BitRegister">BitRegister</a></span>,
     { ... }
-<div class="item-spacer"></div>    fn <a href="#method.mask" class="fnname">mask</a>&lt;R&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from: impl <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="https://doc.rust-lang.org/1.56.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../index/struct.BitIdx.html" title="struct bitvec::index::BitIdx">BitIdx</a>&lt;R&gt;&gt;&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;upto: impl <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="https://doc.rust-lang.org/1.56.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../index/struct.BitTail.html" title="struct bitvec::index::BitTail">BitTail</a>&lt;R&gt;&gt;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;) -&gt; <a class="struct" href="../index/struct.BitMask.html" title="struct bitvec::index::BitMask">BitMask</a>&lt;R&gt;<br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href="../index/trait.BitRegister.html" title="trait bitvec::index::BitRegister">BitRegister</a></span>,
+<div class="item-spacer"></div>    fn <a href="#method.mask" class="fnname">mask</a>&lt;R&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from: impl <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="https://doc.rust-lang.org/1.57.0/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../index/struct.BitIdx.html" title="struct bitvec::index::BitIdx">BitIdx</a>&lt;R&gt;&gt;&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;upto: impl <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="https://doc.rust-lang.org/1.57.0/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../index/struct.BitTail.html" title="struct bitvec::index::BitTail">BitTail</a>&lt;R&gt;&gt;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;) -&gt; <a class="struct" href="../index/struct.BitMask.html" title="struct bitvec::index::BitMask">BitMask</a>&lt;R&gt;<br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href="../index/trait.BitRegister.html" title="trait bitvec::index::BitRegister">BitRegister</a></span>,
     { ... }
 }</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>An ordering over a register.</p>
-<h1 id="usage" class="section-header"><a href="#usage">Usage</a></h1>
+<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
 <p><code>bitvec</code> structures store and operate on semantic counts, not bit positions. The
 <code>BitOrder::at</code> function takes a semantic ordering, <code>BitIdx</code>, and produces an
 electrical position, <code>BitPos</code>.</p>
-<h1 id="safety" class="section-header"><a href="#safety">Safety</a></h1>
+<h2 id="safety" class="section-header"><a href="#safety">Safety</a></h2>
 <p>If your implementation violates any of the requirements on these functions, then
 the program will become incorrect and have unspecified behavior. The best-case
 scenario is that operations relying on your implementation will crash the
@@ -25,7 +25,7 @@ processes in order for the rest of the library to use them.</p>
 <p>The implementations of <code>BitOrder</code> are trusted to drive safe code, and once data
 leaves a <code>BitOrder</code> implementation, it is considered safe to use as the basis
 for interaction with memory.</p>
-<h1 id="verification" class="section-header"><a href="#verification">Verification</a></h1>
+<h2 id="verification" class="section-header"><a href="#verification">Verification</a></h2>
 <p>Rust currently lacks Zig’s compile-time computation capability. This means that
 <code>bitvec</code> cannot fail a compile if it detects that a <code>BitOrder</code> implementation is
 invalid and breaks the stated requirements. <code>bitvec</code> does offer a function,
@@ -43,7 +43,7 @@ message intended to clearly indicate the broken requirement.</p>
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Custom</span>;
 <span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">BitOrder</span> <span class="kw">for</span> <span class="ident">Custom</span> {
-  <span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">BitRegister</span><span class="op">&gt;</span>(<span class="ident">idx</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+  <span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">BitRegister</span><span class="op">&gt;</span>(<span class="ident">idx</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
   <span class="comment">// impl</span>
   }
 }
@@ -56,43 +56,43 @@ message intended to clearly indicate the broken requirement.</p>
 </div></details><h2 id="required-methods" class="small-section-header">Required methods<a href="#required-methods" class="anchor"></a></h2><div class="methods"><details class="rustdoc-toggle" open><summary><div id="tymethod.at" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/bitvec/order.rs.html#150-151" title="goto source code">[src]</a></div><h4 class="code-header">fn <a href="#tymethod.at" class="fnname">at</a>&lt;R&gt;(index: <a class="struct" href="../index/struct.BitIdx.html" title="struct bitvec::index::BitIdx">BitIdx</a>&lt;R&gt;) -&gt; <a class="struct" href="../index/struct.BitPos.html" title="struct bitvec::index::BitPos">BitPos</a>&lt;R&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href="../index/trait.BitRegister.html" title="trait bitvec::index::BitRegister">BitRegister</a>,&nbsp;</span></h4></div></summary><div class="docblock"><p>Converts a semantic bit index into an electrical bit position.</p>
 <p>This function is the basis of the trait, and must adhere to a number of
 requirements in order for an implementation to be considered correct.</p>
-<h1 id="parameters" class="section-header"><a href="#parameters">Parameters</a></h1>
+<h5 id="parameters" class="section-header"><a href="#parameters">Parameters</a></h5>
 <ul>
 <li><code>index</code>: The semantic index of a bit within a register <code>R</code>.</li>
 </ul>
-<h1 id="returns" class="section-header"><a href="#returns">Returns</a></h1>
+<h5 id="returns" class="section-header"><a href="#returns">Returns</a></h5>
 <p>The electrical position of the indexed bit within a register <code>R</code>. See
 the <code>BitPos</code> documentation for what electrical positions are considered
 to mean.</p>
-<h1 id="type-parameters" class="section-header"><a href="#type-parameters">Type Parameters</a></h1>
+<h5 id="type-parameters" class="section-header"><a href="#type-parameters">Type Parameters</a></h5>
 <ul>
 <li><code>R</code>: The register type which the index and position describe.</li>
 </ul>
-<h1 id="requirements" class="section-header"><a href="#requirements">Requirements</a></h1>
+<h5 id="requirements" class="section-header"><a href="#requirements">Requirements</a></h5>
 <p>This function must satisfy the following requirements for all possible
 input and output values for all possible type parameters:</p>
-<h2 id="totality" class="section-header"><a href="#totality">Totality</a></h2>
+<h6 id="totality" class="section-header"><a href="#totality">Totality</a></h6>
 <p>This function must be able to accept every input in the <code>BitIdx&lt;R&gt;</code>
 value range, and produce a corresponding <code>BitPos&lt;R&gt;</code>. It must not abort
 the program or return an invalid <code>BitPos&lt;R&gt;</code> for any input value in the
 <code>BitIdx&lt;R&gt;</code> range.</p>
-<h2 id="bijection" class="section-header"><a href="#bijection">Bijection</a></h2>
+<h6 id="bijection" class="section-header"><a href="#bijection">Bijection</a></h6>
 <p>There must be an exactly one-to-one correspondence between input value
 and output value. No input index may select from a set of more than one
 output position, and no output position may be produced by more than one
 input index.</p>
-<h2 id="purity" class="section-header"><a href="#purity">Purity</a></h2>
+<h6 id="purity" class="section-header"><a href="#purity">Purity</a></h6>
 <p>The translation from index to position must be consistent for the
 lifetime of the program. This function <em>may</em> refer to global state, but
 that state <strong>must</strong> be immutable for the program lifetime, and must not
 be used to violate the totality or bijection requirements.</p>
-<h2 id="output-validity" class="section-header"><a href="#output-validity">Output Validity</a></h2>
+<h6 id="output-validity" class="section-header"><a href="#output-validity">Output Validity</a></h6>
 <p>The produced <code>BitPos&lt;R&gt;</code> must be within the valid range of that type.
 Call sites of this function will not take any steps to constrain the
 output value. If you use <code>unsafe</code> code to produce an invalid
 <code>BitPos&lt;R&gt;</code>, the program is permanently incorrect, and will likely
 crash.</p>
-<h1 id="usage-1" class="section-header"><a href="#usage-1">Usage</a></h1>
+<h5 id="usage-1" class="section-header"><a href="#usage-1">Usage</a></h5>
 <p>This function will only ever be called with input values in the valid
 <code>BitIdx&lt;R&gt;</code> range. Implementors are not required to consider any values
 outside this range in their function body.</p>
@@ -104,43 +104,43 @@ an electrical position, then turns that into a selector mask by setting
 the <code>n</code>th bit more significant than the least significant bit of the
 element. <code>BitOrder</code> implementations may choose to provide a faster mask
 production here, but they must satisfy the requirements listed below.</p>
-<h1 id="parameters-1" class="section-header"><a href="#parameters-1">Parameters</a></h1>
+<h5 id="parameters-1" class="section-header"><a href="#parameters-1">Parameters</a></h5>
 <ul>
 <li><code>index</code>: The semantic index of a bit within a register <code>R</code>.</li>
 </ul>
-<h1 id="returns-1" class="section-header"><a href="#returns-1">Returns</a></h1>
+<h5 id="returns-1" class="section-header"><a href="#returns-1">Returns</a></h5>
 <p>A one-hot selector mask for the bit indicated by the index value.</p>
-<h1 id="type-parameters-1" class="section-header"><a href="#type-parameters-1">Type Parameters</a></h1>
+<h5 id="type-parameters-1" class="section-header"><a href="#type-parameters-1">Type Parameters</a></h5>
 <ul>
 <li><code>R</code>: The storage type for which the mask will be calculated. The mask
 must also be this type, as it will be applied to a register of <code>R</code> in
 order to set, clear, or test a single bit.</li>
 </ul>
-<h1 id="requirements-1" class="section-header"><a href="#requirements-1">Requirements</a></h1>
+<h5 id="requirements-1" class="section-header"><a href="#requirements-1">Requirements</a></h5>
 <p>A one-hot encoding means that there is exactly one bit set in the
 produced value. It must be equivalent to <code>1 &lt;&lt; Self::at::&lt;R&gt;(place)</code>.</p>
 <p>As with <code>at</code>, this function must produce a unique mapping from each
 legal index in the <code>R</code> domain to a one-hot value of <code>R</code>.</p>
-</div></details><details class="rustdoc-toggle" open><summary><div id="method.mask" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/bitvec/order.rs.html#224-238" title="goto source code">[src]</a></div><h4 class="code-header">fn <a href="#method.mask" class="fnname">mask</a>&lt;R&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;from: impl <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="https://doc.rust-lang.org/1.56.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../index/struct.BitIdx.html" title="struct bitvec::index::BitIdx">BitIdx</a>&lt;R&gt;&gt;&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;upto: impl <a class="trait" href="https://doc.rust-lang.org/1.56.1/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="https://doc.rust-lang.org/1.56.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../index/struct.BitTail.html" title="struct bitvec::index::BitTail">BitTail</a>&lt;R&gt;&gt;&gt;<br>) -&gt; <a class="struct" href="../index/struct.BitMask.html" title="struct bitvec::index::BitMask">BitMask</a>&lt;R&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href="../index/trait.BitRegister.html" title="trait bitvec::index::BitRegister">BitRegister</a>,&nbsp;</span></h4></div></summary><div class="docblock"><p>Constructs a multi-bit selector mask for batch operations on a single
+</div></details><details class="rustdoc-toggle" open><summary><div id="method.mask" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/bitvec/order.rs.html#224-238" title="goto source code">[src]</a></div><h4 class="code-header">fn <a href="#method.mask" class="fnname">mask</a>&lt;R&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;from: impl <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="https://doc.rust-lang.org/1.57.0/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../index/struct.BitIdx.html" title="struct bitvec::index::BitIdx">BitIdx</a>&lt;R&gt;&gt;&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;upto: impl <a class="trait" href="https://doc.rust-lang.org/1.57.0/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="https://doc.rust-lang.org/1.57.0/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../index/struct.BitTail.html" title="struct bitvec::index::BitTail">BitTail</a>&lt;R&gt;&gt;&gt;<br>) -&gt; <a class="struct" href="../index/struct.BitMask.html" title="struct bitvec::index::BitMask">BitMask</a>&lt;R&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href="../index/trait.BitRegister.html" title="trait bitvec::index::BitRegister">BitRegister</a>,&nbsp;</span></h4></div></summary><div class="docblock"><p>Constructs a multi-bit selector mask for batch operations on a single
 register <code>R</code>.</p>
 <p>The default implementation of this function traverses the index range,
 converting each index into a single-bit selector with <code>Self::select</code> and
 accumulating into a combined register value.</p>
-<h1 id="parameters-2" class="section-header"><a href="#parameters-2">Parameters</a></h1>
+<h5 id="parameters-2" class="section-header"><a href="#parameters-2">Parameters</a></h5>
 <ul>
 <li><code>from</code>: The inclusive starting index for the mask.</li>
 <li><code>upto</code>: The exclusive ending index for the mask.</li>
 </ul>
-<h1 id="returns-2" class="section-header"><a href="#returns-2">Returns</a></h1>
+<h5 id="returns-2" class="section-header"><a href="#returns-2">Returns</a></h5>
 <p>A bit-mask with all bits corresponding to the input index range set high
 and all others set low.</p>
-<h1 id="type-parameters-2" class="section-header"><a href="#type-parameters-2">Type Parameters</a></h1>
+<h5 id="type-parameters-2" class="section-header"><a href="#type-parameters-2">Type Parameters</a></h5>
 <ul>
 <li><code>R</code>: The storage type for which the mask will be calculated. The mask
 must also be this type, as it will be applied to a register of <code>R</code> in
 order to set, clear, or test all the selected bits.</li>
 </ul>
-<h1 id="requirements-2" class="section-header"><a href="#requirements-2">Requirements</a></h1>
+<h5 id="requirements-2" class="section-header"><a href="#requirements-2">Requirements</a></h5>
 <p>This function must always be equivalent to</p>
 
 <div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore"><code>(<span class="ident">from</span> .. <span class="ident">upto</span>)

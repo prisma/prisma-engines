@@ -62,7 +62,7 @@
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Library</span>, <span class="ident">LibrarySegment</span>, <span class="ident">OsString</span>, <span class="ident">Vec</span>};
 <span class="kw">use</span> <span class="ident">core::slice</span>;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">native_libraries</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Library</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">native_libraries</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Library</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="kw">unsafe</span> {
         <span class="ident">libc::dl_iterate_phdr</span>(<span class="prelude-val">Some</span>(<span class="ident">callback</span>), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>);
@@ -76,10 +76,10 @@
     <span class="ident">info</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc::dl_phdr_info</span>,
     <span class="ident">_size</span>: <span class="ident">libc::size_t</span>,
     <span class="ident">vec</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc::c_void</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">libc::c_int</span> {
+) -&gt; <span class="ident">libc::c_int</span> {
     <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">info</span>;
     <span class="kw">let</span> <span class="ident">libs</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">vec</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Library</span><span class="op">&gt;</span>);
-    <span class="kw">let</span> <span class="ident">is_main_prog</span> <span class="op">=</span> <span class="ident">info</span>.<span class="ident">dlpi_name</span>.<span class="ident">is_null</span>() <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">info</span>.<span class="ident">dlpi_name</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">let</span> <span class="ident">is_main_prog</span> <span class="op">=</span> <span class="ident">info</span>.<span class="ident">dlpi_name</span>.<span class="ident">is_null</span>() <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">info</span>.<span class="ident">dlpi_name</span> <span class="op">==</span> <span class="number">0</span>;
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_main_prog</span> {
         <span class="kw">if</span> <span class="ident">libs</span>.<span class="ident">is_empty</span>() {
             <span class="ident">env::current_exe</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">into</span>()).<span class="ident">unwrap_or_default</span>()

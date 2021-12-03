@@ -1295,12 +1295,12 @@
     <span class="doccomment">///     .build()</span>
     <span class="doccomment">///     .unwrap();</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Builder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() -&gt; <span class="ident">Builder</span> {
         <span class="ident">Builder::new</span>()
     }
 
     <span class="doccomment">/// Attempt to convert a `Uri` from `Parts`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_parts</span>(<span class="ident">src</span>: <span class="ident">Parts</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uri</span>, <span class="ident">InvalidUriParts</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_parts</span>(<span class="ident">src</span>: <span class="ident">Parts</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uri</span>, <span class="ident">InvalidUriParts</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">scheme</span>.<span class="ident">is_some</span>() {
             <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">authority</span>.<span class="ident">is_none</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::AuthorityMissing</span>.<span class="ident">into</span>());
@@ -1316,20 +1316,20 @@
         }
 
         <span class="kw">let</span> <span class="ident">scheme</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">src</span>.<span class="ident">scheme</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">scheme</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">scheme</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Scheme</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">scheme</span>) =&gt; <span class="ident">scheme</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">Scheme</span> {
                 <span class="ident">inner</span>: <span class="ident">Scheme2::None</span>,
             },
         };
 
         <span class="kw">let</span> <span class="ident">authority</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">src</span>.<span class="ident">authority</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">authority</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">authority</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Authority::empty</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">authority</span>) =&gt; <span class="ident">authority</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">Authority::empty</span>(),
         };
 
         <span class="kw">let</span> <span class="ident">path_and_query</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">src</span>.<span class="ident">path_and_query</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">path_and_query</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">path_and_query</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PathAndQuery::empty</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">path_and_query</span>) =&gt; <span class="ident">path_and_query</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">PathAndQuery::empty</span>(),
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">Uri</span> {
@@ -1343,7 +1343,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will try to prevent a copy if the type passed is the type used</span>
     <span class="doccomment">/// internally, and will copy the data if it is not.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_maybe_shared</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidUri</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_maybe_shared</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidUri</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1355,7 +1355,7 @@
     }
 
     <span class="comment">// Not public while `bytes` is unstable.</span>
-    <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">s</span>: <span class="ident">Bytes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uri</span>, <span class="ident">InvalidUri</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">s</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uri</span>, <span class="ident">InvalidUri</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ErrorKind</span>::<span class="kw-2">*</span>;
 
         <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">MAX_LEN</span> {
@@ -1363,25 +1363,25 @@
         }
 
         <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">0</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Empty</span>.<span class="ident">into</span>());
             }
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">s</span>[<span class="number">0</span>] {
-                <span class="string">b&#39;/&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">1</span> =&gt; <span class="kw">match</span> <span class="ident">s</span>[<span class="number">0</span>] {
+                <span class="string">b&#39;/&#39;</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Uri</span> {
                         <span class="ident">scheme</span>: <span class="ident">Scheme::empty</span>(),
                         <span class="ident">authority</span>: <span class="ident">Authority::empty</span>(),
                         <span class="ident">path_and_query</span>: <span class="ident">PathAndQuery::slash</span>(),
                     });
                 }
-                <span class="string">b&#39;*&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">b&#39;*&#39;</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Uri</span> {
                         <span class="ident">scheme</span>: <span class="ident">Scheme::empty</span>(),
                         <span class="ident">authority</span>: <span class="ident">Authority::empty</span>(),
                         <span class="ident">path_and_query</span>: <span class="ident">PathAndQuery::star</span>(),
                     });
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">authority</span> <span class="op">=</span> <span class="ident">Authority::from_shared</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
 
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Uri</span> {
@@ -1391,10 +1391,10 @@
                     });
                 }
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">_</span> =&gt; {}
         }
 
-        <span class="kw">if</span> <span class="ident">s</span>[<span class="number">0</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;/&#39;</span> {
+        <span class="kw">if</span> <span class="ident">s</span>[<span class="number">0</span>] <span class="op">==</span> <span class="string">b&#39;/&#39;</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Uri</span> {
                 <span class="ident">scheme</span>: <span class="ident">Scheme::empty</span>(),
                 <span class="ident">authority</span>: <span class="ident">Authority::empty</span>(),
@@ -1423,11 +1423,11 @@
     <span class="doccomment">/// assert_eq!(uri.host().unwrap(), &quot;example.com&quot;);</span>
     <span class="doccomment">/// assert_eq!(uri.path(), &quot;/foo&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">Bytes::from_static</span>(<span class="ident">src</span>.<span class="ident">as_bytes</span>());
         <span class="kw">match</span> <span class="ident">Uri::from_shared</span>(<span class="ident">s</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">uri</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">uri</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;static str is not valid URI: {}&quot;</span>, <span class="ident">e</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">uri</span>) =&gt; <span class="ident">uri</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;static str is not valid URI: {}&quot;</span>, <span class="ident">e</span>),
         }
     }
 
@@ -1452,13 +1452,13 @@
     <span class="doccomment">/// assert!(parts.authority.is_none());</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parts</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; <span class="ident">Parts</span> {
         <span class="self">self</span>.<span class="ident">into</span>()
     }
 
     <span class="doccomment">/// Returns the path &amp; query components of the Uri</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path_and_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathAndQuery</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path_and_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PathAndQuery</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">scheme</span>.<span class="ident">inner</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">authority</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path_and_query</span>)
         } <span class="kw">else</span> {
@@ -1501,7 +1501,7 @@
     <span class="doccomment">/// assert_eq!(uri.path(), &quot;/hello/world&quot;);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_path</span>() {
             <span class="self">self</span>.<span class="ident">path_and_query</span>.<span class="ident">path</span>()
         } <span class="kw">else</span> {
@@ -1545,7 +1545,7 @@
     <span class="doccomment">/// assert!(uri.scheme().is_none());</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Scheme</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Scheme</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">scheme</span>.<span class="ident">inner</span>.<span class="ident">is_none</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -1564,7 +1564,7 @@
     <span class="doccomment">/// assert_eq!(uri.scheme_str(), Some(&quot;http&quot;));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scheme_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scheme_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">scheme</span>.<span class="ident">inner</span>.<span class="ident">is_none</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -1612,7 +1612,7 @@
     <span class="doccomment">/// assert!(uri.authority().is_none());</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">authority</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Authority</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">authority</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Authority</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">authority</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -1654,7 +1654,7 @@
     <span class="doccomment">/// assert!(uri.host().is_none());</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">authority</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">host</span>())
     }
 
@@ -1701,7 +1701,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert!(uri.port().is_none());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Port</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Port</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">authority</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">port</span>())
     }
 
@@ -1716,7 +1716,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(uri.port_u16(), Some(80));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">port_u16</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">port_u16</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">port</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>.<span class="ident">as_u16</span>()))
     }
 
@@ -1764,11 +1764,11 @@
     <span class="doccomment">/// assert!(uri.query().is_none());</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">path_and_query</span>.<span class="ident">query</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">has_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">has_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">path_and_query</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">scheme</span>.<span class="ident">inner</span>.<span class="ident">is_none</span>()
     }
 }
@@ -1777,7 +1777,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidUri</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident">Uri::from_shared</span>(<span class="ident">Bytes::copy_from_slice</span>(<span class="ident">t</span>))
     }
 }
@@ -1786,7 +1786,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidUri</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident">t</span>.<span class="ident">parse</span>()
     }
 }
@@ -1795,7 +1795,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidUri</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident">t</span>.<span class="ident">parse</span>()
     }
 }
@@ -1804,7 +1804,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidUri</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="ident">String</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident">Uri::from_shared</span>(<span class="ident">Bytes::from</span>(<span class="ident">t</span>))
     }
 }
@@ -1813,7 +1813,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidUri</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident">Uri::from_shared</span>(<span class="ident">Bytes::from</span>(<span class="ident">vec</span>))
     }
 }
@@ -1822,7 +1822,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidUriParts</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">src</span>: <span class="ident">Parts</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">src</span>: <span class="ident">Parts</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident">Uri::from_parts</span>(<span class="ident">src</span>)
     }
 }
@@ -1831,7 +1831,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Uri</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">src</span>.<span class="ident">clone</span>())
     }
 }
@@ -1871,7 +1871,7 @@
 <span class="doccomment">/// assert_eq!(uri.path(), &quot;/foo&quot;);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Uri</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Parts</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">Uri</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">path_and_query</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">has_path</span>() {
             <span class="prelude-val">Some</span>(<span class="ident">src</span>.<span class="ident">path_and_query</span>)
         } <span class="kw">else</span> {
@@ -1879,8 +1879,8 @@
         };
 
         <span class="kw">let</span> <span class="ident">scheme</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">src</span>.<span class="ident">scheme</span>.<span class="ident">inner</span> {
-            <span class="ident">Scheme2::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">src</span>.<span class="ident">scheme</span>),
+            <span class="ident">Scheme2::None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">src</span>.<span class="ident">scheme</span>),
         };
 
         <span class="kw">let</span> <span class="ident">authority</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">authority</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>() {
@@ -1898,16 +1898,16 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_full</span>(<span class="kw-2">mut</span> <span class="ident">s</span>: <span class="ident">Bytes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uri</span>, <span class="ident">InvalidUri</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_full</span>(<span class="kw-2">mut</span> <span class="ident">s</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uri</span>, <span class="ident">InvalidUri</span><span class="op">&gt;</span> {
     <span class="comment">// Parse the scheme</span>
     <span class="kw">let</span> <span class="ident">scheme</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Scheme2::parse</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[..])<span class="question-mark">?</span> {
-        <span class="ident">Scheme2::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Scheme2::None</span>,
-        <span class="ident">Scheme2::Standard</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Scheme2::None</span> =&gt; <span class="ident">Scheme2::None</span>,
+        <span class="ident">Scheme2::Standard</span>(<span class="ident">p</span>) =&gt; {
             <span class="comment">// TODO: use truncate</span>
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split_to</span>(<span class="ident">p</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">3</span>);
             <span class="ident">Scheme2::Standard</span>(<span class="ident">p</span>)
         }
-        <span class="ident">Scheme2::Other</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Scheme2::Other</span>(<span class="ident">n</span>) =&gt; {
             <span class="comment">// Grab the protocol</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scheme</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split_to</span>(<span class="ident">n</span> <span class="op">+</span> <span class="number">3</span>);
 
@@ -1942,7 +1942,7 @@
     }
 
     <span class="comment">// Authority is required when absolute</span>
-    <span class="kw">if</span> <span class="ident">authority_end</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">authority_end</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidFormat</span>.<span class="ident">into</span>());
     }
 
@@ -1962,13 +1962,13 @@
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">InvalidUri</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uri</span>, <span class="ident">InvalidUri</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uri</span>, <span class="ident">InvalidUri</span><span class="op">&gt;</span> {
         <span class="ident">Uri::try_from</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Uri</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Uri</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">scheme</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">scheme</span>() {
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
@@ -1990,7 +1990,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Uri</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">other</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">as_bytes</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">absolute</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
@@ -2033,7 +2033,7 @@
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>();
 
         <span class="kw">if</span> <span class="ident">other</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">path</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">path</span>.<span class="ident">as_bytes</span>() <span class="op">!</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">other</span>[..<span class="ident">path</span>.<span class="ident">len</span>()] {
-            <span class="kw">if</span> <span class="ident">absolute</span> <span class="op">&amp;&amp;</span> <span class="ident">path</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;/&quot;</span> {
+            <span class="kw">if</span> <span class="ident">absolute</span> <span class="op">&amp;&amp;</span> <span class="ident">path</span> <span class="op">==</span> <span class="string">&quot;/&quot;</span> {
                 <span class="comment">// PathAndQuery can be ommitted, fall through</span>
             } <span class="kw">else</span> {
                 <span class="kw">return</span> <span class="bool-val">false</span>;
@@ -2043,8 +2043,8 @@
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">query</span>() {
-            <span class="kw">if</span> <span class="ident">other</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="ident">query</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span>;
+            <span class="kw">if</span> <span class="ident">other</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
+                <span class="kw">return</span> <span class="ident">query</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>;
             }
 
             <span class="kw">if</span> <span class="ident">other</span>[<span class="number">0</span>] <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;?&#39;</span> {
@@ -2064,25 +2064,25 @@
             <span class="ident">other</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">other</span>[<span class="ident">query</span>.<span class="ident">len</span>()..];
         }
 
-        <span class="ident">other</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">other</span>[<span class="number">0</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;#&#39;</span>
+        <span class="ident">other</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">other</span>[<span class="number">0</span>] <span class="op">==</span> <span class="string">b&#39;#&#39;</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Uri</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">uri</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">Uri</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">uri</span> <span class="op">==</span> <span class="self">self</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Uri</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">other</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Uri</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">uri</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">Uri</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">uri</span> <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>
     }
 }
 
@@ -2091,7 +2091,7 @@
 <span class="doccomment">/// Returns a `Uri` representing `/`</span>
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Uri</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Uri</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Uri</span> {
         <span class="ident">Uri</span> {
             <span class="ident">scheme</span>: <span class="ident">Scheme::empty</span>(),
             <span class="ident">authority</span>: <span class="ident">Authority::empty</span>(),
@@ -2101,7 +2101,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Uri</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">scheme</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">scheme</span>() {
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}://&quot;</span>, <span class="ident">scheme</span>)<span class="question-mark">?</span>;
         }
@@ -2121,43 +2121,43 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Uri</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ErrorKind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InvalidUri</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InvalidUri</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="ident">InvalidUri</span> {
         <span class="ident">InvalidUri</span>(<span class="ident">src</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ErrorKind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InvalidUriParts</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InvalidUriParts</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="ident">InvalidUriParts</span> {
         <span class="ident">InvalidUriParts</span>(<span class="ident">src</span>.<span class="ident">into</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">InvalidUri</span> {
-    <span class="kw">fn</span> <span class="ident">s</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">s</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">ErrorKind::InvalidUriChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;invalid uri character&quot;</span>,
-            <span class="ident">ErrorKind::InvalidScheme</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;invalid scheme&quot;</span>,
-            <span class="ident">ErrorKind::InvalidAuthority</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;invalid authority&quot;</span>,
-            <span class="ident">ErrorKind::InvalidPort</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;invalid port&quot;</span>,
-            <span class="ident">ErrorKind::InvalidFormat</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;invalid format&quot;</span>,
-            <span class="ident">ErrorKind::SchemeMissing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;scheme missing&quot;</span>,
-            <span class="ident">ErrorKind::AuthorityMissing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;authority missing&quot;</span>,
-            <span class="ident">ErrorKind::PathAndQueryMissing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;path missing&quot;</span>,
-            <span class="ident">ErrorKind::TooLong</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;uri too long&quot;</span>,
-            <span class="ident">ErrorKind::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;empty string&quot;</span>,
-            <span class="ident">ErrorKind::SchemeTooLong</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;scheme too long&quot;</span>,
+            <span class="ident">ErrorKind::InvalidUriChar</span> =&gt; <span class="string">&quot;invalid uri character&quot;</span>,
+            <span class="ident">ErrorKind::InvalidScheme</span> =&gt; <span class="string">&quot;invalid scheme&quot;</span>,
+            <span class="ident">ErrorKind::InvalidAuthority</span> =&gt; <span class="string">&quot;invalid authority&quot;</span>,
+            <span class="ident">ErrorKind::InvalidPort</span> =&gt; <span class="string">&quot;invalid port&quot;</span>,
+            <span class="ident">ErrorKind::InvalidFormat</span> =&gt; <span class="string">&quot;invalid format&quot;</span>,
+            <span class="ident">ErrorKind::SchemeMissing</span> =&gt; <span class="string">&quot;scheme missing&quot;</span>,
+            <span class="ident">ErrorKind::AuthorityMissing</span> =&gt; <span class="string">&quot;authority missing&quot;</span>,
+            <span class="ident">ErrorKind::PathAndQueryMissing</span> =&gt; <span class="string">&quot;path missing&quot;</span>,
+            <span class="ident">ErrorKind::TooLong</span> =&gt; <span class="string">&quot;uri too long&quot;</span>,
+            <span class="ident">ErrorKind::Empty</span> =&gt; <span class="string">&quot;empty string&quot;</span>,
+            <span class="ident">ErrorKind::SchemeTooLong</span> =&gt; <span class="string">&quot;scheme too long&quot;</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidUri</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">s</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
@@ -2165,7 +2165,7 @@
 <span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">InvalidUri</span> {}
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidUriParts</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }

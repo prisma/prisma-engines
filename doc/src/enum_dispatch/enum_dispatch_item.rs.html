@@ -138,7 +138,7 @@
 
 <span class="doccomment">/// Allows `EnumDispatchItem`s to be parsed from `String`s or `TokenStream`s.</span>
 <span class="kw">impl</span> <span class="ident">syn::parse::Parse</span> <span class="kw">for</span> <span class="ident">EnumDispatchItem</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn::parse::ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::parse::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn::parse::ParseStream</span>) -&gt; <span class="ident">syn::parse::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">call</span>(<span class="ident">syn::Attribute::parse_outer</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">vis</span>: <span class="ident">syn::Visibility</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">enum_token</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="macro">syn::Token!</span>[<span class="kw">enum</span>]<span class="op">&gt;</span>()<span class="question-mark">?</span>;
@@ -181,7 +181,7 @@
 <span class="doccomment">/// Custom conversion implementation that expands the shorthand `enum_dispatch` enum syntax into a</span>
 <span class="doccomment">/// standard Rust enum syntax.</span>
 <span class="kw">impl</span> <span class="ident">::std::convert::From</span><span class="op">&lt;</span><span class="ident">EnumDispatchItem</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">syn::ItemEnum</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">item</span>: <span class="ident">EnumDispatchItem</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::ItemEnum</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">item</span>: <span class="ident">EnumDispatchItem</span>) -&gt; <span class="ident">syn::ItemEnum</span> {
         <span class="kw">use</span> <span class="ident">::std::iter::FromIterator</span>;
         <span class="kw">let</span> <span class="ident">variants</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::Variant</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">item</span>
             .<span class="ident">variants</span>

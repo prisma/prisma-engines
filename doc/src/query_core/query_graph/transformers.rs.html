@@ -34,10 +34,10 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Query</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryGraphError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">n</span>: <span class="ident">Node</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphResult</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">n</span>: <span class="ident">Node</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">n</span> {
-            <span class="ident">Node::Query</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">q</span>),
-            <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphError::InvalidNodeTransformation</span> {
+            <span class="ident">Node::Query</span>(<span class="ident">q</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">q</span>),
+            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphError::InvalidNodeTransformation</span> {
                 <span class="ident">from</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
                 <span class="ident">to</span>: <span class="string">&quot;Query&quot;</span>.<span class="ident">to_owned</span>(),
             }),
@@ -48,10 +48,10 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Flow</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">QueryGraphError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">n</span>: <span class="ident">Node</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphResult</span><span class="op">&lt;</span><span class="ident">Flow</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">n</span>: <span class="ident">Node</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span><span class="ident">Flow</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">n</span> {
-            <span class="ident">Node::Flow</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">f</span>),
-            <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphError::InvalidNodeTransformation</span> {
+            <span class="ident">Node::Flow</span>(<span class="ident">f</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">f</span>),
+            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphError::InvalidNodeTransformation</span> {
                 <span class="ident">from</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
                 <span class="ident">to</span>: <span class="string">&quot;Flow&quot;</span>.<span class="ident">to_owned</span>(),
             }),

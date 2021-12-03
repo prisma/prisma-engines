@@ -4,7 +4,7 @@ without using any table lookups or other timing dependant mechanisms.</p>
 <p>The encryption implementation is based on a technique called <a href="https://eprint.iacr.org/2020/1123.pdf">fixslicing</a>,
 while the decryption implementation is heavily based on <code>aessafe</code> <a href="https://github.com/DaGenix/rust-crypto/blob/master/src/aessafe.rs">module</a>,
 from the original <code>rust-crypto</code> crate.</p>
-<h1 id="usage-example" class="section-header"><a href="#usage-example">Usage example</a></h1>
+<h2 id="usage-example" class="section-header"><a href="#usage-example">Usage example</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">aes_soft::cipher::generic_array::GenericArray</span>;
 <span class="kw">use</span> <span class="ident">aes_soft::cipher</span>::{<span class="ident">BlockCipher</span>, <span class="ident">NewBlockCipher</span>};
 <span class="kw">use</span> <span class="ident">aes_soft::Aes128</span>;
@@ -29,13 +29,13 @@ from the original <code>rust-crypto</code> crate.</p>
 <span class="ident">cipher</span>.<span class="ident">decrypt_blocks</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">block8</span>);
 <span class="macro">assert_eq!</span>(<span class="ident">block8</span>, <span class="ident">block8_copy</span>);</code></pre></div>
 </div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
-<div class="item-table"><div class="item-left import-item"><code>pub use <a class="mod" href="../cipher/index.html" title="mod cipher">cipher</a>;</code></div><div class="item-right docblock-short"></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Aes128.html" title="aes_soft::Aes128 struct">Aes128</a></div><div class="item-right docblock-short"><p>AES-128 block cipher instance</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Aes192.html" title="aes_soft::Aes192 struct">Aes192</a></div><div class="item-right docblock-short"><p>AES-192 block cipher instance</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Aes256.html" title="aes_soft::Aes256 struct">Aes256</a></div><div class="item-right docblock-short"><p>AES-256 block cipher instance</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Block.html" title="aes_soft::Block type">Block</a></div><div class="item-right docblock-short"><p>128-bit AES block</p>
-</div><div class="item-left module-item"><a class="type" href="type.ParBlocks.html" title="aes_soft::ParBlocks type">ParBlocks</a></div><div class="item-right docblock-short"><p>8 x 128-bit AES blocks to be processed in parallel</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="aes_soft" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use <a class="mod" href="../cipher/index.html" title="mod cipher">cipher</a>;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Aes128.html" title="aes_soft::Aes128 struct">Aes128</a></div><div class="item-right docblock-short"><p>AES-128 block cipher instance</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Aes192.html" title="aes_soft::Aes192 struct">Aes192</a></div><div class="item-right docblock-short"><p>AES-192 block cipher instance</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Aes256.html" title="aes_soft::Aes256 struct">Aes256</a></div><div class="item-right docblock-short"><p>AES-256 block cipher instance</p>
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Block.html" title="aes_soft::Block type">Block</a></div><div class="item-right docblock-short"><p>128-bit AES block</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.ParBlocks.html" title="aes_soft::ParBlocks type">ParBlocks</a></div><div class="item-right docblock-short"><p>8 x 128-bit AES blocks to be processed in parallel</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="aes_soft" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

@@ -33,6 +33,9 @@
 <span id="33">33</span>
 <span id="34">34</span>
 <span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::helper::pretty_print</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Span</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
@@ -44,27 +47,30 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DatamodelWarning</span> {
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Preview feature \&quot;{}\&quot; is deprecated. The functionality can be used without specifying it as a preview feature.&quot;</span>, <span class="ident">preview_feature</span>)]</span>
     <span class="ident">DeprecatedPreviewFeature</span> { <span class="ident">preview_feature</span>: <span class="ident">String</span>, <span class="ident">span</span>: <span class="ident">Span</span> },
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Type aliases are an undocumented feature that is getting deprecated. Please chime in in the issue if you need it: https://github.com/prisma/prisma/issues/9939&quot;</span>)]</span>
+    <span class="ident">DeprecatedTypeAlias</span> { <span class="ident">span</span>: <span class="ident">Span</span> },
 }
 
 <span class="kw">impl</span> <span class="ident">DatamodelWarning</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_deprecated_preview_feature_warning</span>(<span class="ident">preview_feature</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DatamodelWarning</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_deprecated_preview_feature_warning</span>(<span class="ident">preview_feature</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelWarning</span> {
         <span class="ident">DatamodelWarning::DeprecatedPreviewFeature</span> {
             <span class="ident">preview_feature</span>: <span class="ident">String::from</span>(<span class="ident">preview_feature</span>),
             <span class="ident">span</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Span</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Span</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DatamodelWarning::DeprecatedPreviewFeature</span> { <span class="ident">span</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
+            <span class="ident">DatamodelWarning::DeprecatedPreviewFeature</span> { <span class="ident">span</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
+            <span class="ident">DatamodelWarning::DeprecatedTypeAlias</span> { <span class="ident">span</span> } =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">to_string</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pretty_print</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">std::io::Write</span>, <span class="ident">file_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pretty_print</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">std::io::Write</span>, <span class="ident">file_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">pretty_print</span>(<span class="ident">f</span>, <span class="ident">file_name</span>, <span class="ident">text</span>, <span class="self">self</span>.<span class="ident">span</span>(), <span class="self">self</span>.<span class="ident">description</span>().<span class="ident">as_str</span>())
     }
 }

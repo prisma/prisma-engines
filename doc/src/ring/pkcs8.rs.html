@@ -248,16 +248,16 @@
 
 <span class="kw">impl</span> <span class="ident">Template</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">alg_id_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">untrusted::Input</span> {
+    <span class="kw">fn</span> <span class="ident">alg_id_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">untrusted::Input</span> {
         <span class="ident">untrusted::Input::from</span>(<span class="self">self</span>.<span class="ident">alg_id_value_</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">alg_id_value_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">alg_id_value_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="self">self</span>.<span class="ident">alg_id_range</span>.<span class="ident">start</span>..<span class="self">self</span>.<span class="ident">alg_id_range</span>.<span class="ident">end</span>]
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">curve_oid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">untrusted::Input</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">curve_oid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">untrusted::Input</span> {
         <span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">alg_id_value_</span>()[<span class="self">self</span>.<span class="ident">curve_id_index</span>..])
     }
 }
@@ -272,7 +272,7 @@
     <span class="ident">template</span>: <span class="kw-2">&amp;</span><span class="ident">Template</span>,
     <span class="ident">version</span>: <span class="ident">Version</span>,
     <span class="ident">input</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
     <span class="ident">unwrap_key_</span>(<span class="ident">template</span>.<span class="ident">alg_id_value</span>(), <span class="ident">version</span>, <span class="ident">input</span>)
 }
 
@@ -290,7 +290,7 @@
     <span class="ident">alg_id</span>: <span class="ident">untrusted::Input</span>,
     <span class="ident">version</span>: <span class="ident">Version</span>,
     <span class="ident">input</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
     <span class="ident">input</span>.<span class="ident">read_all</span>(<span class="ident">error::KeyRejected::invalid_encoding</span>(), <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
         <span class="ident">der::nested</span>(
             <span class="ident">input</span>,
@@ -305,7 +305,7 @@
     <span class="ident">alg_id</span>: <span class="ident">untrusted::Input</span>,
     <span class="ident">version</span>: <span class="ident">Version</span>,
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">actual_version</span> <span class="op">=</span> <span class="ident">der::small_nonnegative_integer</span>(<span class="ident">input</span>)
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
 
@@ -325,10 +325,10 @@
     }
 
     <span class="kw">let</span> <span class="ident">require_public_key</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">actual_version</span>, <span class="ident">version</span>) {
-        (<span class="number">0</span>, <span class="ident">Version::V1Only</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-        (<span class="number">0</span>, <span class="ident">Version::V1OrV2</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-        (<span class="number">1</span>, <span class="ident">Version::V1OrV2</span>) <span class="op">|</span> (<span class="number">1</span>, <span class="ident">Version::V2Only</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="number">0</span>, <span class="ident">Version::V1Only</span>) =&gt; <span class="bool-val">false</span>,
+        (<span class="number">0</span>, <span class="ident">Version::V1OrV2</span>) =&gt; <span class="bool-val">false</span>,
+        (<span class="number">1</span>, <span class="ident">Version::V1OrV2</span>) <span class="op">|</span> (<span class="number">1</span>, <span class="ident">Version::V2Only</span>) =&gt; <span class="bool-val">true</span>,
+        <span class="kw">_</span> =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::KeyRejected::version_not_supported</span>());
         }
     };
@@ -369,12 +369,12 @@
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Document</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[..<span class="self">self</span>.<span class="ident">len</span>]
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">wrap_key</span>(<span class="ident">template</span>: <span class="kw-2">&amp;</span><span class="ident">Template</span>, <span class="ident">private_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">public_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Document</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">wrap_key</span>(<span class="ident">template</span>: <span class="kw-2">&amp;</span><span class="ident">Template</span>, <span class="ident">private_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">public_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Document</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Document</span> {
         <span class="ident">bytes</span>: [<span class="number">0</span>; <span class="ident">ec::PKCS8_DOCUMENT_MAX_LEN</span>],
         <span class="ident">len</span>: <span class="ident">template</span>.<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">private_key</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">public_key</span>.<span class="ident">len</span>(),

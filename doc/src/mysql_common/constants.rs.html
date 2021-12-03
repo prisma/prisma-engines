@@ -912,15 +912,15 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SessionStateType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">x</span> {
-            <span class="number">0x00</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SessionStateType::SESSION_TRACK_SYSTEM_VARIABLES</span>,
-            <span class="number">0x01</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SessionStateType::SESSION_TRACK_SCHEMA</span>,
-            <span class="number">0x02</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SessionStateType::SESSION_TRACK_STATE_CHANGE</span>,
-            <span class="number">0x03</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SessionStateType::SESSION_TRACK_GTIDS</span>,
-            <span class="number">0x04</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SessionStateType::SESSION_TRACK_TRANSACTION_CHARACTERISTICS</span>,
-            <span class="number">0x05</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SessionStateType::SESSION_TRACK_TRANSACTION_STATE</span>,
-            <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unknown session state type {}&quot;</span>, <span class="ident">x</span>),
+            <span class="number">0x00</span> =&gt; <span class="ident">SessionStateType::SESSION_TRACK_SYSTEM_VARIABLES</span>,
+            <span class="number">0x01</span> =&gt; <span class="ident">SessionStateType::SESSION_TRACK_SCHEMA</span>,
+            <span class="number">0x02</span> =&gt; <span class="ident">SessionStateType::SESSION_TRACK_STATE_CHANGE</span>,
+            <span class="number">0x03</span> =&gt; <span class="ident">SessionStateType::SESSION_TRACK_GTIDS</span>,
+            <span class="number">0x04</span> =&gt; <span class="ident">SessionStateType::SESSION_TRACK_TRANSACTION_CHARACTERISTICS</span>,
+            <span class="number">0x05</span> =&gt; <span class="ident">SessionStateType::SESSION_TRACK_TRANSACTION_STATE</span>,
+            <span class="ident">x</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unknown session state type {}&quot;</span>, <span class="ident">x</span>),
         }
     }
 }
@@ -964,39 +964,39 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ColumnType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnType</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u8</span>) -&gt; <span class="ident">ColumnType</span> {
         <span class="kw">match</span> <span class="ident">x</span> {
-            <span class="number">0x00_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_DECIMAL</span>,
-            <span class="number">0x01_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_TINY</span>,
-            <span class="number">0x02_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_SHORT</span>,
-            <span class="number">0x03_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_LONG</span>,
-            <span class="number">0x04_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_FLOAT</span>,
-            <span class="number">0x05_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_DOUBLE</span>,
-            <span class="number">0x06_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_NULL</span>,
-            <span class="number">0x07_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_TIMESTAMP</span>,
-            <span class="number">0x08_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_LONGLONG</span>,
-            <span class="number">0x09_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_INT24</span>,
-            <span class="number">0x0a_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_DATE</span>,
-            <span class="number">0x0b_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_TIME</span>,
-            <span class="number">0x0c_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_DATETIME</span>,
-            <span class="number">0x0d_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_YEAR</span>,
-            <span class="number">0x0f_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_VARCHAR</span>,
-            <span class="number">0x10_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_BIT</span>,
-            <span class="number">0x11_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_TIMESTAMP2</span>,
-            <span class="number">0x12_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_DATETIME2</span>,
-            <span class="number">0x13_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_TIME2</span>,
-            <span class="number">0xf5_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_JSON</span>,
-            <span class="number">0xf6_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_NEWDECIMAL</span>,
-            <span class="number">0xf7_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_ENUM</span>,
-            <span class="number">0xf8_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_SET</span>,
-            <span class="number">0xf9_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_TINY_BLOB</span>,
-            <span class="number">0xfa_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_MEDIUM_BLOB</span>,
-            <span class="number">0xfb_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_LONG_BLOB</span>,
-            <span class="number">0xfc_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_BLOB</span>,
-            <span class="number">0xfd_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_VAR_STRING</span>,
-            <span class="number">0xfe_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_STRING</span>,
-            <span class="number">0xff_u8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnType::MYSQL_TYPE_GEOMETRY</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unknown column type {}&quot;</span>, <span class="ident">x</span>),
+            <span class="number">0x00_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_DECIMAL</span>,
+            <span class="number">0x01_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_TINY</span>,
+            <span class="number">0x02_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_SHORT</span>,
+            <span class="number">0x03_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_LONG</span>,
+            <span class="number">0x04_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_FLOAT</span>,
+            <span class="number">0x05_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_DOUBLE</span>,
+            <span class="number">0x06_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_NULL</span>,
+            <span class="number">0x07_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_TIMESTAMP</span>,
+            <span class="number">0x08_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_LONGLONG</span>,
+            <span class="number">0x09_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_INT24</span>,
+            <span class="number">0x0a_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_DATE</span>,
+            <span class="number">0x0b_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_TIME</span>,
+            <span class="number">0x0c_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_DATETIME</span>,
+            <span class="number">0x0d_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_YEAR</span>,
+            <span class="number">0x0f_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_VARCHAR</span>,
+            <span class="number">0x10_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_BIT</span>,
+            <span class="number">0x11_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_TIMESTAMP2</span>,
+            <span class="number">0x12_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_DATETIME2</span>,
+            <span class="number">0x13_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_TIME2</span>,
+            <span class="number">0xf5_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_JSON</span>,
+            <span class="number">0xf6_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_NEWDECIMAL</span>,
+            <span class="number">0xf7_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_ENUM</span>,
+            <span class="number">0xf8_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_SET</span>,
+            <span class="number">0xf9_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_TINY_BLOB</span>,
+            <span class="number">0xfa_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_MEDIUM_BLOB</span>,
+            <span class="number">0xfb_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_LONG_BLOB</span>,
+            <span class="number">0xfc_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_BLOB</span>,
+            <span class="number">0xfd_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_VAR_STRING</span>,
+            <span class="number">0xfe_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_STRING</span>,
+            <span class="number">0xff_u8</span> =&gt; <span class="ident">ColumnType::MYSQL_TYPE_GEOMETRY</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unknown column type {}&quot;</span>, <span class="ident">x</span>),
         }
     }
 }

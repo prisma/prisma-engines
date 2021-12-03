@@ -559,11 +559,11 @@
 
 <span class="kw">impl</span> <span class="ident">State</span> {
     <span class="doccomment">/// Opens the send-half of a stream if it is not already open.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_open</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eos</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_open</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">eos</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">local</span> <span class="op">=</span> <span class="ident">Streaming</span>;
 
         <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Idle</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Idle</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">eos</span> {
                     <span class="ident">HalfClosedLocal</span>(<span class="ident">AwaitingHeaders</span>)
                 } <span class="kw">else</span> {
@@ -576,21 +576,21 @@
             <span class="ident">Open</span> {
                 <span class="ident">local</span>: <span class="ident">AwaitingHeaders</span>,
                 <span class="ident">remote</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">if</span> <span class="ident">eos</span> {
                     <span class="ident">HalfClosedLocal</span>(<span class="ident">remote</span>)
                 } <span class="kw">else</span> {
                     <span class="ident">Open</span> { <span class="ident">local</span>, <span class="ident">remote</span> }
                 }
             }
-            <span class="ident">HalfClosedRemote</span>(<span class="ident">AwaitingHeaders</span>) <span class="op">|</span> <span class="ident">ReservedLocal</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">HalfClosedRemote</span>(<span class="ident">AwaitingHeaders</span>) <span class="op">|</span> <span class="ident">ReservedLocal</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">eos</span> {
                     <span class="ident">Closed</span>(<span class="ident">Cause::EndStream</span>)
                 } <span class="kw">else</span> {
                     <span class="ident">HalfClosedRemote</span>(<span class="ident">local</span>)
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> =&gt; {
                 <span class="comment">// All other transitions result in a protocol error</span>
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">UserError::UnexpectedFrameType</span>);
             }
@@ -602,12 +602,12 @@
     <span class="doccomment">/// Opens the receive-half of the stream when a HEADERS frame is received.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns true if this transitions the state to Open.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_open</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">frame</span>: <span class="kw-2">&amp;</span><span class="ident">frame::Headers</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_open</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">frame</span>: <span class="kw-2">&amp;</span><span class="ident">frame::Headers</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">initial</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">let</span> <span class="ident">eos</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">is_end_stream</span>();
 
         <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Idle</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Idle</span> =&gt; {
                 <span class="ident">initial</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
                 <span class="kw">if</span> <span class="ident">eos</span> {
@@ -624,7 +624,7 @@
                     }
                 }
             }
-            <span class="ident">ReservedRemote</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ReservedRemote</span> =&gt; {
                 <span class="ident">initial</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
                 <span class="kw">if</span> <span class="ident">eos</span> {
@@ -639,7 +639,7 @@
             <span class="ident">Open</span> {
                 <span class="ident">local</span>,
                 <span class="ident">remote</span>: <span class="ident">AwaitingHeaders</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">if</span> <span class="ident">eos</span> {
                     <span class="ident">HalfClosedRemote</span>(<span class="ident">local</span>)
                 } <span class="kw">else</span> {
@@ -654,7 +654,7 @@
                     }
                 }
             }
-            <span class="ident">HalfClosedLocal</span>(<span class="ident">AwaitingHeaders</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">HalfClosedLocal</span>(<span class="ident">AwaitingHeaders</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">eos</span> {
                     <span class="ident">Closed</span>(<span class="ident">Cause::EndStream</span>)
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">is_informational</span>() {
@@ -664,7 +664,7 @@
                     <span class="ident">HalfClosedLocal</span>(<span class="ident">Streaming</span>)
                 }
             }
-            <span class="kw-2">ref</span> <span class="ident">state</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw-2">ref</span> <span class="ident">state</span> =&gt; {
                 <span class="comment">// All other transitions result in a protocol error</span>
                 <span class="macro">proto_err!</span>(<span class="ident">conn</span>: <span class="string">&quot;recv_open: in unexpected state {:?}&quot;</span>, <span class="ident">state</span>);
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_go_away</span>(<span class="ident">Reason::PROTOCOL_ERROR</span>));
@@ -675,13 +675,13 @@
     }
 
     <span class="doccomment">/// Transition from Idle -&gt; ReservedRemote</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_remote</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_remote</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Idle</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Idle</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">ReservedRemote</span>;
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="kw-2">ref</span> <span class="ident">state</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw-2">ref</span> <span class="ident">state</span> =&gt; {
                 <span class="macro">proto_err!</span>(<span class="ident">conn</span>: <span class="string">&quot;reserve_remote: in unexpected state {:?}&quot;</span>, <span class="ident">state</span>);
                 <span class="prelude-val">Err</span>(<span class="ident">Error::library_go_away</span>(<span class="ident">Reason::PROTOCOL_ERROR</span>))
             }
@@ -689,31 +689,31 @@
     }
 
     <span class="doccomment">/// Transition from Idle -&gt; ReservedLocal</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_local</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_local</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Idle</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Idle</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">ReservedLocal</span>;
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">UserError::UnexpectedFrameType</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UserError::UnexpectedFrameType</span>),
         }
     }
 
     <span class="doccomment">/// Indicates that the remote side will not send more data to the local.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Open</span> { <span class="ident">local</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Open</span> { <span class="ident">local</span>, .. } =&gt; {
                 <span class="comment">// The remote side will continue to receive data.</span>
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;recv_close: Open =&gt; HalfClosedRemote({:?})&quot;</span>, <span class="ident">local</span>);
                 <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">HalfClosedRemote</span>(<span class="ident">local</span>);
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="ident">HalfClosedLocal</span>(..) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">HalfClosedLocal</span>(..) =&gt; {
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;recv_close: HalfClosedLocal =&gt; Closed&quot;</span>);
                 <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">Closed</span>(<span class="ident">Cause::EndStream</span>);
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="kw-2">ref</span> <span class="ident">state</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw-2">ref</span> <span class="ident">state</span> =&gt; {
                 <span class="macro">proto_err!</span>(<span class="ident">conn</span>: <span class="string">&quot;recv_close: in unexpected state {:?}&quot;</span>, <span class="ident">state</span>);
                 <span class="prelude-val">Err</span>(<span class="ident">Error::library_go_away</span>(<span class="ident">Reason::PROTOCOL_ERROR</span>))
             }
@@ -729,7 +729,7 @@
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
             <span class="comment">// If the stream is already in a `Closed` state, do nothing,</span>
             <span class="comment">// provided that there are no frames still in the send queue.</span>
-            <span class="ident">Closed</span>(..) <span class="kw">if</span> <span class="op">!</span><span class="ident">queued</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="ident">Closed</span>(..) <span class="kw">if</span> <span class="op">!</span><span class="ident">queued</span> =&gt; {}
             <span class="comment">// A notionally `Closed` stream may still have queued frames in</span>
             <span class="comment">// the following cases:</span>
             <span class="comment">//</span>
@@ -744,7 +744,7 @@
             <span class="comment">// In either of these cases, we want to overwrite the stream&#39;s</span>
             <span class="comment">// previous state with the received RST_STREAM, so that the queue</span>
             <span class="comment">// will be cleared by `Prioritize::pop_frame`.</span>
-            <span class="kw-2">ref</span> <span class="ident">state</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw-2">ref</span> <span class="ident">state</span> =&gt; {
                 <span class="macro">tracing::trace!</span>(
                     <span class="string">&quot;recv_reset; frame={:?}; state={:?}; queued={:?}&quot;</span>,
                     <span class="ident">frame</span>,
@@ -762,8 +762,8 @@
     <span class="doccomment">/// Handle a connection-level error.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">proto::Error</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Closed</span>(..) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Closed</span>(..) =&gt; {}
+            <span class="kw">_</span> =&gt; {
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;handle_error; err={:?}&quot;</span>, <span class="ident">err</span>);
                 <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">Closed</span>(<span class="ident">Cause::Error</span>(<span class="ident">err</span>.<span class="ident">clone</span>()));
             }
@@ -772,8 +772,8 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_eof</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Closed</span>(..) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="kw-2">ref</span> <span class="ident">state</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Closed</span>(..) =&gt; {}
+            <span class="kw-2">ref</span> <span class="ident">state</span> =&gt; {
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;recv_eof; state={:?}&quot;</span>, <span class="ident">state</span>);
                 <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">Closed</span>(<span class="ident">Cause::Error</span>(<span class="ident">io::ErrorKind::BrokenPipe</span>.<span class="ident">into</span>()));
             }
@@ -783,16 +783,16 @@
     <span class="doccomment">/// Indicates that the local side will not send more data to the local.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Open</span> { <span class="ident">remote</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Open</span> { <span class="ident">remote</span>, .. } =&gt; {
                 <span class="comment">// The remote side will continue to receive data.</span>
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;send_close: Open =&gt; HalfClosedLocal({:?})&quot;</span>, <span class="ident">remote</span>);
                 <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">HalfClosedLocal</span>(<span class="ident">remote</span>);
             }
-            <span class="ident">HalfClosedRemote</span>(..) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">HalfClosedRemote</span>(..) =&gt; {
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;send_close: HalfClosedRemote =&gt; Closed&quot;</span>);
                 <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">Closed</span>(<span class="ident">Cause::EndStream</span>);
             }
-            <span class="kw-2">ref</span> <span class="ident">state</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;send_close: unexpected state {:?}&quot;</span>, <span class="ident">state</span>),
+            <span class="kw-2">ref</span> <span class="ident">state</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;send_close: unexpected state {:?}&quot;</span>, <span class="ident">state</span>),
         }
     }
 
@@ -807,138 +807,138 @@
         <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">Closed</span>(<span class="ident">Cause::ScheduledLibraryReset</span>(<span class="ident">reason</span>));
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_scheduled_reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Reason</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_scheduled_reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Reason</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Closed</span>(<span class="ident">Cause::ScheduledLibraryReset</span>(<span class="ident">reason</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Closed</span>(<span class="ident">Cause::ScheduledLibraryReset</span>(<span class="ident">reason</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">reason</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_scheduled_reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_scheduled_reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Closed</span>(<span class="ident">Cause::ScheduledLibraryReset</span>(..)) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Closed</span>(<span class="ident">Cause::ScheduledLibraryReset</span>(..)) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_local_reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_local_reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Closed</span>(<span class="ident">Cause::Error</span>(<span class="kw-2">ref</span> <span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">is_local</span>(),
-            <span class="ident">Closed</span>(<span class="ident">Cause::ScheduledLibraryReset</span>(..)) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Closed</span>(<span class="ident">Cause::Error</span>(<span class="kw-2">ref</span> <span class="ident">e</span>)) =&gt; <span class="ident">e</span>.<span class="ident">is_local</span>(),
+            <span class="ident">Closed</span>(<span class="ident">Cause::ScheduledLibraryReset</span>(..)) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
     <span class="doccomment">/// Returns true if the stream is already reset.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Closed</span>(<span class="ident">Cause::EndStream</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">Closed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Closed</span>(<span class="ident">Cause::EndStream</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="ident">Closed</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_send_streaming</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_send_streaming</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
             <span class="ident">Open</span> {
                 <span class="ident">local</span>: <span class="ident">Streaming</span>, ..
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">HalfClosedRemote</span>(<span class="ident">Streaming</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            } =&gt; <span class="bool-val">true</span>,
+            <span class="ident">HalfClosedRemote</span>(<span class="ident">Streaming</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
     <span class="doccomment">/// Returns true when the stream is in a state to receive headers</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_recv_headers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_recv_headers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Idle</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">Idle</span> =&gt; <span class="bool-val">true</span>,
             <span class="ident">Open</span> {
                 <span class="ident">remote</span>: <span class="ident">AwaitingHeaders</span>,
                 ..
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">HalfClosedLocal</span>(<span class="ident">AwaitingHeaders</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">ReservedRemote</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            } =&gt; <span class="bool-val">true</span>,
+            <span class="ident">HalfClosedLocal</span>(<span class="ident">AwaitingHeaders</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="ident">ReservedRemote</span> =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_recv_streaming</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_recv_streaming</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
             <span class="ident">Open</span> {
                 <span class="ident">remote</span>: <span class="ident">Streaming</span>, ..
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">HalfClosedLocal</span>(<span class="ident">Streaming</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            } =&gt; <span class="bool-val">true</span>,
+            <span class="ident">HalfClosedLocal</span>(<span class="ident">Streaming</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Closed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Closed</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_recv_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_recv_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Closed</span>(..) <span class="op">|</span> <span class="ident">HalfClosedRemote</span>(..) <span class="op">|</span> <span class="ident">ReservedLocal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Closed</span>(..) <span class="op">|</span> <span class="ident">HalfClosedRemote</span>(..) <span class="op">|</span> <span class="ident">ReservedLocal</span> =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_send_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_send_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Closed</span>(..) <span class="op">|</span> <span class="ident">HalfClosedLocal</span>(..) <span class="op">|</span> <span class="ident">ReservedRemote</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Closed</span>(..) <span class="op">|</span> <span class="ident">HalfClosedLocal</span>(..) <span class="op">|</span> <span class="ident">ReservedRemote</span> =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Idle</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Idle</span> =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_recv_open</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_recv_open</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span> {
         <span class="comment">// TODO: Is this correct?</span>
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">Closed</span>(<span class="ident">Cause::Error</span>(<span class="kw-2">ref</span> <span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">clone</span>()),
-            <span class="ident">Closed</span>(<span class="ident">Cause::ScheduledLibraryReset</span>(<span class="ident">reason</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Closed</span>(<span class="ident">Cause::Error</span>(<span class="kw-2">ref</span> <span class="ident">e</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">clone</span>()),
+            <span class="ident">Closed</span>(<span class="ident">Cause::ScheduledLibraryReset</span>(<span class="ident">reason</span>)) =&gt; {
                 <span class="prelude-val">Err</span>(<span class="ident">proto::Error::library_go_away</span>(<span class="ident">reason</span>))
             }
-            <span class="ident">Closed</span>(<span class="ident">Cause::EndStream</span>) <span class="op">|</span> <span class="ident">HalfClosedRemote</span>(..) <span class="op">|</span> <span class="ident">ReservedLocal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+            <span class="ident">Closed</span>(<span class="ident">Cause::EndStream</span>) <span class="op">|</span> <span class="ident">HalfClosedRemote</span>(..) <span class="op">|</span> <span class="ident">ReservedLocal</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
         }
     }
 
     <span class="doccomment">/// Returns a reason if the stream has been reset.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ensure_reason</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">PollReset</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Reason</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ensure_reason</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">PollReset</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Reason</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
             <span class="ident">Closed</span>(<span class="ident">Cause::Error</span>(<span class="ident">Error::Reset</span>(<span class="kw">_</span>, <span class="ident">reason</span>, <span class="kw">_</span>)))
             <span class="op">|</span> <span class="ident">Closed</span>(<span class="ident">Cause::Error</span>(<span class="ident">Error::GoAway</span>(<span class="kw">_</span>, <span class="ident">reason</span>, <span class="kw">_</span>)))
-            <span class="op">|</span> <span class="ident">Closed</span>(<span class="ident">Cause::ScheduledLibraryReset</span>(<span class="ident">reason</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">reason</span>)),
-            <span class="ident">Closed</span>(<span class="ident">Cause::Error</span>(<span class="kw-2">ref</span> <span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">clone</span>().<span class="ident">into</span>()),
+            <span class="op">|</span> <span class="ident">Closed</span>(<span class="ident">Cause::ScheduledLibraryReset</span>(<span class="ident">reason</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">reason</span>)),
+            <span class="ident">Closed</span>(<span class="ident">Cause::Error</span>(<span class="kw-2">ref</span> <span class="ident">e</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">clone</span>().<span class="ident">into</span>()),
             <span class="ident">Open</span> {
                 <span class="ident">local</span>: <span class="ident">Streaming</span>, ..
             }
-            <span class="op">|</span> <span class="ident">HalfClosedRemote</span>(<span class="ident">Streaming</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">mode</span> {
-                <span class="ident">PollReset::AwaitingHeaders</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">UserError::PollResetAfterSendResponse</span>.<span class="ident">into</span>()),
-                <span class="ident">PollReset::Streaming</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="op">|</span> <span class="ident">HalfClosedRemote</span>(<span class="ident">Streaming</span>) =&gt; <span class="kw">match</span> <span class="ident">mode</span> {
+                <span class="ident">PollReset::AwaitingHeaders</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UserError::PollResetAfterSendResponse</span>.<span class="ident">into</span>()),
+                <span class="ident">PollReset::Streaming</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">State</span> {
         <span class="ident">State</span> { <span class="ident">inner</span>: <span class="ident">Inner::Idle</span> }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Peer</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">AwaitingHeaders</span>
     }
 }

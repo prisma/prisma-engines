@@ -189,7 +189,7 @@
     <span class="doccomment">/// let both = Interest::READABLE | Interest::WRITABLE;</span>
     <span class="doccomment">/// assert!(both.is_readable());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_readable</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_readable</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_readable</span>()
     }
 
@@ -206,7 +206,7 @@
     <span class="doccomment">/// let both = Interest::READABLE | Interest::WRITABLE;</span>
     <span class="doccomment">/// assert!(both.is_writable());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_writable</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_writable</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_writable</span>()
     }
 
@@ -223,20 +223,20 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert!(BOTH.is_readable());</span>
     <span class="doccomment">/// assert!(BOTH.is_writable());</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Interest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Interest</span>) -&gt; <span class="ident">Interest</span> {
         <span class="ident">Interest</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">add</span>(<span class="ident">other</span>.<span class="number">0</span>))
     }
 
     <span class="comment">// This function must be crate-private to avoid exposing a `mio` dependency.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_mio</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">mio::Interest</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_mio</span>(<span class="self">self</span>) -&gt; <span class="ident">mio::Interest</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">mask</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ready</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">mask</span>(<span class="self">self</span>) -&gt; <span class="ident">Ready</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Interest::READABLE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ready::READABLE</span> <span class="op">|</span> <span class="ident">Ready::READ_CLOSED</span>,
-            <span class="ident">Interest::WRITABLE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ready::WRITABLE</span> <span class="op">|</span> <span class="ident">Ready::WRITE_CLOSED</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ready::EMPTY</span>,
+            <span class="ident">Interest::READABLE</span> =&gt; <span class="ident">Ready::READABLE</span> <span class="op">|</span> <span class="ident">Ready::READ_CLOSED</span>,
+            <span class="ident">Interest::WRITABLE</span> =&gt; <span class="ident">Ready::WRITABLE</span> <span class="op">|</span> <span class="ident">Ready::WRITE_CLOSED</span>,
+            <span class="kw">_</span> =&gt; <span class="ident">Ready::EMPTY</span>,
         }
     }
 }
@@ -245,7 +245,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">add</span>(<span class="ident">other</span>)
     }
 }
@@ -258,7 +258,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Interest</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>)
     }
 }

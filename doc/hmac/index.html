@@ -2,7 +2,7 @@
 <p>To use it you’ll need a cryptographic hash function implementation from
 RustCrypto project. You can either import specific crate (e.g. <code>sha2</code>), or
 meta-crate <code>crypto-hashes</code> which reexport all related crates.</p>
-<h1 id="usage" class="section-header"><a href="#usage">Usage</a></h1>
+<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
 <p>Let us demonstrate how to use HMAC using SHA256 as an example.</p>
 <p>To get the authentication code:</p>
 
@@ -33,17 +33,17 @@ meta-crate <code>crypto-hashes</code> which reexport all related crates.</p>
 
 <span class="comment">// `verify` will return `Ok(())` if code is correct, `Err(MacError)` otherwise</span>
 <span class="ident">mac</span>.<span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="ident">code_bytes</span>).<span class="ident">unwrap</span>();</code></pre></div>
-<h1 id="block-and-input-sizes" class="section-header"><a href="#block-and-input-sizes">Block and input sizes</a></h1>
+<h2 id="block-and-input-sizes" class="section-header"><a href="#block-and-input-sizes">Block and input sizes</a></h2>
 <p>Usually it is assumed that block size is larger than output size, due to the
 generic nature of the implementation this edge case must be handled as well
 to remove potential panic scenario. This is done by truncating hash output
 to the hash block size if needed.</p>
 </div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
-<div class="item-table"><div class="item-left import-item"><code>pub use <a class="mod" href="../crypto_mac/index.html" title="mod crypto_mac">crypto_mac</a>;</code></div><div class="item-right docblock-short"></div><div class="item-left import-item"><code>pub use <a class="mod" href="../digest/index.html" title="mod digest">digest</a>;</code></div><div class="item-right docblock-short"></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Hmac.html" title="hmac::Hmac struct">Hmac</a></div><div class="item-right docblock-short"><p>The <code>Hmac</code> struct represents an HMAC using a given hash function <code>D</code>.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Mac.html" title="hmac::Mac trait">Mac</a></div><div class="item-right docblock-short"><p>The <a href="trait.Mac.html" title="Mac"><code>Mac</code></a> trait defines methods for a Message Authentication algorithm.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.NewMac.html" title="hmac::NewMac trait">NewMac</a></div><div class="item-right docblock-short"><p>Instantiate a <a href="trait.Mac.html" title="Mac"><code>Mac</code></a> algorithm.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="hmac" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use <a class="mod" href="../crypto_mac/index.html" title="mod crypto_mac">crypto_mac</a>;</code></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left import-item"><code>pub use <a class="mod" href="../digest/index.html" title="mod digest">digest</a>;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Hmac.html" title="hmac::Hmac struct">Hmac</a></div><div class="item-right docblock-short"><p>The <code>Hmac</code> struct represents an HMAC using a given hash function <code>D</code>.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Mac.html" title="hmac::Mac trait">Mac</a></div><div class="item-right docblock-short"><p>The <a href="trait.Mac.html" title="Mac"><code>Mac</code></a> trait defines methods for a Message Authentication algorithm.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.NewMac.html" title="hmac::NewMac trait">NewMac</a></div><div class="item-right docblock-short"><p>Instantiate a <a href="trait.Mac.html" title="Mac"><code>Mac</code></a> algorithm.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="hmac" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

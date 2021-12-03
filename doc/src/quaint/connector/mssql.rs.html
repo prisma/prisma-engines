@@ -608,11 +608,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">EncryptMode</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::On</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;true&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Off</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;false&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::DangerPlainText</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DANGER_PLAINTEXT&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::On</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;true&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Off</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;false&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::DangerPlainText</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DANGER_PLAINTEXT&quot;</span>),
         }
     }
 }
@@ -620,11 +620,11 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">EncryptMode</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">mode</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>() {
-            <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::On</span>,
-            <span class="kw">_</span> <span class="kw">if</span> <span class="ident">s</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;DANGER_PLAINTEXT&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::DangerPlainText</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Off</span>,
+            <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; <span class="ident"><span class="self">Self</span>::On</span>,
+            <span class="kw">_</span> <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="string">&quot;DANGER_PLAINTEXT&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::DangerPlainText</span>,
+            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Off</span>,
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">mode</span>)
@@ -666,13 +666,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">IsolationLevel</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ReadUncommitted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;READ UNCOMMITTED&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ReadCommitted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;READ COMMITTED&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::RepeatableRead</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;REPEATABLE READ&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Snapshot</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SNAPSHOT&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Serializable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SERIALIZABLE&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::ReadUncommitted</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;READ UNCOMMITTED&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::ReadCommitted</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;READ COMMITTED&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::RepeatableRead</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;REPEATABLE READ&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Snapshot</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SNAPSHOT&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Serializable</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SERIALIZABLE&quot;</span>),
         }
     }
 }
@@ -680,14 +680,14 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">IsolationLevel</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;READ UNCOMMITTED&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ReadUncommitted</span>),
-            <span class="string">&quot;READ COMMITTED&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ReadCommitted</span>),
-            <span class="string">&quot;REPEATABLE READ&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::RepeatableRead</span>),
-            <span class="string">&quot;SNAPSHOT&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Snapshot</span>),
-            <span class="string">&quot;SERIALIZABLE&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Serializable</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;READ UNCOMMITTED&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ReadUncommitted</span>),
+            <span class="string">&quot;READ COMMITTED&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ReadCommitted</span>),
+            <span class="string">&quot;REPEATABLE READ&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::RepeatableRead</span>),
+            <span class="string">&quot;SNAPSHOT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Snapshot</span>),
+            <span class="string">&quot;SERIALIZABLE&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Serializable</span>),
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::database_url_is_invalid</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid isolation level `{}`&quot;</span>, <span class="ident">s</span>));
 
                 <span class="prelude-val">Err</span>(<span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>())
@@ -698,7 +698,7 @@
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">TransactionCapable</span> <span class="kw">for</span> <span class="ident">Mssql</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_transaction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_transaction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Transaction::new</span>(<span class="self">self</span>, <span class="string">&quot;BEGIN TRAN&quot;</span>).<span class="kw">await</span>
     }
 }
@@ -706,113 +706,113 @@
 <span class="kw">impl</span> <span class="ident">MssqlUrl</span> {
     <span class="doccomment">/// Maximum number of connections the pool can have (if used together with</span>
     <span class="doccomment">/// pooled Quaint).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">connection_limit</span>()
     }
 
     <span class="doccomment">/// A duration how long one query can take.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">socket_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">socket_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">socket_timeout</span>()
     }
 
     <span class="doccomment">/// A duration how long we can try to connect to the database.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">connect_timeout</span>()
     }
 
     <span class="doccomment">/// A pool check_out timeout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pool_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pool_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">pool_timeout</span>()
     }
 
     <span class="doccomment">/// The isolation level of a transaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transaction_isolation_level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IsolationLevel</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transaction_isolation_level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IsolationLevel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">transaction_isolation_level</span>
     }
 
     <span class="doccomment">/// Name of the database.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dbname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dbname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">database</span>()
     }
 
     <span class="doccomment">/// The prefix which to use when querying database.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">schema</span>()
     }
 
     <span class="doccomment">/// Database hostname.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">host</span>()
     }
 
     <span class="doccomment">/// The username to use when connecting to the database.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">user</span>()
     }
 
     <span class="doccomment">/// Database port.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">port</span>()
     }
 
     <span class="doccomment">/// The JDBC connection string</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection_string</span>
     }
 
     <span class="doccomment">/// The maximum connection lifetime</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_connection_lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_connection_lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">max_connection_lifetime</span>()
     }
 
     <span class="doccomment">/// The maximum idle connection lifetime</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_idle_connection_lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_idle_connection_lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">query_params</span>.<span class="ident">max_idle_connection_lifetime</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">MssqlQueryParams</span> {
-    <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
         <span class="self">self</span>.<span class="ident">port</span>.<span class="ident">unwrap_or</span>(<span class="number">1433</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">host</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;localhost&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">as_deref</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">socket_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">socket_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">socket_timeout</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">connect_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">connect_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">socket_timeout</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">connection_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">connection_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">connection_limit</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">pool_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">pool_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">pool_timeout</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">max_connection_lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">max_connection_lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">max_connection_lifetime</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">max_idle_connection_lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">max_idle_connection_lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">max_idle_connection_lifetime</span>
     }
 }
@@ -830,15 +830,15 @@
 <span class="kw">impl</span> <span class="ident">Mssql</span> {
     <span class="doccomment">/// Creates a new connection to SQL Server.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;new_connection&quot;</span>, <span class="ident">skip</span>(<span class="ident">url</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">url</span>: <span class="ident">MssqlUrl</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">url</span>: <span class="ident">MssqlUrl</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Config::from_jdbc_string</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">connection_string</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">tcp</span> <span class="op">=</span> <span class="ident">TcpStream::connect_named</span>(<span class="kw-2">&amp;</span><span class="ident">config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">socket_timeout</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">socket_timeout</span>();
 
         <span class="kw">let</span> <span class="ident">connecting</span> <span class="op">=</span> <span class="kw">async</span> {
             <span class="kw">match</span> <span class="ident">Client::connect</span>(<span class="ident">config</span>, <span class="ident">tcp</span>.<span class="ident">compat_write</span>()).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">client</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">client</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">tiberius::error::Error::Routing</span> { <span class="ident">host</span>, <span class="ident">port</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">client</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">client</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">tiberius::error::Error::Routing</span> { <span class="ident">host</span>, <span class="ident">port</span> }) =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Config::from_jdbc_string</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">connection_string</span>)<span class="question-mark">?</span>;
                     <span class="ident">config</span>.<span class="ident">host</span>(<span class="ident">host</span>);
                     <span class="ident">config</span>.<span class="ident">port</span>(<span class="ident">port</span>);
@@ -846,7 +846,7 @@
                     <span class="kw">let</span> <span class="ident">tcp</span> <span class="op">=</span> <span class="ident">TcpStream::connect_named</span>(<span class="kw-2">&amp;</span><span class="ident">config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                     <span class="ident">Client::connect</span>(<span class="ident">config</span>, <span class="ident">tcp</span>.<span class="ident">compat_write</span>()).<span class="kw">await</span>
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
             }
         };
 
@@ -867,34 +867,34 @@
         <span class="prelude-val">Ok</span>(<span class="ident">this</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">perform_io</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fut</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">perform_io</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fut</span>: <span class="ident">F</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">tiberius::error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
         <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::timeout::socket</span>(<span class="self">self</span>.<span class="ident">socket_timeout</span>, <span class="ident">fut</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is_closed</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is_closed</span>() =&gt; {
                 <span class="self">self</span>.<span class="ident">is_healthy</span>.<span class="ident">store</span>(<span class="bool-val">false</span>, <span class="ident">Ordering::SeqCst</span>);
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>)
             }
-            <span class="ident">res</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">res</span>,
+            <span class="ident">res</span> =&gt; <span class="ident">res</span>,
         }
     }
 }
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">Queryable</span> <span class="kw">for</span> <span class="ident">Mssql</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">visitor::Mssql::build</span>(<span class="ident">q</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>[..]).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">visitor::Mssql::build</span>(<span class="ident">q</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">execute_raw</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>[..]).<span class="kw">await</span>
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">params</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
         <span class="ident">metrics::query</span>(<span class="string">&quot;mssql.query_raw&quot;</span>, <span class="ident">sql</span>, <span class="ident">params</span>, <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">conversion::conv_params</span>(<span class="ident">params</span>)<span class="question-mark">?</span>;
@@ -903,7 +903,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">perform_io</span>(<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">into_results</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="kw">match</span> <span class="ident">results</span>.<span class="ident">pop</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">rows</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">rows</span>) =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns_set</span> <span class="op">=</span> <span class="bool-val">false</span>;
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result_rows</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">rows</span>.<span class="ident">len</span>());
@@ -925,14 +925,14 @@
 
                     <span class="prelude-val">Ok</span>(<span class="ident">ResultSet::new</span>(<span class="ident">columns</span>, <span class="ident">result_rows</span>))
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ResultSet::new</span>(<span class="ident">Vec::new</span>(), <span class="ident">Vec::new</span>())),
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ResultSet::new</span>(<span class="ident">Vec::new</span>(), <span class="ident">Vec::new</span>())),
             }
         })
         .<span class="kw">await</span>
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">params</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="ident">metrics::query</span>(<span class="string">&quot;mssql.execute_raw&quot;</span>, <span class="ident">sql</span>, <span class="ident">params</span>, <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">conversion::conv_params</span>(<span class="ident">params</span>)<span class="question-mark">?</span>;
@@ -946,7 +946,7 @@
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">metrics::query</span>(<span class="string">&quot;mssql.raw_cmd&quot;</span>, <span class="ident">cmd</span>, <span class="kw-2">&amp;</span>[], <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
             <span class="self">self</span>.<span class="ident">perform_io</span>(<span class="ident">client</span>.<span class="ident">simple_query</span>(<span class="ident">cmd</span>)).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">into_results</span>().<span class="kw">await</span><span class="question-mark">?</span>;
@@ -956,7 +956,7 @@
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="string">r#&quot;SELECT @@VERSION AS version&quot;#</span>;
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="ident">query</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -967,17 +967,17 @@
         <span class="prelude-val">Ok</span>(<span class="ident">version_string</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_healthy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_healthy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">is_healthy</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">begin_statement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">begin_statement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;BEGIN TRAN&quot;</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">MssqlUrl</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">jdbc_connection_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">jdbc_connection_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">query_params</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::parse_query_params</span>(<span class="ident">jdbc_connection_string</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">connection_string</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::with_jdbc_prefix</span>(<span class="ident">jdbc_connection_string</span>);
 
@@ -987,7 +987,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">with_jdbc_prefix</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">with_jdbc_prefix</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">starts_with</span>(<span class="string">&quot;jdbc:sqlserver&quot;</span>) {
             <span class="ident">input</span>.<span class="ident">into</span>()
         } <span class="kw">else</span> {
@@ -995,12 +995,12 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_query_params</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MssqlQueryParams</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_query_params</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">MssqlQueryParams</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">JdbcString::from_str</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::with_jdbc_prefix</span>(<span class="ident">input</span>))<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">server_name</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">server_name</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">instance_name</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">instance_name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">r#&quot;{}\{}&quot;#</span>, <span class="ident">server_name</span>, <span class="ident">instance_name</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">server_name</span>.<span class="ident">to_string</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">instance_name</span>) =&gt; <span class="macro">format!</span>(<span class="string">r#&quot;{}\{}&quot;#</span>, <span class="ident">server_name</span>, <span class="ident">instance_name</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">server_name</span>.<span class="ident">to_string</span>(),
         });
 
         <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">port</span>();
@@ -1033,9 +1033,9 @@
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">connect_timeout</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">connect_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">5</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="kw">if</span> <span class="ident">dur</span>.<span class="ident">as_secs</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">connect_timeout</span> <span class="op">=</span> <span class="prelude-val">None</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">connect_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">5</span>)),
+            <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="kw">if</span> <span class="ident">dur</span>.<span class="ident">as_secs</span>() <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">connect_timeout</span> <span class="op">=</span> <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; (),
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pool_timeout</span> <span class="op">=</span> <span class="ident">props</span>
@@ -1045,9 +1045,9 @@
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">pool_timeout</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pool_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="kw">if</span> <span class="ident">dur</span>.<span class="ident">as_secs</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pool_timeout</span> <span class="op">=</span> <span class="prelude-val">None</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">pool_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>)),
+            <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="kw">if</span> <span class="ident">dur</span>.<span class="ident">as_secs</span>() <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">pool_timeout</span> <span class="op">=</span> <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; (),
         }
 
         <span class="kw">let</span> <span class="ident">socket_timeout</span> <span class="op">=</span> <span class="ident">props</span>
@@ -1075,8 +1075,8 @@
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">max_connection_lifetime</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="kw">if</span> <span class="ident">dur</span>.<span class="ident">as_secs</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">max_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">None</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="kw">if</span> <span class="ident">dur</span>.<span class="ident">as_secs</span>() <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">max_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; (),
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_idle_connection_lifetime</span> <span class="op">=</span> <span class="ident">props</span>
@@ -1085,9 +1085,9 @@
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">max_idle_connection_lifetime</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">max_idle_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">300</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="kw">if</span> <span class="ident">dur</span>.<span class="ident">as_secs</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">max_idle_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">None</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">max_idle_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">300</span>)),
+            <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="kw">if</span> <span class="ident">dur</span>.<span class="ident">as_secs</span>() <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">max_idle_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; (),
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">MssqlQueryParams</span> {
@@ -1123,7 +1123,7 @@
         <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_err</span>());
 
         <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap_err</span>();
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">err</span>.<span class="ident">kind</span>(), <span class="ident">ErrorKind::AuthenticationFailed</span> { <span class="ident">user</span> } <span class="kw">if</span> <span class="ident">user</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Name::available</span>(<span class="string">&quot;WRONG&quot;</span>)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">err</span>.<span class="ident">kind</span>(), <span class="ident">ErrorKind::AuthenticationFailed</span> { <span class="ident">user</span> } <span class="kw">if</span> <span class="ident">user</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">Name::available</span>(<span class="string">&quot;WRONG&quot;</span>)));
     }
 }
 </code></pre></div>

@@ -131,7 +131,7 @@
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>};
 
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;debug_query_graph&quot;</span>, <span class="ident">skip</span>(<span class="ident">graph</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="ident">graph</span>: <span class="kw-2">&amp;</span><span class="ident">QueryGraph</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="ident">graph</span>: <span class="kw-2">&amp;</span><span class="ident">QueryGraph</span>) -&gt; <span class="ident">String</span> {
     <span class="macro">format!</span>(
         <span class="string">&quot;---- Query Graph ----\nResult Nodes: {}\nMarked Nodes: {}\nRoot Nodes: {}\n\n{}\n----------------------&quot;</span>,
         <span class="ident">fmt_raw_indices</span>(<span class="kw-2">&amp;</span><span class="ident">graph</span>.<span class="ident">result_nodes</span>),
@@ -141,7 +141,7 @@
     )
 }
 
-<span class="kw">fn</span> <span class="ident">stringify_nodes</span>(<span class="ident">graph</span>: <span class="kw-2">&amp;</span><span class="ident">QueryGraph</span>, <span class="ident">nodes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span>, <span class="ident">seen_nodes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">stringify_nodes</span>(<span class="ident">graph</span>: <span class="kw-2">&amp;</span><span class="ident">QueryGraph</span>, <span class="ident">nodes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span>, <span class="ident">seen_nodes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered_nodes</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
     <span class="kw">for</span> <span class="ident">node</span> <span class="kw">in</span> <span class="ident">nodes</span> {
@@ -182,72 +182,72 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Flow</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::If</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;(If (condition func)&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Return</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;(return projections)&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::If</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;(If (condition func)&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Return</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;(return projections)&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Computation</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Diff</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Diff&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Diff</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Diff&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Node</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Query</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">q</span>),
-            <span class="ident"><span class="self">Self</span>::Flow</span>(<span class="ident">flow</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">flow</span>),
-            <span class="ident"><span class="self">Self</span>::Computation</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">c</span>),
-            <span class="ident"><span class="self">Self</span>::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Empty&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Query</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">q</span>),
+            <span class="ident"><span class="self">Self</span>::Flow</span>(<span class="ident">flow</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">flow</span>),
+            <span class="ident"><span class="self">Self</span>::Computation</span>(<span class="ident">c</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">c</span>),
+            <span class="ident"><span class="self">Self</span>::Empty</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Empty&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">NodeRef</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Node {}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">QueryGraph</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">format</span>(<span class="self">self</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">QueryGraphDependency</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ExecutionOrder</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ExecutionOrder&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ParentResult</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ParentResult&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ParentProjection</span>(<span class="ident">projection</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ExecutionOrder</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ExecutionOrder&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::ParentResult</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ParentResult&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::ParentProjection</span>(<span class="ident">projection</span>, <span class="kw">_</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ParentProjection ({:?})&quot;</span>, <span class="ident">projection</span>.<span class="ident">names</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>())
             }
-            <span class="ident"><span class="self">Self</span>::Then</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Then&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Else</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Else&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Then</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Then&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Else</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Else&quot;</span>),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">fmt_raw_indices</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span>[<span class="ident">NodeIndex</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">fmt_raw_indices</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span>[<span class="ident">NodeIndex</span>]) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">refs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">node_ix</span><span class="op">|</span> <span class="ident">NodeRef</span> { <span class="ident">node_ix</span>: <span class="kw-2">*</span><span class="ident">node_ix</span> }).<span class="ident">collect</span>();
 
     <span class="ident">fmt_node_list</span>(<span class="kw-2">&amp;</span><span class="ident">refs</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">fmt_node_list</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span>[<span class="ident">NodeRef</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">fmt_node_list</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span>[<span class="ident">NodeRef</span>]) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">inner_string</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
 
     <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">inner_string</span>.<span class="ident">as_str</span>())
 }
 
-<span class="kw">fn</span> <span class="ident">fmt_node_tuples</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span>[(<span class="ident">NodeRef</span>, <span class="ident">NodeRef</span>)]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">fmt_node_tuples</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span>[(<span class="ident">NodeRef</span>, <span class="ident">NodeRef</span>)]) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">inner_string</span> <span class="op">=</span> <span class="ident">t</span>
         .<span class="ident">iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;({}, {})&quot;</span>, <span class="ident">x</span>.<span class="number">0</span>, <span class="ident">x</span>.<span class="number">1</span>))

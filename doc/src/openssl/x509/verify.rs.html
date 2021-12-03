@@ -244,7 +244,7 @@
     <span class="doccomment">/// This corresponds to [`X509_VERIFY_PARAM_set_flags`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`X509_VERIFY_PARAM_set_flags`]: https://www.openssl.org/docs/man1.0.2/crypto/X509_VERIFY_PARAM_set_flags.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_flags</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">X509VerifyFlags</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_flags</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">X509VerifyFlags</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="ident">cvt</span>(<span class="ident">ffi::X509_VERIFY_PARAM_set_flags</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">flags</span>.<span class="ident">bits</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()) }
     }
 
@@ -253,7 +253,7 @@
     <span class="doccomment">/// This corresponds to [`X509_VERIFY_PARAM_clear_flags`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`X509_VERIFY_PARAM_clear_flags`]: https://www.openssl.org/docs/man1.0.2/crypto/X509_VERIFY_PARAM_clear_flags.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_flags</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">X509VerifyFlags</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_flags</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">X509VerifyFlags</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">cvt</span>(<span class="ident">ffi::X509_VERIFY_PARAM_clear_flags</span>(
                 <span class="self">self</span>.<span class="ident">as_ptr</span>(),
@@ -268,7 +268,7 @@
     <span class="doccomment">/// This corresponds to [`X509_VERIFY_PARAM_get_flags`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`X509_VERIFY_PARAM_get_flags`]: https://www.openssl.org/docs/man1.0.2/crypto/X509_VERIFY_PARAM_get_flags.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">X509VerifyFlags</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">X509VerifyFlags</span> {
         <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::X509_VERIFY_PARAM_get_flags</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) };
         <span class="ident">X509VerifyFlags</span> { <span class="ident">bits</span> }
     }
@@ -278,7 +278,7 @@
     <span class="doccomment">/// This corresponds to [`X509_VERIFY_PARAM_set1_host`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`X509_VERIFY_PARAM_set1_host`]: https://www.openssl.org/docs/man1.1.0/crypto/X509_VERIFY_PARAM_set1_host.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_host</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_host</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">cvt</span>(<span class="ident">ffi::X509_VERIFY_PARAM_set1_host</span>(
                 <span class="self">self</span>.<span class="ident">as_ptr</span>(),
@@ -294,15 +294,15 @@
     <span class="doccomment">/// This corresponds to [`X509_VERIFY_PARAM_set1_ip`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`X509_VERIFY_PARAM_set1_ip`]: https://www.openssl.org/docs/man1.1.0/crypto/X509_VERIFY_PARAM_set1_ip.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_ip</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ip</span>: <span class="ident">IpAddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_ip</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ip</span>: <span class="ident">IpAddr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">16</span>];
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ip</span> {
-                <span class="ident">IpAddr::V4</span>(<span class="ident">addr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">IpAddr::V4</span>(<span class="ident">addr</span>) =&gt; {
                     <span class="ident">buf</span>[..<span class="number">4</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">octets</span>());
                     <span class="number">4</span>
                 }
-                <span class="ident">IpAddr::V6</span>(<span class="ident">addr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">IpAddr::V6</span>(<span class="ident">addr</span>) =&gt; {
                     <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">octets</span>());
                     <span class="number">16</span>
                 }

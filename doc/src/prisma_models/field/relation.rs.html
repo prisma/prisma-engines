@@ -315,11 +315,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RelationField</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">arity</span>, <span class="ident">FieldArity::List</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">arity</span>, <span class="ident">FieldArity::Required</span>)
     }
 
@@ -331,7 +331,7 @@
     <span class="doccomment">/// In case of a many-to-many relation field, we can make the assumption that the primary identifier of the enclosing model</span>
     <span class="doccomment">/// is the set of linking fields, as this is how Prisma many-to-many works and we only support implicit join tables (i.e. m:n)</span>
     <span class="doccomment">/// in the Prisma style.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">linking_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelProjection</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">linking_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelProjection</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">is_many_to_many</span>() {
             <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>()
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">references</span>.<span class="ident">is_empty</span>() {
@@ -362,17 +362,17 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_optional</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_optional</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">is_required</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelRef</span> {
         <span class="self">self</span>.<span class="ident">model</span>
             .<span class="ident">upgrade</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;Model does not exist anymore. Parent model got deleted without deleting the child.&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>();
             <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>();
@@ -394,7 +394,7 @@
         <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">upgrade</span>().<span class="ident">unwrap</span>()).<span class="ident">collect</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationRef</span> {
         <span class="self">self</span>.<span class="ident">relation</span>
             .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="self">self</span>.<span class="ident">model</span>()
@@ -407,58 +407,58 @@
     }
 
     <span class="doccomment">/// Alias for more clarity (in most cases, doesn&#39;t add more clarity for self-relations);</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_inlined_on_enclosing_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_inlined_on_enclosing_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">relation_is_inlined_in_parent</span>()
     }
 
     <span class="doccomment">/// Inlined in self / model of self</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_is_inlined_in_parent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_is_inlined_in_parent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">relation</span>();
 
         <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">manifestation</span> {
-            <span class="ident">RelationLinkManifestation::Inline</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RelationLinkManifestation::Inline</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">is_self_rel</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">is_self_relation</span>();
 
                 <span class="kw">if</span> <span class="ident">is_self_rel</span> {
                     <span class="op">!</span><span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">references</span>.<span class="ident">is_empty</span>()
                 } <span class="kw">else</span> {
-                    <span class="ident">m</span>.<span class="ident">in_table_of_model_name</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>
+                    <span class="ident">m</span>.<span class="ident">in_table_of_model_name</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_is_inlined_in_child</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_is_inlined_in_child</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">is_inline_relation</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">relation_is_inlined_in_parent</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">related_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">related_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelRef</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">relation_side</span> {
-            <span class="ident">RelationSide::A</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">model_b</span>(),
-            <span class="ident">RelationSide::B</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">model_a</span>(),
+            <span class="ident">RelationSide::A</span> =&gt; <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">model_b</span>(),
+            <span class="ident">RelationSide::B</span> =&gt; <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">model_a</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">related_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">related_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">relation_side</span> {
-            <span class="ident">RelationSide::A</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">field_b</span>(),
-            <span class="ident">RelationSide::B</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">field_a</span>(),
+            <span class="ident">RelationSide::A</span> =&gt; <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">field_b</span>(),
+            <span class="ident">RelationSide::B</span> =&gt; <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">field_a</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_relation_with_name_and_side</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">relation_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">side</span>: <span class="ident">RelationSide</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">relation_name</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_side</span> <span class="op">=</span><span class="op">=</span> <span class="ident">side</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_relation_with_name_and_side</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">relation_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">side</span>: <span class="ident">RelationSide</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">name</span> <span class="op">==</span> <span class="ident">relation_name</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_side</span> <span class="op">==</span> <span class="ident">side</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_identifiers_with_arities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TypeIdentifier</span>, <span class="ident">FieldArity</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_identifiers_with_arities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TypeIdentifier</span>, <span class="ident">FieldArity</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">scalar_fields</span>()
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">type_identifier_with_arity</span>())
             .<span class="ident">collect</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">relation_info</span>
             .<span class="ident">references</span>
             .<span class="ident">iter</span>()
@@ -468,7 +468,7 @@
 
     <span class="comment">// Scalar fields on the left (source) side of the relation if starting traversal from `self`.</span>
     <span class="comment">// Todo This is provisionary.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">left_scalars</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">left_scalars</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">is_many_to_many</span>() {
             <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>().<span class="ident">scalar_fields</span>().<span class="ident">collect</span>()
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
@@ -480,7 +480,7 @@
 
     <span class="comment">// Scalar fields on the right (target) side of the relation if starting traversal from `self`.</span>
     <span class="comment">// Todo This is provisionary.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">right_scalars</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">right_scalars</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">is_many_to_many</span>() {
             <span class="kw">let</span> <span class="ident">related_field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">related_field</span>();
             <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">related_model</span>();
@@ -502,21 +502,21 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">scalar_fields</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span>.<span class="ident">as_ref</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">on_update</span>.<span class="ident">as_ref</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RelationField&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
             .<span class="ident">field</span>(<span class="string">&quot;arity&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">arity</span>)
@@ -543,12 +543,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">name</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">arity</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">arity</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">relation_name</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_side</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">relation_side</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">model</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">model</span>()
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">arity</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">arity</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">relation_name</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">relation_side</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">relation_side</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">model</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">model</span>()
     }
 }
 
@@ -559,19 +559,19 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RelationSide</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opposite</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationSide</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opposite</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationSide</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelationSide::A</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RelationSide::B</span>,
-            <span class="ident">RelationSide::B</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RelationSide::A</span>,
+            <span class="ident">RelationSide::A</span> =&gt; <span class="ident">RelationSide::B</span>,
+            <span class="ident">RelationSide::B</span> =&gt; <span class="ident">RelationSide::A</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_a</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RelationSide::A</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_a</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span> <span class="op">==</span> <span class="ident">RelationSide::A</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_b</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RelationSide::B</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_b</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span> <span class="op">==</span> <span class="ident">RelationSide::B</span>
     }
 }
 </code></pre></div>

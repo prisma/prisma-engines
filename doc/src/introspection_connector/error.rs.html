@@ -87,14 +87,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_kind</span>(<span class="ident">kind</span>: <span class="ident">ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_kind</span>(<span class="ident">kind</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ConnectorError</span> {
             <span class="ident">user_facing_error</span>: <span class="prelude-val">None</span>,
             <span class="ident">kind</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_facing_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">KnownError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_facing_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">KnownError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">user_facing_error</span>.<span class="ident">as_ref</span>()
     }
 }

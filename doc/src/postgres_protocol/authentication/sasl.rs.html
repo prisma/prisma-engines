@@ -491,19 +491,19 @@
 <span class="comment">// since postgres passwords are not required to exclude saslprep-prohibited</span>
 <span class="comment">// characters or even be valid UTF8, we run saslprep if possible and otherwise</span>
 <span class="comment">// return the raw password.</span>
-<span class="kw">fn</span> <span class="ident">normalize</span>(<span class="ident">pass</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">normalize</span>(<span class="ident">pass</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">pass</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">str::from_utf8</span>(<span class="ident">pass</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">pass</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pass</span>,
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">pass</span>.<span class="ident">to_vec</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">pass</span>) =&gt; <span class="ident">pass</span>,
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">pass</span>.<span class="ident">to_vec</span>(),
     };
 
     <span class="kw">match</span> <span class="ident">stringprep::saslprep</span>(<span class="ident">pass</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">pass</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pass</span>.<span class="ident">into_owned</span>().<span class="ident">into_bytes</span>(),
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pass</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">pass</span>) =&gt; <span class="ident">pass</span>.<span class="ident">into_owned</span>().<span class="ident">into_bytes</span>(),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">pass</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">hi</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">i</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">hi</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">i</span>: <span class="ident">u32</span>) -&gt; [<span class="ident">u8</span>; <span class="number">32</span>] {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hmac</span> <span class="op">=</span> <span class="ident">Hmac</span>::<span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span><span class="ident">::new_varkey</span>(<span class="ident">str</span>).<span class="ident">expect</span>(<span class="string">&quot;HMAC is able to accept all key sizes&quot;</span>);
     <span class="ident">hmac</span>.<span class="ident">update</span>(<span class="ident">salt</span>);
     <span class="ident">hmac</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>]);
@@ -535,33 +535,33 @@
 
 <span class="kw">impl</span> <span class="ident">ChannelBinding</span> {
     <span class="doccomment">/// The server did not request channel binding.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unrequested</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ChannelBinding</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unrequested</span>() -&gt; <span class="ident">ChannelBinding</span> {
         <span class="ident">ChannelBinding</span>(<span class="ident">ChannelBindingInner::Unrequested</span>)
     }
 
     <span class="doccomment">/// The server requested channel binding but the client is unable to provide it.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unsupported</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ChannelBinding</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unsupported</span>() -&gt; <span class="ident">ChannelBinding</span> {
         <span class="ident">ChannelBinding</span>(<span class="ident">ChannelBindingInner::Unsupported</span>)
     }
 
     <span class="doccomment">/// The server requested channel binding and the client will use the `tls-server-end-point`</span>
     <span class="doccomment">/// method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tls_server_end_point</span>(<span class="ident">signature</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ChannelBinding</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tls_server_end_point</span>(<span class="ident">signature</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">ChannelBinding</span> {
         <span class="ident">ChannelBinding</span>(<span class="ident">ChannelBindingInner::TlsServerEndPoint</span>(<span class="ident">signature</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">gs2_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">gs2_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">ChannelBindingInner::Unrequested</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;y,,&quot;</span>,
-            <span class="ident">ChannelBindingInner::Unsupported</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;n,,&quot;</span>,
-            <span class="ident">ChannelBindingInner::TlsServerEndPoint</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;p=tls-server-end-point,,&quot;</span>,
+            <span class="ident">ChannelBindingInner::Unrequested</span> =&gt; <span class="string">&quot;y,,&quot;</span>,
+            <span class="ident">ChannelBindingInner::Unsupported</span> =&gt; <span class="string">&quot;n,,&quot;</span>,
+            <span class="ident">ChannelBindingInner::TlsServerEndPoint</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;p=tls-server-end-point,,&quot;</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">cbind_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">cbind_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">ChannelBindingInner::Unrequested</span> <span class="op">|</span> <span class="ident">ChannelBindingInner::Unsupported</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[],
-            <span class="ident">ChannelBindingInner::TlsServerEndPoint</span>(<span class="kw-2">ref</span> <span class="ident">buf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">buf</span>,
+            <span class="ident">ChannelBindingInner::Unrequested</span> <span class="op">|</span> <span class="ident">ChannelBindingInner::Unsupported</span> =&gt; <span class="kw-2">&amp;</span>[],
+            <span class="ident">ChannelBindingInner::TlsServerEndPoint</span>(<span class="kw-2">ref</span> <span class="ident">buf</span>) =&gt; <span class="ident">buf</span>,
         }
     }
 }
@@ -601,13 +601,13 @@
 
 <span class="kw">impl</span> <span class="ident">ScramSha256</span> {
     <span class="doccomment">/// Constructs a new instance which will use the provided password for authentication.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">channel_binding</span>: <span class="ident">ChannelBinding</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ScramSha256</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">channel_binding</span>: <span class="ident">ChannelBinding</span>) -&gt; <span class="ident">ScramSha256</span> {
         <span class="comment">// rand 0.5&#39;s ThreadRng is cryptographically secure</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();
         <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">NONCE_LENGTH</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">gen_range</span>(<span class="number">0x21u8</span>..<span class="number">0x7e</span>);
-                <span class="kw">if</span> <span class="ident">v</span> <span class="op">=</span><span class="op">=</span> <span class="number">0x2c</span> {
+                <span class="kw">if</span> <span class="ident">v</span> <span class="op">==</span> <span class="number">0x2c</span> {
                     <span class="ident">v</span> <span class="op">=</span> <span class="number">0x7e</span>
                 }
                 <span class="ident">v</span> <span class="kw">as</span> <span class="ident">char</span>
@@ -617,7 +617,7 @@
         <span class="ident">ScramSha256::new_inner</span>(<span class="ident">password</span>, <span class="ident">channel_binding</span>, <span class="ident">nonce</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">new_inner</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">channel_binding</span>: <span class="ident">ChannelBinding</span>, <span class="ident">nonce</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ScramSha256</span> {
+    <span class="kw">fn</span> <span class="ident">new_inner</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">channel_binding</span>: <span class="ident">ChannelBinding</span>, <span class="ident">nonce</span>: <span class="ident">String</span>) -&gt; <span class="ident">ScramSha256</span> {
         <span class="ident">ScramSha256</span> {
             <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{}n=,r={}&quot;</span>, <span class="ident">channel_binding</span>.<span class="ident">gs2_header</span>(), <span class="ident">nonce</span>),
             <span class="ident">state</span>: <span class="ident">State::Update</span> {
@@ -629,7 +629,7 @@
     }
 
     <span class="doccomment">/// Returns the message which should be sent to the backend in an `SASLResponse` message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State::Done</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;invalid SCRAM state&quot;</span>);
         }
@@ -639,15 +639,15 @@
     <span class="doccomment">/// Updates the state machine with the response from the backend.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should be called when an `AuthenticationSASLContinue` message is received.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">client_nonce</span>, <span class="ident">password</span>, <span class="ident">channel_binding</span>) <span class="op">=</span>
             <span class="kw">match</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="ident">State::Done</span>) {
                 <span class="ident">State::Update</span> {
                     <span class="ident">nonce</span>,
                     <span class="ident">password</span>,
                     <span class="ident">channel_binding</span>,
-                } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">nonce</span>, <span class="ident">password</span>, <span class="ident">channel_binding</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;invalid SCRAM state&quot;</span>)),
+                } =&gt; (<span class="ident">nonce</span>, <span class="ident">password</span>, <span class="ident">channel_binding</span>),
+                <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;invalid SCRAM state&quot;</span>)),
             };
 
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span>
@@ -660,8 +660,8 @@
         }
 
         <span class="kw">let</span> <span class="ident">salt</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">base64::decode</span>(<span class="ident">parsed</span>.<span class="ident">salt</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">salt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">salt</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="ident">e</span>)),
+            <span class="prelude-val">Ok</span>(<span class="ident">salt</span>) =&gt; <span class="ident">salt</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="ident">e</span>)),
         };
 
         <span class="kw">let</span> <span class="ident">salted_password</span> <span class="op">=</span> <span class="ident">hi</span>(<span class="kw-2">&amp;</span><span class="ident">password</span>, <span class="kw-2">&amp;</span><span class="ident">salt</span>, <span class="ident">parsed</span>.<span class="ident">iteration_count</span>);
@@ -708,13 +708,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should be called when the backend sends an `AuthenticationSASLFinal` message.</span>
     <span class="doccomment">/// Authentication has only succeeded if this method returns `Ok(())`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">salted_password</span>, <span class="ident">auth_message</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="ident">State::Done</span>) {
             <span class="ident">State::Finish</span> {
                 <span class="ident">salted_password</span>,
                 <span class="ident">auth_message</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">salted_password</span>, <span class="ident">auth_message</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;invalid SCRAM state&quot;</span>)),
+            } =&gt; (<span class="ident">salted_password</span>, <span class="ident">auth_message</span>),
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;invalid SCRAM state&quot;</span>)),
         };
 
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span>
@@ -723,18 +723,18 @@
         <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="ident">Parser::new</span>(<span class="ident">message</span>).<span class="ident">server_final_message</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">verifier</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parsed</span> {
-            <span class="ident">ServerFinalMessage::Error</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ServerFinalMessage::Error</span>(<span class="ident">e</span>) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                     <span class="ident">io::ErrorKind::Other</span>,
                     <span class="macro">format!</span>(<span class="string">&quot;SCRAM error: {}&quot;</span>, <span class="ident">e</span>),
                 ));
             }
-            <span class="ident">ServerFinalMessage::Verifier</span>(<span class="ident">verifier</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">verifier</span>,
+            <span class="ident">ServerFinalMessage::Verifier</span>(<span class="ident">verifier</span>) =&gt; <span class="ident">verifier</span>,
         };
 
         <span class="kw">let</span> <span class="ident">verifier</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">base64::decode</span>(<span class="ident">verifier</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">verifier</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">verifier</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="ident">e</span>)),
+            <span class="prelude-val">Ok</span>(<span class="ident">verifier</span>) =&gt; <span class="ident">verifier</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="ident">e</span>)),
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hmac</span> <span class="op">=</span> <span class="ident">Hmac</span>::<span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span><span class="ident">::new_varkey</span>(<span class="kw-2">&amp;</span><span class="ident">salted_password</span>)
@@ -756,93 +756,93 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">Parser</span> {
             <span class="ident">s</span>,
             <span class="ident">it</span>: <span class="ident">s</span>.<span class="ident">char_indices</span>().<span class="ident">peekable</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">char</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">c</span>)) <span class="kw">if</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="ident">target</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">c</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">c</span>)) <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="ident">target</span> =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">c</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="macro">format!</span>(
                     <span class="string">&quot;unexpected character at byte {}: expected `{}` but got `{}&quot;</span>,
                     <span class="ident">i</span>, <span class="ident">target</span>, <span class="ident">c</span>
                 );
                 <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="ident">m</span>))
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                 <span class="ident">io::ErrorKind::UnexpectedEof</span>,
                 <span class="string">&quot;unexpected EOF&quot;</span>,
             )),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">take_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">take_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">char</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">peek</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="ident">i</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>),
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="ident">i</span>, <span class="kw">_</span>)) =&gt; <span class="ident">i</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>),
         };
 
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">peek</span>() {
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">c</span>)) <span class="kw">if</span> <span class="ident">f</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">c</span>)) <span class="kw">if</span> <span class="ident">f</span>(<span class="ident">c</span>) =&gt; {
                     <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>();
                 }
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="ident">i</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">s</span>[<span class="ident">start</span>..<span class="ident">i</span>]),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">s</span>[<span class="ident">start</span>..]),
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="ident">i</span>, <span class="kw">_</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">s</span>[<span class="ident">start</span>..<span class="ident">i</span>]),
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">s</span>[<span class="ident">start</span>..]),
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">printable</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">printable</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">c</span>, <span class="string">&#39;\x21&#39;</span>..<span class="op">=</span><span class="string">&#39;\x2b&#39;</span> <span class="op">|</span> <span class="string">&#39;\x2d&#39;</span>..<span class="op">=</span><span class="string">&#39;\x7e&#39;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">nonce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">nonce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">eat</span>(<span class="string">&#39;r&#39;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">eat</span>(<span class="string">&#39;=&#39;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">printable</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">base64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">base64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">c</span>, <span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span> <span class="op">|</span> <span class="string">&#39;A&#39;</span>..<span class="op">=</span><span class="string">&#39;Z&#39;</span> <span class="op">|</span> <span class="string">&#39;0&#39;</span>..<span class="op">=</span><span class="string">&#39;9&#39;</span> <span class="op">|</span> <span class="string">&#39;/&#39;</span> <span class="op">|</span> <span class="string">&#39;+&#39;</span> <span class="op">|</span> <span class="string">&#39;=&#39;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">salt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">salt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">eat</span>(<span class="string">&#39;s&#39;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">eat</span>(<span class="string">&#39;=&#39;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">base64</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">posit_number</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">posit_number</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">c</span>, <span class="string">&#39;0&#39;</span>..<span class="op">=</span><span class="string">&#39;9&#39;</span>))<span class="question-mark">?</span>;
         <span class="ident">n</span>.<span class="ident">parse</span>()
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="ident">e</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">iteration_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">iteration_count</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">eat</span>(<span class="string">&#39;i&#39;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">eat</span>(<span class="string">&#39;=&#39;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">posit_number</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">eof</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">eof</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">peek</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="ident">i</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="ident">i</span>, <span class="kw">_</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                 <span class="ident">io::ErrorKind::InvalidInput</span>,
                 <span class="macro">format!</span>(<span class="string">&quot;unexpected trailing data at byte {}&quot;</span>, <span class="ident">i</span>),
             )),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">server_first_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ServerFirstMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">server_first_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ServerFirstMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">nonce</span>()<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">eat</span>(<span class="string">&#39;,&#39;</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">salt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">salt</span>()<span class="question-mark">?</span>;
@@ -857,14 +857,14 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">c</span>, <span class="string">&#39;\0&#39;</span> <span class="op">|</span> <span class="string">&#39;=&#39;</span> <span class="op">|</span> <span class="string">&#39;,&#39;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">server_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">server_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">peek</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="string">&#39;e&#39;</span>)) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="string">&#39;e&#39;</span>)) =&gt; {}
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
 
         <span class="self">self</span>.<span class="ident">eat</span>(<span class="string">&#39;e&#39;</span>)<span class="question-mark">?</span>;
@@ -872,16 +872,16 @@
         <span class="self">self</span>.<span class="ident">value</span>().<span class="ident">map</span>(<span class="prelude-val">Some</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">verifier</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">verifier</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">eat</span>(<span class="string">&#39;v&#39;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">eat</span>(<span class="string">&#39;=&#39;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">base64</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">server_final_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ServerFinalMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">server_final_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ServerFinalMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">server_error</span>()<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ServerFinalMessage::Error</span>(<span class="ident">error</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ServerFinalMessage::Verifier</span>(<span class="self">self</span>.<span class="ident">verifier</span>()<span class="question-mark">?</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">error</span>) =&gt; <span class="ident">ServerFinalMessage::Error</span>(<span class="ident">error</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">ServerFinalMessage::Verifier</span>(<span class="self">self</span>.<span class="ident">verifier</span>()<span class="question-mark">?</span>),
         };
         <span class="self">self</span>.<span class="ident">eof</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">message</span>)

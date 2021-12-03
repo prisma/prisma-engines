@@ -171,43 +171,43 @@
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ConvIr</span>, <span class="ident">FromValue</span>, <span class="ident">FromValueError</span>, <span class="ident">ParseIr</span>, <span class="ident">Value</span>};
 
 <span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">v</span> {
-            <span class="ident">Value::Int</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
+            <span class="ident">Value::Int</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
                 <span class="ident">value</span>: <span class="ident">Value::Int</span>(<span class="ident">x</span>),
                 <span class="ident">output</span>: <span class="ident">x</span>.<span class="ident">into</span>(),
             }),
-            <span class="ident">Value::UInt</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
+            <span class="ident">Value::UInt</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
                 <span class="ident">value</span>: <span class="ident">Value::UInt</span>(<span class="ident">x</span>),
                 <span class="ident">output</span>: <span class="ident">x</span>.<span class="ident">into</span>(),
             }),
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">BigInt::parse_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>, <span class="number">10</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
+            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; <span class="kw">match</span> <span class="ident">BigInt::parse_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>, <span class="number">10</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
                     <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>),
                     <span class="ident">output</span>: <span class="ident">x</span>,
                 }),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
             },
-            <span class="ident">v</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BigInt</span> {
+    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">BigInt</span> {
         <span class="self">self</span>.<span class="ident">output</span>
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span> {
+    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
         <span class="self">self</span>.<span class="ident">value</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FromValue</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
     <span class="kw">type</span> <span class="ident">Intermediate</span> <span class="op">=</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">v</span>: <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BigInt</span> {
+    <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="ident">BigInt</span> {
         <span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="ident">::from_value_opt</span>(<span class="ident">v</span>).<span class="ident">expect</span>(<span class="string">&quot;Could not retrieve BigInt from Value&quot;</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">BigInt</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">BigInt</span>) -&gt; <span class="ident">Value</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">x</span>.<span class="ident">to_i64</span>() {
             <span class="ident">Value::Int</span>(<span class="ident">x</span>)
         } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">x</span>.<span class="ident">to_u64</span>() {
@@ -219,9 +219,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">v</span> {
-            <span class="ident">Value::Int</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Int</span>(<span class="ident">x</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parsed</span>) <span class="op">=</span> <span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="ident">::from_i64</span>(<span class="ident">x</span>) {
                     <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
                         <span class="ident">value</span>: <span class="ident">Value::Int</span>(<span class="ident">x</span>),
@@ -231,37 +231,37 @@
                     <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Int</span>(<span class="ident">x</span>)))
                 }
             }
-            <span class="ident">Value::UInt</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
+            <span class="ident">Value::UInt</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
                 <span class="ident">value</span>: <span class="ident">Value::UInt</span>(<span class="ident">x</span>),
                 <span class="ident">output</span>: <span class="ident">x</span>.<span class="ident">into</span>(),
             }),
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">BigUint::parse_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>, <span class="number">10</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
+            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; <span class="kw">match</span> <span class="ident">BigUint::parse_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>, <span class="number">10</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
                     <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>),
                     <span class="ident">output</span>: <span class="ident">x</span>,
                 }),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
             },
-            <span class="ident">v</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BigUint</span> {
+    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">BigUint</span> {
         <span class="self">self</span>.<span class="ident">output</span>
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span> {
+    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
         <span class="self">self</span>.<span class="ident">value</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FromValue</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
     <span class="kw">type</span> <span class="ident">Intermediate</span> <span class="op">=</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">v</span>: <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BigUint</span> {
+    <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="ident">BigUint</span> {
         <span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="ident">::from_value_opt</span>(<span class="ident">v</span>).<span class="ident">expect</span>(<span class="string">&quot;Could not retrieve BigUint from Value&quot;</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">BigUint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">Value</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">x</span>.<span class="ident">to_u64</span>() {
             <span class="ident">Value::UInt</span>(<span class="ident">x</span>)
         } <span class="kw">else</span> {

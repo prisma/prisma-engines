@@ -807,9 +807,9 @@
 
 <span class="kw">impl</span> <span class="ident">Topology</span> {
     <span class="doccomment">/// Creates a new Topology given the `options`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="ident">ClientOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="ident">ClientOptions</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">TopologyDescription::new</span>(<span class="ident">options</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">is_load_balanced</span> <span class="op">=</span> <span class="ident">description</span>.<span class="ident">topology_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">TopologyType::LoadBalanced</span>;
+        <span class="kw">let</span> <span class="ident">is_load_balanced</span> <span class="op">=</span> <span class="ident">description</span>.<span class="ident">topology_type</span>() <span class="op">==</span> <span class="ident">TopologyType::LoadBalanced</span>;
 
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">ObjectId::new</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">handler</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">sdam_event_handler</span> {
@@ -897,17 +897,17 @@
 
     <span class="doccomment">/// Gets the addresses of the servers in the cluster.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">servers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">servers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">servers</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TopologyDescription</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyDescription</span> {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">description</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Creates and returns a weak reference to the topology.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">WeakTopology</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">WeakTopology</span> {
         <span class="ident">WeakTopology</span> {
             <span class="ident">state</span>: <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>),
             <span class="ident">common</span>: <span class="self">self</span>.<span class="ident">common</span>.<span class="ident">clone</span>(),
@@ -922,7 +922,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">attempt_to_select_server</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">criteria</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectedServer</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectedServer</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">topology_state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">read</span>().<span class="kw">await</span>;
 
         <span class="ident">server_selection::attempt_to_select_server</span>(
@@ -936,7 +936,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">server_selection_timeout_error_message</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">criteria</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    ) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">state</span>
             .<span class="ident">read</span>()
             .<span class="kw">await</span>
@@ -950,14 +950,14 @@
     }
 
     <span class="doccomment">/// Subscribe to notifications of requests to perform a server check.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">subscribe_to_topology_check_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TopologyMessageSubscriber</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">subscribe_to_topology_check_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyMessageSubscriber</span> {
         <span class="self">self</span>.<span class="ident">common</span>
             .<span class="ident">message_manager</span>
             .<span class="ident">subscribe_to_topology_check_requests</span>()
     }
 
     <span class="doccomment">/// Subscribe to notifications that the topology has been updated.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">subscribe_to_topology_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TopologyMessageSubscriber</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">subscribe_to_topology_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyMessageSubscriber</span> {
         <span class="self">self</span>.<span class="ident">common</span>.<span class="ident">message_manager</span>.<span class="ident">subscribe_to_topology_changes</span>()
     }
 
@@ -971,32 +971,32 @@
         <span class="ident">error</span>: <span class="ident">Error</span>,
         <span class="ident">handshake</span>: <span class="ident">HandshakePhase</span>,
         <span class="ident">server</span>: <span class="kw-2">&amp;</span><span class="ident">Server</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    ) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">state_lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">write</span>().<span class="kw">await</span>;
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">handshake</span> {
-            <span class="ident">HandshakePhase::PreHello</span> { <span class="ident">generation</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">HandshakePhase::PreHello</span> { <span class="ident">generation</span> } =&gt; {
                 <span class="kw">match</span> (<span class="ident">generation</span>, <span class="ident">server</span>.<span class="ident">pool</span>.<span class="ident">generation</span>()) {
-                    (<span class="ident">PoolGeneration::Normal</span>(<span class="ident">hgen</span>), <span class="ident">PoolGeneration::Normal</span>(<span class="ident">sgen</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="ident">PoolGeneration::Normal</span>(<span class="ident">hgen</span>), <span class="ident">PoolGeneration::Normal</span>(<span class="ident">sgen</span>)) =&gt; {
                         <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">hgen</span> <span class="op">&lt;</span> <span class="ident">sgen</span> {
                             <span class="kw">return</span> <span class="bool-val">false</span>;
                         }
                     }
                     <span class="comment">// Pre-hello handshake errors are ignored in load-balanced mode.</span>
-                    (<span class="ident">PoolGeneration::LoadBalanced</span>(<span class="kw">_</span>), <span class="ident">PoolGeneration::LoadBalanced</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="ident">PoolGeneration::LoadBalanced</span>(<span class="kw">_</span>), <span class="ident">PoolGeneration::LoadBalanced</span>(<span class="kw">_</span>)) =&gt; {
                         <span class="kw">return</span> <span class="bool-val">false</span>
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">load_balanced_mode_mismatch!</span>(<span class="bool-val">false</span>),
+                    <span class="kw">_</span> =&gt; <span class="macro">load_balanced_mode_mismatch!</span>(<span class="bool-val">false</span>),
                 }
             }
             <span class="ident">HandshakePhase::PostHello</span> { <span class="ident">generation</span> }
-            <span class="op">|</span> <span class="ident">HandshakePhase::AfterCompletion</span> { <span class="ident">generation</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="op">|</span> <span class="ident">HandshakePhase::AfterCompletion</span> { <span class="ident">generation</span>, .. } =&gt; {
                 <span class="kw">if</span> <span class="ident">generation</span>.<span class="ident">is_stale</span>(<span class="kw-2">&amp;</span><span class="ident">server</span>.<span class="ident">pool</span>.<span class="ident">generation</span>()) {
                     <span class="kw">return</span> <span class="bool-val">false</span>;
                 }
             }
         }
 
-        <span class="kw">let</span> <span class="ident">is_load_balanced</span> <span class="op">=</span> <span class="ident">state_lock</span>.<span class="ident">description</span>.<span class="ident">topology_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">TopologyType::LoadBalanced</span>;
+        <span class="kw">let</span> <span class="ident">is_load_balanced</span> <span class="op">=</span> <span class="ident">state_lock</span>.<span class="ident">description</span>.<span class="ident">topology_type</span>() <span class="op">==</span> <span class="ident">TopologyType::LoadBalanced</span>;
         <span class="kw">if</span> <span class="ident">error</span>.<span class="ident">is_state_change_error</span>() {
             <span class="kw">let</span> <span class="ident">updated</span> <span class="op">=</span> <span class="ident">is_load_balanced</span>
                 <span class="op">|</span><span class="op">|</span> <span class="self">self</span>
@@ -1028,7 +1028,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_monitor_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">error</span>: <span class="ident">Error</span>, <span class="ident">server</span>: <span class="kw-2">&amp;</span><span class="ident">Server</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_monitor_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">error</span>: <span class="ident">Error</span>, <span class="ident">server</span>: <span class="kw-2">&amp;</span><span class="ident">Server</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">state_lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">write</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">updated</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">mark_server_as_unknown</span>(<span class="ident">error</span>.<span class="ident">to_string</span>(), <span class="ident">server</span>, <span class="ident">state_lock</span>)
@@ -1048,7 +1048,7 @@
         <span class="ident">error</span>: <span class="ident">String</span>,
         <span class="ident">server</span>: <span class="kw-2">&amp;</span><span class="ident">Server</span>,
         <span class="ident">state_lock</span>: <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">TopologyState</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    ) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">ServerDescription::new</span>(<span class="ident">server</span>.<span class="ident">address</span>.<span class="ident">clone</span>(), <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">error</span>)));
         <span class="self">self</span>.<span class="ident">update_and_notify</span>(<span class="ident">server</span>, <span class="ident">description</span>, <span class="ident">state_lock</span>)
             .<span class="kw">await</span>
@@ -1065,7 +1065,7 @@
         <span class="ident">server</span>: <span class="kw-2">&amp;</span><span class="ident">Server</span>,
         <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
         <span class="kw-2">mut</span> <span class="ident">state_lock</span>: <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">TopologyState</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    ) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">server_type</span> <span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">server_type</span>;
         <span class="comment">// TODO RUST-580: Theoretically, `TopologyDescription::update` can return an error. However,</span>
         <span class="comment">// this can only happen if we try to access a field from the isMaster response when an error</span>
@@ -1074,16 +1074,16 @@
         <span class="comment">// descriptions when errors occur. Once we implement logging, we can properly inform users</span>
         <span class="comment">// of errors that occur here.</span>
         <span class="kw">match</span> <span class="ident">state_lock</span>.<span class="ident">update</span>(<span class="ident">server_description</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">common</span>.<span class="ident">options</span>, <span class="self">self</span>.<span class="ident">downgrade</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">server_type</span>.<span class="ident">is_data_bearing</span>()
                     <span class="op">|</span><span class="op">|</span> (<span class="ident">server_type</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ServerType::Unknown</span>
-                        <span class="op">&amp;&amp;</span> <span class="ident">state_lock</span>.<span class="ident">description</span>.<span class="ident">topology_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">TopologyType::Single</span>)
+                        <span class="op">&amp;&amp;</span> <span class="ident">state_lock</span>.<span class="ident">description</span>.<span class="ident">topology_type</span>() <span class="op">==</span> <span class="ident">TopologyType::Single</span>)
                 {
                     <span class="ident">server</span>.<span class="ident">pool</span>.<span class="ident">mark_as_ready</span>().<span class="kw">await</span>;
                 }
                 <span class="bool-val">true</span>
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
@@ -1095,7 +1095,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">server</span>: <span class="kw-2">&amp;</span><span class="ident">Server</span>,
         <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    ) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">update_and_notify</span>(<span class="ident">server</span>, <span class="ident">server_description</span>, <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">write</span>().<span class="kw">await</span>)
             .<span class="kw">await</span>
     }
@@ -1105,7 +1105,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">hosts</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ClientOptions</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    ) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">state</span>
             .<span class="ident">write</span>()
             .<span class="kw">await</span>
@@ -1125,7 +1125,7 @@
     }
 
     <span class="doccomment">/// Get the topology&#39;s currently highest seen cluster time.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">cluster_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">cluster_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">state</span>
             .<span class="ident">read</span>()
             .<span class="kw">await</span>
@@ -1148,12 +1148,12 @@
     }
 
     <span class="doccomment">/// Gets the latest information on whether sessions are supported or not.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">session_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionSupportStatus</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">session_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SessionSupportStatus</span> {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">description</span>.<span class="ident">session_support_status</span>()
     }
 
     <span class="doccomment">/// Gets the latest information on whether transactions are support or not.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TransactionSupportStatus</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TransactionSupportStatus</span> {
         <span class="self">self</span>.<span class="ident">state</span>
             .<span class="ident">read</span>()
             .<span class="kw">await</span>
@@ -1161,14 +1161,14 @@
             .<span class="ident">transaction_support_status</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">topology_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TopologyType</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">topology_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyType</span> {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">description</span>.<span class="ident">topology_type</span>()
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_server_description</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerDescription</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerDescription</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">state</span>
             .<span class="ident">read</span>()
             .<span class="kw">await</span>
@@ -1178,7 +1178,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_servers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ServerAddress</span>, <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Server</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_servers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ServerAddress</span>, <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Server</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">state</span>
             .<span class="ident">read</span>()
             .<span class="kw">await</span>
@@ -1216,18 +1216,18 @@
 
 <span class="kw">impl</span> <span class="ident">WeakTopology</span> {
     <span class="doccomment">/// Attempts to convert the WeakTopology to a strong reference.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">upgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Topology</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">upgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Topology</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="ident">Topology</span> {
             <span class="ident">state</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">upgrade</span>()<span class="question-mark">?</span>,
             <span class="ident">common</span>: <span class="self">self</span>.<span class="ident">common</span>.<span class="ident">clone</span>(),
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_alive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_alive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">common</span>.<span class="ident">is_alive</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">client_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ClientOptions</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">client_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ClientOptions</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">common</span>.<span class="ident">options</span>
     }
 }
@@ -1290,7 +1290,7 @@
         <span class="ident">server</span>: <span class="ident">ServerDescription</span>,
         <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ClientOptions</span>,
         <span class="ident">topology</span>: <span class="ident">WeakTopology</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">old_description</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">clone</span>();
         <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">update</span>(<span class="ident">server</span>)<span class="question-mark">?</span>;
 
@@ -1399,7 +1399,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">HandshakePhase</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">after_completion</span>(<span class="ident">handshaked_connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">after_completion</span>(<span class="ident">handshaked_connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::AfterCompletion</span> {
             <span class="ident">generation</span>: <span class="ident">handshaked_connection</span>.<span class="ident">generation</span>.<span class="ident">clone</span>(),
             <span class="comment">// given that this is a handshaked connection, the stream description should</span>
@@ -1414,27 +1414,27 @@
 
     <span class="doccomment">/// The `serviceId` reported by the server.  If the initial hello has not completed, returns</span>
     <span class="doccomment">/// `None`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">service_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">service_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">HandshakePhase::PreHello</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">HandshakePhase::PostHello</span> { <span class="ident">generation</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">generation</span>.<span class="ident">service_id</span>(),
-            <span class="ident">HandshakePhase::AfterCompletion</span> { <span class="ident">generation</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">generation</span>.<span class="ident">service_id</span>(),
+            <span class="ident">HandshakePhase::PreHello</span> { .. } =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">HandshakePhase::PostHello</span> { <span class="ident">generation</span>, .. } =&gt; <span class="ident">generation</span>.<span class="ident">service_id</span>(),
+            <span class="ident">HandshakePhase::AfterCompletion</span> { <span class="ident">generation</span>, .. } =&gt; <span class="ident">generation</span>.<span class="ident">service_id</span>(),
         }
     }
 
     <span class="doccomment">/// Whether this phase is before the handshake completed or not.</span>
-    <span class="kw">fn</span> <span class="ident">is_before_completion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_before_completion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">HandshakePhase::AfterCompletion</span> { .. })
     }
 
     <span class="doccomment">/// The wire version of the server as reported by the handshake. If the handshake did not</span>
     <span class="doccomment">/// complete, this returns `None`.</span>
-    <span class="kw">fn</span> <span class="ident">wire_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">wire_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">HandshakePhase::AfterCompletion</span> {
                 <span class="ident">max_wire_version</span>, ..
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">max_wire_version</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            } =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">max_wire_version</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }

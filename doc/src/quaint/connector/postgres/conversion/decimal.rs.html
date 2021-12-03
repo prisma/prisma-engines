@@ -266,7 +266,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidDecimal</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>);
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidDecimal</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;Invalid Decimal: {}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
     }
 }
@@ -280,18 +280,18 @@
     <span class="ident">digits</span>: <span class="ident">D</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">from_postgres</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u16</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">dec</span>: <span class="ident">PostgresDecimal</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigDecimal</span>, <span class="ident">InvalidDecimal</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">from_postgres</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u16</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">dec</span>: <span class="ident">PostgresDecimal</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigDecimal</span>, <span class="ident">InvalidDecimal</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">PostgresDecimal</span> {
         <span class="ident">neg</span>, <span class="ident">digits</span>, <span class="ident">weight</span>, ..
     } <span class="op">=</span> <span class="ident">dec</span>;
 
-    <span class="kw">if</span> <span class="ident">digits</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">digits</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0u64</span>.<span class="ident">into</span>());
     }
 
     <span class="kw">let</span> <span class="ident">sign</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">neg</span> {
-        <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Sign::Plus</span>,
-        <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Sign::Minus</span>,
+        <span class="bool-val">false</span> =&gt; <span class="ident">Sign::Plus</span>,
+        <span class="bool-val">true</span> =&gt; <span class="ident">Sign::Minus</span>,
     };
 
     <span class="comment">// weight is 0 if the decimal point falls after the first base-10000 digit</span>
@@ -311,7 +311,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">BigDecimal::new</span>(<span class="ident">bigint</span>, <span class="ident">scale</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">to_postgres</span>(<span class="ident">decimal</span>: <span class="kw-2">&amp;</span><span class="ident">BigDecimal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PostgresDecimal</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">to_postgres</span>(<span class="ident">decimal</span>: <span class="kw-2">&amp;</span><span class="ident">BigDecimal</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PostgresDecimal</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">decimal</span>.<span class="ident">is_zero</span>() {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">PostgresDecimal</span> {
             <span class="ident">neg</span>: <span class="bool-val">false</span>,
@@ -364,8 +364,8 @@
     }
 
     <span class="kw">let</span> <span class="ident">neg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">sign</span> {
-        <span class="ident">Sign::Plus</span> <span class="op">|</span> <span class="ident">Sign::NoSign</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-        <span class="ident">Sign::Minus</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+        <span class="ident">Sign::Plus</span> <span class="op">|</span> <span class="ident">Sign::NoSign</span> =&gt; <span class="bool-val">false</span>,
+        <span class="ident">Sign::Minus</span> =&gt; <span class="bool-val">true</span>,
     };
 
     <span class="prelude-val">Ok</span>(<span class="ident">PostgresDecimal</span> {
@@ -430,7 +430,7 @@
     <span class="comment">//   result = result + 5600 * 0.00000001;</span>
     <span class="comment">//</span>
 
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DecimalWrapper</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DecimalWrapper</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">raw</span>);
         <span class="kw">let</span> <span class="ident">num_groups</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">weight</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">read_i16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>; <span class="comment">// 10000^weight</span>
@@ -447,7 +447,7 @@
         }
 
         <span class="kw">let</span> <span class="ident">dec</span> <span class="op">=</span> <span class="ident">from_postgres</span>(<span class="ident">PostgresDecimal</span> {
-            <span class="ident">neg</span>: <span class="ident">sign</span> <span class="op">=</span><span class="op">=</span> <span class="number">0x4000</span>,
+            <span class="ident">neg</span>: <span class="ident">sign</span> <span class="op">==</span> <span class="number">0x4000</span>,
             <span class="ident">weight</span>,
             <span class="ident">scale</span>,
             <span class="ident">digits</span>: <span class="ident">groups</span>.<span class="ident">into_iter</span>(),
@@ -457,13 +457,13 @@
         <span class="prelude-val">Ok</span>(<span class="ident">DecimalWrapper</span>(<span class="ident">dec</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="ident">ty</span>, <span class="ident">Type::NUMERIC</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">DecimalWrapper</span> {
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">PostgresDecimal</span> {
             <span class="ident">neg</span>,
             <span class="ident">weight</span>,
@@ -496,7 +496,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">IsNull::No</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="ident">ty</span>, <span class="ident">Type::NUMERIC</span>)
     }
 

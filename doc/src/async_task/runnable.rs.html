@@ -440,7 +440,7 @@
 <span class="doccomment">/// // Create a task with the future and the schedule function.</span>
 <span class="doccomment">/// let (runnable, task) = async_task::spawn(future, schedule);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">schedule</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Runnable</span>, <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">schedule</span>: <span class="ident">S</span>) -&gt; (<span class="ident">Runnable</span>, <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span>)
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">F::Output</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -482,7 +482,7 @@
 <span class="doccomment">/// let (runnable, task) = async_task::spawn_local(future, schedule);</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_local</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">schedule</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Runnable</span>, <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_local</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">schedule</span>: <span class="ident">S</span>) -&gt; (<span class="ident">Runnable</span>, <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span>)
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">F::Output</span>: <span class="lifetime">&#39;static</span>,
@@ -494,7 +494,7 @@
     <span class="kw">use</span> <span class="ident">std::thread</span>::{<span class="self">self</span>, <span class="ident">ThreadId</span>};
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">thread_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ThreadId</span> {
+    <span class="kw">fn</span> <span class="ident">thread_id</span>() -&gt; <span class="ident">ThreadId</span> {
         <span class="macro">thread_local!</span> {
             <span class="kw">static</span> <span class="ident">ID</span>: <span class="ident">ThreadId</span> <span class="op">=</span> <span class="ident">thread::current</span>().<span class="ident">id</span>();
         }
@@ -510,7 +510,7 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Checked</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
         <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
             <span class="macro">assert!</span>(
-                <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">thread_id</span>(),
+                <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">thread_id</span>(),
                 <span class="string">&quot;local task dropped by a thread that didn&#39;t spawn it&quot;</span>
             );
             <span class="kw">unsafe</span> {
@@ -522,9 +522,9 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Checked</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
         <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F::Output</span>;
 
-        <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
             <span class="macro">assert!</span>(
-                <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">thread_id</span>(),
+                <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">thread_id</span>(),
                 <span class="string">&quot;local task polled by a thread that didn&#39;t spawn it&quot;</span>
             );
             <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">map_unchecked_mut</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">c</span>.<span class="ident">inner</span>).<span class="ident">poll</span>(<span class="ident">cx</span>) }
@@ -569,7 +569,7 @@
 <span class="doccomment">/// // Create a task with the future and the schedule function.</span>
 <span class="doccomment">/// let (runnable, task) = unsafe { async_task::spawn_unchecked(future, schedule) };</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">spawn_unchecked</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">schedule</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Runnable</span>, <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span>)
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">spawn_unchecked</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">schedule</span>: <span class="ident">S</span>) -&gt; (<span class="ident">Runnable</span>, <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span>)
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Future</span>,
     <span class="ident">S</span>: <span class="ident">Fn</span>(<span class="ident">Runnable</span>),
@@ -699,7 +699,7 @@
     <span class="doccomment">/// runnable.run();</span>
     <span class="doccomment">/// assert_eq!(smol::future::block_on(task), 3);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ptr</span>.<span class="ident">as_ptr</span>();
         <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Header</span>;
         <span class="ident">mem::forget</span>(<span class="self">self</span>);
@@ -730,7 +730,7 @@
     <span class="doccomment">/// waker.wake();</span>
     <span class="doccomment">/// assert_eq!(r.len(), 1);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">waker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Waker</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">waker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Waker</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ptr</span>.<span class="ident">as_ptr</span>();
         <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Header</span>;
 
@@ -762,8 +762,8 @@
                     <span class="ident">Ordering::AcqRel</span>,
                     <span class="ident">Ordering::Acquire</span>,
                 ) {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">s</span>,
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
+                    <span class="prelude-val">Err</span>(<span class="ident">s</span>) =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">s</span>,
                 }
             }
 
@@ -785,7 +785,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Runnable</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ptr</span>.<span class="ident">as_ptr</span>();
         <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Header</span>;
 

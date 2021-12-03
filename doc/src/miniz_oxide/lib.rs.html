@@ -237,13 +237,13 @@
     <span class="doccomment">/// Create an MZFlush value from an integer value.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `MZError::Param` on invalid values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">flush</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">MZError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">flush</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">MZError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">flush</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">MZFlush::None</span>),
-            <span class="number">1</span> <span class="op">|</span> <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">MZFlush::Sync</span>),
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">MZFlush::Full</span>),
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">MZFlush::Finish</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">MZError::Param</span>),
+            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MZFlush::None</span>),
+            <span class="number">1</span> <span class="op">|</span> <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MZFlush::Sync</span>),
+            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MZFlush::Full</span>),
+            <span class="number">4</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MZFlush::Finish</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">MZError::Param</span>),
         }
     }
 }
@@ -280,7 +280,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DataFormat</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_window_bits</span>(<span class="ident">window_bits</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DataFormat</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_window_bits</span>(<span class="ident">window_bits</span>: <span class="ident">i32</span>) -&gt; <span class="ident">DataFormat</span> {
         <span class="kw">if</span> <span class="ident">window_bits</span> <span class="op">&gt;</span> <span class="number">0</span> {
             <span class="ident">DataFormat::Zlib</span>
         } <span class="kw">else</span> {
@@ -288,10 +288,10 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_window_bits</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_window_bits</span>(<span class="self">self</span>) -&gt; <span class="ident">i32</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DataFormat::Zlib</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">shared::MZ_DEFAULT_WINDOW_BITS</span>,
-            <span class="ident">DataFormat::Raw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="ident">shared::MZ_DEFAULT_WINDOW_BITS</span>,
+            <span class="ident">DataFormat::Zlib</span> =&gt; <span class="ident">shared::MZ_DEFAULT_WINDOW_BITS</span>,
+            <span class="ident">DataFormat::Raw</span> =&gt; <span class="op">-</span><span class="ident">shared::MZ_DEFAULT_WINDOW_BITS</span>,
         }
     }
 }
@@ -312,7 +312,7 @@
 
 <span class="kw">impl</span> <span class="ident">StreamResult</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">error</span>(<span class="ident">error</span>: <span class="ident">MZError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StreamResult</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">error</span>(<span class="ident">error</span>: <span class="ident">MZError</span>) -&gt; <span class="ident">StreamResult</span> {
         <span class="ident">StreamResult</span> {
             <span class="ident">bytes_consumed</span>: <span class="number">0</span>,
             <span class="ident">bytes_written</span>: <span class="number">0</span>,
@@ -322,13 +322,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">core::convert::From</span><span class="op">&lt;</span><span class="ident">StreamResult</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MZResult</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">StreamResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="ident">StreamResult</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">res</span>.<span class="ident">status</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">core::convert::From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">StreamResult</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MZResult</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="kw-2">&amp;</span><span class="ident">StreamResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">res</span>: <span class="kw-2">&amp;</span><span class="ident">StreamResult</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">res</span>.<span class="ident">status</span>
     }
 }

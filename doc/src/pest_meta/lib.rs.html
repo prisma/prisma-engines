@@ -157,7 +157,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">parser</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">validator</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_or_report</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_or_report</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>) -&gt; <span class="ident">T</span>
 <span class="kw">where</span>
     <span class="ident">E</span>: <span class="ident">IntoIterator</span>,
     <span class="ident">E::Item</span>: <span class="ident">Display</span>,

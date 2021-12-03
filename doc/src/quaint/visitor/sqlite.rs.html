@@ -898,7 +898,7 @@
     <span class="kw">const</span> <span class="ident">C_WILDCARD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;%&quot;</span>;
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;render_sql&quot;</span>, <span class="ident">skip</span>(<span class="ident">query</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">build</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="ident">query</span>: <span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">build</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="ident">query</span>: <span class="ident">Q</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Q</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -912,32 +912,32 @@
         <span class="prelude-val">Ok</span>((<span class="ident">sqlite</span>.<span class="ident">query</span>, <span class="ident">sqlite</span>.<span class="ident">parameters</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">write</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">write</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="ident">D</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">write!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">query</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">s</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_raw_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_raw_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">Value::Integer</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">i</span>)),
-            <span class="ident">Value::Text</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">t</span>))),
-            <span class="ident">Value::Enum</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">e</span>)),
-            <span class="ident">Value::Bytes</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;x&#39;{}&#39;&quot;</span>, <span class="ident">hex::encode</span>(<span class="ident">b</span>)))),
-            <span class="ident">Value::Boolean</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">b</span>)),
-            <span class="ident">Value::Char</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">c</span>))),
-            <span class="ident">Value::Float</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
-                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_nan</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
-                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">=</span><span class="op">=</span> <span class="ident">f32::INFINITY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
-                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">=</span><span class="op">=</span> <span class="ident">f32::NEG_INFINITY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;-Infinity&quot;</span>),
-                <span class="ident">v</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">v</span>)),
+            <span class="ident">Value::Integer</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">i</span>)),
+            <span class="ident">Value::Text</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">t</span>))),
+            <span class="ident">Value::Enum</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">e</span>)),
+            <span class="ident">Value::Bytes</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;x&#39;{}&#39;&quot;</span>, <span class="ident">hex::encode</span>(<span class="ident">b</span>)))),
+            <span class="ident">Value::Boolean</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">b</span>)),
+            <span class="ident">Value::Char</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">c</span>))),
+            <span class="ident">Value::Float</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
+                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_nan</span>() =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
+                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">==</span> <span class="ident">f32::INFINITY</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
+                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">==</span> <span class="ident">f32::NEG_INFINITY</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;-Infinity&quot;</span>),
+                <span class="ident">v</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">v</span>)),
             }),
-            <span class="ident">Value::Double</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
-                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_nan</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
-                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">=</span><span class="op">=</span> <span class="ident">f64::INFINITY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
-                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">=</span><span class="op">=</span> <span class="ident">f64::NEG_INFINITY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;-Infinity&quot;</span>),
-                <span class="ident">v</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">v</span>)),
+            <span class="ident">Value::Double</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
+                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_nan</span>() =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;NaN&#39;&quot;</span>),
+                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">==</span> <span class="ident">f64::INFINITY</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;Infinity&#39;&quot;</span>),
+                <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span> <span class="op">==</span> <span class="ident">f64::NEG_INFINITY</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;&#39;-Infinity&quot;</span>),
+                <span class="ident">v</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">v</span>)),
             }),
-            <span class="ident">Value::Array</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Array</span>(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Arrays are not supported in SQLite.&quot;</span>;
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::conversion</span>(<span class="ident">msg</span>);
 
@@ -947,36 +947,36 @@
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">builder</span>.<span class="ident">build</span>());
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
-            <span class="ident">Value::Json</span>(<span class="ident">j</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">j</span> {
-                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">j</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Json</span>(<span class="ident">j</span>) =&gt; <span class="kw">match</span> <span class="ident">j</span> {
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">j</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="ident">j</span>)<span class="question-mark">?</span>;
                     <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">s</span>)))
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            <span class="ident">Value::Numeric</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">r</span>)),
+            <span class="ident">Value::Numeric</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">r</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-            <span class="ident">Value::Uuid</span>(<span class="ident">uuid</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">uuid</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">uuid</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">uuid</span>.<span class="ident">to_hyphenated</span>().<span class="ident">to_string</span>()))),
+            <span class="ident">Value::Uuid</span>(<span class="ident">uuid</span>) =&gt; <span class="ident">uuid</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">uuid</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">uuid</span>.<span class="ident">to_hyphenated</span>().<span class="ident">to_string</span>()))),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            <span class="ident">Value::DateTime</span>(<span class="ident">dt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">dt</span>.<span class="ident">to_rfc3339</span>(),))),
+            <span class="ident">Value::DateTime</span>(<span class="ident">dt</span>) =&gt; <span class="ident">dt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">dt</span>.<span class="ident">to_rfc3339</span>(),))),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            <span class="ident">Value::Date</span>(<span class="ident">date</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">date</span>))),
+            <span class="ident">Value::Date</span>(<span class="ident">date</span>) =&gt; <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">date</span>))),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            <span class="ident">Value::Time</span>(<span class="ident">time</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">time</span>))),
-            <span class="ident">Value::Xml</span>(<span class="ident">cow</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cow</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">cow</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">cow</span>))),
+            <span class="ident">Value::Time</span>(<span class="ident">time</span>) =&gt; <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">time</span>))),
+            <span class="ident">Value::Xml</span>(<span class="ident">cow</span>) =&gt; <span class="ident">cow</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">cow</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39;&quot;</span>, <span class="ident">cow</span>))),
         };
 
         <span class="kw">match</span> <span class="ident">res</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">res</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;null&quot;</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">res</span>) =&gt; <span class="ident">res</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;null&quot;</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">insert</span>: <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">insert</span>: <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">match</span> <span class="ident">insert</span>.<span class="ident">on_conflict</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">OnConflict::DoNothing</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;INSERT OR IGNORE&quot;</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;INSERT&quot;</span>)<span class="question-mark">?</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">OnConflict::DoNothing</span>) =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;INSERT OR IGNORE&quot;</span>)<span class="question-mark">?</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;INSERT&quot;</span>)<span class="question-mark">?</span>,
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">table</span>) <span class="op">=</span> <span class="ident">insert</span>.<span class="ident">table</span> {
@@ -988,7 +988,7 @@
             <span class="ident">Expression</span> {
                 <span class="ident">kind</span>: <span class="ident">ExpressionKind::Row</span>(<span class="ident">row</span>),
                 ..
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">values</span>.<span class="ident">is_empty</span>() {
                     <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; DEFAULT VALUES&quot;</span>)<span class="question-mark">?</span>;
                 } <span class="kw">else</span> {
@@ -1011,7 +1011,7 @@
             <span class="ident">Expression</span> {
                 <span class="ident">kind</span>: <span class="ident">ExpressionKind::Values</span>(<span class="ident">values</span>),
                 ..
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">insert</span>.<span class="ident">columns</span>.<span class="ident">len</span>();
 
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; (&quot;</span>)<span class="question-mark">?</span>;
@@ -1035,7 +1035,7 @@
                     }
                 }
             }
-            <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">expr</span>)<span class="question-mark">?</span>,
+            <span class="ident">expr</span> =&gt; <span class="self">self</span>.<span class="ident">visit_expression</span>(<span class="ident">expr</span>)<span class="question-mark">?</span>,
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">returning</span>) <span class="op">=</span> <span class="ident">insert</span>.<span class="ident">returning</span> {
@@ -1061,7 +1061,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">parameter_substitution</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">parameter_substitution</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;?&quot;</span>)
     }
 
@@ -1069,36 +1069,36 @@
         <span class="self">self</span>.<span class="ident">parameters</span>.<span class="ident">push</span>(<span class="ident">value</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_limit_and_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_limit_and_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="kw">match</span> (<span class="ident">limit</span>, <span class="ident">offset</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">limit</span>), <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">Some</span>(<span class="ident">limit</span>), <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) =&gt; {
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; LIMIT &quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">visit_parameterized</span>(<span class="ident">limit</span>)<span class="question-mark">?</span>;
 
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; OFFSET &quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">visit_parameterized</span>(<span class="ident">offset</span>)
             }
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) =&gt; {
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; LIMIT &quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">visit_parameterized</span>(<span class="ident">Value::from</span>(<span class="op">-</span><span class="number">1</span>))<span class="question-mark">?</span>;
 
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; OFFSET &quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">visit_parameterized</span>(<span class="ident">offset</span>)
             }
-            (<span class="prelude-val">Some</span>(<span class="ident">limit</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">Some</span>(<span class="ident">limit</span>), <span class="prelude-val">None</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot; LIMIT &quot;</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">visit_parameterized</span>(<span class="ident">limit</span>)
             }
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_aggregate_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_aggregate_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="self">self</span>.<span class="ident">write</span>(<span class="string">&quot;GROUP_CONCAT&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">surround_with</span>(<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, <span class="op">|</span><span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">visit_expression</span>(<span class="ident">value</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_values</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">values</span>: <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_values</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">values</span>: <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="self">self</span>.<span class="ident">surround_with</span>(<span class="string">&quot;(VALUES &quot;</span>, <span class="string">&quot;)&quot;</span>, <span class="op">|</span><span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">s</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">len</span>();
             <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">row</span>) <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
@@ -1113,7 +1113,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">visit_json_extract</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_json_extract</span>: <span class="ident">JsonExtract</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_json_extract</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_json_extract</span>: <span class="ident">JsonExtract</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on SQLite&quot;</span>)
     }
 
@@ -1123,17 +1123,17 @@
         <span class="ident">_left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">_right</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">_not</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    ) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on SQLite&quot;</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">visit_json_type_equals</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">_json_type</span>: <span class="ident">JsonType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_json_type_equals</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">_json_type</span>: <span class="ident">JsonType</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON_TYPE is not yet supported on SQLite&quot;</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">visit_text_search</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_text_search</span>: <span class="ident"><span class="kw">crate</span>::prelude::TextSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_text_search</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_text_search</span>: <span class="ident"><span class="kw">crate</span>::prelude::TextSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;Full-text search is not yet supported on SQLite&quot;</span>)
     }
 
@@ -1143,17 +1143,17 @@
         <span class="ident">_left</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">_right</span>: <span class="ident">std::borrow::Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">_not</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    ) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;Full-text search is not yet supported on SQLite&quot;</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">visit_json_extract_last_array_item</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_extract</span>: <span class="ident">JsonExtractLastArrayElem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_json_extract_last_array_item</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_extract</span>: <span class="ident">JsonExtractLastArrayElem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on SQLite&quot;</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">visit_json_extract_first_array_item</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_extract</span>: <span class="ident">JsonExtractFirstArrayElem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">visitor::Result</span> {
+    <span class="kw">fn</span> <span class="ident">visit_json_extract_first_array_item</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_extract</span>: <span class="ident">JsonExtractFirstArrayElem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">visitor::Result</span> {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;JSON filtering is not yet supported on SQLite&quot;</span>)
     }
 }
@@ -1162,14 +1162,14 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">val</span>, <span class="ident">visitor</span>::<span class="kw-2">*</span>};
 
-    <span class="kw">fn</span> <span class="ident">expected_values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>)
+    <span class="kw">fn</span> <span class="ident">expected_values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; (<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>)
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
         (<span class="ident">String::from</span>(<span class="ident">sql</span>), <span class="ident">params</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">into</span>()).<span class="ident">collect</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">default_params</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">additional</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default_params</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">additional</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">for</span> <span class="ident">param</span> <span class="kw">in</span> <span class="ident">additional</span>.<span class="ident">drain</span>(<span class="number">0</span>..) {
@@ -1589,7 +1589,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">sqlite_harness</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::rusqlite::Connection</span> {
+    <span class="kw">fn</span> <span class="ident">sqlite_harness</span>() -&gt; <span class="ident">::rusqlite::Connection</span> {
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">::rusqlite::Connection::open_in_memory</span>().<span class="ident">unwrap</span>();
 
         <span class="ident">conn</span>.<span class="ident">execute</span>(<span class="string">&quot;CREATE TABLE users (id, name TEXT, age REAL, nice INTEGER)&quot;</span>, [])

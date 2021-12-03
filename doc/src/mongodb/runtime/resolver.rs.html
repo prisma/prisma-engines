@@ -82,23 +82,23 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsyncResolver</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResolverConfig</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResolverConfig</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">resolver</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">config</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">config</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">config</span>) =&gt; {
                 <span class="ident">trust_dns_resolver::TokioAsyncResolver::tokio</span>(<span class="ident">config</span>, <span class="ident">Default::default</span>())
                     .<span class="ident">map_err</span>(<span class="ident">Error::from_resolve_error</span>)<span class="question-mark">?</span>
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">trust_dns_resolver::TokioAsyncResolver::tokio_from_system_conf</span>()
+            <span class="prelude-val">None</span> =&gt; <span class="ident">trust_dns_resolver::TokioAsyncResolver::tokio_from_system_conf</span>()
                 .<span class="ident">map_err</span>(<span class="ident">Error::from_resolve_error</span>)<span class="question-mark">?</span>,
         };
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">resolver</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">config</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">config</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">async_std_resolver::resolver</span>(<span class="ident">config</span>, <span class="ident">Default::default</span>())
+            <span class="prelude-val">Some</span>(<span class="ident">config</span>) =&gt; <span class="ident">async_std_resolver::resolver</span>(<span class="ident">config</span>, <span class="ident">Default::default</span>())
                 .<span class="kw">await</span>
                 .<span class="ident">map_err</span>(<span class="ident">Error::from_resolve_error</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">async_std_resolver::resolver_from_system_conf</span>()
+            <span class="prelude-val">None</span> =&gt; <span class="ident">async_std_resolver::resolver_from_system_conf</span>()
                 .<span class="kw">await</span>
                 .<span class="ident">map_err</span>(<span class="ident">Error::from_resolve_error</span>)<span class="question-mark">?</span>,
         };
@@ -108,7 +108,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsyncResolver</span> {
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">srv_lookup</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SrvLookup</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">srv_lookup</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">N</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SrvLookup</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">resolver</span>
             .<span class="ident">srv_lookup</span>(<span class="ident">query</span>)
@@ -117,13 +117,13 @@
         <span class="prelude-val">Ok</span>(<span class="ident">lookup</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">txt_lookup</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TxtLookup</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">txt_lookup</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">N</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TxtLookup</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">lookup_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">resolver</span>.<span class="ident">txt_lookup</span>(<span class="ident">query</span>).<span class="kw">await</span>;
         <span class="kw">match</span> <span class="ident">lookup_result</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">lookup</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">lookup</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
-                <span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from_resolve_error</span>(<span class="ident">e</span>)),
+            <span class="prelude-val">Ok</span>(<span class="ident">lookup</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">lookup</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
+                <span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. } =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::from_resolve_error</span>(<span class="ident">e</span>)),
             },
         }
     }

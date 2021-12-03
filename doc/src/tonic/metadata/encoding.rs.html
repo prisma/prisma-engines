@@ -225,28 +225,28 @@
 
     <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span> {
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+        <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span>;
 
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span>;
+        <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span>;
 
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">value</span>: <span class="ident">Bytes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span>;
+        <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">value</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span>;
 
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HeaderValue</span>;
+        <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">HeaderValue</span>;
 
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span>;
+        <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span>;
 
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">equals</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+        <span class="kw">fn</span> <span class="ident">equals</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span>;
 
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">values_equal</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+        <span class="kw">fn</span> <span class="ident">values_equal</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>) -&gt; <span class="ident">bool</span>;
 
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span>;
+        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span>;
     }
 }
 
@@ -254,7 +254,7 @@
     <span class="doccomment">/// Returns true if the provided key is valid for this ValueEncoding type.</span>
     <span class="doccomment">/// For example, `Ascii::is_valid_key(&quot;a&quot;) == true`,</span>
     <span class="doccomment">/// `Ascii::is_valid_key(&quot;a-bin&quot;) == false`.</span>
-    <span class="kw">fn</span> <span class="ident">is_valid_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">is_valid_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span>;
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
@@ -267,47 +267,47 @@
 <span class="comment">// ===== impl ValueEncoding =====</span>
 
 <span class="kw">impl</span> <span class="ident"><span class="self">self</span>::value_encoding::Sealed</span> <span class="kw">for</span> <span class="ident">Ascii</span> {
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
         <span class="ident">value</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
         <span class="ident">HeaderValue::from_bytes</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidMetadataValueBytes::new</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">value</span>: <span class="ident">Bytes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">value</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
         <span class="ident">HeaderValue::from_maybe_shared</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidMetadataValueBytes::new</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HeaderValue</span> {
+    <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">HeaderValue</span> {
         <span class="ident">HeaderValue::from_static</span>(<span class="ident">value</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">Bytes::copy_from_slice</span>(<span class="ident">value</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">equals</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">a</span>.<span class="ident">as_bytes</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">b</span>
+    <span class="kw">fn</span> <span class="ident">equals</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
+        <span class="ident">a</span>.<span class="ident">as_bytes</span>() <span class="op">==</span> <span class="ident">b</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">values_equal</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="ident">b</span>
+    <span class="kw">fn</span> <span class="ident">values_equal</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt::Debug::fmt</span>(<span class="ident">value</span>, <span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ValueEncoding</span> <span class="kw">for</span> <span class="ident">Ascii</span> {
-    <span class="kw">fn</span> <span class="ident">is_valid_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_valid_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="ident">Binary::is_valid_key</span>(<span class="ident">key</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident"><span class="self">self</span>::value_encoding::Sealed</span> <span class="kw">for</span> <span class="ident">Binary</span> {
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
         <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">value</span> {
             <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;=&#39;</span> {
                 <span class="kw">return</span> <span class="bool-val">false</span>;
@@ -316,17 +316,17 @@
         <span class="bool-val">true</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">encoded_value</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">base64::encode_config</span>(<span class="ident">value</span>, <span class="ident">base64::STANDARD_NO_PAD</span>);
         <span class="ident">HeaderValue::from_maybe_shared</span>(<span class="ident">Bytes::from</span>(<span class="ident">encoded_value</span>))
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidMetadataValueBytes::new</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">value</span>: <span class="ident">Bytes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">value</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderValue</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::from_bytes</span>(<span class="ident">value</span>.<span class="ident">as_ref</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HeaderValue</span> {
+    <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">HeaderValue</span> {
         <span class="kw">if</span> <span class="ident">base64::decode</span>(<span class="ident">value</span>).<span class="ident">is_err</span>() {
             <span class="macro">panic!</span>(<span class="string">&quot;Invalid base64 passed to from_static: {}&quot;</span>, <span class="ident">value</span>);
         }
@@ -337,29 +337,29 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">InvalidMetadataValueBytes</span><span class="op">&gt;</span> {
         <span class="ident">base64::decode</span>(<span class="ident">value</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">bytes_vec</span><span class="op">|</span> <span class="ident">bytes_vec</span>.<span class="ident">into</span>())
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidMetadataValueBytes::new</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">equals</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">equals</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">decoded</span>) <span class="op">=</span> <span class="ident">base64::decode</span>(<span class="ident">a</span>.<span class="ident">as_bytes</span>()) {
-            <span class="ident">decoded</span> <span class="op">=</span><span class="op">=</span> <span class="ident">b</span>
+            <span class="ident">decoded</span> <span class="op">==</span> <span class="ident">b</span>
         } <span class="kw">else</span> {
-            <span class="ident">a</span>.<span class="ident">as_bytes</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">b</span>
+            <span class="ident">a</span>.<span class="ident">as_bytes</span>() <span class="op">==</span> <span class="ident">b</span>
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">values_equal</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">values_equal</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> (<span class="ident"><span class="self">Self</span>::decode</span>(<span class="ident">a</span>.<span class="ident">as_bytes</span>()), <span class="ident"><span class="self">Self</span>::decode</span>(<span class="ident">b</span>.<span class="ident">as_bytes</span>())) {
-            (<span class="prelude-val">Ok</span>(<span class="ident">a</span>), <span class="prelude-val">Ok</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="ident">b</span>,
-            (<span class="prelude-val">Err</span>(<span class="kw">_</span>), <span class="prelude-val">Err</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            (<span class="prelude-val">Ok</span>(<span class="ident">a</span>), <span class="prelude-val">Ok</span>(<span class="ident">b</span>)) =&gt; <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>,
+            (<span class="prelude-val">Err</span>(<span class="kw">_</span>), <span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">HeaderValue</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">decoded</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::decode</span>(<span class="ident">value</span>.<span class="ident">as_bytes</span>()) {
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">decoded</span>)
         } <span class="kw">else</span> {
@@ -369,7 +369,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ValueEncoding</span> <span class="kw">for</span> <span class="ident">Binary</span> {
-    <span class="kw">fn</span> <span class="ident">is_valid_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_valid_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">key</span>.<span class="ident">ends_with</span>(<span class="string">&quot;-bin&quot;</span>)
     }
 }
@@ -377,13 +377,13 @@
 <span class="comment">// ===== impl InvalidMetadataValue =====</span>
 
 <span class="kw">impl</span> <span class="ident">InvalidMetadataValue</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">InvalidMetadataValue</span> { <span class="ident">_priv</span>: () }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidMetadataValue</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;failed to parse metadata value&quot;</span>)
     }
 }
@@ -398,13 +398,13 @@
 <span class="comment">// ===== impl InvalidMetadataValueBytes =====</span>
 
 <span class="kw">impl</span> <span class="ident">InvalidMetadataValueBytes</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">InvalidMetadataValueBytes</span>(<span class="ident">InvalidMetadataValue::new</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidMetadataValueBytes</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }

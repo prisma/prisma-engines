@@ -93,7 +93,7 @@
     })
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_all</span>(<span class="ident">tag</span>: <span class="ident">Tag</span>, <span class="ident">write_value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Accumulator</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_all</span>(<span class="ident">tag</span>: <span class="ident">Tag</span>, <span class="ident">write_value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Accumulator</span>)) -&gt; <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">LengthMeasurement::zero</span>();
         <span class="ident">write_tlv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">length</span>, <span class="ident">tag</span>, <span class="ident">write_value</span>);

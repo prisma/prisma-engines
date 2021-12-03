@@ -111,7 +111,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Field</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Meta</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Meta</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ty</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tags</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unknown_attrs</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
@@ -122,8 +122,8 @@
                     <span class="ident">Meta::NameValue</span>(<span class="ident">MetaNameValue</span> {
                         <span class="ident">lit</span>: <span class="ident">Lit::Str</span>(<span class="kw-2">ref</span> <span class="ident">lit</span>),
                         ..
-                    }) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_str</span>::<span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">lit</span>.<span class="ident">value</span>())<span class="question-mark">?</span>,
-                    <span class="ident">Meta::List</span>(<span class="kw-2">ref</span> <span class="ident">list</span>) <span class="kw">if</span> <span class="ident">list</span>.<span class="ident">nested</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    }) =&gt; <span class="ident">parse_str</span>::<span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">lit</span>.<span class="ident">value</span>())<span class="question-mark">?</span>,
+                    <span class="ident">Meta::List</span>(<span class="kw-2">ref</span> <span class="ident">list</span>) <span class="kw">if</span> <span class="ident">list</span>.<span class="ident">nested</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> =&gt; {
                         <span class="comment">// TODO(rustlang/rust#23121): slice pattern matching would make this much nicer.</span>
                         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::Path</span>(<span class="kw-2">ref</span> <span class="ident">path</span>)) <span class="op">=</span> <span class="ident">list</span>.<span class="ident">nested</span>[<span class="number">0</span>] {
                             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="op">=</span> <span class="ident">path</span>.<span class="ident">get_ident</span>() {
@@ -135,7 +135,7 @@
                             <span class="macro">bail!</span>(<span class="string">&quot;invalid oneof attribute: item must be an identifier&quot;</span>);
                         }
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;invalid oneof attribute: {:?}&quot;</span>, <span class="ident">attr</span>),
+                    <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;invalid oneof attribute: {:?}&quot;</span>, <span class="ident">attr</span>),
                 };
                 <span class="ident">set_option</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ty</span>, <span class="ident">t</span>, <span class="string">&quot;duplicate oneof attribute&quot;</span>)<span class="question-mark">?</span>;
             } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="ident">tags_attr</span>(<span class="ident">attr</span>)<span class="question-mark">?</span> {
@@ -146,29 +146,29 @@
         }
 
         <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ty</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">ty</span>) =&gt; <span class="ident">ty</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
         <span class="kw">match</span> <span class="ident">unknown_attrs</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(
+            <span class="number">0</span> =&gt; (),
+            <span class="number">1</span> =&gt; <span class="macro">bail!</span>(
                 <span class="string">&quot;unknown attribute for message field: {:?}&quot;</span>,
                 <span class="ident">unknown_attrs</span>[<span class="number">0</span>]
             ),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;unknown attributes for message field: {:?}&quot;</span>, <span class="ident">unknown_attrs</span>),
+            <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;unknown attributes for message field: {:?}&quot;</span>, <span class="ident">unknown_attrs</span>),
         }
 
         <span class="kw">let</span> <span class="ident">tags</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tags</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">tags</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tags</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;oneof field is missing a tags attribute&quot;</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">tags</span>) =&gt; <span class="ident">tags</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;oneof field is missing a tags attribute&quot;</span>),
         };
 
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Field</span> { <span class="ident">ty</span>, <span class="ident">tags</span> }))
     }
 
     <span class="doccomment">/// Returns a statement which encodes the oneof field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="macro">quote!</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">oneof</span>) <span class="op">=</span> #<span class="ident">ident</span> {
                 <span class="ident">oneof</span>.<span class="ident">encode</span>(<span class="ident">buf</span>)
@@ -177,7 +177,7 @@
     }
 
     <span class="doccomment">/// Returns an expression which evaluates to the result of decoding the oneof field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ty</span>;
         <span class="macro">quote!</span> {
             #<span class="ident">ty::merge</span>(#<span class="ident">ident</span>, <span class="ident">tag</span>, <span class="ident">wire_type</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)
@@ -185,14 +185,14 @@
     }
 
     <span class="doccomment">/// Returns an expression which evaluates to the encoded length of the oneof field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoded_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoded_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ty</span>;
         <span class="macro">quote!</span> {
             #<span class="ident">ident</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="number">0</span>, #<span class="ident">ty::encoded_len</span>)
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="macro">quote!</span>(#<span class="ident">ident</span> <span class="op">=</span> <span class="ident">::core::option::Option::None</span>)
     }
 }

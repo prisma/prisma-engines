@@ -341,7 +341,7 @@
 <span class="kw">type</span> <span class="ident">ReadyFuture</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">future::Ready</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="macro">cfg_net!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_socket_addrs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">arg</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T::Future</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_socket_addrs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">arg</span>: <span class="ident">T</span>) -&gt; <span class="ident">T::Future</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">ToSocketAddrs</span>,
     {
@@ -360,7 +360,7 @@
     <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">T::Iter</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">T::Future</span>;
 
-    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">to_socket_addrs</span>(<span class="ident">sealed::Internal</span>)
     }
 }
@@ -373,7 +373,7 @@
     <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">std::option::IntoIter</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ReadyFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into_iter</span>();
         <span class="ident">future::ok</span>(<span class="ident">iter</span>)
     }
@@ -387,7 +387,7 @@
     <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">std::option::IntoIter</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ReadyFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="ident">SocketAddr::V4</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">to_socket_addrs</span>(<span class="ident">sealed::Internal</span>)
     }
 }
@@ -400,7 +400,7 @@
     <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">std::option::IntoIter</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ReadyFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="ident">SocketAddr::V6</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">to_socket_addrs</span>(<span class="ident">sealed::Internal</span>)
     }
 }
@@ -413,7 +413,7 @@
     <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">std::option::IntoIter</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ReadyFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SocketAddr::from</span>(<span class="kw-2">*</span><span class="self">self</span>)).<span class="ident">into_iter</span>();
         <span class="ident">future::ok</span>(<span class="ident">iter</span>)
     }
@@ -427,7 +427,7 @@
     <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">std::option::IntoIter</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ReadyFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="kw">let</span> (<span class="ident">ip</span>, <span class="ident">port</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
         <span class="ident">SocketAddrV4::new</span>(<span class="ident">ip</span>, <span class="ident">port</span>).<span class="ident">to_socket_addrs</span>(<span class="ident">sealed::Internal</span>)
     }
@@ -441,7 +441,7 @@
     <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">std::option::IntoIter</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ReadyFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="kw">let</span> (<span class="ident">ip</span>, <span class="ident">port</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
         <span class="ident">SocketAddrV6::new</span>(<span class="ident">ip</span>, <span class="ident">port</span>, <span class="number">0</span>, <span class="number">0</span>).<span class="ident">to_socket_addrs</span>(<span class="ident">sealed::Internal</span>)
     }
@@ -455,7 +455,7 @@
     <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">std::vec::IntoIter</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ReadyFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>();
         <span class="ident">future::ok</span>(<span class="ident">iter</span>)
     }
@@ -470,7 +470,7 @@
         <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">sealed::OneOrMore</span>;
         <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">sealed::MaybeReady</span>;
 
-        <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+        <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
             <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::blocking::spawn_blocking</span>;
             <span class="kw">use</span> <span class="ident">sealed::MaybeReady</span>;
 
@@ -498,7 +498,7 @@
         <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">sealed::OneOrMore</span>;
         <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">sealed::MaybeReady</span>;
 
-        <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+        <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
             <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::blocking::spawn_blocking</span>;
             <span class="kw">use</span> <span class="ident">sealed::MaybeReady</span>;
 
@@ -535,7 +535,7 @@
         <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">sealed::OneOrMore</span>;
         <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">sealed::MaybeReady</span>;
 
-        <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+        <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
             (<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="number">1</span>).<span class="ident">to_socket_addrs</span>(<span class="ident">sealed::Internal</span>)
         }
     }
@@ -548,7 +548,7 @@
         <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">str</span> <span class="kw">as</span> <span class="ident">sealed::ToSocketAddrsPriv</span><span class="op">&gt;</span><span class="ident">::Iter</span>;
         <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">str</span> <span class="kw">as</span> <span class="ident">sealed::ToSocketAddrsPriv</span><span class="op">&gt;</span><span class="ident">::Future</span>;
 
-        <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+        <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">sealed::Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
             (<span class="kw-2">&amp;</span><span class="self">self</span>[..]).<span class="ident">to_socket_addrs</span>(<span class="ident">sealed::Internal</span>)
         }
     }
@@ -568,7 +568,7 @@
         <span class="kw">type</span> <span class="ident">Iter</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">SocketAddr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
         <span class="kw">type</span> <span class="ident">Future</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
 
-        <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">internal</span>: <span class="ident">Internal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span>;
+        <span class="kw">fn</span> <span class="ident">to_socket_addrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">internal</span>: <span class="ident">Internal</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span>;
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
@@ -602,13 +602,13 @@
         <span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">MaybeReady</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">OneOrMore</span><span class="op">&gt;</span>;
 
-            <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
                 <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-                    <span class="ident">State::Ready</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">State::Ready</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">i</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">OneOrMore::One</span>(<span class="ident">i</span>.<span class="ident">take</span>().<span class="ident">into_iter</span>());
                         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">iter</span>))
                     }
-                    <span class="ident">State::Blocking</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rx</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">State::Blocking</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rx</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">rx</span>).<span class="ident">poll</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="ident">OneOrMore::More</span>);
 
                         <span class="ident">Poll::Ready</span>(<span class="ident">res</span>)
@@ -620,17 +620,17 @@
         <span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">OneOrMore</span> {
             <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">SocketAddr</span>;
 
-            <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
                 <span class="kw">match</span> <span class="self">self</span> {
-                    <span class="ident">OneOrMore::One</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">next</span>(),
-                    <span class="ident">OneOrMore::More</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">next</span>(),
+                    <span class="ident">OneOrMore::One</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">next</span>(),
+                    <span class="ident">OneOrMore::More</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">next</span>(),
                 }
             }
 
-            <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+            <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
                 <span class="kw">match</span> <span class="self">self</span> {
-                    <span class="ident">OneOrMore::One</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">size_hint</span>(),
-                    <span class="ident">OneOrMore::More</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">size_hint</span>(),
+                    <span class="ident">OneOrMore::One</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">size_hint</span>(),
+                    <span class="ident">OneOrMore::More</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">size_hint</span>(),
                 }
             }
         }

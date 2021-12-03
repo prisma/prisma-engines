@@ -1016,7 +1016,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DepthTracker</span> {
-    <span class="kw">fn</span> <span class="ident">track</span>(<span class="ident">query_depth</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicU8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">track</span>(<span class="ident">query_depth</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicU8</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">query_depth</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Release</span>);
         <span class="self">Self</span> { <span class="ident">query_depth</span> }
     }
@@ -1049,7 +1049,7 @@
     <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max_size</span>: <span class="ident">usize</span>, <span class="ident">client</span>: <span class="ident">C</span>, <span class="ident">preserve_intermediates</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max_size</span>: <span class="ident">usize</span>, <span class="ident">client</span>: <span class="ident">C</span>, <span class="ident">preserve_intermediates</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::with_cache</span>(
             <span class="ident">DnsLru::new</span>(<span class="ident">max_size</span>, <span class="ident">Default::default</span>()),
             <span class="ident">client</span>,
@@ -1057,7 +1057,7 @@
         )
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_cache</span>(<span class="ident">lru</span>: <span class="ident">DnsLru</span>, <span class="ident">client</span>: <span class="ident">C</span>, <span class="ident">preserve_intermediates</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_cache</span>(<span class="ident">lru</span>: <span class="ident">DnsLru</span>, <span class="ident">client</span>: <span class="ident">C</span>, <span class="ident">preserve_intermediates</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">query_depth</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AtomicU8::new</span>(<span class="number">0</span>));
         <span class="ident">CachingClient</span> {
             <span class="ident">lru</span>,
@@ -1072,7 +1072,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">query</span>: <span class="ident">Query</span>,
         <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Box::pin</span>(<span class="ident"><span class="self">Self</span>::inner_lookup</span>(<span class="ident">query</span>, <span class="ident">options</span>, <span class="self">self</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[]))
     }
 
@@ -1081,7 +1081,7 @@
         <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
         <span class="kw-2">mut</span> <span class="ident">client</span>: <span class="self">Self</span>,
         <span class="ident">preserved_records</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Record</span>, <span class="ident">u32</span>)<span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="comment">// see https://tools.ietf.org/html/rfc6761</span>
         <span class="comment">//</span>
         <span class="comment">// ```text</span>
@@ -1092,23 +1092,23 @@
         <span class="comment">// localhost names to their configured caching DNS server(s).</span>
         <span class="comment">// ```</span>
         <span class="comment">// special use rules only apply to the IN Class</span>
-        <span class="kw">if</span> <span class="ident">query</span>.<span class="ident">query_class</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">DNSClass::IN</span> {
+        <span class="kw">if</span> <span class="ident">query</span>.<span class="ident">query_class</span>() <span class="op">==</span> <span class="ident">DNSClass::IN</span> {
             <span class="kw">let</span> <span class="ident">usage</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">query</span>.<span class="ident">name</span>() {
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">LOCALHOST_usage</span>.<span class="ident">zone_of</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">LOCALHOST_usage</span>,
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">IN_ADDR_ARPA_127</span>.<span class="ident">zone_of</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">LOCALHOST_usage</span>,
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">IP6_ARPA_1</span>.<span class="ident">zone_of</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">LOCALHOST_usage</span>,
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">INVALID</span>.<span class="ident">zone_of</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">INVALID</span>,
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">LOCAL</span>.<span class="ident">zone_of</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">LOCAL</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">DEFAULT</span>,
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">LOCALHOST_usage</span>.<span class="ident">zone_of</span>(<span class="ident">n</span>) =&gt; <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">LOCALHOST_usage</span>,
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">IN_ADDR_ARPA_127</span>.<span class="ident">zone_of</span>(<span class="ident">n</span>) =&gt; <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">LOCALHOST_usage</span>,
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">IP6_ARPA_1</span>.<span class="ident">zone_of</span>(<span class="ident">n</span>) =&gt; <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">LOCALHOST_usage</span>,
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">INVALID</span>.<span class="ident">zone_of</span>(<span class="ident">n</span>) =&gt; <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">INVALID</span>,
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">LOCAL</span>.<span class="ident">zone_of</span>(<span class="ident">n</span>) =&gt; <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">LOCAL</span>,
+                <span class="kw">_</span> =&gt; <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">DEFAULT</span>,
             };
 
             <span class="kw">match</span> <span class="ident">usage</span>.<span class="ident">resolver</span>() {
-                <span class="ident">ResolverUsage::Loopback</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">query</span>.<span class="ident">query_type</span>() {
+                <span class="ident">ResolverUsage::Loopback</span> =&gt; <span class="kw">match</span> <span class="ident">query</span>.<span class="ident">query_type</span>() {
                     <span class="comment">// TODO: look in hosts for these ips/names first...</span>
-                    <span class="ident">RecordType::A</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Lookup::from_rdata</span>(<span class="ident">query</span>, <span class="ident">LOCALHOST_V4</span>.<span class="ident">clone</span>())),
-                    <span class="ident">RecordType::AAAA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Lookup::from_rdata</span>(<span class="ident">query</span>, <span class="ident">LOCALHOST_V6</span>.<span class="ident">clone</span>())),
-                    <span class="ident">RecordType::PTR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Lookup::from_rdata</span>(<span class="ident">query</span>, <span class="ident">LOCALHOST</span>.<span class="ident">clone</span>())),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">RecordType::A</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Lookup::from_rdata</span>(<span class="ident">query</span>, <span class="ident">LOCALHOST_V4</span>.<span class="ident">clone</span>())),
+                    <span class="ident">RecordType::AAAA</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Lookup::from_rdata</span>(<span class="ident">query</span>, <span class="ident">LOCALHOST_V6</span>.<span class="ident">clone</span>())),
+                    <span class="ident">RecordType::PTR</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Lookup::from_rdata</span>(<span class="ident">query</span>, <span class="ident">LOCALHOST</span>.<span class="ident">clone</span>())),
+                    <span class="kw">_</span> =&gt; {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ResolveError::nx_error</span>(
                             <span class="ident">query</span>,
                             <span class="prelude-val">None</span>,
@@ -1120,12 +1120,12 @@
                 },
                 <span class="comment">// when mdns is enabled we will follow a standard query path</span>
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-                <span class="ident">ResolverUsage::LinkLocal</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                <span class="ident">ResolverUsage::LinkLocal</span> =&gt; (),
                 <span class="comment">// TODO: this requires additional config, as Kubernetes and other systems misuse the .local. zone.</span>
                 <span class="comment">// when mdns is not enabled we will return errors on LinkLocal (&quot;*.local.&quot;) names</span>
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>))]</span>
-                <span class="ident">ResolverUsage::LinkLocal</span> <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="ident">ResolverUsage::NxDomain</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ResolverUsage::LinkLocal</span> =&gt; (),
+                <span class="ident">ResolverUsage::NxDomain</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ResolveError::nx_error</span>(
                         <span class="ident">query</span>,
                         <span class="prelude-val">None</span>,
@@ -1134,7 +1134,7 @@
                         <span class="bool-val">false</span>,
                     ))
                 }
-                <span class="ident">ResolverUsage::Normal</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                <span class="ident">ResolverUsage::Normal</span> =&gt; (),
             }
         }
 
@@ -1174,7 +1174,7 @@
                         <span class="ident">trusted</span>,
                     },
                 ..
-            }) <span class="op">=</span><span class="op">&gt;</span> {
+            }) =&gt; {
                 <span class="prelude-val">Err</span>(<span class="ident"><span class="self">Self</span>::handle_nxdomain</span>(
                     <span class="ident">is_dnssec</span>,
                     <span class="bool-val">false</span>, <span class="comment">/*tbd*/</span>
@@ -1185,8 +1185,8 @@
                     <span class="ident">trusted</span>,
                 ))
             }
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
-            <span class="prelude-val">Ok</span>(<span class="ident">response_message</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">response_message</span>) =&gt; {
                 <span class="comment">// allow the handle_noerror function to deal with any error codes</span>
                 <span class="kw">let</span> <span class="ident">records</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::handle_noerror</span>(
                     <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">client</span>,
@@ -1206,14 +1206,14 @@
             <span class="prelude-val">Ok</span>(<span class="ident">Records::CnameChain</span> {
                 <span class="ident">next</span>: <span class="ident">future</span>,
                 <span class="ident">min_ttl</span>: <span class="ident">ttl</span>,
-            }) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client</span>.<span class="ident">cname</span>(<span class="ident">future</span>.<span class="kw">await</span><span class="question-mark">?</span>, <span class="ident">query</span>, <span class="ident">ttl</span>),
-            <span class="prelude-val">Ok</span>(<span class="ident">Records::Exists</span>(<span class="ident">rdata</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client</span>.<span class="ident">cache</span>(<span class="ident">query</span>, <span class="prelude-val">Ok</span>(<span class="ident">rdata</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client</span>.<span class="ident">cache</span>(<span class="ident">query</span>, <span class="prelude-val">Err</span>(<span class="ident">e</span>)),
+            }) =&gt; <span class="ident">client</span>.<span class="ident">cname</span>(<span class="ident">future</span>.<span class="kw">await</span><span class="question-mark">?</span>, <span class="ident">query</span>, <span class="ident">ttl</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">Records::Exists</span>(<span class="ident">rdata</span>)) =&gt; <span class="ident">client</span>.<span class="ident">cache</span>(<span class="ident">query</span>, <span class="prelude-val">Ok</span>(<span class="ident">rdata</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">client</span>.<span class="ident">cache</span>(<span class="ident">query</span>, <span class="prelude-val">Err</span>(<span class="ident">e</span>)),
         }
     }
 
     <span class="doccomment">/// Check if this query is already cached</span>
-    <span class="kw">fn</span> <span class="ident">from_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">Query</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">Query</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">lru</span>.<span class="ident">get</span>(<span class="ident">query</span>, <span class="ident">Instant::now</span>())
     }
 
@@ -1242,7 +1242,7 @@
         <span class="ident">negative_ttl</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
         <span class="ident">response_code</span>: <span class="ident">ResponseCode</span>,
         <span class="ident">trusted</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveError</span> {
+    ) -&gt; <span class="ident">ResolveError</span> {
         <span class="kw">if</span> <span class="ident">valid_nsec</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_dnssec</span> {
             <span class="comment">// only trust if there were validated NSEC records</span>
             <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
@@ -1274,7 +1274,7 @@
         <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">Query</span>,
         <span class="kw-2">mut</span> <span class="ident">response</span>: <span class="ident">DnsResponse</span>,
         <span class="kw-2">mut</span> <span class="ident">preserved_records</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Record</span>, <span class="ident">u32</span>)<span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Records</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Records</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="comment">// initial ttl is what CNAMES for min usage</span>
         <span class="kw">const</span> <span class="ident">INITIAL_TTL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">dns_lru::MAX_TTL</span>;
 
@@ -1303,15 +1303,15 @@
                         (<span class="ident">Cow::Borrowed</span>(<span class="ident">query</span>.<span class="ident">name</span>()), <span class="ident">INITIAL_TTL</span>, <span class="bool-val">false</span>),
                         <span class="op">|</span>(<span class="ident">search_name</span>, <span class="ident">cname_ttl</span>, <span class="ident">was_cname</span>), <span class="ident">r</span><span class="op">|</span> {
                             <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">r</span>.<span class="ident">rdata</span>() {
-                                <span class="ident">RData::CNAME</span>(<span class="kw-2">ref</span> <span class="ident">cname</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="ident">RData::CNAME</span>(<span class="kw-2">ref</span> <span class="ident">cname</span>) =&gt; {
                                     <span class="comment">// take the minimum TTL of the cname_ttl and the next record in the chain</span>
                                     <span class="kw">let</span> <span class="ident">ttl</span> <span class="op">=</span> <span class="ident">cname_ttl</span>.<span class="ident">min</span>(<span class="ident">r</span>.<span class="ident">ttl</span>());
                                     <span class="macro">debug_assert_eq!</span>(<span class="ident">r</span>.<span class="ident">rr_type</span>(), <span class="ident">RecordType::CNAME</span>);
-                                    <span class="kw">if</span> <span class="ident">search_name</span>.<span class="ident">as_ref</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">r</span>.<span class="ident">name</span>() {
+                                    <span class="kw">if</span> <span class="ident">search_name</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">r</span>.<span class="ident">name</span>() {
                                         <span class="kw">return</span> (<span class="ident">Cow::Owned</span>(<span class="ident">cname</span>.<span class="ident">clone</span>()), <span class="ident">ttl</span>, <span class="bool-val">true</span>);
                                     }
                                 }
-                                <span class="ident">RData::SRV</span>(<span class="kw-2">ref</span> <span class="ident">srv</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="ident">RData::SRV</span>(<span class="kw-2">ref</span> <span class="ident">srv</span>) =&gt; {
                                     <span class="comment">// take the minimum TTL of the cname_ttl and the next record in the chain</span>
                                     <span class="kw">let</span> <span class="ident">ttl</span> <span class="op">=</span> <span class="ident">cname_ttl</span>.<span class="ident">min</span>(<span class="ident">r</span>.<span class="ident">ttl</span>());
                                     <span class="macro">debug_assert_eq!</span>(<span class="ident">r</span>.<span class="ident">rr_type</span>(), <span class="ident">RecordType::SRV</span>);
@@ -1319,7 +1319,7 @@
                                     <span class="comment">// the search name becomes the srv.target</span>
                                     <span class="kw">return</span> (<span class="ident">Cow::Owned</span>(<span class="ident">srv</span>.<span class="ident">target</span>().<span class="ident">clone</span>()), <span class="ident">ttl</span>, <span class="bool-val">true</span>);
                                 }
-                                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                                <span class="kw">_</span> =&gt; (),
                             }
 
                             (<span class="ident">search_name</span>, <span class="ident">cname_ttl</span>, <span class="ident">was_cname</span>)
@@ -1356,20 +1356,20 @@
                     <span class="kw">let</span> <span class="ident">ttl</span> <span class="op">=</span> <span class="ident">cname_ttl</span>.<span class="ident">min</span>(<span class="ident">r</span>.<span class="ident">ttl</span>());
                     <span class="comment">// TODO: disable name validation with ResolverOpts? glibc feature...</span>
                     <span class="comment">// restrict to the RData type requested</span>
-                    <span class="kw">if</span> <span class="ident">query</span>.<span class="ident">query_class</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">r</span>.<span class="ident">dns_class</span>() {
+                    <span class="kw">if</span> <span class="ident">query</span>.<span class="ident">query_class</span>() <span class="op">==</span> <span class="ident">r</span>.<span class="ident">dns_class</span>() {
                         <span class="comment">// standard evaluation, it&#39;s an any type or it&#39;s the requested type and the search_name matches</span>
                         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::suspicious_operation_groupings</span>)]</span>
-                        <span class="kw">if</span> (<span class="ident">query</span>.<span class="ident">query_type</span>().<span class="ident">is_any</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">query</span>.<span class="ident">query_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">r</span>.<span class="ident">rr_type</span>())
-                            <span class="op">&amp;&amp;</span> (<span class="ident">search_name</span>.<span class="ident">as_ref</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">r</span>.<span class="ident">name</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">query</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">r</span>.<span class="ident">name</span>())
+                        <span class="kw">if</span> (<span class="ident">query</span>.<span class="ident">query_type</span>().<span class="ident">is_any</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">query</span>.<span class="ident">query_type</span>() <span class="op">==</span> <span class="ident">r</span>.<span class="ident">rr_type</span>())
+                            <span class="op">&amp;&amp;</span> (<span class="ident">search_name</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">r</span>.<span class="ident">name</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">query</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">r</span>.<span class="ident">name</span>())
                         {
                             <span class="ident">found_name</span> <span class="op">=</span> <span class="bool-val">true</span>;
                             <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">r</span>, <span class="ident">ttl</span>));
                         }
                         <span class="comment">// CNAME evaluation, it&#39;s an A/AAAA lookup and the record is from the CNAME lookup chain.</span>
                         <span class="kw">if</span> <span class="ident">client</span>.<span class="ident">preserve_intermediates</span>
-                            <span class="op">&amp;&amp;</span> <span class="ident">r</span>.<span class="ident">rr_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RecordType::CNAME</span>
-                            <span class="op">&amp;&amp;</span> (<span class="ident">query</span>.<span class="ident">query_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RecordType::A</span>
-                                <span class="op">|</span><span class="op">|</span> <span class="ident">query</span>.<span class="ident">query_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RecordType::AAAA</span>)
+                            <span class="op">&amp;&amp;</span> <span class="ident">r</span>.<span class="ident">rr_type</span>() <span class="op">==</span> <span class="ident">RecordType::CNAME</span>
+                            <span class="op">&amp;&amp;</span> (<span class="ident">query</span>.<span class="ident">query_type</span>() <span class="op">==</span> <span class="ident">RecordType::A</span>
+                                <span class="op">|</span><span class="op">|</span> <span class="ident">query</span>.<span class="ident">query_type</span>() <span class="op">==</span> <span class="ident">RecordType::AAAA</span>)
                         {
                             <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">r</span>, <span class="ident">ttl</span>));
                         }
@@ -1377,7 +1377,7 @@
                         <span class="comment">//    and it&#39;s an IP</span>
                         <span class="kw">if</span> <span class="ident">query</span>.<span class="ident">query_type</span>().<span class="ident">is_srv</span>()
                             <span class="op">&amp;&amp;</span> <span class="ident">r</span>.<span class="ident">rr_type</span>().<span class="ident">is_ip_addr</span>()
-                            <span class="op">&amp;&amp;</span> <span class="ident">search_name</span>.<span class="ident">as_ref</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">r</span>.<span class="ident">name</span>()
+                            <span class="op">&amp;&amp;</span> <span class="ident">search_name</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">r</span>.<span class="ident">name</span>()
                         {
                             <span class="ident">found_name</span> <span class="op">=</span> <span class="bool-val">true</span>;
                             <span class="prelude-val">Some</span>((<span class="ident">r</span>, <span class="ident">ttl</span>))
@@ -1435,7 +1435,7 @@
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_wraps</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">cname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lookup</span>: <span class="ident">Lookup</span>, <span class="ident">query</span>: <span class="ident">Query</span>, <span class="ident">cname_ttl</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">cname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lookup</span>: <span class="ident">Lookup</span>, <span class="ident">query</span>: <span class="ident">Query</span>, <span class="ident">cname_ttl</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="comment">// this duplicates the cache entry under the original query</span>
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">lru</span>.<span class="ident">duplicate</span>(<span class="ident">query</span>, <span class="ident">lookup</span>, <span class="ident">cname_ttl</span>, <span class="ident">Instant::now</span>()))
     }
@@ -1444,11 +1444,11 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">query</span>: <span class="ident">Query</span>,
         <span class="ident">records</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Record</span>, <span class="ident">u32</span>)<span class="op">&gt;</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="comment">// this will put this object into an inconsistent state, but no one should call poll again...</span>
         <span class="kw">match</span> <span class="ident">records</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">rdata</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">lru</span>.<span class="ident">insert</span>(<span class="ident">query</span>, <span class="ident">rdata</span>, <span class="ident">Instant::now</span>())),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">lru</span>.<span class="ident">negative</span>(<span class="ident">query</span>, <span class="ident">err</span>, <span class="ident">Instant::now</span>())),
+            <span class="prelude-val">Ok</span>(<span class="ident">rdata</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">lru</span>.<span class="ident">insert</span>(<span class="ident">query</span>, <span class="ident">rdata</span>, <span class="ident">Instant::now</span>())),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">lru</span>.<span class="ident">negative</span>(<span class="ident">query</span>, <span class="ident">err</span>, <span class="ident">Instant::now</span>())),
         }
     }
 }
@@ -1577,7 +1577,7 @@
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_wraps</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cname_message</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cname_message</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::new</span>();
         <span class="ident">message</span>.<span class="ident">add_query</span>(<span class="ident">Query::query</span>(
             <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>(),
@@ -1592,7 +1592,7 @@
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_wraps</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">srv_message</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">srv_message</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::new</span>();
         <span class="ident">message</span>.<span class="ident">add_query</span>(<span class="ident">Query::query</span>(
             <span class="ident">Name::from_str</span>(<span class="string">&quot;_443._tcp.www.example.com.&quot;</span>).<span class="ident">unwrap</span>(),
@@ -1802,7 +1802,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">records</span>) <span class="op">=</span> <span class="ident">records</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Records::Exists</span>(<span class="ident">records</span>) <span class="op">=</span> <span class="ident">records</span> {
                 <span class="kw">for</span> (<span class="ident">record</span>, <span class="ident">ttl</span>) <span class="kw">in</span> <span class="ident">records</span>.<span class="ident">iter</span>() {
-                    <span class="kw">if</span> <span class="ident">record</span>.<span class="ident">record_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RecordType::CNAME</span> {
+                    <span class="kw">if</span> <span class="ident">record</span>.<span class="ident">record_type</span>() <span class="op">==</span> <span class="ident">RecordType::CNAME</span> {
                         <span class="kw">continue</span>;
                     }
                     <span class="macro">assert_eq!</span>(<span class="ident">ttl</span>, <span class="kw-2">&amp;</span><span class="number">1</span>);

@@ -73,9 +73,9 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Positive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_non_empty_without_leading_zeros</span>(<span class="ident">input</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_non_empty_without_leading_zeros</span>(<span class="ident">input</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">input</span>.<span class="ident">is_empty</span>());
-        <span class="macro">debug_assert!</span>(<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">input</span>.<span class="ident">as_slice_less_safe</span>()[<span class="number">0</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">input</span>.<span class="ident">as_slice_less_safe</span>()[<span class="number">0</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
         <span class="self">Self</span>(<span class="ident">input</span>)
     }
 
@@ -83,13 +83,13 @@
     <span class="doccomment">/// byte, without any leading zeros. The result is guaranteed to be</span>
     <span class="doccomment">/// non-empty.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">big_endian_without_leading_zero</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">big_endian_without_leading_zero</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="ident">big_endian_without_leading_zero_as_input</span>()
             .<span class="ident">as_slice_less_safe</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">big_endian_without_leading_zero_as_input</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">big_endian_without_leading_zero_as_input</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -99,7 +99,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will not panic because the value is guaranteed to have at least one</span>
     <span class="doccomment">/// byte.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_byte</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_byte</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="comment">// This won&#39;t panic because</span>
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_slice_less_safe</span>()[<span class="number">0</span>]
     }

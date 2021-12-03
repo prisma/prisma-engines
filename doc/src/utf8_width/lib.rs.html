@@ -132,33 +132,33 @@ cargo bench
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_4</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xF4</span>;
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_1</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_1</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
     <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_1</span> <span class="comment">// no need to check `MIN_1 &lt;= byte`</span>
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_2</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_2</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
     <span class="ident">MIN_2</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">byte</span> <span class="op">&amp;&amp;</span> <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_2</span>
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_3</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_3</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
     <span class="ident">MIN_3</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">byte</span> <span class="op">&amp;&amp;</span> <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_3</span>
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_4</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_4</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
     <span class="ident">MIN_4</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">byte</span> <span class="op">&amp;&amp;</span> <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_4</span>
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_0</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_0</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
     <span class="ident">MIN_0_1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">byte</span> <span class="op">&amp;&amp;</span> <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_0_1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">MIN_0_2</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">byte</span> <span class="comment">// no need to check `byte &lt;= MAX_0_2`</span>
 }
 
 <span class="doccomment">/// Given a first byte, determines how many bytes are in this UTF-8 character. If the UTF-8 character is invalid, returns `0`, otherwise returns `1` ~ `4`,</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_width</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_width</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">if</span> <span class="ident">is_width_1</span>(<span class="ident">byte</span>) {
         <span class="number">1</span>
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_width_2</span>(<span class="ident">byte</span>) {
@@ -175,7 +175,7 @@ cargo bench
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_safety_doc</span>)]</span>
 <span class="doccomment">/// *Assume the input first byte is from a valid UTF-8 character.* Given a first byte, determines how many bytes are in this UTF-8 character. It returns `1` ~ `4`,</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_width_assume_valid</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_width_assume_valid</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">if</span> <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_1</span> {
         <span class="number">1</span>
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_2</span> {

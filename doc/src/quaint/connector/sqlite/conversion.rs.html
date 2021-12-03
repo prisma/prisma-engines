@@ -295,28 +295,28 @@
 <span class="kw">use</span> <span class="ident">chrono::TimeZone</span>;
 
 <span class="kw">impl</span> <span class="ident">TypeIdentifier</span> <span class="kw">for</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">is_real</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_real</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">decl_type</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;DECIMAL&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;decimal&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="string">&quot;NUMERIC&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;REAL&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="string">&quot;numeric&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;real&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;DECIMAL&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;decimal&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;NUMERIC&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;REAL&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;numeric&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;real&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">is_float</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_float</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">decl_type</span>(), <span class="prelude-val">Some</span>(<span class="string">&quot;float&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;FLOAT&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">is_double</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_double</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="self">self</span>.<span class="ident">decl_type</span>(),
             <span class="prelude-val">Some</span>(<span class="string">&quot;double&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;DOUBLE&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;DOUBLE PRECISION&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;double precision&quot;</span>)
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">is_integer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_integer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="self">self</span>.<span class="ident">decl_type</span>(),
             <span class="prelude-val">Some</span>(<span class="string">&quot;INT&quot;</span>)
@@ -342,118 +342,118 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">is_datetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_datetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="self">self</span>.<span class="ident">decl_type</span>(),
             <span class="prelude-val">Some</span>(<span class="string">&quot;DATETIME&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;datetime&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;TIMESTAMP&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;timestamp&quot;</span>)
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">is_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">is_date</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_date</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">decl_type</span>(), <span class="prelude-val">Some</span>(<span class="string">&quot;DATE&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;date&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">is_text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">decl_type</span>() {
-            <span class="prelude-val">Some</span>(<span class="string">&quot;TEXT&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;CLOB&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="string">&quot;text&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;clob&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;CHARACTER&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;character&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;VARCHAR&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;varchar&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;VARYING CHARACTER&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;varying character&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;NCHAR&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;nchar&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;NATIVE CHARACTER&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;native character&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;NVARCHAR&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;nvarchar&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;TEXT&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;CLOB&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;text&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;clob&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;CHARACTER&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;character&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;VARCHAR&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;varchar&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;VARYING CHARACTER&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;varying character&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;NCHAR&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;nchar&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;NATIVE CHARACTER&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;native character&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;NVARCHAR&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">starts_with</span>(<span class="string">&quot;nvarchar&quot;</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">is_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">decl_type</span>(), <span class="prelude-val">Some</span>(<span class="string">&quot;BLOB&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;blob&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">is_bool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_bool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">decl_type</span>(), <span class="prelude-val">Some</span>(<span class="string">&quot;BOOLEAN&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;boolean&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">is_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
-    <span class="kw">fn</span> <span class="ident">is_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
-    <span class="kw">fn</span> <span class="ident">is_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">decl_type</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">None</span>
+    <span class="kw">fn</span> <span class="ident">is_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">decl_type</span>() <span class="op">==</span> <span class="prelude-val">None</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">GetRow</span> <span class="kw">for</span> <span class="ident">SqliteRow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">get_result_row</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_result_row</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">columns</span>().<span class="ident">len</span>());
 
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">column</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">columns</span>().<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
             <span class="kw">let</span> <span class="ident">pv</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_ref_unwrap</span>(<span class="ident">i</span>) {
-                <span class="ident">ValueRef::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">column</span> {
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_integer</span>() <span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_null</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_text</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Text</span>(<span class="prelude-val">None</span>),
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_bytes</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Bytes</span>(<span class="prelude-val">None</span>),
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_float</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Float</span>(<span class="prelude-val">None</span>),
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_double</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Double</span>(<span class="prelude-val">None</span>),
+                <span class="ident">ValueRef::Null</span> =&gt; <span class="kw">match</span> <span class="ident">column</span> {
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_integer</span>() <span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_null</span>() =&gt; <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_text</span>() =&gt; <span class="ident">Value::Text</span>(<span class="prelude-val">None</span>),
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_bytes</span>() =&gt; <span class="ident">Value::Bytes</span>(<span class="prelude-val">None</span>),
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_float</span>() =&gt; <span class="ident">Value::Float</span>(<span class="prelude-val">None</span>),
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_double</span>() =&gt; <span class="ident">Value::Double</span>(<span class="prelude-val">None</span>),
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_real</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Numeric</span>(<span class="prelude-val">None</span>),
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_real</span>() =&gt; <span class="ident">Value::Numeric</span>(<span class="prelude-val">None</span>),
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_datetime</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::DateTime</span>(<span class="prelude-val">None</span>),
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_datetime</span>() =&gt; <span class="ident">Value::DateTime</span>(<span class="prelude-val">None</span>),
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_date</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Date</span>(<span class="prelude-val">None</span>),
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_bool</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Boolean</span>(<span class="prelude-val">None</span>),
-                    <span class="ident">c</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">decl_type</span>() {
-                        <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_date</span>() =&gt; <span class="ident">Value::Date</span>(<span class="prelude-val">None</span>),
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_bool</span>() =&gt; <span class="ident">Value::Boolean</span>(<span class="prelude-val">None</span>),
+                    <span class="ident">c</span> =&gt; <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">decl_type</span>() {
+                        <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; {
                             <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Value {} not supported&quot;</span>, <span class="ident">n</span>);
                             <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::conversion</span>(<span class="ident">msg</span>);
 
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>());
                         }
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
                     },
                 },
-                <span class="ident">ValueRef::Integer</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">column</span> {
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_bool</span>() <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="ident">ValueRef::Integer</span>(<span class="ident">i</span>) =&gt; <span class="kw">match</span> <span class="ident">column</span> {
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_bool</span>() =&gt; {
+                        <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> {
                             <span class="ident">Value::boolean</span>(<span class="bool-val">false</span>)
                         } <span class="kw">else</span> {
                             <span class="ident">Value::boolean</span>(<span class="bool-val">true</span>)
                         }
                     }
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_date</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_date</span>() =&gt; {
                         <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">chrono::NaiveDateTime::from_timestamp</span>(<span class="ident">i</span> <span class="op">/</span> <span class="number">1000</span>, <span class="number">0</span>);
                         <span class="ident">Value::date</span>(<span class="ident">dt</span>.<span class="ident">date</span>())
                     }
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_datetime</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_datetime</span>() =&gt; {
                         <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">chrono::Utc</span>.<span class="ident">timestamp_millis</span>(<span class="ident">i</span>);
                         <span class="ident">Value::datetime</span>(<span class="ident">dt</span>)
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::integer</span>(<span class="ident">i</span>),
+                    <span class="kw">_</span> =&gt; <span class="ident">Value::integer</span>(<span class="ident">i</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-                <span class="ident">ValueRef::Real</span>(<span class="ident">f</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">is_real</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ValueRef::Real</span>(<span class="ident">f</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">is_real</span>() =&gt; {
                     <span class="kw">use</span> <span class="ident">bigdecimal</span>::{<span class="ident">BigDecimal</span>, <span class="ident">FromPrimitive</span>};
 
                     <span class="ident">Value::numeric</span>(<span class="ident">BigDecimal::from_f64</span>(<span class="ident">f</span>).<span class="ident">unwrap</span>())
                 }
-                <span class="ident">ValueRef::Real</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::double</span>(<span class="ident">f</span>),
+                <span class="ident">ValueRef::Real</span>(<span class="ident">f</span>) =&gt; <span class="ident">Value::double</span>(<span class="ident">f</span>),
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                <span class="ident">ValueRef::Text</span>(<span class="ident">bytes</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">is_datetime</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ValueRef::Text</span>(<span class="ident">bytes</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">is_datetime</span>() =&gt; {
                     <span class="kw">let</span> <span class="ident">parse_res</span> <span class="op">=</span> <span class="ident">std::str::from_utf8</span>(<span class="ident">bytes</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
                         <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ConversionError</span>(
                             <span class="string">&quot;Failed to read contents of SQLite datetime column as UTF-8&quot;</span>.<span class="ident">into</span>(),
@@ -478,8 +478,8 @@
                             })
                     })<span class="question-mark">?</span>
                 }
-                <span class="ident">ValueRef::Text</span>(<span class="ident">bytes</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::text</span>(<span class="ident">String::from_utf8</span>(<span class="ident">bytes</span>.<span class="ident">to_vec</span>())<span class="question-mark">?</span>),
-                <span class="ident">ValueRef::Blob</span>(<span class="ident">bytes</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::bytes</span>(<span class="ident">bytes</span>.<span class="ident">to_owned</span>()),
+                <span class="ident">ValueRef::Text</span>(<span class="ident">bytes</span>) =&gt; <span class="ident">Value::text</span>(<span class="ident">String::from_utf8</span>(<span class="ident">bytes</span>.<span class="ident">to_vec</span>())<span class="question-mark">?</span>),
+                <span class="ident">ValueRef::Blob</span>(<span class="ident">bytes</span>) =&gt; <span class="ident">Value::bytes</span>(<span class="ident">bytes</span>.<span class="ident">to_owned</span>()),
             };
 
             <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">pv</span>);
@@ -490,26 +490,26 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ToColumnNames</span> <span class="kw">for</span> <span class="ident">SqliteRows</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_column_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_column_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">column_names</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">columns</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into</span>()).<span class="ident">collect</span>(),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
+            <span class="prelude-val">Some</span>(<span class="ident">columns</span>) =&gt; <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into</span>()).<span class="ident">collect</span>(),
+            <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span>, <span class="ident">RusqlError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span>, <span class="ident">RusqlError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Value::Integer</span>(<span class="ident">integer</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">integer</span>.<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
-            <span class="ident">Value::Float</span>(<span class="ident">float</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">float</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span> <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
-            <span class="ident">Value::Double</span>(<span class="ident">double</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">double</span>.<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
-            <span class="ident">Value::Text</span>(<span class="ident">cow</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cow</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">cow</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">cow</span>.<span class="ident">as_ref</span>())),
-            <span class="ident">Value::Enum</span>(<span class="ident">cow</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cow</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">cow</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">cow</span>.<span class="ident">as_ref</span>())),
-            <span class="ident">Value::Boolean</span>(<span class="ident">boo</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">boo</span>.<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
-            <span class="ident">Value::Char</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">c</span> <span class="kw">as</span> <span class="ident">u8</span>)),
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bytes</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">bytes</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>())),
-            <span class="ident">Value::Array</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Integer</span>(<span class="ident">integer</span>) =&gt; <span class="ident">integer</span>.<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
+            <span class="ident">Value::Float</span>(<span class="ident">float</span>) =&gt; <span class="ident">float</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span> <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
+            <span class="ident">Value::Double</span>(<span class="ident">double</span>) =&gt; <span class="ident">double</span>.<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
+            <span class="ident">Value::Text</span>(<span class="ident">cow</span>) =&gt; <span class="ident">cow</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">cow</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">cow</span>.<span class="ident">as_ref</span>())),
+            <span class="ident">Value::Enum</span>(<span class="ident">cow</span>) =&gt; <span class="ident">cow</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">cow</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">cow</span>.<span class="ident">as_ref</span>())),
+            <span class="ident">Value::Boolean</span>(<span class="ident">boo</span>) =&gt; <span class="ident">boo</span>.<span class="ident">map</span>(<span class="ident">ToSqlOutput::from</span>),
+            <span class="ident">Value::Char</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">c</span> <span class="kw">as</span> <span class="ident">u8</span>)),
+            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; <span class="ident">bytes</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">bytes</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>())),
+            <span class="ident">Value::Array</span>(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Arrays are not supported in SQLite.&quot;</span>;
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::conversion</span>(<span class="ident">msg</span>);
 
@@ -519,29 +519,29 @@
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">RusqlError::ToSqlConversionFailure</span>(<span class="ident">Box::new</span>(<span class="ident">builder</span>.<span class="ident">build</span>())));
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            <span class="ident">Value::Numeric</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">d</span>
+            <span class="ident">Value::Numeric</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>
                 .<span class="ident">as_ref</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">d</span>.<span class="ident">to_string</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>().<span class="ident">expect</span>(<span class="string">&quot;BigDecimal is not a f64.&quot;</span>))),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
-            <span class="ident">Value::Json</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
+            <span class="ident">Value::Json</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">stringified</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="ident">value</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">RusqlError::ToSqlConversionFailure</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>)))
                     .<span class="ident">unwrap</span>();
 
                 <span class="ident">ToSqlOutput::from</span>(<span class="ident">stringified</span>)
             }),
-            <span class="ident">Value::Xml</span>(<span class="ident">cow</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cow</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">cow</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">cow</span>.<span class="ident">as_ref</span>())),
+            <span class="ident">Value::Xml</span>(<span class="ident">cow</span>) =&gt; <span class="ident">cow</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">cow</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">cow</span>.<span class="ident">as_ref</span>())),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-            <span class="ident">Value::Uuid</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">value</span>.<span class="ident">to_hyphenated</span>().<span class="ident">to_string</span>())),
+            <span class="ident">Value::Uuid</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">value</span>.<span class="ident">to_hyphenated</span>().<span class="ident">to_string</span>())),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            <span class="ident">Value::DateTime</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">value</span>.<span class="ident">timestamp_millis</span>())),
+            <span class="ident">Value::DateTime</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">ToSqlOutput::from</span>(<span class="ident">value</span>.<span class="ident">timestamp_millis</span>())),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            <span class="ident">Value::Date</span>(<span class="ident">date</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">date</span><span class="op">|</span> {
+            <span class="ident">Value::Date</span>(<span class="ident">date</span>) =&gt; <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">date</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">date</span>.<span class="ident">and_hms</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);
                 <span class="ident">ToSqlOutput::from</span>(<span class="ident">dt</span>.<span class="ident">timestamp_millis</span>())
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            <span class="ident">Value::Time</span>(<span class="ident">time</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> {
+            <span class="ident">Value::Time</span>(<span class="ident">time</span>) =&gt; <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> {
                 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">NaiveDate</span>, <span class="ident">Timelike</span>};
 
                 <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>).<span class="ident">and_hms</span>(<span class="ident">time</span>.<span class="ident">hour</span>(), <span class="ident">time</span>.<span class="ident">minute</span>(), <span class="ident">time</span>.<span class="ident">second</span>());
@@ -551,8 +551,8 @@
         };
 
         <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">value</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="ident">Null</span>)),
+            <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">value</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="ident">Null</span>)),
         }
     }
 }

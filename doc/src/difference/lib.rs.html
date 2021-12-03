@@ -427,7 +427,7 @@
     <span class="doccomment">///     Difference::Same(&quot;t&quot;.to_string())</span>
     <span class="doccomment">/// ]);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">edit</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">split</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Changeset</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">edit</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">split</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Changeset</span> {
         <span class="kw">let</span> (<span class="ident">dist</span>, <span class="ident">common</span>) <span class="op">=</span> <span class="ident">lcs</span>(<span class="ident">orig</span>, <span class="ident">edit</span>, <span class="ident">split</span>);
         <span class="ident">Changeset</span> {
             <span class="ident">diffs</span>: <span class="ident">merge</span>(<span class="ident">orig</span>, <span class="ident">edit</span>, <span class="kw-2">&amp;</span><span class="ident">common</span>, <span class="ident">split</span>),
@@ -465,7 +465,7 @@
 <span class="doccomment">/// ]);</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;1.0.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;please use `Changeset::new` instead&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">edit</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">split</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">i32</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Difference</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">edit</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">split</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; (<span class="ident">i32</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Difference</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">ch</span> <span class="op">=</span> <span class="ident">Changeset::new</span>(<span class="ident">orig</span>, <span class="ident">edit</span>, <span class="ident">split</span>);
     (<span class="ident">ch</span>.<span class="ident">distance</span>, <span class="ident">ch</span>.<span class="ident">diffs</span>)
 }
@@ -489,7 +489,7 @@
 <span class="doccomment">/// Will print an error with a colorful diff in case of failure.</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">assert_diff</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">orig</span>:<span class="ident">expr</span> , <span class="macro-nonterminal">$</span><span class="macro-nonterminal">edit</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">split</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>: <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> ({
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">orig</span>:<span class="ident">expr</span> , <span class="macro-nonterminal">$</span><span class="macro-nonterminal">edit</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">split</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>: <span class="ident">expr</span>) =&gt; ({
         <span class="kw">let</span> <span class="ident">orig</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">orig</span>;
         <span class="kw">let</span> <span class="ident">edit</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">edit</span>;
 

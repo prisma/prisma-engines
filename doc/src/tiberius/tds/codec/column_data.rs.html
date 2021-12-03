@@ -410,56 +410,56 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">type_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">type_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ColumnData::U8</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;tinyint&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::I16</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;smallint&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::I32</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;int&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::I64</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;bigint&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::F32</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;float(24)&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::F64</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;float(53)&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::Bit</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;bit&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;nvarchar(4000)&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::String</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">4000</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;nvarchar(4000)&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::String</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_NVARCHAR_SIZE</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::U8</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;tinyint&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::I16</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;smallint&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::I32</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;int&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::I64</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;bigint&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::F32</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;float(24)&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::F64</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;float(53)&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::Bit</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;bit&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>) =&gt; <span class="string">&quot;nvarchar(4000)&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::String</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">4000</span> =&gt; <span class="string">&quot;nvarchar(4000)&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::String</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_NVARCHAR_SIZE</span> =&gt; {
                 <span class="string">&quot;nvarchar(max)&quot;</span>.<span class="ident">into</span>()
             }
-            <span class="ident">ColumnData::String</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ntext(max)&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::Guid</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;uniqueidentifier&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">8000</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;varbinary(8000)&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::Binary</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;varbinary(max)&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">n</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::String</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;ntext(max)&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::Guid</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;uniqueidentifier&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">8000</span> =&gt; <span class="string">&quot;varbinary(8000)&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::Binary</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;varbinary(max)&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">n</span>)) =&gt; {
                 <span class="macro">format!</span>(<span class="string">&quot;numeric({},{})&quot;</span>, <span class="ident">n</span>.<span class="ident">precision</span>(), <span class="ident">n</span>.<span class="ident">scale</span>()).<span class="ident">into</span>()
             }
-            <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;numeric&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::Xml</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;xml&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::DateTime</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;datetime&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">ColumnData::SmallDateTime</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;smalldatetime&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">None</span>) =&gt; <span class="string">&quot;numeric&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::Xml</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;xml&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::DateTime</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;datetime&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::SmallDateTime</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;smalldatetime&quot;</span>.<span class="ident">into</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-            <span class="ident">ColumnData::Time</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;time&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::Time</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;time&quot;</span>.<span class="ident">into</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-            <span class="ident">ColumnData::Date</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;date&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::Date</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;date&quot;</span>.<span class="ident">into</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-            <span class="ident">ColumnData::DateTime2</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;datetime2&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::DateTime2</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;datetime2&quot;</span>.<span class="ident">into</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-            <span class="ident">ColumnData::DateTimeOffset</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;datetimeoffset&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident">ColumnData::DateTimeOffset</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;datetimeoffset&quot;</span>.<span class="ident">into</span>(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">TypeInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">TypeInfo</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
     {
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span> {
-            <span class="ident">TypeInfo::FixedLen</span>(<span class="ident">fixed_ty</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fixed_len::decode</span>(<span class="ident">src</span>, <span class="ident">fixed_ty</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-            <span class="ident">TypeInfo::VarLenSized</span>(<span class="ident">cx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">var_len::decode</span>(<span class="ident">src</span>, <span class="ident">cx</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-            <span class="ident">TypeInfo::VarLenSizedPrecision</span> { <span class="ident">ty</span>, <span class="ident">scale</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">ty</span> {
-                <span class="ident">VarLenType::Decimaln</span> <span class="op">|</span> <span class="ident">VarLenType::Numericn</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TypeInfo::FixedLen</span>(<span class="ident">fixed_ty</span>) =&gt; <span class="ident">fixed_len::decode</span>(<span class="ident">src</span>, <span class="ident">fixed_ty</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+            <span class="ident">TypeInfo::VarLenSized</span>(<span class="ident">cx</span>) =&gt; <span class="ident">var_len::decode</span>(<span class="ident">src</span>, <span class="ident">cx</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+            <span class="ident">TypeInfo::VarLenSizedPrecision</span> { <span class="ident">ty</span>, <span class="ident">scale</span>, .. } =&gt; <span class="kw">match</span> <span class="ident">ty</span> {
+                <span class="ident">VarLenType::Decimaln</span> <span class="op">|</span> <span class="ident">VarLenType::Numericn</span> =&gt; {
                     <span class="ident">ColumnData::Numeric</span>(<span class="ident">Numeric::decode</span>(<span class="ident">src</span>, <span class="kw-2">*</span><span class="ident">scale</span>).<span class="kw">await</span><span class="question-mark">?</span>)
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">todo!</span>(),
+                <span class="kw">_</span> =&gt; <span class="macro">todo!</span>(),
             },
-            <span class="ident">TypeInfo::Xml</span> { <span class="ident">schema</span>, <span class="ident">size</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">xml::decode</span>(<span class="ident">src</span>, <span class="kw-2">*</span><span class="ident">size</span>, <span class="ident">schema</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>,
+            <span class="ident">TypeInfo::Xml</span> { <span class="ident">schema</span>, <span class="ident">size</span> } =&gt; <span class="ident">xml::decode</span>(<span class="ident">src</span>, <span class="kw-2">*</span><span class="ident">size</span>, <span class="ident">schema</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>,
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
@@ -467,51 +467,51 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ColumnData::Bit</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::Bit</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Bitn</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">1</span>, <span class="number">1</span>][..]].<span class="ident">concat</span>();
 
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
                 <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">val</span> <span class="kw">as</span> <span class="ident">u8</span>);
             }
-            <span class="ident">ColumnData::U8</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::U8</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Intn</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">1</span>, <span class="number">1</span>][..]].<span class="ident">concat</span>();
 
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
                 <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">val</span>);
             }
-            <span class="ident">ColumnData::I16</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::I16</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Intn</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">2</span>, <span class="number">2</span>][..]].<span class="ident">concat</span>();
 
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
                 <span class="ident">dst</span>.<span class="ident">put_i16_le</span>(<span class="ident">val</span>);
             }
-            <span class="ident">ColumnData::I32</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::I32</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Intn</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">4</span>, <span class="number">4</span>][..]].<span class="ident">concat</span>();
 
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
                 <span class="ident">dst</span>.<span class="ident">put_i32_le</span>(<span class="ident">val</span>);
             }
-            <span class="ident">ColumnData::I64</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::I64</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Intn</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">8</span>, <span class="number">8</span>][..]].<span class="ident">concat</span>();
 
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
                 <span class="ident">dst</span>.<span class="ident">put_i64_le</span>(<span class="ident">val</span>);
             }
-            <span class="ident">ColumnData::F32</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::F32</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Floatn</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">4</span>, <span class="number">4</span>][..]].<span class="ident">concat</span>();
 
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
                 <span class="ident">dst</span>.<span class="ident">put_f32_le</span>(<span class="ident">val</span>);
             }
-            <span class="ident">ColumnData::F64</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::F64</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Floatn</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">8</span>, <span class="number">8</span>][..]].<span class="ident">concat</span>();
 
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
                 <span class="ident">dst</span>.<span class="ident">put_f64_le</span>(<span class="ident">val</span>);
             }
-            <span class="ident">ColumnData::Guid</span>(<span class="prelude-val">Some</span>(<span class="ident">uuid</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::Guid</span>(<span class="prelude-val">Some</span>(<span class="ident">uuid</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Guid</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">16</span>, <span class="number">16</span>][..]].<span class="ident">concat</span>();
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
 
@@ -519,7 +519,7 @@
                 <span class="ident"><span class="kw">super</span>::guid::reorder_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>);
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>);
             }
-            <span class="ident">ColumnData::String</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">4000</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::String</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">4000</span> =&gt; {
                 <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">VarLenType::NVarchar</span> <span class="kw">as</span> <span class="ident">u8</span>);
                 <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="number">8000</span>);
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">0u8</span>; <span class="number">5</span>][..]);
@@ -541,7 +541,7 @@
                     <span class="ident">dst</span>[<span class="ident">len_pos</span> <span class="op">+</span> <span class="ident">i</span>] <span class="op">=</span> <span class="kw-2">*</span><span class="ident">byte</span>;
                 }
             }
-            <span class="ident">ColumnData::String</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::String</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) =&gt; {
                 <span class="comment">// length: 0xffff and raw collation</span>
                 <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">VarLenType::NVarchar</span> <span class="kw">as</span> <span class="ident">u8</span>);
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">0xff_u8</span>; <span class="number">2</span>][..]);
@@ -572,13 +572,13 @@
                     <span class="ident">dst</span>[<span class="ident">len_pos</span> <span class="op">+</span> <span class="ident">i</span>] <span class="op">=</span> <span class="kw-2">*</span><span class="ident">byte</span>;
                 }
             }
-            <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">Some</span>(<span class="ident">bytes</span>)) <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">8000</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">Some</span>(<span class="ident">bytes</span>)) <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">8000</span> =&gt; {
                 <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">VarLenType::BigVarBin</span> <span class="kw">as</span> <span class="ident">u8</span>);
                 <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="number">8000</span>);
                 <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>);
                 <span class="ident">dst</span>.<span class="ident">extend</span>(<span class="ident">bytes</span>.<span class="ident">into_owned</span>());
             }
-            <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">Some</span>(<span class="ident">bytes</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">Some</span>(<span class="ident">bytes</span>)) =&gt; {
                 <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">VarLenType::BigVarBin</span> <span class="kw">as</span> <span class="ident">u8</span>);
                 <span class="comment">// Max length</span>
                 <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="number">0xffff_u16</span>);
@@ -591,27 +591,27 @@
                 <span class="comment">// PLP_TERMINATOR</span>
                 <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="number">0</span>);
             }
-            <span class="ident">ColumnData::DateTime</span>(<span class="prelude-val">Some</span>(<span class="ident">dt</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::DateTime</span>(<span class="prelude-val">Some</span>(<span class="ident">dt</span>)) =&gt; {
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Datetimen</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">8</span>, <span class="number">8</span>]);
                 <span class="ident">dt</span>.<span class="ident">encode</span>(<span class="ident">dst</span>)<span class="question-mark">?</span>;
             }
-            <span class="ident">ColumnData::SmallDateTime</span>(<span class="prelude-val">Some</span>(<span class="ident">dt</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::SmallDateTime</span>(<span class="prelude-val">Some</span>(<span class="ident">dt</span>)) =&gt; {
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Datetimen</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">4</span>, <span class="number">4</span>]);
                 <span class="ident">dt</span>.<span class="ident">encode</span>(<span class="ident">dst</span>)<span class="question-mark">?</span>;
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-            <span class="ident">ColumnData::Time</span>(<span class="prelude-val">Some</span>(<span class="ident">time</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::Time</span>(<span class="prelude-val">Some</span>(<span class="ident">time</span>)) =&gt; {
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Timen</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">time</span>.<span class="ident">scale</span>(), <span class="ident">time</span>.<span class="ident">len</span>()<span class="question-mark">?</span>]);
 
                 <span class="ident">time</span>.<span class="ident">encode</span>(<span class="ident">dst</span>)<span class="question-mark">?</span>;
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-            <span class="ident">ColumnData::Date</span>(<span class="prelude-val">Some</span>(<span class="ident">date</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::Date</span>(<span class="prelude-val">Some</span>(<span class="ident">date</span>)) =&gt; {
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Daten</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">3</span>]);
                 <span class="ident">date</span>.<span class="ident">encode</span>(<span class="ident">dst</span>)<span class="question-mark">?</span>;
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-            <span class="ident">ColumnData::DateTime2</span>(<span class="prelude-val">Some</span>(<span class="ident">dt</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::DateTime2</span>(<span class="prelude-val">Some</span>(<span class="ident">dt</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">dt</span>.<span class="ident">time</span>().<span class="ident">len</span>()<span class="question-mark">?</span> <span class="op">+</span> <span class="number">3</span>;
 
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span>[<span class="ident">VarLenType::Datetime2</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">dt</span>.<span class="ident">time</span>().<span class="ident">scale</span>(), <span class="ident">len</span>]);
@@ -619,7 +619,7 @@
                 <span class="ident">dt</span>.<span class="ident">encode</span>(<span class="ident">dst</span>)<span class="question-mark">?</span>;
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-            <span class="ident">ColumnData::DateTimeOffset</span>(<span class="prelude-val">Some</span>(<span class="ident">dto</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::DateTimeOffset</span>(<span class="prelude-val">Some</span>(<span class="ident">dto</span>)) =&gt; {
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span>[
                     <span class="ident">VarLenType::DatetimeOffsetn</span> <span class="kw">as</span> <span class="ident">u8</span>,
                     <span class="ident">dto</span>.<span class="ident">datetime2</span>().<span class="ident">time</span>().<span class="ident">scale</span>(),
@@ -628,11 +628,11 @@
 
                 <span class="ident">dto</span>.<span class="ident">encode</span>(<span class="ident">dst</span>)<span class="question-mark">?</span>;
             }
-            <span class="ident">ColumnData::Xml</span>(<span class="prelude-val">Some</span>(<span class="ident">xml</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::Xml</span>(<span class="prelude-val">Some</span>(<span class="ident">xml</span>)) =&gt; {
                 <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">VarLenType::Xml</span> <span class="kw">as</span> <span class="ident">u8</span>);
                 <span class="ident">xml</span>.<span class="ident">into_owned</span>().<span class="ident">encode</span>(<span class="ident">dst</span>)<span class="question-mark">?</span>;
             }
-            <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">Some</span>(<span class="ident">num</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">Some</span>(<span class="ident">num</span>)) =&gt; {
                 <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span>[
                     <span class="ident">VarLenType::Numericn</span> <span class="kw">as</span> <span class="ident">u8</span>,
                     <span class="ident">num</span>.<span class="ident">len</span>(),
@@ -641,7 +641,7 @@
                 ]);
                 <span class="ident">num</span>.<span class="ident">encode</span>(<span class="ident">dst</span>)<span class="question-mark">?</span>;
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> =&gt; {
                 <span class="comment">// None/null</span>
                 <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">FixedLenType::Null</span> <span class="kw">as</span> <span class="ident">u8</span>);
             }

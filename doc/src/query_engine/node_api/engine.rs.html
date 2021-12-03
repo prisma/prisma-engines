@@ -166,7 +166,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::engine</span>::{<span class="ident">ConstructorOptions</span>, <span class="ident">QueryEngine</span>};
 
 <span class="attribute">#[<span class="ident">js_function</span>(<span class="number">2</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constructor</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsUndefined</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constructor</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) -&gt; <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsUndefined</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">JsUnknown</span><span class="op">&gt;</span>(<span class="number">0</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">callback</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">JsFunction</span><span class="op">&gt;</span>(<span class="number">1</span>)<span class="question-mark">?</span>;
 
@@ -192,7 +192,7 @@
 }
 
 <span class="attribute">#[<span class="ident">js_function</span>(<span class="number">0</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) -&gt; <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">this</span>: <span class="ident">JsObject</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">this_unchecked</span>();
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="kw-2">&amp;</span><span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">env</span>.<span class="ident">unwrap</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">engine</span>.<span class="ident">clone</span>();
@@ -204,7 +204,7 @@
 }
 
 <span class="attribute">#[<span class="ident">js_function</span>(<span class="number">0</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disconnect</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disconnect</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) -&gt; <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">this</span>: <span class="ident">JsObject</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">this_unchecked</span>();
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="kw-2">&amp;</span><span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">env</span>.<span class="ident">unwrap</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">engine</span>.<span class="ident">clone</span>();
@@ -216,7 +216,7 @@
 }
 
 <span class="attribute">#[<span class="ident">js_function</span>(<span class="number">3</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) -&gt; <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">this</span>: <span class="ident">JsObject</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">this_unchecked</span>();
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="kw-2">&amp;</span><span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">env</span>.<span class="ident">unwrap</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">engine</span>.<span class="ident">clone</span>();
@@ -228,13 +228,13 @@
     <span class="kw">let</span> <span class="ident">trace</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">trace</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">tx_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsString</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">try_get</span>::<span class="op">&lt;</span><span class="ident">JsString</span><span class="op">&gt;</span>(<span class="number">2</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">either</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">either</span>.<span class="ident">into</span>(),
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">Ok</span>(<span class="ident">either</span>) =&gt; <span class="ident">either</span>.<span class="ident">into</span>(),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="kw">let</span> <span class="ident">tx_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tx_id</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">js_string</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">js_string</span>.<span class="ident">into_utf8</span>()<span class="question-mark">?</span>.<span class="ident">into_owned</span>()<span class="question-mark">?</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">js_string</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">js_string</span>.<span class="ident">into_utf8</span>()<span class="question-mark">?</span>.<span class="ident">into_owned</span>()<span class="question-mark">?</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="ident">ctx</span>.<span class="ident">env</span>.<span class="ident">execute_tokio_future</span>(
@@ -249,7 +249,7 @@
 }
 
 <span class="attribute">#[<span class="ident">js_function</span>(<span class="number">0</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sdl_schema</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sdl_schema</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) -&gt; <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">this</span>: <span class="ident">JsObject</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">this_unchecked</span>();
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="kw-2">&amp;</span><span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">env</span>.<span class="ident">unwrap</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">engine</span>.<span class="ident">clone</span>();
@@ -263,7 +263,7 @@
 }
 
 <span class="attribute">#[<span class="ident">js_function</span>(<span class="number">2</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_transaction</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_transaction</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) -&gt; <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">this</span>: <span class="ident">JsObject</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">this_unchecked</span>();
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="kw-2">&amp;</span><span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">env</span>.<span class="ident">unwrap</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">engine</span>.<span class="ident">clone</span>();
@@ -282,7 +282,7 @@
 }
 
 <span class="attribute">#[<span class="ident">js_function</span>(<span class="number">2</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commit_transaction</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commit_transaction</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) -&gt; <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">this</span>: <span class="ident">JsObject</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">this_unchecked</span>();
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="kw-2">&amp;</span><span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">env</span>.<span class="ident">unwrap</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">engine</span>.<span class="ident">clone</span>();
@@ -300,7 +300,7 @@
 }
 
 <span class="attribute">#[<span class="ident">js_function</span>(<span class="number">2</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rollback_transaction</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rollback_transaction</span>(<span class="ident">ctx</span>: <span class="ident">CallContext</span>) -&gt; <span class="ident">napi::Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">this</span>: <span class="ident">JsObject</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">this_unchecked</span>();
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="kw-2">&amp;</span><span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">env</span>.<span class="ident">unwrap</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">engine</span>: <span class="ident">QueryEngine</span> <span class="op">=</span> <span class="ident">engine</span>.<span class="ident">clone</span>();

@@ -287,7 +287,7 @@
 
 <span class="doccomment">/// A simple macro that will generate a schema prefix if it exists</span>
 <span class="macro">macro_rules!</span> <span class="ident">prefix</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">schema</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">schema</span>:<span class="ident">expr</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">schema</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`.&quot;</span>, <span class="ident">s</span>))
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">String::new</span>())
@@ -297,32 +297,32 @@
 <span class="doccomment">/// MySQL generator backend</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MySql</span>;
 <span class="kw">impl</span> <span class="ident">SqlGenerator</span> <span class="kw">for</span> <span class="ident">MySql</span> {
-    <span class="kw">fn</span> <span class="ident">create_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">create_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;CREATE TABLE {}`{}`&quot;</span>, <span class="macro">prefix!</span>(<span class="ident">schema</span>), <span class="ident">name</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">create_table_if_not_exists</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">create_table_if_not_exists</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;CREATE TABLE {}`{}` IF NOT EXISTS&quot;</span>, <span class="macro">prefix!</span>(<span class="ident">schema</span>), <span class="ident">name</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">drop_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;DROP TABLE {}`{}`&quot;</span>, <span class="macro">prefix!</span>(<span class="ident">schema</span>), <span class="ident">name</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_table_if_exists</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">drop_table_if_exists</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;DROP TABLE {}`{}` IF EXISTS&quot;</span>, <span class="macro">prefix!</span>(<span class="ident">schema</span>), <span class="ident">name</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">rename_table</span>(<span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">rename_table</span>(<span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">prefix!</span>(<span class="ident">schema</span>);
         <span class="macro">format!</span>(<span class="string">&quot;RENAME TABLE {}`{}` TO {}`{}`&quot;</span>, <span class="ident">schema</span>, <span class="ident">old</span>, <span class="ident">schema</span>, <span class="ident">new</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">alter_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">alter_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;ALTER TABLE {}`{}`&quot;</span>, <span class="macro">prefix!</span>(<span class="ident">schema</span>), <span class="ident">name</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">add_column</span>(<span class="ident">ex</span>: <span class="ident">bool</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">tt</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">add_column</span>(<span class="ident">ex</span>: <span class="ident">bool</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">tt</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">bt</span>: <span class="ident">BaseType</span> <span class="op">=</span> <span class="ident">tt</span>.<span class="ident">get_inner</span>();
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::BaseType</span>::<span class="kw-2">*</span>;
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">name</span>);
@@ -331,101 +331,101 @@
         <span class="macro">format!</span>(
             <span class="string">&quot;{}{}{}{}{}{}&quot;</span>,
             <span class="kw">match</span> <span class="ident">bt</span> {
-                <span class="ident">Text</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Varchar</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Char</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Primary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Integer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Serial</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Float</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Double</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">UUID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(),
-                <span class="ident">Json</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Boolean</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Date</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Time</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">DateTime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Binary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Foreign</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Custom</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
-                <span class="ident">Array</span>(<span class="ident">it</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">Array</span>(<span class="ident">Box::new</span>(<span class="kw-2">*</span><span class="ident">it</span>)), <span class="ident">schema</span>)),
-                <span class="ident">Index</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;Indices are handled via custom builder&quot;</span>),
-                <span class="ident">Constraint</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;Constraints are handled via custom builder&quot;</span>),
+                <span class="ident">Text</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Varchar</span>(<span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Char</span>(<span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Primary</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Integer</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Serial</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Float</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Double</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">UUID</span> =&gt; <span class="macro">unimplemented!</span>(),
+                <span class="ident">Json</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Boolean</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Date</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Time</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">DateTime</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Binary</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Foreign</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Custom</span>(<span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)),
+                <span class="ident">Array</span>(<span class="ident">it</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">MySql::prefix</span>(<span class="ident">ex</span>), <span class="ident">name</span>, <span class="ident">MySql::print_type</span>(<span class="ident">Array</span>(<span class="ident">Box::new</span>(<span class="kw-2">*</span><span class="ident">it</span>)), <span class="ident">schema</span>)),
+                <span class="ident">Index</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Indices are handled via custom builder&quot;</span>),
+                <span class="ident">Constraint</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Constraints are handled via custom builder&quot;</span>),
             },
             <span class="kw">match</span> <span class="ident">tt</span>.<span class="ident">increments</span> {
-                <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot; AUTO_INCREMENT&quot;</span>,
-                <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;&quot;</span>,
+                <span class="bool-val">true</span> =&gt; <span class="string">&quot; AUTO_INCREMENT&quot;</span>,
+                <span class="bool-val">false</span> =&gt; <span class="string">&quot;&quot;</span>,
             },
             <span class="kw">match</span> <span class="ident">tt</span>.<span class="ident">primary</span> {
-                <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot; PRIMARY KEY&quot;</span>,
-                <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;&quot;</span>,
+                <span class="bool-val">true</span> =&gt; <span class="string">&quot; PRIMARY KEY&quot;</span>,
+                <span class="bool-val">false</span> =&gt; <span class="string">&quot;&quot;</span>,
             },
             <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">tt</span>.<span class="ident">default</span>).<span class="ident">as_ref</span>() {
-                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">m</span> {
-                    <span class="ident">WrappedDefault::Function</span>(<span class="kw-2">ref</span> <span class="ident">fun</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">fun</span> {
-                        <span class="ident">AutogenFunction::CurrentTimestamp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot; DEFAULT CURRENT_TIMESTAMP&quot;</span>)
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) =&gt; <span class="kw">match</span> <span class="ident">m</span> {
+                    <span class="ident">WrappedDefault::Function</span>(<span class="kw-2">ref</span> <span class="ident">fun</span>) =&gt; <span class="kw">match</span> <span class="ident">fun</span> {
+                        <span class="ident">AutogenFunction::CurrentTimestamp</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT CURRENT_TIMESTAMP&quot;</span>)
                     },
-                    <span class="ident">WrappedDefault::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot; DEFAULT NULL&quot;</span>),
-                    <span class="ident">WrappedDefault::AnyText</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{}&#39;&quot;</span>, <span class="ident">val</span>),
-                    <span class="ident">WrappedDefault::UUID</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{}&#39;&quot;</span>, <span class="ident">val</span>),
-                    <span class="ident">WrappedDefault::Date</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{:?}&#39;&quot;</span>, <span class="ident">val</span>),
-                    <span class="ident">WrappedDefault::Boolean</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">val</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> }),
-                    <span class="ident">WrappedDefault::Custom</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{}&#39;&quot;</span>, <span class="ident">val</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, <span class="ident">m</span>),
+                    <span class="ident">WrappedDefault::Null</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT NULL&quot;</span>),
+                    <span class="ident">WrappedDefault::AnyText</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{}&#39;&quot;</span>, <span class="ident">val</span>),
+                    <span class="ident">WrappedDefault::UUID</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{}&#39;&quot;</span>, <span class="ident">val</span>),
+                    <span class="ident">WrappedDefault::Date</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{:?}&#39;&quot;</span>, <span class="ident">val</span>),
+                    <span class="ident">WrappedDefault::Boolean</span>(<span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">val</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> }),
+                    <span class="ident">WrappedDefault::Custom</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{}&#39;&quot;</span>, <span class="ident">val</span>),
+                    <span class="kw">_</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, <span class="ident">m</span>),
                 },
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;&quot;</span>),
+                <span class="kw">_</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;&quot;</span>),
             },
             <span class="kw">match</span> <span class="ident">tt</span>.<span class="ident">nullable</span> {
-                <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;&quot;</span>,
-                <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot; NOT NULL&quot;</span>,
+                <span class="bool-val">true</span> =&gt; <span class="string">&quot;&quot;</span>,
+                <span class="bool-val">false</span> =&gt; <span class="string">&quot; NOT NULL&quot;</span>,
             },
             <span class="kw">match</span> <span class="ident">tt</span>.<span class="ident">unique</span> {
-                <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot; UNIQUE&quot;</span>,
-                <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;&quot;</span>,
+                <span class="bool-val">true</span> =&gt; <span class="string">&quot; UNIQUE&quot;</span>,
+                <span class="bool-val">false</span> =&gt; <span class="string">&quot;&quot;</span>,
             },
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_column</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">drop_column</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;DROP COLUMN `{}`&quot;</span>, <span class="ident">name</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">rename_column</span>(<span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">rename_column</span>(<span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;CHANGE COLUMN `{}` `{}`&quot;</span>, <span class="ident">old</span>, <span class="ident">new</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">create_index</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">create_index</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">String</span> {
         <span class="comment">// FIXME: Implement Mysql specific index builder here</span>
         <span class="macro">format!</span>(
             <span class="string">&quot;CREATE {} INDEX `{}` ON {}`{}` ({})&quot;</span>,
             <span class="kw">match</span> <span class="ident">_type</span>.<span class="ident">unique</span> {
-                <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UNIQUE&quot;</span>,
-                <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;&quot;</span>,
+                <span class="bool-val">true</span> =&gt; <span class="string">&quot;UNIQUE&quot;</span>,
+                <span class="bool-val">false</span> =&gt; <span class="string">&quot;&quot;</span>,
             },
             <span class="ident">name</span>,
             <span class="macro">prefix!</span>(<span class="ident">schema</span>),
             <span class="ident">table</span>,
             <span class="kw">match</span> <span class="ident">_type</span>.<span class="ident">inner</span> {
-                <span class="ident">BaseType::Index</span>(<span class="kw-2">ref</span> <span class="ident">cols</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cols</span>
+                <span class="ident">BaseType::Index</span>(<span class="kw-2">ref</span> <span class="ident">cols</span>) =&gt; <span class="ident">cols</span>
                     .<span class="ident">iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">col</span>))
                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                     .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
             }
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">create_constraint</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">create_constraint</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> (<span class="ident">r#type</span>, <span class="ident">columns</span>, <span class="ident">suffix</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">_type</span>.<span class="ident">inner</span> {
-            <span class="ident">BaseType::Constraint</span>(<span class="kw-2">ref</span> <span class="ident">r#type</span>, <span class="kw-2">ref</span> <span class="ident">columns</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">BaseType::Constraint</span>(<span class="kw-2">ref</span> <span class="ident">r#type</span>, <span class="kw-2">ref</span> <span class="ident">columns</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">r#type</span> {
                     <span class="ident">Constraint::ForeignKey</span> {
                         <span class="ident">table</span>,
                         <span class="ident">foreign_columns</span>,
                         <span class="ident">on_delete</span>,
                         <span class="ident">on_update</span>,
-                    } <span class="op">=</span><span class="op">&gt;</span> {
+                    } =&gt; {
                         <span class="kw">let</span> <span class="ident">foreign_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">foreign_columns</span>
                             .<span class="ident">iter</span>()
                             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">col</span>))
@@ -444,7 +444,7 @@
 
                         <span class="prelude-val">Some</span>(<span class="ident">suffix</span>)
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 };
 
                 <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">columns</span>
@@ -454,7 +454,7 @@
 
                 (<span class="ident">r#type</span>.<span class="ident">clone</span>(), <span class="ident">columns</span>, <span class="ident">suffix</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CONSTRAINT `{}` {} ({})&quot;</span>, <span class="ident">name</span>, <span class="ident">r#type</span>, <span class="ident">columns</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),);
@@ -472,11 +472,11 @@
         <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>,
         <span class="ident">_conditions</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    ) -&gt; <span class="ident">String</span> {
         <span class="macro">panic!</span>(<span class="string">&quot;Partial indices are not supported in MySQL&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_index</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">drop_index</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;DROP INDEX `{}`&quot;</span>, <span class="ident">name</span>)
     }
 
@@ -485,7 +485,7 @@
         <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">relation_columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
         <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    ) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">c</span>)).<span class="ident">collect</span>();
         <span class="kw">let</span> <span class="ident">relation_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">relation_columns</span>
             .<span class="ident">into_iter</span>()
@@ -501,52 +501,52 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">add_primary_key</span>(<span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">add_primary_key</span>(<span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">c</span>)).<span class="ident">collect</span>();
         <span class="macro">format!</span>(<span class="string">&quot;PRIMARY KEY ({})&quot;</span>, <span class="ident">columns</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">MySql</span> {
-    <span class="kw">fn</span> <span class="ident">prefix</span>(<span class="ident">ex</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">prefix</span>(<span class="ident">ex</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="ident">ex</span> {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;ADD COLUMN &quot;</span>),
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;&quot;</span>),
+            <span class="bool-val">true</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;ADD COLUMN &quot;</span>),
+            <span class="bool-val">false</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;&quot;</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">print_type</span>(<span class="ident">t</span>: <span class="ident">BaseType</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">print_type</span>(<span class="ident">t</span>: <span class="ident">BaseType</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::BaseType</span>::<span class="kw-2">*</span>;
         <span class="kw">match</span> <span class="ident">t</span> {
-            <span class="ident">Text</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;TEXT&quot;</span>),
-            <span class="ident">Varchar</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">l</span> {
-                <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;VARCHAR&quot;</span>), <span class="comment">// For &quot;0&quot; remove the limit</span>
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;VARCHAR({})&quot;</span>, <span class="ident">l</span>),
+            <span class="ident">Text</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;TEXT&quot;</span>),
+            <span class="ident">Varchar</span>(<span class="ident">l</span>) =&gt; <span class="kw">match</span> <span class="ident">l</span> {
+                <span class="number">0</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARCHAR&quot;</span>), <span class="comment">// For &quot;0&quot; remove the limit</span>
+                <span class="kw">_</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARCHAR({})&quot;</span>, <span class="ident">l</span>),
             },
-            <span class="ident">Char</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;CHAR({})&quot;</span>, <span class="ident">l</span>),
+            <span class="ident">Char</span>(<span class="ident">l</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;CHAR({})&quot;</span>, <span class="ident">l</span>),
             <span class="comment">/* &quot;NOT NULL&quot; is added here because normally primary keys are implicitly not-null */</span>
-            <span class="ident">Primary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY&quot;</span>),
-            <span class="ident">Integer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;INTEGER&quot;</span>),
-            <span class="ident">Serial</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;INTEGER AUTO_INCREMENT&quot;</span>),
-            <span class="ident">Float</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;FLOAT&quot;</span>),
-            <span class="ident">Double</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;DOUBLE&quot;</span>),
-            <span class="ident">UUID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;CHAR(36)&quot;</span>),
-            <span class="ident">Boolean</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;BOOLEAN&quot;</span>),
-            <span class="ident">Date</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;DATE&quot;</span>),
-            <span class="ident">Time</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;TIME&quot;</span>),
-            <span class="ident">DateTime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;DATETIME&quot;</span>),
-            <span class="ident">Json</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;JSON&quot;</span>),
-            <span class="ident">Binary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;BYTEA&quot;</span>),
-            <span class="ident">Foreign</span>(<span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">refs</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
+            <span class="ident">Primary</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY&quot;</span>),
+            <span class="ident">Integer</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;INTEGER&quot;</span>),
+            <span class="ident">Serial</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;INTEGER AUTO_INCREMENT&quot;</span>),
+            <span class="ident">Float</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;FLOAT&quot;</span>),
+            <span class="ident">Double</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;DOUBLE&quot;</span>),
+            <span class="ident">UUID</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;CHAR(36)&quot;</span>),
+            <span class="ident">Boolean</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;BOOLEAN&quot;</span>),
+            <span class="ident">Date</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;DATE&quot;</span>),
+            <span class="ident">Time</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIME&quot;</span>),
+            <span class="ident">DateTime</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;DATETIME&quot;</span>),
+            <span class="ident">Json</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;JSON&quot;</span>),
+            <span class="ident">Binary</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;BYTEA&quot;</span>),
+            <span class="ident">Foreign</span>(<span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">refs</span>) =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;INTEGER REFERENCES {}{}({})&quot;</span>,
                 <span class="macro">prefix!</span>(<span class="ident">s</span>),
                 <span class="ident">t</span>,
                 <span class="ident">refs</span>.<span class="number">0</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>)
             ),
-            <span class="ident">Custom</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">t</span>),
-            <span class="ident">Array</span>(<span class="ident">meh</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}[]&quot;</span>, <span class="ident">MySql::print_type</span>(<span class="kw-2">*</span><span class="ident">meh</span>, <span class="ident">schema</span>)),
-            <span class="ident">Index</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
-            <span class="ident">Constraint</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident">Custom</span>(<span class="ident">t</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">t</span>),
+            <span class="ident">Array</span>(<span class="ident">meh</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}[]&quot;</span>, <span class="ident">MySql::print_type</span>(<span class="kw-2">*</span><span class="ident">meh</span>, <span class="ident">schema</span>)),
+            <span class="ident">Index</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+            <span class="ident">Constraint</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 }

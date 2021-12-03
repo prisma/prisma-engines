@@ -47,22 +47,22 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EncoderOnlyUTF8Encoding</span>;
 
 <span class="kw">impl</span> <span class="ident">Encoding</span> <span class="kw">for</span> <span class="ident">EncoderOnlyUTF8Encoding</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;encoder-only-utf-8&quot;</span> }
-    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="string">&quot;replacement&quot;</span>) } <span class="comment">// WHATWG compatibility</span>
-    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">codec::utf_8::UTF8Encoding</span>.<span class="ident">raw_encoder</span>() }
-    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">codec::error::ErrorEncoding</span>.<span class="ident">raw_decoder</span>() }
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;encoder-only-utf-8&quot;</span> }
+    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="string">&quot;replacement&quot;</span>) } <span class="comment">// WHATWG compatibility</span>
+    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">codec::utf_8::UTF8Encoding</span>.<span class="ident">raw_encoder</span>() }
+    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">codec::error::ErrorEncoding</span>.<span class="ident">raw_decoder</span>() }
 }
 
 <span class="doccomment">/// Algorithmic mapping for `x-user-defined` encoding.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">x_user_defined</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forward</span>(<span class="ident">code</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forward</span>(<span class="ident">code</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u16</span> {
         <span class="number">0xf700</span> <span class="op">|</span> (<span class="ident">code</span> <span class="kw">as</span> <span class="ident">u16</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">backward</span>(<span class="ident">code</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
-        <span class="kw">if</span> (<span class="ident">code</span> <span class="op">&amp;</span> <span class="op">!</span><span class="number">0x7f</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0xf780</span> {(<span class="ident">code</span> <span class="op">&amp;</span> <span class="number">0xff</span>) <span class="kw">as</span> <span class="ident">u8</span>} <span class="kw">else</span> {<span class="number">0</span>}
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">backward</span>(<span class="ident">code</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u8</span> {
+        <span class="kw">if</span> (<span class="ident">code</span> <span class="op">&amp;</span> <span class="op">!</span><span class="number">0x7f</span>) <span class="op">==</span> <span class="number">0xf780</span> {(<span class="ident">code</span> <span class="op">&amp;</span> <span class="number">0xff</span>) <span class="kw">as</span> <span class="ident">u8</span>} <span class="kw">else</span> {<span class="number">0</span>}
     }
 }
 

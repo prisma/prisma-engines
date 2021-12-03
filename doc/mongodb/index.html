@@ -4,16 +4,16 @@ in Rust applications. It uses the <a href="docs.rs/bson"><code>bson</code></a> c
 The driver contains a fully async API that supports either <a href="docs.rs/tokio"><code>tokio</code></a> (default)
 or <a href="docs.rs/async-std"><code>async-std</code></a>, depending on the feature flags set. The driver also has
 a sync API that may be enabled via the <code>&quot;sync&quot;</code> feature flag.</p>
-<h1 id="installation" class="section-header"><a href="#installation">Installation</a></h1><h2 id="requirements" class="section-header"><a href="#requirements">Requirements</a></h2>
+<h2 id="installation" class="section-header"><a href="#installation">Installation</a></h2><h3 id="requirements" class="section-header"><a href="#requirements">Requirements</a></h3>
 <ul>
 <li>Rust 1.48+</li>
 <li>MongoDB 3.6+</li>
 </ul>
-<h2 id="importing" class="section-header"><a href="#importing">Importing</a></h2>
+<h3 id="importing" class="section-header"><a href="#importing">Importing</a></h3>
 <p>The driver is available on <a href="https://crates.io/crates/mongodb">crates.io</a>. To use the driver in
 your application, simply add it to your project’s <code>Cargo.toml</code>.</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
-mongodb = &quot;2.0.0&quot;</code></pre></div><h3 id="configuring-the-async-runtime" class="section-header"><a href="#configuring-the-async-runtime">Configuring the async runtime</a></h3>
+mongodb = &quot;2.0.0&quot;</code></pre></div><h4 id="configuring-the-async-runtime" class="section-header"><a href="#configuring-the-async-runtime">Configuring the async runtime</a></h4>
 <p>The driver supports both of the most popular async runtime crates, namely
 <a href="https://crates.io/crates/tokio"><code>tokio</code></a> and <a href="https://crates.io/crates/async-std"><code>async-std</code></a>. By
 default, the driver will use <a href="https://crates.io/crates/tokio"><code>tokio</code></a>, but you can explicitly choose
@@ -24,7 +24,7 @@ add the following to your <code>Cargo.toml</code>:</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies.mongodb]
 version = &quot;2.0.0&quot;
 default-features = false
-features = [&quot;async-std-runtime&quot;]</code></pre></div><h3 id="enabling-the-sync-api" class="section-header"><a href="#enabling-the-sync-api">Enabling the sync API</a></h3>
+features = [&quot;async-std-runtime&quot;]</code></pre></div><h4 id="enabling-the-sync-api" class="section-header"><a href="#enabling-the-sync-api">Enabling the sync API</a></h4>
 <p>The driver also provides a blocking sync API. To enable this, add the <code>&quot;sync&quot;</code> feature to your
 <code>Cargo.toml</code>:</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies.mongodb]
@@ -34,7 +34,7 @@ features = [&quot;sync&quot;]</code></pre></div>
 <p><strong>Note:</strong> if the sync API is enabled, the async-specific types will be privatized (e.g.
 <code>mongodb::Client</code>). The sync-specific types can be imported from <code>mongodb::sync</code> (e.g.
 <code>mongodb::sync::Client</code>).</p>
-<h3 id="all-feature-flags" class="section-header"><a href="#all-feature-flags">All Feature flags</a></h3><table><thead><tr><th align="left">Feature</th><th align="left">Description</th><th align="left">Extra dependencies</th><th align="left">Default</th></tr></thead><tbody>
+<h4 id="all-feature-flags" class="section-header"><a href="#all-feature-flags">All Feature flags</a></h4><div><table><thead><tr><th align="left">Feature</th><th align="left">Description</th><th align="left">Extra dependencies</th><th align="left">Default</th></tr></thead><tbody>
 <tr><td align="left"><code>tokio-runtime</code></td><td align="left">Enable support for the <code>tokio</code> async runtime</td><td align="left"><code>tokio</code> 1.0 with the <code>full</code> feature</td><td align="left">yes</td></tr>
 <tr><td align="left"><code>async-std-runtime</code></td><td align="left">Enable support for the <code>async-std</code> runtime</td><td align="left"><code>async-std</code> 1.0</td><td align="left">no</td></tr>
 <tr><td align="left"><code>sync</code></td><td align="left">Expose the synchronous API (<code>mongodb::sync</code>). This flag cannot be used in conjunction with either of the async runtime feature flags.</td><td align="left"><code>async-std</code> 1.0</td><td align="left">no</td></tr>
@@ -45,7 +45,7 @@ features = [&quot;sync&quot;]</code></pre></div>
 <tr><td align="left"><code>zstd-compression</code></td><td align="left">Enable support for compressing messages with <a href="http://facebook.github.io/zstd/"><code>zstd</code></a>.  This flag requires Rust version 1.54.</td><td align="left"><code>zstd</code> 0.9.0</td><td align="left">no</td></tr>
 <tr><td align="left"><code>snappy-compression</code></td><td align="left">Enable support for compressing messages with <a href="http://google.github.io/snappy/"><code>snappy</code></a>.</td><td align="left"><code>snap</code> 1.0.5</td><td align="left">no</td></tr>
 </tbody></table>
-<h1 id="example-usage" class="section-header"><a href="#example-usage">Example Usage</a></h1><h2 id="using-the-async-api" class="section-header"><a href="#using-the-async-api">Using the async API</a></h2><h3 id="connecting-to-a-mongodb-deployment" class="section-header"><a href="#connecting-to-a-mongodb-deployment">Connecting to a MongoDB deployment</a></h3>
+</div><h2 id="example-usage" class="section-header"><a href="#example-usage">Example Usage</a></h2><h3 id="using-the-async-api" class="section-header"><a href="#using-the-async-api">Using the async API</a></h3><h4 id="connecting-to-a-mongodb-deployment" class="section-header"><a href="#connecting-to-a-mongodb-deployment">Connecting to a MongoDB deployment</a></h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">mongodb</span>::{<span class="ident">Client</span>, <span class="ident">options::ClientOptions</span>};
 
 <span class="comment">// Parse a connection string into an options struct.</span>
@@ -61,7 +61,7 @@ features = [&quot;sync&quot;]</code></pre></div>
 <span class="kw">for</span> <span class="ident">db_name</span> <span class="kw">in</span> <span class="ident">client</span>.<span class="ident">list_database_names</span>(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span> {
     <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">db_name</span>);
 }</code></pre></div>
-<h3 id="getting-a-handle-to-a-database" class="section-header"><a href="#getting-a-handle-to-a-database">Getting a handle to a database</a></h3>
+<h4 id="getting-a-handle-to-a-database" class="section-header"><a href="#getting-a-handle-to-a-database">Getting a handle to a database</a></h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// Get a handle to a database.</span>
 <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">database</span>(<span class="string">&quot;mydb&quot;</span>);
 
@@ -69,7 +69,7 @@ features = [&quot;sync&quot;]</code></pre></div>
 <span class="kw">for</span> <span class="ident">collection_name</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">list_collection_names</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span> {
     <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">collection_name</span>);
 }</code></pre></div>
-<h3 id="inserting-documents-into-a-collection" class="section-header"><a href="#inserting-documents-into-a-collection">Inserting documents into a collection</a></h3>
+<h4 id="inserting-documents-into-a-collection" class="section-header"><a href="#inserting-documents-into-a-collection">Inserting documents into a collection</a></h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>};
 
 <span class="comment">// Get a handle to a collection in the database.</span>
@@ -111,7 +111,7 @@ not just <code>Document</code>:</p>
 
 <span class="comment">// Insert the books into &quot;mydb.books&quot; collection, no manual conversion to BSON necessary.</span>
 <span class="ident">typed_collection</span>.<span class="ident">insert_many</span>(<span class="ident">books</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
-<h3 id="finding-documents-in-a-collection" class="section-header"><a href="#finding-documents-in-a-collection">Finding documents in a collection</a></h3>
+<h4 id="finding-documents-in-a-collection" class="section-header"><a href="#finding-documents-in-a-collection">Finding documents in a collection</a></h4>
 <p>Results from queries are generally returned via <a href="struct.Cursor.html"><code>Cursor</code></a>, a struct which streams
 the results back from the server as requested. The <a href="struct.Cursor.html"><code>Cursor</code></a> type implements the
 <a href="https://docs.rs/futures/latest/futures/stream/trait.Stream.html"><code>Stream</code></a> trait from
@@ -133,7 +133,7 @@ functionality you need to import at least one of the
 <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">book</span>) <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
     <span class="macro">println!</span>(<span class="string">&quot;title: {}&quot;</span>, <span class="ident">book</span>.<span class="ident">title</span>);
 }</code></pre></div>
-<h3 id="using-the-sync-api" class="section-header"><a href="#using-the-sync-api">Using the sync API</a></h3>
+<h4 id="using-the-sync-api" class="section-header"><a href="#using-the-sync-api">Using the sync API</a></h4>
 <p>The driver also provides a blocking sync API. See the <a href="#enabling-the-sync-api">Installation</a>
 section for instructions on how to enable it.</p>
 <p>The various sync-specific types are found in the <code>mongodb::sync</code> submodule rather than in the
@@ -178,7 +178,7 @@ though, so it looks and behaves similarly to it.</p>
 <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">cursor</span> {
     <span class="macro">println!</span>(<span class="string">&quot;title: {}&quot;</span>, <span class="ident">result</span><span class="question-mark">?</span>.<span class="ident">title</span>);
 }</code></pre></div>
-<h2 id="warning-about-timeouts--cancellation" class="section-header"><a href="#warning-about-timeouts--cancellation">Warning about timeouts / cancellation</a></h2>
+<h3 id="warning-about-timeouts--cancellation" class="section-header"><a href="#warning-about-timeouts--cancellation">Warning about timeouts / cancellation</a></h3>
 <p>In async Rust, it is common to implement cancellation and timeouts by dropping a future after a
 certain period of time instead of polling it to completion. This is how
 <a href="https://docs.rs/tokio/1.10.1/tokio/time/fn.timeout.html"><code>tokio::time::timeout</code></a> works, for
@@ -198,46 +198,46 @@ while also allowing the application to continue in the event of a timeout.</p>
 });
 
 <span class="ident">tokio::time::timeout</span>(<span class="ident">Duration::from_secs</span>(<span class="number">5</span>), <span class="ident">handle</span>).<span class="kw">await</span><span class="question-mark">?</span><span class="question-mark">?</span><span class="question-mark">?</span>;</code></pre></div>
-<h2 id="minimum-supported-rust-version-msrv" class="section-header"><a href="#minimum-supported-rust-version-msrv">Minimum supported Rust version (MSRV)</a></h2>
+<h3 id="minimum-supported-rust-version-msrv" class="section-header"><a href="#minimum-supported-rust-version-msrv">Minimum supported Rust version (MSRV)</a></h3>
 <p>The MSRV for this crate is currently 1.48.0. This will be rarely be increased, and if it ever is,
 it will only happen in a minor or major version release.</p>
 </div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
-<div class="item-table"><div class="item-left import-item"><code>pub use <a class="mod" href="../bson/index.html" title="mod bson">bson</a>;</code></div><div class="item-right docblock-short"></div></div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="error/index.html" title="mongodb::error mod">error</a></div><div class="item-right docblock-short"><p>Contains the <code>Error</code> and <code>Result</code> types that <code>mongodb</code> uses.</p>
-</div><div class="item-left module-item"><a class="mod" href="event/index.html" title="mongodb::event mod">event</a></div><div class="item-right docblock-short"><p>Contains the events and functionality for monitoring internal <code>Client</code> behavior.</p>
-</div><div class="item-left module-item"><a class="mod" href="options/index.html" title="mongodb::options mod">options</a></div><div class="item-right docblock-short"><p>Contains all of the types needed to specify options to MongoDB operations.</p>
-</div><div class="item-left module-item"><a class="mod" href="results/index.html" title="mongodb::results mod">results</a></div><div class="item-right docblock-short"><p>Contains the types of results returned by CRUD operations.</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Client.html" title="mongodb::Client struct">Client</a></div><div class="item-right docblock-short"><p>This is the main entry point for the API. A <code>Client</code> is used to connect to a MongoDB cluster.
+<div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use {{root}}::<a class="mod" href="../bson/index.html" title="mod bson">bson</a>;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="error/index.html" title="mongodb::error mod">error</a></div><div class="item-right docblock-short"><p>Contains the <code>Error</code> and <code>Result</code> types that <code>mongodb</code> uses.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="event/index.html" title="mongodb::event mod">event</a></div><div class="item-right docblock-short"><p>Contains the events and functionality for monitoring internal <code>Client</code> behavior.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="options/index.html" title="mongodb::options mod">options</a></div><div class="item-right docblock-short"><p>Contains all of the types needed to specify options to MongoDB operations.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="results/index.html" title="mongodb::results mod">results</a></div><div class="item-right docblock-short"><p>Contains the types of results returned by CRUD operations.</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Client.html" title="mongodb::Client struct">Client</a></div><div class="item-right docblock-short"><p>This is the main entry point for the API. A <code>Client</code> is used to connect to a MongoDB cluster.
 By default, it will monitor the topology of the cluster, keeping track of any changes, such
 as servers being added or removed.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ClientSession.html" title="mongodb::ClientSession struct">ClientSession</a></div><div class="item-right docblock-short"><p>A MongoDB client session. This struct represents a logical session used for ordering sequential
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ClientSession.html" title="mongodb::ClientSession struct">ClientSession</a></div><div class="item-right docblock-short"><p>A MongoDB client session. This struct represents a logical session used for ordering sequential
 operations. To create a <code>ClientSession</code>, call <code>start_session</code> on a <code>Client</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ClusterTime.html" title="mongodb::ClusterTime struct">ClusterTime</a></div><div class="item-right docblock-short"><p>Struct modeling a cluster time reported by the server.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Collection.html" title="mongodb::Collection struct">Collection</a></div><div class="item-right docblock-short"><p><code>Collection</code> is the client-side abstraction of a MongoDB Collection. It can be used to
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ClusterTime.html" title="mongodb::ClusterTime struct">ClusterTime</a></div><div class="item-right docblock-short"><p>Struct modeling a cluster time reported by the server.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Collection.html" title="mongodb::Collection struct">Collection</a></div><div class="item-right docblock-short"><p><code>Collection</code> is the client-side abstraction of a MongoDB Collection. It can be used to
 perform collection-level operations such as CRUD operations. A <code>Collection</code> can be obtained
 through a <a href="struct.Database.html"><code>Database</code></a> by calling either
 <a href="struct.Database.html#method.collection"><code>Database::collection</code></a> or
 <a href="struct.Database.html#method.collection_with_options"><code>Database::collection_with_options</code></a>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Cursor.html" title="mongodb::Cursor struct">Cursor</a></div><div class="item-right docblock-short"><p>A <a href="struct.Cursor.html" title="Cursor"><code>Cursor</code></a> streams the result of a query. When a query is made, the returned <a href="struct.Cursor.html" title="Cursor"><code>Cursor</code></a> will
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Cursor.html" title="mongodb::Cursor struct">Cursor</a></div><div class="item-right docblock-short"><p>A <a href="struct.Cursor.html" title="Cursor"><code>Cursor</code></a> streams the result of a query. When a query is made, the returned <a href="struct.Cursor.html" title="Cursor"><code>Cursor</code></a> will
 contain the first batch of results from the server; the individual results will then be returned
 as the <a href="struct.Cursor.html" title="Cursor"><code>Cursor</code></a> is iterated. When the batch is exhausted and if there are more results, the
 <a href="struct.Cursor.html" title="Cursor"><code>Cursor</code></a> will fetch the next batch of documents, and so forth until the results are exhausted.
 Note that because of this batching, additional network I/O may occur on any given call to
 <code>next</code>. Because of this, a <a href="struct.Cursor.html" title="Cursor"><code>Cursor</code></a> iterates over <code>Result&lt;T&gt;</code> items rather than
 simply <code>T</code> items.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Database.html" title="mongodb::Database struct">Database</a></div><div class="item-right docblock-short"><p><code>Database</code> is the client-side abstraction of a MongoDB database. It can be used to perform
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Database.html" title="mongodb::Database struct">Database</a></div><div class="item-right docblock-short"><p><code>Database</code> is the client-side abstraction of a MongoDB database. It can be used to perform
 database-level operations or to obtain handles to specific collections within the database. A
 <code>Database</code> can only be obtained through a <a href="struct.Client.html"><code>Client</code></a> by calling either
 <a href="struct.Client.html#method.database"><code>Client::database</code></a> or
 <a href="struct.Client.html#method.database_with_options"><code>Client::database_with_options</code></a>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.IndexModel.html" title="mongodb::IndexModel struct">IndexModel</a></div><div class="item-right docblock-short"><p>Specifies the fields and options for an index. For more information, see the <a href="https://docs.mongodb.com/manual/indexes/">documentation</a>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Namespace.html" title="mongodb::Namespace struct">Namespace</a></div><div class="item-right docblock-short"><p>A struct modeling the canonical name for a collection in MongoDB.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SessionCursor.html" title="mongodb::SessionCursor struct">SessionCursor</a></div><div class="item-right docblock-short"><p>A <a href="struct.SessionCursor.html" title="SessionCursor"><code>SessionCursor</code></a> is a cursor that was created with a <a href="struct.ClientSession.html" title="ClientSession"><code>ClientSession</code></a> that must be iterated
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.IndexModel.html" title="mongodb::IndexModel struct">IndexModel</a></div><div class="item-right docblock-short"><p>Specifies the fields and options for an index. For more information, see the <a href="https://docs.mongodb.com/manual/indexes/">documentation</a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Namespace.html" title="mongodb::Namespace struct">Namespace</a></div><div class="item-right docblock-short"><p>A struct modeling the canonical name for a collection in MongoDB.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SessionCursor.html" title="mongodb::SessionCursor struct">SessionCursor</a></div><div class="item-right docblock-short"><p>A <a href="struct.SessionCursor.html" title="SessionCursor"><code>SessionCursor</code></a> is a cursor that was created with a <a href="struct.ClientSession.html" title="ClientSession"><code>ClientSession</code></a> that must be iterated
 using one. To iterate, use <a href="struct.SessionCursor.html#method.next" title="SessionCursor::next"><code>SessionCursor::next</code></a> or retrieve a <a href="struct.SessionCursorStream.html" title="SessionCursorStream"><code>SessionCursorStream</code></a> using
 <a href="struct.SessionCursor.html#method.stream" title="SessionCursor::stream"><code>SessionCursor::stream</code></a>:</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SessionCursorStream.html" title="mongodb::SessionCursorStream struct">SessionCursorStream</a></div><div class="item-right docblock-short"><p>A type that implements <a href="https://docs.rs/futures/latest/futures/stream/index.html"><code>Stream</code></a> which can be used to
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SessionCursorStream.html" title="mongodb::SessionCursorStream struct">SessionCursorStream</a></div><div class="item-right docblock-short"><p>A type that implements <a href="https://docs.rs/futures/latest/futures/stream/index.html"><code>Stream</code></a> which can be used to
 stream the results of a <a href="struct.SessionCursor.html" title="SessionCursor"><code>SessionCursor</code></a>. Returned from <a href="struct.SessionCursor.html#method.stream" title="SessionCursor::stream"><code>SessionCursor::stream</code></a>.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="mongodb" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="mongodb" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

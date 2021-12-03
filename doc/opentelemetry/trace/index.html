@@ -5,7 +5,7 @@ is a tree of <a href="trait.Span.html" title="Span"><code>Span</code></a>s which
 by individual services or components involved in a request as it flows
 through a system. This module implements the OpenTelemetry <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/v1.3.0/specification/trace/api.md">trace
 specification</a>.</p>
-<h2 id="getting-started" class="section-header"><a href="#getting-started">Getting Started</a></h2>
+<h3 id="getting-started" class="section-header"><a href="#getting-started">Getting Started</a></h3>
 <p>In application code:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">opentelemetry</span>::{<span class="ident">global</span>, <span class="ident">sdk::export::trace::stdout</span>, <span class="ident">trace::Tracer</span>};
@@ -41,7 +41,7 @@ specification</a>.</p>
     <span class="comment">// End the span</span>
     <span class="ident">span</span>.<span class="ident">end</span>();
 }</code></pre></div>
-<h2 id="overview" class="section-header"><a href="#overview">Overview</a></h2>
+<h3 id="overview" class="section-header"><a href="#overview">Overview</a></h3>
 <p>The tracing API consists of a three main traits:</p>
 <ul>
 <li><a href="trait.TracerProvider.html" title="TracerProvider"><code>TracerProvider</code></a>s are the entry point of the API. They provide access to
@@ -49,14 +49,14 @@ specification</a>.</p>
 <li><a href="trait.Tracer.html" title="Tracer"><code>Tracer</code></a>s are types responsible for creating <code>Span</code>s.</li>
 <li><a href="trait.Span.html" title="Span"><code>Span</code></a>s provide the API to trace an operation.</li>
 </ul>
-<h2 id="working-with-async-runtimes" class="section-header"><a href="#working-with-async-runtimes">Working with Async Runtimes</a></h2>
+<h3 id="working-with-async-runtimes" class="section-header"><a href="#working-with-async-runtimes">Working with Async Runtimes</a></h3>
 <p>Exporting spans often involves sending data over a network or performing
 other I/O tasks. OpenTelemetry allows you to schedule these tasks using
 whichever runtime you area already using such as <a href="https://tokio.rs">Tokio</a> or <a href="https://async.rs">async-std</a>.
 When using an async runtime it’s best to use the <a href="../sdk/trace/struct.BatchSpanProcessor.html"><code>BatchSpanProcessor</code></a>
 where the spans will be sent in batches as opposed to being sent once ended,
 which often ends up being more efficient.</p>
-<h2 id="managing-active-spans" class="section-header"><a href="#managing-active-spans">Managing Active Spans</a></h2>
+<h3 id="managing-active-spans" class="section-header"><a href="#managing-active-spans">Managing Active Spans</a></h3>
 <p>Spans can be marked as “active” for a given <a href="../struct.Context.html"><code>Context</code></a>, and all newly
 created spans will automatically be children of the currently active span.</p>
 <p>The active span for a given thread can be managed via <a href="fn.get_active_span.html" title="get_active_span"><code>get_active_span</code></a>
@@ -106,7 +106,7 @@ simplify managing the parent context.</p>
 <span class="ident">tracer</span>.<span class="ident">with_span</span>(<span class="ident">span</span>, <span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
     <span class="comment">// spans created here will be children of `parent_span`</span>
 });</code></pre></div>
-<h4 id="async-active-spans" class="section-header"><a href="#async-active-spans">Async active spans</a></h4>
+<h5 id="async-active-spans" class="section-header"><a href="#async-active-spans">Async active spans</a></h5>
 <p>Async spans can be propagated with <a href="trait.TraceContextExt.html" title="TraceContextExt"><code>TraceContextExt</code></a> and <a href="trait.FutureExt.html" title="FutureExt"><code>FutureExt</code></a>.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">opentelemetry</span>::{<span class="ident">Context</span>, <span class="ident">global</span>, <span class="ident">trace</span>::{<span class="ident">FutureExt</span>, <span class="ident">TraceContextExt</span>, <span class="ident">Tracer</span>}};
@@ -122,45 +122,45 @@ simplify managing the parent context.</p>
 <span class="comment">// Perform some async work with this span as the currently active parent.</span>
 <span class="ident">some_work</span>().<span class="ident">with_context</span>(<span class="ident">Context::current_with_span</span>(<span class="ident">span</span>));</code></pre></div>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="noop/index.html" title="opentelemetry::trace::noop mod">noop</a></div><div class="item-right docblock-short"><p>No-op trace impls</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Event.html" title="opentelemetry::trace::Event struct">Event</a></div><div class="item-right docblock-short"><p>A <code>Span</code> has the ability to add events. Events have a time associated
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="noop/index.html" title="opentelemetry::trace::noop mod">noop</a></div><div class="item-right docblock-short"><p>No-op trace impls</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Event.html" title="opentelemetry::trace::Event struct">Event</a></div><div class="item-right docblock-short"><p>A <code>Span</code> has the ability to add events. Events have a time associated
 with the moment when they are added to the <code>Span</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Link.html" title="opentelemetry::trace::Link struct">Link</a></div><div class="item-right docblock-short"><p>During the <code>Span</code> creation user MUST have the ability to record links to other <code>Span</code>s. Linked
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Link.html" title="opentelemetry::trace::Link struct">Link</a></div><div class="item-right docblock-short"><p>During the <code>Span</code> creation user MUST have the ability to record links to other <code>Span</code>s. Linked
 <code>Span</code>s can be from the same or a different trace.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SpanBuilder.html" title="opentelemetry::trace::SpanBuilder struct">SpanBuilder</a></div><div class="item-right docblock-short"><p><code>SpanBuilder</code> allows span attributes to be configured before the span
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SpanBuilder.html" title="opentelemetry::trace::SpanBuilder struct">SpanBuilder</a></div><div class="item-right docblock-short"><p><code>SpanBuilder</code> allows span attributes to be configured before the span
 has started.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SpanContext.html" title="opentelemetry::trace::SpanContext struct">SpanContext</a></div><div class="item-right docblock-short"><p>Immutable portion of a <code>Span</code> which can be serialized and propagated.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SpanId.html" title="opentelemetry::trace::SpanId struct">SpanId</a></div><div class="item-right docblock-short"><p>SpanId is an 8-byte value which uniquely identifies a given span within a trace
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SpanContext.html" title="opentelemetry::trace::SpanContext struct">SpanContext</a></div><div class="item-right docblock-short"><p>Immutable portion of a <code>Span</code> which can be serialized and propagated.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SpanId.html" title="opentelemetry::trace::SpanId struct">SpanId</a></div><div class="item-right docblock-short"><p>SpanId is an 8-byte value which uniquely identifies a given span within a trace
 The actual <code>u64</code> value is wrapped in a tuple struct in order to leverage the newtype pattern</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SpanRef.html" title="opentelemetry::trace::SpanRef struct">SpanRef</a></div><div class="item-right docblock-short"><p>A reference to the currently active span in this context.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.TraceFlags.html" title="opentelemetry::trace::TraceFlags struct">TraceFlags</a></div><div class="item-right docblock-short"><p>Flags that can be set on a <a href="struct.SpanContext.html" title="SpanContext"><code>SpanContext</code></a>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.TraceId.html" title="opentelemetry::trace::TraceId struct">TraceId</a></div><div class="item-right docblock-short"><p>TraceId is an 16-byte value which uniquely identifies a given trace
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SpanRef.html" title="opentelemetry::trace::SpanRef struct">SpanRef</a></div><div class="item-right docblock-short"><p>A reference to the currently active span in this context.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.TraceFlags.html" title="opentelemetry::trace::TraceFlags struct">TraceFlags</a></div><div class="item-right docblock-short"><p>Flags that can be set on a <a href="struct.SpanContext.html" title="SpanContext"><code>SpanContext</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.TraceId.html" title="opentelemetry::trace::TraceId struct">TraceId</a></div><div class="item-right docblock-short"><p>TraceId is an 16-byte value which uniquely identifies a given trace
 The actual <code>u128</code> value is wrapped in a tuple struct in order to leverage the newtype pattern</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.TraceState.html" title="opentelemetry::trace::TraceState struct">TraceState</a></div><div class="item-right docblock-short"><p>TraceState carries system-specific configuration data, represented as a list
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.TraceState.html" title="opentelemetry::trace::TraceState struct">TraceState</a></div><div class="item-right docblock-short"><p>TraceState carries system-specific configuration data, represented as a list
 of key-value pairs. TraceState allows multiple tracing systems to
 participate in the same trace.</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.SpanKind.html" title="opentelemetry::trace::SpanKind enum">SpanKind</a></div><div class="item-right docblock-short"><p><code>SpanKind</code> describes the relationship between the Span, its parents,
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.SpanKind.html" title="opentelemetry::trace::SpanKind enum">SpanKind</a></div><div class="item-right docblock-short"><p><code>SpanKind</code> describes the relationship between the Span, its parents,
 and its children in a <code>Trace</code>. <code>SpanKind</code> describes two independent
 properties that benefit tracing systems during analysis.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.StatusCode.html" title="opentelemetry::trace::StatusCode enum">StatusCode</a></div><div class="item-right docblock-short"><p>The <code>StatusCode</code> interface represents the status of a finished <code>Span</code>.
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.StatusCode.html" title="opentelemetry::trace::StatusCode enum">StatusCode</a></div><div class="item-right docblock-short"><p>The <code>StatusCode</code> interface represents the status of a finished <code>Span</code>.
 It’s composed of a canonical code in conjunction with an optional
 descriptive message.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.TraceError.html" title="opentelemetry::trace::TraceError enum">TraceError</a></div><div class="item-right docblock-short"><p>Errors returned by the trace API.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.TraceStateError.html" title="opentelemetry::trace::TraceStateError enum">TraceStateError</a></div><div class="item-right docblock-short"><p>Error returned by <code>TraceState</code> operations.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.FutureExt.html" title="opentelemetry::trace::FutureExt trait">FutureExt</a></div><div class="item-right docblock-short"><p>Extension trait allowing futures, streams, and sinks to be traced with a span.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.IdGenerator.html" title="opentelemetry::trace::IdGenerator trait">IdGenerator</a></div><div class="item-right docblock-short"><p>Interface for generating IDs</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Span.html" title="opentelemetry::trace::Span trait">Span</a></div><div class="item-right docblock-short"><p>Interface for a single operation within a trace.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.TraceContextExt.html" title="opentelemetry::trace::TraceContextExt trait">TraceContextExt</a></div><div class="item-right docblock-short"><p>Methods for storing and retrieving trace data in a context.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Tracer.html" title="opentelemetry::trace::Tracer trait">Tracer</a></div><div class="item-right docblock-short"><p>Interface for constructing <code>Span</code>s.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.TracerProvider.html" title="opentelemetry::trace::TracerProvider trait">TracerProvider</a></div><div class="item-right docblock-short"><p>Types that can create instances of <a href="trait.Tracer.html" title="Tracer"><code>Tracer</code></a>.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.get_active_span.html" title="opentelemetry::trace::get_active_span fn">get_active_span</a></div><div class="item-right docblock-short"><p>Executes a closure with a reference to this thread’s current span.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.mark_span_as_active.html" title="opentelemetry::trace::mark_span_as_active fn">mark_span_as_active</a></div><div class="item-right docblock-short"><p>Mark a given <code>Span</code> as active.</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.TraceResult.html" title="opentelemetry::trace::TraceResult type">TraceResult</a></div><div class="item-right docblock-short"><p>Describe the result of operations in tracing API.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.TraceError.html" title="opentelemetry::trace::TraceError enum">TraceError</a></div><div class="item-right docblock-short"><p>Errors returned by the trace API.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.TraceStateError.html" title="opentelemetry::trace::TraceStateError enum">TraceStateError</a></div><div class="item-right docblock-short"><p>Error returned by <code>TraceState</code> operations.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.FutureExt.html" title="opentelemetry::trace::FutureExt trait">FutureExt</a></div><div class="item-right docblock-short"><p>Extension trait allowing futures, streams, and sinks to be traced with a span.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IdGenerator.html" title="opentelemetry::trace::IdGenerator trait">IdGenerator</a></div><div class="item-right docblock-short"><p>Interface for generating IDs</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Span.html" title="opentelemetry::trace::Span trait">Span</a></div><div class="item-right docblock-short"><p>Interface for a single operation within a trace.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.TraceContextExt.html" title="opentelemetry::trace::TraceContextExt trait">TraceContextExt</a></div><div class="item-right docblock-short"><p>Methods for storing and retrieving trace data in a context.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Tracer.html" title="opentelemetry::trace::Tracer trait">Tracer</a></div><div class="item-right docblock-short"><p>Interface for constructing <code>Span</code>s.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.TracerProvider.html" title="opentelemetry::trace::TracerProvider trait">TracerProvider</a></div><div class="item-right docblock-short"><p>Types that can create instances of <a href="trait.Tracer.html" title="Tracer"><code>Tracer</code></a>.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.get_active_span.html" title="opentelemetry::trace::get_active_span fn">get_active_span</a></div><div class="item-right docblock-short"><p>Executes a closure with a reference to this thread’s current span.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.mark_span_as_active.html" title="opentelemetry::trace::mark_span_as_active fn">mark_span_as_active</a></div><div class="item-right docblock-short"><p>Mark a given <code>Span</code> as active.</p>
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.TraceResult.html" title="opentelemetry::trace::TraceResult type">TraceResult</a></div><div class="item-right docblock-short"><p>Describe the result of operations in tracing API.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

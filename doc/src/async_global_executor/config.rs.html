@@ -111,11 +111,11 @@
     <span class="doccomment">/// The maximum number of threads to spawn.</span>
     <span class="ident">max_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The closure function used to get the name of the thread. The name can be used for identification in panic messages.</span>
-    <span class="ident">thread_name_fn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">thread_name_fn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() -&gt; <span class="ident">String</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">GlobalExecutorConfig</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;GlobalExecutorConfig&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;env_var&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">env_var</span>)
             .<span class="ident">field</span>(<span class="string">&quot;min_threads&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">min_threads</span>)
@@ -126,19 +126,19 @@
 
 <span class="kw">impl</span> <span class="ident">GlobalExecutorConfig</span> {
     <span class="doccomment">/// Use the specified environment variable to find the number of threads to spawn.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_env_var</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">env_var</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_env_var</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">env_var</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">env_var</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">env_var</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Use the specified value as the minimum number of threads.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_min_threads</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">min_threads</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_min_threads</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">min_threads</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">min_threads</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">min_threads</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Use the specified value as the maximum number of threads.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_threads</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_threads</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_threads</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_threads</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">max_threads</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max_threads</span>);
         <span class="self">self</span>
     }
@@ -146,13 +146,13 @@
     <span class="doccomment">/// Use the specified prefix to name the threads.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_thread_name_fn</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">thread_name_fn</span>: <span class="kw">impl</span> <span class="ident">Fn</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident">thread_name_fn</span>: <span class="kw">impl</span> <span class="ident">Fn</span>() -&gt; <span class="ident">String</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">thread_name_fn</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">thread_name_fn</span>));
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">seal</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Config</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">seal</span>(<span class="self">self</span>) -&gt; <span class="ident">Config</span> {
         <span class="kw">let</span> <span class="ident">min_threads</span> <span class="op">=</span> <span class="ident">std::env::var</span>(<span class="self">self</span>.<span class="ident">env_var</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;ASYNC_GLOBAL_EXECUTOR_THREADS&quot;</span>))
             .<span class="ident">ok</span>()
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">threads</span><span class="op">|</span> <span class="ident">threads</span>.<span class="ident">parse</span>().<span class="ident">ok</span>())
@@ -180,11 +180,11 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Config</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">min_threads</span>: <span class="ident">usize</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_threads</span>: <span class="ident">usize</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">thread_name_fn</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">thread_name_fn</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() -&gt; <span class="ident">String</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">GlobalExecutorConfig::default</span>().<span class="ident">seal</span>()
     }
 }

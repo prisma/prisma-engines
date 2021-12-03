@@ -118,7 +118,7 @@
 
 <span class="kw">fn</span> <span class="ident">parse_public_key</span>(
     <span class="ident">input</span>: <span class="ident">untrusted::Input</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">io::Positive</span>, <span class="ident">io::Positive</span>), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">io::Positive</span>, <span class="ident">io::Positive</span>), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="ident">input</span>.<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
         <span class="ident">der::nested</span>(<span class="ident">input</span>, <span class="ident">der::Tag::Sequence</span>, <span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">der::positive_integer</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;

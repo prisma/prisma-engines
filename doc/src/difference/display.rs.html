@@ -104,16 +104,16 @@
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Changeset</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">for</span> <span class="ident">d</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">diffs</span> {
             <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">d</span> {
-                <span class="ident">Difference::Same</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Difference::Same</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; {
                     <span class="macro">try!</span>(<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}{}&quot;</span>, <span class="ident">x</span>, <span class="self">self</span>.<span class="ident">split</span>));
                 }
-                <span class="ident">Difference::Add</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Difference::Add</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; {
                     <span class="macro">try!</span>(<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\x1b[92m{}\x1b[0m{}&quot;</span>, <span class="ident">x</span>, <span class="self">self</span>.<span class="ident">split</span>));
                 }
-                <span class="ident">Difference::Rem</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Difference::Rem</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; {
                     <span class="macro">try!</span>(<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\x1b[91m{}\x1b[0m{}&quot;</span>, <span class="ident">x</span>, <span class="self">self</span>.<span class="ident">split</span>));
                 }
             }
@@ -131,7 +131,7 @@
     <span class="kw">use</span> <span class="ident">std::time</span>;
 
     <span class="doccomment">/// convert slice to vector for assert_eq</span>
-    <span class="kw">fn</span> <span class="ident">vb</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">vb</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="ident">Vec::from_iter</span>(<span class="ident">b</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>())
     }
 
@@ -166,10 +166,10 @@
         <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="ident">bytes</span> {
             <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">b</span> {
                 <span class="comment">// 9 =&gt; print!(&quot;{}&quot;, *b as char), // TAB</span>
-                <span class="string">b&#39;\n&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">print!</span>(<span class="string">&quot;\\n&quot;</span>),
-                <span class="string">b&#39;\r&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">print!</span>(<span class="string">&quot;\\r&quot;</span>),
-                <span class="number">32</span>...<span class="number">126</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">print!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">*</span><span class="ident">b</span> <span class="kw">as</span> <span class="ident">char</span>), <span class="comment">// visible ASCII</span>
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">print!</span>(<span class="string">r&quot;\x{:0&gt;2x}&quot;</span>, <span class="ident">b</span>),
+                <span class="string">b&#39;\n&#39;</span> =&gt; <span class="macro">print!</span>(<span class="string">&quot;\\n&quot;</span>),
+                <span class="string">b&#39;\r&#39;</span> =&gt; <span class="macro">print!</span>(<span class="string">&quot;\\r&quot;</span>),
+                <span class="number">32</span>...<span class="number">126</span> =&gt; <span class="macro">print!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">*</span><span class="ident">b</span> <span class="kw">as</span> <span class="ident">char</span>), <span class="comment">// visible ASCII</span>
+                <span class="kw">_</span> =&gt; <span class="macro">print!</span>(<span class="string">r&quot;\x{:0&gt;2x}&quot;</span>, <span class="ident">b</span>),
 
             }
         }

@@ -495,7 +495,7 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ResolverFuture</span> <span class="op">=</span> <span class="ident">TokioAsyncResolver</span>;
 
 <span class="doccomment">/// returns a version as specified in Cargo.toml</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
     <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>)
 }
 </code></pre></div>

@@ -34,7 +34,7 @@
 <span class="kw">use</span> <span class="ident">prisma_models::ModelRef</span>;
 
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">field</span>, <span class="ident">model</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_many</span>(<span class="ident">field</span>: <span class="ident">ParsedField</span>, <span class="ident">model</span>: <span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">ReadQuery</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_many</span>(<span class="ident">field</span>: <span class="ident">ParsedField</span>, <span class="ident">model</span>: <span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">ReadQuery</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">extractors::extract_query_args</span>(<span class="ident">field</span>.<span class="ident">arguments</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">name</span>;
     <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">alias</span>;

@@ -221,7 +221,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HeaderProtectionKey</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key_bytes</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident"><span class="kw">super</span>::MAX_KEY_LEN</span>];
         <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">okm</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">key_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">key_bytes</span>[..<span class="ident">algorithm</span>.<span class="ident">key_len</span>()];
@@ -237,7 +237,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>,
         <span class="ident">key_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">inner</span>: (<span class="ident">algorithm</span>.<span class="ident">init</span>)(<span class="ident">key_bytes</span>, <span class="ident">cpu::features</span>())<span class="question-mark">?</span>,
             <span class="ident">algorithm</span>,
@@ -247,7 +247,7 @@
     <span class="doccomment">/// Generate a new QUIC Header Protection mask.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `sample` must be exactly `self.algorithm().sample_len()` bytes long.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_mask</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sample</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">5</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_mask</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sample</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">5</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sample</span> <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="ident">SAMPLE_LEN</span>]<span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">sample</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">new_mask</span>)(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="kw-2">*</span><span class="ident">sample</span>);
@@ -256,7 +256,7 @@
 
     <span class="doccomment">/// The key&#39;s algorithm.</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
         <span class="self">self</span>.<span class="ident">algorithm</span>
     }
 }
@@ -268,9 +268,9 @@
 
 <span class="doccomment">/// A QUIC Header Protection Algorithm.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Algorithm</span> {
-    <span class="ident">init</span>: <span class="kw">fn</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
+    <span class="ident">init</span>: <span class="kw">fn</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
 
-    <span class="ident">new_mask</span>: <span class="kw">fn</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>, <span class="ident">sample</span>: <span class="ident">Sample</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">5</span>],
+    <span class="ident">new_mask</span>: <span class="kw">fn</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>, <span class="ident">sample</span>: <span class="ident">Sample</span>) -&gt; [<span class="ident">u8</span>; <span class="number">5</span>],
 
     <span class="ident">key_len</span>: <span class="ident">usize</span>,
     <span class="ident">id</span>: <span class="ident">AlgorithmID</span>,
@@ -278,7 +278,7 @@
 
 <span class="kw">impl</span> <span class="ident">hkdf::KeyType</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">key_len</span>()
     }
 }
@@ -286,13 +286,13 @@
 <span class="kw">impl</span> <span class="ident">Algorithm</span> {
     <span class="doccomment">/// The length of the key.</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">key_len</span>
     }
 
     <span class="doccomment">/// The required sample length.</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sample_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sample_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident">SAMPLE_LEN</span>
     }
 }
@@ -307,8 +307,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Algorithm</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">id</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">id</span>
     }
 }
 
@@ -330,20 +330,20 @@
     <span class="ident">id</span>: <span class="ident">AlgorithmID::AES_256</span>,
 };
 
-<span class="kw">fn</span> <span class="ident">aes_init_128</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">aes_init_128</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">aes_key</span> <span class="op">=</span> <span class="ident">aes::Key::new</span>(<span class="ident">key</span>, <span class="ident">aes::Variant::AES_128</span>, <span class="ident">cpu_features</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">KeyInner::Aes</span>(<span class="ident">aes_key</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">aes_init_256</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">aes_init_256</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">aes_key</span> <span class="op">=</span> <span class="ident">aes::Key::new</span>(<span class="ident">key</span>, <span class="ident">aes::Variant::AES_256</span>, <span class="ident">cpu_features</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">KeyInner::Aes</span>(<span class="ident">aes_key</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">aes_new_mask</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>, <span class="ident">sample</span>: <span class="ident">Sample</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">5</span>] {
+<span class="kw">fn</span> <span class="ident">aes_new_mask</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>, <span class="ident">sample</span>: <span class="ident">Sample</span>) -&gt; [<span class="ident">u8</span>; <span class="number">5</span>] {
     <span class="kw">let</span> <span class="ident">aes_key</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">key</span> {
-        <span class="ident">KeyInner::Aes</span>(<span class="ident">key</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">key</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="ident">KeyInner::Aes</span>(<span class="ident">key</span>) =&gt; <span class="ident">key</span>,
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
     };
 
     <span class="ident">aes_key</span>.<span class="ident">new_mask</span>(<span class="ident">sample</span>)
@@ -357,15 +357,15 @@
     <span class="ident">id</span>: <span class="ident">AlgorithmID::CHACHA20</span>,
 };
 
-<span class="kw">fn</span> <span class="ident">chacha20_init</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">_todo</span>: <span class="ident">cpu::Features</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">chacha20_init</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">_todo</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">chacha20_key</span>: [<span class="ident">u8</span>; <span class="ident">chacha::KEY_LEN</span>] <span class="op">=</span> <span class="ident">key</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">KeyInner::ChaCha20</span>(<span class="ident">chacha::Key::from</span>(<span class="ident">chacha20_key</span>)))
 }
 
-<span class="kw">fn</span> <span class="ident">chacha20_new_mask</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>, <span class="ident">sample</span>: <span class="ident">Sample</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">5</span>] {
+<span class="kw">fn</span> <span class="ident">chacha20_new_mask</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>, <span class="ident">sample</span>: <span class="ident">Sample</span>) -&gt; [<span class="ident">u8</span>; <span class="number">5</span>] {
     <span class="kw">let</span> <span class="ident">chacha20_key</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">key</span> {
-        <span class="ident">KeyInner::ChaCha20</span>(<span class="ident">key</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">key</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="ident">KeyInner::ChaCha20</span>(<span class="ident">key</span>) =&gt; <span class="ident">key</span>,
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
     };
 
     <span class="ident">chacha20_key</span>.<span class="ident">new_mask</span>(<span class="ident">sample</span>)

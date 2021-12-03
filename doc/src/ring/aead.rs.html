@@ -727,16 +727,16 @@
     <span class="doccomment">/// implementation may that enforce a maximum number of records are</span>
     <span class="doccomment">/// sent/received under a key this way. Once `advance()` fails, it must</span>
     <span class="doccomment">/// fail for all subsequent calls.</span>
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Nonce</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Nonce</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// An AEAD key bound to a nonce sequence.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BoundKey</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span>: <span class="ident">core::fmt::Debug</span> {
     <span class="doccomment">/// Constructs a new key from the given `UnboundKey` and `NonceSequence`.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">UnboundKey</span>, <span class="ident">nonce_sequence</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">UnboundKey</span>, <span class="ident">nonce_sequence</span>: <span class="ident">N</span>) -&gt; <span class="self">Self</span>;
 
     <span class="doccomment">/// The key&#39;s AEAD algorithm.</span>
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>;
+    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>;
 }
 
 <span class="doccomment">/// An AEAD key for authenticating and decrypting (&quot;opening&quot;), bound to a nonce</span>
@@ -750,7 +750,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span> <span class="ident">BoundKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OpeningKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">UnboundKey</span>, <span class="ident">nonce_sequence</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">UnboundKey</span>, <span class="ident">nonce_sequence</span>: <span class="ident">N</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">key</span>,
             <span class="ident">nonce_sequence</span>,
@@ -758,13 +758,13 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
+    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
         <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">algorithm</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">OpeningKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;OpeningKey&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;algorithm&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">algorithm</span>())
             .<span class="ident">finish</span>()
@@ -788,7 +788,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     {
@@ -844,7 +844,7 @@
         <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">ciphertext_and_tag</span>: <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     {
@@ -865,14 +865,14 @@
     <span class="ident">Aad</span>(<span class="ident">aad</span>): <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
     <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
     <span class="ident">ciphertext_and_tag</span>: <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">open_within</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span><span class="op">&gt;</span>(
         <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">UnboundKey</span>,
         <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
         <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">ciphertext_and_tag</span>: <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">in_prefix_len</span> <span class="op">=</span> <span class="ident">ciphertext_and_tag</span>.<span class="ident">start</span>;
         <span class="kw">let</span> <span class="ident">ciphertext_and_tag_len</span> <span class="op">=</span> <span class="ident">in_out</span>
             .<span class="ident">len</span>()
@@ -925,7 +925,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span> <span class="ident">BoundKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SealingKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">UnboundKey</span>, <span class="ident">nonce_sequence</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">UnboundKey</span>, <span class="ident">nonce_sequence</span>: <span class="ident">N</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">key</span>,
             <span class="ident">nonce_sequence</span>,
@@ -933,13 +933,13 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
+    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
         <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">algorithm</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">SealingKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;SealingKey&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;algorithm&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">algorithm</span>())
             .<span class="ident">finish</span>()
@@ -954,7 +954,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">InOut</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
         <span class="ident">InOut</span>: <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="ident">u8</span><span class="op">&gt;</span>,
@@ -976,7 +976,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">InOut</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
         <span class="ident">InOut</span>: <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="ident">u8</span><span class="op">&gt;</span>,
@@ -1001,7 +1001,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Tag</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Tag</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     {
@@ -1020,7 +1020,7 @@
     <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
     <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Tag</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Tag</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="ident">check_per_nonce_max_bytes</span>(<span class="ident">key</span>.<span class="ident">algorithm</span>, <span class="ident">in_out</span>.<span class="ident">len</span>())<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((<span class="ident">key</span>.<span class="ident">algorithm</span>.<span class="ident">seal</span>)(
         <span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">inner</span>,
@@ -1041,7 +1041,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Construct the `Aad` from the given bytes.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">aad</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">aad</span>: <span class="ident">A</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Aad</span>(<span class="ident">aad</span>)
     }
 }
@@ -1050,14 +1050,14 @@
 <span class="kw">where</span>
     <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Aad</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">0</span>]<span class="op">&gt;</span> {
     <span class="doccomment">/// Construct an empty `Aad`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from</span>([])
     }
 }
@@ -1070,7 +1070,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">UnboundKey</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;UnboundKey&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;algorithm&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">algorithm</span>)
             .<span class="ident">finish</span>()
@@ -1090,7 +1090,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>,
         <span class="ident">key_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cpu_features</span> <span class="op">=</span> <span class="ident">cpu::features</span>();
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">inner</span>: (<span class="ident">algorithm</span>.<span class="ident">init</span>)(<span class="ident">key_bytes</span>, <span class="ident">cpu_features</span>)<span class="question-mark">?</span>,
@@ -1101,13 +1101,13 @@
 
     <span class="doccomment">/// The key&#39;s AEAD algorithm.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
         <span class="self">self</span>.<span class="ident">algorithm</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UnboundKey</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key_bytes</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">MAX_KEY_LEN</span>];
         <span class="kw">let</span> <span class="ident">key_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">key_bytes</span>[..<span class="ident">okm</span>.<span class="ident">len</span>().<span class="ident">key_len</span>];
         <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">okm</span>.<span class="ident">len</span>();
@@ -1118,7 +1118,7 @@
 
 <span class="kw">impl</span> <span class="ident">hkdf::KeyType</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">key_len</span>()
     }
 }
@@ -1133,7 +1133,7 @@
 
 <span class="kw">impl</span> <span class="ident">LessSafeKey</span> {
     <span class="doccomment">/// Constructs a `LessSafeKey` from an `UnboundKey`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">UnboundKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">UnboundKey</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">key</span> }
     }
 
@@ -1146,7 +1146,7 @@
         <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
         <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     {
@@ -1163,7 +1163,7 @@
         <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">ciphertext_and_tag</span>: <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     {
@@ -1178,7 +1178,7 @@
         <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
         <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">InOut</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
         <span class="ident">InOut</span>: <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="ident">u8</span><span class="op">&gt;</span>,
@@ -1196,7 +1196,7 @@
         <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
         <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">InOut</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
         <span class="ident">InOut</span>: <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="ident">u8</span><span class="op">&gt;</span>,
@@ -1215,7 +1215,7 @@
         <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
         <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Tag</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Tag</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     {
@@ -1224,13 +1224,13 @@
 
     <span class="doccomment">/// The key&#39;s AEAD algorithm.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>.<span class="ident">algorithm</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">LessSafeKey</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;LessSafeKey&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;algorithm&quot;</span>, <span class="self">self</span>.<span class="ident">algorithm</span>())
             .<span class="ident">finish</span>()
@@ -1239,7 +1239,7 @@
 
 <span class="doccomment">/// An AEAD Algorithm.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Algorithm</span> {
-    <span class="ident">init</span>: <span class="kw">fn</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
+    <span class="ident">init</span>: <span class="kw">fn</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
 
     <span class="ident">seal</span>: <span class="kw">fn</span>(
         <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>,
@@ -1247,7 +1247,7 @@
         <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Tag</span>,
+    ) -&gt; <span class="ident">Tag</span>,
     <span class="ident">open</span>: <span class="kw">fn</span>(
         <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>,
         <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
@@ -1255,7 +1255,7 @@
         <span class="ident">in_prefix_len</span>: <span class="ident">usize</span>,
         <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Tag</span>,
+    ) -&gt; <span class="ident">Tag</span>,
 
     <span class="ident">key_len</span>: <span class="ident">usize</span>,
     <span class="ident">id</span>: <span class="ident">AlgorithmID</span>,
@@ -1265,7 +1265,7 @@
     <span class="ident">max_input_len</span>: <span class="ident">u64</span>,
 }
 
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">max_input_len</span>(<span class="ident">block_len</span>: <span class="ident">usize</span>, <span class="ident">overhead_blocks_per_nonce</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">max_input_len</span>(<span class="ident">block_len</span>: <span class="ident">usize</span>, <span class="ident">overhead_blocks_per_nonce</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
     <span class="comment">// Each of our AEADs use a 32-bit block counter so the maximum is the</span>
     <span class="comment">// largest input that will not overflow the counter.</span>
     ((<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">-</span> <span class="ident">polyfill::u64_from_usize</span>(<span class="ident">overhead_blocks_per_nonce</span>))
@@ -1275,7 +1275,7 @@
 <span class="kw">impl</span> <span class="ident">Algorithm</span> {
     <span class="doccomment">/// The length of the key.</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">key_len</span>
     }
 
@@ -1283,13 +1283,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// See also `MAX_TAG_LEN`.</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident">TAG_LEN</span>
     }
 
     <span class="doccomment">/// The length of the nonces.</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nonce_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nonce_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident">NONCE_LEN</span>
     }
 }
@@ -1304,8 +1304,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Algorithm</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">id</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">id</span>
     }
 }
 
@@ -1317,7 +1317,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Tag</span>([<span class="ident">u8</span>; <span class="ident">TAG_LEN</span>]);
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Tag</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
     }
 }
@@ -1330,7 +1330,7 @@
 <span class="doccomment">/// The maximum length of a tag for the algorithms in this module.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_TAG_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">TAG_LEN</span>;
 
-<span class="kw">fn</span> <span class="ident">check_per_nonce_max_bytes</span>(<span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="ident">Algorithm</span>, <span class="ident">in_out_len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">check_per_nonce_max_bytes</span>(<span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="ident">Algorithm</span>, <span class="ident">in_out_len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">polyfill::u64_from_usize</span>(<span class="ident">in_out_len</span>) <span class="op">&gt;</span> <span class="ident">alg</span>.<span class="ident">max_input_len</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
     }

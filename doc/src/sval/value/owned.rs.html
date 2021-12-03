@@ -1137,7 +1137,7 @@ features = [&quot;std&quot;]
 
     [`Value`]: struct.Value.html
     */</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect</span>(<span class="ident">v</span>: <span class="kw">impl</span> <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect</span>(<span class="ident">v</span>: <span class="kw">impl</span> <span class="ident">Value</span>) -&gt; <span class="self">Self</span> {
         <span class="comment">// Try get a primitive first</span>
         <span class="comment">// If the value is a simple primitive that can</span>
         <span class="comment">// be represented in a single token then we can avoid</span>
@@ -1159,7 +1159,7 @@ features = [&quot;std&quot;]
     [`Value`]: struct.Value.html
     */</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">v</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Value</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">v</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Value</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Shared</span>(<span class="ident">v</span>.<span class="ident">into</span>()))
     }
 }
@@ -1174,13 +1174,13 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">Value</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">value::Result</span> {
+    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">ValueInner::Error</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::custom</span>(<span class="ident">e</span>)),
+            <span class="ident">ValueInner::Error</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::custom</span>(<span class="ident">e</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-            <span class="ident">ValueInner::Shared</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">stream</span>(<span class="ident">stream</span>),
-            <span class="ident">ValueInner::Primitive</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">stream</span>(<span class="ident">stream</span>),
-            <span class="ident">ValueInner::Stream</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ValueInner::Shared</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">stream</span>(<span class="ident">stream</span>),
+            <span class="ident">ValueInner::Primitive</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">stream</span>(<span class="ident">stream</span>),
+            <span class="ident">ValueInner::Stream</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; {
                 <span class="kw">for</span> <span class="ident">token</span> <span class="kw">in</span> <span class="ident">v</span>.<span class="ident">iter</span>() {
                     <span class="ident">token</span>.<span class="ident">stream</span>(<span class="ident">stream</span>)<span class="question-mark">?</span>;
                 }
@@ -1192,7 +1192,7 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fmt&quot;</span>)]</span>
         {
             <span class="ident"><span class="kw">crate</span>::fmt::debug</span>(<span class="ident">f</span>, <span class="self">self</span>)
@@ -1206,109 +1206,109 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Unsigned</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u64</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Unsigned</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u64</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Unsigned</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u64</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Unsigned</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u64</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Unsigned</span>(<span class="ident">v</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">u128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">u128</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::BigUnsigned</span>(<span class="ident">v</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">isize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">isize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Signed</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">i64</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">i8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">i8</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Signed</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">i64</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">i16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">i16</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Signed</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">i64</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">i32</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Signed</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">i64</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">i64</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Signed</span>(<span class="ident">v</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">i128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">i128</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::BigSigned</span>(<span class="ident">v</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">f32</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Float</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">f64</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Float</span>(<span class="ident">v</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Bool</span>(<span class="ident">v</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">char</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Char</span>(<span class="ident">v</span>)))
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Str</span>(<span class="ident">v</span>.<span class="ident">into</span>())))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedValue</span>(<span class="ident">ValueInner::Primitive</span>(<span class="ident">Primitive::Str</span>(<span class="ident">v</span>.<span class="ident">into</span>())))
     }
 }
@@ -1338,7 +1338,7 @@ features = [&quot;std&quot;]
     <span class="ident">T</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InlineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">InlineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>();
 
         <span class="ident">InlineString</span>(<span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">SHARED_STR_INLINE_CAPACITY</span> {
@@ -1368,7 +1368,7 @@ features = [&quot;std&quot;]
     <span class="ident">T</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InlineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="ident">InlineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">InlineString</span>(<span class="ident">InlineStringInner::Shared</span>(<span class="ident">s</span>.<span class="ident">into</span>()))
     }
 }
@@ -1380,14 +1380,14 @@ features = [&quot;std&quot;]
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">str</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">InlineStringInner::Inline</span>(<span class="ident">len</span>, <span class="kw-2">ref</span> <span class="ident">buf</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">InlineStringInner::Inline</span>(<span class="ident">len</span>, <span class="kw-2">ref</span> <span class="ident">buf</span>) =&gt; {
                 <span class="comment">// SAFETY: The written portion of `buf[..len]` is a valid UTF8 string</span>
                 <span class="comment">// SAFETY: `len` is within the bounds of `buf`</span>
                 <span class="kw">unsafe</span> { <span class="ident">str::from_utf8_unchecked</span>(<span class="ident">buf</span>.<span class="ident">get_unchecked</span>(<span class="number">0</span>..<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)) }
             }
-            <span class="ident">InlineStringInner::Shared</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">s</span>,
+            <span class="ident">InlineStringInner::Shared</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">s</span>,
         }
     }
 }
@@ -1403,7 +1403,7 @@ features = [&quot;std&quot;]
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
 <span class="kw">impl</span> <span class="ident">OwnedSource</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">empty</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">OwnedSource</span> {
             <span class="ident">debug</span>: <span class="ident">String::new</span>(),
             <span class="ident">display</span>: <span class="ident">String::new</span>(),
@@ -1412,7 +1412,7 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">stream::Source</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedSource</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">stream::Source</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OwnedSource</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">stream::Source</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">OwnedSource</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
         {
             <span class="ident">OwnedSource::collect</span>(<span class="ident">err</span>.<span class="ident">as_ref</span>())
@@ -1427,7 +1427,7 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OwnedSource</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">stream::Source</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OwnedSource</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Source</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OwnedSource</span>) -&gt; <span class="ident">stream::Source</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
         {
             <span class="ident">stream::Source::new</span>(<span class="ident">err</span>)
@@ -1442,13 +1442,13 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">OwnedSource</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">debug</span>, <span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">OwnedSource</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">display</span>, <span class="ident">f</span>)
     }
 }
@@ -1483,33 +1483,33 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">Token</span> {
-    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">value::Result</span> {
+    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::TokenKind</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Signed</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">i64</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">Unsigned</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">u64</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">Float</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">f64</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">BigSigned</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">i128</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">BigUnsigned</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">u128</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">Bool</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">bool</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">Str</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">Char</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">char</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">Error</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">any</span>(<span class="ident">stream::Source::from</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">v</span>))<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">none</span>()<span class="question-mark">?</span>,
-            <span class="ident">MapBegin</span>(<span class="ident">len</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">map_begin</span>(<span class="ident">len</span>)<span class="question-mark">?</span>,
-            <span class="ident">MapKey</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Signed</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">i64</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Unsigned</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">u64</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Float</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">f64</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">BigSigned</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">i128</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">BigUnsigned</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">u128</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Bool</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">bool</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Str</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Char</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">char</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Error</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">any</span>(<span class="ident">stream::Source::from</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">v</span>))<span class="question-mark">?</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">stream</span>.<span class="ident">none</span>()<span class="question-mark">?</span>,
+            <span class="ident">MapBegin</span>(<span class="ident">len</span>) =&gt; <span class="ident">stream</span>.<span class="ident">map_begin</span>(<span class="ident">len</span>)<span class="question-mark">?</span>,
+            <span class="ident">MapKey</span> =&gt; {
                 <span class="ident">stream</span>.<span class="ident">map_key_begin</span>()<span class="question-mark">?</span>;
             }
-            <span class="ident">MapValue</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">MapValue</span> =&gt; {
                 <span class="ident">stream</span>.<span class="ident">map_value_begin</span>()<span class="question-mark">?</span>;
             }
-            <span class="ident">MapEnd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">map_end</span>()<span class="question-mark">?</span>,
-            <span class="ident">SeqBegin</span>(<span class="ident">len</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">seq_begin</span>(<span class="ident">len</span>)<span class="question-mark">?</span>,
-            <span class="ident">SeqElem</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">MapEnd</span> =&gt; <span class="ident">stream</span>.<span class="ident">map_end</span>()<span class="question-mark">?</span>,
+            <span class="ident">SeqBegin</span>(<span class="ident">len</span>) =&gt; <span class="ident">stream</span>.<span class="ident">seq_begin</span>(<span class="ident">len</span>)<span class="question-mark">?</span>,
+            <span class="ident">SeqElem</span> =&gt; {
                 <span class="ident">stream</span>.<span class="ident">seq_elem_begin</span>()<span class="question-mark">?</span>;
             }
-            <span class="ident">SeqEnd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">seq_end</span>()<span class="question-mark">?</span>,
+            <span class="ident">SeqEnd</span> =&gt; <span class="ident">stream</span>.<span class="ident">seq_end</span>()<span class="question-mark">?</span>,
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -1523,7 +1523,7 @@ features = [&quot;std&quot;]
 
 <span class="kw">impl</span> <span class="ident">TokenBuf</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenBuf</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">TokenBuf</span> {
         <span class="ident">TokenBuf</span> {
             <span class="ident">stack</span>: <span class="ident">Stack::new</span>(),
             <span class="ident">tokens</span>: <span class="ident">Vec::new</span>(),
@@ -1531,7 +1531,7 @@ features = [&quot;std&quot;]
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">collect</span>(<span class="ident">v</span>: <span class="kw">impl</span> <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">collect</span>(<span class="ident">v</span>: <span class="kw">impl</span> <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident"><span class="kw">crate</span>::stream</span>(<span class="ident">TokenBuf::new</span>(), <span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">tokens</span>)
     }
 
@@ -1548,17 +1548,17 @@ features = [&quot;std&quot;]
         <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">clear</span>();
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">Token</span>] {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Token</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tokens</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_streamable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_streamable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">can_end</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">TokenBuf</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">stream::Arguments</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">stream::Arguments</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Str</span>(<span class="ident">StringContainer::from</span>(<span class="ident">f</span>.<span class="ident">to_string</span>())), <span class="ident">depth</span>);
@@ -1566,7 +1566,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">stream::Source</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">stream::Source</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(
@@ -1577,7 +1577,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Signed</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1585,7 +1585,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Unsigned</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1593,7 +1593,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">i128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">i128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i128</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::BigSigned</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1601,7 +1601,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">u128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">u128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u128</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::BigUnsigned</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1609,7 +1609,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Float</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1617,7 +1617,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Bool</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1625,7 +1625,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Char</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1633,7 +1633,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Str</span>(<span class="ident">StringContainer::from</span>(<span class="ident">v</span>)), <span class="ident">depth</span>);
@@ -1641,7 +1641,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">none</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">none</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::None</span>, <span class="ident">depth</span>);
@@ -1649,7 +1649,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">map_begin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_begin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">map_begin</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::MapBegin</span>(<span class="ident">len</span>), <span class="ident">depth</span>);
@@ -1657,7 +1657,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">map_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">map_key</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::MapKey</span>, <span class="ident">depth</span>);
@@ -1665,7 +1665,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">map_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">map_value</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::MapValue</span>, <span class="ident">depth</span>);
@@ -1673,7 +1673,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">map_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">map_end</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::MapEnd</span>, <span class="ident">depth</span>);
@@ -1681,7 +1681,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">seq_begin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">seq_begin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">seq_begin</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::SeqBegin</span>(<span class="ident">len</span>), <span class="ident">depth</span>);
@@ -1689,7 +1689,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">seq_elem</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">seq_elem</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">seq_elem</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::SeqElem</span>, <span class="ident">depth</span>);
@@ -1697,7 +1697,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">seq_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">seq_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">seq_end</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::SeqEnd</span>, <span class="ident">depth</span>);
@@ -1722,40 +1722,40 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">Primitive</span> {
-    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">value::Result</span> {
+    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Primitive</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Signed</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">i64</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">Unsigned</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">u64</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">Float</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">f64</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">BigSigned</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">i128</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">BigUnsigned</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">u128</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">Bool</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">bool</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">Str</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">Char</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">char</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
-            <span class="ident">Error</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">any</span>(<span class="ident">stream::Source::from</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">v</span>))<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">none</span>()<span class="question-mark">?</span>,
+            <span class="ident">Signed</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">i64</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Unsigned</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">u64</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Float</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">f64</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">BigSigned</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">i128</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">BigUnsigned</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">u128</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Bool</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">bool</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Str</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Char</span>(<span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">char</span>(<span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Error</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">stream</span>.<span class="ident">any</span>(<span class="ident">stream::Source::from</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">v</span>))<span class="question-mark">?</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">stream</span>.<span class="ident">none</span>()<span class="question-mark">?</span>,
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;test&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">to_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Token</span> {
+    <span class="kw">fn</span> <span class="ident">to_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Token</span> {
         <span class="ident">Token</span> {
             <span class="ident">depth</span>: <span class="ident">stack::Depth::root</span>(),
             <span class="ident">kind</span>: <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                <span class="ident">Primitive::Signed</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::Signed</span>(<span class="ident">v</span>),
-                <span class="ident">Primitive::Unsigned</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::Unsigned</span>(<span class="ident">v</span>),
-                <span class="ident">Primitive::Float</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::Float</span>(<span class="ident">v</span>),
-                <span class="ident">Primitive::BigSigned</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::BigSigned</span>(<span class="ident">v</span>),
-                <span class="ident">Primitive::BigUnsigned</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::BigUnsigned</span>(<span class="ident">v</span>),
-                <span class="ident">Primitive::Bool</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::Bool</span>(<span class="ident">v</span>),
-                <span class="ident">Primitive::Str</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::Str</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">v</span>).<span class="ident">into</span>()),
-                <span class="ident">Primitive::Char</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::Char</span>(<span class="ident">v</span>),
-                <span class="ident">Primitive::Error</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::Error</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">v</span>).<span class="ident">clone</span>().<span class="ident">into</span>()),
-                <span class="ident">Primitive::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TokenKind::None</span>,
+                <span class="ident">Primitive::Signed</span>(<span class="ident">v</span>) =&gt; <span class="ident">TokenKind::Signed</span>(<span class="ident">v</span>),
+                <span class="ident">Primitive::Unsigned</span>(<span class="ident">v</span>) =&gt; <span class="ident">TokenKind::Unsigned</span>(<span class="ident">v</span>),
+                <span class="ident">Primitive::Float</span>(<span class="ident">v</span>) =&gt; <span class="ident">TokenKind::Float</span>(<span class="ident">v</span>),
+                <span class="ident">Primitive::BigSigned</span>(<span class="ident">v</span>) =&gt; <span class="ident">TokenKind::BigSigned</span>(<span class="ident">v</span>),
+                <span class="ident">Primitive::BigUnsigned</span>(<span class="ident">v</span>) =&gt; <span class="ident">TokenKind::BigUnsigned</span>(<span class="ident">v</span>),
+                <span class="ident">Primitive::Bool</span>(<span class="ident">v</span>) =&gt; <span class="ident">TokenKind::Bool</span>(<span class="ident">v</span>),
+                <span class="ident">Primitive::Str</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">TokenKind::Str</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">v</span>).<span class="ident">into</span>()),
+                <span class="ident">Primitive::Char</span>(<span class="ident">v</span>) =&gt; <span class="ident">TokenKind::Char</span>(<span class="ident">v</span>),
+                <span class="ident">Primitive::Error</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">TokenKind::Error</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">v</span>).<span class="ident">clone</span>().<span class="ident">into</span>()),
+                <span class="ident">Primitive::None</span> =&gt; <span class="ident">TokenKind::None</span>,
             },
         }
     }
@@ -1767,12 +1767,12 @@ features = [&quot;std&quot;]
 
 <span class="kw">impl</span> <span class="ident">PrimitiveBuf</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrimitiveBuf</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">PrimitiveBuf</span> {
         <span class="ident">PrimitiveBuf</span> { <span class="ident">primitive</span>: <span class="prelude-val">None</span> }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">collect</span>(<span class="ident">v</span>: <span class="kw">impl</span> <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Primitive</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">collect</span>(<span class="ident">v</span>: <span class="kw">impl</span> <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Primitive</span><span class="op">&gt;</span> {
         <span class="ident"><span class="kw">crate</span>::stream</span>(<span class="ident">PrimitiveBuf::new</span>(), <span class="ident">v</span>)
             .<span class="ident">ok</span>()
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">primitive</span>)
@@ -1785,13 +1785,13 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">PrimitiveBuf</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">stream::Arguments</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">stream::Arguments</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Str</span>(<span class="ident">StringContainer::from</span>(<span class="ident">f</span>.<span class="ident">to_string</span>())));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">stream::Source</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">stream::Source</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Error</span>(<span class="ident">SharedContainer::from</span>(<span class="ident">OwnedSource::from</span>(
             <span class="ident">v</span>,
         ))));
@@ -1799,85 +1799,85 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Signed</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Unsigned</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">i128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">i128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i128</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::BigSigned</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">u128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">u128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u128</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::BigUnsigned</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Float</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Bool</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Char</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Str</span>(<span class="ident">StringContainer::from</span>(<span class="ident">v</span>)));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">none</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">none</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::None</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">map_begin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_begin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">map_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">map_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">map_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">seq_begin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">seq_begin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">seq_elem</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">seq_elem</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">seq_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">seq_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 }
@@ -1886,13 +1886,13 @@ features = [&quot;std&quot;]
 <span class="kw">impl</span> <span class="ident">OwnedValue</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tokens</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::std::ops::Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> [<span class="ident">Token</span>]<span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::std::ops::Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> [<span class="ident">Token</span>]<span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">ValueInner::Primitive</span>(<span class="kw-2">ref</span> <span class="ident">primitive</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">primitive</span>.<span class="ident">to_token</span>()].<span class="ident">into</span>()),
-            <span class="ident">ValueInner::Stream</span>(<span class="ident">tokens</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">tokens</span>.<span class="ident">clone</span>()),
-            <span class="ident">ValueInner::Error</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::custom</span>(<span class="ident">err</span>)),
+            <span class="ident">ValueInner::Primitive</span>(<span class="kw-2">ref</span> <span class="ident">primitive</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">primitive</span>.<span class="ident">to_token</span>()].<span class="ident">into</span>()),
+            <span class="ident">ValueInner::Stream</span>(<span class="ident">tokens</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">tokens</span>.<span class="ident">clone</span>()),
+            <span class="ident">ValueInner::Error</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::custom</span>(<span class="ident">err</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-            <span class="ident">ValueInner::Shared</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::msg</span>(<span class="string">&quot;expected a set of tokens&quot;</span>)),
+            <span class="ident">ValueInner::Shared</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::msg</span>(<span class="string">&quot;expected a set of tokens&quot;</span>)),
         }
     }
 }
@@ -1904,7 +1904,7 @@ features = [&quot;std&quot;]
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::std::error::Error</span>;
 
     <span class="kw">impl</span> <span class="ident">OwnedSource</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">collect</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">collect</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Error</span>) -&gt; <span class="self">Self</span> {
             <span class="ident">OwnedSource</span> {
                 <span class="ident">debug</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>),
                 <span class="ident">display</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>),
@@ -1916,7 +1916,7 @@ features = [&quot;std&quot;]
     }
 
     <span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">OwnedSource</span> {
-        <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">source</span>
                 .<span class="ident">as_ref</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">source</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">source</span> <span class="kw">as</span> <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>))
@@ -1942,7 +1942,7 @@ features = [&quot;std&quot;]
     <span class="kw">struct</span> <span class="ident">Map</span>;
 
     <span class="kw">impl</span> <span class="ident">Value</span> <span class="kw">for</span> <span class="ident">Map</span> {
-        <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">value::Result</span> {
+        <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
             <span class="ident">stream</span>.<span class="ident">map_begin</span>(<span class="prelude-val">Some</span>(<span class="number">2</span>))<span class="question-mark">?</span>;
 
             <span class="ident">stream</span>.<span class="ident">map_key</span>(<span class="number">1</span>)<span class="question-mark">?</span>;
@@ -1958,7 +1958,7 @@ features = [&quot;std&quot;]
     <span class="kw">struct</span> <span class="ident">Seq</span>;
 
     <span class="kw">impl</span> <span class="ident">Value</span> <span class="kw">for</span> <span class="ident">Seq</span> {
-        <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">value::Result</span> {
+        <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
             <span class="ident">stream</span>.<span class="ident">seq_begin</span>(<span class="prelude-val">Some</span>(<span class="number">2</span>))<span class="question-mark">?</span>;
 
             <span class="ident">stream</span>.<span class="ident">seq_elem</span>(<span class="number">1</span>)<span class="question-mark">?</span>;
@@ -2126,13 +2126,13 @@ features = [&quot;std&quot;]
             }
 
             <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">TestError</span> {
-                <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+                <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
                     <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">source</span>)
                 }
             }
 
             <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TestError</span> {
-                <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+                <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
                     <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;it broke!&quot;</span>)
                 }
             }

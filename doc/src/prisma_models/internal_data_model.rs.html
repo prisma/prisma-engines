@@ -131,48 +131,48 @@
         <span class="self">self</span>.<span class="ident">models</span>().<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">finalize</span>());
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">models</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">ModelRef</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">models</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">ModelRef</span>] {
         <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">get</span>().<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">models_cloned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">models_cloned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">models</span>.<span class="ident">get</span>().<span class="ident">unwrap</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>).<span class="ident">collect</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">RelationRef</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">RelationRef</span>] {
         <span class="self">self</span>.<span class="ident">relations</span>.<span class="ident">get</span>().<span class="ident">unwrap</span>().<span class="ident">as_slice</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">InternalEnumRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">InternalEnumRef</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">enums</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>)
+            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
             .<span class="ident">cloned</span>()
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DomainError::EnumNotFound</span> { <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>() })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">models</span>
             .<span class="ident">get</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">models</span><span class="op">|</span> <span class="ident">models</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>))
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">models</span><span class="op">|</span> <span class="ident">models</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>))
             .<span class="ident">cloned</span>()
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DomainError::ModelNotFound</span> { <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>() })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">RelationWeakRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">RelationWeakRef</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">relations</span>
             .<span class="ident">get</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">relations</span><span class="op">|</span> <span class="ident">relations</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">relation</span><span class="op">|</span> <span class="ident">relation</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">relation</span><span class="op">|</span> <span class="ident">Arc::downgrade</span>(<span class="ident">relation</span>))
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">relations</span><span class="op">|</span> <span class="ident">relations</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">relation</span><span class="op">|</span> <span class="ident">relation</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>))
+            .<span class="ident">map</span>(<span class="ident">Arc::downgrade</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DomainError::RelationNotFound</span> { <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>() })
     }
 
     <span class="doccomment">/// Finds all non-list relation fields pointing to the given model.</span>
     <span class="doccomment">/// `required` may narrow down the returned fields to required fields only. Returns all on `false`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields_pointing_to_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">required</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields_pointing_to_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">required</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">relation_fields</span>()
             .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">related_model</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">model</span>) <span class="comment">// All relation fields pointing to `model`.</span>
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">related_model</span>() <span class="op">==</span> <span class="ident">model</span>) <span class="comment">// All relation fields pointing to `model`.</span>
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">is_inlined_on_enclosing_model</span>()) <span class="comment">// Not a list, not a virtual field.</span>
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="op">!</span><span class="ident">required</span> <span class="op">|</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">is_required</span>()) <span class="comment">// If only required fields should be returned</span>
             .<span class="ident">map</span>(<span class="ident">Arc::clone</span>)
@@ -180,24 +180,24 @@
     }
 
     <span class="doccomment">/// Finds all relation fields where the foreign key refers to the given field (as either singular or compound).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields_refering_to_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields_refering_to_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">container</span> {
-            <span class="ident">ParentContainer::Model</span>(<span class="ident">model</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ParentContainer::Model</span>(<span class="ident">model</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">upgrade</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>;
 
                 <span class="self">self</span>.<span class="ident">relation_fields</span>()
                     .<span class="ident">iter</span>()
-                    .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">to</span> <span class="op">=</span><span class="op">=</span> <span class="ident">model_name</span>)
+                    .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">to</span> <span class="op">==</span> <span class="ident">model_name</span>)
                     .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">references</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>))
                     .<span class="ident">map</span>(<span class="ident">Arc::clone</span>)
                     .<span class="ident">collect</span>()
             }
             <span class="comment">// Relation fields can not refer to composite fields.</span>
-            <span class="ident">ParentContainer::CompositeType</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
+            <span class="ident">ParentContainer::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[],
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">RelationFieldRef</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">RelationFieldRef</span>] {
         <span class="self">self</span>.<span class="ident">relation_fields</span>
             .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="self">self</span>.<span class="ident">models</span>()

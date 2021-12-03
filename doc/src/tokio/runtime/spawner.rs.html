@@ -71,24 +71,24 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">spawn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">spawn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">F::Output</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Spawner::Basic</span>(<span class="ident">spawner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">spawner</span>.<span class="ident">spawn</span>(<span class="ident">future</span>),
+            <span class="ident">Spawner::Basic</span>(<span class="ident">spawner</span>) =&gt; <span class="ident">spawner</span>.<span class="ident">spawn</span>(<span class="ident">future</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
-            <span class="ident">Spawner::ThreadPool</span>(<span class="ident">spawner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">spawner</span>.<span class="ident">spawn</span>(<span class="ident">future</span>),
+            <span class="ident">Spawner::ThreadPool</span>(<span class="ident">spawner</span>) =&gt; <span class="ident">spawner</span>.<span class="ident">spawn</span>(<span class="ident">future</span>),
         }
     }
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;stats&quot;</span>)), <span class="ident">allow</span>(<span class="ident">dead_code</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">stats</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">RuntimeStats</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">stats</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">RuntimeStats</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Spawner::Basic</span>(<span class="ident">spawner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">spawner</span>.<span class="ident">stats</span>(),
+            <span class="ident">Spawner::Basic</span>(<span class="ident">spawner</span>) =&gt; <span class="ident">spawner</span>.<span class="ident">stats</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
-            <span class="ident">Spawner::ThreadPool</span>(<span class="ident">spawner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">spawner</span>.<span class="ident">stats</span>(),
+            <span class="ident">Spawner::ThreadPool</span>(<span class="ident">spawner</span>) =&gt; <span class="ident">spawner</span>.<span class="ident">stats</span>(),
         }
     }
 }

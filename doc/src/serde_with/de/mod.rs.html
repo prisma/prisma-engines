@@ -171,14 +171,14 @@
 <span class="comment">// which prevents proc macros on non-inline modules</span>
 <span class="attribute">#[<span class="ident">rustversion::before</span>(<span class="number">1.51</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">mod_arrays</span> {
-    () <span class="op">=</span><span class="op">&gt;</span> {
+    () =&gt; {
         <span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;legacy_arrays.rs&quot;</span>]</span>
         <span class="kw">mod</span> <span class="ident">arrays</span>;
     };
 }
 <span class="attribute">#[<span class="ident">rustversion::since</span>(<span class="number">1.51</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">mod_arrays</span> {
-    () <span class="op">=</span><span class="op">&gt;</span> {
+    () =&gt; {
         <span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;const_arrays.rs&quot;</span>]</span>
         <span class="kw">mod</span> <span class="ident">arrays</span>;
     };
@@ -281,7 +281,7 @@
 <span class="doccomment">/// [impl-deserialize]: https://serde.rs/impl-deserialize.html</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span>: <span class="ident">Sized</span> {
     <span class="doccomment">/// Deserialize this value from the given Serde deserializer.</span>
-    <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>;
 }
@@ -295,7 +295,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">DeserializeAsWrap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Return the inner value of type `T`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
         <span class="self">self</span>.<span class="ident">value</span>
     }
 }
@@ -304,7 +304,7 @@
 <span class="kw">where</span>
     <span class="ident">U</span>: <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {

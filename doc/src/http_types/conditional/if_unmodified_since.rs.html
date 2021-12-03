@@ -167,20 +167,20 @@
 
 <span class="kw">impl</span> <span class="ident">IfUnmodifiedSince</span> {
     <span class="doccomment">/// Create a new instance of `IfUnmodifiedSince`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">instant</span>: <span class="ident">SystemTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">instant</span>: <span class="ident">SystemTime</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">instant</span> }
     }
 
     <span class="doccomment">/// Returns the last modification time listed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modified</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SystemTime</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modified</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SystemTime</span> {
         <span class="self">self</span>.<span class="ident">instant</span>
     }
 
     <span class="doccomment">/// Create an instance of `IfUnmodifiedSince` from a `Headers` instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_headers</span>(<span class="ident">headers</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_headers</span>(<span class="ident">headers</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">headers</span>.<span class="ident">as_ref</span>().<span class="ident">get</span>(<span class="ident">IF_UNMODIFIED_SINCE</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">headers</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">headers</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">headers</span>) =&gt; <span class="ident">headers</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
         <span class="comment">// If we successfully parsed the header then there&#39;s always at least one</span>
@@ -197,12 +197,12 @@
     }
 
     <span class="doccomment">/// Get the `HeaderName`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HeaderName</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HeaderName</span> {
         <span class="ident">IF_UNMODIFIED_SINCE</span>
     }
 
     <span class="doccomment">/// Get the `HeaderValue`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HeaderValue</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HeaderValue</span> {
         <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">fmt_http_date</span>(<span class="self">self</span>.<span class="ident">instant</span>);
 
         <span class="comment">// SAFETY: the internal string is validated to be ASCII.</span>
@@ -212,7 +212,7 @@
 
 <span class="kw">impl</span> <span class="ident">ToHeaderValues</span> <span class="kw">for</span> <span class="ident">IfUnmodifiedSince</span> {
     <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">option::IntoIter</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">to_header_values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_header_values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span> {
         <span class="comment">// A HeaderValue will always convert into itself.</span>
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">value</span>().<span class="ident">to_header_values</span>().<span class="ident">unwrap</span>())
     }
@@ -225,7 +225,7 @@
     <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">smoke</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">smoke</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">SystemTime::now</span>() <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">5</span> <span class="op">*</span> <span class="number">60</span>);
         <span class="kw">let</span> <span class="ident">expires</span> <span class="op">=</span> <span class="ident">IfUnmodifiedSince::new</span>(<span class="ident">time</span>);
 

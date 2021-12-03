@@ -50,23 +50,23 @@
 }
 
 <span class="kw">impl</span> <span class="ident">WithIdentifier</span> <span class="kw">for</span> <span class="ident">GeneratorConfig</span> {
-    <span class="kw">fn</span> <span class="ident">identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Identifier</span> {
+    <span class="kw">fn</span> <span class="ident">identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Identifier</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">WithSpan</span> <span class="kw">for</span> <span class="ident">GeneratorConfig</span> {
-    <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Span</span> {
+    <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Span</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">span</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">WithDocumentation</span> <span class="kw">for</span> <span class="ident">GeneratorConfig</span> {
-    <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">documentation</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">is_commented_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_commented_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
 }

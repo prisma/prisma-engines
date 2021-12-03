@@ -319,31 +319,31 @@
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">TableChange</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FmtResult</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">FmtResult</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;TableChange&quot;</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">IndexChange</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FmtResult</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">FmtResult</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;IndexChange&quot;</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ConstraintChange</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FmtResult</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">FmtResult</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ConstraintChange&quot;</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ForeignKeyChange</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FmtResult</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ForeignKeyChange&quot;</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">PrimaryKeyChange</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FmtResult</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;PrimaryKeyChange&quot;</span>)
     }
 }
@@ -368,7 +368,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Table</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">meta</span>: <span class="ident">TableMeta::new</span>(<span class="ident">name</span>.<span class="ident">into</span>()),
             <span class="ident">columns</span>: <span class="macro">vec!</span>[],
@@ -389,13 +389,13 @@
     <span class="doccomment">/// table.add_column(&quot;name&quot;, types::varchar(64));</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_column</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">_type</span>: <span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Type</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_column</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">_type</span>: <span class="ident">Type</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Type</span> {
         <span class="self">self</span>.<span class="ident">columns</span>
             .<span class="ident">push</span>(<span class="ident">TableChange::AddColumn</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">_type</span>));
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">last_mut</span>().<span class="ident">unwrap</span>() {
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TableChange::AddColumn</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TableChange::AddColumn</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) =&gt; <span class="ident">c</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
@@ -423,8 +423,8 @@
     <span class="doccomment">/// Add a new index to a table, spanning over multiple columns</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_index</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">columns</span>: <span class="ident">Type</span>) {
         <span class="kw">match</span> <span class="ident">columns</span>.<span class="ident">inner</span> {
-            <span class="ident"><span class="kw">crate</span>::types::BaseType::Index</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Calling `add_index` with a non-`Index` type is not allowed!&quot;</span>),
+            <span class="ident"><span class="kw">crate</span>::types::BaseType::Index</span>(<span class="kw">_</span>) =&gt; {}
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Calling `add_index` with a non-`Index` type is not allowed!&quot;</span>),
         }
 
         <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">push</span>(<span class="ident">IndexChange::AddIndex</span> {
@@ -436,8 +436,8 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_constraint</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">columns</span>: <span class="ident">Type</span>) {
         <span class="kw">match</span> <span class="ident">columns</span>.<span class="ident">inner</span> {
-            <span class="ident"><span class="kw">crate</span>::types::BaseType::Constraint</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Calling `add_index` with a non-`Constraint` type is not allowed!&quot;</span>),
+            <span class="ident"><span class="kw">crate</span>::types::BaseType::Constraint</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {}
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Calling `add_index` with a non-`Constraint` type is not allowed!&quot;</span>),
         }
 
         <span class="self">self</span>.<span class="ident">constraints</span>.<span class="ident">push</span>(<span class="ident">ConstraintChange::AddConstraint</span> {
@@ -448,8 +448,8 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_partial_index</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>, <span class="ident">columns</span>: <span class="ident">Type</span>, <span class="ident">conditions</span>: <span class="ident">S</span>) {
         <span class="kw">match</span> <span class="ident">columns</span>.<span class="ident">inner</span> {
-            <span class="ident"><span class="kw">crate</span>::types::BaseType::Index</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Calling `add_index` with a non-`Index` type is not allowed!&quot;</span>),
+            <span class="ident"><span class="kw">crate</span>::types::BaseType::Index</span>(<span class="kw">_</span>) =&gt; {}
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Calling `add_index` with a non-`Index` type is not allowed!&quot;</span>),
         }
 
         <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">push</span>(<span class="ident">IndexChange::AddPartialIndex</span> {
@@ -501,7 +501,7 @@
     }
 
     <span class="doccomment">/// Generate Sql for this table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SqlGenerator</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ex</span>: <span class="ident">bool</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SqlChanges</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SqlGenerator</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ex</span>: <span class="ident">bool</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">SqlChanges</span> {
         <span class="kw">use</span> <span class="ident">ConstraintChange</span> <span class="kw">as</span> <span class="ident">CC</span>;
         <span class="kw">use</span> <span class="ident">ForeignKeyChange</span> <span class="kw">as</span> <span class="ident">KFC</span>;
         <span class="kw">use</span> <span class="ident">IndexChange</span> <span class="kw">as</span> <span class="ident">IC</span>;
@@ -512,11 +512,11 @@
             .<span class="ident">columns</span>
             .<span class="ident">iter_mut</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">change</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">change</span> {
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TC::AddColumn</span>(<span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">col</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T::add_column</span>(<span class="ident">ex</span>, <span class="ident">schema</span>, <span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">col</span>),
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TC::DropColumn</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T::drop_column</span>(<span class="ident">name</span>),
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TC::RenameColumn</span>(<span class="kw-2">ref</span> <span class="ident">old</span>, <span class="kw-2">ref</span> <span class="ident">new</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T::rename_column</span>(<span class="ident">old</span>, <span class="ident">new</span>),
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TC::ChangeColumn</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T::alter_table</span>(<span class="ident">name</span>, <span class="ident">schema</span>),
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TC::CustomLine</span>(<span class="kw-2">ref</span> <span class="ident">sql</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sql</span>.<span class="ident">clone</span>(),
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TC::AddColumn</span>(<span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">col</span>) =&gt; <span class="ident">T::add_column</span>(<span class="ident">ex</span>, <span class="ident">schema</span>, <span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">col</span>),
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TC::DropColumn</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="ident">T::drop_column</span>(<span class="ident">name</span>),
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TC::RenameColumn</span>(<span class="kw-2">ref</span> <span class="ident">old</span>, <span class="kw-2">ref</span> <span class="ident">new</span>) =&gt; <span class="ident">T::rename_column</span>(<span class="ident">old</span>, <span class="ident">new</span>),
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TC::ChangeColumn</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">T::alter_table</span>(<span class="ident">name</span>, <span class="ident">schema</span>),
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TC::CustomLine</span>(<span class="kw-2">ref</span> <span class="ident">sql</span>) =&gt; <span class="ident">sql</span>.<span class="ident">clone</span>(),
             })
             .<span class="ident">collect</span>();
 
@@ -528,26 +528,26 @@
                     <span class="ident">index</span>,
                     <span class="ident">table</span>,
                     <span class="ident">columns</span>,
-                } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T::create_index</span>(<span class="ident">table</span>, <span class="ident">schema</span>, <span class="ident">index</span>, <span class="ident">columns</span>),
+                } =&gt; <span class="ident">T::create_index</span>(<span class="ident">table</span>, <span class="ident">schema</span>, <span class="ident">index</span>, <span class="ident">columns</span>),
                 <span class="ident">IC::AddPartialIndex</span> {
                     <span class="ident">index</span>,
                     <span class="ident">table</span>,
                     <span class="ident">columns</span>,
                     <span class="ident">conditions</span>,
-                } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T::create_partial_index</span>(<span class="ident">table</span>, <span class="ident">schema</span>, <span class="ident">index</span>, <span class="ident">columns</span>, <span class="ident">conditions</span>),
-                <span class="ident">IC::RemoveIndex</span>(<span class="kw">_</span>, <span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T::drop_index</span>(<span class="ident">index</span>),
+                } =&gt; <span class="ident">T::create_partial_index</span>(<span class="ident">table</span>, <span class="ident">schema</span>, <span class="ident">index</span>, <span class="ident">columns</span>, <span class="ident">conditions</span>),
+                <span class="ident">IC::RemoveIndex</span>(<span class="kw">_</span>, <span class="ident">index</span>) =&gt; <span class="ident">T::drop_index</span>(<span class="ident">index</span>),
             })
             .<span class="ident">collect</span>();
 
         <span class="kw">let</span> <span class="ident">primary_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">primary_key</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">pk</span> {
-            <span class="ident">PKC::AddPrimaryKey</span>(<span class="kw-2">ref</span> <span class="ident">cols</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T::add_primary_key</span>(<span class="ident">cols</span>),
+            <span class="ident">PKC::AddPrimaryKey</span>(<span class="kw-2">ref</span> <span class="ident">cols</span>) =&gt; <span class="ident">T::add_primary_key</span>(<span class="ident">cols</span>),
         });
 
         <span class="kw">let</span> <span class="ident">constraints</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">constraints</span>
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="ident">CC::AddConstraint</span> { <span class="ident">index</span>, <span class="ident">columns</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T::create_constraint</span>(<span class="ident">index</span>, <span class="ident">columns</span>, <span class="ident">schema</span>),
+                <span class="ident">CC::AddConstraint</span> { <span class="ident">index</span>, <span class="ident">columns</span> } =&gt; <span class="ident">T::create_constraint</span>(<span class="ident">index</span>, <span class="ident">columns</span>, <span class="ident">schema</span>),
             })
             .<span class="ident">collect</span>();
 
@@ -559,7 +559,7 @@
                     <span class="ident">columns</span>,
                     <span class="ident">table</span>,
                     <span class="ident">relation_columns</span>,
-                } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T::add_foreign_key</span>(
+                } =&gt; <span class="ident">T::add_foreign_key</span>(
                     <span class="ident">columns</span>.<span class="ident">as_slice</span>(),
                     <span class="ident">table</span>,
                     <span class="ident">relation_columns</span>.<span class="ident">as_slice</span>(),
@@ -587,7 +587,7 @@
 
 <span class="kw">impl</span> <span class="ident">TableMeta</span> {
     <span class="doccomment">/// Create a new tablemeta with default values</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">name</span>,
             <span class="ident">encoding</span>: <span class="string">&quot;utf-8&quot;</span>.<span class="ident">to_owned</span>(),
@@ -595,13 +595,13 @@
     }
 
     <span class="doccomment">/// Get a clone of the table name</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Specify an encoding for this table which might vary from the main encoding</span>
     <span class="doccomment">/// of your database</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoding</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enc</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TableMeta</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoding</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enc</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TableMeta</span> {
         <span class="self">self</span>.<span class="ident">encoding</span> <span class="op">=</span> <span class="ident">enc</span>.<span class="ident">into</span>();
         <span class="self">self</span>
     }

@@ -353,7 +353,7 @@ at your option.
 <span class="doccomment">///</span>
 <span class="doccomment">/// The returned crate name is sanitized in such a way that it is a valid rust identifier. Thus,</span>
 <span class="doccomment">/// it is ready to be used in `extern crate` as identifier.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crate_name</span>(<span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crate_name</span>(<span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">manifest_dir</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>)
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;Could not find `CARGO_MANIFEST_DIR` env variable.&quot;</span>)<span class="question-mark">?</span>;
 
@@ -369,12 +369,12 @@ at your option.
 }
 
 <span class="doccomment">/// Make sure that the given crate name is a valid rust identifier.</span>
-<span class="kw">fn</span> <span class="ident">sanitize_crate_name</span>(<span class="ident">name</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">sanitize_crate_name</span>(<span class="ident">name</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
     <span class="ident">name</span>.<span class="ident">replace</span>(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;_&quot;</span>)
 }
 
 <span class="doccomment">/// Open the given `Cargo.toml` and parse it into a hashmap.</span>
-<span class="kw">fn</span> <span class="ident">open_cargo_toml</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CargoToml</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">open_cargo_toml</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CargoToml</span>, <span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="ident">File::open</span>(<span class="ident">path</span>)
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Could not open `{}`: {:?}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>(), <span class="ident">e</span>))<span class="question-mark">?</span>
@@ -384,7 +384,7 @@ at your option.
 }
 
 <span class="doccomment">/// Create the not found error.</span>
-<span class="kw">fn</span> <span class="ident">create_not_found_err</span>(<span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">create_not_found_err</span>(<span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Display</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
     <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
         <span class="string">&quot;Could not find `{}` in `dependencies` or `dev-dependencies` in `{}`!&quot;</span>,
         <span class="ident">orig_name</span>, <span class="ident">path</span>
@@ -400,7 +400,7 @@ at your option.
     <span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="kw-2">mut</span> <span class="ident">cargo_toml</span>: <span class="ident">CargoToml</span>,
     <span class="ident">cargo_toml_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> [<span class="string">&quot;dependencies&quot;</span>, <span class="string">&quot;dev-dependencies&quot;</span>]
         .<span class="ident">iter</span>()
         .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">search_crate_at_key</span>(<span class="ident">k</span>, <span class="ident">orig_name</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cargo_toml</span>))
@@ -426,7 +426,7 @@ at your option.
 }
 
 <span class="doccomment">/// Search the `orig_name` crate at the given `key` in `cargo_toml`.</span>
-<span class="kw">fn</span> <span class="ident">search_crate_at_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">cargo_toml</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CargoToml</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">search_crate_at_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">cargo_toml</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CargoToml</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="ident">cargo_toml</span>
         .<span class="ident">remove</span>(<span class="ident">key</span>)
         .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">try_into</span>::<span class="op">&lt;</span><span class="ident">Table</span><span class="op">&gt;</span>().<span class="ident">ok</span>())
@@ -437,16 +437,16 @@ at your option.
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns `Some(orig_name)` if the crate is not renamed in the `Cargo.toml` or otherwise</span>
 <span class="doccomment">/// the renamed identifier.</span>
-<span class="kw">fn</span> <span class="ident">extract_crate_name_from_deps</span>(<span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">deps</span>: <span class="ident">Table</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_crate_name_from_deps</span>(<span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">deps</span>: <span class="ident">Table</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">deps</span>.<span class="ident">into_iter</span>() {
         <span class="kw">let</span> <span class="ident">renamed</span> <span class="op">=</span> <span class="ident">value</span>
             .<span class="ident">try_into</span>::<span class="op">&lt;</span><span class="ident">Table</span><span class="op">&gt;</span>()
             .<span class="ident">ok</span>()
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>).<span class="ident">cloned</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">as_str</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">orig_name</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">orig_name</span>))
             .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
 
-        <span class="kw">if</span> <span class="ident">key</span> <span class="op">=</span><span class="op">=</span> <span class="ident">orig_name</span> <span class="op">|</span><span class="op">|</span> <span class="ident">renamed</span> {
+        <span class="kw">if</span> <span class="ident">key</span> <span class="op">==</span> <span class="ident">orig_name</span> <span class="op">|</span><span class="op">|</span> <span class="ident">renamed</span> {
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>.<span class="ident">clone</span>());
         }
     }
@@ -463,7 +463,7 @@ at your option.
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>,
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cargo_toml</span>:<span class="ident">expr</span>,
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">expr</span>,
-        ) <span class="op">=</span><span class="op">&gt;</span> {
+        ) =&gt; {
             <span class="attribute">#[<span class="ident">test</span>]</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
                 <span class="kw">let</span> <span class="ident">cargo_toml</span> <span class="op">=</span> <span class="ident">toml::from_str</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cargo_toml</span>).<span class="ident">expect</span>(<span class="string">&quot;Parses `Cargo.toml`&quot;</span>);

@@ -951,7 +951,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">HyperlinkCollection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">text2dest_label</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">label2label</span>: <span class="ident">Vec::new</span>(),
@@ -965,7 +965,7 @@
     <span class="doccomment">/// copy is stored in `HyperlinkCollection::Text2Dest` and the other copy is</span>
     <span class="doccomment">/// stored in `HyperlinkCollection::Label2Dest`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">render_label2dest</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">render_label2dest</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">input</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hc</span> <span class="op">=</span> <span class="ident">HyperlinkCollection::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">anonymous_text2label_counter</span> <span class="op">=</span> <span class="number">0</span>;
@@ -976,15 +976,15 @@
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="ident">skipped</span>, <span class="ident">res</span>))) <span class="op">=</span> <span class="ident">take_link</span>(<span class="ident">i</span>) {
             <span class="kw">match</span> <span class="ident">res</span> {
                 <span class="comment">// `Text2Dest` is stored without modification in `hc.text2dest_label`.</span>
-                <span class="ident">l</span> <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">l</span>, <span class="ident">Link::Text2Dest</span>{..}) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">l</span> <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">l</span>, <span class="ident">Link::Text2Dest</span>{..}) =&gt; {
                     <span class="kw">let</span> <span class="ident">link_offset</span> <span class="op">=</span> <span class="ident">input_idx</span> <span class="op">+</span> <span class="ident">skipped</span>.<span class="ident">len</span>();
                     <span class="kw">let</span> <span class="ident">link_len</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">j</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">skipped</span>.<span class="ident">len</span>();
                     <span class="ident">hc</span>.<span class="ident">text2dest_label</span>.<span class="ident">push</span>((<span class="ident">link_offset</span>, <span class="ident">link_len</span>, <span class="ident">l</span>));
                 }
 
                 <span class="comment">// `Text2label` is stored without modification in `hc.text2dest_label`.</span>
-                <span class="ident">Link::Text2Label</span>(<span class="ident">text</span>, <span class="kw-2">mut</span> <span class="ident">label</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">label</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_&quot;</span> {
+                <span class="ident">Link::Text2Label</span>(<span class="ident">text</span>, <span class="kw-2">mut</span> <span class="ident">label</span>) =&gt; {
+                    <span class="kw">if</span> <span class="ident">label</span> <span class="op">==</span> <span class="string">&quot;_&quot;</span> {
                         <span class="ident">anonymous_text2label_counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                         <span class="ident">label</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="ident">anonymous_text2label_counter</span>));
                     }
@@ -995,7 +995,7 @@
                 }
                 <span class="comment">//`TextLabel2Dest` are cloned and stored in `hc.text2dest_label` as `Text2Dest`</span>
                 <span class="comment">// and in `hc.label2dest` (repacked in a `HashMap`).</span>
-                <span class="ident">Link::TextLabel2Dest</span>(<span class="ident">tl</span>, <span class="ident">d</span>, <span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Link::TextLabel2Dest</span>(<span class="ident">tl</span>, <span class="ident">d</span>, <span class="ident">t</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">link_offset</span> <span class="op">=</span> <span class="ident">input_idx</span> <span class="op">+</span> <span class="ident">skipped</span>.<span class="ident">len</span>();
                     <span class="kw">let</span> <span class="ident">link_len</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">j</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">skipped</span>.<span class="ident">len</span>();
                     <span class="ident">hc</span>.<span class="ident">text2dest_label</span>.<span class="ident">push</span>((
@@ -1009,8 +1009,8 @@
                 }
 
                 <span class="comment">// `Label2Label` are unpacked and stored in `hc.label2label`.</span>
-                <span class="ident">Link::Label2Label</span>(<span class="kw-2">mut</span> <span class="ident">from</span>, <span class="ident">to</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">from</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_&quot;</span> {
+                <span class="ident">Link::Label2Label</span>(<span class="kw-2">mut</span> <span class="ident">from</span>, <span class="ident">to</span>) =&gt; {
+                    <span class="kw">if</span> <span class="ident">from</span> <span class="op">==</span> <span class="string">&quot;_&quot;</span> {
                         <span class="ident">anonymous_label2x_counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                         <span class="ident">from</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="ident">anonymous_label2x_counter</span>));
                     }
@@ -1018,8 +1018,8 @@
                 }
 
                 <span class="comment">// `Label2Dest` are unpacked and stored as `HashMap` in `hc.label2dest`:</span>
-                <span class="ident">Link::Label2Dest</span>(<span class="kw-2">mut</span> <span class="ident">l</span>, <span class="ident">d</span>, <span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">l</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_&quot;</span> {
+                <span class="ident">Link::Label2Dest</span>(<span class="kw-2">mut</span> <span class="ident">l</span>, <span class="ident">d</span>, <span class="ident">t</span>) =&gt; {
+                    <span class="kw">if</span> <span class="ident">l</span> <span class="op">==</span> <span class="string">&quot;_&quot;</span> {
                         <span class="ident">anonymous_label2x_counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                         <span class="ident">l</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="ident">anonymous_label2x_counter</span>));
                     }
@@ -1043,7 +1043,7 @@
                     <span class="comment">// Silently ignore when overwriting a key that exists already.</span>
                     <span class="ident">hc</span>.<span class="ident">label2dest</span>.<span class="ident">insert</span>(<span class="ident">l</span>, (<span class="ident">d</span>, <span class="ident">t</span>));
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
             };
 
             <span class="comment">// Prepare next iteration.</span>
@@ -1102,7 +1102,7 @@
             <span class="comment">// If we can not resolve the label, we just skip it.</span>
             <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">input_offset</span>, <span class="ident">len</span>, <span class="ident">Link::Text2Label</span>(<span class="ident">text</span>, <span class="ident">label</span>)) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">text2dest_label</span>[<span class="ident">idx</span>] {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">dest</span>, <span class="ident">title</span>)) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">label2dest</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">label</span>) {
-                    <span class="kw">let</span> <span class="ident">new_link</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">text</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;&quot;</span> {
+                    <span class="kw">let</span> <span class="ident">new_link</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">text</span> <span class="op">==</span> <span class="string">&quot;&quot;</span> {
                         (
                             <span class="kw-2">*</span><span class="ident">input_offset</span>,
                             <span class="kw-2">*</span><span class="ident">len</span>,
@@ -1309,7 +1309,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">render_label</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">render_label</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">input</span>,
             <span class="ident">status</span>: <span class="ident">Status::Init</span>,
@@ -1352,7 +1352,7 @@
     <span class="doccomment">///    2. the `next()` method outputs and deletes</span>
     <span class="doccomment">///       `HyperlinkCollection::Dest2Text_label[0]`.</span>
     <span class="doccomment">///       Not resolved `Text2Label` are ignored.</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">Status::Init</span>;
         <span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">status</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">status</span>);
@@ -1363,9 +1363,9 @@
             <span class="ident">status</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">status</span> {
                 <span class="comment">// Cloning a pointer is cheap.</span>
                 <span class="comment">// Advance state machine and match one more time.</span>
-                <span class="ident">Status::Init</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::DirectSearch</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">clone</span>()),
+                <span class="ident">Status::Init</span> =&gt; <span class="ident">Status::DirectSearch</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">clone</span>()),
 
-                <span class="ident">Status::DirectSearch</span>(<span class="ident">input</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Status::DirectSearch</span>(<span class="ident">input</span>) =&gt; {
                     <span class="comment">// We stay in direct mode.</span>
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>((<span class="ident">remaining_input</span>, (<span class="ident">skipped</span>, <span class="ident">Link::Text2Dest</span>(<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)))) <span class="op">=</span>
                         <span class="ident">take_link</span>(<span class="ident">input</span>)
@@ -1397,7 +1397,7 @@
                     }
                 }
 
-                <span class="ident">Status::ResolvedLinks</span>(<span class="kw-2">mut</span> <span class="ident">resolved_links</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Status::ResolvedLinks</span>(<span class="kw-2">mut</span> <span class="ident">resolved_links</span>) =&gt; {
                     <span class="kw">while</span> <span class="ident">resolved_links</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
                         <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">input_offset</span>, <span class="ident">len</span>, <span class="ident">Link::Text2Dest</span>(<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)) <span class="op">=</span>
                             <span class="ident">resolved_links</span>.<span class="ident">remove</span>(<span class="number">0</span>)
@@ -1430,7 +1430,7 @@
                     }
                 }
 
-                <span class="ident">Status::End</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Status::End</span> =&gt; {
                     <span class="ident">again</span> <span class="op">=</span> <span class="bool-val">false</span>;
                     <span class="ident">output</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                     <span class="ident">Status::End</span>
@@ -1459,7 +1459,7 @@
 <span class="doccomment">/// let r = first_hyperlink(i);</span>
 <span class="doccomment">/// assert_eq!(r, Some((Cow::from(&quot;t&quot;), Cow::from(&quot;v&quot;), Cow::from(&quot;w&quot;))));</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_hyperlink</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_hyperlink</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, (<span class="ident">text</span>, <span class="ident">dest</span>, <span class="ident">title</span>))) <span class="op">=</span> <span class="ident">Hyperlink::new</span>(<span class="ident">i</span>, <span class="bool-val">false</span>).<span class="ident">next</span>() {
         <span class="prelude-val">Some</span>((<span class="ident">text</span>, <span class="ident">dest</span>, <span class="ident">title</span>))
     } <span class="kw">else</span> {

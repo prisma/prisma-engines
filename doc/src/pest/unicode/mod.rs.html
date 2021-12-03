@@ -77,10 +77,10 @@
         [$(
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prop</span>:<span class="ident">ident</span>,
         )<span class="kw-2">*</span>];
-    )<span class="kw-2">*</span>} <span class="op">=</span><span class="op">&gt;</span> {$(
+    )<span class="kw-2">*</span>} =&gt; {$(
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
         <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>;
-        $(<span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prop</span>(<span class="ident">c</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        $(<span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">prop</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
             <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">prop</span>.<span class="ident">contains_char</span>(<span class="ident">c</span>)
         })<span class="op">*</span>
     )<span class="kw-2">*</span>};
@@ -115,15 +115,15 @@
     ];
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">by_name</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Fn</span>(<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">by_name</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Fn</span>(<span class="ident">char</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">for</span> <span class="ident">property</span> <span class="kw">in</span> <span class="ident">binary::BY_NAME</span> {
-        <span class="kw">if</span> <span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">property</span>.<span class="number">0</span>.<span class="ident">to_uppercase</span>() {
+        <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="ident">property</span>.<span class="number">0</span>.<span class="ident">to_uppercase</span>() {
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">property</span>.<span class="number">1</span>.<span class="ident">contains_char</span>(<span class="ident">c</span>)));
         }
     }
 
     <span class="kw">for</span> <span class="ident">property</span> <span class="kw">in</span> <span class="ident">category::BY_NAME</span> {
-        <span class="kw">if</span> <span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">property</span>.<span class="number">0</span>.<span class="ident">to_uppercase</span>() {
+        <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="ident">property</span>.<span class="number">0</span>.<span class="ident">to_uppercase</span>() {
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">property</span>.<span class="number">1</span>.<span class="ident">contains_char</span>(<span class="ident">c</span>)));
         }
     }

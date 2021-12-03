@@ -6,7 +6,7 @@ written quickly at the expense of some usability. The documentation is
 lacking. The best way to learn it is to look at some examples. The digest
 tests are the most complicated because they use named sections. Other tests
 avoid named sections and so are easier to understand.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1><h2 id="writing-tests" class="section-header"><a href="#writing-tests">Writing Tests</a></h2>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2><h3 id="writing-tests" class="section-header"><a href="#writing-tests">Writing Tests</a></h3>
 <p>Input files look like this:</p>
 <div class="example-wrap"><pre class="language-text"><code>
 HMAC = SHA1
@@ -40,7 +40,7 @@ can only be represented with the quoted string form (<code>&quot;&quot;</code>).
 <p>Note that <code>consume_digest_alg</code> automatically maps the string “SHA1” to a
 reference to <code>digest::SHA1_FOR_LEGACY_USE_ONLY</code>, “SHA256” to
 <code>digest::SHA256</code>, etc.</p>
-<h2 id="output-when-a-test-fails" class="section-header"><a href="#output-when-a-test-fails">Output When a Test Fails</a></h2>
+<h3 id="output-when-a-test-fails" class="section-header"><a href="#output-when-a-test-fails">Output When a Test Fails</a></h3>
 <p>When a test case fails, the framework automatically prints out the test
 case. If the test case failed with a panic, then the backtrace of the panic
 will be printed too. For example, let’s say the failing test case looks
@@ -80,24 +80,24 @@ stack backtrace:
 stack trace to the line in the test code that panicked: entry 9 in the
 stack trace pointing to line 652 of the file <code>example.rs</code>.</p>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.File.html" title="ring::test::File struct">File</a></div><div class="item-right docblock-short"><p>A test input file.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.TestCase.html" title="ring::test::TestCase struct">TestCase</a></div><div class="item-right docblock-short"><p>A test case. A test case consists of a set of named attributes. Every
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.File.html" title="ring::test::File struct">File</a></div><div class="item-right docblock-short"><p>A test input file.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.TestCase.html" title="ring::test::TestCase struct">TestCase</a></div><div class="item-right docblock-short"><p>A test case. A test case consists of a set of named attributes. Every
 attribute in the test case must be consumed exactly once; this helps catch
 typos and omissions.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.compile_time_assert_clone.html" title="ring::test::compile_time_assert_clone fn">compile_time_assert_clone</a></div><div class="item-right docblock-short"><p><code>compile_time_assert_clone::&lt;T&gt;();</code> fails to compile if <code>T</code> doesn’t
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.compile_time_assert_clone.html" title="ring::test::compile_time_assert_clone fn">compile_time_assert_clone</a></div><div class="item-right docblock-short"><p><code>compile_time_assert_clone::&lt;T&gt;();</code> fails to compile if <code>T</code> doesn’t
 implement <code>Clone</code>.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.compile_time_assert_copy.html" title="ring::test::compile_time_assert_copy fn">compile_time_assert_copy</a></div><div class="item-right docblock-short"><p><code>compile_time_assert_copy::&lt;T&gt;();</code> fails to compile if <code>T</code> doesn’t
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.compile_time_assert_copy.html" title="ring::test::compile_time_assert_copy fn">compile_time_assert_copy</a></div><div class="item-right docblock-short"><p><code>compile_time_assert_copy::&lt;T&gt;();</code> fails to compile if <code>T</code> doesn’t
 implement <code>Copy</code>.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.compile_time_assert_send.html" title="ring::test::compile_time_assert_send fn">compile_time_assert_send</a></div><div class="item-right docblock-short"><p><code>compile_time_assert_send::&lt;T&gt;();</code> fails to compile if <code>T</code> doesn’t
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.compile_time_assert_send.html" title="ring::test::compile_time_assert_send fn">compile_time_assert_send</a></div><div class="item-right docblock-short"><p><code>compile_time_assert_send::&lt;T&gt;();</code> fails to compile if <code>T</code> doesn’t
 implement <code>Send</code>.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.compile_time_assert_sync.html" title="ring::test::compile_time_assert_sync fn">compile_time_assert_sync</a></div><div class="item-right docblock-short"><p><code>compile_time_assert_sync::&lt;T&gt;();</code> fails to compile if <code>T</code> doesn’t
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.compile_time_assert_sync.html" title="ring::test::compile_time_assert_sync fn">compile_time_assert_sync</a></div><div class="item-right docblock-short"><p><code>compile_time_assert_sync::&lt;T&gt;();</code> fails to compile if <code>T</code> doesn’t
 implement <code>Sync</code>.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.from_hex.html" title="ring::test::from_hex fn">from_hex</a></div><div class="item-right docblock-short"><p>Decode an string of hex digits into a sequence of bytes. The input must
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.from_hex.html" title="ring::test::from_hex fn">from_hex</a></div><div class="item-right docblock-short"><p>Decode an string of hex digits into a sequence of bytes. The input must
 have an even number of digits.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.run.html" title="ring::test::run fn">run</a></div><div class="item-right docblock-short"><p>Parses test cases out of the given file, calling <code>f</code> on each vector until
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.run.html" title="ring::test::run fn">run</a></div><div class="item-right docblock-short"><p>Parses test cases out of the given file, calling <code>f</code> on each vector until
 <code>f</code> fails or until all the test vectors have been read. <code>f</code> can indicate
 failure either by returning <code>Err()</code> or by panicking.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

@@ -176,7 +176,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TokenRpcRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">proc_id</span>: <span class="ident">I</span>, <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RpcParam</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">transaction_desc</span>: [<span class="ident">u8</span>; <span class="number">8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">proc_id</span>: <span class="ident">I</span>, <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RpcParam</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">transaction_desc</span>: [<span class="ident">u8</span>; <span class="number">8</span>]) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RpcProcIdValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -222,19 +222,19 @@
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Name</span>(<span class="ident">s</span>.<span class="ident">into</span>())
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RpcProcId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RpcProcIdValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">RpcProcId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">RpcProcId</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Id</span>(<span class="ident">id</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TokenRpcRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="ident">ALL_HEADERS_LEN_TX</span> <span class="kw">as</span> <span class="ident">u32</span>);
         <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="ident">ALL_HEADERS_LEN_TX</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">4</span>);
         <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="ident">AllHeaderTy::TransactionDescriptor</span> <span class="kw">as</span> <span class="ident">u16</span>);
@@ -242,11 +242,11 @@
         <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="number">1</span>);
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">proc_id</span> {
-            <span class="ident">RpcProcIdValue::Id</span>(<span class="kw-2">ref</span> <span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RpcProcIdValue::Id</span>(<span class="kw-2">ref</span> <span class="ident">id</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> (<span class="number">0xffff_u32</span>) <span class="op">|</span> ((<span class="kw-2">*</span><span class="ident">id</span> <span class="kw">as</span> <span class="ident">u16</span>) <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
                 <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="ident">val</span>);
             }
-            <span class="ident">RpcProcIdValue::Name</span>(<span class="kw-2">ref</span> <span class="ident">_name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RpcProcIdValue::Name</span>(<span class="kw-2">ref</span> <span class="ident">_name</span>) =&gt; {
                 <span class="comment">//let (left_bytes, _) = try!(write_varchar::&lt;u16&gt;(&amp;mut cursor, name, 0));</span>
                 <span class="comment">//assert_eq!(left_bytes, 0);</span>
                 <span class="macro">todo!</span>()
@@ -264,7 +264,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RpcParam</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len_pos</span> <span class="op">=</span> <span class="ident">dst</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length</span> <span class="op">=</span> <span class="number">0u8</span>;
 

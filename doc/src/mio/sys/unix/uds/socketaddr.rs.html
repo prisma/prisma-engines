@@ -150,7 +150,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SocketAddr</span> {
-    <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AddressKind</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AddressKind</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">path_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sockaddr</span>);
         <span class="comment">// Don&#39;t underflow in `len` below.</span>
         <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">socklen</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&lt;</span> <span class="ident">offset</span> {
@@ -160,12 +160,12 @@
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sockaddr</span>.<span class="ident">sun_path</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> [<span class="ident">libc::c_char</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> [<span class="ident">u8</span>]) };
 
         <span class="comment">// macOS seems to return a len of 16 and a zeroed sun_path for unnamed addresses</span>
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+        <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">0</span>
             <span class="op">|</span><span class="op">|</span> (<span class="macro">cfg!</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>)))
-                <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">sockaddr</span>.<span class="ident">sun_path</span>[<span class="number">0</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span>)
+                <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">sockaddr</span>.<span class="ident">sun_path</span>[<span class="number">0</span>] <span class="op">==</span> <span class="number">0</span>)
         {
             <span class="ident">AddressKind::Unnamed</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sockaddr</span>.<span class="ident">sun_path</span>[<span class="number">0</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sockaddr</span>.<span class="ident">sun_path</span>[<span class="number">0</span>] <span class="op">==</span> <span class="number">0</span> {
             <span class="ident">AddressKind::Abstract</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>[<span class="number">1</span>..<span class="ident">len</span>])
         } <span class="kw">else</span> {
             <span class="ident">AddressKind::Pathname</span>(<span class="ident">OsStr::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>[..<span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>]).<span class="ident">as_ref</span>())
@@ -177,9 +177,9 @@
     <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io</span>, <span class="ident">mem</span>};
 
     <span class="kw">impl</span> <span class="ident">SocketAddr</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>
         <span class="kw">where</span>
-            <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc::sockaddr</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">libc::socklen_t</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">libc::c_int</span><span class="op">&gt;</span>,
+            <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc::sockaddr</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">libc::socklen_t</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">libc::c_int</span><span class="op">&gt;</span>,
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sockaddr</span> <span class="op">=</span> {
                 <span class="kw">let</span> <span class="ident">sockaddr</span> <span class="op">=</span> <span class="ident">mem::MaybeUninit</span>::<span class="op">&lt;</span><span class="ident">libc::sockaddr_un</span><span class="op">&gt;</span><span class="ident">::zeroed</span>();
@@ -193,7 +193,7 @@
             <span class="prelude-val">Ok</span>(<span class="ident">SocketAddr::from_parts</span>(<span class="ident">sockaddr</span>, <span class="ident">socklen</span>))
         }
 
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_parts</span>(<span class="ident">sockaddr</span>: <span class="ident">libc::sockaddr_un</span>, <span class="ident">socklen</span>: <span class="ident">libc::socklen_t</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SocketAddr</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_parts</span>(<span class="ident">sockaddr</span>: <span class="ident">libc::sockaddr_un</span>, <span class="ident">socklen</span>: <span class="ident">libc::socklen_t</span>) -&gt; <span class="ident">SocketAddr</span> {
             <span class="ident">SocketAddr</span> { <span class="ident">sockaddr</span>, <span class="ident">socklen</span> }
         }
 
@@ -204,7 +204,7 @@
         <span class="doccomment">/// [`SocketAddr`]: std::os::unix::net::SocketAddr</span>
         <span class="comment">// FIXME: The matches macro requires rust 1.42.0 and we still support 1.39.0</span>
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::match_like_matches_macro</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unnamed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unnamed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AddressKind::Unnamed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">address</span>() {
                 <span class="bool-val">true</span>
             } <span class="kw">else</span> {
@@ -217,7 +217,7 @@
         <span class="doccomment">/// Documentation reflected in [`SocketAddr`]</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [`SocketAddr`]: std::os::unix::net::SocketAddr</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_pathname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Path</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_pathname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Path</span><span class="op">&gt;</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AddressKind::Pathname</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">address</span>() {
                 <span class="prelude-val">Some</span>(<span class="ident">path</span>)
             } <span class="kw">else</span> {
@@ -228,17 +228,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">SocketAddr</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">address</span>() {
-            <span class="ident">AddressKind::Unnamed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;(unnamed)&quot;</span>),
-            <span class="ident">AddressKind::Abstract</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{} (abstract)&quot;</span>, <span class="ident">AsciiEscaped</span>(<span class="ident">name</span>)),
-            <span class="ident">AddressKind::Pathname</span>(<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{:?} (pathname)&quot;</span>, <span class="ident">path</span>),
+            <span class="ident">AddressKind::Unnamed</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;(unnamed)&quot;</span>),
+            <span class="ident">AddressKind::Abstract</span>(<span class="ident">name</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{} (abstract)&quot;</span>, <span class="ident">AsciiEscaped</span>(<span class="ident">name</span>)),
+            <span class="ident">AddressKind::Pathname</span>(<span class="ident">path</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{:?} (pathname)&quot;</span>, <span class="ident">path</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">AsciiEscaped</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;\&quot;&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">flat_map</span>(<span class="ident">ascii::escape_default</span>) {
             <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">byte</span> <span class="kw">as</span> <span class="ident">char</span>)<span class="question-mark">?</span>;

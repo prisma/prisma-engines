@@ -357,7 +357,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">DatabaseConstraint</span>, <span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="ident">Name</span>};
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tokio_postgres::error::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">tokio_postgres::error::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">tokio_postgres::error::Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="kw">use</span> <span class="ident">tokio_postgres::error::DbError</span>;
 
         <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is_closed</span>() {
@@ -365,7 +365,7 @@
         }
 
         <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">code</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">code</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;22001&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;22001&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::LengthMismatch</span> {
@@ -381,7 +381,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;23505&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;23505&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
 
                 <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
@@ -406,7 +406,7 @@
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
             <span class="comment">// Even lipstick will not save this...</span>
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;23502&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;23502&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
 
                 <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
@@ -429,12 +429,12 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;23503&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;23503&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
                 <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
 
                 <span class="kw">match</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">column</span>()) {
-                    <span class="prelude-val">Some</span>(<span class="ident">column</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">column</span>) =&gt; {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ForeignKeyConstraintViolation</span> {
                             <span class="ident">constraint</span>: <span class="ident">DatabaseConstraint::fields</span>(<span class="prelude-val">Some</span>(<span class="ident">column</span>)),
                         });
@@ -447,7 +447,7 @@
 
                         <span class="ident">builder</span>.<span class="ident">build</span>()
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">None</span> =&gt; {
                         <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">db_error</span>
                             .<span class="ident">as_ref</span>()
                             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>())
@@ -470,7 +470,7 @@
                     }
                 }
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;3D000&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;3D000&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
                 <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
                 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
@@ -492,7 +492,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;28000&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;28000&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
                 <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
                 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
@@ -514,7 +514,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;28P01&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;28P01&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
                 <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
                 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
@@ -536,7 +536,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;42P01&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;42P01&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
                 <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
                 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
@@ -558,7 +558,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;42703&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;42703&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
                 <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
                 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
@@ -568,9 +568,9 @@
                     .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">split_whitespace</span>().<span class="ident">nth</span>(<span class="number">1</span>))
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;\&quot;&#39;</span>))
                     .<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">s</span><span class="op">|</span> <span class="kw">match</span> (<span class="ident">s</span>.<span class="ident">next</span>(), <span class="ident">s</span>.<span class="ident">next</span>()) {
-                        (<span class="prelude-val">Some</span>(<span class="ident">column</span>), <span class="kw">_</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">column</span>.<span class="ident">is_empty</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">column</span>),
-                        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">column</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">column</span>.<span class="ident">is_empty</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">column</span>),
-                        (<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                        (<span class="prelude-val">Some</span>(<span class="ident">column</span>), <span class="kw">_</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">column</span>.<span class="ident">is_empty</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">column</span>),
+                        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">column</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">column</span>.<span class="ident">is_empty</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">column</span>),
+                        (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     })
                     .<span class="ident">into</span>();
 
@@ -586,7 +586,7 @@
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
 
-            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;42P04&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="string">&quot;42P04&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_string</span>();
                 <span class="kw">let</span> <span class="ident">db_error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into_source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
                 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">db_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">message</span>());
@@ -608,7 +608,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">code</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">code</span> =&gt; {
                 <span class="comment">// This is necessary, on top of the other conversions, for the cases where a</span>
                 <span class="comment">// native_tls error comes wrapped in a tokio_postgres error.</span>
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">tls_error</span>) <span class="op">=</span> <span class="ident">try_extracting_tls_error</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>) {
@@ -628,7 +628,7 @@
                 <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>);
 
                 <span class="kw">match</span> <span class="ident">reason</span>.<span class="ident">as_str</span>() {
-                    <span class="string">&quot;error connecting to server: timed out&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">&quot;error connecting to server: timed out&quot;</span> =&gt; {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ConnectTimeout</span>);
 
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">code</span>) <span class="op">=</span> <span class="ident">code</span> {
@@ -639,7 +639,7 @@
                         <span class="ident">builder</span>.<span class="ident">build</span>()
                     } <span class="comment">// sigh...</span>
                     <span class="comment">// https://github.com/sfackler/rust-postgres/blob/0c84ed9f8201f4e5b4803199a24afa2c9f3723b2/tokio-postgres/src/connect_tls.rs#L37</span>
-                    <span class="string">&quot;error performing TLS handshake: server does not support TLS&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">&quot;error performing TLS handshake: server does not support TLS&quot;</span> =&gt; {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::TlsError</span> {
                             <span class="ident">message</span>: <span class="ident">reason</span>.<span class="ident">clone</span>(),
                         });
@@ -651,7 +651,7 @@
                         <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">reason</span>);
                         <span class="ident">builder</span>.<span class="ident">build</span>()
                     } <span class="comment">// double sigh</span>
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; {
                         <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">to_string</span>());
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()));
 
@@ -669,7 +669,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">try_extracting_uuid_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">tokio_postgres::error::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">try_extracting_uuid_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">tokio_postgres::error::Error</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="kw">_</span>;
 
     <span class="ident">err</span>.<span class="ident">source</span>()
@@ -678,7 +678,7 @@
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">kind</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>())
 }
 
-<span class="kw">fn</span> <span class="ident">try_extracting_tls_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">tokio_postgres::error::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">try_extracting_tls_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">tokio_postgres::error::Error</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">std::error::Error</span>;
 
     <span class="ident">err</span>.<span class="ident">source</span>()
@@ -686,7 +686,7 @@
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">into</span>())
 }
 
-<span class="kw">fn</span> <span class="ident">try_extracting_io_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">tokio_postgres::error::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">try_extracting_io_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">tokio_postgres::error::Error</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="kw">_</span>;
 
     <span class="ident">err</span>.<span class="ident">source</span>()
@@ -696,13 +696,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">native_tls::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">native_tls::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">native_tls::Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::from</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">native_tls::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="ident">native_tls::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="ident">native_tls::Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::TlsError</span> {
             <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>),
         };

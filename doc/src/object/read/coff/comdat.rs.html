@@ -180,7 +180,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">CoffComdatIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">CoffComdat</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>;
             <span class="kw">let</span> <span class="ident">symbol</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">common</span>.<span class="ident">symbols</span>.<span class="ident">symbol</span>(<span class="ident">index</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
@@ -206,7 +206,7 @@
         <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">CoffFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>,
         <span class="ident">section_symbol</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">pe::ImageSymbol</span>,
         <span class="ident">index</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CoffComdat</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CoffComdat</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Must be a section symbol.</span>
         <span class="kw">if</span> <span class="op">!</span><span class="ident">section_symbol</span>.<span class="ident">has_aux_section</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
@@ -215,7 +215,7 @@
         <span class="comment">// Auxiliary record must have a non-associative selection.</span>
         <span class="kw">let</span> <span class="ident">aux</span> <span class="op">=</span> <span class="ident">file</span>.<span class="ident">common</span>.<span class="ident">symbols</span>.<span class="ident">aux_section</span>(<span class="ident">index</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">selection</span> <span class="op">=</span> <span class="ident">aux</span>.<span class="ident">selection</span>;
-        <span class="kw">if</span> <span class="ident">selection</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">selection</span> <span class="op">=</span><span class="op">=</span> <span class="ident">pe::IMAGE_COMDAT_SELECT_ASSOCIATIVE</span> {
+        <span class="kw">if</span> <span class="ident">selection</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">selection</span> <span class="op">==</span> <span class="ident">pe::IMAGE_COMDAT_SELECT_ASSOCIATIVE</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
@@ -226,7 +226,7 @@
         <span class="kw">loop</span> {
             <span class="ident">symbol_index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">symbol</span>.<span class="ident">number_of_aux_symbols</span> <span class="kw">as</span> <span class="ident">usize</span>;
             <span class="ident">symbol</span> <span class="op">=</span> <span class="ident">file</span>.<span class="ident">common</span>.<span class="ident">symbols</span>.<span class="ident">symbol</span>(<span class="ident">symbol_index</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">section_number</span> <span class="op">=</span><span class="op">=</span> <span class="ident">symbol</span>.<span class="ident">section_number</span>.<span class="ident">get</span>(<span class="ident">LE</span>) {
+            <span class="kw">if</span> <span class="ident">section_number</span> <span class="op">==</span> <span class="ident">symbol</span>.<span class="ident">section_number</span>.<span class="ident">get</span>(<span class="ident">LE</span>) {
                 <span class="kw">break</span>;
             }
         }
@@ -246,25 +246,25 @@
     <span class="kw">type</span> <span class="ident">SectionIterator</span> <span class="op">=</span> <span class="ident">CoffComdatSectionIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ComdatKind</span> {
+    <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ComdatKind</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">selection</span> {
-            <span class="ident">pe::IMAGE_COMDAT_SELECT_NODUPLICATES</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ComdatKind::NoDuplicates</span>,
-            <span class="ident">pe::IMAGE_COMDAT_SELECT_ANY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ComdatKind::Any</span>,
-            <span class="ident">pe::IMAGE_COMDAT_SELECT_SAME_SIZE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ComdatKind::SameSize</span>,
-            <span class="ident">pe::IMAGE_COMDAT_SELECT_EXACT_MATCH</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ComdatKind::ExactMatch</span>,
-            <span class="ident">pe::IMAGE_COMDAT_SELECT_LARGEST</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ComdatKind::Largest</span>,
-            <span class="ident">pe::IMAGE_COMDAT_SELECT_NEWEST</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ComdatKind::Newest</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ComdatKind::Unknown</span>,
+            <span class="ident">pe::IMAGE_COMDAT_SELECT_NODUPLICATES</span> =&gt; <span class="ident">ComdatKind::NoDuplicates</span>,
+            <span class="ident">pe::IMAGE_COMDAT_SELECT_ANY</span> =&gt; <span class="ident">ComdatKind::Any</span>,
+            <span class="ident">pe::IMAGE_COMDAT_SELECT_SAME_SIZE</span> =&gt; <span class="ident">ComdatKind::SameSize</span>,
+            <span class="ident">pe::IMAGE_COMDAT_SELECT_EXACT_MATCH</span> =&gt; <span class="ident">ComdatKind::ExactMatch</span>,
+            <span class="ident">pe::IMAGE_COMDAT_SELECT_LARGEST</span> =&gt; <span class="ident">ComdatKind::Largest</span>,
+            <span class="ident">pe::IMAGE_COMDAT_SELECT_NEWEST</span> =&gt; <span class="ident">ComdatKind::Newest</span>,
+            <span class="kw">_</span> =&gt; <span class="ident">ComdatKind::Unknown</span>,
         }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">symbol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SymbolIndex</span> {
+    <span class="kw">fn</span> <span class="ident">symbol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolIndex</span> {
         <span class="self">self</span>.<span class="ident">symbol_index</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="comment">// Find the name of first symbol referring to the section.</span>
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">name</span>(<span class="self">self</span>.<span class="ident">file</span>.<span class="ident">common</span>.<span class="ident">symbols</span>.<span class="ident">strings</span>())<span class="question-mark">?</span>;
         <span class="ident">str::from_utf8</span>(<span class="ident">name</span>)
@@ -273,7 +273,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sections</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::SectionIterator</span> {
+    <span class="kw">fn</span> <span class="ident">sections</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::SectionIterator</span> {
         <span class="ident">CoffComdatSectionIterator</span> {
             <span class="ident">file</span>: <span class="self">self</span>.<span class="ident">file</span>,
             <span class="ident">section_number</span>: <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">section_number</span>.<span class="ident">get</span>(<span class="ident">LE</span>),
@@ -293,7 +293,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">CoffComdatSectionIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">R</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">SectionIndex</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="comment">// Find associated COMDAT symbols.</span>
         <span class="comment">// TODO: it seems gcc doesn&#39;t use associated symbols for this</span>
         <span class="kw">loop</span> {
@@ -309,13 +309,13 @@
             <span class="kw">let</span> <span class="ident">section_number</span> <span class="op">=</span> <span class="ident">symbol</span>.<span class="ident">section_number</span>.<span class="ident">get</span>(<span class="ident">LE</span>);
 
             <span class="kw">let</span> <span class="ident">aux</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">common</span>.<span class="ident">symbols</span>.<span class="ident">aux_section</span>(<span class="ident">index</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">aux</span>.<span class="ident">selection</span> <span class="op">=</span><span class="op">=</span> <span class="ident">pe::IMAGE_COMDAT_SELECT_ASSOCIATIVE</span> {
+            <span class="kw">if</span> <span class="ident">aux</span>.<span class="ident">selection</span> <span class="op">==</span> <span class="ident">pe::IMAGE_COMDAT_SELECT_ASSOCIATIVE</span> {
                 <span class="comment">// TODO: use high_number for bigobj</span>
-                <span class="kw">if</span> <span class="ident">aux</span>.<span class="ident">number</span>.<span class="ident">get</span>(<span class="ident">LE</span>) <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">section_number</span> {
+                <span class="kw">if</span> <span class="ident">aux</span>.<span class="ident">number</span>.<span class="ident">get</span>(<span class="ident">LE</span>) <span class="op">==</span> <span class="self">self</span>.<span class="ident">section_number</span> {
                     <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">SectionIndex</span>(<span class="ident">section_number</span> <span class="kw">as</span> <span class="ident">usize</span>));
                 }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">aux</span>.<span class="ident">selection</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">if</span> <span class="ident">section_number</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">section_number</span> {
+                <span class="kw">if</span> <span class="ident">section_number</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">section_number</span> {
                     <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">SectionIndex</span>(<span class="ident">section_number</span> <span class="kw">as</span> <span class="ident">usize</span>));
                 }
             }

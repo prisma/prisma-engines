@@ -564,7 +564,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Connection&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;transport&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;Framed&lt;..&gt;&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;flushed&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">flushed</span>)
@@ -576,7 +576,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new connection</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">config</span>: <span class="ident">Config</span>, <span class="ident">tcp_stream</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">config</span>: <span class="ident">Config</span>, <span class="ident">tcp_stream</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">Context::new</span>();
             <span class="ident">context</span>.<span class="ident">set_spn</span>(<span class="ident">config</span>.<span class="ident">get_host</span>(), <span class="ident">config</span>.<span class="ident">get_port</span>());
@@ -615,17 +615,17 @@
     }
 
     <span class="doccomment">/// Flush the incoming token stream until receiving `DONE` token.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_done</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TokenDone</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_done</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TokenDone</span><span class="op">&gt;</span> {
         <span class="ident">TokenStream::new</span>(<span class="self">self</span>).<span class="ident">flush_done</span>().<span class="kw">await</span>
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">windows</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]</span>
     <span class="doccomment">/// Flush the incoming token stream until receiving `SSPI` token.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_sspi</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TokenSspi</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_sspi</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TokenSspi</span><span class="op">&gt;</span> {
         <span class="ident">TokenStream::new</span>(<span class="self">self</span>).<span class="ident">flush_sspi</span>().<span class="kw">await</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">post_login_encryption</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">post_login_encryption</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">EncryptionLevel::Off</span> <span class="op">=</span> <span class="ident">encryption</span> {
             <span class="macro">event!</span>(
                 <span class="ident">Level::WARN</span>,
@@ -647,7 +647,7 @@
     <span class="doccomment">/// the negotiated packet size, and handle flushing to the wire in an optimal way.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Encode`]: ../protocol/codec/trait.Encode.html</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">header</span>: <span class="ident">PacketHeader</span>, <span class="ident">item</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">header</span>: <span class="ident">PacketHeader</span>, <span class="ident">item</span>: <span class="ident">E</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span>,
     {
@@ -690,7 +690,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Calling this will slow down the queries if stream is still dirty if all</span>
     <span class="doccomment">/// results are not handled.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">truncate</span>(<span class="number">0</span>);
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flushed</span> {
@@ -715,7 +715,7 @@
 
     <span class="doccomment">/// True if the underlying stream has no more data and is consumed</span>
     <span class="doccomment">/// completely.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_eof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_eof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">flushed</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>()
     }
 
@@ -727,7 +727,7 @@
     <span class="doccomment">/// encryption is needed. In this scenario, where PRELOGIN message is</span>
     <span class="doccomment">/// transporting the TLS handshake payload, the packet data is simply the</span>
     <span class="doccomment">/// raw bytes of the TLS handshake payload.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prelogin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PreloginMessage</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prelogin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PreloginMessage</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">PreloginMessage::new</span>();
         <span class="ident">msg</span>.<span class="ident">encryption</span> <span class="op">=</span> <span class="ident">encryption</span>;
 
@@ -746,7 +746,7 @@
         <span class="ident">db</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">server_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">application_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">login_message</span> <span class="op">=</span> <span class="ident">LoginMessage::new</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">db</span>) <span class="op">=</span> <span class="ident">db</span> {
@@ -763,7 +763,7 @@
 
         <span class="kw">match</span> <span class="ident">auth</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-            <span class="ident">AuthMethod::Integrated</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMethod::Integrated</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">NtlmSspiBuilder::new</span>()
                     .<span class="ident">target_spn</span>(<span class="self">self</span>.<span class="ident">context</span>.<span class="ident">spn</span>())
                     .<span class="ident">build</span>()<span class="question-mark">?</span>;
@@ -778,7 +778,7 @@
                 <span class="kw">let</span> <span class="ident">sspi_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flush_sspi</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">next_bytes</span>(<span class="prelude-val">Some</span>(<span class="ident">sspi_bytes</span>.<span class="ident">as_ref</span>()))<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">sspi_response</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">sspi_response</span>) =&gt; {
                         <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">sspi_response_len</span> <span class="op">=</span> <span class="ident">sspi_response</span>.<span class="ident">len</span>());
 
                         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
@@ -787,11 +787,11 @@
                         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">TokenSspi::new</span>(<span class="ident">sspi_response</span>);
                         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">header</span>, <span class="ident">token</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                    <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(),
                 }
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]</span>
-            <span class="ident">AuthMethod::Integrated</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMethod::Integrated</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">OidSet::new</span>()<span class="question-mark">?</span>;
                 <span class="ident">s</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">GSS_MECH_KRB5</span>)<span class="question-mark">?</span>;
 
@@ -816,11 +816,11 @@
                 <span class="kw">let</span> <span class="ident">auth_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flush_sspi</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="kw">let</span> <span class="ident">next_token</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">step</span>(<span class="prelude-val">Some</span>(<span class="ident">auth_bytes</span>.<span class="ident">as_ref</span>()))<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">response</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">response</span>) =&gt; {
                         <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">response_len</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">len</span>());
                         <span class="ident">TokenSspi::new</span>(<span class="ident">Vec::from</span>(<span class="ident">response</span>.<span class="ident">deref</span>()))
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">None</span> =&gt; {
                         <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">response_len</span> <span class="op">=</span> <span class="number">0</span>);
                         <span class="ident">TokenSspi::new</span>(<span class="ident">Vec::new</span>())
                     }
@@ -832,7 +832,7 @@
                 <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">header</span>, <span class="ident">next_token</span>).<span class="kw">await</span><span class="question-mark">?</span>;
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-            <span class="ident">AuthMethod::Windows</span>(<span class="ident">auth</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMethod::Windows</span>(<span class="ident">auth</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">spn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">spn</span>().<span class="ident">to_string</span>();
                 <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">winauth::NtlmV2ClientBuilder::new</span>().<span class="ident">target_spn</span>(<span class="ident">spn</span>);
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>(<span class="ident">auth</span>.<span class="ident">domain</span>, <span class="ident">auth</span>.<span class="ident">user</span>, <span class="ident">auth</span>.<span class="ident">password</span>);
@@ -847,7 +847,7 @@
                 <span class="kw">let</span> <span class="ident">sspi_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flush_sspi</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">next_bytes</span>(<span class="prelude-val">Some</span>(<span class="ident">sspi_bytes</span>.<span class="ident">as_ref</span>()))<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">sspi_response</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">sspi_response</span>) =&gt; {
                         <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">sspi_response_len</span> <span class="op">=</span> <span class="ident">sspi_response</span>.<span class="ident">len</span>());
 
                         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
@@ -856,15 +856,15 @@
                         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">TokenSspi::new</span>(<span class="ident">sspi_response</span>);
                         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">header</span>, <span class="ident">token</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                    <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(),
                 }
             }
-            <span class="ident">AuthMethod::None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMethod::None</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
                 <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::login</span>(<span class="ident">id</span>), <span class="ident">login_message</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">post_login_encryption</span>(<span class="ident">encryption</span>);
             }
-            <span class="ident">AuthMethod::SqlServer</span>(<span class="ident">auth</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMethod::SqlServer</span>(<span class="ident">auth</span>) =&gt; {
                 <span class="ident">login_message</span>.<span class="ident">user_name</span>(<span class="ident">auth</span>.<span class="ident">user</span>());
                 <span class="ident">login_message</span>.<span class="ident">password</span>(<span class="ident">auth</span>.<span class="ident">password</span>());
 
@@ -883,7 +883,7 @@
         <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>,
         <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>,
         <span class="ident">trust_cert</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">encryption</span> <span class="op">!</span><span class="op">=</span> <span class="ident">EncryptionLevel::NotSupported</span> {
             <span class="macro">event!</span>(<span class="ident">Level::INFO</span>, <span class="string">&quot;Performing a TLS handshake&quot;</span>);
 
@@ -904,12 +904,12 @@
                 <span class="ident">transport</span>, <span class="ident">context</span>, ..
             } <span class="op">=</span> <span class="self">self</span>;
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">transport</span>.<span class="ident">release</span>().<span class="number">0</span> {
-                <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">tcp</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">tcp</span>) =&gt; {
                     <span class="ident">builder</span>
                         .<span class="ident">connect</span>(<span class="ident">config</span>.<span class="ident">get_host</span>(), <span class="ident">TlsPreloginWrapper::new</span>(<span class="ident">tcp</span>))
                         .<span class="kw">await</span><span class="question-mark">?</span>
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
             };
 
             <span class="ident">stream</span>.<span class="ident">get_mut</span>().<span class="ident">handshake_complete</span>();
@@ -937,16 +937,16 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Packet</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>();
 
         <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">transport</span>.<span class="ident">try_poll_next_unpin</span>(<span class="ident">cx</span>)) {
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">packet</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">packet</span>)) =&gt; {
                 <span class="ident">this</span>.<span class="ident">flushed</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">is_last</span>();
                 <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">packet</span>)))
             }
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
         }
     }
 }
@@ -956,14 +956,14 @@
         <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>();
         <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
 
         <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">size</span> {
             <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">this</span>).<span class="ident">try_poll_next</span>(<span class="ident">cx</span>)) {
                 <span class="kw">match</span> <span class="ident">item</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">packet</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">packet</span>) =&gt; {
                         <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">payload</span>) <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">into_parts</span>();
                         <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">payload</span>);
 
@@ -971,7 +971,7 @@
                             <span class="kw">break</span>;
                         }
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                         <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                             <span class="ident">io::ErrorKind::BrokenPipe</span>,
                             <span class="ident">e</span>.<span class="ident">to_string</span>(),
@@ -1001,12 +1001,12 @@
     }
 
     <span class="doccomment">/// The current execution context.</span>
-    <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Context</span> {
+    <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Context</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">context</span>
     }
 
     <span class="doccomment">/// A mutable reference to the current execution context.</span>
-    <span class="kw">fn</span> <span class="ident">context_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span> {
+    <span class="kw">fn</span> <span class="ident">context_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">context</span>
     }
 }

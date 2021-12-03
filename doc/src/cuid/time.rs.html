@@ -34,7 +34,7 @@
 <span class="kw">use</span> <span class="ident">error::CuidError</span>;
 <span class="kw">use</span> <span class="ident">text::to_base_str</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
     <span class="ident">SystemTime::now</span>()
         .<span class="ident">duration_since</span>(<span class="ident">UNIX_EPOCH</span>)
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> <span class="ident">time</span>.<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">u64</span>)

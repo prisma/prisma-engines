@@ -2,30 +2,30 @@
     (@
  {
      <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>)
-     $(($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">skip</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bind</span> : <span class="ident">pat</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fut</span> : <span class="ident">expr</span>, <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> : <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">handle</span> :
+     $(($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">skip</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bind</span> : <span class="ident">pat</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fut</span> : <span class="ident">expr</span>, <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> : <span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">handle</span> :
        <span class="ident">expr</span>,) <span class="op">+</span> ; <span class="macro-nonterminal">$</span><span class="kw">else</span> : <span class="macro-nonterminal">expr</span>
- }) <span class="op">=</span><span class="op">&gt;</span> { ... };
-    (@ { <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="op">*</span> }) <span class="op">=</span><span class="op">&gt;</span> { ... };
-    (@ { <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="op">*</span> } <span class="kw">else</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">else</span> : <span class="macro-nonterminal">expr</span> $(,) <span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> { ... };
+ }) =&gt; { ... };
+    (@ { <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="op">*</span> }) =&gt; { ... };
+    (@ { <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="op">*</span> } <span class="kw">else</span> =&gt; <span class="macro-nonterminal">$</span><span class="kw">else</span> : <span class="macro-nonterminal">expr</span> $(,) <span class="question-mark">?</span>) =&gt; { ... };
     (@ { <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="op">*</span> } <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span> : <span class="ident">pat</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span> :
- <span class="ident">expr</span>, <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> : <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">block</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> { ... };
+ <span class="ident">expr</span>, <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> : <span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">block</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) =&gt; { ... };
     (@ { <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="op">*</span> } <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span> : <span class="ident">pat</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span> :
- <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">block</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> { ... };
+ <span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">block</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) =&gt; { ... };
     (@ { <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="op">*</span> } <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span> : <span class="ident">pat</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span> :
- <span class="ident">expr</span>, <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> : <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">block</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> { ... };
+ <span class="ident">expr</span>, <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> : <span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">block</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) =&gt; { ... };
     (@ { <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="op">*</span> } <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span> : <span class="ident">pat</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span> :
- <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">block</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> { ... };
+ <span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">block</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) =&gt; { ... };
     (@ { <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="op">*</span> } <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span> : <span class="ident">pat</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span> :
- <span class="ident">expr</span>, <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> : <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { ... };
+ <span class="ident">expr</span>, <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> : <span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">expr</span>) =&gt; { ... };
     (@ { <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="op">*</span> } <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span> : <span class="ident">pat</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span> :
- <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { ... };
+ <span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">expr</span>) =&gt; { ... };
     (@ { <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="op">*</span> } <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span> : <span class="ident">pat</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span> :
- <span class="ident">expr</span>, <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> : <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> { ... };
+ <span class="ident">expr</span>, <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> : <span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) =&gt; { ... };
     (@ { <span class="ident">start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span> : <span class="ident">expr</span> ; ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="op">*</span> } <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span> : <span class="ident">pat</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span> :
- <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> { ... };
-    (<span class="ident">biased</span> ; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span> : <span class="ident">pat</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> { ... };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span> : <span class="ident">pat</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> { ... };
-    () <span class="op">=</span><span class="op">&gt;</span> { ... };
+ <span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h</span> : <span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) =&gt; { ... };
+    (<span class="ident">biased</span> ; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span> : <span class="ident">pat</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) =&gt; { ... };
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span> : <span class="ident">pat</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> : <span class="ident">tt</span>) <span class="kw-2">*</span>) =&gt; { ... };
+    () =&gt; { ... };
 }</code></pre></div>
 </div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Wait on multiple concurrent branches, returning when the <strong>first</strong> branch
 completes, cancelling the remaining branches.</p>
@@ -62,14 +62,14 @@ and for the remainder of the current call to <code>select!</code>. Continue from
 <li>If <strong>all</strong> branches are disabled, evaluate the <code>else</code> expression. If no
 else branch is provided, panic.</li>
 </ol>
-<h1 id="runtime-characteristics" class="section-header"><a href="#runtime-characteristics">Runtime characteristics</a></h1>
+<h2 id="runtime-characteristics" class="section-header"><a href="#runtime-characteristics">Runtime characteristics</a></h2>
 <p>By running all async expressions on the current task, the expressions are
 able to run <strong>concurrently</strong> but not in <strong>parallel</strong>. This means all
 expressions are run on the same thread and if one branch blocks the thread,
 all other expressions will be unable to continue. If parallelism is
 required, spawn each async expression using <a href="task/fn.spawn.html"><code>tokio::spawn</code></a> and pass the
 join handle to <code>select!</code>.</p>
-<h1 id="fairness" class="section-header"><a href="#fairness">Fairness</a></h1>
+<h2 id="fairness" class="section-header"><a href="#fairness">Fairness</a></h2>
 <p>By default, <code>select!</code> randomly picks a branch to check first. This provides
 some level of fairness when calling <code>select!</code> in a loop with branches that
 are always ready.</p>
@@ -88,12 +88,12 @@ huge volume of messages and zero or nearly zero time between them, you should
 place the shutdown future earlier in the <code>select!</code> list to ensure that it is
 always polled, and will not be ignored due to the stream being constantly
 ready.</p>
-<h1 id="panics" class="section-header"><a href="#panics">Panics</a></h1>
+<h2 id="panics" class="section-header"><a href="#panics">Panics</a></h2>
 <p>The <code>select!</code> macro panics if all branches are disabled <strong>and</strong> there is no
 provided <code>else</code> branch. A branch is disabled when the provided <code>if</code>
 precondition returns <code>false</code> <strong>or</strong> when the pattern does not match the
 result of <code>&lt;async expression&gt;</code>.</p>
-<h1 id="cancellation-safety" class="section-header"><a href="#cancellation-safety">Cancellation safety</a></h1>
+<h2 id="cancellation-safety" class="section-header"><a href="#cancellation-safety">Cancellation safety</a></h2>
 <p>When using <code>select!</code> in a loop to receive messages from multiple sources,
 you should make sure that the receive call is cancellation safe to avoid
 losing messages. This section goes through various common methods and
@@ -139,7 +139,7 @@ cancellation safe.</p>
 necessarily wrong. For example, if you are cancelling a task because the
 application is shutting down, then you probably don’t care that partially
 read data is lost.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>Basic select with two branches.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">async</span> <span class="kw">fn</span> <span class="ident">do_stuff_async</span>() {
@@ -153,10 +153,10 @@ read data is lost.</p>
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="macro">tokio::select!</span> {
-        <span class="kw">_</span> <span class="op">=</span> <span class="ident">do_stuff_async</span>() <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">_</span> <span class="op">=</span> <span class="ident">do_stuff_async</span>() =&gt; {
             <span class="macro">println!</span>(<span class="string">&quot;do_stuff_async() completed first&quot;</span>)
         }
-        <span class="kw">_</span> <span class="op">=</span> <span class="ident">more_async_work</span>() <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">_</span> <span class="op">=</span> <span class="ident">more_async_work</span>() =&gt; {
             <span class="macro">println!</span>(<span class="string">&quot;more_async_work() completed first&quot;</span>)
         }
     };
@@ -171,11 +171,11 @@ read data is lost.</p>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream2</span> <span class="op">=</span> <span class="ident">stream::iter</span>(<span class="macro">vec!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]);
 
     <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="macro">tokio::select!</span> {
-        <span class="ident">v</span> <span class="op">=</span> <span class="ident">stream1</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">unwrap</span>(),
-        <span class="ident">v</span> <span class="op">=</span> <span class="ident">stream2</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">unwrap</span>(),
+        <span class="ident">v</span> <span class="op">=</span> <span class="ident">stream1</span>.<span class="ident">next</span>() =&gt; <span class="ident">v</span>.<span class="ident">unwrap</span>(),
+        <span class="ident">v</span> <span class="op">=</span> <span class="ident">stream2</span>.<span class="ident">next</span>() =&gt; <span class="ident">v</span>.<span class="ident">unwrap</span>(),
     };
 
-    <span class="macro">assert!</span>(<span class="ident">next</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">next</span> <span class="op">=</span><span class="op">=</span> <span class="number">4</span>);
+    <span class="macro">assert!</span>(<span class="ident">next</span> <span class="op">==</span> <span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">next</span> <span class="op">==</span> <span class="number">4</span>);
 }</code></pre></div>
 <p>Collect the contents of two streams. In this example, we rely on pattern
 matching and the fact that <code>stream::iter</code> is “fused”, i.e. once the stream
@@ -192,9 +192,9 @@ is complete, all calls to <code>next()</code> return <code>None</code>.</p>
 
     <span class="kw">loop</span> {
         <span class="macro">tokio::select!</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">stream1</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">v</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">stream2</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">v</span>),
-            <span class="kw">else</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">stream1</span>.<span class="ident">next</span>() =&gt; <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">v</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">stream2</span>.<span class="ident">next</span>() =&gt; <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">v</span>),
+            <span class="kw">else</span> =&gt; <span class="kw">break</span>,
         }
     }
 
@@ -202,8 +202,8 @@ is complete, all calls to <code>next()</code> return <code>None</code>.</p>
     <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>], <span class="kw-2">&amp;</span><span class="ident">values</span>[..]);
 }</code></pre></div>
 <p>Using the same future in multiple <code>select!</code> expressions can be done by passing
-a reference to the future. Doing so requires the future to be <a href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Unpin.html"><code>Unpin</code></a>. A
-future can be made <a href="https://doc.rust-lang.org/1.56.1/core/marker/trait.Unpin.html"><code>Unpin</code></a> by either using <a href="https://doc.rust-lang.org/1.56.1/alloc/boxed/struct.Box.html#method.pin"><code>Box::pin</code></a> or stack pinning.</p>
+a reference to the future. Doing so requires the future to be <a href="https://doc.rust-lang.org/1.57.0/core/marker/trait.Unpin.html"><code>Unpin</code></a>. A
+future can be made <a href="https://doc.rust-lang.org/1.57.0/core/marker/trait.Unpin.html"><code>Unpin</code></a> by either using <a href="https://doc.rust-lang.org/1.57.0/alloc/boxed/struct.Box.html#method.pin"><code>Box::pin</code></a> or stack pinning.</p>
 <p>Here, a stream is consumed for at most 1 second.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio_stream</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">stream</span>, <span class="ident">StreamExt</span>};
@@ -217,14 +217,14 @@ future can be made <a href="https://doc.rust-lang.org/1.56.1/core/marker/trait.U
 
     <span class="kw">loop</span> {
         <span class="macro">tokio::select!</span> {
-            <span class="ident">maybe_v</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">maybe_v</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">next</span>() =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">maybe_v</span> {
                     <span class="macro">println!</span>(<span class="string">&quot;got = {}&quot;</span>, <span class="ident">v</span>);
                 } <span class="kw">else</span> {
                     <span class="kw">break</span>;
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sleep</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sleep</span> =&gt; {
                 <span class="macro">println!</span>(<span class="string">&quot;timeout&quot;</span>);
                 <span class="kw">break</span>;
             }
@@ -253,8 +253,8 @@ future can be made <a href="https://doc.rust-lang.org/1.56.1/core/marker/trait.U
 
     <span class="kw">while</span> <span class="ident">a</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">is_none</span>() {
         <span class="macro">tokio::select!</span> {
-            <span class="ident">v1</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rx1</span>), <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_none</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">v1</span>.<span class="ident">unwrap</span>()),
-            <span class="ident">v2</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rx2</span>), <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">is_none</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">v2</span>.<span class="ident">unwrap</span>()),
+            <span class="ident">v1</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rx1</span>), <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_none</span>() =&gt; <span class="ident">a</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">v1</span>.<span class="ident">unwrap</span>()),
+            <span class="ident">v2</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rx2</span>), <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">is_none</span>() =&gt; <span class="ident">b</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">v2</span>.<span class="ident">unwrap</span>()),
         }
     }
 
@@ -276,30 +276,30 @@ future can be made <a href="https://doc.rust-lang.org/1.56.1/core/marker/trait.U
             <span class="comment">// (probably) fail.</span>
             <span class="ident">biased</span>;
 
-            <span class="kw">_</span> <span class="op">=</span> <span class="kw">async</span> {}, <span class="kw">if</span> <span class="ident">count</span> <span class="op">&lt;</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="op">=</span> <span class="kw">async</span> {}, <span class="kw">if</span> <span class="ident">count</span> <span class="op">&lt;</span> <span class="number">1</span> =&gt; {
                 <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="macro">assert_eq!</span>(<span class="ident">count</span>, <span class="number">1</span>);
             }
-            <span class="kw">_</span> <span class="op">=</span> <span class="kw">async</span> {}, <span class="kw">if</span> <span class="ident">count</span> <span class="op">&lt;</span> <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="op">=</span> <span class="kw">async</span> {}, <span class="kw">if</span> <span class="ident">count</span> <span class="op">&lt;</span> <span class="number">2</span> =&gt; {
                 <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="macro">assert_eq!</span>(<span class="ident">count</span>, <span class="number">2</span>);
             }
-            <span class="kw">_</span> <span class="op">=</span> <span class="kw">async</span> {}, <span class="kw">if</span> <span class="ident">count</span> <span class="op">&lt;</span> <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="op">=</span> <span class="kw">async</span> {}, <span class="kw">if</span> <span class="ident">count</span> <span class="op">&lt;</span> <span class="number">3</span> =&gt; {
                 <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="macro">assert_eq!</span>(<span class="ident">count</span>, <span class="number">3</span>);
             }
-            <span class="kw">_</span> <span class="op">=</span> <span class="kw">async</span> {}, <span class="kw">if</span> <span class="ident">count</span> <span class="op">&lt;</span> <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="op">=</span> <span class="kw">async</span> {}, <span class="kw">if</span> <span class="ident">count</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; {
                 <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="macro">assert_eq!</span>(<span class="ident">count</span>, <span class="number">4</span>);
             }
 
-            <span class="kw">else</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">else</span> =&gt; {
                 <span class="kw">break</span>;
             }
         };
     }
 }</code></pre></div>
-<h2 id="avoid-racy-if-preconditions" class="section-header"><a href="#avoid-racy-if-preconditions">Avoid racy <code>if</code> preconditions</a></h2>
+<h3 id="avoid-racy-if-preconditions" class="section-header"><a href="#avoid-racy-if-preconditions">Avoid racy <code>if</code> preconditions</a></h3>
 <p>Given that <code>if</code> preconditions are used to disable <code>select!</code> branches, some
 caution must be used to avoid missing values.</p>
 <p>For example, here is <strong>incorrect</strong> usage of <code>sleep</code> with <code>if</code>. The objective
@@ -319,10 +319,10 @@ However, there is a potential for the <code>sleep</code> completion to be missed
 
     <span class="kw">while</span> <span class="op">!</span><span class="ident">sleep</span>.<span class="ident">is_elapsed</span>() {
         <span class="macro">tokio::select!</span> {
-            <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sleep</span>, <span class="kw">if</span> <span class="op">!</span><span class="ident">sleep</span>.<span class="ident">is_elapsed</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sleep</span>, <span class="kw">if</span> <span class="op">!</span><span class="ident">sleep</span>.<span class="ident">is_elapsed</span>() =&gt; {
                 <span class="macro">println!</span>(<span class="string">&quot;operation timed out&quot;</span>);
             }
-            <span class="kw">_</span> <span class="op">=</span> <span class="ident">some_async_work</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="op">=</span> <span class="ident">some_async_work</span>() =&gt; {
                 <span class="macro">println!</span>(<span class="string">&quot;operation completed&quot;</span>);
             }
         }
@@ -350,11 +350,11 @@ run uninterrupted despite the sleep having elapsed.</p>
 
     <span class="kw">loop</span> {
         <span class="macro">tokio::select!</span> {
-            <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sleep</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sleep</span> =&gt; {
                 <span class="macro">println!</span>(<span class="string">&quot;operation timed out&quot;</span>);
                 <span class="kw">break</span>;
             }
-            <span class="kw">_</span> <span class="op">=</span> <span class="ident">some_async_work</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="op">=</span> <span class="ident">some_async_work</span>() =&gt; {
                 <span class="macro">println!</span>(<span class="string">&quot;operation completed&quot;</span>);
             }
         }

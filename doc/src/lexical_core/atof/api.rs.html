@@ -1056,13 +1056,13 @@
 <span class="doccomment">/// Trait to define parsing of a string to float.</span>
 <span class="kw">trait</span> <span class="ident">StringToFloat</span>: <span class="ident">Float</span> {
     <span class="doccomment">/// Serialize string to float, favoring correctness.</span>
-    <span class="kw">fn</span> <span class="ident">default</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">lossy</span>: <span class="ident">bool</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">default</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">lossy</span>: <span class="ident">bool</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">StringToFloat</span> <span class="kw">for</span> <span class="ident">f32</span> {
     <span class="macro">perftools_inline_always!</span>{
     <span class="kw">fn</span> <span class="ident">default</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">lossy</span>: <span class="ident">bool</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">f32</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
+        -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">f32</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
     {
         <span class="ident">algorithm::atof</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>)
     }}
@@ -1071,7 +1071,7 @@
 <span class="kw">impl</span> <span class="ident">StringToFloat</span> <span class="kw">for</span> <span class="ident">f64</span> {
     <span class="macro">perftools_inline_always!</span>{
     <span class="kw">fn</span> <span class="ident">default</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">lossy</span>: <span class="ident">bool</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">f64</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
+        -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">f64</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
     {
         <span class="ident">algorithm::atod</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>)
     }}
@@ -1082,14 +1082,14 @@
 
 <span class="comment">// Convert slice to iterator without digit separators.</span>
 <span class="macro">perftools_inline!</span>{
-<span class="kw">fn</span> <span class="ident">to_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw">_</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">to_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw">_</span>: <span class="ident">u8</span>) -&gt; <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span><span class="op">&gt;</span> {
     <span class="ident">bytes</span>.<span class="ident">iter</span>()
 }}
 
 <span class="comment">// Convert slice to iterator with digit separators.</span>
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">to_iter_s</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">digit_separator</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SkipValueIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">to_iter_s</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">digit_separator</span>: <span class="ident">u8</span>) -&gt; <span class="ident">SkipValueIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span><span class="op">&gt;</span> {
     <span class="ident">SkipValueIterator::new</span>(<span class="ident">bytes</span>, <span class="ident">digit_separator</span>)
 }}
 
@@ -1106,11 +1106,11 @@
     <span class="ident">to_iter</span>: <span class="ident">ToIter</span>,
     <span class="ident">starts_with</span>: <span class="ident">StartsWith</span>
 )
-    <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
+    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">StringToFloat</span>,
-          <span class="ident">ToIter</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Iter</span>,
+          <span class="ident">ToIter</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">u8</span>) -&gt; <span class="ident">Iter</span>,
           <span class="ident">Iter</span>: <span class="ident">AsPtrIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span><span class="op">&gt;</span>,
-          <span class="ident">StartsWith</span>: <span class="ident">Fn</span>(<span class="ident">Iter</span>, <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">bool</span>, <span class="ident">Iter</span>)
+          <span class="ident">StartsWith</span>: <span class="ident">Fn</span>(<span class="ident">Iter</span>, <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span><span class="op">&gt;</span>) -&gt; (<span class="ident">bool</span>, <span class="ident">Iter</span>)
 {
     <span class="kw">let</span> <span class="ident">infinity</span> <span class="op">=</span> <span class="ident">get_infinity_string</span>();
     <span class="kw">let</span> <span class="ident">inf</span> <span class="op">=</span> <span class="ident">get_inf_string</span>();
@@ -1139,11 +1139,11 @@
     <span class="ident">to_iter</span>: <span class="ident">ToIter</span>,
     <span class="ident">starts_with</span>: <span class="ident">StartsWith</span>
 )
-<span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
+-&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">StringToFloat</span>,
-          <span class="ident">ToIter</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Iter</span>,
+          <span class="ident">ToIter</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">u8</span>) -&gt; <span class="ident">Iter</span>,
           <span class="ident">Iter</span>: <span class="ident">AsPtrIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span><span class="op">&gt;</span>,
-          <span class="ident">StartsWith</span>: <span class="ident">Fn</span>(<span class="ident">Iter</span>, <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">bool</span>, <span class="ident">Iter</span>)
+          <span class="ident">StartsWith</span>: <span class="ident">Fn</span>(<span class="ident">Iter</span>, <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span><span class="op">&gt;</span>) -&gt; (<span class="ident">bool</span>, <span class="ident">Iter</span>)
 {
     <span class="kw">let</span> <span class="ident">nan</span> <span class="op">=</span> <span class="ident">get_nan_string</span>();
     <span class="kw">if</span> <span class="kw">let</span> (<span class="bool-val">true</span>, <span class="ident">iter</span>) <span class="op">=</span> <span class="ident">starts_with</span>(<span class="ident">to_iter</span>(<span class="ident">bytes</span>, <span class="ident">format</span>.<span class="ident">digit_separator</span>()), <span class="ident">nan</span>.<span class="ident">iter</span>()) {
@@ -1165,15 +1165,15 @@
 <span class="comment">// and no digit separators are allowed.</span>
 <span class="macro">perftools_inline!</span>{
 <span class="kw">fn</span> <span class="ident">parse_float_standard</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">lossy</span>: <span class="ident">bool</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
+    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
 {
     <span class="comment">// Use predictive parsing to filter special cases. This leads to</span>
     <span class="comment">// dramatic performance gains.</span>
     <span class="kw">let</span> <span class="ident">starts_with</span> <span class="op">=</span> <span class="ident">case_insensitive_starts_with_iter</span>;
     <span class="kw">match</span> <span class="macro">index!</span>(<span class="ident">bytes</span>[<span class="number">0</span>]) {
-        <span class="string">b&#39;i&#39;</span> <span class="op">|</span> <span class="string">b&#39;I&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_infinity</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter</span>, <span class="ident">starts_with</span>),
-        <span class="string">b&#39;N&#39;</span> <span class="op">|</span> <span class="string">b&#39;n&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_nan</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter</span>, <span class="ident">starts_with</span>),
-        <span class="kw">_</span>           <span class="op">=</span><span class="op">&gt;</span> <span class="ident">F::default</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
+        <span class="string">b&#39;i&#39;</span> <span class="op">|</span> <span class="string">b&#39;I&#39;</span> =&gt; <span class="ident">parse_infinity</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter</span>, <span class="ident">starts_with</span>),
+        <span class="string">b&#39;N&#39;</span> <span class="op">|</span> <span class="string">b&#39;n&#39;</span> =&gt; <span class="ident">parse_nan</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter</span>, <span class="ident">starts_with</span>),
+        <span class="kw">_</span>           =&gt; <span class="ident">F::default</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
     }
 }}
 
@@ -1183,14 +1183,14 @@
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">parse_float_cs</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">lossy</span>: <span class="ident">bool</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
+    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
 {
     <span class="kw">let</span> <span class="ident">digit_separator</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">digit_separator</span>();
     <span class="kw">let</span> <span class="ident">starts_with</span> <span class="op">=</span> <span class="ident">starts_with_iter</span>;
     <span class="kw">match</span> <span class="ident">SkipValueIterator::new</span>(<span class="ident">bytes</span>, <span class="ident">digit_separator</span>).<span class="ident">next</span>()  {
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;i&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;I&#39;</span>)   <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_infinity</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter_s</span>, <span class="ident">starts_with</span>),
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;n&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;N&#39;</span>)   <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_nan</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter_s</span>, <span class="ident">starts_with</span>),
-        <span class="kw">_</span>                           <span class="op">=</span><span class="op">&gt;</span> <span class="ident">F::default</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;i&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;I&#39;</span>)   =&gt; <span class="ident">parse_infinity</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter_s</span>, <span class="ident">starts_with</span>),
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;n&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;N&#39;</span>)   =&gt; <span class="ident">parse_nan</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter_s</span>, <span class="ident">starts_with</span>),
+        <span class="kw">_</span>                           =&gt; <span class="ident">F::default</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
     }
 }}
 
@@ -1200,15 +1200,15 @@
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">parse_float_c</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">lossy</span>: <span class="ident">bool</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
+    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
 {
     <span class="comment">// Use predictive parsing to filter special cases. This leads to</span>
     <span class="comment">// dramatic performance gains.</span>
     <span class="kw">let</span> <span class="ident">starts_with</span> <span class="op">=</span> <span class="ident">starts_with_iter</span>;
     <span class="kw">match</span> <span class="macro">index!</span>(<span class="ident">bytes</span>[<span class="number">0</span>]) {
-        <span class="string">b&#39;i&#39;</span> <span class="op">|</span> <span class="string">b&#39;I&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_infinity</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter</span>, <span class="ident">starts_with</span>),
-        <span class="string">b&#39;N&#39;</span> <span class="op">|</span> <span class="string">b&#39;n&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_nan</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter</span>, <span class="ident">starts_with</span>),
-        <span class="kw">_</span>           <span class="op">=</span><span class="op">&gt;</span> <span class="ident">F::default</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
+        <span class="string">b&#39;i&#39;</span> <span class="op">|</span> <span class="string">b&#39;I&#39;</span> =&gt; <span class="ident">parse_infinity</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter</span>, <span class="ident">starts_with</span>),
+        <span class="string">b&#39;N&#39;</span> <span class="op">|</span> <span class="string">b&#39;n&#39;</span> =&gt; <span class="ident">parse_nan</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter</span>, <span class="ident">starts_with</span>),
+        <span class="kw">_</span>           =&gt; <span class="ident">F::default</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
     }
 }}
 
@@ -1218,14 +1218,14 @@
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">parse_float_s</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">lossy</span>: <span class="ident">bool</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
+    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
 {
     <span class="kw">let</span> <span class="ident">digit_separator</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">digit_separator</span>();
     <span class="kw">let</span> <span class="ident">starts_with</span> <span class="op">=</span> <span class="ident">case_insensitive_starts_with_iter</span>;
     <span class="kw">match</span> <span class="ident">SkipValueIterator::new</span>(<span class="ident">bytes</span>, <span class="ident">digit_separator</span>).<span class="ident">next</span>()  {
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;i&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;I&#39;</span>)   <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_infinity</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter_s</span>, <span class="ident">starts_with</span>),
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;n&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;N&#39;</span>)   <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_nan</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter_s</span>, <span class="ident">starts_with</span>),
-        <span class="kw">_</span>                           <span class="op">=</span><span class="op">&gt;</span> <span class="ident">F::default</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;i&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;I&#39;</span>)   =&gt; <span class="ident">parse_infinity</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter_s</span>, <span class="ident">starts_with</span>),
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;n&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;N&#39;</span>)   =&gt; <span class="ident">parse_nan</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>, <span class="ident">to_iter_s</span>, <span class="ident">starts_with</span>),
+        <span class="kw">_</span>                           =&gt; <span class="ident">F::default</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
     }
 }}
 
@@ -1233,7 +1233,7 @@
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>))]</span>
 <span class="kw">fn</span> <span class="ident">parse_float</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">lossy</span>: <span class="ident">bool</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
+    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
 {
     <span class="ident">parse_float_standard</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>)
 }}
@@ -1242,7 +1242,7 @@
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">parse_float</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">lossy</span>: <span class="ident">bool</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
+    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
 {
     <span class="comment">// Need to consider 3 possibilities:</span>
     <span class="comment">//  1). No special values are allowed.</span>
@@ -1252,11 +1252,11 @@
     <span class="kw">let</span> <span class="ident">case</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">case_sensitive_special</span>();
     <span class="kw">let</span> <span class="ident">has_sep</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">special_digit_separator</span>();
     <span class="kw">match</span> (<span class="ident">no_special</span>, <span class="ident">case</span>, <span class="ident">has_sep</span>) {
-        (<span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>)            <span class="op">=</span><span class="op">&gt;</span> <span class="ident">F::default</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
-        (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>)     <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_float_cs</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
-        (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>)    <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_float_s</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
-        (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>)    <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_float_c</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
-        (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>)   <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_float_standard</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
+        (<span class="bool-val">true</span>, <span class="kw">_</span>, <span class="kw">_</span>)            =&gt; <span class="ident">F::default</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
+        (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>)     =&gt; <span class="ident">parse_float_cs</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
+        (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>)    =&gt; <span class="ident">parse_float_s</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
+        (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>)    =&gt; <span class="ident">parse_float_c</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
+        (<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>)   =&gt; <span class="ident">parse_float_standard</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="ident">lossy</span>, <span class="ident">sign</span>, <span class="ident">format</span>),
     }
 }}
 
@@ -1264,7 +1264,7 @@
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>))]</span>
 <span class="kw">fn</span> <span class="ident">validate_sign</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw">_</span>: <span class="ident">Sign</span>, <span class="kw">_</span>: <span class="ident">NumberFormat</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
 {
     <span class="prelude-val">Ok</span>(())
 }}
@@ -1273,10 +1273,10 @@
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">validate_sign</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">digits</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">sign</span>: <span class="ident">Sign</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
 {
     <span class="kw">let</span> <span class="ident">has_sign</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">as_ptr</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">digits</span>.<span class="ident">as_ptr</span>();
-    <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">no_positive_mantissa_sign</span>() <span class="op">&amp;&amp;</span> <span class="ident">has_sign</span> <span class="op">&amp;&amp;</span> <span class="ident">sign</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Sign::Positive</span> {
+    <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">no_positive_mantissa_sign</span>() <span class="op">&amp;&amp;</span> <span class="ident">has_sign</span> <span class="op">&amp;&amp;</span> <span class="ident">sign</span> <span class="op">==</span> <span class="ident">Sign::Positive</span> {
         <span class="prelude-val">Err</span>((<span class="ident">ErrorCode::InvalidPositiveMantissaSign</span>, <span class="ident">bytes</span>.<span class="ident">as_ptr</span>()))
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">required_mantissa_sign</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">has_sign</span> {
         <span class="prelude-val">Err</span>((<span class="ident">ErrorCode::MissingMantissaSign</span>, <span class="ident">bytes</span>.<span class="ident">as_ptr</span>()))
@@ -1287,18 +1287,18 @@
 
 <span class="comment">// Convert float to signed representation.</span>
 <span class="macro">perftools_inline!</span>{
-<span class="kw">fn</span> <span class="ident">to_signed</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">float</span>: <span class="ident">F</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F</span>
+<span class="kw">fn</span> <span class="ident">to_signed</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">float</span>: <span class="ident">F</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>) -&gt; <span class="ident">F</span>
 {
     <span class="kw">match</span> <span class="ident">sign</span> {
-        <span class="ident">Sign::Positive</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">float</span>,
-        <span class="ident">Sign::Negative</span> <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="ident">float</span>
+        <span class="ident">Sign::Positive</span> =&gt; <span class="ident">float</span>,
+        <span class="ident">Sign::Negative</span> =&gt; <span class="op">-</span><span class="ident">float</span>
     }
 }}
 
 <span class="comment">// Standalone atof processor.</span>
 <span class="macro">perftools_inline!</span>{
 <span class="kw">fn</span> <span class="ident">atof</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">lossy</span>: <span class="ident">bool</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
+    -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span>
 {
     <span class="kw">let</span> (<span class="ident">sign</span>, <span class="ident">digits</span>) <span class="op">=</span> <span class="ident">parse_sign</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">format</span>);
     <span class="kw">if</span> <span class="ident">digits</span>.<span class="ident">is_empty</span>() {
@@ -1312,47 +1312,47 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="kw">fn</span> <span class="ident">atof_lossy</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
+    -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
 {
     <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="op">|</span> <span class="ident">ptr</span> <span class="op">|</span> <span class="ident">distance</span>(<span class="ident">bytes</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr</span>);
     <span class="kw">match</span> <span class="ident">atof</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="bool-val">true</span>, <span class="ident">NumberFormat::standard</span>().<span class="ident">unwrap</span>()) {
-        <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">ptr</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">index</span>(<span class="ident">ptr</span>))),
-        <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">ptr</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">index</span>(<span class="ident">ptr</span>)).<span class="ident">into</span>()),
+        <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">ptr</span>)) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">index</span>(<span class="ident">ptr</span>))),
+        <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">ptr</span>)) =&gt; <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">index</span>(<span class="ident">ptr</span>)).<span class="ident">into</span>()),
     }
 }}
 
 <span class="macro">perftools_inline!</span>{
 <span class="kw">fn</span> <span class="ident">atof_nonlossy</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
+    -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
 {
     <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="op">|</span> <span class="ident">ptr</span> <span class="op">|</span> <span class="ident">distance</span>(<span class="ident">bytes</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr</span>);
     <span class="kw">match</span> <span class="ident">atof</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="bool-val">false</span>, <span class="ident">NumberFormat::standard</span>().<span class="ident">unwrap</span>()) {
-        <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">ptr</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">index</span>(<span class="ident">ptr</span>))),
-        <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">ptr</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">index</span>(<span class="ident">ptr</span>)).<span class="ident">into</span>()),
+        <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">ptr</span>)) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">index</span>(<span class="ident">ptr</span>))),
+        <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">ptr</span>)) =&gt; <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">index</span>(<span class="ident">ptr</span>)).<span class="ident">into</span>()),
     }
 }}
 
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">atof_format</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
+    -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
 {
     <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="op">|</span> <span class="ident">ptr</span> <span class="op">|</span> <span class="ident">distance</span>(<span class="ident">bytes</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr</span>);
     <span class="kw">match</span> <span class="ident">atof</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="bool-val">false</span>, <span class="ident">format</span>) {
-        <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">ptr</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">index</span>(<span class="ident">ptr</span>))),
-        <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">ptr</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">index</span>(<span class="ident">ptr</span>)).<span class="ident">into</span>()),
+        <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">ptr</span>)) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">index</span>(<span class="ident">ptr</span>))),
+        <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">ptr</span>)) =&gt; <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">index</span>(<span class="ident">ptr</span>)).<span class="ident">into</span>()),
     }
 }}
 
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">atof_lossy_format</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">StringToFloat</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">format</span>: <span class="ident">NumberFormat</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
+    -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
 {
     <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="op">|</span> <span class="ident">ptr</span> <span class="op">|</span> <span class="ident">distance</span>(<span class="ident">bytes</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr</span>);
     <span class="kw">match</span> <span class="ident">atof</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">radix</span>, <span class="bool-val">true</span>, <span class="ident">format</span>) {
-        <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">ptr</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">index</span>(<span class="ident">ptr</span>))),
-        <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">ptr</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">index</span>(<span class="ident">ptr</span>)).<span class="ident">into</span>()),
+        <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">ptr</span>)) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">index</span>(<span class="ident">ptr</span>))),
+        <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">ptr</span>)) =&gt; <span class="prelude-val">Err</span>((<span class="ident">code</span>, <span class="ident">index</span>(<span class="ident">ptr</span>)).<span class="ident">into</span>()),
     }
 }}
 
@@ -1960,8 +1960,8 @@
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">f32::from_lexical</span>(<span class="ident">i</span>.<span class="ident">as_bytes</span>());
             <span class="macro">prop_assert!</span>(<span class="ident">res</span>.<span class="ident">is_err</span>());
             <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">err</span>().<span class="ident">unwrap</span>();
-            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ErrorCode::InvalidDigit</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ErrorCode::EmptyMantissa</span>);
-            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span>);
+            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">code</span> <span class="op">==</span> <span class="ident">ErrorCode::InvalidDigit</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">code</span> <span class="op">==</span> <span class="ident">ErrorCode::EmptyMantissa</span>);
+            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">index</span> <span class="op">==</span> <span class="number">1</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1969,8 +1969,8 @@
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">f32::from_lexical</span>(<span class="ident">i</span>.<span class="ident">as_bytes</span>());
             <span class="macro">prop_assert!</span>(<span class="ident">res</span>.<span class="ident">is_err</span>());
             <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">err</span>().<span class="ident">unwrap</span>();
-            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ErrorCode::Empty</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ErrorCode::EmptyMantissa</span>);
-            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span>);
+            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">code</span> <span class="op">==</span> <span class="ident">ErrorCode::Empty</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">code</span> <span class="op">==</span> <span class="ident">ErrorCode::EmptyMantissa</span>);
+            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">index</span> <span class="op">==</span> <span class="number">1</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -2023,8 +2023,8 @@
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">f64::from_lexical</span>(<span class="ident">i</span>.<span class="ident">as_bytes</span>());
             <span class="macro">prop_assert!</span>(<span class="ident">res</span>.<span class="ident">is_err</span>());
             <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">err</span>().<span class="ident">unwrap</span>();
-            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ErrorCode::InvalidDigit</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ErrorCode::EmptyMantissa</span>);
-            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span>);
+            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">code</span> <span class="op">==</span> <span class="ident">ErrorCode::InvalidDigit</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">code</span> <span class="op">==</span> <span class="ident">ErrorCode::EmptyMantissa</span>);
+            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">index</span> <span class="op">==</span> <span class="number">1</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -2032,8 +2032,8 @@
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">f64::from_lexical</span>(<span class="ident">i</span>.<span class="ident">as_bytes</span>());
             <span class="macro">prop_assert!</span>(<span class="ident">res</span>.<span class="ident">is_err</span>());
             <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">err</span>().<span class="ident">unwrap</span>();
-            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ErrorCode::Empty</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ErrorCode::EmptyMantissa</span>);
-            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span>);
+            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">code</span> <span class="op">==</span> <span class="ident">ErrorCode::Empty</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">code</span> <span class="op">==</span> <span class="ident">ErrorCode::EmptyMantissa</span>);
+            <span class="macro">prop_assert!</span>(<span class="ident">err</span>.<span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">index</span> <span class="op">==</span> <span class="number">1</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>

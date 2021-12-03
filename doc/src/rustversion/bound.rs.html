@@ -75,7 +75,7 @@
     <span class="ident">Stable</span>(<span class="ident">Release</span>),
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">paren</span>: <span class="ident">Group</span>, <span class="ident">iter</span>: <span class="ident">Iter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bound</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">paren</span>: <span class="ident">Group</span>, <span class="ident">iter</span>: <span class="ident">Iter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bound</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Literal</span>(<span class="ident">literal</span>)) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">peek</span>() {
         <span class="kw">let</span> <span class="ident">repr</span> <span class="op">=</span> <span class="ident">literal</span>.<span class="ident">to_string</span>();
         <span class="kw">if</span> <span class="ident">repr</span>.<span class="ident">starts_with</span>(<span class="op">|</span><span class="ident">ch</span>: <span class="ident">char</span><span class="op">|</span> <span class="ident">ch</span>.<span class="ident">is_ascii_digit</span>()) {
@@ -94,29 +94,29 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Bound</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Version</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">Bound</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">Bound</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="ident">rhs</span> {
-            <span class="ident">Bound::Nightly</span>(<span class="ident">date</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">channel</span> {
-                <span class="ident">Stable</span> <span class="op">|</span> <span class="ident">Beta</span> <span class="op">|</span> <span class="ident">Dev</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-                <span class="ident">Nightly</span>(<span class="ident">nightly</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">nightly</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">date</span>,
+            <span class="ident">Bound::Nightly</span>(<span class="ident">date</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">channel</span> {
+                <span class="ident">Stable</span> <span class="op">|</span> <span class="ident">Beta</span> <span class="op">|</span> <span class="ident">Dev</span> =&gt; <span class="bool-val">false</span>,
+                <span class="ident">Nightly</span>(<span class="ident">nightly</span>) =&gt; <span class="ident">nightly</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">date</span>,
             },
-            <span class="ident">Bound::Stable</span>(<span class="ident">release</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">minor</span> <span class="op">=</span><span class="op">=</span> <span class="ident">release</span>.<span class="ident">minor</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">release</span>.<span class="ident">patch</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">patch</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">patch</span> <span class="op">=</span><span class="op">=</span> <span class="ident">patch</span>)
+            <span class="ident">Bound::Stable</span>(<span class="ident">release</span>) =&gt; {
+                <span class="self">self</span>.<span class="ident">minor</span> <span class="op">==</span> <span class="ident">release</span>.<span class="ident">minor</span>
+                    <span class="op">&amp;&amp;</span> <span class="ident">release</span>.<span class="ident">patch</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">patch</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">patch</span> <span class="op">==</span> <span class="ident">patch</span>)
             }
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Bound</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Version</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">Bound</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">Bound</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">rhs</span> {
-            <span class="ident">Bound::Nightly</span>(<span class="ident">date</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">channel</span> {
-                <span class="ident">Stable</span> <span class="op">|</span> <span class="ident">Beta</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Ordering::Less</span>),
-                <span class="ident">Nightly</span>(<span class="ident">nightly</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">nightly</span>.<span class="ident">cmp</span>(<span class="ident">date</span>)),
-                <span class="ident">Dev</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Ordering::Greater</span>),
+            <span class="ident">Bound::Nightly</span>(<span class="ident">date</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">channel</span> {
+                <span class="ident">Stable</span> <span class="op">|</span> <span class="ident">Beta</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Ordering::Less</span>),
+                <span class="ident">Nightly</span>(<span class="ident">nightly</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">nightly</span>.<span class="ident">cmp</span>(<span class="ident">date</span>)),
+                <span class="ident">Dev</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Ordering::Greater</span>),
             },
-            <span class="ident">Bound::Stable</span>(<span class="ident">release</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Bound::Stable</span>(<span class="ident">release</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">minor</span>, <span class="self">self</span>.<span class="ident">patch</span>);
                 <span class="kw">let</span> <span class="ident">bound</span> <span class="op">=</span> (<span class="ident">release</span>.<span class="ident">minor</span>, <span class="ident">release</span>.<span class="ident">patch</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>));
                 <span class="prelude-val">Some</span>(<span class="ident">version</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">bound</span>))

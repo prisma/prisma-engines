@@ -235,15 +235,15 @@
     <span class="doccomment">/// let var: DNSClass = DNSClass::from_str(&quot;IN&quot;).unwrap();</span>
     <span class="doccomment">/// assert_eq!(DNSClass::IN, var);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert!</span>(<span class="ident">str</span>.<span class="ident">chars</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">char::is_ascii_uppercase</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>)));
         <span class="kw">match</span> <span class="ident">str</span> {
-            <span class="string">&quot;IN&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::IN</span>),
-            <span class="string">&quot;CH&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::CH</span>),
-            <span class="string">&quot;HS&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::HS</span>),
-            <span class="string">&quot;NONE&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::NONE</span>),
-            <span class="string">&quot;ANY&quot;</span> <span class="op">|</span> <span class="string">&quot;*&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::ANY</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoErrorKind::UnknownDnsClassStr</span>(<span class="ident">str</span>.<span class="ident">to_string</span>()).<span class="ident">into</span>()),
+            <span class="string">&quot;IN&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::IN</span>),
+            <span class="string">&quot;CH&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::CH</span>),
+            <span class="string">&quot;HS&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::HS</span>),
+            <span class="string">&quot;NONE&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::NONE</span>),
+            <span class="string">&quot;ANY&quot;</span> <span class="op">|</span> <span class="string">&quot;*&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::ANY</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ProtoErrorKind::UnknownDnsClassStr</span>(<span class="ident">str</span>.<span class="ident">to_string</span>()).<span class="ident">into</span>()),
         }
     }
 }
@@ -257,19 +257,19 @@
     <span class="doccomment">/// let var = DNSClass::from_u16(1).unwrap();</span>
     <span class="doccomment">/// assert_eq!(DNSClass::IN, var);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u16</span>(<span class="ident">value</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u16</span>(<span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::IN</span>),
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::CH</span>),
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::HS</span>),
-            <span class="number">254</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::NONE</span>),
-            <span class="number">255</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::ANY</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoErrorKind::UnknownDnsClassValue</span>(<span class="ident">value</span>).<span class="ident">into</span>()),
+            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::IN</span>),
+            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::CH</span>),
+            <span class="number">4</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::HS</span>),
+            <span class="number">254</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::NONE</span>),
+            <span class="number">255</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DNSClass::ANY</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ProtoErrorKind::UnknownDnsClassValue</span>(<span class="ident">value</span>).<span class="ident">into</span>()),
         }
     }
 
     <span class="doccomment">/// Return the OPT version from value</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">for_opt</span>(<span class="ident">value</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">for_opt</span>(<span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
         <span class="comment">// From RFC 6891: `Values lower than 512 MUST be treated as equal to 512`</span>
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">max</span>(<span class="number">512</span>);
         <span class="ident">DNSClass::OPT</span>(<span class="ident">value</span>)
@@ -277,13 +277,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">BinEncodable</span> <span class="kw">for</span> <span class="ident">DNSClass</span> {
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">encoder</span>.<span class="ident">emit_u16</span>((<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into</span>())
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="ident">BinDecodable</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DNSClass</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::from_u16</span>(
             <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*DNSClass is verified as safe in processing this*/</span>),
         )
@@ -301,14 +301,14 @@
 <span class="doccomment">/// assert_eq!(&quot;IN&quot;, var);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DNSClass</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">DNSClass</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">DNSClass</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="ident">rt</span> {
-            <span class="ident">DNSClass::IN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;IN&quot;</span>,
-            <span class="ident">DNSClass::CH</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;CH&quot;</span>,
-            <span class="ident">DNSClass::HS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;HS&quot;</span>,
-            <span class="ident">DNSClass::NONE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;NONE&quot;</span>,
-            <span class="ident">DNSClass::ANY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ANY&quot;</span>,
-            <span class="ident">DNSClass::OPT</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;OPT&quot;</span>,
+            <span class="ident">DNSClass::IN</span> =&gt; <span class="string">&quot;IN&quot;</span>,
+            <span class="ident">DNSClass::CH</span> =&gt; <span class="string">&quot;CH&quot;</span>,
+            <span class="ident">DNSClass::HS</span> =&gt; <span class="string">&quot;HS&quot;</span>,
+            <span class="ident">DNSClass::NONE</span> =&gt; <span class="string">&quot;NONE&quot;</span>,
+            <span class="ident">DNSClass::ANY</span> =&gt; <span class="string">&quot;ANY&quot;</span>,
+            <span class="ident">DNSClass::OPT</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;OPT&quot;</span>,
         }
     }
 }
@@ -322,33 +322,33 @@
 <span class="doccomment">/// assert_eq!(1, var);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DNSClass</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">DNSClass</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">DNSClass</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">rt</span> {
-            <span class="ident">DNSClass::IN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">DNSClass::CH</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-            <span class="ident">DNSClass::HS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-            <span class="ident">DNSClass::NONE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">254</span>,
-            <span class="ident">DNSClass::ANY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">255</span>,
+            <span class="ident">DNSClass::IN</span> =&gt; <span class="number">1</span>,
+            <span class="ident">DNSClass::CH</span> =&gt; <span class="number">3</span>,
+            <span class="ident">DNSClass::HS</span> =&gt; <span class="number">4</span>,
+            <span class="ident">DNSClass::NONE</span> =&gt; <span class="number">254</span>,
+            <span class="ident">DNSClass::ANY</span> =&gt; <span class="number">255</span>,
             <span class="comment">// see https://tools.ietf.org/html/rfc6891#section-6.1.2</span>
-            <span class="ident">DNSClass::OPT</span>(<span class="ident">max_payload_len</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">max_payload_len</span>.<span class="ident">max</span>(<span class="number">512</span>),
+            <span class="ident">DNSClass::OPT</span>(<span class="ident">max_payload_len</span>) =&gt; <span class="ident">max_payload_len</span>.<span class="ident">max</span>(<span class="number">512</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">DNSClass</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DNSClass</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">DNSClass</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">DNSClass</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">DNSClass</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
         <span class="ident">u16::from</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">u16::from</span>(<span class="kw-2">*</span><span class="ident">other</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DNSClass</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">Into</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="ident">::into</span>(<span class="kw-2">*</span><span class="self">self</span>))
     }
 }

@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="An asynchronous, runtime-independent, pure-rust Tabular Data Stream (TDS) implementation for Microsoft SQL Server."><meta name="keywords" content="rust, rustlang, rust-lang, tiberius"><title>tiberius - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../tiberius/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate tiberius</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.6.4</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all tiberius's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><div id="sidebar-vars" data-name="tiberius" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">tiberius</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/tiberius/lib.rs.html#1-217" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>An asynchronous, runtime-independent, pure-rust Tabular Data Stream (TDS)
 implementation for Microsoft SQL Server.</p>
-<h1 id="connecting-with-async-std" class="section-header"><a href="#connecting-with-async-std">Connecting with async-std</a></h1>
+<h2 id="connecting-with-async-std" class="section-header"><a href="#connecting-with-async-std">Connecting with async-std</a></h2>
 <p>Being not bound to any single runtime, a <code>TcpStream</code> must be created
 separately and injected to the <a href="struct.Client.html"><code>Client</code></a>.</p>
 
@@ -8,7 +8,7 @@ separately and injected to the <a href="struct.Client.html"><code>Client</code><
 <span class="kw">use</span> <span class="ident">async_std::net::TcpStream</span>;
 
 <span class="attribute">#[<span class="ident">async_std::main</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="comment">// Using the builder method to construct the options.</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Config::new</span>();
 
@@ -46,7 +46,7 @@ separately and injected to the <a href="struct.Client.html"><code>Client</code><
 
     <span class="prelude-val">Ok</span>(())
 }</code></pre></div>
-<h1 id="connecting-with-tokio" class="section-header"><a href="#connecting-with-tokio">Connecting with Tokio</a></h1>
+<h2 id="connecting-with-tokio" class="section-header"><a href="#connecting-with-tokio">Connecting with Tokio</a></h2>
 <p>Tokio is using their own version of <code>AsyncRead</code> and <code>AsyncWrite</code> traits,
 meaning that when wanting to use Tiberius with Tokio, their <code>TcpStream</code>
 needs to be wrapped in Tokio’s <code>Compat</code> module.</p>
@@ -56,7 +56,7 @@ needs to be wrapped in Tokio’s <code>Compat</code> module.</p>
 <span class="kw">use</span> <span class="ident">tokio_util::compat::TokioAsyncWriteCompatExt</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Config::new</span>();
      
     <span class="ident">config</span>.<span class="ident">host</span>(<span class="string">&quot;localhost&quot;</span>);
@@ -74,7 +74,7 @@ needs to be wrapped in Tokio’s <code>Compat</code> module.</p>
 
     <span class="prelude-val">Ok</span>(())
 }</code></pre></div>
-<h1 id="authentication" class="section-header"><a href="#authentication">Authentication</a></h1>
+<h2 id="authentication" class="section-header"><a href="#authentication">Authentication</a></h2>
 <p>Tiberius supports different <a href="enum.AuthMethod.html">ways of authentication</a> to the SQL Server:</p>
 <ul>
 <li>SQL Server authentication uses the facilities of the database to
@@ -84,12 +84,12 @@ specified Windows credentials.</li>
 <li>If enabling the <code>integrated-auth-gssapi</code> feature, it is possible to login
 with the currently active Kerberos credentials.</li>
 </ul>
-<h1 id="tls" class="section-header"><a href="#tls">TLS</a></h1>
+<h2 id="tls" class="section-header"><a href="#tls">TLS</a></h2>
 <p>When compiled using the default features, a TLS encryption will be available
 and by default, used for all traffic. TLS is handled with the given
 <code>TcpStream</code>. Please see the documentation for <a href="enum.EncryptionLevel.html"><code>EncryptionLevel</code></a> for
 details.</p>
-<h1 id="sql-browser" class="section-header"><a href="#sql-browser">SQL Browser</a></h1>
+<h2 id="sql-browser" class="section-header"><a href="#sql-browser">SQL Browser</a></h2>
 <p>On Windows platforms, connecting to the SQL Server might require going through
 the SQL Browser service to get the correct port for the named instance. This
 feature requires either the <code>sql-browser-async-std</code> or <code>sql-browser-tokio</code> feature
@@ -103,7 +103,7 @@ flag to be enabled and has a bit different way of connecting:</p>
 <span class="kw">use</span> <span class="ident">tiberius::SqlBrowser</span>;
 
 <span class="attribute">#[<span class="ident">async_std::main</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Config::new</span>();
 
     <span class="ident">config</span>.<span class="ident">authentication</span>(<span class="ident">AuthMethod::sql_server</span>(<span class="string">&quot;SA&quot;</span>, <span class="string">&quot;&lt;password&gt;&quot;</span>));
@@ -126,7 +126,7 @@ flag to be enabled and has a bit different way of connecting:</p>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::connect</span>(<span class="ident">config</span>, <span class="ident">tcp</span>).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }</code></pre></div>
-<h1 id="other-features" class="section-header"><a href="#other-features">Other features</a></h1>
+<h2 id="other-features" class="section-header"><a href="#other-features">Other features</a></h2>
 <ul>
 <li>If using an <a href="https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-strings">ADO.NET connection string</a>, it is possible to create a
 <a href="struct.Config.html"><code>Config</code></a> from one. Please see the documentation for
@@ -135,39 +135,39 @@ flag to be enabled and has a bit different way of connecting:</p>
 disable the <code>tds73</code> feature.</li>
 </ul>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="error/index.html" title="tiberius::error mod">error</a></div><div class="item-right docblock-short"><p>Error module</p>
-</div><div class="item-left module-item"><a class="mod" href="numeric/index.html" title="tiberius::numeric mod">numeric</a></div><div class="item-right docblock-short"><p>Representations of numeric types.</p>
-</div><div class="item-left module-item"><a class="mod" href="time/index.html" title="tiberius::time mod">time</a></div><div class="item-right docblock-short"><p>Date and time handling.</p>
-</div><div class="item-left module-item"><a class="mod" href="xml/index.html" title="tiberius::xml mod">xml</a></div><div class="item-right docblock-short"><p>The XML containers</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Client.html" title="tiberius::Client struct">Client</a></div><div class="item-right docblock-short"><p><code>Client</code> is the main entry point to the SQL Server, providing query
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="error/index.html" title="tiberius::error mod">error</a></div><div class="item-right docblock-short"><p>Error module</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="numeric/index.html" title="tiberius::numeric mod">numeric</a></div><div class="item-right docblock-short"><p>Representations of numeric types.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="time/index.html" title="tiberius::time mod">time</a></div><div class="item-right docblock-short"><p>Date and time handling.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="xml/index.html" title="tiberius::xml mod">xml</a></div><div class="item-right docblock-short"><p>The XML containers</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Client.html" title="tiberius::Client struct">Client</a></div><div class="item-right docblock-short"><p><code>Client</code> is the main entry point to the SQL Server, providing query
 execution capabilities.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Column.html" title="tiberius::Column struct">Column</a></div><div class="item-right docblock-short"><p>A column of data from a query.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Config.html" title="tiberius::Config struct">Config</a></div><div class="item-right docblock-short"><p>The <code>Config</code> struct contains all configuration information
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Column.html" title="tiberius::Column struct">Column</a></div><div class="item-right docblock-short"><p>A column of data from a query.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Config.html" title="tiberius::Config struct">Config</a></div><div class="item-right docblock-short"><p>The <code>Config</code> struct contains all configuration information
 required for connecting to the database with a <a href="struct.Client.html"><code>Client</code></a>. It also provides
 the server address when connecting to a <code>TcpStream</code> via the
 <a href="struct.Config.html#method.get_addr"><code>get_addr</code></a> method.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ExecuteResult.html" title="tiberius::ExecuteResult struct">ExecuteResult</a></div><div class="item-right docblock-short"><p>A result from a query execution, listing the number of affected rows.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.QueryStream.html" title="tiberius::QueryStream struct">QueryStream</a></div><div class="item-right docblock-short"><p>A set of <code>Streams</code> of <a href="enum.QueryItem.html" title="QueryItem"><code>QueryItem</code></a> values, which can be either result
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ExecuteResult.html" title="tiberius::ExecuteResult struct">ExecuteResult</a></div><div class="item-right docblock-short"><p>A result from a query execution, listing the number of affected rows.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.QueryStream.html" title="tiberius::QueryStream struct">QueryStream</a></div><div class="item-right docblock-short"><p>A set of <code>Streams</code> of <a href="enum.QueryItem.html" title="QueryItem"><code>QueryItem</code></a> values, which can be either result
 metadata or a row.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ResultMetadata.html" title="tiberius::ResultMetadata struct">ResultMetadata</a></div><div class="item-right docblock-short"><p>Info about the following stream of rows.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Row.html" title="tiberius::Row struct">Row</a></div><div class="item-right docblock-short"><p>A row of data from a query.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Uuid.html" title="tiberius::Uuid struct">Uuid</a></div><div class="item-right docblock-short"><p>A Universally Unique Identifier (UUID).</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.AuthMethod.html" title="tiberius::AuthMethod enum">AuthMethod</a></div><div class="item-right docblock-short"><p>Defines the method of authentication to the server.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.ColumnData.html" title="tiberius::ColumnData enum">ColumnData</a></div><div class="item-right docblock-short"><p>A container of a value that can be represented as a TDS value.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.ColumnType.html" title="tiberius::ColumnType enum">ColumnType</a></div><div class="item-right docblock-short"><p>The type of the column.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.EncryptionLevel.html" title="tiberius::EncryptionLevel enum">EncryptionLevel</a></div><div class="item-right docblock-short"><p>The configured encryption level specifying if encryption is required</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.QueryItem.html" title="tiberius::QueryItem enum">QueryItem</a></div><div class="item-right docblock-short"><p>Resulting data from a query.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.FromSql.html" title="tiberius::FromSql trait">FromSql</a></div><div class="item-right docblock-short"><p>A conversion trait from a TDS type by-reference.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.FromSqlOwned.html" title="tiberius::FromSqlOwned trait">FromSqlOwned</a></div><div class="item-right docblock-short"><p>A conversion trait from a TDS type by-value.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.IntoSql.html" title="tiberius::IntoSql trait">IntoSql</a></div><div class="item-right docblock-short"><p>A by-value conversion trait to a TDS type.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.SqlBrowser.html" title="tiberius::SqlBrowser trait">SqlBrowser</a></div><div class="item-right docblock-short"><p>An extension trait to a <code>TcpStream</code> to find a port and connecting to a
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ResultMetadata.html" title="tiberius::ResultMetadata struct">ResultMetadata</a></div><div class="item-right docblock-short"><p>Info about the following stream of rows.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Row.html" title="tiberius::Row struct">Row</a></div><div class="item-right docblock-short"><p>A row of data from a query.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Uuid.html" title="tiberius::Uuid struct">Uuid</a></div><div class="item-right docblock-short"><p>A Universally Unique Identifier (UUID).</p>
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.AuthMethod.html" title="tiberius::AuthMethod enum">AuthMethod</a></div><div class="item-right docblock-short"><p>Defines the method of authentication to the server.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ColumnData.html" title="tiberius::ColumnData enum">ColumnData</a></div><div class="item-right docblock-short"><p>A container of a value that can be represented as a TDS value.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ColumnType.html" title="tiberius::ColumnType enum">ColumnType</a></div><div class="item-right docblock-short"><p>The type of the column.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.EncryptionLevel.html" title="tiberius::EncryptionLevel enum">EncryptionLevel</a></div><div class="item-right docblock-short"><p>The configured encryption level specifying if encryption is required</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.QueryItem.html" title="tiberius::QueryItem enum">QueryItem</a></div><div class="item-right docblock-short"><p>Resulting data from a query.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.FromSql.html" title="tiberius::FromSql trait">FromSql</a></div><div class="item-right docblock-short"><p>A conversion trait from a TDS type by-reference.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.FromSqlOwned.html" title="tiberius::FromSqlOwned trait">FromSqlOwned</a></div><div class="item-right docblock-short"><p>A conversion trait from a TDS type by-value.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IntoSql.html" title="tiberius::IntoSql trait">IntoSql</a></div><div class="item-right docblock-short"><p>A by-value conversion trait to a TDS type.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.SqlBrowser.html" title="tiberius::SqlBrowser trait">SqlBrowser</a></div><div class="item-right docblock-short"><p>An extension trait to a <code>TcpStream</code> to find a port and connecting to a
 named database instance.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.ToSql.html" title="tiberius::ToSql trait">ToSql</a></div><div class="item-right docblock-short"><p>A conversion trait to a TDS type.</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Result.html" title="tiberius::Result type">Result</a></div><div class="item-right docblock-short"><p>An alias for a result that holds crate’s error type as the error.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="tiberius" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ToSql.html" title="tiberius::ToSql trait">ToSql</a></div><div class="item-right docblock-short"><p>A conversion trait to a TDS type.</p>
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Result.html" title="tiberius::Result type">Result</a></div><div class="item-right docblock-short"><p>An alias for a result that holds crate’s error type as the error.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="tiberius" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

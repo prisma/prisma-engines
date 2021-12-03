@@ -6,28 +6,28 @@ is primarily a convenience wrapper around <a href="https://docs.rs/futures/lates
 <p>Every discovered service is assigned an identifier that is distinct among the currently active
 services. If that service later goes away, a <a href="enum.Change.html#variant.Remove" title="Change::Remove"><code>Change::Remove</code></a> is yielded with that service’s
 identifier. From that point forward, the identifier may be re-used.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">future::poll_fn</span>, <span class="ident">pin_mut</span>};
 <span class="kw">use</span> <span class="ident">tower::discover</span>::{<span class="ident">Change</span>, <span class="ident">Discover</span>};
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">services_monitor</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Discover</span><span class="op">&gt;</span>(<span class="ident">services</span>: <span class="ident">D</span>) {
     <span class="macro">pin_mut!</span>(<span class="ident">services</span>);
     <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">change</span>)) <span class="op">=</span> <span class="ident">poll_fn</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="ident">services</span>.<span class="ident">as_mut</span>().<span class="ident">poll_discover</span>(<span class="ident">cx</span>)).<span class="kw">await</span> {
         <span class="kw">match</span> <span class="ident">change</span> {
-            <span class="ident">Change::Insert</span>(<span class="ident">key</span>, <span class="ident">svc</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Change::Insert</span>(<span class="ident">key</span>, <span class="ident">svc</span>) =&gt; {
                 <span class="comment">// a new service with identifier `key` was discovered</span>
             }
-            <span class="ident">Change::Remove</span>(<span class="ident">key</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Change::Remove</span>(<span class="ident">key</span>) =&gt; {
                 <span class="comment">// the service with identifier `key` has gone away</span>
             }
         }
     }
 }</code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.ServiceList.html" title="tower::discover::ServiceList struct">ServiceList</a></div><div class="item-right docblock-short"><p>Static service discovery based on a predetermined list of services.</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.Change.html" title="tower::discover::Change enum">Change</a></div><div class="item-right docblock-short"><p>A change in the service set.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Discover.html" title="tower::discover::Discover trait">Discover</a></div><div class="item-right docblock-short"><p>A dynamically changing set of related services.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tower" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ServiceList.html" title="tower::discover::ServiceList struct">ServiceList</a></div><div class="item-right docblock-short"><p>Static service discovery based on a predetermined list of services.</p>
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Change.html" title="tower::discover::Change enum">Change</a></div><div class="item-right docblock-short"><p>A change in the service set.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Discover.html" title="tower::discover::Discover trait">Discover</a></div><div class="item-right docblock-short"><p>A dynamically changing set of related services.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tower" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

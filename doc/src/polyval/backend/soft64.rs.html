@@ -235,7 +235,7 @@
     <span class="kw">type</span> <span class="ident">KeySize</span> <span class="op">=</span> <span class="ident">U16</span>;
 
     <span class="doccomment">/// Initialize POLYVAL with the given `H` field element</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">h</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">h</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">H</span>: <span class="ident">h</span>.<span class="ident">into</span>(),
             <span class="ident">S</span>: <span class="ident">U64x2::default</span>(),
@@ -258,7 +258,7 @@
     }
 
     <span class="doccomment">/// Get POLYVAL result (i.e. computed `S` field element)</span>
-    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="self">self</span>) -&gt; <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">Block::default</span>();
 
         <span class="kw">for</span> (<span class="ident">chunk</span>, <span class="ident">i</span>) <span class="kw">in</span> <span class="ident">block</span>.<span class="ident">chunks_mut</span>(<span class="number">8</span>).<span class="ident">zip</span>(<span class="kw-2">&amp;</span>[<span class="self">self</span>.<span class="ident">S</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">S</span>.<span class="number">1</span>]) {
@@ -274,7 +274,7 @@
 <span class="kw">struct</span> <span class="ident">U64x2</span>(<span class="ident">u64</span>, <span class="ident">u64</span>);
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">U64x2</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">Block</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">U64x2</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">Block</span>) -&gt; <span class="ident">U64x2</span> {
         <span class="ident">U64x2</span>(
             <span class="ident">u64::from_le_bytes</span>(<span class="ident">bytes</span>[..<span class="number">8</span>].<span class="ident">try_into</span>().<span class="ident">unwrap</span>()),
             <span class="ident">u64::from_le_bytes</span>(<span class="ident">bytes</span>[<span class="number">8</span>..].<span class="ident">try_into</span>().<span class="ident">unwrap</span>()),
@@ -287,7 +287,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
     <span class="doccomment">/// Adds two POLYVAL field elements.</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident">U64x2</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">^</span> <span class="ident">rhs</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span> <span class="op">^</span> <span class="ident">rhs</span>.<span class="number">1</span>)
     }
 }
@@ -313,7 +313,7 @@
     <span class="doccomment">/// &gt; include a shifting step to put it back where it should</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This shift is unnecessary for POLYVAL and has been removed.</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">h0</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">h1</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">1</span>;
         <span class="kw">let</span> <span class="ident">h0r</span> <span class="op">=</span> <span class="ident">rev64</span>(<span class="ident">h0</span>);
@@ -360,7 +360,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// When carries do occur, they wind up in a &quot;hole&quot; and are subsequently masked</span>
 <span class="doccomment">/// out of the result.</span>
-<span class="kw">fn</span> <span class="ident">bmul64</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">y</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">bmul64</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">y</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">x0</span> <span class="op">=</span> <span class="ident">Wrapping</span>(<span class="ident">x</span> <span class="op">&amp;</span> <span class="number">0x1111_1111_1111_1111</span>);
     <span class="kw">let</span> <span class="ident">x1</span> <span class="op">=</span> <span class="ident">Wrapping</span>(<span class="ident">x</span> <span class="op">&amp;</span> <span class="number">0x2222_2222_2222_2222</span>);
     <span class="kw">let</span> <span class="ident">x2</span> <span class="op">=</span> <span class="ident">Wrapping</span>(<span class="ident">x</span> <span class="op">&amp;</span> <span class="number">0x4444_4444_4444_4444</span>);
@@ -384,7 +384,7 @@
 }
 
 <span class="doccomment">/// Bit-reverse a `u64` in constant time</span>
-<span class="kw">fn</span> <span class="ident">rev64</span>(<span class="kw-2">mut</span> <span class="ident">x</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">rev64</span>(<span class="kw-2">mut</span> <span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="ident">x</span> <span class="op">=</span> ((<span class="ident">x</span> <span class="op">&amp;</span> <span class="number">0x5555_5555_5555_5555</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>) <span class="op">|</span> ((<span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>) <span class="op">&amp;</span> <span class="number">0x5555_5555_5555_5555</span>);
     <span class="ident">x</span> <span class="op">=</span> ((<span class="ident">x</span> <span class="op">&amp;</span> <span class="number">0x3333_3333_3333_3333</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>) <span class="op">|</span> ((<span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>) <span class="op">&amp;</span> <span class="number">0x3333_3333_3333_3333</span>);
     <span class="ident">x</span> <span class="op">=</span> ((<span class="ident">x</span> <span class="op">&amp;</span> <span class="number">0x0f0f_0f0f_0f0f_0f0f</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>) <span class="op">|</span> ((<span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>) <span class="op">&amp;</span> <span class="number">0x0f0f_0f0f_0f0f_0f0f</span>);

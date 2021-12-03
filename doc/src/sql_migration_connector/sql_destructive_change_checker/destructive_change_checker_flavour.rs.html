@@ -92,12 +92,12 @@
         <span class="ident">step_index</span>: <span class="ident">usize</span>,
     );
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">count_rows_in_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">count_rows_in_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">count_values_in_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_and_column</span>: (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>), <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">count_values_in_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_and_column</span>: (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>), <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>;
 }
 
-<span class="kw">fn</span> <span class="ident">extract_table_rows_count</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">result_set</span>: <span class="ident">quaint::prelude::ResultSet</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_table_rows_count</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">result_set</span>: <span class="ident">quaint::prelude::ResultSet</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
     <span class="ident">result_set</span>
         .<span class="ident">first</span>()
         .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
@@ -116,7 +116,7 @@
         })
 }
 
-<span class="kw">fn</span> <span class="ident">extract_column_values_count</span>(<span class="ident">result_set</span>: <span class="ident">quaint::prelude::ResultSet</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_column_values_count</span>(<span class="ident">result_set</span>: <span class="ident">quaint::prelude::ResultSet</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
     <span class="ident">result_set</span>
         .<span class="ident">first</span>()
         .<span class="ident">as_ref</span>()

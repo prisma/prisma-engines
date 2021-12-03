@@ -70,7 +70,7 @@
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # })</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Task</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current</span>() -&gt; <span class="ident">Task</span> {
     <span class="ident">try_current</span>().<span class="ident">expect</span>(<span class="string">&quot;`task::current()` called outside the context of a task&quot;</span>)
 }
 
@@ -91,7 +91,7 @@
 <span class="doccomment">///     None    =&gt; println!(&quot;Not inside a task!&quot;),</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_current</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Task</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_current</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Task</span><span class="op">&gt;</span> {
     <span class="ident">TaskLocalsWrapper::get_current</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">task</span>().<span class="ident">clone</span>())
 }</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="async_std" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

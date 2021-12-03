@@ -380,18 +380,18 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;x</span>, <span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;env</span><span class="op">&gt;</span> <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;x</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> <span class="kw-2">mut</span> <span class="ident">De</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> {
   <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-  <span class="kw">fn</span> <span class="ident">deserialize_any</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+  <span class="kw">fn</span> <span class="ident">deserialize_any</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;x</span><span class="op">&gt;</span>,
   {
     <span class="kw">let</span> <span class="ident">js_value_type</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="macro">type_of!</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>) }<span class="question-mark">?</span>;
     <span class="kw">match</span> <span class="ident">js_value_type</span> {
-      <span class="ident">ValueType::Null</span> <span class="op">|</span> <span class="ident">ValueType::Undefined</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">visitor</span>.<span class="ident">visit_unit</span>(),
-      <span class="ident">ValueType::Boolean</span> <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="ident">ValueType::Null</span> <span class="op">|</span> <span class="ident">ValueType::Undefined</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_unit</span>(),
+      <span class="ident">ValueType::Boolean</span> =&gt; {
         <span class="kw">let</span> <span class="ident">js_boolean</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">JsBoolean::from_raw_unchecked</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>) };
         <span class="ident">visitor</span>.<span class="ident">visit_bool</span>(<span class="ident">js_boolean</span>.<span class="ident">get_value</span>()<span class="question-mark">?</span>)
       }
-      <span class="ident">ValueType::Number</span> <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="ident">ValueType::Number</span> =&gt; {
         <span class="kw">let</span> <span class="ident">js_number</span>: <span class="ident">f64</span> <span class="op">=</span>
           <span class="kw">unsafe</span> { <span class="ident">JsNumber::from_raw_unchecked</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>).<span class="ident">try_into</span>()<span class="question-mark">?</span> };
         <span class="kw">if</span> (<span class="ident">js_number</span>.<span class="ident">trunc</span>() <span class="op">-</span> <span class="ident">js_number</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">f64::EPSILON</span> {
@@ -400,11 +400,11 @@
           <span class="ident">visitor</span>.<span class="ident">visit_f64</span>(<span class="ident">js_number</span>)
         }
       }
-      <span class="ident">ValueType::String</span> <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="ident">ValueType::String</span> =&gt; {
         <span class="kw">let</span> <span class="ident">js_string</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">JsString::from_raw_unchecked</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>) };
         <span class="ident">visitor</span>.<span class="ident">visit_str</span>(<span class="ident">js_string</span>.<span class="ident">into_utf8</span>()<span class="question-mark">?</span>.<span class="ident">as_str</span>()<span class="question-mark">?</span>)
       }
-      <span class="ident">ValueType::Object</span> <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="ident">ValueType::Object</span> =&gt; {
         <span class="kw">let</span> <span class="ident">js_object</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">JsObject::from_raw_unchecked</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>) };
         <span class="kw">if</span> <span class="ident">js_object</span>.<span class="ident">is_array</span>()<span class="question-mark">?</span> {
           <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">deserializer</span> <span class="op">=</span>
@@ -418,7 +418,7 @@
         }
       }
       <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi6&quot;</span>)]</span>
-      <span class="ident">ValueType::Bigint</span> <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="ident">ValueType::Bigint</span> =&gt; {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">js_bigint</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">JsBigint::from_raw</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>)<span class="question-mark">?</span> };
         <span class="kw">let</span> (<span class="ident">signed</span>, <span class="ident">v</span>, <span class="ident">_loss</span>) <span class="op">=</span> <span class="ident">js_bigint</span>.<span class="ident">get_u128</span>()<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">signed</span> {
@@ -427,35 +427,35 @@
           <span class="ident">visitor</span>.<span class="ident">visit_u128</span>(<span class="ident">v</span>)
         }
       }
-      <span class="ident">ValueType::External</span> <span class="op">|</span> <span class="ident">ValueType::Function</span> <span class="op">|</span> <span class="ident">ValueType::Symbol</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
+      <span class="ident">ValueType::External</span> <span class="op">|</span> <span class="ident">ValueType::Function</span> <span class="op">|</span> <span class="ident">ValueType::Symbol</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
         <span class="ident">Status::InvalidArg</span>,
         <span class="macro">format!</span>(<span class="string">&quot;typeof {:?} value could not be deserialized&quot;</span>, <span class="ident">js_value_type</span>),
       )),
-      <span class="ident">ValueType::Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+      <span class="ident">ValueType::Unknown</span> =&gt; <span class="macro">unreachable!</span>(),
     }
   }
 
-  <span class="kw">fn</span> <span class="ident">deserialize_bytes</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+  <span class="kw">fn</span> <span class="ident">deserialize_bytes</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;x</span><span class="op">&gt;</span>,
   {
     <span class="ident">visitor</span>.<span class="ident">visit_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">JsBufferValue::from_raw</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>)<span class="question-mark">?</span>)
   }
 
-  <span class="kw">fn</span> <span class="ident">deserialize_byte_buf</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+  <span class="kw">fn</span> <span class="ident">deserialize_byte_buf</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;x</span><span class="op">&gt;</span>,
   {
     <span class="ident">visitor</span>.<span class="ident">visit_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">JsBufferValue::from_raw</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>)<span class="question-mark">?</span>)
   }
 
-  <span class="kw">fn</span> <span class="ident">deserialize_option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+  <span class="kw">fn</span> <span class="ident">deserialize_option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;x</span><span class="op">&gt;</span>,
   {
     <span class="kw">match</span> <span class="kw">unsafe</span> { <span class="macro">type_of!</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>) }<span class="question-mark">?</span> {
-      <span class="ident">ValueType::Undefined</span> <span class="op">|</span> <span class="ident">ValueType::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">visitor</span>.<span class="ident">visit_none</span>(),
-      <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">visitor</span>.<span class="ident">visit_some</span>(<span class="self">self</span>),
+      <span class="ident">ValueType::Undefined</span> <span class="op">|</span> <span class="ident">ValueType::Null</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_none</span>(),
+      <span class="kw">_</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_some</span>(<span class="self">self</span>),
     }
   }
 
@@ -464,19 +464,19 @@
     <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
     <span class="ident">_variants</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>],
     <span class="ident">visitor</span>: <span class="ident">V</span>,
-  ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+  ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;x</span><span class="op">&gt;</span>,
   {
     <span class="kw">let</span> <span class="ident">js_value_type</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="macro">type_of!</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>)<span class="question-mark">?</span> };
     <span class="kw">match</span> <span class="ident">js_value_type</span> {
-      <span class="ident">ValueType::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">visitor</span>.<span class="ident">visit_enum</span>(<span class="ident">JsEnumAccess::new</span>(
+      <span class="ident">ValueType::String</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_enum</span>(<span class="ident">JsEnumAccess::new</span>(
         <span class="kw">unsafe</span> { <span class="ident">JsString::from_raw_unchecked</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>) }
           .<span class="ident">into_utf8</span>()<span class="question-mark">?</span>
           .<span class="ident">into_owned</span>()<span class="question-mark">?</span>,
         <span class="prelude-val">None</span>,
       )),
-      <span class="ident">ValueType::Object</span> <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="ident">ValueType::Object</span> =&gt; {
         <span class="kw">let</span> <span class="ident">js_object</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">JsObject::from_raw_unchecked</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>) };
         <span class="kw">let</span> <span class="ident">properties</span> <span class="op">=</span> <span class="ident">js_object</span>.<span class="ident">get_property_names</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">property_len</span> <span class="op">=</span> <span class="ident">properties</span>.<span class="ident">get_array_length_unchecked</span>()<span class="question-mark">?</span>;
@@ -497,7 +497,7 @@
           ))
         }
       }
-      <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
+      <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
         <span class="ident">Status::InvalidArg</span>,
         <span class="macro">format!</span>(
           <span class="string">&quot;{:?} type could not deserialize to Enum type&quot;</span>,
@@ -507,7 +507,7 @@
     }
   }
 
-  <span class="kw">fn</span> <span class="ident">deserialize_ignored_any</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+  <span class="kw">fn</span> <span class="ident">deserialize_ignored_any</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;x</span><span class="op">&gt;</span>,
   {
@@ -530,7 +530,7 @@
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> <span class="ident">JsEnumAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> {
-  <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">variant</span>: <span class="ident">String</span>, <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;env</span> <span class="ident">Value</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">variant</span>: <span class="ident">String</span>, <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;env</span> <span class="ident">Value</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
     <span class="self">Self</span> { <span class="ident">variant</span>, <span class="ident">value</span> }
   }
 }
@@ -540,7 +540,7 @@
   <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
   <span class="kw">type</span> <span class="ident">Variant</span> <span class="op">=</span> <span class="ident">JsVariantAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span>;
 
-  <span class="kw">fn</span> <span class="ident">variant_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Variant</span>)<span class="op">&gt;</span>
+  <span class="kw">fn</span> <span class="ident">variant_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">V::Value</span>, <span class="ident"><span class="self">Self</span>::Variant</span>)<span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">V</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
   {
@@ -559,38 +559,38 @@
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;env</span><span class="op">&gt;</span> <span class="ident">VariantAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsVariantAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> {
   <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
-  <span class="kw">fn</span> <span class="ident">unit_variant</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+  <span class="kw">fn</span> <span class="ident">unit_variant</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">value</span> {
-      <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">deserializer</span> <span class="op">=</span> <span class="ident">De</span>(<span class="ident">val</span>);
         <span class="ident">serde::de::Deserialize::deserialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">deserializer</span>)
       }
-      <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+      <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(()),
     }
   }
 
-  <span class="kw">fn</span> <span class="ident">newtype_variant_seed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span>
+  <span class="kw">fn</span> <span class="ident">newtype_variant_seed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
   {
     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">value</span> {
-      <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">deserializer</span> <span class="op">=</span> <span class="ident">De</span>(<span class="ident">val</span>);
         <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">deserializer</span>)
       }
-      <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::invalid_type</span>(
+      <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::invalid_type</span>(
         <span class="ident">Unexpected::UnitVariant</span>,
         <span class="kw-2">&amp;</span><span class="string">&quot;newtype variant&quot;</span>,
       )),
     }
   }
 
-  <span class="kw">fn</span> <span class="ident">tuple_variant</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">_len</span>: <span class="ident">usize</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+  <span class="kw">fn</span> <span class="ident">tuple_variant</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">_len</span>: <span class="ident">usize</span>, <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
   {
     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">value</span> {
-      <span class="prelude-val">Some</span>(<span class="ident">js_value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="prelude-val">Some</span>(<span class="ident">js_value</span>) =&gt; {
         <span class="kw">let</span> <span class="ident">js_object</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">JsObject::from_raw</span>(<span class="ident">js_value</span>.<span class="ident">env</span>, <span class="ident">js_value</span>.<span class="ident">value</span>)<span class="question-mark">?</span> };
         <span class="kw">if</span> <span class="ident">js_object</span>.<span class="ident">is_array</span>()<span class="question-mark">?</span> {
           <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">deserializer</span> <span class="op">=</span>
@@ -603,19 +603,19 @@
           ))
         }
       }
-      <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::invalid_type</span>(
+      <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::invalid_type</span>(
         <span class="ident">Unexpected::UnitVariant</span>,
         <span class="kw-2">&amp;</span><span class="string">&quot;tuple variant&quot;</span>,
       )),
     }
   }
 
-  <span class="kw">fn</span> <span class="ident">struct_variant</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">_fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>], <span class="ident">visitor</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+  <span class="kw">fn</span> <span class="ident">struct_variant</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">_fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>], <span class="ident">visitor</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">V</span>: <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
   {
     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">value</span> {
-      <span class="prelude-val">Some</span>(<span class="ident">js_value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="prelude-val">Some</span>(<span class="ident">js_value</span>) =&gt; {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">JsObject::from_raw</span>(<span class="ident">js_value</span>.<span class="ident">env</span>, <span class="ident">js_value</span>.<span class="ident">value</span>) } {
           <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">deserializer</span> <span class="op">=</span> <span class="ident">JsObjectAccess::new</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>)<span class="question-mark">?</span>;
           <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">deserializer</span>)
@@ -626,7 +626,7 @@
           ))
         }
       }
-      <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::invalid_type</span>(
+      <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::invalid_type</span>(
         <span class="ident">Unexpected::UnitVariant</span>,
         <span class="kw-2">&amp;</span><span class="string">&quot;struct variant&quot;</span>,
       )),
@@ -643,7 +643,7 @@
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> <span class="ident">JsArrayAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> {
-  <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;env</span> <span class="ident">JsObject</span>, <span class="ident">len</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;env</span> <span class="ident">JsObject</span>, <span class="ident">len</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
     <span class="self">Self</span> { <span class="ident">input</span>, <span class="ident">idx</span>: <span class="number">0</span>, <span class="ident">len</span> }
   }
 }
@@ -652,7 +652,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;env</span><span class="op">&gt;</span> <span class="ident">SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsArrayAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> {
   <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-  <span class="kw">fn</span> <span class="ident">next_element_seed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
+  <span class="kw">fn</span> <span class="ident">next_element_seed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
   {
@@ -677,7 +677,7 @@
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> <span class="ident">JsObjectAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> {
-  <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;env</span> <span class="ident">JsObject</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+  <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;env</span> <span class="ident">JsObject</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">properties</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">get_property_names</span>()<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">property_len</span> <span class="op">=</span> <span class="ident">properties</span>.<span class="ident">get_array_length_unchecked</span>()<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
@@ -693,7 +693,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;env</span><span class="op">&gt;</span> <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsObjectAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> {
   <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-  <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
+  <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">K</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
   {
@@ -707,7 +707,7 @@
     <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">de</span>).<span class="ident">map</span>(<span class="prelude-val">Some</span>)
   }
 
-  <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+  <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
   <span class="kw">where</span>
     <span class="ident">V</span>: <span class="ident">DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
   {

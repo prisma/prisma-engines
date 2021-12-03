@@ -201,7 +201,7 @@
         <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">Registry</span>,
         <span class="ident">token</span>: <span class="ident">Token</span>,
         <span class="ident">interests</span>: <span class="ident">Interest</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">poll::selector</span>(<span class="ident">registry</span>).<span class="ident">register</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">token</span>, <span class="ident">interests</span>)
     }
 
@@ -210,11 +210,11 @@
         <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">Registry</span>,
         <span class="ident">token</span>: <span class="ident">Token</span>,
         <span class="ident">interests</span>: <span class="ident">Interest</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">poll::selector</span>(<span class="ident">registry</span>).<span class="ident">reregister</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">token</span>, <span class="ident">interests</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">deregister</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">Registry</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">deregister</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">Registry</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">poll::selector</span>(<span class="ident">registry</span>).<span class="ident">deregister</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }

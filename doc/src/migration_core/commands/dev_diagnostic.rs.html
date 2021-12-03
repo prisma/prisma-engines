@@ -203,7 +203,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dev_diagnostic</span>(
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">DevDiagnosticInput</span>,
     <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DevDiagnosticOutput</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DevDiagnosticOutput</span><span class="op">&gt;</span> {
     <span class="ident">migrations_directory::error_on_changed_provider</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">migrations_directory_path</span>, <span class="ident">connector</span>.<span class="ident">connector_type</span>())<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">diagnose_input</span> <span class="op">=</span> <span class="ident">DiagnoseMigrationHistoryInput</span> {
@@ -226,7 +226,7 @@
     })
 }
 
-<span class="kw">fn</span> <span class="ident">check_for_broken_migrations</span>(<span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">DiagnoseMigrationHistoryOutput</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">check_for_broken_migrations</span>(<span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">DiagnoseMigrationHistoryOutput</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">DriftDiagnostic::MigrationFailedToApply</span> { <span class="ident">error</span> }) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">output</span>.<span class="ident">drift</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>.<span class="ident">clone</span>());
     }
@@ -238,7 +238,7 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">check_for_reset_conditions</span>(<span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">DiagnoseMigrationHistoryOutput</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">check_for_reset_conditions</span>(<span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">DiagnoseMigrationHistoryOutput</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reset_reasons</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
     <span class="kw">for</span> <span class="ident">failed_migration_name</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">output</span>.<span class="ident">failed_migration_names</span> {
@@ -264,23 +264,23 @@
     }
 
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">output</span>.<span class="ident">history</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">HistoryDiagnostic::HistoriesDiverge</span> { <span class="ident">last_common_migration_name</span>, <span class="ident">unapplied_migration_names</span>: <span class="kw">_</span>, <span class="ident">unpersisted_migration_names</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">HistoryDiagnostic::HistoriesDiverge</span> { <span class="ident">last_common_migration_name</span>, <span class="ident">unapplied_migration_names</span>: <span class="kw">_</span>, <span class="ident">unpersisted_migration_names</span> }) =&gt; {
             <span class="kw">let</span> <span class="ident">details</span> <span class="op">=</span> <span class="ident">last_common_migration_name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">last_common_migration_name</span><span class="op">|</span>{
                 <span class="macro">format!</span>(<span class="string">&quot; Last common migration: `{}`. Migrations applied to the database but absent from the migrations directory are: {}&quot;</span>, <span class="ident">last_common_migration_name</span>, <span class="ident">unpersisted_migration_names</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
             }).<span class="ident">unwrap_or_else</span>(<span class="ident">String::new</span>);
 
             <span class="ident">reset_reasons</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;The migrations recorded in the database diverge from the local migrations directory.{}&quot;</span>, <span class="ident">details</span>))
         },
-        <span class="prelude-val">Some</span>(<span class="ident">HistoryDiagnostic::MigrationsDirectoryIsBehind</span> { <span class="ident">unpersisted_migration_names</span>}) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">reset_reasons</span>.<span class="ident">push</span>(
+        <span class="prelude-val">Some</span>(<span class="ident">HistoryDiagnostic::MigrationsDirectoryIsBehind</span> { <span class="ident">unpersisted_migration_names</span>}) =&gt; <span class="ident">reset_reasons</span>.<span class="ident">push</span>(
            <span class="macro">format!</span>(<span class="string">&quot;The following migration(s) are applied to the database but missing from the local migrations directory: {}&quot;</span>, <span class="ident">unpersisted_migration_names</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)),
         ),
-        <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">HistoryDiagnostic::DatabaseIsBehind</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> (),
+        <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">HistoryDiagnostic::DatabaseIsBehind</span> { .. }) =&gt; (),
     }
 
     <span class="kw">match</span> <span class="ident">reset_reasons</span>.<span class="ident">as_slice</span>() {
-        [] <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-        [<span class="ident">first_reason</span>] <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">first_reason</span>.<span class="ident">clone</span>()),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        [] =&gt; <span class="prelude-val">None</span>,
+        [<span class="ident">first_reason</span>] =&gt; <span class="prelude-val">Some</span>(<span class="ident">first_reason</span>.<span class="ident">clone</span>()),
+        <span class="kw">_</span> =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">reset_reasons</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">3</span>).<span class="ident">sum</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>());
 
             <span class="kw">for</span> <span class="ident">reason</span> <span class="kw">in</span> <span class="ident">reset_reasons</span> {
@@ -322,15 +322,15 @@ https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/troubl
 
 <span class="kw">impl</span> <span class="ident">DevAction</span> {
     <span class="doccomment">/// Attempts to convert to a `Reset` and returns the reason.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DevAction::Reset</span> { <span class="ident">reason</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">DevAction::Reset</span> { <span class="ident">reason</span> } =&gt; <span class="prelude-val">Some</span>(<span class="ident">reason</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Returns `true` if the action is CreateMigration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_create_migration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_create_migration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">DevAction::CreateMigration</span>)
     }
 }

@@ -904,21 +904,21 @@
 <span class="doccomment">/// and combine existing errors in combinators like `alt`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>: <span class="ident">Sized</span> {
   <span class="doccomment">/// Creates an error from the input position and an [ErrorKind]</span>
-  <span class="kw">fn</span> <span class="ident">from_error_kind</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+  <span class="kw">fn</span> <span class="ident">from_error_kind</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="self">Self</span>;
 
   <span class="doccomment">/// Combines an existing error with a new one created from the input</span>
   <span class="doccomment">/// position and an [ErrorKind]. This is useful when backtracking</span>
   <span class="doccomment">/// through a parse tree, accumulating error context on the way</span>
-  <span class="kw">fn</span> <span class="ident">append</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">other</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+  <span class="kw">fn</span> <span class="ident">append</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
 
   <span class="doccomment">/// Creates an error from an input position and an expected character</span>
-  <span class="kw">fn</span> <span class="ident">from_char</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="kw">_</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from_char</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="kw">_</span>: <span class="ident">char</span>) -&gt; <span class="self">Self</span> {
     <span class="ident"><span class="self">Self</span>::from_error_kind</span>(<span class="ident">input</span>, <span class="ident">ErrorKind::Char</span>)
   }
 
   <span class="doccomment">/// Combines two existing errors. This function is used to compare errors</span>
   <span class="doccomment">/// generated in various branches of [alt]</span>
-  <span class="kw">fn</span> <span class="ident">or</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">or</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">other</span>
   }
 }
@@ -929,7 +929,7 @@
   <span class="doccomment">/// Creates a new error from an input position, a static string and an existing error.</span>
   <span class="doccomment">/// This is used mainly in the [context] combinator, to add user friendly information</span>
   <span class="doccomment">/// to errors when backtracking through a parse tree</span>
-  <span class="kw">fn</span> <span class="ident">add_context</span>(<span class="ident">_input</span>: <span class="ident">I</span>, <span class="ident">_ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">other</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">add_context</span>(<span class="ident">_input</span>: <span class="ident">I</span>, <span class="ident">_ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">other</span>
   }
 }
@@ -939,7 +939,7 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromExternalError</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span><span class="op">&gt;</span> {
   <span class="doccomment">/// Creates a new error from an input position, an [ErrorKind] indicating the</span>
   <span class="doccomment">/// wrapping parser, and an external error</span>
-  <span class="kw">fn</span> <span class="ident">from_external_error</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">e</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+  <span class="kw">fn</span> <span class="ident">from_external_error</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">e</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span>;
 }
 
 <span class="doccomment">/// default error type, only contains the error&#39; location and code</span>
@@ -953,17 +953,17 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
   <span class="doccomment">/// creates a new basic error</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">code</span>: <span class="ident">ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">code</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
     <span class="ident">Error</span> { <span class="ident">input</span>, <span class="ident">code</span> }
   }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-  <span class="kw">fn</span> <span class="ident">from_error_kind</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from_error_kind</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">Error</span> { <span class="ident">input</span>, <span class="ident">code</span>: <span class="ident">kind</span> }
   }
 
-  <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw">_</span>: <span class="ident">I</span>, <span class="kw">_</span>: <span class="ident">ErrorKind</span>, <span class="ident">other</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw">_</span>: <span class="ident">I</span>, <span class="kw">_</span>: <span class="ident">ErrorKind</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">other</span>
   }
 }
@@ -972,14 +972,14 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">FromExternalError</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
   <span class="doccomment">/// Create a new error from an input position and an external error</span>
-  <span class="kw">fn</span> <span class="ident">from_external_error</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">_e</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from_external_error</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">_e</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">Error</span> { <span class="ident">input</span>, <span class="ident">code</span>: <span class="ident">kind</span> }
   }
 }
 
 <span class="doccomment">/// The Display implementation allows the std::error::Error implementation</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
     <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;error {:?} at: {}&quot;</span>, <span class="self">self</span>.<span class="ident">code</span>, <span class="self">self</span>.<span class="ident">input</span>)
   }
 }
@@ -990,11 +990,11 @@
 <span class="comment">// for backward compatibility, keep those trait implementations</span>
 <span class="comment">// for the previously used error type</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">I</span>, <span class="ident">ErrorKind</span>) {
-  <span class="kw">fn</span> <span class="ident">from_error_kind</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from_error_kind</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="self">Self</span> {
     (<span class="ident">input</span>, <span class="ident">kind</span>)
   }
 
-  <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw">_</span>: <span class="ident">I</span>, <span class="kw">_</span>: <span class="ident">ErrorKind</span>, <span class="ident">other</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw">_</span>: <span class="ident">I</span>, <span class="kw">_</span>: <span class="ident">ErrorKind</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">other</span>
   }
 }
@@ -1002,32 +1002,32 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">ContextError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">I</span>, <span class="ident">ErrorKind</span>) {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">FromExternalError</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">I</span>, <span class="ident">ErrorKind</span>) {
-  <span class="kw">fn</span> <span class="ident">from_external_error</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">_e</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from_external_error</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">_e</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span> {
     (<span class="ident">input</span>, <span class="ident">kind</span>)
   }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> () {
-  <span class="kw">fn</span> <span class="ident">from_error_kind</span>(<span class="kw">_</span>: <span class="ident">I</span>, <span class="kw">_</span>: <span class="ident">ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {}
+  <span class="kw">fn</span> <span class="ident">from_error_kind</span>(<span class="kw">_</span>: <span class="ident">I</span>, <span class="kw">_</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="self">Self</span> {}
 
-  <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw">_</span>: <span class="ident">I</span>, <span class="kw">_</span>: <span class="ident">ErrorKind</span>, <span class="kw">_</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {}
+  <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw">_</span>: <span class="ident">I</span>, <span class="kw">_</span>: <span class="ident">ErrorKind</span>, <span class="kw">_</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {}
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">ContextError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> () {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">FromExternalError</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> () {
-  <span class="kw">fn</span> <span class="ident">from_external_error</span>(<span class="ident">_input</span>: <span class="ident">I</span>, <span class="ident">_kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">_e</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {}
+  <span class="kw">fn</span> <span class="ident">from_external_error</span>(<span class="ident">_input</span>: <span class="ident">I</span>, <span class="ident">_kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">_e</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span> {}
 }
 
 <span class="doccomment">/// Creates an error from the input position and an [ErrorKind]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_error</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">E</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_error</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="ident">E</span> {
   <span class="ident">E::from_error_kind</span>(<span class="ident">input</span>, <span class="ident">kind</span>)
 }
 
 <span class="doccomment">/// Combines an existing error with a new one created from the input</span>
 <span class="doccomment">/// position and an [ErrorKind]. This is useful when backtracking</span>
 <span class="doccomment">/// through a parse tree, accumulating error context on the way</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_error</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">other</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">E</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_error</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">other</span>: <span class="ident">E</span>) -&gt; <span class="ident">E</span> {
   <span class="ident">E::append</span>(<span class="ident">input</span>, <span class="ident">kind</span>, <span class="ident">other</span>)
 }
 
@@ -1059,18 +1059,18 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docsrs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">VerboseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-  <span class="kw">fn</span> <span class="ident">from_error_kind</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from_error_kind</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">VerboseError</span> {
       <span class="ident">errors</span>: <span class="macro">vec!</span>[(<span class="ident">input</span>, <span class="ident">VerboseErrorKind::Nom</span>(<span class="ident">kind</span>))],
     }
   }
 
-  <span class="kw">fn</span> <span class="ident">append</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">append</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">other</span>.<span class="ident">errors</span>.<span class="ident">push</span>((<span class="ident">input</span>, <span class="ident">VerboseErrorKind::Nom</span>(<span class="ident">kind</span>)));
     <span class="ident">other</span>
   }
 
-  <span class="kw">fn</span> <span class="ident">from_char</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">c</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from_char</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">VerboseError</span> {
       <span class="ident">errors</span>: <span class="macro">vec!</span>[(<span class="ident">input</span>, <span class="ident">VerboseErrorKind::Char</span>(<span class="ident">c</span>))],
     }
@@ -1080,7 +1080,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docsrs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">ContextError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">VerboseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-  <span class="kw">fn</span> <span class="ident">add_context</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">add_context</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">other</span>.<span class="ident">errors</span>.<span class="ident">push</span>((<span class="ident">input</span>, <span class="ident">VerboseErrorKind::Context</span>(<span class="ident">ctx</span>)));
     <span class="ident">other</span>
   }
@@ -1090,20 +1090,20 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docsrs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">FromExternalError</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">VerboseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
   <span class="doccomment">/// Create a new error from an input position and an external error</span>
-  <span class="kw">fn</span> <span class="ident">from_external_error</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">_e</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from_external_error</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">kind</span>: <span class="ident">ErrorKind</span>, <span class="ident">_e</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span> {
     <span class="ident"><span class="self">Self</span>::from_error_kind</span>(<span class="ident">input</span>, <span class="ident">kind</span>)
   }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">VerboseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
     <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;Parse error:&quot;</span>)<span class="question-mark">?</span>;
     <span class="kw">for</span> (<span class="ident">input</span>, <span class="ident">error</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">errors</span> {
       <span class="kw">match</span> <span class="ident">error</span> {
-        <span class="ident">VerboseErrorKind::Nom</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?} at: {}&quot;</span>, <span class="ident">e</span>, <span class="ident">input</span>)<span class="question-mark">?</span>,
-        <span class="ident">VerboseErrorKind::Char</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;expected &#39;{}&#39; at: {}&quot;</span>, <span class="ident">c</span>, <span class="ident">input</span>)<span class="question-mark">?</span>,
-        <span class="ident">VerboseErrorKind::Context</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;in section &#39;{}&#39;, at: {}&quot;</span>, <span class="ident">s</span>, <span class="ident">input</span>)<span class="question-mark">?</span>,
+        <span class="ident">VerboseErrorKind::Nom</span>(<span class="ident">e</span>) =&gt; <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?} at: {}&quot;</span>, <span class="ident">e</span>, <span class="ident">input</span>)<span class="question-mark">?</span>,
+        <span class="ident">VerboseErrorKind::Char</span>(<span class="ident">c</span>) =&gt; <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;expected &#39;{}&#39; at: {}&quot;</span>, <span class="ident">c</span>, <span class="ident">input</span>)<span class="question-mark">?</span>,
+        <span class="ident">VerboseErrorKind::Context</span>(<span class="ident">s</span>) =&gt; <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;in section &#39;{}&#39;, at: {}&quot;</span>, <span class="ident">s</span>, <span class="ident">input</span>)<span class="question-mark">?</span>,
       }
     }
 
@@ -1122,15 +1122,15 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">context</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Clone</span>, <span class="ident">E</span>: <span class="ident">ContextError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>, <span class="ident">F</span>, <span class="ident">O</span><span class="op">&gt;</span>(
   <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
   <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident">I</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">F</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">O</span>, <span class="ident">E</span><span class="op">&gt;</span>,
 {
   <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="ident">I</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">parse</span>(<span class="ident">i</span>.<span class="ident">clone</span>()) {
-    <span class="prelude-val">Ok</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">o</span>),
-    <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">i</span>)),
-    <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">E::add_context</span>(<span class="ident">i</span>, <span class="ident">context</span>, <span class="ident">e</span>))),
-    <span class="prelude-val">Err</span>(<span class="ident">Err::Failure</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Failure</span>(<span class="ident">E::add_context</span>(<span class="ident">i</span>, <span class="ident">context</span>, <span class="ident">e</span>))),
+    <span class="prelude-val">Ok</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">o</span>),
+    <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">i</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">i</span>)),
+    <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">e</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">E::add_context</span>(<span class="ident">i</span>, <span class="ident">context</span>, <span class="ident">e</span>))),
+    <span class="prelude-val">Err</span>(<span class="ident">Err::Failure</span>(<span class="ident">e</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Failure</span>(<span class="ident">E::add_context</span>(<span class="ident">i</span>, <span class="ident">context</span>, <span class="ident">e</span>))),
   }
 }
 
@@ -1140,7 +1140,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">convert_error</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">core::ops::Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(
   <span class="ident">input</span>: <span class="ident">I</span>,
   <span class="ident">e</span>: <span class="ident">VerboseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::lib::std::string::String</span> {
+) -&gt; <span class="ident"><span class="kw">crate</span>::lib::std::string::String</span> {
   <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lib::std::fmt::Write</span>;
   <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::traits::Offset</span>;
 
@@ -1151,24 +1151,24 @@
 
     <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">is_empty</span>() {
       <span class="kw">match</span> <span class="ident">kind</span> {
-        <span class="ident">VerboseErrorKind::Char</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">VerboseErrorKind::Char</span>(<span class="ident">c</span>) =&gt; {
           <span class="macro">write!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>, <span class="string">&quot;{}: expected &#39;{}&#39;, got empty input\n\n&quot;</span>, <span class="ident">i</span>, <span class="ident">c</span>)
         }
-        <span class="ident">VerboseErrorKind::Context</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>, <span class="string">&quot;{}: in {}, got empty input\n\n&quot;</span>, <span class="ident">i</span>, <span class="ident">s</span>),
-        <span class="ident">VerboseErrorKind::Nom</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>, <span class="string">&quot;{}: in {:?}, got empty input\n\n&quot;</span>, <span class="ident">i</span>, <span class="ident">e</span>),
+        <span class="ident">VerboseErrorKind::Context</span>(<span class="ident">s</span>) =&gt; <span class="macro">write!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>, <span class="string">&quot;{}: in {}, got empty input\n\n&quot;</span>, <span class="ident">i</span>, <span class="ident">s</span>),
+        <span class="ident">VerboseErrorKind::Nom</span>(<span class="ident">e</span>) =&gt; <span class="macro">write!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>, <span class="string">&quot;{}: in {:?}, got empty input\n\n&quot;</span>, <span class="ident">i</span>, <span class="ident">e</span>),
       }
     } <span class="kw">else</span> {
       <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">as_bytes</span>()[..<span class="ident">offset</span>];
 
       <span class="comment">// Count the number of newlines in the first `offset` bytes of input</span>
-      <span class="kw">let</span> <span class="ident">line_number</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="op">&amp;&amp;</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;\n&#39;</span>).<span class="ident">count</span>() <span class="op">+</span> <span class="number">1</span>;
+      <span class="kw">let</span> <span class="ident">line_number</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="op">&amp;&amp;</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;\n&#39;</span>).<span class="ident">count</span>() <span class="op">+</span> <span class="number">1</span>;
 
       <span class="comment">// Find the line that includes the subslice:</span>
       <span class="comment">// Find the *last* newline before the substring starts</span>
       <span class="kw">let</span> <span class="ident">line_begin</span> <span class="op">=</span> <span class="ident">prefix</span>
         .<span class="ident">iter</span>()
         .<span class="ident">rev</span>()
-        .<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;\n&#39;</span>)
+        .<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;\n&#39;</span>)
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">offset</span> <span class="op">-</span> <span class="ident">pos</span>)
         .<span class="ident">unwrap_or</span>(<span class="number">0</span>);
 
@@ -1183,7 +1183,7 @@
       <span class="kw">let</span> <span class="ident">column_number</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">offset</span>(<span class="ident">substring</span>) <span class="op">+</span> <span class="number">1</span>;
 
       <span class="kw">match</span> <span class="ident">kind</span> {
-        <span class="ident">VerboseErrorKind::Char</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">VerboseErrorKind::Char</span>(<span class="ident">c</span>) =&gt; {
           <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">actual</span>) <span class="op">=</span> <span class="ident">substring</span>.<span class="ident">chars</span>().<span class="ident">next</span>() {
             <span class="macro">write!</span>(
               <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>,
@@ -1215,7 +1215,7 @@
             )
           }
         }
-        <span class="ident">VerboseErrorKind::Context</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+        <span class="ident">VerboseErrorKind::Context</span>(<span class="ident">s</span>) =&gt; <span class="macro">write!</span>(
           <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>,
           <span class="string">&quot;{i}: at line {line_number}, in {context}:\n\
              {line}\n\
@@ -1227,7 +1227,7 @@
           <span class="ident">caret</span> <span class="op">=</span> <span class="string">&#39;^&#39;</span>,
           <span class="ident">column</span> <span class="op">=</span> <span class="ident">column_number</span>,
         ),
-        <span class="ident">VerboseErrorKind::Nom</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+        <span class="ident">VerboseErrorKind::Nom</span>(<span class="ident">e</span>) =&gt; <span class="macro">write!</span>(
           <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>,
           <span class="string">&quot;{i}: at line {line_number}, in {nom_err:?}:\n\
              {line}\n\
@@ -1311,61 +1311,61 @@
 <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="doccomment">/// Converts an ErrorKind to a number</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_to_u32</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="ident">ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_to_u32</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="ident">ErrorKind</span>) -&gt; <span class="ident">u32</span> {
   <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span> {
-    <span class="ident">ErrorKind::Tag</span>                       <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-    <span class="ident">ErrorKind::MapRes</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-    <span class="ident">ErrorKind::MapOpt</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-    <span class="ident">ErrorKind::Alt</span>                       <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-    <span class="ident">ErrorKind::IsNot</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
-    <span class="ident">ErrorKind::IsA</span>                       <span class="op">=</span><span class="op">&gt;</span> <span class="number">6</span>,
-    <span class="ident">ErrorKind::SeparatedList</span>             <span class="op">=</span><span class="op">&gt;</span> <span class="number">7</span>,
-    <span class="ident">ErrorKind::SeparatedNonEmptyList</span>     <span class="op">=</span><span class="op">&gt;</span> <span class="number">8</span>,
-    <span class="ident">ErrorKind::Many1</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="number">9</span>,
-    <span class="ident">ErrorKind::Count</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="number">10</span>,
-    <span class="ident">ErrorKind::TakeUntil</span>                 <span class="op">=</span><span class="op">&gt;</span> <span class="number">12</span>,
-    <span class="ident">ErrorKind::LengthValue</span>               <span class="op">=</span><span class="op">&gt;</span> <span class="number">15</span>,
-    <span class="ident">ErrorKind::TagClosure</span>                <span class="op">=</span><span class="op">&gt;</span> <span class="number">16</span>,
-    <span class="ident">ErrorKind::Alpha</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="number">17</span>,
-    <span class="ident">ErrorKind::Digit</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="number">18</span>,
-    <span class="ident">ErrorKind::AlphaNumeric</span>              <span class="op">=</span><span class="op">&gt;</span> <span class="number">19</span>,
-    <span class="ident">ErrorKind::Space</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="number">20</span>,
-    <span class="ident">ErrorKind::MultiSpace</span>                <span class="op">=</span><span class="op">&gt;</span> <span class="number">21</span>,
-    <span class="ident">ErrorKind::LengthValueFn</span>             <span class="op">=</span><span class="op">&gt;</span> <span class="number">22</span>,
-    <span class="ident">ErrorKind::Eof</span>                       <span class="op">=</span><span class="op">&gt;</span> <span class="number">23</span>,
-    <span class="ident">ErrorKind::Switch</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="number">27</span>,
-    <span class="ident">ErrorKind::TagBits</span>                   <span class="op">=</span><span class="op">&gt;</span> <span class="number">28</span>,
-    <span class="ident">ErrorKind::OneOf</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="number">29</span>,
-    <span class="ident">ErrorKind::NoneOf</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="number">30</span>,
-    <span class="ident">ErrorKind::Char</span>                      <span class="op">=</span><span class="op">&gt;</span> <span class="number">40</span>,
-    <span class="ident">ErrorKind::CrLf</span>                      <span class="op">=</span><span class="op">&gt;</span> <span class="number">41</span>,
-    <span class="ident">ErrorKind::RegexpMatch</span>               <span class="op">=</span><span class="op">&gt;</span> <span class="number">42</span>,
-    <span class="ident">ErrorKind::RegexpMatches</span>             <span class="op">=</span><span class="op">&gt;</span> <span class="number">43</span>,
-    <span class="ident">ErrorKind::RegexpFind</span>                <span class="op">=</span><span class="op">&gt;</span> <span class="number">44</span>,
-    <span class="ident">ErrorKind::RegexpCapture</span>             <span class="op">=</span><span class="op">&gt;</span> <span class="number">45</span>,
-    <span class="ident">ErrorKind::RegexpCaptures</span>            <span class="op">=</span><span class="op">&gt;</span> <span class="number">46</span>,
-    <span class="ident">ErrorKind::TakeWhile1</span>                <span class="op">=</span><span class="op">&gt;</span> <span class="number">47</span>,
-    <span class="ident">ErrorKind::Complete</span>                  <span class="op">=</span><span class="op">&gt;</span> <span class="number">48</span>,
-    <span class="ident">ErrorKind::Fix</span>                       <span class="op">=</span><span class="op">&gt;</span> <span class="number">49</span>,
-    <span class="ident">ErrorKind::Escaped</span>                   <span class="op">=</span><span class="op">&gt;</span> <span class="number">50</span>,
-    <span class="ident">ErrorKind::EscapedTransform</span>          <span class="op">=</span><span class="op">&gt;</span> <span class="number">51</span>,
-    <span class="ident">ErrorKind::NonEmpty</span>                  <span class="op">=</span><span class="op">&gt;</span> <span class="number">56</span>,
-    <span class="ident">ErrorKind::ManyMN</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="number">57</span>,
-    <span class="ident">ErrorKind::HexDigit</span>                  <span class="op">=</span><span class="op">&gt;</span> <span class="number">59</span>,
-    <span class="ident">ErrorKind::OctDigit</span>                  <span class="op">=</span><span class="op">&gt;</span> <span class="number">61</span>,
-    <span class="ident">ErrorKind::Many0</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="number">62</span>,
-    <span class="ident">ErrorKind::Not</span>                       <span class="op">=</span><span class="op">&gt;</span> <span class="number">63</span>,
-    <span class="ident">ErrorKind::Permutation</span>               <span class="op">=</span><span class="op">&gt;</span> <span class="number">64</span>,
-    <span class="ident">ErrorKind::ManyTill</span>                  <span class="op">=</span><span class="op">&gt;</span> <span class="number">65</span>,
-    <span class="ident">ErrorKind::Verify</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="number">66</span>,
-    <span class="ident">ErrorKind::TakeTill1</span>                 <span class="op">=</span><span class="op">&gt;</span> <span class="number">67</span>,
-    <span class="ident">ErrorKind::TakeWhileMN</span>               <span class="op">=</span><span class="op">&gt;</span> <span class="number">69</span>,
-    <span class="ident">ErrorKind::ParseTo</span>                   <span class="op">=</span><span class="op">&gt;</span> <span class="number">70</span>,
-    <span class="ident">ErrorKind::TooLarge</span>                  <span class="op">=</span><span class="op">&gt;</span> <span class="number">71</span>,
-    <span class="ident">ErrorKind::Many0Count</span>                <span class="op">=</span><span class="op">&gt;</span> <span class="number">72</span>,
-    <span class="ident">ErrorKind::Many1Count</span>                <span class="op">=</span><span class="op">&gt;</span> <span class="number">73</span>,
-    <span class="ident">ErrorKind::Float</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="number">74</span>,
-    <span class="ident">ErrorKind::Satisfy</span>                   <span class="op">=</span><span class="op">&gt;</span> <span class="number">75</span>,
+    <span class="ident">ErrorKind::Tag</span>                       =&gt; <span class="number">1</span>,
+    <span class="ident">ErrorKind::MapRes</span>                    =&gt; <span class="number">2</span>,
+    <span class="ident">ErrorKind::MapOpt</span>                    =&gt; <span class="number">3</span>,
+    <span class="ident">ErrorKind::Alt</span>                       =&gt; <span class="number">4</span>,
+    <span class="ident">ErrorKind::IsNot</span>                     =&gt; <span class="number">5</span>,
+    <span class="ident">ErrorKind::IsA</span>                       =&gt; <span class="number">6</span>,
+    <span class="ident">ErrorKind::SeparatedList</span>             =&gt; <span class="number">7</span>,
+    <span class="ident">ErrorKind::SeparatedNonEmptyList</span>     =&gt; <span class="number">8</span>,
+    <span class="ident">ErrorKind::Many1</span>                     =&gt; <span class="number">9</span>,
+    <span class="ident">ErrorKind::Count</span>                     =&gt; <span class="number">10</span>,
+    <span class="ident">ErrorKind::TakeUntil</span>                 =&gt; <span class="number">12</span>,
+    <span class="ident">ErrorKind::LengthValue</span>               =&gt; <span class="number">15</span>,
+    <span class="ident">ErrorKind::TagClosure</span>                =&gt; <span class="number">16</span>,
+    <span class="ident">ErrorKind::Alpha</span>                     =&gt; <span class="number">17</span>,
+    <span class="ident">ErrorKind::Digit</span>                     =&gt; <span class="number">18</span>,
+    <span class="ident">ErrorKind::AlphaNumeric</span>              =&gt; <span class="number">19</span>,
+    <span class="ident">ErrorKind::Space</span>                     =&gt; <span class="number">20</span>,
+    <span class="ident">ErrorKind::MultiSpace</span>                =&gt; <span class="number">21</span>,
+    <span class="ident">ErrorKind::LengthValueFn</span>             =&gt; <span class="number">22</span>,
+    <span class="ident">ErrorKind::Eof</span>                       =&gt; <span class="number">23</span>,
+    <span class="ident">ErrorKind::Switch</span>                    =&gt; <span class="number">27</span>,
+    <span class="ident">ErrorKind::TagBits</span>                   =&gt; <span class="number">28</span>,
+    <span class="ident">ErrorKind::OneOf</span>                     =&gt; <span class="number">29</span>,
+    <span class="ident">ErrorKind::NoneOf</span>                    =&gt; <span class="number">30</span>,
+    <span class="ident">ErrorKind::Char</span>                      =&gt; <span class="number">40</span>,
+    <span class="ident">ErrorKind::CrLf</span>                      =&gt; <span class="number">41</span>,
+    <span class="ident">ErrorKind::RegexpMatch</span>               =&gt; <span class="number">42</span>,
+    <span class="ident">ErrorKind::RegexpMatches</span>             =&gt; <span class="number">43</span>,
+    <span class="ident">ErrorKind::RegexpFind</span>                =&gt; <span class="number">44</span>,
+    <span class="ident">ErrorKind::RegexpCapture</span>             =&gt; <span class="number">45</span>,
+    <span class="ident">ErrorKind::RegexpCaptures</span>            =&gt; <span class="number">46</span>,
+    <span class="ident">ErrorKind::TakeWhile1</span>                =&gt; <span class="number">47</span>,
+    <span class="ident">ErrorKind::Complete</span>                  =&gt; <span class="number">48</span>,
+    <span class="ident">ErrorKind::Fix</span>                       =&gt; <span class="number">49</span>,
+    <span class="ident">ErrorKind::Escaped</span>                   =&gt; <span class="number">50</span>,
+    <span class="ident">ErrorKind::EscapedTransform</span>          =&gt; <span class="number">51</span>,
+    <span class="ident">ErrorKind::NonEmpty</span>                  =&gt; <span class="number">56</span>,
+    <span class="ident">ErrorKind::ManyMN</span>                    =&gt; <span class="number">57</span>,
+    <span class="ident">ErrorKind::HexDigit</span>                  =&gt; <span class="number">59</span>,
+    <span class="ident">ErrorKind::OctDigit</span>                  =&gt; <span class="number">61</span>,
+    <span class="ident">ErrorKind::Many0</span>                     =&gt; <span class="number">62</span>,
+    <span class="ident">ErrorKind::Not</span>                       =&gt; <span class="number">63</span>,
+    <span class="ident">ErrorKind::Permutation</span>               =&gt; <span class="number">64</span>,
+    <span class="ident">ErrorKind::ManyTill</span>                  =&gt; <span class="number">65</span>,
+    <span class="ident">ErrorKind::Verify</span>                    =&gt; <span class="number">66</span>,
+    <span class="ident">ErrorKind::TakeTill1</span>                 =&gt; <span class="number">67</span>,
+    <span class="ident">ErrorKind::TakeWhileMN</span>               =&gt; <span class="number">69</span>,
+    <span class="ident">ErrorKind::ParseTo</span>                   =&gt; <span class="number">70</span>,
+    <span class="ident">ErrorKind::TooLarge</span>                  =&gt; <span class="number">71</span>,
+    <span class="ident">ErrorKind::Many0Count</span>                =&gt; <span class="number">72</span>,
+    <span class="ident">ErrorKind::Many1Count</span>                =&gt; <span class="number">73</span>,
+    <span class="ident">ErrorKind::Float</span>                     =&gt; <span class="number">74</span>,
+    <span class="ident">ErrorKind::Satisfy</span>                   =&gt; <span class="number">75</span>,
   }
 }
 
@@ -1373,61 +1373,61 @@
   <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
   <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
   <span class="doccomment">/// Converts an ErrorKind to a text description</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
     <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-      <span class="ident">ErrorKind::Tag</span>                       <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Tag&quot;</span>,
-      <span class="ident">ErrorKind::MapRes</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Map on Result&quot;</span>,
-      <span class="ident">ErrorKind::MapOpt</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Map on Option&quot;</span>,
-      <span class="ident">ErrorKind::Alt</span>                       <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Alternative&quot;</span>,
-      <span class="ident">ErrorKind::IsNot</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;IsNot&quot;</span>,
-      <span class="ident">ErrorKind::IsA</span>                       <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;IsA&quot;</span>,
-      <span class="ident">ErrorKind::SeparatedList</span>             <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Separated list&quot;</span>,
-      <span class="ident">ErrorKind::SeparatedNonEmptyList</span>     <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Separated non empty list&quot;</span>,
-      <span class="ident">ErrorKind::Many0</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Many0&quot;</span>,
-      <span class="ident">ErrorKind::Many1</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Many1&quot;</span>,
-      <span class="ident">ErrorKind::Count</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Count&quot;</span>,
-      <span class="ident">ErrorKind::TakeUntil</span>                 <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Take until&quot;</span>,
-      <span class="ident">ErrorKind::LengthValue</span>               <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Length followed by value&quot;</span>,
-      <span class="ident">ErrorKind::TagClosure</span>                <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Tag closure&quot;</span>,
-      <span class="ident">ErrorKind::Alpha</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Alphabetic&quot;</span>,
-      <span class="ident">ErrorKind::Digit</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Digit&quot;</span>,
-      <span class="ident">ErrorKind::AlphaNumeric</span>              <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;AlphaNumeric&quot;</span>,
-      <span class="ident">ErrorKind::Space</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Space&quot;</span>,
-      <span class="ident">ErrorKind::MultiSpace</span>                <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Multiple spaces&quot;</span>,
-      <span class="ident">ErrorKind::LengthValueFn</span>             <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;LengthValueFn&quot;</span>,
-      <span class="ident">ErrorKind::Eof</span>                       <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;End of file&quot;</span>,
-      <span class="ident">ErrorKind::Switch</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Switch&quot;</span>,
-      <span class="ident">ErrorKind::TagBits</span>                   <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Tag on bitstream&quot;</span>,
-      <span class="ident">ErrorKind::OneOf</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;OneOf&quot;</span>,
-      <span class="ident">ErrorKind::NoneOf</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;NoneOf&quot;</span>,
-      <span class="ident">ErrorKind::Char</span>                      <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Char&quot;</span>,
-      <span class="ident">ErrorKind::CrLf</span>                      <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;CrLf&quot;</span>,
-      <span class="ident">ErrorKind::RegexpMatch</span>               <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;RegexpMatch&quot;</span>,
-      <span class="ident">ErrorKind::RegexpMatches</span>             <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;RegexpMatches&quot;</span>,
-      <span class="ident">ErrorKind::RegexpFind</span>                <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;RegexpFind&quot;</span>,
-      <span class="ident">ErrorKind::RegexpCapture</span>             <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;RegexpCapture&quot;</span>,
-      <span class="ident">ErrorKind::RegexpCaptures</span>            <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;RegexpCaptures&quot;</span>,
-      <span class="ident">ErrorKind::TakeWhile1</span>                <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;TakeWhile1&quot;</span>,
-      <span class="ident">ErrorKind::Complete</span>                  <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Complete&quot;</span>,
-      <span class="ident">ErrorKind::Fix</span>                       <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Fix&quot;</span>,
-      <span class="ident">ErrorKind::Escaped</span>                   <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Escaped&quot;</span>,
-      <span class="ident">ErrorKind::EscapedTransform</span>          <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;EscapedTransform&quot;</span>,
-      <span class="ident">ErrorKind::NonEmpty</span>                  <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;NonEmpty&quot;</span>,
-      <span class="ident">ErrorKind::ManyMN</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Many(m, n)&quot;</span>,
-      <span class="ident">ErrorKind::HexDigit</span>                  <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Hexadecimal Digit&quot;</span>,
-      <span class="ident">ErrorKind::OctDigit</span>                  <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Octal digit&quot;</span>,
-      <span class="ident">ErrorKind::Not</span>                       <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Negation&quot;</span>,
-      <span class="ident">ErrorKind::Permutation</span>               <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Permutation&quot;</span>,
-      <span class="ident">ErrorKind::ManyTill</span>                  <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ManyTill&quot;</span>,
-      <span class="ident">ErrorKind::Verify</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;predicate verification&quot;</span>,
-      <span class="ident">ErrorKind::TakeTill1</span>                 <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;TakeTill1&quot;</span>,
-      <span class="ident">ErrorKind::TakeWhileMN</span>               <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;TakeWhileMN&quot;</span>,
-      <span class="ident">ErrorKind::ParseTo</span>                   <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Parse string to the specified type&quot;</span>,
-      <span class="ident">ErrorKind::TooLarge</span>                  <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Needed data size is too large&quot;</span>,
-      <span class="ident">ErrorKind::Many0Count</span>                <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Count occurrence of &gt;=0 patterns&quot;</span>,
-      <span class="ident">ErrorKind::Many1Count</span>                <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Count occurrence of &gt;=1 patterns&quot;</span>,
-      <span class="ident">ErrorKind::Float</span>                     <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Float&quot;</span>,
-      <span class="ident">ErrorKind::Satisfy</span>                   <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Satisfy&quot;</span>,
+      <span class="ident">ErrorKind::Tag</span>                       =&gt; <span class="string">&quot;Tag&quot;</span>,
+      <span class="ident">ErrorKind::MapRes</span>                    =&gt; <span class="string">&quot;Map on Result&quot;</span>,
+      <span class="ident">ErrorKind::MapOpt</span>                    =&gt; <span class="string">&quot;Map on Option&quot;</span>,
+      <span class="ident">ErrorKind::Alt</span>                       =&gt; <span class="string">&quot;Alternative&quot;</span>,
+      <span class="ident">ErrorKind::IsNot</span>                     =&gt; <span class="string">&quot;IsNot&quot;</span>,
+      <span class="ident">ErrorKind::IsA</span>                       =&gt; <span class="string">&quot;IsA&quot;</span>,
+      <span class="ident">ErrorKind::SeparatedList</span>             =&gt; <span class="string">&quot;Separated list&quot;</span>,
+      <span class="ident">ErrorKind::SeparatedNonEmptyList</span>     =&gt; <span class="string">&quot;Separated non empty list&quot;</span>,
+      <span class="ident">ErrorKind::Many0</span>                     =&gt; <span class="string">&quot;Many0&quot;</span>,
+      <span class="ident">ErrorKind::Many1</span>                     =&gt; <span class="string">&quot;Many1&quot;</span>,
+      <span class="ident">ErrorKind::Count</span>                     =&gt; <span class="string">&quot;Count&quot;</span>,
+      <span class="ident">ErrorKind::TakeUntil</span>                 =&gt; <span class="string">&quot;Take until&quot;</span>,
+      <span class="ident">ErrorKind::LengthValue</span>               =&gt; <span class="string">&quot;Length followed by value&quot;</span>,
+      <span class="ident">ErrorKind::TagClosure</span>                =&gt; <span class="string">&quot;Tag closure&quot;</span>,
+      <span class="ident">ErrorKind::Alpha</span>                     =&gt; <span class="string">&quot;Alphabetic&quot;</span>,
+      <span class="ident">ErrorKind::Digit</span>                     =&gt; <span class="string">&quot;Digit&quot;</span>,
+      <span class="ident">ErrorKind::AlphaNumeric</span>              =&gt; <span class="string">&quot;AlphaNumeric&quot;</span>,
+      <span class="ident">ErrorKind::Space</span>                     =&gt; <span class="string">&quot;Space&quot;</span>,
+      <span class="ident">ErrorKind::MultiSpace</span>                =&gt; <span class="string">&quot;Multiple spaces&quot;</span>,
+      <span class="ident">ErrorKind::LengthValueFn</span>             =&gt; <span class="string">&quot;LengthValueFn&quot;</span>,
+      <span class="ident">ErrorKind::Eof</span>                       =&gt; <span class="string">&quot;End of file&quot;</span>,
+      <span class="ident">ErrorKind::Switch</span>                    =&gt; <span class="string">&quot;Switch&quot;</span>,
+      <span class="ident">ErrorKind::TagBits</span>                   =&gt; <span class="string">&quot;Tag on bitstream&quot;</span>,
+      <span class="ident">ErrorKind::OneOf</span>                     =&gt; <span class="string">&quot;OneOf&quot;</span>,
+      <span class="ident">ErrorKind::NoneOf</span>                    =&gt; <span class="string">&quot;NoneOf&quot;</span>,
+      <span class="ident">ErrorKind::Char</span>                      =&gt; <span class="string">&quot;Char&quot;</span>,
+      <span class="ident">ErrorKind::CrLf</span>                      =&gt; <span class="string">&quot;CrLf&quot;</span>,
+      <span class="ident">ErrorKind::RegexpMatch</span>               =&gt; <span class="string">&quot;RegexpMatch&quot;</span>,
+      <span class="ident">ErrorKind::RegexpMatches</span>             =&gt; <span class="string">&quot;RegexpMatches&quot;</span>,
+      <span class="ident">ErrorKind::RegexpFind</span>                =&gt; <span class="string">&quot;RegexpFind&quot;</span>,
+      <span class="ident">ErrorKind::RegexpCapture</span>             =&gt; <span class="string">&quot;RegexpCapture&quot;</span>,
+      <span class="ident">ErrorKind::RegexpCaptures</span>            =&gt; <span class="string">&quot;RegexpCaptures&quot;</span>,
+      <span class="ident">ErrorKind::TakeWhile1</span>                =&gt; <span class="string">&quot;TakeWhile1&quot;</span>,
+      <span class="ident">ErrorKind::Complete</span>                  =&gt; <span class="string">&quot;Complete&quot;</span>,
+      <span class="ident">ErrorKind::Fix</span>                       =&gt; <span class="string">&quot;Fix&quot;</span>,
+      <span class="ident">ErrorKind::Escaped</span>                   =&gt; <span class="string">&quot;Escaped&quot;</span>,
+      <span class="ident">ErrorKind::EscapedTransform</span>          =&gt; <span class="string">&quot;EscapedTransform&quot;</span>,
+      <span class="ident">ErrorKind::NonEmpty</span>                  =&gt; <span class="string">&quot;NonEmpty&quot;</span>,
+      <span class="ident">ErrorKind::ManyMN</span>                    =&gt; <span class="string">&quot;Many(m, n)&quot;</span>,
+      <span class="ident">ErrorKind::HexDigit</span>                  =&gt; <span class="string">&quot;Hexadecimal Digit&quot;</span>,
+      <span class="ident">ErrorKind::OctDigit</span>                  =&gt; <span class="string">&quot;Octal digit&quot;</span>,
+      <span class="ident">ErrorKind::Not</span>                       =&gt; <span class="string">&quot;Negation&quot;</span>,
+      <span class="ident">ErrorKind::Permutation</span>               =&gt; <span class="string">&quot;Permutation&quot;</span>,
+      <span class="ident">ErrorKind::ManyTill</span>                  =&gt; <span class="string">&quot;ManyTill&quot;</span>,
+      <span class="ident">ErrorKind::Verify</span>                    =&gt; <span class="string">&quot;predicate verification&quot;</span>,
+      <span class="ident">ErrorKind::TakeTill1</span>                 =&gt; <span class="string">&quot;TakeTill1&quot;</span>,
+      <span class="ident">ErrorKind::TakeWhileMN</span>               =&gt; <span class="string">&quot;TakeWhileMN&quot;</span>,
+      <span class="ident">ErrorKind::ParseTo</span>                   =&gt; <span class="string">&quot;Parse string to the specified type&quot;</span>,
+      <span class="ident">ErrorKind::TooLarge</span>                  =&gt; <span class="string">&quot;Needed data size is too large&quot;</span>,
+      <span class="ident">ErrorKind::Many0Count</span>                =&gt; <span class="string">&quot;Count occurrence of &gt;=0 patterns&quot;</span>,
+      <span class="ident">ErrorKind::Many1Count</span>                =&gt; <span class="string">&quot;Count occurrence of &gt;=1 patterns&quot;</span>,
+      <span class="ident">ErrorKind::Float</span>                     =&gt; <span class="string">&quot;Float&quot;</span>,
+      <span class="ident">ErrorKind::Satisfy</span>                   =&gt; <span class="string">&quot;Satisfy&quot;</span>,
     }
   }
 }
@@ -1437,7 +1437,7 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
 <span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">error_position</span>(
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> ({
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>:<span class="ident">expr</span>) =&gt; ({
     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::make_error</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>)
   });
 );
@@ -1448,7 +1448,7 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
 <span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">error_node_position</span>(
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">next</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> ({
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">next</span>:<span class="ident">expr</span>) =&gt; ({
     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::append_error</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">next</span>)
   });
 );
@@ -1489,29 +1489,29 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">fix_error</span> (
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span> )) <span class="op">=</span><span class="op">&gt;</span> (
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span> )) =&gt; (
     {
       <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::lib::std::result::Result</span>::<span class="kw-2">*</span>;
       <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Err</span>;
 
       <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro">submac!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>) {
-        <span class="prelude-val">Ok</span>((<span class="ident">i</span>,<span class="ident">o</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="ident">i</span>,<span class="ident">o</span>)),
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>((<span class="ident">i</span>,<span class="ident">o</span>)) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">i</span>,<span class="ident">o</span>)),
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
           <span class="kw">let</span> <span class="ident">e2</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">Err::Error</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Err::Error</span>(<span class="ident">err</span>) =&gt; {
               <span class="ident">Err::Error</span>(<span class="ident">err</span>.<span class="ident">into</span>())
             },
-            <span class="ident">Err::Failure</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Err::Failure</span>(<span class="ident">err</span>) =&gt; {
               <span class="ident">Err::Failure</span>(<span class="ident">err</span>.<span class="ident">into</span>())
             },
-            <span class="ident">Err::Incomplete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Err::Incomplete</span>(<span class="ident">e</span>),
+            <span class="ident">Err::Incomplete</span>(<span class="ident">e</span>) =&gt; <span class="ident">Err::Incomplete</span>(<span class="ident">e</span>),
           };
           <span class="prelude-val">Err</span>(<span class="ident">e2</span>)
         }
       }
     }
   );
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="ident">expr</span>) =&gt; (
     <span class="macro">fix_error!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="macro">call!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>));
   );
 );
@@ -1534,19 +1534,19 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">flat_map</span>(
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span> ), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac2</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args2</span>:<span class="ident">tt</span>)<span class="op">*</span> )) <span class="op">=</span><span class="op">&gt;</span> (
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span> ), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac2</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args2</span>:<span class="ident">tt</span>)<span class="op">*</span> )) =&gt; (
     <span class="macro">flat_map!</span>(<span class="ident">__impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>, <span class="macro-nonterminal">$</span><span class="macro">submac!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>), <span class="macro-nonterminal">$</span><span class="macro">submac2!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args2</span>)<span class="kw-2">*</span>));
   );
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span> ), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">g</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span> ), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">g</span>:<span class="ident">expr</span>) =&gt; (
     <span class="macro">flat_map!</span>(<span class="ident">__impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>, <span class="macro-nonterminal">$</span><span class="macro">submac!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>), <span class="macro">call!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">g</span>));
   );
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span> )) <span class="op">=</span><span class="op">&gt;</span> (
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span> )) =&gt; (
     <span class="macro">flat_map!</span>(<span class="ident">__impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>, <span class="macro">call!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>), <span class="macro-nonterminal">$</span><span class="macro">submac!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>));
   );
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">g</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">g</span>:<span class="ident">expr</span>) =&gt; (
     <span class="macro">flat_map!</span>(<span class="ident">__impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>, <span class="macro">call!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>), <span class="macro">call!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">g</span>));
   );
-  (<span class="ident">__impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span> ), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac2</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args2</span>:<span class="ident">tt</span>)<span class="op">*</span> )) <span class="op">=</span><span class="op">&gt;</span> (
+  (<span class="ident">__impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="op">*</span> ), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">submac2</span>:<span class="macro">ident!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args2</span>:<span class="ident">tt</span>)<span class="op">*</span> )) =&gt; (
     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::combinator::map_parserc</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span><span class="op">|</span> {<span class="macro-nonterminal">$</span><span class="macro">submac!</span>(<span class="macro-nonterminal">i</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>)}, <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span><span class="op">|</span> {<span class="macro-nonterminal">$</span><span class="macro">submac2!</span>(<span class="macro-nonterminal">i</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args2</span>)<span class="kw-2">*</span>)})
   );
 );

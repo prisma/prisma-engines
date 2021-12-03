@@ -209,7 +209,7 @@
 <span class="doccomment">/// Create module with CPU feature detection code.</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">new</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">mod_name</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>:<span class="ident">tt</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">mod_name</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>:<span class="ident">tt</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">mod_name</span> {
             <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicU8</span>, <span class="ident">Ordering::Relaxed</span>};
 
@@ -223,10 +223,10 @@
             <span class="kw">impl</span> <span class="ident">InitToken</span> {
                 <span class="doccomment">/// Get initialized value</span>
                 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
                     <span class="macro-nonterminal">$</span><span class="macro">crate::__unless_target_features!</span> {
-                        $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>),<span class="op">+</span> <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="ident">STORAGE</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>) <span class="op">=</span><span class="op">=</span> <span class="number">1</span>
+                        $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>),<span class="op">+</span> =&gt; {
+                            <span class="ident">STORAGE</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>) <span class="op">==</span> <span class="number">1</span>
                         }
                     }
                 }
@@ -235,18 +235,18 @@
             <span class="doccomment">/// Initialize underlying storage if needed and get</span>
             <span class="doccomment">/// stored value and initialization token.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_get</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">InitToken</span>, <span class="ident">bool</span>) {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_get</span>() -&gt; (<span class="ident">InitToken</span>, <span class="ident">bool</span>) {
                 <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__unless_target_features!</span> {
-                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>),<span class="op">+</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>),<span class="op">+</span> =&gt; {
                         <span class="comment">// Relaxed ordering is fine, as we only have a single atomic variable.</span>
                         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">STORAGE</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>);
 
-                        <span class="kw">if</span> <span class="ident">val</span> <span class="op">=</span><span class="op">=</span> <span class="ident">UNINIT</span> {
+                        <span class="kw">if</span> <span class="ident">val</span> <span class="op">==</span> <span class="ident">UNINIT</span> {
                             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__detect_target_features!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>),<span class="op">+</span>);
                             <span class="ident">STORAGE</span>.<span class="ident">store</span>(<span class="ident">res</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">Relaxed</span>);
                             <span class="ident">res</span>
                         } <span class="kw">else</span> {
-                            <span class="ident">val</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span>
+                            <span class="ident">val</span> <span class="op">==</span> <span class="number">1</span>
                         }
                     }
                 };
@@ -257,14 +257,14 @@
             <span class="doccomment">/// Initialize underlying storage if needed and get</span>
             <span class="doccomment">/// initialization token.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InitToken</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() -&gt; <span class="ident">InitToken</span> {
                 <span class="ident">init_get</span>().<span class="number">0</span>
             }
 
             <span class="doccomment">/// Initialize underlying storage if needed and get</span>
             <span class="doccomment">/// stored value.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() -&gt; <span class="ident">bool</span> {
                 <span class="ident">init_get</span>().<span class="number">1</span>
             }
         }

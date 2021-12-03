@@ -59,13 +59,13 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
     <span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>,
     <span class="ident">collation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Collation</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
 {
     <span class="kw">let</span> <span class="ident">ptr_len</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
 
-    <span class="kw">if</span> <span class="ident">ptr_len</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">ptr_len</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>));
     }
 
@@ -78,7 +78,7 @@
 
     <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">collation</span> {
         <span class="comment">// TEXT</span>
-        <span class="prelude-val">Some</span>(<span class="ident">collation</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">collation</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">collation</span>.<span class="ident">encoding</span>()<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">text_len</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u32_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">text_len</span>);
@@ -92,7 +92,7 @@
                 .<span class="ident">map_err</span>(<span class="ident">Error::Encoding</span>)<span class="question-mark">?</span>
         }
         <span class="comment">// NTEXT</span>
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">None</span> =&gt; {
             <span class="kw">let</span> <span class="ident">text_len</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u32_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">/</span> <span class="number">2</span>;
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">text_len</span>);
 

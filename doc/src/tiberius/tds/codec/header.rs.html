@@ -205,7 +205,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PacketHeader</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">length</span>: <span class="ident">usize</span>, <span class="ident">id</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PacketHeader</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">length</span>: <span class="ident">usize</span>, <span class="ident">id</span>: <span class="ident">u8</span>) -&gt; <span class="ident">PacketHeader</span> {
         <span class="macro">assert!</span>(<span class="ident">length</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u16::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>);
         <span class="ident">PacketHeader</span> {
             <span class="ident">ty</span>: <span class="ident">PacketType::TDSv7Login</span>,
@@ -217,7 +217,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rpc</span>(<span class="ident">id</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rpc</span>(<span class="ident">id</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ty</span>: <span class="ident">PacketType::Rpc</span>,
             <span class="ident">status</span>: <span class="ident">PacketStatus::NormalMessage</span>,
@@ -225,7 +225,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pre_login</span>(<span class="ident">id</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pre_login</span>(<span class="ident">id</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ty</span>: <span class="ident">PacketType::PreLogin</span>,
             <span class="ident">status</span>: <span class="ident">PacketStatus::EndOfMessage</span>,
@@ -233,7 +233,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">login</span>(<span class="ident">id</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">login</span>(<span class="ident">id</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ty</span>: <span class="ident">PacketType::TDSv7Login</span>,
             <span class="ident">status</span>: <span class="ident">PacketStatus::EndOfMessage</span>,
@@ -241,7 +241,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">batch</span>(<span class="ident">id</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">batch</span>(<span class="ident">id</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ty</span>: <span class="ident">PacketType::SQLBatch</span>,
             <span class="ident">status</span>: <span class="ident">PacketStatus::NormalMessage</span>,
@@ -258,7 +258,7 @@
 <span class="kw">where</span>
     <span class="ident">B</span>: <span class="ident">BufMut</span>,
 {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="self">self</span>.<span class="ident">ty</span> <span class="kw">as</span> <span class="ident">u8</span>);
         <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="self">self</span>.<span class="ident">status</span> <span class="kw">as</span> <span class="ident">u8</span>);
         <span class="ident">dst</span>.<span class="ident">put_u16</span>(<span class="self">self</span>.<span class="ident">length</span>);
@@ -271,7 +271,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Decode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PacketHeader</span> {
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
     {

@@ -153,7 +153,7 @@
         <span class="doccomment">/// # Ok(())</span>
         <span class="doccomment">/// # }</span>
         <span class="doccomment">/// ```</span>
-        <span class="kw">fn</span> <span class="ident">seek</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pos</span>: <span class="ident">SeekFrom</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Seek</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span><span class="op">&gt;</span>
+        <span class="kw">fn</span> <span class="ident">seek</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pos</span>: <span class="ident">SeekFrom</span>) -&gt; <span class="ident">Seek</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span><span class="op">&gt;</span>
         <span class="kw">where</span>
             <span class="self">Self</span>: <span class="ident">Unpin</span>,
         {
@@ -163,7 +163,7 @@
         <span class="doccomment">/// Creates a future which will rewind to the beginning of the stream.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This is convenience method, equivalent to to `self.seek(SeekFrom::Start(0))`.</span>
-        <span class="kw">fn</span> <span class="ident">rewind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Seek</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span><span class="op">&gt;</span>
+        <span class="kw">fn</span> <span class="ident">rewind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Seek</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span><span class="op">&gt;</span>
         <span class="kw">where</span>
             <span class="self">Self</span>: <span class="ident">Unpin</span>,
         {
@@ -174,7 +174,7 @@
         <span class="doccomment">/// start of the stream.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This is equivalent to `self.seek(SeekFrom::Current(0))`.</span>
-        <span class="kw">fn</span> <span class="ident">stream_position</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Seek</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span><span class="op">&gt;</span>
+        <span class="kw">fn</span> <span class="ident">stream_position</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Seek</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span><span class="op">&gt;</span>
         <span class="kw">where</span>
             <span class="self">Self</span>: <span class="ident">Unpin</span>,
         {

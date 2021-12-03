@@ -738,7 +738,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Encoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max_size</span>: <span class="ident">usize</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Encoder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max_size</span>: <span class="ident">usize</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Encoder</span> {
         <span class="ident">Encoder</span> {
             <span class="ident">table</span>: <span class="ident">Table::new</span>(<span class="ident">max_size</span>, <span class="ident">capacity</span>),
             <span class="ident">size_update</span>: <span class="prelude-val">None</span>,
@@ -750,7 +750,7 @@
     <span class="doccomment">/// The next call to `encode` will include a dynamic size update frame.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_max_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">size_update</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">SizeUpdate::One</span>(<span class="ident">old</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">SizeUpdate::One</span>(<span class="ident">old</span>)) =&gt; {
                 <span class="kw">if</span> <span class="ident">val</span> <span class="op">&gt;</span> <span class="ident">old</span> {
                     <span class="kw">if</span> <span class="ident">old</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">max_size</span>() {
                         <span class="self">self</span>.<span class="ident">size_update</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SizeUpdate::One</span>(<span class="ident">val</span>));
@@ -761,14 +761,14 @@
                     <span class="self">self</span>.<span class="ident">size_update</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SizeUpdate::One</span>(<span class="ident">val</span>));
                 }
             }
-            <span class="prelude-val">Some</span>(<span class="ident">SizeUpdate::Two</span>(<span class="ident">min</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">SizeUpdate::Two</span>(<span class="ident">min</span>, <span class="kw">_</span>)) =&gt; {
                 <span class="kw">if</span> <span class="ident">val</span> <span class="op">&lt;</span> <span class="ident">min</span> {
                     <span class="self">self</span>.<span class="ident">size_update</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SizeUpdate::One</span>(<span class="ident">val</span>));
                 } <span class="kw">else</span> {
                     <span class="self">self</span>.<span class="ident">size_update</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SizeUpdate::Two</span>(<span class="ident">min</span>, <span class="ident">val</span>));
                 }
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">val</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">max_size</span>() {
                     <span class="comment">// Don&#39;t bother writing a frame if the value already matches</span>
                     <span class="comment">// the table&#39;s max size.</span>
@@ -794,7 +794,7 @@
             <span class="kw">match</span> <span class="ident">header</span>.<span class="ident">reify</span>() {
                 <span class="comment">// The header has an associated name. In which case, try to</span>
                 <span class="comment">// index it in the table.</span>
-                <span class="prelude-val">Ok</span>(<span class="ident">header</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">header</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">index</span>(<span class="ident">header</span>);
                     <span class="self">self</span>.<span class="ident">encode_header</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>, <span class="ident">dst</span>);
 
@@ -804,7 +804,7 @@
                 <span class="comment">// the name is the same as the previously yielded header. In</span>
                 <span class="comment">// which case, we skip table lookup and just use the same index</span>
                 <span class="comment">// as the previous entry.</span>
-                <span class="prelude-val">Err</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">value</span>) =&gt; {
                     <span class="self">self</span>.<span class="ident">encode_header_without_name</span>(
                         <span class="ident">last_index</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                             <span class="macro">panic!</span>(<span class="string">&quot;encoding header without name, but no previous index to use for name&quot;</span>);
@@ -819,31 +819,31 @@
 
     <span class="kw">fn</span> <span class="ident">encode_size_updates</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">size_update</span>.<span class="ident">take</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">SizeUpdate::One</span>(<span class="ident">val</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">SizeUpdate::One</span>(<span class="ident">val</span>)) =&gt; {
                 <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">resize</span>(<span class="ident">val</span>);
                 <span class="ident">encode_size_update</span>(<span class="ident">val</span>, <span class="ident">dst</span>);
             }
-            <span class="prelude-val">Some</span>(<span class="ident">SizeUpdate::Two</span>(<span class="ident">min</span>, <span class="ident">max</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">SizeUpdate::Two</span>(<span class="ident">min</span>, <span class="ident">max</span>)) =&gt; {
                 <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">resize</span>(<span class="ident">min</span>);
                 <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">resize</span>(<span class="ident">max</span>);
                 <span class="ident">encode_size_update</span>(<span class="ident">min</span>, <span class="ident">dst</span>);
                 <span class="ident">encode_size_update</span>(<span class="ident">max</span>, <span class="ident">dst</span>);
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="prelude-val">None</span> =&gt; {}
         }
     }
 
     <span class="kw">fn</span> <span class="ident">encode_header</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="ident">Index</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">index</span> {
-            <span class="ident">Index::Indexed</span>(<span class="ident">idx</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Index::Indexed</span>(<span class="ident">idx</span>, <span class="kw">_</span>) =&gt; {
                 <span class="ident">encode_int</span>(<span class="ident">idx</span>, <span class="number">7</span>, <span class="number">0x80</span>, <span class="ident">dst</span>);
             }
-            <span class="ident">Index::Name</span>(<span class="ident">idx</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Index::Name</span>(<span class="ident">idx</span>, <span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>);
 
                 <span class="ident">encode_not_indexed</span>(<span class="ident">idx</span>, <span class="ident">header</span>.<span class="ident">value_slice</span>(), <span class="ident">header</span>.<span class="ident">is_sensitive</span>(), <span class="ident">dst</span>);
             }
-            <span class="ident">Index::Inserted</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Index::Inserted</span>(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>);
 
                 <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">header</span>.<span class="ident">is_sensitive</span>());
@@ -853,7 +853,7 @@
                 <span class="ident">encode_str</span>(<span class="ident">header</span>.<span class="ident">name</span>().<span class="ident">as_slice</span>(), <span class="ident">dst</span>);
                 <span class="ident">encode_str</span>(<span class="ident">header</span>.<span class="ident">value_slice</span>(), <span class="ident">dst</span>);
             }
-            <span class="ident">Index::InsertedValue</span>(<span class="ident">idx</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Index::InsertedValue</span>(<span class="ident">idx</span>, <span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>);
 
                 <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">header</span>.<span class="ident">is_sensitive</span>());
@@ -861,7 +861,7 @@
                 <span class="ident">encode_int</span>(<span class="ident">idx</span>, <span class="number">6</span>, <span class="number">0b0100_0000</span>, <span class="ident">dst</span>);
                 <span class="ident">encode_str</span>(<span class="ident">header</span>.<span class="ident">value_slice</span>(), <span class="ident">dst</span>);
             }
-            <span class="ident">Index::NotIndexed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Index::NotIndexed</span>(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>);
 
                 <span class="ident">encode_not_indexed2</span>(
@@ -884,12 +884,12 @@
             <span class="ident">Index::Indexed</span>(..)
             <span class="op">|</span> <span class="ident">Index::Name</span>(..)
             <span class="op">|</span> <span class="ident">Index::Inserted</span>(..)
-            <span class="op">|</span> <span class="ident">Index::InsertedValue</span>(..) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="op">|</span> <span class="ident">Index::InsertedValue</span>(..) =&gt; {
                 <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">resolve_idx</span>(<span class="ident">last</span>);
 
                 <span class="ident">encode_not_indexed</span>(<span class="ident">idx</span>, <span class="ident">value</span>.<span class="ident">as_ref</span>(), <span class="ident">value</span>.<span class="ident">is_sensitive</span>(), <span class="ident">dst</span>);
             }
-            <span class="ident">Index::NotIndexed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Index::NotIndexed</span>(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">resolve</span>(<span class="ident">last</span>);
 
                 <span class="ident">encode_not_indexed2</span>(
@@ -904,7 +904,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Encoder</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Encoder</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Encoder</span> {
         <span class="ident">Encoder::new</span>(<span class="number">4096</span>, <span class="number">0</span>)
     }
 }
@@ -1009,11 +1009,11 @@
 }
 
 <span class="doccomment">/// Returns true if the in the int can be fully encoded in the first byte.</span>
-<span class="kw">fn</span> <span class="ident">encode_int_one_byte</span>(<span class="ident">value</span>: <span class="ident">usize</span>, <span class="ident">prefix_bits</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">encode_int_one_byte</span>(<span class="ident">value</span>: <span class="ident">usize</span>, <span class="ident">prefix_bits</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
     <span class="ident">value</span> <span class="op">&lt;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">prefix_bits</span>) <span class="op">-</span> <span class="number">1</span>
 }
 
-<span class="kw">fn</span> <span class="ident">position</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">position</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="ident">BytesMut</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">buf</span>.<span class="ident">len</span>()
 }
 
@@ -1415,17 +1415,17 @@
         <span class="comment">// Not sure what the best way to do this is.</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Encoder</span>, <span class="ident">hdrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BytesMut</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Encoder</span>, <span class="ident">hdrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">BytesMut</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="ident">BytesMut::with_capacity</span>(<span class="number">1024</span>);
         <span class="ident">e</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">hdrs</span>.<span class="ident">into_iter</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dst</span>);
         <span class="ident">dst</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">method</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Header</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">method</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Header</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Header::Method</span>(<span class="ident">Method::from_bytes</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">header</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Header</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">header</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Header</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">HeaderName::from_bytes</span>(<span class="ident">name</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">HeaderValue::from_bytes</span>(<span class="ident">val</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
 
@@ -1435,7 +1435,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">huff_decode</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BytesMut</span> {
+    <span class="kw">fn</span> <span class="ident">huff_decode</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">BytesMut</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
         <span class="ident">huffman::decode</span>(<span class="ident">src</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>()
     }

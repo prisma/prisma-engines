@@ -165,17 +165,17 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_connection_info</span>(
     <span class="ident">connection_info</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectionInfo</span>,
     <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SqlFlavour</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SqlFlavour</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">connection_info</span> {
-        <span class="ident">ConnectionInfo::Mysql</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::new</span>(<span class="ident">MysqlFlavour::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>(), <span class="ident">preview_features</span>)),
-        <span class="ident">ConnectionInfo::Postgres</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::new</span>(<span class="ident">PostgresFlavour::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>(), <span class="ident">preview_features</span>)),
-        <span class="ident">ConnectionInfo::Sqlite</span> { <span class="ident">file_path</span>, <span class="ident">db_name</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::new</span>(<span class="ident">SqliteFlavour</span> {
+        <span class="ident">ConnectionInfo::Mysql</span>(<span class="ident">url</span>) =&gt; <span class="ident">Box::new</span>(<span class="ident">MysqlFlavour::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>(), <span class="ident">preview_features</span>)),
+        <span class="ident">ConnectionInfo::Postgres</span>(<span class="ident">url</span>) =&gt; <span class="ident">Box::new</span>(<span class="ident">PostgresFlavour::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>(), <span class="ident">preview_features</span>)),
+        <span class="ident">ConnectionInfo::Sqlite</span> { <span class="ident">file_path</span>, <span class="ident">db_name</span> } =&gt; <span class="ident">Box::new</span>(<span class="ident">SqliteFlavour</span> {
             <span class="ident">file_path</span>: <span class="ident">file_path</span>.<span class="ident">clone</span>(),
             <span class="ident">attached_name</span>: <span class="ident">db_name</span>.<span class="ident">clone</span>(),
             <span class="ident">preview_features</span>,
         }),
-        <span class="ident">ConnectionInfo::Mssql</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::new</span>(<span class="ident">MssqlFlavour::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>(), <span class="ident">preview_features</span>)),
-        <span class="ident">ConnectionInfo::InMemorySqlite</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;SqlFlavour for in-memory SQLite&quot;</span>),
+        <span class="ident">ConnectionInfo::Mssql</span>(<span class="ident">url</span>) =&gt; <span class="ident">Box::new</span>(<span class="ident">MssqlFlavour::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>(), <span class="ident">preview_features</span>)),
+        <span class="ident">ConnectionInfo::InMemorySqlite</span> { .. } =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;SqlFlavour for in-memory SQLite&quot;</span>),
     }
 }
 
@@ -183,47 +183,47 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">SqlFlavour</span>:
     <span class="ident">DestructiveChangeCheckerFlavour</span> <span class="op">+</span> <span class="ident">SqlRenderer</span> <span class="op">+</span> <span class="ident">SqlSchemaDifferFlavour</span> <span class="op">+</span> <span class="ident">SqlSchemaCalculatorFlavour</span> <span class="op">+</span> <span class="ident">Debug</span>
 {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">acquire_lock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">acquire_lock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migration_script</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">check_database_version_compatibility</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">user_facing_errors::common::DatabaseVersionIncompatibility</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">user_facing_errors::common::DatabaseVersionIncompatibility</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 
     <span class="doccomment">/// Create a database for the given URL on the server, if applicable.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Initialize the `_prisma_migrations` table.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Drop the database for the provided URL on the server.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Drop the migrations table</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Check a connection to make sure it is usable by the migration engine.</span>
     <span class="doccomment">/// This can include some set up on the database, like ensuring that the</span>
     <span class="doccomment">/// schema we connect to exists.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Perform the initialization required by connector-test-kit-rs tests.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">qe_setup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">qe_setup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Perform teardown required by connector-test-kit-rs tests.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">qe_teardown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">qe_teardown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Drop the database and recreate it empty.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Optionally scan a migration script that could have been altered by users and emit warnings.</span>
     <span class="kw">fn</span> <span class="ident">scan_migration_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {}
@@ -235,35 +235,35 @@
         <span class="ident">migrations</span>: <span class="kw-2">&amp;</span>[<span class="ident">MigrationDirectory</span>],
         <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="ident">SqlMigrationConnector</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Runs a single SQL script.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_query_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_query_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// The preview features in use.</span>
-    <span class="kw">fn</span> <span class="ident">preview_features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">preview_features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Table to store applied migrations, the name part.</span>
-    <span class="kw">fn</span> <span class="ident">migrations_table_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">migrations_table_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;_prisma_migrations&quot;</span>
     }
 
     <span class="doccomment">/// Table to store applied migrations.</span>
-    <span class="kw">fn</span> <span class="ident">migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">migrations_table_name</span>().<span class="ident">into</span>()
     }
 }
 
 <span class="comment">// Utility function shared by multiple flavours to compare shadow database and main connection.</span>
-<span class="kw">fn</span> <span class="ident">validate_connection_infos_do_not_match</span>((<span class="ident">previous</span>, <span class="ident">next</span>): (<span class="kw-2">&amp;</span><span class="ident">ConnectionInfo</span>, <span class="kw-2">&amp;</span><span class="ident">ConnectionInfo</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">previous</span>.<span class="ident">host</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">host</span>() <span class="op">&amp;&amp;</span> <span class="ident">previous</span>.<span class="ident">dbname</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">dbname</span>() <span class="op">&amp;&amp;</span> <span class="ident">previous</span>.<span class="ident">port</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">port</span>() {
+<span class="kw">fn</span> <span class="ident">validate_connection_infos_do_not_match</span>((<span class="ident">previous</span>, <span class="ident">next</span>): (<span class="kw-2">&amp;</span><span class="ident">ConnectionInfo</span>, <span class="kw-2">&amp;</span><span class="ident">ConnectionInfo</span>)) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="ident">previous</span>.<span class="ident">host</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">host</span>() <span class="op">&amp;&amp;</span> <span class="ident">previous</span>.<span class="ident">dbname</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">dbname</span>() <span class="op">&amp;&amp;</span> <span class="ident">previous</span>.<span class="ident">port</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">port</span>() {
         <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;The shadow database you configured appears to be the same as the main database. Please specify another shadow database.&quot;</span>.<span class="ident">into</span>()))
     } <span class="kw">else</span> {
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">generic_apply_migration_script</span>(<span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">generic_apply_migration_script</span>(<span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="ident">script</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">sql_error</span><span class="op">|</span> {
         <span class="ident">ConnectorError::user_facing</span>(<span class="ident">ApplyMigrationError</span> {
             <span class="ident">migration_name</span>: <span class="ident">migration_name</span>.<span class="ident">to_owned</span>(),

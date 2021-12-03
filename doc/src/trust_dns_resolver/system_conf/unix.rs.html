@@ -217,18 +217,18 @@
 
 <span class="kw">const</span> <span class="ident">DEFAULT_PORT</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">53</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_system_conf</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">ResolverConfig</span>, <span class="ident">ResolverOpts</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_system_conf</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">ResolverConfig</span>, <span class="ident">ResolverOpts</span>)<span class="op">&gt;</span> {
     <span class="ident">read_resolv_conf</span>(<span class="string">&quot;/etc/resolv.conf&quot;</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">read_resolv_conf</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">ResolverConfig</span>, <span class="ident">ResolverOpts</span>)<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">read_resolv_conf</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">ResolverConfig</span>, <span class="ident">ResolverOpts</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
     <span class="ident">file</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>)<span class="question-mark">?</span>;
     <span class="ident">parse_resolv_conf</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">parse_resolv_conf</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">ResolverConfig</span>, <span class="ident">ResolverOpts</span>)<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_resolv_conf</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="ident">T</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">ResolverConfig</span>, <span class="ident">ResolverOpts</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">parsed_conf</span> <span class="op">=</span> <span class="ident">resolv_conf::Config::parse</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
         <span class="ident">io::Error::new</span>(
             <span class="ident">io::ErrorKind::Other</span>,
@@ -241,7 +241,7 @@
 <span class="comment">// TODO: use a custom parsing error type maybe?</span>
 <span class="kw">fn</span> <span class="ident">into_resolver_config</span>(
     <span class="ident">parsed_config</span>: <span class="ident">resolv_conf::Config</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">ResolverConfig</span>, <span class="ident">ResolverOpts</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">ResolverConfig</span>, <span class="ident">ResolverOpts</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">domain</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">domain</span>) <span class="op">=</span> <span class="ident">parsed_config</span>.<span class="ident">get_system_domain</span>() {
         <span class="prelude-val">Some</span>(<span class="ident">Name::from_str</span>(<span class="ident">domain</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>)
     } <span class="kw">else</span> {
@@ -303,11 +303,11 @@
     <span class="kw">use</span> <span class="ident">std::net</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
-    <span class="kw">fn</span> <span class="ident">empty_config</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolverConfig</span> {
+    <span class="kw">fn</span> <span class="ident">empty_config</span>() -&gt; <span class="ident">ResolverConfig</span> {
         <span class="ident">ResolverConfig::from_parts</span>(<span class="prelude-val">None</span>, <span class="macro">vec!</span>[], <span class="macro">vec!</span>[])
     }
 
-    <span class="kw">fn</span> <span class="ident">nameserver_config</span>(<span class="ident">ip</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">NameServerConfig</span>; <span class="number">2</span>] {
+    <span class="kw">fn</span> <span class="ident">nameserver_config</span>(<span class="ident">ip</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; [<span class="ident">NameServerConfig</span>; <span class="number">2</span>] {
         <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">SocketAddr::new</span>(<span class="ident">IpAddr::from_str</span>(<span class="ident">ip</span>).<span class="ident">unwrap</span>(), <span class="number">53</span>);
         [
             <span class="ident">NameServerConfig</span> {
@@ -329,7 +329,7 @@
         ]
     }
 
-    <span class="kw">fn</span> <span class="ident">tests_dir</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">tests_dir</span>() -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">server_path</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="string">&quot;TDNS_WORKSPACE_ROOT&quot;</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;../..&quot;</span>.<span class="ident">to_owned</span>());
         <span class="macro">format!</span>(<span class="string">&quot;{}/crates/resolver/tests&quot;</span>, <span class="ident">server_path</span>)
     }

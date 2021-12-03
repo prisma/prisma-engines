@@ -151,18 +151,18 @@
 <span class="doccomment">/// This trait is sealed and cannot be implemented outside of `http-types`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Status</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>: <span class="ident">private::Sealed</span> {
     <span class="doccomment">/// Wrap the error value with an additional status code.</span>
-    <span class="kw">fn</span> <span class="ident">status</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">status</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">status</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">status</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span>,
         <span class="ident">S::Error</span>: <span class="ident">Debug</span>;
 
     <span class="doccomment">/// Wrap the error value with an additional status code that is evaluated</span>
     <span class="doccomment">/// lazily only once an error does occur.</span>
-    <span class="kw">fn</span> <span class="ident">with_status</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">with_status</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span>,
         <span class="ident">S::Error</span>: <span class="ident">Debug</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">S</span>;
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">S</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Status</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>
@@ -177,7 +177,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [status]: crate::Status</span>
     <span class="doccomment">/// [statuscode]: crate::StatusCode</span>
-    <span class="kw">fn</span> <span class="ident">status</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">status</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">status</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">status</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span>,
         <span class="ident">S::Error</span>: <span class="ident">Debug</span>,
@@ -199,11 +199,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [status]: crate::Status</span>
     <span class="doccomment">/// [statuscode]: crate::StatusCode</span>
-    <span class="kw">fn</span> <span class="ident">with_status</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">with_status</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span>,
         <span class="ident">S::Error</span>: <span class="ident">Debug</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">S</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">S</span>,
     {
         <span class="self">self</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">f</span>()
@@ -223,7 +223,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [status]: crate::Status</span>
     <span class="doccomment">/// [statuscode]: crate::StatusCode</span>
-    <span class="kw">fn</span> <span class="ident">status</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">status</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">status</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">status</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span>,
         <span class="ident">S::Error</span>: <span class="ident">Debug</span>,
@@ -245,11 +245,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [status]: crate::Status</span>
     <span class="doccomment">/// [statuscode]: crate::StatusCode</span>
-    <span class="kw">fn</span> <span class="ident">with_status</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">with_status</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span>,
         <span class="ident">S::Error</span>: <span class="ident">Debug</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">S</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">S</span>,
     {
         <span class="self">self</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">f</span>()

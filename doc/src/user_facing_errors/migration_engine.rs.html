@@ -349,14 +349,14 @@
 <span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::UserFacingError</span> <span class="kw">for</span> <span class="ident">MigrationDoesNotApplyCleanly</span> {
     <span class="kw">const</span> <span class="ident">ERROR_CODE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;P3006&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">error_code</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner_error</span>.<span class="ident">inner</span> {
             <span class="ident"><span class="kw">crate</span>::ErrorType::Known</span>(<span class="ident"><span class="kw">crate</span>::KnownError</span> {
                 <span class="ident">message</span>: <span class="kw">_</span>,
                 <span class="ident">meta</span>: <span class="kw">_</span>,
                 <span class="ident">error_code</span>,
-            }) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;Error code: {}\n&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">error_code</span>),
-            <span class="ident"><span class="kw">crate</span>::ErrorType::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::new</span>(),
+            }) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Error code: {}\n&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">error_code</span>),
+            <span class="ident"><span class="kw">crate</span>::ErrorType::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::new</span>(),
         };
 
         <span class="macro">format!</span>(
@@ -376,7 +376,7 @@
 <span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::UserFacingError</span> <span class="kw">for</span> <span class="ident">PreviewFeaturesBlocked</span> {
     <span class="kw">const</span> <span class="ident">ERROR_CODE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;P3007&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">blocked</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">features</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">s</span>)).<span class="ident">collect</span>();
 
         <span class="macro">format!</span>(
@@ -448,14 +448,14 @@
 <span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::UserFacingError</span> <span class="kw">for</span> <span class="ident">ShadowDbCreationError</span> {
     <span class="kw">const</span> <span class="ident">ERROR_CODE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;P3014&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">error_code</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner_error</span>.<span class="ident">inner</span> {
             <span class="ident"><span class="kw">crate</span>::ErrorType::Known</span>(<span class="ident"><span class="kw">crate</span>::KnownError</span> {
                 <span class="ident">message</span>: <span class="kw">_</span>,
                 <span class="ident">meta</span>: <span class="kw">_</span>,
                 <span class="ident">error_code</span>,
-            }) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;Error code: {}\n&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">error_code</span>),
-            <span class="ident"><span class="kw">crate</span>::ErrorType::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::new</span>(),
+            }) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Error code: {}\n&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">error_code</span>),
+            <span class="ident"><span class="kw">crate</span>::ErrorType::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::new</span>(),
         };
 
         <span class="macro">format!</span>(
@@ -483,14 +483,14 @@
 <span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::UserFacingError</span> <span class="kw">for</span> <span class="ident">SoftResetFailed</span> {
     <span class="kw">const</span> <span class="ident">ERROR_CODE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;P3016&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">error_code</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner_error</span>.<span class="ident">inner</span> {
             <span class="ident"><span class="kw">crate</span>::ErrorType::Known</span>(<span class="ident"><span class="kw">crate</span>::KnownError</span> {
                 <span class="ident">message</span>: <span class="kw">_</span>,
                 <span class="ident">meta</span>: <span class="kw">_</span>,
                 <span class="ident">error_code</span>,
-            }) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;Error code: {}\n&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">error_code</span>),
-            <span class="ident"><span class="kw">crate</span>::ErrorType::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::new</span>(),
+            }) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Error code: {}\n&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">error_code</span>),
+            <span class="ident"><span class="kw">crate</span>::ErrorType::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::new</span>(),
         };
 
         <span class="macro">format!</span>(

@@ -417,12 +417,12 @@
 
 <span class="kw">impl</span> <span class="ident">Column</span> {
     <span class="doccomment">/// The name of the column.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
     }
 
     <span class="doccomment">/// The type of the column.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnType</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnType</span> {
         <span class="self">self</span>.<span class="ident">column_type</span>
     }
 }
@@ -503,83 +503,83 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">TypeInfo</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ColumnType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ti</span>: <span class="kw-2">&amp;</span><span class="ident">TypeInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ti</span>: <span class="kw-2">&amp;</span><span class="ident">TypeInfo</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">ti</span> {
-            <span class="ident">TypeInfo::FixedLen</span>(<span class="ident">flt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">flt</span> {
-                <span class="ident">FixedLenType::Int1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Int1</span>,
-                <span class="ident">FixedLenType::Bit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Bit</span>,
-                <span class="ident">FixedLenType::Int2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Int2</span>,
-                <span class="ident">FixedLenType::Int4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Int4</span>,
-                <span class="ident">FixedLenType::Datetime4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Datetime4</span>,
-                <span class="ident">FixedLenType::Float4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Float4</span>,
-                <span class="ident">FixedLenType::Money</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Money</span>,
-                <span class="ident">FixedLenType::Datetime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Datetime</span>,
-                <span class="ident">FixedLenType::Float8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Float8</span>,
-                <span class="ident">FixedLenType::Money4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Money4</span>,
-                <span class="ident">FixedLenType::Int8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Int8</span>,
-                <span class="ident">FixedLenType::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Null</span>,
+            <span class="ident">TypeInfo::FixedLen</span>(<span class="ident">flt</span>) =&gt; <span class="kw">match</span> <span class="ident">flt</span> {
+                <span class="ident">FixedLenType::Int1</span> =&gt; <span class="ident"><span class="self">Self</span>::Int1</span>,
+                <span class="ident">FixedLenType::Bit</span> =&gt; <span class="ident"><span class="self">Self</span>::Bit</span>,
+                <span class="ident">FixedLenType::Int2</span> =&gt; <span class="ident"><span class="self">Self</span>::Int2</span>,
+                <span class="ident">FixedLenType::Int4</span> =&gt; <span class="ident"><span class="self">Self</span>::Int4</span>,
+                <span class="ident">FixedLenType::Datetime4</span> =&gt; <span class="ident"><span class="self">Self</span>::Datetime4</span>,
+                <span class="ident">FixedLenType::Float4</span> =&gt; <span class="ident"><span class="self">Self</span>::Float4</span>,
+                <span class="ident">FixedLenType::Money</span> =&gt; <span class="ident"><span class="self">Self</span>::Money</span>,
+                <span class="ident">FixedLenType::Datetime</span> =&gt; <span class="ident"><span class="self">Self</span>::Datetime</span>,
+                <span class="ident">FixedLenType::Float8</span> =&gt; <span class="ident"><span class="self">Self</span>::Float8</span>,
+                <span class="ident">FixedLenType::Money4</span> =&gt; <span class="ident"><span class="self">Self</span>::Money4</span>,
+                <span class="ident">FixedLenType::Int8</span> =&gt; <span class="ident"><span class="self">Self</span>::Int8</span>,
+                <span class="ident">FixedLenType::Null</span> =&gt; <span class="ident"><span class="self">Self</span>::Null</span>,
             },
-            <span class="ident">TypeInfo::VarLenSized</span>(<span class="ident">cx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">cx</span>.<span class="ident">r#type</span>() {
-                <span class="ident">VarLenType::Guid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Guid</span>,
-                <span class="ident">VarLenType::Intn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Intn</span>,
-                <span class="ident">VarLenType::Bitn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Bitn</span>,
-                <span class="ident">VarLenType::Decimaln</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Decimaln</span>,
-                <span class="ident">VarLenType::Numericn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Numericn</span>,
-                <span class="ident">VarLenType::Floatn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Floatn</span>,
-                <span class="ident">VarLenType::Money</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Money</span>,
-                <span class="ident">VarLenType::Datetimen</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Datetimen</span>,
+            <span class="ident">TypeInfo::VarLenSized</span>(<span class="ident">cx</span>) =&gt; <span class="kw">match</span> <span class="ident">cx</span>.<span class="ident">r#type</span>() {
+                <span class="ident">VarLenType::Guid</span> =&gt; <span class="ident"><span class="self">Self</span>::Guid</span>,
+                <span class="ident">VarLenType::Intn</span> =&gt; <span class="ident"><span class="self">Self</span>::Intn</span>,
+                <span class="ident">VarLenType::Bitn</span> =&gt; <span class="ident"><span class="self">Self</span>::Bitn</span>,
+                <span class="ident">VarLenType::Decimaln</span> =&gt; <span class="ident"><span class="self">Self</span>::Decimaln</span>,
+                <span class="ident">VarLenType::Numericn</span> =&gt; <span class="ident"><span class="self">Self</span>::Numericn</span>,
+                <span class="ident">VarLenType::Floatn</span> =&gt; <span class="ident"><span class="self">Self</span>::Floatn</span>,
+                <span class="ident">VarLenType::Money</span> =&gt; <span class="ident"><span class="self">Self</span>::Money</span>,
+                <span class="ident">VarLenType::Datetimen</span> =&gt; <span class="ident"><span class="self">Self</span>::Datetimen</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::Daten</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Daten</span>,
+                <span class="ident">VarLenType::Daten</span> =&gt; <span class="ident"><span class="self">Self</span>::Daten</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::Timen</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Timen</span>,
+                <span class="ident">VarLenType::Timen</span> =&gt; <span class="ident"><span class="self">Self</span>::Timen</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::Datetime2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Datetime2</span>,
+                <span class="ident">VarLenType::Datetime2</span> =&gt; <span class="ident"><span class="self">Self</span>::Datetime2</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::DatetimeOffsetn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::DatetimeOffsetn</span>,
-                <span class="ident">VarLenType::BigVarBin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::BigVarBin</span>,
-                <span class="ident">VarLenType::BigVarChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::BigVarChar</span>,
-                <span class="ident">VarLenType::BigBinary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::BigBinary</span>,
-                <span class="ident">VarLenType::BigChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::BigChar</span>,
-                <span class="ident">VarLenType::NVarchar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NVarchar</span>,
-                <span class="ident">VarLenType::NChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NChar</span>,
-                <span class="ident">VarLenType::Xml</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Xml</span>,
-                <span class="ident">VarLenType::Udt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Udt</span>,
-                <span class="ident">VarLenType::Text</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Text</span>,
-                <span class="ident">VarLenType::Image</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Image</span>,
-                <span class="ident">VarLenType::NText</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NText</span>,
-                <span class="ident">VarLenType::SSVariant</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::SSVariant</span>,
+                <span class="ident">VarLenType::DatetimeOffsetn</span> =&gt; <span class="ident"><span class="self">Self</span>::DatetimeOffsetn</span>,
+                <span class="ident">VarLenType::BigVarBin</span> =&gt; <span class="ident"><span class="self">Self</span>::BigVarBin</span>,
+                <span class="ident">VarLenType::BigVarChar</span> =&gt; <span class="ident"><span class="self">Self</span>::BigVarChar</span>,
+                <span class="ident">VarLenType::BigBinary</span> =&gt; <span class="ident"><span class="self">Self</span>::BigBinary</span>,
+                <span class="ident">VarLenType::BigChar</span> =&gt; <span class="ident"><span class="self">Self</span>::BigChar</span>,
+                <span class="ident">VarLenType::NVarchar</span> =&gt; <span class="ident"><span class="self">Self</span>::NVarchar</span>,
+                <span class="ident">VarLenType::NChar</span> =&gt; <span class="ident"><span class="self">Self</span>::NChar</span>,
+                <span class="ident">VarLenType::Xml</span> =&gt; <span class="ident"><span class="self">Self</span>::Xml</span>,
+                <span class="ident">VarLenType::Udt</span> =&gt; <span class="ident"><span class="self">Self</span>::Udt</span>,
+                <span class="ident">VarLenType::Text</span> =&gt; <span class="ident"><span class="self">Self</span>::Text</span>,
+                <span class="ident">VarLenType::Image</span> =&gt; <span class="ident"><span class="self">Self</span>::Image</span>,
+                <span class="ident">VarLenType::NText</span> =&gt; <span class="ident"><span class="self">Self</span>::NText</span>,
+                <span class="ident">VarLenType::SSVariant</span> =&gt; <span class="ident"><span class="self">Self</span>::SSVariant</span>,
             },
-            <span class="ident">TypeInfo::VarLenSizedPrecision</span> { <span class="ident">ty</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">ty</span> {
-                <span class="ident">VarLenType::Guid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Guid</span>,
-                <span class="ident">VarLenType::Intn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Intn</span>,
-                <span class="ident">VarLenType::Bitn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Bitn</span>,
-                <span class="ident">VarLenType::Decimaln</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Decimaln</span>,
-                <span class="ident">VarLenType::Numericn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Numericn</span>,
-                <span class="ident">VarLenType::Floatn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Floatn</span>,
-                <span class="ident">VarLenType::Money</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Money</span>,
-                <span class="ident">VarLenType::Datetimen</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Datetimen</span>,
+            <span class="ident">TypeInfo::VarLenSizedPrecision</span> { <span class="ident">ty</span>, .. } =&gt; <span class="kw">match</span> <span class="ident">ty</span> {
+                <span class="ident">VarLenType::Guid</span> =&gt; <span class="ident"><span class="self">Self</span>::Guid</span>,
+                <span class="ident">VarLenType::Intn</span> =&gt; <span class="ident"><span class="self">Self</span>::Intn</span>,
+                <span class="ident">VarLenType::Bitn</span> =&gt; <span class="ident"><span class="self">Self</span>::Bitn</span>,
+                <span class="ident">VarLenType::Decimaln</span> =&gt; <span class="ident"><span class="self">Self</span>::Decimaln</span>,
+                <span class="ident">VarLenType::Numericn</span> =&gt; <span class="ident"><span class="self">Self</span>::Numericn</span>,
+                <span class="ident">VarLenType::Floatn</span> =&gt; <span class="ident"><span class="self">Self</span>::Floatn</span>,
+                <span class="ident">VarLenType::Money</span> =&gt; <span class="ident"><span class="self">Self</span>::Money</span>,
+                <span class="ident">VarLenType::Datetimen</span> =&gt; <span class="ident"><span class="self">Self</span>::Datetimen</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::Daten</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Daten</span>,
+                <span class="ident">VarLenType::Daten</span> =&gt; <span class="ident"><span class="self">Self</span>::Daten</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::Timen</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Timen</span>,
+                <span class="ident">VarLenType::Timen</span> =&gt; <span class="ident"><span class="self">Self</span>::Timen</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::Datetime2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Datetime2</span>,
+                <span class="ident">VarLenType::Datetime2</span> =&gt; <span class="ident"><span class="self">Self</span>::Datetime2</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::DatetimeOffsetn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::DatetimeOffsetn</span>,
-                <span class="ident">VarLenType::BigVarBin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::BigVarBin</span>,
-                <span class="ident">VarLenType::BigVarChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::BigVarChar</span>,
-                <span class="ident">VarLenType::BigBinary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::BigBinary</span>,
-                <span class="ident">VarLenType::BigChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::BigChar</span>,
-                <span class="ident">VarLenType::NVarchar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NVarchar</span>,
-                <span class="ident">VarLenType::NChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NChar</span>,
-                <span class="ident">VarLenType::Xml</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Xml</span>,
-                <span class="ident">VarLenType::Udt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Udt</span>,
-                <span class="ident">VarLenType::Text</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Text</span>,
-                <span class="ident">VarLenType::Image</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Image</span>,
-                <span class="ident">VarLenType::NText</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NText</span>,
-                <span class="ident">VarLenType::SSVariant</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::SSVariant</span>,
+                <span class="ident">VarLenType::DatetimeOffsetn</span> =&gt; <span class="ident"><span class="self">Self</span>::DatetimeOffsetn</span>,
+                <span class="ident">VarLenType::BigVarBin</span> =&gt; <span class="ident"><span class="self">Self</span>::BigVarBin</span>,
+                <span class="ident">VarLenType::BigVarChar</span> =&gt; <span class="ident"><span class="self">Self</span>::BigVarChar</span>,
+                <span class="ident">VarLenType::BigBinary</span> =&gt; <span class="ident"><span class="self">Self</span>::BigBinary</span>,
+                <span class="ident">VarLenType::BigChar</span> =&gt; <span class="ident"><span class="self">Self</span>::BigChar</span>,
+                <span class="ident">VarLenType::NVarchar</span> =&gt; <span class="ident"><span class="self">Self</span>::NVarchar</span>,
+                <span class="ident">VarLenType::NChar</span> =&gt; <span class="ident"><span class="self">Self</span>::NChar</span>,
+                <span class="ident">VarLenType::Xml</span> =&gt; <span class="ident"><span class="self">Self</span>::Xml</span>,
+                <span class="ident">VarLenType::Udt</span> =&gt; <span class="ident"><span class="self">Self</span>::Udt</span>,
+                <span class="ident">VarLenType::Text</span> =&gt; <span class="ident"><span class="self">Self</span>::Text</span>,
+                <span class="ident">VarLenType::Image</span> =&gt; <span class="ident"><span class="self">Self</span>::Image</span>,
+                <span class="ident">VarLenType::NText</span> =&gt; <span class="ident"><span class="self">Self</span>::NText</span>,
+                <span class="ident">VarLenType::SSVariant</span> =&gt; <span class="ident"><span class="self">Self</span>::SSVariant</span>,
             },
-            <span class="ident">TypeInfo::Xml</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Xml</span>,
+            <span class="ident">TypeInfo::Xml</span> { .. } =&gt; <span class="ident"><span class="self">Self</span>::Xml</span>,
         }
     }
 }
@@ -644,18 +644,18 @@
 <span class="kw">where</span>
     <span class="self">Self</span>: <span class="ident">Display</span>,
 {
-    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">Row</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">Row</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">QueryIdx</span> <span class="kw">for</span> <span class="ident">usize</span> {
-    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_row</span>: <span class="kw-2">&amp;</span><span class="ident">Row</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_row</span>: <span class="kw-2">&amp;</span><span class="ident">Row</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="self">self</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">QueryIdx</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">Row</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="ident">row</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>)
+    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">Row</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="ident">row</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="kw-2">*</span><span class="self">self</span>)
     }
 }
 
@@ -690,13 +690,13 @@
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">Column</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Column</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">columns</span>
     }
 
     <span class="doccomment">/// The result set number, starting from zero and increasing if the stream</span>
     <span class="doccomment">/// has results from more than one query.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">result_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">result_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">result_index</span>
     }
 
@@ -729,7 +729,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::len_without_is_empty</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>()
     }
 
@@ -772,7 +772,7 @@
     <span class="doccomment">/// Use [`try_get`] for a non-panicking version of the function.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`try_get`]: #method.try_get</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">I</span>: <span class="ident">QueryIdx</span>,
@@ -781,7 +781,7 @@
     }
 
     <span class="doccomment">/// Retrieve a column&#39;s value for a given column index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_get</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_get</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">I</span>: <span class="ident">QueryIdx</span>,
@@ -800,7 +800,7 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">std::vec::IntoIter</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">into_iter</span>()
     }
 }

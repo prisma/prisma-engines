@@ -461,7 +461,7 @@
 <span class="doccomment">/// assert!(char(&#39;A&#39;).parse(&quot;!&quot;).is_err());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">char</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Token</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">char</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">Token</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
@@ -480,7 +480,7 @@
     <span class="doccomment">/// assert_eq!(digit().parse(&quot;9&quot;), Ok((&#39;9&#39;, &quot;&quot;)));</span>
     <span class="doccomment">/// assert!(digit().parse(&quot;A&quot;).is_err());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digit</span>[<span class="ident">I</span>]()(<span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digit</span>[<span class="ident">I</span>]()(<span class="ident">I</span>) -&gt; <span class="ident">char</span>
     <span class="kw">where</span>
         [<span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,]
     {
@@ -488,7 +488,7 @@
     }
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Space</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser!</span> { <span class="ident">Space</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
 
 <span class="doccomment">/// Parse a single whitespace according to [`std::char::is_whitespace`].</span>
 <span class="doccomment">///</span>
@@ -505,12 +505,12 @@
 <span class="doccomment">/// assert!(space().parse(&quot;&quot;).is_err());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">space</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Space</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">space</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Space</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
 {
-    <span class="kw">let</span> <span class="ident">f</span>: <span class="kw">fn</span>(<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">=</span> <span class="ident">char::is_whitespace</span>;
+    <span class="kw">let</span> <span class="ident">f</span>: <span class="kw">fn</span>(<span class="ident">char</span>) -&gt; <span class="ident">bool</span> <span class="op">=</span> <span class="ident">char::is_whitespace</span>;
     <span class="ident">Space</span>(<span class="ident">satisfy</span>(<span class="ident">f</span>).<span class="ident">expected</span>(<span class="string">&quot;whitespace&quot;</span>), <span class="ident">PhantomData</span>)
 }
 
@@ -529,7 +529,7 @@
 <span class="doccomment">/// assert_eq!(spaces().parse(&quot;   &quot;), Ok(((), &quot;&quot;)));</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spaces</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Spaces</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spaces</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Spaces</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
@@ -537,7 +537,7 @@
     <span class="ident">Spaces</span>(<span class="ident">skip_many</span>(<span class="ident">space</span>()).<span class="ident">expected</span>(<span class="string">&quot;whitespaces&quot;</span>), <span class="ident">PhantomData</span>)
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Newline</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser!</span> { <span class="ident">Newline</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
 
 <span class="doccomment">/// Parses a newline character (`&#39;\n&#39;`).</span>
 <span class="doccomment">///</span>
@@ -548,18 +548,18 @@
 <span class="doccomment">/// assert!(newline().parse(&quot;\r&quot;).is_err());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">newline</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Newline</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">newline</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Newline</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
 {
     <span class="ident">Newline</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="ident">ch</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\n&#39;</span> })).<span class="ident">expected</span>(<span class="string">&quot;lf newline&quot;</span>),
+        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span> <span class="op">==</span> <span class="string">&#39;\n&#39;</span> })).<span class="ident">expected</span>(<span class="string">&quot;lf newline&quot;</span>),
         <span class="ident">PhantomData</span>,
     )
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">CrLf</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">With</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">Newline</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser!</span> { <span class="ident">CrLf</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">With</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">Newline</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> }
 
 <span class="doccomment">/// Parses carriage return and newline (`&quot;\r\n&quot;`), returning the newline character.</span>
 <span class="doccomment">///</span>
@@ -571,20 +571,20 @@
 <span class="doccomment">/// assert!(crlf().parse(&quot;\n&quot;).is_err());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crlf</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CrLf</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crlf</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">CrLf</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
 {
     <span class="ident">CrLf</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="ident">ch</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\r&#39;</span> }))
+        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span> <span class="op">==</span> <span class="string">&#39;\r&#39;</span> }))
             .<span class="ident">with</span>(<span class="ident">newline</span>())
             .<span class="ident">expected</span>(<span class="string">&quot;crlf newline&quot;</span>),
         <span class="ident">PhantomData</span>,
     )
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Tab</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser!</span> { <span class="ident">Tab</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
 
 <span class="doccomment">/// Parses a tab character (`&#39;\t&#39;`).</span>
 <span class="doccomment">///</span>
@@ -595,18 +595,18 @@
 <span class="doccomment">/// assert!(tab().parse(&quot; &quot;).is_err());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tab</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Tab</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tab</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Tab</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
 {
     <span class="ident">Tab</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="ident">ch</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\t&#39;</span> })).<span class="ident">expected</span>(<span class="string">&quot;tab&quot;</span>),
+        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span> <span class="op">==</span> <span class="string">&#39;\t&#39;</span> })).<span class="ident">expected</span>(<span class="string">&quot;tab&quot;</span>),
         <span class="ident">PhantomData</span>,
     )
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Upper</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser!</span> { <span class="ident">Upper</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
 
 <span class="doccomment">/// Parses an uppercase letter according to [`std::char::is_uppercase`].</span>
 <span class="doccomment">///</span>
@@ -619,18 +619,18 @@
 <span class="doccomment">/// assert!(upper().parse(&quot;a&quot;).is_err());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upper</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Upper</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upper</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Upper</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
 {
     <span class="ident">Upper</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="ident">ch</span>.<span class="ident">is_uppercase</span>()})).<span class="ident">expected</span>(<span class="string">&quot;uppercase letter&quot;</span>),
+        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span>.<span class="ident">is_uppercase</span>()})).<span class="ident">expected</span>(<span class="string">&quot;uppercase letter&quot;</span>),
         <span class="ident">PhantomData</span>,
     )
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Lower</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser!</span> { <span class="ident">Lower</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
 
 <span class="doccomment">/// Parses an lowercase letter according to [`std::char::is_lowercase`].</span>
 <span class="doccomment">///</span>
@@ -643,18 +643,18 @@
 <span class="doccomment">/// assert!(lower().parse(&quot;A&quot;).is_err());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lower</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Lower</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lower</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Lower</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
 {
     <span class="ident">Lower</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="ident">ch</span>.<span class="ident">is_lowercase</span>() })).<span class="ident">expected</span>(<span class="string">&quot;lowercase letter&quot;</span>),
+        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span>.<span class="ident">is_lowercase</span>() })).<span class="ident">expected</span>(<span class="string">&quot;lowercase letter&quot;</span>),
         <span class="ident">PhantomData</span>,
     )
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">AlphaNum</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser!</span> { <span class="ident">AlphaNum</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
 
 <span class="doccomment">/// Parses either an alphabet letter or digit according to [`std::char::is_alphanumeric`].</span>
 <span class="doccomment">///</span>
@@ -668,19 +668,19 @@
 <span class="doccomment">/// assert!(alpha_num().parse(&quot;!&quot;).is_err());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alpha_num</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AlphaNum</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alpha_num</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">AlphaNum</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
 {
     <span class="ident">AlphaNum</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="ident">ch</span>.<span class="ident">is_alphanumeric</span>() }))
+        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span>.<span class="ident">is_alphanumeric</span>() }))
             .<span class="ident">expected</span>(<span class="string">&quot;letter or digit&quot;</span>),
         <span class="ident">PhantomData</span>,
     )
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Letter</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser!</span> { <span class="ident">Letter</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
 
 <span class="doccomment">/// Parses an alphabet letter according to [`std::char::is_alphabetic`].</span>
 <span class="doccomment">///</span>
@@ -694,18 +694,18 @@
 <span class="doccomment">/// assert!(letter().parse(&quot;9&quot;).is_err());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">letter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Letter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">letter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Letter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
 {
     <span class="ident">Letter</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="ident">ch</span>.<span class="ident">is_alphabetic</span>() })).<span class="ident">expected</span>(<span class="string">&quot;letter&quot;</span>),
+        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span>.<span class="ident">is_alphabetic</span>() })).<span class="ident">expected</span>(<span class="string">&quot;letter&quot;</span>),
         <span class="ident">PhantomData</span>,
     )
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">OctDigit</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser!</span> { <span class="ident">OctDigit</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
 
 <span class="doccomment">/// Parses an octal digit.</span>
 <span class="doccomment">///</span>
@@ -716,18 +716,18 @@
 <span class="doccomment">/// assert!(oct_digit().parse(&quot;8&quot;).is_err());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">oct_digit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OctDigit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">oct_digit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">OctDigit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
 {
     <span class="ident">OctDigit</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="ident">ch</span>.<span class="ident">is_digit</span>(<span class="number">8</span>) })).<span class="ident">expected</span>(<span class="string">&quot;octal digit&quot;</span>),
+        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span>.<span class="ident">is_digit</span>(<span class="number">8</span>) })).<span class="ident">expected</span>(<span class="string">&quot;octal digit&quot;</span>),
         <span class="ident">PhantomData</span>,
     )
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">HexDigit</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser!</span> { <span class="ident">HexDigit</span>(), <span class="ident">char</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">char</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
 
 <span class="doccomment">/// Parses a hexdecimal digit with uppercase and lowercase.</span>
 <span class="doccomment">///</span>
@@ -738,23 +738,23 @@
 <span class="doccomment">/// assert!(hex_digit().parse(&quot;H&quot;).is_err());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hex_digit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HexDigit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hex_digit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">HexDigit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
 {
     <span class="ident">HexDigit</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="ident">ch</span>.<span class="ident">is_digit</span>(<span class="number">0x10</span>) })).<span class="ident">expected</span>(<span class="string">&quot;hexadecimal digit&quot;</span>),
+        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">char</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span>.<span class="ident">is_digit</span>(<span class="number">0x10</span>) })).<span class="ident">expected</span>(<span class="string">&quot;hexadecimal digit&quot;</span>),
         <span class="ident">PhantomData</span>,
     )
 }
 
-<span class="kw">fn</span> <span class="ident">eq</span>(<span class="ident">l</span>: <span class="ident">char</span>, <span class="ident">r</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">l</span> <span class="op">=</span><span class="op">=</span> <span class="ident">r</span>
+<span class="kw">fn</span> <span class="ident">eq</span>(<span class="ident">l</span>: <span class="ident">char</span>, <span class="ident">r</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">l</span> <span class="op">==</span> <span class="ident">r</span>
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Str</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">I</span><span class="op">&gt;</span>)
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Str</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>)
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>;
@@ -768,7 +768,7 @@
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="ident">tokens</span>(<span class="ident">eq</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>(), <span class="self">self</span>.<span class="number">0</span>.<span class="ident">chars</span>())
             .<span class="ident">parse_lazy</span>(<span class="ident">input</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="number">0</span>)
@@ -792,7 +792,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Str</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">Str</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
@@ -801,13 +801,13 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StrCmp</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">C</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">I</span><span class="op">&gt;</span>)
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StrCmp</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">C</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>)
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>;
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">StrCmp</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">char</span>, <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">char</span>, <span class="ident">char</span>) -&gt; <span class="ident">bool</span>,
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
 {
@@ -816,7 +816,7 @@
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="ident">tokens</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">1</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>(), <span class="self">self</span>.<span class="number">0</span>.<span class="ident">chars</span>())
             .<span class="ident">parse_lazy</span>(<span class="ident">input</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="number">0</span>)
@@ -841,9 +841,9 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string_cmp</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">cmp</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StrCmp</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string_cmp</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">cmp</span>: <span class="ident">C</span>) -&gt; <span class="ident">StrCmp</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">char</span>, <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">char</span>, <span class="ident">char</span>) -&gt; <span class="ident">bool</span>,
     <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
 {

@@ -644,7 +644,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">BlockContext</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">state</span>: <span class="ident">algorithm</span>.<span class="ident">initial_state</span>,
             <span class="ident">completed_data_blocks</span>: <span class="number">0</span>,
@@ -668,7 +668,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pending</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">num_pending</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Digest</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pending</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">num_pending</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Digest</span> {
         <span class="kw">let</span> <span class="ident">block_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">block_len</span>;
         <span class="macro">assert_eq!</span>(<span class="ident">pending</span>.<span class="ident">len</span>(), <span class="ident">block_len</span>);
         <span class="macro">assert!</span>(<span class="ident">num_pending</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">pending</span>.<span class="ident">len</span>());
@@ -738,7 +738,7 @@
 
 <span class="kw">impl</span> <span class="ident">Context</span> {
     <span class="doccomment">/// Constructs a new context.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">block</span>: <span class="ident">BlockContext::new</span>(<span class="ident">algorithm</span>),
             <span class="ident">pending</span>: [<span class="number">0u8</span>; <span class="ident">MAX_BLOCK_LEN</span>],
@@ -746,7 +746,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clone_from</span>(<span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="ident">BlockContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clone_from</span>(<span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="ident">BlockContext</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">block</span>: <span class="ident">block</span>.<span class="ident">clone</span>(),
             <span class="ident">pending</span>: [<span class="number">0u8</span>; <span class="ident">MAX_BLOCK_LEN</span>],
@@ -787,7 +787,7 @@
     <span class="doccomment">/// Finalizes the digest calculation and returns the digest value. `finish`</span>
     <span class="doccomment">/// consumes the context so it cannot be (mis-)used after `finish` has been</span>
     <span class="doccomment">/// called.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Digest</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Digest</span> {
         <span class="kw">let</span> <span class="ident">block_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">block</span>.<span class="ident">algorithm</span>.<span class="ident">block_len</span>;
         <span class="self">self</span>.<span class="ident">block</span>
             .<span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">pending</span>[..<span class="ident">block_len</span>], <span class="self">self</span>.<span class="ident">num_pending</span>)
@@ -795,7 +795,7 @@
 
     <span class="doccomment">/// The algorithm that this context is using.</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
         <span class="self">self</span>.<span class="ident">block</span>.<span class="ident">algorithm</span>
     }
 }
@@ -815,7 +815,7 @@
 <span class="doccomment">/// assert_eq!(&amp;expected, &amp;actual.as_ref());</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digest</span>(<span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Digest</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digest</span>(<span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Digest</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context::new</span>(<span class="ident">algorithm</span>);
     <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">data</span>);
     <span class="ident">ctx</span>.<span class="ident">finish</span>()
@@ -833,21 +833,21 @@
 <span class="kw">impl</span> <span class="ident">Digest</span> {
     <span class="doccomment">/// The algorithm that was used to calculate the digest value.</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
         <span class="self">self</span>.<span class="ident">algorithm</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Digest</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">let</span> <span class="ident">as64</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as64</span> };
         <span class="kw-2">&amp;</span><span class="ident">endian::as_byte_slice</span>(<span class="ident">as64</span>)[..<span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">output_len</span>]
     }
 }
 
 <span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Digest</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">core::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{:?}:&quot;</span>, <span class="self">self</span>.<span class="ident">algorithm</span>)<span class="question-mark">?</span>;
         <span class="ident">debug::write_hex_bytes</span>(<span class="ident">fmt</span>, <span class="self">self</span>.<span class="ident">as_ref</span>())
     }
@@ -873,7 +873,7 @@
     <span class="ident">len_len</span>: <span class="ident">usize</span>,
 
     <span class="ident">block_data_order</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span>, <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>, <span class="ident">num</span>: <span class="ident">c::size_t</span>),
-    <span class="ident">format_output</span>: <span class="kw">fn</span>(<span class="ident">input</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Output</span>,
+    <span class="ident">format_output</span>: <span class="kw">fn</span>(<span class="ident">input</span>: <span class="ident">State</span>) -&gt; <span class="ident">Output</span>,
 
     <span class="ident">initial_state</span>: <span class="ident">State</span>,
 
@@ -890,8 +890,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Algorithm</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">id</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">id</span>
     }
 }
 
@@ -1030,14 +1030,14 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span> <span class="comment">// XXX: Why do we need to be `Copy`?</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="ident">union</span> <span class="ident">State</span> {
+<span class="kw">union</span> <span class="ident">State</span> {
     <span class="ident">as64</span>: [<span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>; <span class="ident">sha2::CHAINING_WORDS</span>],
     <span class="ident">as32</span>: [<span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>; <span class="ident">sha2::CHAINING_WORDS</span>],
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="ident">union</span> <span class="ident">Output</span> {
+<span class="kw">union</span> <span class="ident">Output</span> {
     <span class="ident">as64</span>: [<span class="ident">BigEndian</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>; <span class="number">512</span> <span class="op">/</span> <span class="number">8</span> <span class="op">/</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span>()],
     <span class="ident">as32</span>: [<span class="ident">BigEndian</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>; <span class="number">256</span> <span class="op">/</span> <span class="number">8</span> <span class="op">/</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>()],
 }
@@ -1054,7 +1054,7 @@
 <span class="doccomment">/// algorithms in this module.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_CHAINING_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">MAX_OUTPUT_LEN</span>;
 
-<span class="kw">fn</span> <span class="ident">sha256_format_output</span>(<span class="ident">input</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Output</span> {
+<span class="kw">fn</span> <span class="ident">sha256_format_output</span>(<span class="ident">input</span>: <span class="ident">State</span>) -&gt; <span class="ident">Output</span> {
     <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">as32</span> };
     <span class="ident">Output</span> {
         <span class="ident">as32</span>: [
@@ -1070,7 +1070,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">sha512_format_output</span>(<span class="ident">input</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Output</span> {
+<span class="kw">fn</span> <span class="ident">sha512_format_output</span>(<span class="ident">input</span>: <span class="ident">State</span>) -&gt; <span class="ident">Output</span> {
     <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">as64</span> };
     <span class="ident">Output</span> {
         <span class="ident">as64</span>: [
@@ -1116,7 +1116,7 @@
         <span class="kw">use</span> <span class="ident">alloc::vec</span>;
 
         <span class="macro">macro_rules!</span> <span class="ident">max_input_tests</span> {
-            ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">algorithm_name</span>:<span class="ident">ident</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+            ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">algorithm_name</span>:<span class="ident">ident</span> ) =&gt; {
                 <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">algorithm_name</span> {
                     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::digest</span>;
 
@@ -1162,7 +1162,7 @@
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">finish</span>(); <span class="comment">// should panic</span>
         }
 
-        <span class="kw">fn</span> <span class="ident">nearly_full_context</span>(<span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">digest::Context</span> {
+        <span class="kw">fn</span> <span class="ident">nearly_full_context</span>(<span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>) -&gt; <span class="ident">digest::Context</span> {
             <span class="comment">// All implementations currently support up to 2^64-1 bits</span>
             <span class="comment">// of input; according to the spec, SHA-384 and SHA-512</span>
             <span class="comment">// support up to 2^128-1, but that&#39;s not implemented yet.</span>

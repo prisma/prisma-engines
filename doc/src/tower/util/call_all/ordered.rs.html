@@ -286,7 +286,7 @@
     <span class="doccomment">/// yielded in the same order by the implementation of [`Stream`] for [`CallAll`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Stream`]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">service</span>: <span class="ident">Svc</span>, <span class="ident">stream</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CallAll</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">service</span>: <span class="ident">Svc</span>, <span class="ident">stream</span>: <span class="ident">S</span>) -&gt; <span class="ident">CallAll</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span><span class="op">&gt;</span> {
         <span class="ident">CallAll</span> {
             <span class="ident">inner</span>: <span class="ident">common::CallAll::new</span>(<span class="ident">service</span>, <span class="ident">stream</span>, <span class="ident">FuturesOrdered::new</span>()),
         }
@@ -299,7 +299,7 @@
     <span class="doccomment">/// Panics if [`take_service`] was already called.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`take_service`]: crate::util::CallAll::take_service</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Svc</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">Svc</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into_inner</span>()
     }
 
@@ -312,7 +312,7 @@
     <span class="doccomment">/// Panics if [`take_service`] was already called.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`take_service`]: crate::util::CallAll::take_service</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_service</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Svc</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_service</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Svc</span> {
         <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">take_service</span>()
     }
 
@@ -325,7 +325,7 @@
     <span class="doccomment">/// Panics if [`poll`] was called.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`poll`]: std::future::Future::poll</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unordered</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::CallAllUnordered</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unordered</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">super</span>::CallAllUnordered</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">unordered</span>()
     }
 }
@@ -338,13 +338,13 @@
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Svc::Response</span>, <span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span> <span class="ident">common::Drive</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FuturesOrdered</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">FuturesOrdered::is_empty</span>(<span class="self">self</span>)
     }
 
@@ -352,7 +352,7 @@
         <span class="ident">FuturesOrdered::push</span>(<span class="self">self</span>, <span class="ident">future</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Stream::poll_next</span>(<span class="ident">Pin::new</span>(<span class="self">self</span>), <span class="ident">cx</span>)
     }
 }

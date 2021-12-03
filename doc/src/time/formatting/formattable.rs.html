@@ -217,7 +217,7 @@
             <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span>,
             <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span>,
             <span class="ident">offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UtcOffset</span><span class="op">&gt;</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span>;
+        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span>;
 
         <span class="doccomment">/// Format the item directly to a `String`.</span>
         <span class="kw">fn</span> <span class="ident">format</span>(
@@ -225,7 +225,7 @@
             <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span>,
             <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span>,
             <span class="ident">offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UtcOffset</span><span class="op">&gt;</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
             <span class="self">self</span>.<span class="ident">format_into</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">offset</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">into_owned</span>())
@@ -241,15 +241,15 @@
         <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span>,
         <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span>,
         <span class="ident">offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UtcOffset</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Literal</span>(<span class="ident">literal</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="ident">literal</span>)<span class="question-mark">?</span>,
-            <span class="ident"><span class="self">Self</span>::Component</span>(<span class="ident">component</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">format_component</span>(<span class="ident">output</span>, <span class="ident">component</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">offset</span>)<span class="question-mark">?</span>,
-            <span class="ident"><span class="self">Self</span>::Compound</span>(<span class="ident">items</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">items</span>.<span class="ident">format_into</span>(<span class="ident">output</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">offset</span>)<span class="question-mark">?</span>,
-            <span class="ident"><span class="self">Self</span>::Optional</span>(<span class="ident">item</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">item</span>.<span class="ident">format_into</span>(<span class="ident">output</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">offset</span>)<span class="question-mark">?</span>,
-            <span class="ident"><span class="self">Self</span>::First</span>(<span class="ident">items</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">items</span> {
-                [] <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-                [<span class="ident">item</span>, ..] <span class="op">=</span><span class="op">&gt;</span> <span class="ident">item</span>.<span class="ident">format_into</span>(<span class="ident">output</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">offset</span>)<span class="question-mark">?</span>,
+            <span class="ident"><span class="self">Self</span>::Literal</span>(<span class="ident">literal</span>) =&gt; <span class="ident">write</span>(<span class="ident">output</span>, <span class="ident">literal</span>)<span class="question-mark">?</span>,
+            <span class="ident"><span class="self">Self</span>::Component</span>(<span class="ident">component</span>) =&gt; <span class="ident">format_component</span>(<span class="ident">output</span>, <span class="ident">component</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">offset</span>)<span class="question-mark">?</span>,
+            <span class="ident"><span class="self">Self</span>::Compound</span>(<span class="ident">items</span>) =&gt; <span class="ident">items</span>.<span class="ident">format_into</span>(<span class="ident">output</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">offset</span>)<span class="question-mark">?</span>,
+            <span class="ident"><span class="self">Self</span>::Optional</span>(<span class="ident">item</span>) =&gt; <span class="ident">item</span>.<span class="ident">format_into</span>(<span class="ident">output</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">offset</span>)<span class="question-mark">?</span>,
+            <span class="ident"><span class="self">Self</span>::First</span>(<span class="ident">items</span>) =&gt; <span class="kw">match</span> <span class="ident">items</span> {
+                [] =&gt; <span class="number">0</span>,
+                [<span class="ident">item</span>, ..] =&gt; <span class="ident">item</span>.<span class="ident">format_into</span>(<span class="ident">output</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">offset</span>)<span class="question-mark">?</span>,
             },
         })
     }
@@ -262,7 +262,7 @@
         <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span>,
         <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span>,
         <span class="ident">offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UtcOffset</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>() {
             <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">item</span>.<span class="ident">format_into</span>(<span class="ident">output</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">offset</span>)<span class="question-mark">?</span>;
@@ -281,7 +281,7 @@
         <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span>,
         <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span>,
         <span class="ident">offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UtcOffset</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">format_into</span>(<span class="ident">output</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">offset</span>)
     }
 }
@@ -295,7 +295,7 @@
         <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span>,
         <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Time</span><span class="op">&gt;</span>,
         <span class="ident">offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UtcOffset</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">date</span>.<span class="ident">ok_or</span>(<span class="ident">error::Format::InsufficientTypeInformation</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">time</span>.<span class="ident">ok_or</span>(<span class="ident">error::Format::InsufficientTypeInformation</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">offset</span>.<span class="ident">ok_or</span>(<span class="ident">error::Format::InsufficientTypeInformation</span>)<span class="question-mark">?</span>;
@@ -348,7 +348,7 @@
             }<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">offset</span> <span class="op">=</span><span class="op">=</span> <span class="ident">UtcOffset::UTC</span> {
+        <span class="kw">if</span> <span class="ident">offset</span> <span class="op">==</span> <span class="ident">UtcOffset::UTC</span> {
             <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39;Z&#39;</span>])<span class="question-mark">?</span>;
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>);
         }

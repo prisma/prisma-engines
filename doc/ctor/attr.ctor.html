@@ -3,7 +3,7 @@ This uses OS-specific linker sections to call a specific function at
 load time.</p>
 <p>Multiple startup functions/statics are supported, but the invocation order is not
 guaranteed.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>Print a startup message:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">ctor</span>]</span>
@@ -31,7 +31,7 @@ guaranteed.</p>
   <span class="ident">m</span>
 };
 </code></pre></div>
-<h1 id="details" class="section-header"><a href="#details">Details</a></h1>
+<h2 id="details" class="section-header"><a href="#details">Details</a></h2>
 <p>The <code>#[ctor]</code> macro makes use of linker sections to ensure that a
 function is run at startup time.</p>
 <p>The above example translates into the following Rust code (approximately):</p>

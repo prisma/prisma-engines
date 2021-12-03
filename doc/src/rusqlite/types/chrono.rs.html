@@ -281,7 +281,7 @@
 <span class="doccomment">/// ISO 8601 calendar date without timezone =&gt; &quot;YYYY-MM-DD&quot;</span>
 <span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">NaiveDate</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">date_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">format</span>(<span class="string">&quot;%F&quot;</span>).<span class="ident">to_string</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="ident">date_str</span>))
     }
@@ -290,12 +290,12 @@
 <span class="doccomment">/// &quot;YYYY-MM-DD&quot; =&gt; ISO 8601 calendar date without timezone.</span>
 <span class="kw">impl</span> <span class="ident">FromSql</span> <span class="kw">for</span> <span class="ident">NaiveDate</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">value</span>
             .<span class="ident">as_str</span>()
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">NaiveDate::parse_from_str</span>(<span class="ident">s</span>, <span class="string">&quot;%F&quot;</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">dt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">dt</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>))),
+                <span class="prelude-val">Ok</span>(<span class="ident">dt</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">dt</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>))),
             })
     }
 }
@@ -303,7 +303,7 @@
 <span class="doccomment">/// ISO 8601 time without timezone =&gt; &quot;HH:MM:SS.SSS&quot;</span>
 <span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">NaiveTime</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">date_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">format</span>(<span class="string">&quot;%T%.f&quot;</span>).<span class="ident">to_string</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="ident">date_str</span>))
     }
@@ -311,16 +311,16 @@
 
 <span class="doccomment">/// &quot;HH:MM&quot;/&quot;HH:MM:SS&quot;/&quot;HH:MM:SS.SSS&quot; =&gt; ISO 8601 time without timezone.</span>
 <span class="kw">impl</span> <span class="ident">FromSql</span> <span class="kw">for</span> <span class="ident">NaiveTime</span> {
-    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">value</span>.<span class="ident">as_str</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">fmt</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">len</span>() {
-                <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;%H:%M&quot;</span>,
-                <span class="number">8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;%T&quot;</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;%T%.f&quot;</span>,
+                <span class="number">5</span> =&gt; <span class="string">&quot;%H:%M&quot;</span>,
+                <span class="number">8</span> =&gt; <span class="string">&quot;%T&quot;</span>,
+                <span class="kw">_</span> =&gt; <span class="string">&quot;%T%.f&quot;</span>,
             };
             <span class="kw">match</span> <span class="ident">NaiveTime::parse_from_str</span>(<span class="ident">s</span>, <span class="ident">fmt</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">dt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">dt</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>))),
+                <span class="prelude-val">Ok</span>(<span class="ident">dt</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">dt</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>))),
             }
         })
     }
@@ -330,7 +330,7 @@
 <span class="doccomment">/// &quot;YYYY-MM-DD HH:MM:SS.SSS&quot;</span>
 <span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">NaiveDateTime</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">date_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">format</span>(<span class="string">&quot;%F %T%.f&quot;</span>).<span class="ident">to_string</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="ident">date_str</span>))
     }
@@ -340,17 +340,17 @@
 <span class="doccomment">/// and time without timezone. (&quot;YYYY-MM-DDTHH:MM:SS&quot;/&quot;YYYY-MM-DDTHH:MM:SS.SSS&quot;</span>
 <span class="doccomment">/// also supported)</span>
 <span class="kw">impl</span> <span class="ident">FromSql</span> <span class="kw">for</span> <span class="ident">NaiveDateTime</span> {
-    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">value</span>.<span class="ident">as_str</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">fmt</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">11</span> <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>()[<span class="number">10</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;T&#39;</span> {
+            <span class="kw">let</span> <span class="ident">fmt</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">11</span> <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>()[<span class="number">10</span>] <span class="op">==</span> <span class="string">b&#39;T&#39;</span> {
                 <span class="string">&quot;%FT%T%.f&quot;</span>
             } <span class="kw">else</span> {
                 <span class="string">&quot;%F %T%.f&quot;</span>
             };
 
             <span class="kw">match</span> <span class="ident">NaiveDateTime::parse_from_str</span>(<span class="ident">s</span>, <span class="ident">fmt</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">dt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">dt</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>))),
+                <span class="prelude-val">Ok</span>(<span class="ident">dt</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">dt</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>))),
             }
         })
     }
@@ -360,7 +360,7 @@
 <span class="doccomment">/// (&quot;YYYY-MM-DD HH:MM:SS.SSS+00:00&quot;).</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">date_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">Utc</span>).<span class="ident">format</span>(<span class="string">&quot;%F %T%.f%:z&quot;</span>).<span class="ident">to_string</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="ident">date_str</span>))
     }
@@ -368,12 +368,12 @@
 
 <span class="doccomment">/// RFC3339 (&quot;YYYY-MM-DD HH:MM:SS.SSS[+-]HH:MM&quot;) into `DateTime&lt;Utc&gt;`.</span>
 <span class="kw">impl</span> <span class="ident">FromSql</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         {
             <span class="comment">// Try to parse value as rfc3339 first.</span>
             <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_str</span>()<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">fmt</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">11</span> <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>()[<span class="number">10</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;T&#39;</span> {
+            <span class="kw">let</span> <span class="ident">fmt</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">11</span> <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>()[<span class="number">10</span>] <span class="op">==</span> <span class="string">b&#39;T&#39;</span> {
                 <span class="string">&quot;%FT%T%.f%#z&quot;</span>
             } <span class="kw">else</span> {
                 <span class="string">&quot;%F %T%.f%#z&quot;</span>
@@ -392,7 +392,7 @@
 <span class="doccomment">/// RFC3339 (&quot;YYYY-MM-DD HH:MM:SS.SSS[+-]HH:MM&quot;) into `DateTime&lt;Local&gt;`.</span>
 <span class="kw">impl</span> <span class="ident">FromSql</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Local</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">utc_dt</span> <span class="op">=</span> <span class="ident">DateTime</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::column_result</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">utc_dt</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">Local</span>))
     }
@@ -406,14 +406,14 @@
     };
     <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Duration</span>, <span class="ident">Local</span>, <span class="ident">NaiveDate</span>, <span class="ident">NaiveDateTime</span>, <span class="ident">NaiveTime</span>, <span class="ident">TimeZone</span>, <span class="ident">Utc</span>};
 
-    <span class="kw">fn</span> <span class="ident">checked_memory_handle</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">checked_memory_handle</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo (t TEXT, i INTEGER, f FLOAT, b BLOB)&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">db</span>)
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_naive_date</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_naive_date</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2016</span>, <span class="number">2</span>, <span class="number">23</span>);
         <span class="ident">db</span>.<span class="ident">execute</span>(<span class="string">&quot;INSERT INTO foo (t) VALUES (?)&quot;</span>, [<span class="ident">date</span>])<span class="question-mark">?</span>;
@@ -426,7 +426,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_naive_time</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_naive_time</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">NaiveTime::from_hms</span>(<span class="number">23</span>, <span class="number">56</span>, <span class="number">4</span>);
         <span class="ident">db</span>.<span class="ident">execute</span>(<span class="string">&quot;INSERT INTO foo (t) VALUES (?)&quot;</span>, [<span class="ident">time</span>])<span class="question-mark">?</span>;
@@ -439,7 +439,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_naive_date_time</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_naive_date_time</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2016</span>, <span class="number">2</span>, <span class="number">23</span>);
         <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">NaiveTime::from_hms</span>(<span class="number">23</span>, <span class="number">56</span>, <span class="number">4</span>);
@@ -459,7 +459,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_date_time_utc</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_date_time_utc</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2016</span>, <span class="number">2</span>, <span class="number">23</span>);
         <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">NaiveTime::from_hms_milli</span>(<span class="number">23</span>, <span class="number">56</span>, <span class="number">4</span>, <span class="number">789</span>);
@@ -488,7 +488,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_date_time_local</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_date_time_local</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2016</span>, <span class="number">2</span>, <span class="number">23</span>);
         <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">NaiveTime::from_hms_milli</span>(<span class="number">23</span>, <span class="number">56</span>, <span class="number">4</span>, <span class="number">789</span>);
@@ -507,7 +507,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_sqlite_functions</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_sqlite_functions</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NaiveTime</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT CURRENT_TIME&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
         <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_ok</span>());
@@ -523,7 +523,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_naive_date_time_param</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_naive_date_time_param</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT 1 WHERE ? BETWEEN datetime(&#39;now&#39;, &#39;-1 minute&#39;) AND datetime(&#39;now&#39;, &#39;+1 minute&#39;)&quot;</span>, [<span class="ident">Utc::now</span>().<span class="ident">naive_utc</span>()], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
         <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_ok</span>());
@@ -531,7 +531,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_date_time_param</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_date_time_param</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT 1 WHERE ? BETWEEN datetime(&#39;now&#39;, &#39;-1 minute&#39;) AND datetime(&#39;now&#39;, &#39;+1 minute&#39;)&quot;</span>, [<span class="ident">Utc::now</span>()], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
         <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_ok</span>());

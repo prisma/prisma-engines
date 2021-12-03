@@ -110,26 +110,26 @@
 <span class="kw">impl</span> <span class="ident">Cli</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="self">self</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">run_inner</span>().<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">msg</span>) =&gt; {
                 <span class="macro">tracing::info!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>);
             }
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">log_error_and_exit</span>(<span class="ident">error</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; <span class="ident">log_error_and_exit</span>(<span class="ident">error</span>),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_inner</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">datasource_from_database_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">datasource</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_api</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">command</span> {
-            <span class="ident">CliCommand::CreateDatabase</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CliCommand::CreateDatabase</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">api</span>.<span class="ident">create_database</span>().<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;Database &#39;{}&#39; was successfully created.&quot;</span>, <span class="ident">db_name</span>))
             }
-            <span class="ident">CliCommand::CanConnectToDatabase</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CliCommand::CanConnectToDatabase</span> =&gt; {
                 <span class="ident">api</span>.<span class="ident">ensure_connection_validity</span>().<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="string">&quot;Connection successful&quot;</span>.<span class="ident">to_owned</span>())
             }
-            <span class="ident">CliCommand::DropDatabase</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CliCommand::DropDatabase</span> =&gt; {
                 <span class="ident">api</span>.<span class="ident">drop_database</span>().<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="string">&quot;The database was successfully dropped.&quot;</span>.<span class="ident">to_owned</span>())
             }
@@ -148,25 +148,25 @@
     <span class="ident">DropDatabase</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">parse_base64_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_base64_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">base64::decode</span>(<span class="ident">s</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">String::from_utf8</span>(<span class="ident">bytes</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::user_facing</span>(<span class="ident">SchemaParserError</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>) =&gt; <span class="kw">match</span> <span class="ident">String::from_utf8</span>(<span class="ident">bytes</span>) {
+            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::user_facing</span>(<span class="ident">SchemaParserError</span> {
                 <span class="ident">full_error</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
             })),
         },
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">String::from</span>(<span class="ident">s</span>)),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">String::from</span>(<span class="ident">s</span>)),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">datasource_from_database_str</span>(<span class="ident">database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">datasource_from_database_str</span>(<span class="ident">database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">database_str</span>.<span class="ident">split</span>(<span class="string">&#39;:&#39;</span>).<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>(<span class="string">&quot;postgres&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;postgresql&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;file&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;sqlite&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;mongodb+srv&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;mongodb&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">other</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">other</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="string">&quot;postgres&quot;</span>) =&gt; <span class="string">&quot;postgresql&quot;</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;file&quot;</span>) =&gt; <span class="string">&quot;sqlite&quot;</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;mongodb+srv&quot;</span>) =&gt; <span class="string">&quot;mongodb&quot;</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">other</span>) =&gt; <span class="ident">other</span>,
+        <span class="prelude-val">None</span> =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::user_facing</span>(<span class="ident">InvalidConnectionString</span> {
                 <span class="ident">details</span>: <span class="ident">String::new</span>(),
             }))

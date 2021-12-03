@@ -57,7 +57,7 @@
     <span class="doccomment">/// 2606:4700:4700::1001 (thank you, Cloudflare).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see: &lt;https://www.cloudflare.com/dns/&gt;</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig</span> {
             <span class="ident">inner</span>: <span class="ident">TrustDnsResolverConfig::cloudflare</span>(),
         }
@@ -68,7 +68,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see Google’s privacy statement for important information about what they track, many</span>
     <span class="doccomment">/// ISP’s track similar information in DNS.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">google</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">google</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig</span> {
             <span class="ident">inner</span>: <span class="ident">TrustDnsResolverConfig::google</span>(),
         }
@@ -78,7 +78,7 @@
     <span class="doccomment">/// “secure” variants of the quad9 settings (thank you, Quad9).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see: &lt;https://www.quad9.net/faq/&gt;</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig</span> {
             <span class="ident">inner</span>: <span class="ident">TrustDnsResolverConfig::quad9</span>(),
         }

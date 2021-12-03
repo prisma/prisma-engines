@@ -926,7 +926,7 @@
     <span class="doccomment">/// Whether a method is considered &quot;safe&quot;, meaning the request is essentially read-only.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See [the spec](https://tools.ietf.org/html/rfc7231#section-4.2.1) for more details.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_safe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_safe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
             <span class="ident">Method::Get</span>
@@ -946,23 +946,23 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MethodVisitor</span> {
     <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">Method</span>;
 
-    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;a HTTP method &amp;str&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">DeError</span>,
     {
         <span class="kw">match</span> <span class="ident">Method::from_str</span>(<span class="ident">v</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">method</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">method</span>),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::invalid_value</span>(<span class="ident">Unexpected::Str</span>(<span class="ident">v</span>), <span class="kw-2">&amp;</span><span class="self">self</span>)),
+            <span class="prelude-val">Ok</span>(<span class="ident">method</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">method</span>),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">DeError::invalid_value</span>(<span class="ident">Unexpected::Str</span>(<span class="ident">v</span>), <span class="kw-2">&amp;</span><span class="self">self</span>)),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -971,7 +971,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Serializer</span>,
     {
@@ -980,7 +980,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">AsRef</span>::<span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="ident">::as_ref</span>(<span class="self">self</span>))
     }
 }
@@ -988,48 +988,48 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Method</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">to_ascii_uppercase</span>() {
-            <span class="string">&quot;ACL&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Acl</span>),
-            <span class="string">&quot;BASELINE-CONTROL&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::BaselineControl</span>),
-            <span class="string">&quot;BIND&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Bind</span>),
-            <span class="string">&quot;CHECKIN&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Checkin</span>),
-            <span class="string">&quot;CHECKOUT&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Checkout</span>),
-            <span class="string">&quot;CONNECT&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Connect</span>),
-            <span class="string">&quot;COPY&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Copy</span>),
-            <span class="string">&quot;DELETE&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Delete</span>),
-            <span class="string">&quot;GET&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Get</span>),
-            <span class="string">&quot;HEAD&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Head</span>),
-            <span class="string">&quot;LABEL&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Label</span>),
-            <span class="string">&quot;LINK&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Link</span>),
-            <span class="string">&quot;LOCK&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Lock</span>),
-            <span class="string">&quot;MERGE&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Merge</span>),
-            <span class="string">&quot;MKACTIVITY&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::MkActivity</span>),
-            <span class="string">&quot;MKCALENDAR&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::MkCalendar</span>),
-            <span class="string">&quot;MKCOL&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::MkCol</span>),
-            <span class="string">&quot;MKREDIRECTREF&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::MkRedirectRef</span>),
-            <span class="string">&quot;MKWORKSPACE&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::MkWorkspace</span>),
-            <span class="string">&quot;MOVE&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Move</span>),
-            <span class="string">&quot;OPTIONS&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Options</span>),
-            <span class="string">&quot;ORDERPATCH&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::OrderPatch</span>),
-            <span class="string">&quot;PATCH&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Patch</span>),
-            <span class="string">&quot;POST&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Post</span>),
-            <span class="string">&quot;PRI&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Pri</span>),
-            <span class="string">&quot;PROPFIND&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::PropFind</span>),
-            <span class="string">&quot;PROPPATCH&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::PropPatch</span>),
-            <span class="string">&quot;PUT&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Put</span>),
-            <span class="string">&quot;REBIND&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Rebind</span>),
-            <span class="string">&quot;REPORT&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Report</span>),
-            <span class="string">&quot;SEARCH&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Search</span>),
-            <span class="string">&quot;TRACE&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Trace</span>),
-            <span class="string">&quot;UNBIND&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Unbind</span>),
-            <span class="string">&quot;UNCHECKOUT&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Uncheckout</span>),
-            <span class="string">&quot;UNLINK&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Unlink</span>),
-            <span class="string">&quot;UNLOCK&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Unlock</span>),
-            <span class="string">&quot;UPDATE&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Update</span>),
-            <span class="string">&quot;UPDATEREDIRECTREF&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::UpdateRedirectRef</span>),
-            <span class="string">&quot;VERSION-CONTROL&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::VersionControl</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">crate::bail!</span>(<span class="string">&quot;Invalid HTTP method&quot;</span>),
+            <span class="string">&quot;ACL&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Acl</span>),
+            <span class="string">&quot;BASELINE-CONTROL&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::BaselineControl</span>),
+            <span class="string">&quot;BIND&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Bind</span>),
+            <span class="string">&quot;CHECKIN&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Checkin</span>),
+            <span class="string">&quot;CHECKOUT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Checkout</span>),
+            <span class="string">&quot;CONNECT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Connect</span>),
+            <span class="string">&quot;COPY&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Copy</span>),
+            <span class="string">&quot;DELETE&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Delete</span>),
+            <span class="string">&quot;GET&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Get</span>),
+            <span class="string">&quot;HEAD&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Head</span>),
+            <span class="string">&quot;LABEL&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Label</span>),
+            <span class="string">&quot;LINK&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Link</span>),
+            <span class="string">&quot;LOCK&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Lock</span>),
+            <span class="string">&quot;MERGE&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Merge</span>),
+            <span class="string">&quot;MKACTIVITY&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::MkActivity</span>),
+            <span class="string">&quot;MKCALENDAR&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::MkCalendar</span>),
+            <span class="string">&quot;MKCOL&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::MkCol</span>),
+            <span class="string">&quot;MKREDIRECTREF&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::MkRedirectRef</span>),
+            <span class="string">&quot;MKWORKSPACE&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::MkWorkspace</span>),
+            <span class="string">&quot;MOVE&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Move</span>),
+            <span class="string">&quot;OPTIONS&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Options</span>),
+            <span class="string">&quot;ORDERPATCH&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::OrderPatch</span>),
+            <span class="string">&quot;PATCH&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Patch</span>),
+            <span class="string">&quot;POST&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Post</span>),
+            <span class="string">&quot;PRI&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Pri</span>),
+            <span class="string">&quot;PROPFIND&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::PropFind</span>),
+            <span class="string">&quot;PROPPATCH&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::PropPatch</span>),
+            <span class="string">&quot;PUT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Put</span>),
+            <span class="string">&quot;REBIND&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Rebind</span>),
+            <span class="string">&quot;REPORT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Report</span>),
+            <span class="string">&quot;SEARCH&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Search</span>),
+            <span class="string">&quot;TRACE&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Trace</span>),
+            <span class="string">&quot;UNBIND&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Unbind</span>),
+            <span class="string">&quot;UNCHECKOUT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Uncheckout</span>),
+            <span class="string">&quot;UNLINK&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Unlink</span>),
+            <span class="string">&quot;UNLOCK&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Unlock</span>),
+            <span class="string">&quot;UPDATE&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Update</span>),
+            <span class="string">&quot;UPDATEREDIRECTREF&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::UpdateRedirectRef</span>),
+            <span class="string">&quot;VERSION-CONTROL&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::VersionControl</span>),
+            <span class="kw">_</span> =&gt; <span class="macro">crate::bail!</span>(<span class="string">&quot;Invalid HTTP method&quot;</span>),
         }
     }
 }
@@ -1037,53 +1037,53 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">std::convert::TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::from_str</span>(<span class="ident">value</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Acl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ACL&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::BaselineControl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;BASELINE-CONTROL&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Bind</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;BIND&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Checkin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;CHECKIN&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Checkout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;CHECKOUT&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Connect</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;CONNECT&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Copy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;COPY&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;DELETE&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Get</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;GET&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Head</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;HEAD&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Label</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;LABEL&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Link</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;LINK&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Lock</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;LOCK&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Merge</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;MERGE&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::MkActivity</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;MKACTIVITY&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::MkCalendar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;MKCALENDAR&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::MkCol</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;MKCOL&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::MkRedirectRef</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;MKREDIRECTREF&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::MkWorkspace</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;MKWORKSPACE&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Move</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;MOVE&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Options</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;OPTIONS&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::OrderPatch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ORDERPATCH&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Patch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;PATCH&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Post</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;POST&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Pri</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;PRI&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::PropFind</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;PROPFIND&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::PropPatch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;PROPPATCH&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Put</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;PUT&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Rebind</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;REBIND&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Report</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;REPORT&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Search</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SEARCH&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Trace</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;TRACE&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Unbind</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UNBIND&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Uncheckout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UNCHECKOUT&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Unlink</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UNLINK&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Unlock</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UNLOCK&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UPDATE&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::UpdateRedirectRef</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;UPDATEREDIRECTREF&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::VersionControl</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;VERSION-CONTROL&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Acl</span> =&gt; <span class="string">&quot;ACL&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::BaselineControl</span> =&gt; <span class="string">&quot;BASELINE-CONTROL&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Bind</span> =&gt; <span class="string">&quot;BIND&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Checkin</span> =&gt; <span class="string">&quot;CHECKIN&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Checkout</span> =&gt; <span class="string">&quot;CHECKOUT&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Connect</span> =&gt; <span class="string">&quot;CONNECT&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Copy</span> =&gt; <span class="string">&quot;COPY&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Delete</span> =&gt; <span class="string">&quot;DELETE&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Get</span> =&gt; <span class="string">&quot;GET&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Head</span> =&gt; <span class="string">&quot;HEAD&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Label</span> =&gt; <span class="string">&quot;LABEL&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Link</span> =&gt; <span class="string">&quot;LINK&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Lock</span> =&gt; <span class="string">&quot;LOCK&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Merge</span> =&gt; <span class="string">&quot;MERGE&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::MkActivity</span> =&gt; <span class="string">&quot;MKACTIVITY&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::MkCalendar</span> =&gt; <span class="string">&quot;MKCALENDAR&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::MkCol</span> =&gt; <span class="string">&quot;MKCOL&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::MkRedirectRef</span> =&gt; <span class="string">&quot;MKREDIRECTREF&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::MkWorkspace</span> =&gt; <span class="string">&quot;MKWORKSPACE&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Move</span> =&gt; <span class="string">&quot;MOVE&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Options</span> =&gt; <span class="string">&quot;OPTIONS&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::OrderPatch</span> =&gt; <span class="string">&quot;ORDERPATCH&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Patch</span> =&gt; <span class="string">&quot;PATCH&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Post</span> =&gt; <span class="string">&quot;POST&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Pri</span> =&gt; <span class="string">&quot;PRI&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::PropFind</span> =&gt; <span class="string">&quot;PROPFIND&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::PropPatch</span> =&gt; <span class="string">&quot;PROPPATCH&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Put</span> =&gt; <span class="string">&quot;PUT&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Rebind</span> =&gt; <span class="string">&quot;REBIND&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Report</span> =&gt; <span class="string">&quot;REPORT&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Search</span> =&gt; <span class="string">&quot;SEARCH&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Trace</span> =&gt; <span class="string">&quot;TRACE&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Unbind</span> =&gt; <span class="string">&quot;UNBIND&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Uncheckout</span> =&gt; <span class="string">&quot;UNCHECKOUT&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Unlink</span> =&gt; <span class="string">&quot;UNLINK&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Unlock</span> =&gt; <span class="string">&quot;UNLOCK&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Update</span> =&gt; <span class="string">&quot;UPDATE&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::UpdateRedirectRef</span> =&gt; <span class="string">&quot;UPDATEREDIRECTREF&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::VersionControl</span> =&gt; <span class="string">&quot;VERSION-CONTROL&quot;</span>,
         }
     }
 }
@@ -1095,7 +1095,7 @@
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Method</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serde</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">serde_json::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">serde</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">serde_json::Error</span><span class="op">&gt;</span> {
         <span class="macro">assert_eq!</span>(<span class="ident">Method::Get</span>, <span class="ident">serde_json::from_str</span>(<span class="string">&quot;\&quot;GET\&quot;&quot;</span>)<span class="question-mark">?</span>);
         <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;PATCH&quot;</span>), <span class="ident">serde_json::to_value</span>(<span class="ident">Method::Patch</span>)<span class="question-mark">?</span>.<span class="ident">as_str</span>());
         <span class="prelude-val">Ok</span>(())
@@ -1107,7 +1107,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">names</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">names</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">method_names</span> <span class="op">=</span> [
             <span class="string">&quot;ACL&quot;</span>,
             <span class="string">&quot;BASELINE-CONTROL&quot;</span>,

@@ -314,49 +314,49 @@
 <span class="doccomment">/// e.g. that the query schema guarantees that required fields are present.</span>
 <span class="doccomment">/// Errors occur if conversions fail.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">arguments</span>, <span class="ident">model</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_query_args</span>(<span class="ident">arguments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParsedArgument</span><span class="op">&gt;</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">QueryArguments</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_query_args</span>(<span class="ident">arguments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParsedArgument</span><span class="op">&gt;</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">QueryArguments</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">query_args</span> <span class="op">=</span> <span class="ident">arguments</span>.<span class="ident">into_iter</span>().<span class="ident">fold</span>(
         <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments::new</span>(<span class="ident">model</span>.<span class="ident">clone</span>())),
         <span class="op">|</span><span class="ident">result</span>: <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">QueryArguments</span><span class="op">&gt;</span>, <span class="ident">arg</span><span class="op">|</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">res</span>) <span class="op">=</span> <span class="ident">result</span> {
                 <span class="kw">match</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_str</span>() {
-                    <span class="ident">args::CURSOR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments</span> {
+                    <span class="ident">args::CURSOR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments</span> {
                         <span class="ident">cursor</span>: <span class="ident">extract_cursor</span>(<span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">model</span>)<span class="question-mark">?</span>,
                         ..<span class="ident">res</span>
                     }),
 
-                    <span class="ident">args::TAKE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments</span> {
+                    <span class="ident">args::TAKE</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments</span> {
                         <span class="ident">take</span>: <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
                         ..<span class="ident">res</span>
                     }),
 
-                    <span class="ident">args::SKIP</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments</span> {
+                    <span class="ident">args::SKIP</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments</span> {
                         <span class="ident">skip</span>: <span class="ident">extract_skip</span>(<span class="ident">arg</span>.<span class="ident">value</span>)<span class="question-mark">?</span>,
                         ..<span class="ident">res</span>
                     }),
 
-                    <span class="ident">args::ORDER_BY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments</span> {
+                    <span class="ident">args::ORDER_BY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments</span> {
                         <span class="ident">order_by</span>: <span class="ident">extract_order_by</span>(<span class="ident">model</span>, <span class="ident">arg</span>.<span class="ident">value</span>)<span class="question-mark">?</span>,
                         ..<span class="ident">res</span>
                     }),
 
-                    <span class="ident">args::DISTINCT</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments</span> {
+                    <span class="ident">args::DISTINCT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments</span> {
                         <span class="ident">distinct</span>: <span class="prelude-val">Some</span>(<span class="ident">extract_distinct</span>(<span class="ident">arg</span>.<span class="ident">value</span>)<span class="question-mark">?</span>),
                         ..<span class="ident">res</span>
                     }),
 
-                    <span class="ident">args::WHERE</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">args::WHERE</span> =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedInputMap</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
                         <span class="kw">match</span> <span class="ident">val</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">m</span>) =&gt; {
                                 <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">extract_filter</span>(<span class="ident">m</span>, <span class="ident">model</span>)<span class="question-mark">?</span>);
                                 <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments</span> { <span class="ident">filter</span>, ..<span class="ident">res</span> })
                             }
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">res</span>),
+                            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">res</span>),
                         }
                     }
 
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">res</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">res</span>),
                 }
             } <span class="kw">else</span> {
                 <span class="ident">result</span>
@@ -368,9 +368,9 @@
 }
 
 <span class="doccomment">/// Extracts order by conditions in order of appearance.</span>
-<span class="kw">fn</span> <span class="ident">extract_order_by</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_order_by</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">ParsedInputValue::List</span>(<span class="ident">list</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">list</span>
+        <span class="ident">ParsedInputValue::List</span>(<span class="ident">list</span>) =&gt; <span class="ident">list</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">list_value</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">list_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
@@ -379,12 +379,12 @@
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">results</span><span class="op">|</span> <span class="ident">results</span>.<span class="ident">into_iter</span>().<span class="ident">flatten</span>().<span class="ident">collect</span>()),
 
-        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">process_order_object</span>(<span class="ident">model</span>, <span class="ident">map</span>, <span class="macro">vec!</span>[], <span class="prelude-val">None</span>)<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">order</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">order</span>],
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
+        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">process_order_object</span>(<span class="ident">model</span>, <span class="ident">map</span>, <span class="macro">vec!</span>[], <span class="prelude-val">None</span>)<span class="question-mark">?</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">order</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">order</span>],
+            <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
         }),
 
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
@@ -394,11 +394,11 @@
     <span class="ident">object</span>: <span class="ident">ParsedInputMap</span>,
     <span class="kw-2">mut</span> <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
     <span class="ident">parent_sort_aggregation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SortAggregation</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">object</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>() {
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-        <span class="prelude-val">Some</span>((<span class="ident">field_name</span>, <span class="ident">field_value</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="ident">field_name</span>.<span class="ident">as_str</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">ordering::UNDERSCORE_RELEVANCE</span> {
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="prelude-val">Some</span>((<span class="ident">field_name</span>, <span class="ident">field_value</span>)) =&gt; {
+            <span class="kw">if</span> <span class="ident">field_name</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="ident">ordering::UNDERSCORE_RELEVANCE</span> {
                 <span class="kw">let</span> <span class="ident">object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">field_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
                 <span class="kw">return</span> <span class="ident">extract_order_by_relevance</span>(<span class="ident">model</span>, <span class="ident">object</span>);
@@ -413,7 +413,7 @@
             <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_all</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>)<span class="question-mark">?</span>;
 
             <span class="kw">match</span> <span class="ident">field</span> {
-                <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() =&gt; {
                     <span class="kw">let</span> <span class="ident">object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">field_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
                     <span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">rf</span>.<span class="ident">clone</span>());
@@ -424,14 +424,14 @@
 
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">OrderBy::aggregation</span>(<span class="prelude-val">None</span>, <span class="ident">path</span>, <span class="ident">sort_order</span>, <span class="ident">sort_aggregation</span>)))
                 }
-                <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">field_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
                     <span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">rf</span>.<span class="ident">clone</span>());
 
                     <span class="ident">process_order_object</span>(<span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">related_model</span>(), <span class="ident">object</span>, <span class="ident">path</span>, <span class="prelude-val">None</span>)
                 }
-                <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">extract_sort_order</span>(<span class="ident">field_value</span>)<span class="question-mark">?</span>;
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sort_aggr</span>) <span class="op">=</span> <span class="ident">parent_sort_aggregation</span> {
@@ -445,23 +445,23 @@
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">OrderBy::scalar</span>(<span class="ident">sf</span>.<span class="ident">clone</span>(), <span class="ident">path</span>, <span class="ident">sort_order</span>)))
                     }
                 }
-                <span class="ident">Field::Composite</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// [Composites] todo</span>
+                <span class="ident">Field::Composite</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// [Composites] todo</span>
             }
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">extract_order_by_relevance</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">object</span>: <span class="ident">ParsedInputMap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_order_by_relevance</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">object</span>: <span class="ident">ParsedInputMap</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">extract_sort_order</span>(<span class="ident">object</span>.<span class="ident">get</span>(<span class="ident">ordering::SORT</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>())<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">search</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">object</span>.<span class="ident">get</span>(<span class="ident">ordering::SEARCH</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">search</span> <span class="op">=</span> <span class="ident">search</span>.<span class="ident">into_string</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">object</span>.<span class="ident">get</span>(<span class="ident">ordering::FIELDS</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">fields</span> {
-        <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)]),
-        <span class="ident">PrismaValue::Enum</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">PrismaValue::String</span>(<span class="ident">e</span>)]),
-        <span class="ident">PrismaValue::List</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">l</span>),
-        <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+        <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)]),
+        <span class="ident">PrismaValue::Enum</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">PrismaValue::String</span>(<span class="ident">e</span>)]),
+        <span class="ident">PrismaValue::List</span>(<span class="ident">l</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">l</span>),
+        <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
             <span class="string">&quot;Expected field `fields` to be of type String, Enum or List&lt;Enum&gt;, found: {:?}&quot;</span>,
             <span class="ident">x</span>
         ))),
@@ -476,68 +476,68 @@
     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">OrderBy::relevance</span>(<span class="ident">fields</span>, <span class="ident">search</span>, <span class="ident">sort_order</span>)))
 }
 
-<span class="kw">fn</span> <span class="ident">extract_sort_aggregation</span>(<span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">SortAggregation</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_sort_aggregation</span>(<span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">SortAggregation</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">field_name</span> {
-        <span class="ident">aggregations::UNDERSCORE_COUNT</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Count</span>),
-        <span class="ident">aggregations::UNDERSCORE_AVG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Avg</span>),
-        <span class="ident">aggregations::UNDERSCORE_SUM</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Sum</span>),
-        <span class="ident">aggregations::UNDERSCORE_MIN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Min</span>),
-        <span class="ident">aggregations::UNDERSCORE_MAX</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Max</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(
+        <span class="ident">aggregations::UNDERSCORE_COUNT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Count</span>),
+        <span class="ident">aggregations::UNDERSCORE_AVG</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Avg</span>),
+        <span class="ident">aggregations::UNDERSCORE_SUM</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Sum</span>),
+        <span class="ident">aggregations::UNDERSCORE_MIN</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Min</span>),
+        <span class="ident">aggregations::UNDERSCORE_MAX</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Max</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(
             <span class="string">&quot;No aggregation operation could be found. This should not happen&quot;</span>.<span class="ident">to_string</span>(),
         )),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">extract_sort_order</span>(<span class="ident">field_value</span>: <span class="ident">ParsedInputValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">SortOrder</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_sort_order</span>(<span class="ident">field_value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">SortOrder</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">field_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">into_string</span>().<span class="ident">unwrap</span>().<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
-        <span class="ident">ordering::ASC</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SortOrder::Ascending</span>,
-        <span class="ident">ordering::DESC</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SortOrder::Descending</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="ident">ordering::ASC</span> =&gt; <span class="ident">SortOrder::Ascending</span>,
+        <span class="ident">ordering::DESC</span> =&gt; <span class="ident">SortOrder::Descending</span>,
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
     };
 
     <span class="prelude-val">Ok</span>(<span class="ident">sort_order</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">extract_distinct</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">ModelProjection</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_distinct</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">ModelProjection</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">ParsedInputValue::List</span>(<span class="ident">list</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">list</span>
+        <span class="ident">ParsedInputValue::List</span>(<span class="ident">list</span>) =&gt; <span class="ident">list</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">element</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">field</span>: <span class="ident">ScalarFieldRef</span> <span class="op">=</span> <span class="ident">element</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">field</span>.<span class="ident">into</span>())
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
     };
 
     <span class="prelude-val">Ok</span>(<span class="ident">ModelProjection::new</span>(<span class="ident">fields</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">extract_skip</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_skip</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">val</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
     <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="kw">if</span> <span class="ident">val</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::AssertionError</span>(<span class="macro">format!</span>(
+        <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="kw">if</span> <span class="ident">val</span> <span class="op">&lt;</span> <span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::AssertionError</span>(<span class="macro">format!</span>(
             <span class="string">&quot;Invalid value for skip argument: Value can only be positive, found: {}&quot;</span>,
             <span class="ident">val</span>,
         ))),
 
-        <span class="ident">val</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">val</span>),
+        <span class="ident">val</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">val</span>),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">extract_cursor</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_cursor</span>(<span class="ident">value</span>: <span class="ident">ParsedInputValue</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">input_map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
     <span class="kw">for</span> (<span class="ident">field_name</span>, <span class="ident">map_value</span>) <span class="kw">in</span> <span class="ident">input_map</span> {
         <span class="kw">let</span> <span class="ident">additional_pairs</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">field</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">extract_cursor_field</span>(<span class="ident">field</span>, <span class="ident">map_value</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">utils::resolve_compound_field</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">extract_compound_cursor_field</span>(<span class="ident">fields</span>, <span class="ident">map_value</span>)<span class="question-mark">?</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">field</span>) =&gt; <span class="ident">extract_cursor_field</span>(<span class="ident">field</span>, <span class="ident">map_value</span>)<span class="question-mark">?</span>,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">utils::resolve_compound_field</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">fields</span>) =&gt; <span class="ident">extract_compound_cursor_field</span>(<span class="ident">fields</span>, <span class="ident">map_value</span>)<span class="question-mark">?</span>,
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::AssertionError</span>(<span class="macro">format!</span>(
                         <span class="string">&quot;Unable to resolve field {} to a field or a set of fields on model {}&quot;</span>,
                         <span class="ident">field_name</span>, <span class="ident">model</span>.<span class="ident">name</span>
@@ -555,7 +555,7 @@
 <span class="kw">fn</span> <span class="ident">extract_cursor_field</span>(
     <span class="ident">field</span>: <span class="ident">ScalarFieldRef</span>,
     <span class="ident">input_value</span>: <span class="ident">ParsedInputValue</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">input_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[(<span class="ident">field</span>, <span class="ident">value</span>)])
 }
@@ -563,7 +563,7 @@
 <span class="kw">fn</span> <span class="ident">extract_compound_cursor_field</span>(
     <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
     <span class="ident">input_value</span>: <span class="ident">ParsedInputValue</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">input_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
@@ -576,7 +576,7 @@
 }
 
 <span class="doccomment">/// Runs final transformations on the QueryArguments.</span>
-<span class="kw">fn</span> <span class="ident">finalize_arguments</span>(<span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">QueryArguments</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryArguments</span> {
+<span class="kw">fn</span> <span class="ident">finalize_arguments</span>(<span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">QueryArguments</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryArguments</span> {
     <span class="comment">// Check if the query requires an implicit ordering added to the arguments.</span>
     <span class="comment">// An implicit ordering is convenient for deterministic results for take and skip, for cursor it&#39;s _required_</span>
     <span class="comment">// as a cursor needs a direction to page. We simply take the primary identifier as a default order-by.</span>
@@ -587,8 +587,8 @@
     <span class="kw">if</span> <span class="ident">add_implicit_ordering</span> {
         <span class="kw">let</span> <span class="ident">primary_identifier</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>();
         <span class="kw">let</span> <span class="ident">order_bys</span> <span class="op">=</span> <span class="ident">primary_identifier</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
-            <span class="ident">Field::Scalar</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">into</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident">Field::Scalar</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">into</span>(),
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         });
 
         <span class="ident">args</span>.<span class="ident">order_by</span>.<span class="ident">extend</span>(<span class="ident">order_bys</span>);

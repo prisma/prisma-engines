@@ -64,7 +64,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OsResourceDetector</span>;
 
 <span class="kw">impl</span> <span class="ident">ResourceDetector</span> <span class="kw">for</span> <span class="ident">OsResourceDetector</span> {
-    <span class="kw">fn</span> <span class="ident">detect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_timeout</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Resource</span> {
+    <span class="kw">fn</span> <span class="ident">detect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">Resource</span> {
         <span class="ident">Resource::new</span>(<span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;os.type&quot;</span>, <span class="ident">OS</span>)])
     }
 }
@@ -84,7 +84,7 @@
             <span class="ident">resource</span>
                 .<span class="ident">iter</span>()
                 .<span class="number">0</span>
-                .<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">_v</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">k</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Key::from_static_str</span>(<span class="string">&quot;os.type&quot;</span>))
+                .<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">_v</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">k</span> <span class="op">==</span> <span class="ident">Key::from_static_str</span>(<span class="string">&quot;os.type&quot;</span>))
                 .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">_k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string</span>()),
             <span class="prelude-val">Some</span>(<span class="string">&quot;linux&quot;</span>.<span class="ident">to_string</span>())
         );

@@ -200,13 +200,13 @@
     <span class="kw">type</span> <span class="ident">KeySize</span>: <span class="ident">ArrayLength</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Initialize new MAC instance from key with fixed size.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>;
 
     <span class="doccomment">/// Initialize new MAC instance from key with variable size.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default implementation will accept only keys with length equal to</span>
     <span class="doccomment">/// `KeySize`, but some MACs can accept range of key lengths.</span>
-    <span class="kw">fn</span> <span class="ident">new_from_slice</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidKeyLength</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new_from_slice</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidKeyLength</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">key</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::KeySize::to_usize</span>() {
             <span class="prelude-val">Err</span>(<span class="ident">InvalidKeyLength</span>)
         } <span class="kw">else</span> {
@@ -228,21 +228,21 @@
 
     <span class="doccomment">/// Obtain the result of a [`Mac`] computation as a [`Output`] and consume</span>
     <span class="doccomment">/// [`Mac`] instance.</span>
-    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="self">self</span>) -&gt; <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Obtain the result of a [`Mac`] computation as a [`Output`] and reset</span>
     <span class="doccomment">/// [`Mac`] instance.</span>
-    <span class="kw">fn</span> <span class="ident">finalize_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">finalize_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">finalize</span>();
         <span class="self">self</span>.<span class="ident">reset</span>();
         <span class="ident">res</span>
     }
 
     <span class="doccomment">/// Check if tag/code value is correct for the processed input.</span>
-    <span class="kw">fn</span> <span class="ident">verify</span>(<span class="self">self</span>, <span class="ident">tag</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">MacError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">verify</span>(<span class="self">self</span>, <span class="ident">tag</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">MacError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">choice</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">finalize</span>().<span class="ident">bytes</span>.<span class="ident">ct_eq</span>(<span class="ident">tag</span>);
 
-        <span class="kw">if</span> <span class="ident">choice</span>.<span class="ident">unwrap_u8</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">choice</span>.<span class="ident">unwrap_u8</span>() <span class="op">==</span> <span class="number">1</span> {
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="ident">MacError</span>)
@@ -259,7 +259,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mac</span><span class="op">&gt;</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new MAC [`Output`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">bytes</span>: <span class="ident">GenericArray</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">M::OutputSize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">bytes</span>: <span class="ident">GenericArray</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">M::OutputSize</span><span class="op">&gt;</span>) -&gt; <span class="ident">Output</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="ident">Output</span> { <span class="ident">bytes</span> }
     }
 
@@ -268,20 +268,20 @@
     <span class="doccomment">/// Be very careful using this method, since incorrect use of the tag value</span>
     <span class="doccomment">/// may permit timing attacks which defeat the security provided by the</span>
     <span class="doccomment">/// [`Mac`] trait.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GenericArray</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">M::OutputSize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bytes</span>(<span class="self">self</span>) -&gt; <span class="ident">GenericArray</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">M::OutputSize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">bytes</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mac</span><span class="op">&gt;</span> <span class="ident">ConstantTimeEq</span> <span class="kw">for</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Choice</span> {
+    <span class="kw">fn</span> <span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Choice</span> {
         <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">bytes</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mac</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Output</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">ct_eq</span>(<span class="ident">x</span>).<span class="ident">unwrap_u8</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Output</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ct_eq</span>(<span class="ident">x</span>).<span class="ident">unwrap_u8</span>() <span class="op">==</span> <span class="number">1</span>
     }
 }
 
@@ -295,7 +295,7 @@
     <span class="kw">type</span> <span class="ident">Cipher</span>: <span class="ident">BlockCipher</span>;
 
     <span class="doccomment">/// Create new MAC isntance from provided block cipher.</span>
-    <span class="kw">fn</span> <span class="ident">from_cipher</span>(<span class="ident">cipher</span>: <span class="ident"><span class="self">Self</span>::Cipher</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">from_cipher</span>(<span class="ident">cipher</span>: <span class="ident"><span class="self">Self</span>::Cipher</span>) -&gt; <span class="self">Self</span>;
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cipher&quot;</span>)]</span>
@@ -307,12 +307,12 @@
 {
     <span class="kw">type</span> <span class="ident">KeySize</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">FromBlockCipher</span><span class="op">&gt;</span><span class="ident">::Cipher</span> <span class="kw">as</span> <span class="ident">NewBlockCipher</span><span class="op">&gt;</span><span class="ident">::KeySize</span>;
 
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">FromBlockCipher</span><span class="op">&gt;</span><span class="ident">::Cipher::new</span>(<span class="ident">key</span>);
         <span class="ident"><span class="self">Self</span>::from_cipher</span>(<span class="ident">cipher</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">new_from_slice</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidKeyLength</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new_from_slice</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidKeyLength</span><span class="op">&gt;</span> {
         <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">FromBlockCipher</span><span class="op">&gt;</span><span class="ident">::Cipher::new_from_slice</span>(<span class="ident">key</span>)
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidKeyLength</span>)
             .<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::from_cipher</span>)

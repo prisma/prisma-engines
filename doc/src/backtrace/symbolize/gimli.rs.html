@@ -486,9 +486,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Mapping</span> {
-    <span class="kw">fn</span> <span class="ident">mk</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="ident">Mmap</span>, <span class="ident">mk</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mapping</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">mk</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="ident">Mmap</span>, <span class="ident">mk</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mapping</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Stash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Stash</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">stash</span> <span class="op">=</span> <span class="ident">Stash::new</span>();
         <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">mk</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">stash</span>)<span class="question-mark">?</span>;
@@ -508,8 +508,8 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stash</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Stash</span>, <span class="ident">object</span>: <span class="ident">Object</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">sections</span> <span class="op">=</span> <span class="ident">gimli::Dwarf::load</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">_</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stash</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Stash</span>, <span class="ident">object</span>: <span class="ident">Object</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">sections</span> <span class="op">=</span> <span class="ident">gimli::Dwarf::load</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">_</span>, ()<span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">object</span>.<span class="ident">section</span>(<span class="ident">stash</span>, <span class="ident">id</span>.<span class="ident">name</span>()).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[]);
             <span class="prelude-val">Ok</span>(<span class="ident">EndianSlice::new</span>(<span class="ident">data</span>, <span class="ident">Endian</span>))
         })
@@ -520,7 +520,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">mmap</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mmap</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">mmap</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mmap</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">file</span>.<span class="ident">metadata</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">len</span>().<span class="ident">try_into</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
     <span class="kw">unsafe</span> { <span class="ident">Mmap::map</span>(<span class="kw-2">&amp;</span><span class="ident">file</span>, <span class="ident">len</span>) }
@@ -578,7 +578,7 @@
         <span class="kw">use</span> <span class="ident">libs_haiku::native_libraries</span>;
     } <span class="kw">else</span> {
         <span class="comment">// Everything else should doesn&#39;t know how to load native libraries.</span>
-        <span class="kw">fn</span> <span class="ident">native_libraries</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Library</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">native_libraries</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Library</span><span class="op">&gt;</span> {
             <span class="ident">Vec::new</span>()
         }
     }
@@ -628,7 +628,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Cache</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cache</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Cache</span> {
         <span class="ident">Cache</span> {
             <span class="ident">mappings</span>: <span class="ident">Vec::with_capacity</span>(<span class="ident">MAPPINGS_CACHE_SIZE</span>),
             <span class="ident">libraries</span>: <span class="ident">native_libraries</span>(),
@@ -652,7 +652,7 @@
         <span class="ident">f</span>(<span class="ident">MAPPINGS_CACHE</span>.<span class="ident">get_or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Cache::new</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">avma_to_svma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">avma_to_svma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">libraries</span>
             .<span class="ident">iter</span>()
             .<span class="ident">enumerate</span>()
@@ -686,8 +686,8 @@
             .<span class="ident">next</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">mapping_for_lib</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">lib</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mappings</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">idx</span> <span class="op">=</span><span class="op">=</span> <span class="ident">lib</span>);
+    <span class="kw">fn</span> <span class="ident">mapping_for_lib</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">lib</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mappings</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">idx</span> <span class="op">==</span> <span class="ident">lib</span>);
 
         <span class="comment">// Invariant: after this conditional completes without early returning</span>
         <span class="comment">// from an error, the cache entry for this path is at index 0.</span>
@@ -705,7 +705,7 @@
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">libraries</span>[<span class="ident">lib</span>].<span class="ident">name</span>;
             <span class="kw">let</span> <span class="ident">mapping</span> <span class="op">=</span> <span class="ident">Mapping::new</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">mappings</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">MAPPINGS_CACHE_SIZE</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">mappings</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">MAPPINGS_CACHE_SIZE</span> {
                 <span class="self">self</span>.<span class="ident">mappings</span>.<span class="ident">pop</span>();
             }
 
@@ -731,23 +731,23 @@
 
     <span class="ident">Cache::with_global</span>(<span class="op">|</span><span class="ident">cache</span><span class="op">|</span> {
         <span class="kw">let</span> (<span class="ident">lib</span>, <span class="ident">addr</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">avma_to_svma</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">pair</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pair</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">pair</span>) =&gt; <span class="ident">pair</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
         };
 
         <span class="comment">// Finally, get a cached mapping or create a new mapping for this file, and</span>
         <span class="comment">// evaluate the DWARF info to find the file/line/name for this address.</span>
         <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">mapping_for_lib</span>(<span class="ident">lib</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">cx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cx</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">cx</span>) =&gt; <span class="ident">cx</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
         };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">any_frames</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">frames</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">dwarf</span>.<span class="ident">find_frames</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="ident">u64</span>) {
             <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">frame</span>)) <span class="op">=</span> <span class="ident">frames</span>.<span class="ident">next</span>() {
                 <span class="ident">any_frames</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">frame</span>.<span class="ident">function</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">slice</span>()),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cx</span>.<span class="ident">object</span>.<span class="ident">search_symtab</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="ident">u64</span>),
+                    <span class="prelude-val">Some</span>(<span class="ident">f</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">slice</span>()),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">cx</span>.<span class="ident">object</span>.<span class="ident">search_symtab</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="ident">u64</span>),
                 };
                 <span class="ident">call</span>(<span class="ident">Symbol::Frame</span> {
                     <span class="ident">addr</span>: <span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
@@ -795,54 +795,54 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Symbol</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SymbolName</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SymbolName</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Symbol::Frame</span> { <span class="ident">name</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Symbol::Frame</span> { <span class="ident">name</span>, .. } =&gt; {
                 <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>;
                 <span class="prelude-val">Some</span>(<span class="ident">SymbolName::new</span>(<span class="ident">name</span>))
             }
-            <span class="ident">Symbol::Symtab</span> { <span class="ident">name</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">SymbolName::new</span>(<span class="ident">name</span>)),
+            <span class="ident">Symbol::Symtab</span> { <span class="ident">name</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="ident">SymbolName::new</span>(<span class="ident">name</span>)),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Symbol::Frame</span> { <span class="ident">addr</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">addr</span>),
-            <span class="ident">Symbol::Symtab</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Symbol::Frame</span> { <span class="ident">addr</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">addr</span>),
+            <span class="ident">Symbol::Symtab</span> { .. } =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filename_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BytesOrWideString</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filename_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BytesOrWideString</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Symbol::Frame</span> { <span class="ident">location</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Symbol::Frame</span> { <span class="ident">location</span>, .. } =&gt; {
                 <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">location</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">file</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Some</span>(<span class="ident">BytesOrWideString::Bytes</span>(<span class="ident">file</span>.<span class="ident">as_bytes</span>()))
             }
-            <span class="ident">Symbol::Symtab</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Symbol::Symtab</span> { .. } =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filename</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Path</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filename</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Path</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Symbol::Frame</span> { <span class="ident">location</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Symbol::Frame</span> { <span class="ident">location</span>, .. } =&gt; {
                 <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">location</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">file</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Some</span>(<span class="ident">Path::new</span>(<span class="ident">file</span>))
             }
-            <span class="ident">Symbol::Symtab</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Symbol::Symtab</span> { .. } =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lineno</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lineno</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Symbol::Frame</span> { <span class="ident">location</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">location</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">line</span>,
-            <span class="ident">Symbol::Symtab</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Symbol::Frame</span> { <span class="ident">location</span>, .. } =&gt; <span class="ident">location</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">line</span>,
+            <span class="ident">Symbol::Symtab</span> { .. } =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colno</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colno</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Symbol::Frame</span> { <span class="ident">location</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">location</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">column</span>,
-            <span class="ident">Symbol::Symtab</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Symbol::Frame</span> { <span class="ident">location</span>, .. } =&gt; <span class="ident">location</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">column</span>,
+            <span class="ident">Symbol::Symtab</span> { .. } =&gt; <span class="prelude-val">None</span>,
         }
     }
 }

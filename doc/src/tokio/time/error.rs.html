@@ -155,7 +155,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Kind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">k</span>: <span class="ident">Kind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">k</span>: <span class="ident">Kind</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Error</span>(<span class="ident">k</span>)
     }
 }
@@ -173,32 +173,32 @@
 
 <span class="kw">impl</span> <span class="ident">Error</span> {
     <span class="doccomment">/// Creates an error representing a shutdown timer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>() -&gt; <span class="ident">Error</span> {
         <span class="ident">Error</span>(<span class="ident">Shutdown</span>)
     }
 
     <span class="doccomment">/// Returns `true` if the error was caused by the timer being shutdown.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_shutdown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_shutdown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">Kind::Shutdown</span>)
     }
 
     <span class="doccomment">/// Creates an error representing a timer at capacity.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">at_capacity</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">at_capacity</span>() -&gt; <span class="ident">Error</span> {
         <span class="ident">Error</span>(<span class="ident">AtCapacity</span>)
     }
 
     <span class="doccomment">/// Returns `true` if the error was caused by the timer being at capacity.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_at_capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_at_capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">Kind::AtCapacity</span>)
     }
 
     <span class="doccomment">/// Create an error representing a misconfigured timer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalid</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalid</span>() -&gt; <span class="ident">Error</span> {
         <span class="ident">Error</span>(<span class="ident">Invalid</span>)
     }
 
     <span class="doccomment">/// Returns `true` if the error was caused by the timer being misconfigured.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_invalid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_invalid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">Kind::Invalid</span>)
     }
 }
@@ -206,12 +206,12 @@
 <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Kind</span>::<span class="kw-2">*</span>;
         <span class="kw">let</span> <span class="ident">descr</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">Shutdown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;the timer is shutdown, must be called from the context of Tokio runtime&quot;</span>,
-            <span class="ident">AtCapacity</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;timer is at capacity and cannot create a new entry&quot;</span>,
-            <span class="ident">Invalid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;timer duration exceeds maximum duration&quot;</span>,
+            <span class="ident">Shutdown</span> =&gt; <span class="string">&quot;the timer is shutdown, must be called from the context of Tokio runtime&quot;</span>,
+            <span class="ident">AtCapacity</span> =&gt; <span class="string">&quot;timer is at capacity and cannot create a new entry&quot;</span>,
+            <span class="ident">Invalid</span> =&gt; <span class="string">&quot;timer duration exceeds maximum duration&quot;</span>,
         };
         <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">descr</span>)
     }
@@ -220,13 +220,13 @@
 <span class="comment">// ===== impl Elapsed =====</span>
 
 <span class="kw">impl</span> <span class="ident">Elapsed</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Elapsed</span>(())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Elapsed</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="string">&quot;deadline has elapsed&quot;</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>)
     }
 }
@@ -234,7 +234,7 @@
 <span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">Elapsed</span> {}
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Elapsed</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">std::io::Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">_err</span>: <span class="ident">Elapsed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">_err</span>: <span class="ident">Elapsed</span>) -&gt; <span class="ident">std::io::Error</span> {
         <span class="ident">std::io::ErrorKind::TimedOut</span>.<span class="ident">into</span>()
     }
 }

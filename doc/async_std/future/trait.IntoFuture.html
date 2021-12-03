@@ -3,7 +3,7 @@
     type <a href="#associatedtype.Future" class="type">Future</a>: <a class="trait" href="trait.Future.html" title="trait async_std::future::Future">Future</a>&lt;Output = Self::<a class="type" href="trait.IntoFuture.html#associatedtype.Output" title="type async_std::future::IntoFuture::Output">Output</a>&gt;;
     fn <a href="#tymethod.into_future" class="fnname">into_future</a>(self) -&gt; Self::<a class="type" href="trait.IntoFuture.html#associatedtype.Future" title="type async_std::future::IntoFuture::Future">Future</a>;
 }</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Convert a type into a <code>Future</code>.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">async_std::future</span>::{<span class="ident">Future</span>, <span class="ident">IntoFuture</span>};
 <span class="kw">use</span> <span class="ident">async_std::io</span>;
 <span class="kw">use</span> <span class="ident">async_std::pin::Pin</span>;
@@ -11,7 +11,7 @@
 <span class="kw">struct</span> <span class="ident">Client</span>;
 
 <span class="kw">impl</span> <span class="ident">Client</span> {
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// Send a request</span>
         <span class="prelude-val">Ok</span>(())
     }
@@ -22,7 +22,7 @@
 
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">into_future</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">into_future</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="ident">Box::pin</span>(<span class="kw">async</span> {
             <span class="self">self</span>.<span class="ident">send</span>().<span class="kw">await</span>
         })

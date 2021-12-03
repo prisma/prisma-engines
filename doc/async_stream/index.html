@@ -8,7 +8,7 @@ stream. The <code>try_stream!</code> also returns an anonymous type implementing
 <a href="https://docs.rs/futures-core/*/futures_core/stream/trait.Stream.html"><code>Stream</code></a> trait, but the <code>Item</code> associated type is <code>Result&lt;T, Error&gt;</code>. The
 <code>try_stream!</code> macro supports using <code>?</code> notiation as part of the
 implementation.</p>
-<h1 id="usage" class="section-header"><a href="#usage">Usage</a></h1>
+<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
 <p>A basic stream yielding numbers. Values are yielded using the <code>yield</code>
 keyword. The stream block must return <code>()</code>.</p>
 
@@ -39,7 +39,7 @@ keyword. The stream block must return <code>()</code>.</p>
 <span class="kw">use</span> <span class="ident">futures_util::pin_mut</span>;
 <span class="kw">use</span> <span class="ident">futures_util::stream::StreamExt</span>;
 
-<span class="kw">fn</span> <span class="ident">zero_to_three</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u32</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">zero_to_three</span>() -&gt; <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u32</span><span class="op">&gt;</span> {
     <span class="macro">stream!</span> {
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">3</span> {
             <span class="kw">yield</span> <span class="ident">i</span>;
@@ -65,7 +65,7 @@ syntax to assist with this:</p>
 <span class="kw">use</span> <span class="ident">futures_util::pin_mut</span>;
 <span class="kw">use</span> <span class="ident">futures_util::stream::StreamExt</span>;
 
-<span class="kw">fn</span> <span class="ident">zero_to_three</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u32</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">zero_to_three</span>() -&gt; <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u32</span><span class="op">&gt;</span> {
     <span class="macro">stream!</span> {
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">3</span> {
             <span class="kw">yield</span> <span class="ident">i</span>;
@@ -74,7 +74,7 @@ syntax to assist with this:</p>
 }
 
 <span class="kw">fn</span> <span class="ident">double</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="ident">S</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u32</span><span class="op">&gt;</span>
+    -&gt; <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u32</span><span class="op">&gt;</span>
 {
     <span class="macro">stream!</span> {
         <span class="kw">for</span> <span class="kw">await</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">input</span> {
@@ -105,7 +105,7 @@ of the returned stream is <code>Result</code> with <code>Ok</code> being the val
 <span class="kw">use</span> <span class="ident">std::net::SocketAddr</span>;
 
 <span class="kw">fn</span> <span class="ident">bind_and_accept</span>(<span class="ident">addr</span>: <span class="ident">SocketAddr</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    -&gt; <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span><span class="op">&gt;</span>
 {
     <span class="macro">try_stream!</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">TcpListener::bind</span>(<span class="ident">addr</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -117,7 +117,7 @@ of the returned stream is <code>Result</code> with <code>Ok</code> being the val
         }
     }
 }</code></pre></div>
-<h1 id="implementation" class="section-header"><a href="#implementation">Implementation</a></h1>
+<h2 id="implementation" class="section-header"><a href="#implementation">Implementation</a></h2>
 <p>The <code>stream!</code> and <code>try_stream!</code> macros are implemented using proc macros.
 The macro searches the syntax tree for instances of <code>sender.send($expr)</code> and
 transforms them into <code>sender.send($expr).await</code>.</p>
@@ -128,8 +128,8 @@ stored on the stack. A pointer to the cell is stored in a thread local and
 <code>sender.send(value)</code> stores the value that cell and yields back to the
 caller.</p>
 </div></details><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="macro" href="macro.stream.html" title="async_stream::stream macro">stream</a></div><div class="item-right docblock-short"><p>Asynchronous stream</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.try_stream.html" title="async_stream::try_stream macro">try_stream</a></div><div class="item-right docblock-short"><p>Asynchronous fallible stream</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="async_stream" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.stream.html" title="async_stream::stream macro">stream</a></div><div class="item-right docblock-short"><p>Asynchronous stream</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.try_stream.html" title="async_stream::try_stream macro">try_stream</a></div><div class="item-right docblock-short"><p>Asynchronous fallible stream</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="async_stream" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

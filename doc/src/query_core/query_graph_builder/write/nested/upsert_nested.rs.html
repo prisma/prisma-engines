@@ -388,7 +388,7 @@
     <span class="ident">parent_node</span>: <span class="ident">NodeRef</span>,
     <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
     <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">child_model</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>();
     <span class="kw">let</span> <span class="ident">child_model_identifier</span> <span class="op">=</span> <span class="ident">child_model</span>.<span class="ident">primary_identifier</span>();
 
@@ -451,8 +451,8 @@
                 <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_node</span>, <span class="kw-2">mut</span> <span class="ident">child_ids</span><span class="op">|</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateRecord</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span>))) <span class="op">=</span> <span class="ident">update_node</span> {
                         <span class="kw">let</span> <span class="ident">child_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">child_ids</span>.<span class="ident">pop</span>() {
-                            <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">id</span>),
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+                            <span class="prelude-val">Some</span>(<span class="ident">id</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">id</span>),
+                            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
                                 <span class="string">&quot;No &#39;{}&#39; record (needed for nested update `where` on exists) was found for a nested upsert on relation &#39;{}&#39;.&quot;</span>,
                                 <span class="ident">child_model_name</span>, <span class="ident">relation_name</span>
                             ))),
@@ -506,8 +506,8 @@
                 <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
                 <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="ident">parent_model_id</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_ids</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_ids</span>.<span class="ident">pop</span>() {
-                        <span class="prelude-val">Some</span>(<span class="ident">pid</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+                        <span class="prelude-val">Some</span>(<span class="ident">pid</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
                             <span class="string">&quot;No &#39;{}&#39; record (needed to update inlined relation on &#39;{}&#39;) was found for a nested upsert on relation &#39;{}&#39;.&quot;</span>,
                             <span class="kw-2">&amp;</span><span class="ident">parent_model_name</span>, <span class="ident">parent_model_name</span>, <span class="ident">relation_name</span>
                         ))),
@@ -531,8 +531,8 @@
                 <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
                 <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="ident">child_link</span>.<span class="ident">clone</span>(), <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_node</span>, <span class="kw-2">mut</span> <span class="ident">child_links</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">child_link</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">child_links</span>.<span class="ident">pop</span>() {
-                        <span class="prelude-val">Some</span>(<span class="ident">link</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">link</span>),
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+                        <span class="prelude-val">Some</span>(<span class="ident">link</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">link</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
                             <span class="string">&quot;No &#39;{}&#39; record (needed to update inlined relation on &#39;{}&#39;) was found for a nested upsert on relation &#39;{}&#39;.&quot;</span>,
                             <span class="ident">child_model_name</span>, <span class="ident">parent_model_name</span>, <span class="ident">relation_name</span>
                         ))),
@@ -557,8 +557,8 @@
                 <span class="kw-2">&amp;</span><span class="ident">create_node</span>,
                 <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="ident">parent_link</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">create_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_links</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">parent_link</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_links</span>.<span class="ident">pop</span>() {
-                        <span class="prelude-val">Some</span>(<span class="ident">link</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">link</span>),
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+                        <span class="prelude-val">Some</span>(<span class="ident">link</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">link</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
                             <span class="string">&quot;No &#39;{}&#39; record (needed to update inlined relation on &#39;{}&#39;) was found for a nested upsert on relation &#39;{}&#39;.&quot;</span>,
                             <span class="ident">parent_model_name</span>, <span class="ident">child_model_name</span>, <span class="ident">relation_name</span>
                         ))),

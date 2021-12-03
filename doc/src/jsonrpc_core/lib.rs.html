@@ -149,7 +149,7 @@
 <span class="doccomment">/// workaround for https://github.com/serde-rs/json/issues/505</span>
 <span class="doccomment">/// Arbitrary precision confuses serde when deserializing into untagged enums,</span>
 <span class="doccomment">/// this is a workaround</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serde_from_str</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">SerdeError</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serde_from_str</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">SerdeError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">T</span>: <span class="ident">serde::de::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 {

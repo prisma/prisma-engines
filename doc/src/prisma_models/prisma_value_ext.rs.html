@@ -75,59 +75,59 @@
 <span class="comment">// use std::convert::TryFrom;</span>
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PrismaValueExtensions</span> {
-    <span class="kw">fn</span> <span class="ident">coerce</span>(<span class="self">self</span>, <span class="ident">to_type</span>: <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">coerce</span>(<span class="self">self</span>, <span class="ident">to_type</span>: <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">PrismaValueExtensions</span> <span class="kw">for</span> <span class="ident">PrismaValue</span> {
     <span class="comment">// Todo this is not exhaustive for now.</span>
-    <span class="kw">fn</span> <span class="ident">coerce</span>(<span class="self">self</span>, <span class="ident">to_type</span>: <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">coerce</span>(<span class="self">self</span>, <span class="ident">to_type</span>: <span class="kw-2">&amp;</span><span class="ident">TypeIdentifier</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">coerced</span> <span class="op">=</span> <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">to_type</span>) {
             <span class="comment">// Trivial cases</span>
-            (<span class="ident">PrismaValue::Null</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Null</span>,
-            (<span class="ident">val</span> @ <span class="ident">PrismaValue::String</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::String</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
-            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Int</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Int</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
-            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Float</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Float</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
-            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Boolean</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Boolean</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
-            (<span class="ident">val</span> @ <span class="ident">PrismaValue::DateTime</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::DateTime</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
-            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Enum</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
-            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Uuid</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::UUID</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
-            (<span class="ident">val</span> @ <span class="ident">PrismaValue::BigInt</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::BigInt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
-            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Bytes</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Bytes</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
+            (<span class="ident">PrismaValue::Null</span>, <span class="kw">_</span>) =&gt; <span class="ident">PrismaValue::Null</span>,
+            (<span class="ident">val</span> @ <span class="ident">PrismaValue::String</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::String</span>) =&gt; <span class="ident">val</span>,
+            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Int</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Int</span>) =&gt; <span class="ident">val</span>,
+            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Float</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Float</span>) =&gt; <span class="ident">val</span>,
+            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Boolean</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Boolean</span>) =&gt; <span class="ident">val</span>,
+            (<span class="ident">val</span> @ <span class="ident">PrismaValue::DateTime</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::DateTime</span>) =&gt; <span class="ident">val</span>,
+            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Enum</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>)) =&gt; <span class="ident">val</span>,
+            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Uuid</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::UUID</span>) =&gt; <span class="ident">val</span>,
+            (<span class="ident">val</span> @ <span class="ident">PrismaValue::BigInt</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::BigInt</span>) =&gt; <span class="ident">val</span>,
+            (<span class="ident">val</span> @ <span class="ident">PrismaValue::Bytes</span>(<span class="kw">_</span>), <span class="ident">TypeIdentifier::Bytes</span>) =&gt; <span class="ident">val</span>,
 
             <span class="comment">// Valid String coercions</span>
-            (<span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>), <span class="ident">TypeIdentifier::String</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::String</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">i</span>)),
-            (<span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>), <span class="ident">TypeIdentifier::String</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::String</span>(<span class="ident">f</span>.<span class="ident">to_string</span>()),
-            (<span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>), <span class="ident">TypeIdentifier::String</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::String</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">b</span>)),
-            (<span class="ident">PrismaValue::Enum</span>(<span class="ident">e</span>), <span class="ident">TypeIdentifier::String</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::String</span>(<span class="ident">e</span>),
-            (<span class="ident">PrismaValue::Uuid</span>(<span class="ident">u</span>), <span class="ident">TypeIdentifier::String</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::String</span>(<span class="ident">u</span>.<span class="ident">to_string</span>()),
+            (<span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>), <span class="ident">TypeIdentifier::String</span>) =&gt; <span class="ident">PrismaValue::String</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">i</span>)),
+            (<span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>), <span class="ident">TypeIdentifier::String</span>) =&gt; <span class="ident">PrismaValue::String</span>(<span class="ident">f</span>.<span class="ident">to_string</span>()),
+            (<span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>), <span class="ident">TypeIdentifier::String</span>) =&gt; <span class="ident">PrismaValue::String</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">b</span>)),
+            (<span class="ident">PrismaValue::Enum</span>(<span class="ident">e</span>), <span class="ident">TypeIdentifier::String</span>) =&gt; <span class="ident">PrismaValue::String</span>(<span class="ident">e</span>),
+            (<span class="ident">PrismaValue::Uuid</span>(<span class="ident">u</span>), <span class="ident">TypeIdentifier::String</span>) =&gt; <span class="ident">PrismaValue::String</span>(<span class="ident">u</span>.<span class="ident">to_string</span>()),
 
             <span class="comment">// Valid Int coersions</span>
-            (<span class="ident">PrismaValue::String</span>(<span class="ident">s</span>), <span class="ident">TypeIdentifier::Int</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">parse</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">PrismaValue::String</span>(<span class="ident">s</span>), <span class="ident">TypeIdentifier::Int</span>) =&gt; <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">parse</span>() {
+                <span class="prelude-val">Ok</span>(<span class="ident">i</span>) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DomainError::ConversionFailure</span>(
                         <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">s</span>),
                         <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">to_type</span>),
                     ))
                 }
             },
-            (<span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>), <span class="ident">TypeIdentifier::Int</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Int</span>(<span class="ident">f</span>.<span class="ident">to_i64</span>().<span class="ident">unwrap</span>()),
-            (<span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>), <span class="ident">TypeIdentifier::Int</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>),
+            (<span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>), <span class="ident">TypeIdentifier::Int</span>) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">f</span>.<span class="ident">to_i64</span>().<span class="ident">unwrap</span>()),
+            (<span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>), <span class="ident">TypeIdentifier::Int</span>) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>),
 
             <span class="comment">// Valid BigInt coersions</span>
-            (<span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>), <span class="ident">TypeIdentifier::BigInt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>),
+            (<span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>), <span class="ident">TypeIdentifier::BigInt</span>) =&gt; <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>),
 
             <span class="comment">// Todo other coercions here</span>
 
             <span class="comment">// Lists</span>
-            (<span class="ident">PrismaValue::List</span>(<span class="ident">list</span>), <span class="ident">typ</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::List</span>(
+            (<span class="ident">PrismaValue::List</span>(<span class="ident">list</span>), <span class="ident">typ</span>) =&gt; <span class="ident">PrismaValue::List</span>(
                 <span class="ident">list</span>.<span class="ident">into_iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">coerce</span>(<span class="ident">typ</span>))
                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
             ),
 
             <span class="comment">// Invalid coercion</span>
-            (<span class="ident">val</span>, <span class="ident">typ</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">val</span>, <span class="ident">typ</span>) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DomainError::ConversionFailure</span>(
                     <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">val</span>),
                     <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">typ</span>),

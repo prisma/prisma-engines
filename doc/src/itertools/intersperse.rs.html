@@ -121,14 +121,14 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::size_hint</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntersperseElement</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">generate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Item</span>;
+    <span class="kw">fn</span> <span class="ident">generate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Item</span>;
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntersperseElementSimple</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>(<span class="ident">Item</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">IntersperseElement</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntersperseElementSimple</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">generate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Item</span> {
+    <span class="kw">fn</span> <span class="ident">generate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Item</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()
     }
 }
@@ -144,14 +144,14 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Intersperse</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">IntersperseWith</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">IntersperseElementSimple</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">I</span> <span class="kw">as</span> <span class="ident">Iterator</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Create a new Intersperse iterator</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersperse</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">elt</span>: <span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Intersperse</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersperse</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">elt</span>: <span class="ident">I::Item</span>) -&gt; <span class="ident">Intersperse</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Iterator</span>,
 {
     <span class="ident">intersperse_with</span>(<span class="ident">iter</span>, <span class="ident">IntersperseElementSimple</span>(<span class="ident">elt</span>))
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">F</span>: <span class="ident">FnMut</span>()<span class="op">-</span><span class="op">&gt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="ident">IntersperseElement</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span> {
-    <span class="kw">fn</span> <span class="ident">generate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Item</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">F</span>: <span class="ident">FnMut</span>()-&gt;<span class="ident">Item</span><span class="op">&gt;</span> <span class="ident">IntersperseElement</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span> {
+    <span class="kw">fn</span> <span class="ident">generate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Item</span> {
         <span class="self">self</span>()
     }
 }
@@ -175,7 +175,7 @@
 }
 
 <span class="doccomment">/// Create a new IntersperseWith iterator</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersperse_with</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">ElemF</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">elt</span>: <span class="ident">ElemF</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IntersperseWith</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">ElemF</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersperse_with</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">ElemF</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">elt</span>: <span class="ident">ElemF</span>) -&gt; <span class="ident">IntersperseWith</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">ElemF</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Iterator</span>,
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">fuse</span>();
@@ -192,7 +192,7 @@
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">peek</span>.<span class="ident">is_some</span>() {
             <span class="self">self</span>.<span class="ident">peek</span>.<span class="ident">take</span>()
         } <span class="kw">else</span> {
@@ -205,15 +205,15 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
         <span class="comment">// 2 * SH + { 1 or 0 }</span>
         <span class="kw">let</span> <span class="ident">has_peek</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">peek</span>.<span class="ident">is_some</span>() <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="ident">sh</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">size_hint</span>();
         <span class="ident">size_hint::add_scalar</span>(<span class="ident">size_hint::add</span>(<span class="ident">sh</span>, <span class="ident">sh</span>), <span class="ident">has_peek</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">fold</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">init</span>: <span class="ident">B</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">B</span> <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>, <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">B</span>, <span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">B</span>,
+    <span class="kw">fn</span> <span class="ident">fold</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">init</span>: <span class="ident">B</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">B</span> <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>, <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">B</span>, <span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">B</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">accum</span> <span class="op">=</span> <span class="ident">init</span>;
 

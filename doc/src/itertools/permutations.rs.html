@@ -339,10 +339,10 @@
     <span class="macro">debug_fmt_fields!</span>(<span class="ident">Permutations</span>, <span class="ident">vals</span>, <span class="ident">state</span>);
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permutations</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">k</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Permutations</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permutations</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">k</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Permutations</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vals</span> <span class="op">=</span> <span class="ident">LazyBuffer::new</span>(<span class="ident">iter</span>);
 
-    <span class="kw">if</span> <span class="ident">k</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">k</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="comment">// Special case, yields single empty vec; `n` is irrelevant</span>
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">PermutationState::Complete</span>(<span class="ident">CompleteState::Start</span> { <span class="ident">n</span>: <span class="number">0</span>, <span class="ident">k</span>: <span class="number">0</span> });
 
@@ -380,69 +380,69 @@
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">I::Item</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">advance</span>();
 
         <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Permutations</span> { <span class="kw-2">ref</span> <span class="ident">vals</span>, <span class="kw-2">ref</span> <span class="ident">state</span> } <span class="op">=</span> <span class="self">self</span>;
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">state</span> {
-            <span class="ident">PermutationState::StartUnknownLen</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;unexpected iterator state&quot;</span>),
-            <span class="ident">PermutationState::OngoingUnknownLen</span> { <span class="ident">k</span>, <span class="ident">min_n</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PermutationState::StartUnknownLen</span> { .. } =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unexpected iterator state&quot;</span>),
+            <span class="ident">PermutationState::OngoingUnknownLen</span> { <span class="ident">k</span>, <span class="ident">min_n</span> } =&gt; {
                 <span class="kw">let</span> <span class="ident">latest_idx</span> <span class="op">=</span> <span class="ident">min_n</span> <span class="op">-</span> <span class="number">1</span>;
                 <span class="kw">let</span> <span class="ident">indices</span> <span class="op">=</span> (<span class="number">0</span>..(<span class="ident">k</span> <span class="op">-</span> <span class="number">1</span>)).<span class="ident">chain</span>(<span class="ident">once</span>(<span class="ident">latest_idx</span>));
 
                 <span class="prelude-val">Some</span>(<span class="ident">indices</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">vals</span>[<span class="ident">i</span>].<span class="ident">clone</span>()).<span class="ident">collect</span>())
             }
-            <span class="ident">PermutationState::Complete</span>(<span class="ident">CompleteState::Start</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">PermutationState::Complete</span>(<span class="ident">CompleteState::Ongoing</span> { <span class="kw-2">ref</span> <span class="ident">indices</span>, <span class="kw-2">ref</span> <span class="ident">cycles</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PermutationState::Complete</span>(<span class="ident">CompleteState::Start</span> { .. }) =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">PermutationState::Complete</span>(<span class="ident">CompleteState::Ongoing</span> { <span class="kw-2">ref</span> <span class="ident">indices</span>, <span class="kw-2">ref</span> <span class="ident">cycles</span> }) =&gt; {
                 <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">cycles</span>.<span class="ident">len</span>();
 
                 <span class="prelude-val">Some</span>(<span class="ident">indices</span>[<span class="number">0</span>..<span class="ident">k</span>].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">i</span><span class="op">|</span> <span class="ident">vals</span>[<span class="ident">i</span>].<span class="ident">clone</span>()).<span class="ident">collect</span>())
             },
-            <span class="ident">PermutationState::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>
+            <span class="ident">PermutationState::Empty</span> =&gt; <span class="prelude-val">None</span>
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">count</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">count</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">let</span> <span class="ident">Permutations</span> { <span class="ident">vals</span>, <span class="ident">state</span> } <span class="op">=</span> <span class="self">self</span>;
 
-        <span class="kw">fn</span> <span class="ident">from_complete</span>(<span class="ident">complete_state</span>: <span class="ident">CompleteState</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="kw">fn</span> <span class="ident">from_complete</span>(<span class="ident">complete_state</span>: <span class="ident">CompleteState</span>) -&gt; <span class="ident">usize</span> {
             <span class="kw">match</span> <span class="ident">complete_state</span>.<span class="ident">remaining</span>() {
-                <span class="ident">CompleteStateRemaining::Known</span>(<span class="ident">count</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">count</span>,
-                <span class="ident">CompleteStateRemaining::Overflow</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">CompleteStateRemaining::Known</span>(<span class="ident">count</span>) =&gt; <span class="ident">count</span>,
+                <span class="ident">CompleteStateRemaining::Overflow</span> =&gt; {
                     <span class="macro">panic!</span>(<span class="string">&quot;Iterator count greater than usize::MAX&quot;</span>);
                 }
             }
         }
 
         <span class="kw">match</span> <span class="ident">state</span> {
-            <span class="ident">PermutationState::StartUnknownLen</span> { <span class="ident">k</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PermutationState::StartUnknownLen</span> { <span class="ident">k</span> } =&gt; {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">vals</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">vals</span>.<span class="ident">it</span>.<span class="ident">count</span>();
                 <span class="kw">let</span> <span class="ident">complete_state</span> <span class="op">=</span> <span class="ident">CompleteState::Start</span> { <span class="ident">n</span>, <span class="ident">k</span> };
 
                 <span class="ident">from_complete</span>(<span class="ident">complete_state</span>)
             }
-            <span class="ident">PermutationState::OngoingUnknownLen</span> { <span class="ident">k</span>, <span class="ident">min_n</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PermutationState::OngoingUnknownLen</span> { <span class="ident">k</span>, <span class="ident">min_n</span> } =&gt; {
                 <span class="kw">let</span> <span class="ident">prev_iteration_count</span> <span class="op">=</span> <span class="ident">min_n</span> <span class="op">-</span> <span class="ident">k</span> <span class="op">+</span> <span class="number">1</span>;
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">vals</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">vals</span>.<span class="ident">it</span>.<span class="ident">count</span>();
                 <span class="kw">let</span> <span class="ident">complete_state</span> <span class="op">=</span> <span class="ident">CompleteState::Start</span> { <span class="ident">n</span>, <span class="ident">k</span> };
 
                 <span class="ident">from_complete</span>(<span class="ident">complete_state</span>) <span class="op">-</span> <span class="ident">prev_iteration_count</span>
             },
-            <span class="ident">PermutationState::Complete</span>(<span class="ident">state</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">from_complete</span>(<span class="ident">state</span>),
-            <span class="ident">PermutationState::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>
+            <span class="ident">PermutationState::Complete</span>(<span class="ident">state</span>) =&gt; <span class="ident">from_complete</span>(<span class="ident">state</span>),
+            <span class="ident">PermutationState::Empty</span> =&gt; <span class="number">0</span>
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="ident">PermutationState::StartUnknownLen</span> { .. } <span class="op">|</span>
-            <span class="ident">PermutationState::OngoingUnknownLen</span> { .. } <span class="op">=</span><span class="op">&gt;</span> (<span class="number">0</span>, <span class="prelude-val">None</span>), <span class="comment">// TODO can we improve this lower bound?</span>
-            <span class="ident">PermutationState::Complete</span>(<span class="kw-2">ref</span> <span class="ident">state</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">remaining</span>() {
-                <span class="ident">CompleteStateRemaining::Known</span>(<span class="ident">count</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">count</span>, <span class="prelude-val">Some</span>(<span class="ident">count</span>)),
-                <span class="ident">CompleteStateRemaining::Overflow</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">::std::usize::MAX</span>, <span class="prelude-val">None</span>)
+            <span class="ident">PermutationState::OngoingUnknownLen</span> { .. } =&gt; (<span class="number">0</span>, <span class="prelude-val">None</span>), <span class="comment">// TODO can we improve this lower bound?</span>
+            <span class="ident">PermutationState::Complete</span>(<span class="kw-2">ref</span> <span class="ident">state</span>) =&gt; <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">remaining</span>() {
+                <span class="ident">CompleteStateRemaining::Known</span>(<span class="ident">count</span>) =&gt; (<span class="ident">count</span>, <span class="prelude-val">Some</span>(<span class="ident">count</span>)),
+                <span class="ident">CompleteStateRemaining::Overflow</span> =&gt; (<span class="ident">::std::usize::MAX</span>, <span class="prelude-val">None</span>)
             }
-            <span class="ident">PermutationState::Empty</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>))
+            <span class="ident">PermutationState::Empty</span> =&gt; (<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>))
         }
     }
 }
@@ -456,10 +456,10 @@
         <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Permutations</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">vals</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">state</span> } <span class="op">=</span> <span class="self">self</span>;
 
         <span class="kw-2">*</span><span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">state</span> {
-            <span class="ident">PermutationState::StartUnknownLen</span> { <span class="ident">k</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PermutationState::StartUnknownLen</span> { <span class="ident">k</span> } =&gt; {
                 <span class="ident">PermutationState::OngoingUnknownLen</span> { <span class="ident">k</span>, <span class="ident">min_n</span>: <span class="ident">k</span> }
             }
-            <span class="ident">PermutationState::OngoingUnknownLen</span> { <span class="ident">k</span>, <span class="ident">min_n</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PermutationState::OngoingUnknownLen</span> { <span class="ident">k</span>, <span class="ident">min_n</span> } =&gt; {
                 <span class="kw">if</span> <span class="ident">vals</span>.<span class="ident">get_next</span>() {
                     <span class="ident">PermutationState::OngoingUnknownLen</span> { <span class="ident">k</span>, <span class="ident">min_n</span>: <span class="ident">min_n</span> <span class="op">+</span> <span class="number">1</span> }
                 } <span class="kw">else</span> {
@@ -475,12 +475,12 @@
                     <span class="ident">PermutationState::Complete</span>(<span class="ident">complete_state</span>)
                 }
             }
-            <span class="ident">PermutationState::Complete</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">state</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PermutationState::Complete</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">state</span>) =&gt; {
                 <span class="ident">state</span>.<span class="ident">advance</span>();
 
                 <span class="kw">return</span>;
             }
-            <span class="ident">PermutationState::Empty</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="kw">return</span>; }
+            <span class="ident">PermutationState::Empty</span> =&gt; { <span class="kw">return</span>; }
         };
     }
 }
@@ -488,7 +488,7 @@
 <span class="kw">impl</span> <span class="ident">CompleteState</span> {
     <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">CompleteState::Start</span> { <span class="ident">n</span>, <span class="ident">k</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CompleteState::Start</span> { <span class="ident">n</span>, <span class="ident">k</span> } =&gt; {
                 <span class="kw">let</span> <span class="ident">indices</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">n</span>).<span class="ident">collect</span>();
                 <span class="kw">let</span> <span class="ident">cycles</span> <span class="op">=</span> ((<span class="ident">n</span> <span class="op">-</span> <span class="ident">k</span>)..<span class="ident">n</span>).<span class="ident">rev</span>().<span class="ident">collect</span>();
 
@@ -497,12 +497,12 @@
                     <span class="ident">indices</span>
                 }
             },
-            <span class="ident">CompleteState::Ongoing</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">indices</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">cycles</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CompleteState::Ongoing</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">indices</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">cycles</span> } =&gt; {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">indices</span>.<span class="ident">len</span>();
                 <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">cycles</span>.<span class="ident">len</span>();
 
                 <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> (<span class="number">0</span>..<span class="ident">k</span>).<span class="ident">rev</span>() {
-                    <span class="kw">if</span> <span class="ident">cycles</span>[<span class="ident">i</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">cycles</span>[<span class="ident">i</span>] <span class="op">==</span> <span class="number">0</span> {
                         <span class="ident">cycles</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">n</span> <span class="op">-</span> <span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>;
 
                         <span class="kw">let</span> <span class="ident">to_push</span> <span class="op">=</span> <span class="ident">indices</span>.<span class="ident">remove</span>(<span class="ident">i</span>);
@@ -521,11 +521,11 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CompleteStateRemaining</span> {
+    <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CompleteStateRemaining</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::CompleteStateRemaining</span>::{<span class="ident">Known</span>, <span class="ident">Overflow</span>};
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">CompleteState::Start</span> { <span class="ident">n</span>, <span class="ident">k</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CompleteState::Start</span> { <span class="ident">n</span>, <span class="ident">k</span> } =&gt; {
                 <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="ident">k</span> {
                     <span class="kw">return</span> <span class="ident">Known</span>(<span class="number">0</span>);
                 }
@@ -535,11 +535,11 @@
                 });
 
                 <span class="kw">match</span> <span class="ident">count</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">count</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Known</span>(<span class="ident">count</span>),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Overflow</span>
+                    <span class="prelude-val">Some</span>(<span class="ident">count</span>) =&gt; <span class="ident">Known</span>(<span class="ident">count</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Overflow</span>
                 }
             }
-            <span class="ident">CompleteState::Ongoing</span> { <span class="kw-2">ref</span> <span class="ident">indices</span>, <span class="kw-2">ref</span> <span class="ident">cycles</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CompleteState::Ongoing</span> { <span class="kw-2">ref</span> <span class="ident">indices</span>, <span class="kw-2">ref</span> <span class="ident">cycles</span> } =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
 
                 <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="kw">in</span> <span class="ident">cycles</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
@@ -548,8 +548,8 @@
                         .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">count</span><span class="op">|</span> <span class="ident">count</span>.<span class="ident">checked_add</span>(<span class="ident">c</span>));
 
                     <span class="ident">count</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">next_count</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">count</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">count</span>,
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="kw">return</span> <span class="ident">Overflow</span>; }
+                        <span class="prelude-val">Some</span>(<span class="ident">count</span>) =&gt; <span class="ident">count</span>,
+                        <span class="prelude-val">None</span> =&gt; { <span class="kw">return</span> <span class="ident">Overflow</span>; }
                     };
                 }
 

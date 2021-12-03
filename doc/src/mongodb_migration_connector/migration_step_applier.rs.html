@@ -84,7 +84,7 @@
 
 <span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">DatabaseMigrationStepApplier</span> <span class="kw">for</span> <span class="ident">MongoDbMigrationConnector</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">database</span>();
 
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">migration_is_empty</span>(<span class="ident">migration</span>) {
@@ -99,12 +99,12 @@
 
         <span class="kw">for</span> <span class="ident">step</span> <span class="kw">in</span> <span class="ident">migration</span>.<span class="ident">steps</span>.<span class="ident">iter</span>() {
             <span class="kw">match</span> <span class="ident">step</span> {
-                <span class="ident">MongoDbMigrationStep::CreateCollection</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">MongoDbMigrationStep::CreateCollection</span>(<span class="ident">id</span>) =&gt; {
                     <span class="ident">db</span>.<span class="ident">create_collection</span>(<span class="ident">migration</span>.<span class="ident">next</span>.<span class="ident">walk_collection</span>(<span class="kw-2">*</span><span class="ident">id</span>).<span class="ident">name</span>(), <span class="prelude-val">None</span>)
                         .<span class="kw">await</span>
                         .<span class="ident">map_err</span>(<span class="ident">mongo_error_to_connector_error</span>)<span class="question-mark">?</span>;
                 }
-                <span class="ident">MongoDbMigrationStep::CreateIndex</span>(<span class="ident">index_id</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">MongoDbMigrationStep::CreateIndex</span>(<span class="ident">index_id</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">migration</span>.<span class="ident">next</span>.<span class="ident">walk_index</span>(<span class="kw-2">*</span><span class="ident">index_id</span>);
                     <span class="kw">let</span> <span class="ident">collection</span>: <span class="ident">mongodb::Collection</span><span class="op">&lt;</span><span class="ident">bson::Document</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">collection</span>(<span class="ident">index</span>.<span class="ident">collection</span>().<span class="ident">name</span>());
 
@@ -124,7 +124,7 @@
                         .<span class="kw">await</span>
                         .<span class="ident">map_err</span>(<span class="ident">mongo_error_to_connector_error</span>)<span class="question-mark">?</span>;
                 }
-                <span class="ident">MongoDbMigrationStep::DropIndex</span>(<span class="ident">index_id</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">MongoDbMigrationStep::DropIndex</span>(<span class="ident">index_id</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">migration</span>.<span class="ident">previous</span>.<span class="ident">walk_index</span>(<span class="kw-2">*</span><span class="ident">index_id</span>);
                     <span class="kw">let</span> <span class="ident">collection</span>: <span class="ident">mongodb::Collection</span><span class="op">&lt;</span><span class="ident">bson::Document</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">collection</span>(<span class="ident">index</span>.<span class="ident">collection</span>().<span class="ident">name</span>());
                     <span class="ident">collection</span>
@@ -138,11 +138,11 @@
         <span class="prelude-val">Ok</span>(<span class="ident">migration</span>.<span class="ident">steps</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>, <span class="ident">_diagnostics</span>: <span class="kw-2">&amp;</span><span class="ident">DestructiveChangeDiagnostics</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>, <span class="ident">_diagnostics</span>: <span class="kw-2">&amp;</span><span class="ident">DestructiveChangeDiagnostics</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">unreachable!</span>()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::unsupported_command_error</span>())
     }
 }

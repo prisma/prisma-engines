@@ -727,18 +727,18 @@
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">stream::Range</span>;
         <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">position</span>();
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">uncons_range</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="ident">other</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">other</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="number">0</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">other</span>) =&gt; {
+                <span class="kw">if</span> <span class="ident">other</span> <span class="op">==</span> <span class="self">self</span>.<span class="number">0</span> {
                     <span class="ident">ConsumedOk</span>(<span class="ident">other</span>)
                 } <span class="kw">else</span> {
                     <span class="ident">EmptyErr</span>(<span class="ident">I::Error::empty</span>(<span class="ident">position</span>).<span class="ident">into</span>())
                 }
             }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">wrap_stream_error</span>(<span class="ident">input</span>, <span class="ident">err</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">wrap_stream_error</span>(<span class="ident">input</span>, <span class="ident">err</span>),
         }
     }
     <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
@@ -768,7 +768,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recognize</span>[<span class="ident">P</span>](<span class="ident">parser</span>: <span class="ident">P</span>)(<span class="ident">P::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recognize</span>[<span class="ident">P</span>](<span class="ident">parser</span>: <span class="ident">P</span>)(<span class="ident">P::Input</span>) -&gt; <span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span>
     <span class="kw">where</span> [
         <span class="ident">P</span>: <span class="ident">Parser</span>,
         <span class="ident">P::Input</span>: <span class="ident">RangeStream</span>,
@@ -787,18 +787,18 @@
     <span class="ident">state</span>: <span class="ident">S</span>,
     <span class="ident">first</span>: <span class="ident">F</span>,
     <span class="ident">resume</span>: <span class="ident">G</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">M</span>: <span class="ident">ParseMode</span>,
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>,
-    <span class="ident">G</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">S</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>,
+    <span class="ident">G</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">S</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>,
     <span class="ident">I</span>: <span class="ident">RangeStream</span>,
 {
     <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_partial</span>() {
         <span class="ident">first</span>(<span class="ident">input</span>, <span class="ident">state</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">mode</span>.<span class="ident">is_first</span>() <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">distance_state</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">mode</span>.<span class="ident">is_first</span>() <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">distance_state</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">first</span>(<span class="ident">input</span>, <span class="ident">state</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ConsumedErr</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">result</span> {
             <span class="kw-2">*</span><span class="ident">distance_state</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">before</span>);
@@ -811,9 +811,9 @@
         }
 
         <span class="kw">match</span> <span class="ident">resume</span>(<span class="ident">input</span>, <span class="ident">state</span>) {
-            <span class="ident">ConsumedOk</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">EmptyErr</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
-            <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ConsumedOk</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="kw">_</span>) =&gt; (),
+            <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
+            <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; {
                 <span class="kw-2">*</span><span class="ident">distance_state</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">before</span>);
                 <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
                 <span class="kw">return</span> <span class="ident">ConsumedErr</span>(<span class="ident">err</span>);
@@ -849,7 +849,7 @@
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
     {
@@ -863,9 +863,9 @@
         }
 
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">child_state</span>) {
-            <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
-            <span class="ident">EmptyErr</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
-            <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+            <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
+            <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; {
                 <span class="kw-2">*</span><span class="ident">distance_state</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">before</span>);
                 <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
                 <span class="kw">return</span> <span class="ident">ConsumedErr</span>(<span class="ident">err</span>);
@@ -908,7 +908,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recognize_with_value</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">parser</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RecognizeWithValue</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recognize_with_value</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">parser</span>: <span class="ident">P</span>) -&gt; <span class="ident">RecognizeWithValue</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">Parser</span>,
     <span class="ident">P::Input</span>: <span class="ident">RangeStream</span>,
@@ -936,7 +936,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="ident">I::Range</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="ident">I::Range</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">RangeStream</span>,
     <span class="ident">I::Range</span>: <span class="ident">PartialEq</span>,
@@ -944,7 +944,7 @@
     <span class="ident">Range</span>(<span class="ident">i</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Take</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">usize</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">I</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Take</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">usize</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>);
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Take</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">RangeStream</span>,
@@ -954,7 +954,7 @@
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="ident">uncons_range</span>(<span class="ident">input</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -980,19 +980,19 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Take</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Take</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">RangeStream</span>,
 {
     <span class="ident">Take</span>(<span class="ident">n</span>, <span class="ident">PhantomData</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TakeWhile</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">F</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">I</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TakeWhile</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">F</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>);
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">TakeWhile</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">RangeStream</span>,
     <span class="ident">I::Range</span>: <span class="ident">::stream::Range</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
 {
     <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Range</span>;
@@ -1005,7 +1005,7 @@
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
     {
@@ -1038,21 +1038,21 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_while</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TakeWhile</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_while</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">TakeWhile</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">RangeStream</span>,
     <span class="ident">I::Range</span>: <span class="ident">::stream::Range</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
 {
     <span class="ident">TakeWhile</span>(<span class="ident">f</span>, <span class="ident">PhantomData</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TakeWhile1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">F</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">I</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TakeWhile1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">F</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>);
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">TakeWhile1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">RangeStream</span>,
     <span class="ident">I::Range</span>: <span class="ident">::stream::Range</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
 {
     <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Range</span>;
@@ -1065,7 +1065,7 @@
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
     {
@@ -1098,11 +1098,11 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_while1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TakeWhile1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_while1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">TakeWhile1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">RangeStream</span>,
     <span class="ident">I::Range</span>: <span class="ident">::stream::Range</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
 {
     <span class="ident">TakeWhile1</span>(<span class="ident">f</span>, <span class="ident">PhantomData</span>)
 }
@@ -1124,7 +1124,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">to_consume</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">stream::Range</span>;
 
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>();
@@ -1138,13 +1138,13 @@
             <span class="kw">let</span> <span class="ident">look_ahead_input</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
 
             <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">uncons_range</span>(<span class="ident">len</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">xs</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">xs</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="number">0</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">xs</span>) =&gt; {
+                    <span class="kw">if</span> <span class="ident">xs</span> <span class="op">==</span> <span class="self">self</span>.<span class="number">0</span> {
                         <span class="kw">let</span> <span class="ident">distance</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">before</span>) <span class="op">-</span> <span class="ident">len</span>;
                         <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
 
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">consumed</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">uncons_range</span>(<span class="ident">distance</span>) {
-                            <span class="kw">if</span> <span class="ident">distance</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                            <span class="kw">if</span> <span class="ident">distance</span> <span class="op">==</span> <span class="number">0</span> {
                                 <span class="kw">return</span> <span class="ident">EmptyOk</span>(<span class="ident">consumed</span>);
                             } <span class="kw">else</span> {
                                 <span class="kw-2">*</span><span class="ident">to_consume</span> <span class="op">=</span> <span class="number">0</span>;
@@ -1165,7 +1165,7 @@
                         }
                     }
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">first_error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">first_error</span>) =&gt; {
                     <span class="comment">// If we are unable to find a successful parse even after advancing with `uncons`</span>
                     <span class="comment">// below we must reset the stream to its state before the first error.</span>
                     <span class="comment">// If we don&#39;t we may try and match the range `::` against `:&lt;EOF&gt;` which would</span>
@@ -1217,7 +1217,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_until_range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">r</span>: <span class="ident">I::Range</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TakeUntilRange</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_until_range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">r</span>: <span class="ident">I::Range</span>) -&gt; <span class="ident">TakeUntilRange</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">RangeStream</span>,
 {
@@ -1233,10 +1233,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TakeRange</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TakeRange</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">TakeRange</span> {
         <span class="kw">match</span> <span class="ident">opt</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TakeRange::Found</span>(<span class="ident">i</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TakeRange::NotFound</span>(<span class="number">0</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="ident">TakeRange::Found</span>(<span class="ident">i</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">TakeRange::NotFound</span>(<span class="number">0</span>),
         }
     }
 }
@@ -1248,7 +1248,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">TakeFn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Range</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Range</span>) -&gt; <span class="ident">R</span>,
     <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">TakeRange</span><span class="op">&gt;</span>,
     <span class="ident">I</span>: <span class="ident">RangeStream</span> <span class="op">+</span> <span class="ident">FullRangeStream</span>,
     <span class="ident">I::Range</span>: <span class="ident">::stream::Range</span>,
@@ -1264,7 +1264,7 @@
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">offset</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
     {
@@ -1277,7 +1277,7 @@
         }
 
         <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">searcher</span>)(<span class="ident">input</span>.<span class="ident">range</span>()).<span class="ident">into</span>() {
-            <span class="ident">TakeRange::Found</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TakeRange::Found</span>(<span class="ident">i</span>) =&gt; {
                 <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">checkpoint</span>);
                 <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">uncons_range</span>(<span class="ident">input</span>, <span class="kw-2">*</span><span class="ident">offset</span> <span class="op">+</span> <span class="ident">i</span>);
                 <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() {
@@ -1285,7 +1285,7 @@
                 }
                 <span class="ident">result</span>
             }
-            <span class="ident">TakeRange::NotFound</span>(<span class="ident">next_offset</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TakeRange::NotFound</span>(<span class="ident">next_offset</span>) =&gt; {
                 <span class="kw-2">*</span><span class="ident">offset</span> <span class="op">=</span> <span class="ident">next_offset</span>;
 
                 <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">range</span>();
@@ -1313,9 +1313,9 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// See [`take_until_bytes`](../byte/fn.take_until_bytes.html) for a usecase.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_fn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">searcher</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TakeFn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_fn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">searcher</span>: <span class="ident">F</span>) -&gt; <span class="ident">TakeFn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Range</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Range</span>) -&gt; <span class="ident">R</span>,
     <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">TakeRange</span><span class="op">&gt;</span>,
     <span class="ident">I</span>: <span class="ident">FullRangeStream</span>,
     <span class="ident">I::Range</span>: <span class="ident">::stream::Range</span>,

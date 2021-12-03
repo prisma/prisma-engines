@@ -363,7 +363,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">version</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">x509</span>;
 
-<span class="kw">fn</span> <span class="ident">cvt_p</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">cvt_p</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">is_null</span>() {
         <span class="prelude-val">Err</span>(<span class="ident">ErrorStack::get</span>())
     } <span class="kw">else</span> {
@@ -371,7 +371,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">cvt</span>(<span class="ident">r</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">c_int</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">cvt</span>(<span class="ident">r</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">c_int</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">r</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0</span> {
         <span class="prelude-val">Err</span>(<span class="ident">ErrorStack::get</span>())
     } <span class="kw">else</span> {
@@ -379,7 +379,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">cvt_n</span>(<span class="ident">r</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">c_int</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">cvt_n</span>(<span class="ident">r</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">c_int</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">r</span> <span class="op">&lt;</span> <span class="number">0</span> {
         <span class="prelude-val">Err</span>(<span class="ident">ErrorStack::get</span>())
     } <span class="kw">else</span> {

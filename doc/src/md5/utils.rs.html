@@ -147,7 +147,7 @@
 <span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">op_f</span>(<span class="ident">w</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">m</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">fn</span> <span class="ident">op_f</span>(<span class="ident">w</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">m</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
     ((<span class="ident">x</span> <span class="op">&amp;</span> <span class="ident">y</span>) <span class="op">|</span> (<span class="op">!</span><span class="ident">x</span> <span class="op">&amp;</span> <span class="ident">z</span>))
         .<span class="ident">wrapping_add</span>(<span class="ident">w</span>)
         .<span class="ident">wrapping_add</span>(<span class="ident">m</span>)
@@ -156,7 +156,7 @@
         .<span class="ident">wrapping_add</span>(<span class="ident">x</span>)
 }
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">op_g</span>(<span class="ident">w</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">m</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">fn</span> <span class="ident">op_g</span>(<span class="ident">w</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">m</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
     ((<span class="ident">x</span> <span class="op">&amp;</span> <span class="ident">z</span>) <span class="op">|</span> (<span class="ident">y</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">z</span>))
         .<span class="ident">wrapping_add</span>(<span class="ident">w</span>)
         .<span class="ident">wrapping_add</span>(<span class="ident">m</span>)
@@ -166,7 +166,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">op_h</span>(<span class="ident">w</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">m</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">fn</span> <span class="ident">op_h</span>(<span class="ident">w</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">m</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
     (<span class="ident">x</span> <span class="op">^</span> <span class="ident">y</span> <span class="op">^</span> <span class="ident">z</span>)
         .<span class="ident">wrapping_add</span>(<span class="ident">w</span>)
         .<span class="ident">wrapping_add</span>(<span class="ident">m</span>)
@@ -176,7 +176,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">op_i</span>(<span class="ident">w</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">m</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">fn</span> <span class="ident">op_i</span>(<span class="ident">w</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">m</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
     (<span class="ident">y</span> <span class="op">^</span> (<span class="ident">x</span> <span class="op">|</span> <span class="op">!</span><span class="ident">z</span>))
         .<span class="ident">wrapping_add</span>(<span class="ident">w</span>)
         .<span class="ident">wrapping_add</span>(<span class="ident">m</span>)

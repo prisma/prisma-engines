@@ -106,14 +106,14 @@
 <span class="kw">use</span> <span class="ident">core::result::Result</span>;
 
 <span class="doccomment">/// Returns a `String` showing octets grouped in 4-byte words. </span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_hex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_hex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="ident">simple_hex_write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>, <span class="ident">source</span>).<span class="ident">unwrap_or</span>(());
     <span class="ident">writer</span>
 }
 
 <span class="doccomment">/// Return a multi-line `String` complete with addressing, hex digits, and ASCII representation. </span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pretty_hex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pretty_hex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="ident">pretty_hex_write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>, <span class="ident">source</span>).<span class="ident">unwrap_or</span>(());
     <span class="ident">writer</span>
@@ -124,16 +124,16 @@
 <span class="kw">const</span> <span class="ident">NASCI</span>: <span class="ident">char</span> <span class="op">=</span> <span class="string">&#39;.&#39;</span>;
 
 <span class="doccomment">/// Dump hex octets grouped in 4-byte words to the writer. </span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_hex_write</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_hex_write</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>
         , <span class="ident">W</span>: <span class="ident">fmt::Write</span>
 {
     <span class="kw">for</span> (<span class="ident">i</span>,<span class="ident">x</span>) <span class="kw">in</span> <span class="ident">source</span>.<span class="ident">as_ref</span>().<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
         <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:02x}{}&quot;</span>, <span class="ident">x</span>,
             <span class="kw">match</span> <span class="ident">i</span><span class="op">+</span><span class="number">1</span> {
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="ident">source</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;&quot;</span>,
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">%</span> <span class="ident">CHNK</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;  &quot;</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot; &quot;</span>,
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">source</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>() =&gt; <span class="string">&quot;&quot;</span>,
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">%</span> <span class="ident">CHNK</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="string">&quot;  &quot;</span>,
+                <span class="kw">_</span> =&gt; <span class="string">&quot; &quot;</span>,
             } 
         )<span class="question-mark">?</span>;
     }
@@ -141,7 +141,7 @@
 }
 
 <span class="doccomment">/// Write multi-line dump complete with addressing, hex digits, and ASCII representation to the writer.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pretty_hex_write</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pretty_hex_write</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>
         , <span class="ident">W</span>: <span class="ident">fmt::Write</span>
 {
@@ -175,14 +175,14 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>:<span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Formats the value by `simple_hex_write` using the given formatter.</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">simple_hex_write</span>(<span class="ident">f</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>:<span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Formats the value by `pretty_hex_write` using the given formatter.</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">pretty_hex_write</span>(<span class="ident">f</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -190,19 +190,19 @@
 <span class="doccomment">/// Allows generates hex dumps to a formatter.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PrettyHex</span>: <span class="ident">Sized</span> {
     <span class="doccomment">/// Wrap self reference for use in `std::fmt::Display`/`std::fmt::Debug` formating as hex dumps.</span>
-    <span class="kw">fn</span> <span class="ident">hex_dump</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">hex_dump</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="self">Self</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">PrettyHex</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">hex_dump</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="self">Self</span><span class="op">&gt;</span> { <span class="ident">Hex</span>(<span class="self">self</span>) }
+    <span class="kw">fn</span> <span class="ident">hex_dump</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="self">Self</span><span class="op">&gt;</span> { <span class="ident">Hex</span>(<span class="self">self</span>) }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PrettyHex</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">hex_dump</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="self">Self</span><span class="op">&gt;</span> { <span class="ident">Hex</span>(<span class="self">self</span>) }
+    <span class="kw">fn</span> <span class="ident">hex_dump</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) -&gt; <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="self">Self</span><span class="op">&gt;</span> { <span class="ident">Hex</span>(<span class="self">self</span>) }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PrettyHex</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">hex_dump</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="self">Self</span><span class="op">&gt;</span> { <span class="ident">Hex</span>(<span class="self">self</span>) }
+    <span class="kw">fn</span> <span class="ident">hex_dump</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) -&gt; <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="self">Self</span><span class="op">&gt;</span> { <span class="ident">Hex</span>(<span class="self">self</span>) }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pretty_hex" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

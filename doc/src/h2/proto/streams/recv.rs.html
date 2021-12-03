@@ -1152,7 +1152,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Recv</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">peer</span>: <span class="ident">peer::Dyn</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">peer</span>: <span class="ident">peer::Dyn</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">next_stream_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">peer</span>.<span class="ident">is_server</span>() { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">2</span> };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flow</span> <span class="op">=</span> <span class="ident">FlowControl::new</span>();
@@ -1181,12 +1181,12 @@
     }
 
     <span class="doccomment">/// Returns the initial receive window size</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_window_sz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">WindowSize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_window_sz</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">WindowSize</span> {
         <span class="self">self</span>.<span class="ident">init_window_sz</span>
     }
 
     <span class="doccomment">/// Returns the ID of the last processed stream</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_processed_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StreamId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_processed_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StreamId</span> {
         <span class="self">self</span>.<span class="ident">last_processed_id</span>
     }
 
@@ -1198,7 +1198,7 @@
         <span class="ident">id</span>: <span class="ident">StreamId</span>,
         <span class="ident">mode</span>: <span class="ident">Open</span>,
         <span class="ident">counts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Counts</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StreamId</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StreamId</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">refused</span>.<span class="ident">is_none</span>());
 
         <span class="ident">counts</span>.<span class="ident">peer</span>().<span class="ident">ensure_can_open</span>(<span class="ident">id</span>, <span class="ident">mode</span>)<span class="question-mark">?</span>;
@@ -1227,7 +1227,7 @@
         <span class="ident">frame</span>: <span class="ident">frame::Headers</span>,
         <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">store::Ptr</span>,
         <span class="ident">counts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Counts</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">RecvHeaderBlockError</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">frame::Headers</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">RecvHeaderBlockError</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">frame::Headers</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">tracing::trace!</span>(<span class="string">&quot;opening stream; init_window={}&quot;</span>, <span class="self">self</span>.<span class="ident">init_window_sz</span>);
         <span class="kw">let</span> <span class="ident">is_initial</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">recv_open</span>(<span class="kw-2">&amp;</span><span class="ident">frame</span>)<span class="question-mark">?</span>;
 
@@ -1247,8 +1247,8 @@
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">content_length</span>) <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">fields</span>().<span class="ident">get</span>(<span class="ident">header::CONTENT_LENGTH</span>) {
                 <span class="kw">let</span> <span class="ident">content_length</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">frame::parse_u64</span>(<span class="ident">content_length</span>.<span class="ident">as_bytes</span>()) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>,
-                    <span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
+                    <span class="prelude-val">Err</span>(()) =&gt; {
                         <span class="macro">proto_err!</span>(<span class="ident">stream</span>: <span class="string">&quot;could not parse content-length; stream={:?}&quot;</span>, <span class="ident">stream</span>.<span class="ident">id</span>);
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_reset</span>(<span class="ident">stream</span>.<span class="ident">id</span>, <span class="ident">Reason::PROTOCOL_ERROR</span>).<span class="ident">into</span>());
                     }
@@ -1314,12 +1314,12 @@
     <span class="doccomment">/// Called by the server to get the request</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// TODO: Should this fn return `Result`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">store::Ptr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Request</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">store::Ptr</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::peer::PollMessage</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">pop_front</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">Event::Headers</span>(<span class="ident">Server</span>(<span class="ident">request</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">request</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">Event::Headers</span>(<span class="ident">Server</span>(<span class="ident">request</span>))) =&gt; <span class="ident">request</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(),
         }
     }
 
@@ -1328,16 +1328,16 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
         <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">store::Ptr</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Request</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">store::Key</span>), <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Request</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">store::Key</span>), <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::peer::PollMessage</span>::<span class="kw-2">*</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ppp</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">pending_push_promises</span>.<span class="ident">take</span>();
         <span class="kw">let</span> <span class="ident">pushed</span> <span class="op">=</span> <span class="ident">ppp</span>.<span class="ident">pop</span>(<span class="ident">stream</span>.<span class="ident">store_mut</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">pushed</span><span class="op">|</span> {
             <span class="kw">match</span> <span class="ident">pushed</span>.<span class="ident">pending_recv</span>.<span class="ident">pop_front</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">Event::Headers</span>(<span class="ident">Server</span>(<span class="ident">headers</span>))) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">headers</span>, <span class="ident">pushed</span>.<span class="ident">key</span>()),
+                <span class="prelude-val">Some</span>(<span class="ident">Event::Headers</span>(<span class="ident">Server</span>(<span class="ident">headers</span>))) =&gt; (<span class="ident">headers</span>, <span class="ident">pushed</span>.<span class="ident">key</span>()),
                 <span class="comment">// When frames are pushed into the queue, it is verified that</span>
                 <span class="comment">// the first frame is a HEADERS frame.</span>
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Headers not set on pushed stream&quot;</span>),
+                <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Headers not set on pushed stream&quot;</span>),
             }
         });
         <span class="ident">stream</span>.<span class="ident">pending_push_promises</span> <span class="op">=</span> <span class="ident">ppp</span>;
@@ -1360,15 +1360,15 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
         <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">store::Ptr</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::peer::PollMessage</span>::<span class="kw-2">*</span>;
 
         <span class="comment">// If the buffer is not empty, then the first frame must be a HEADERS</span>
         <span class="comment">// frame or the user violated the contract.</span>
         <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">pop_front</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">Event::Headers</span>(<span class="ident">Client</span>(<span class="ident">response</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">response</span>)),
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;poll_response called after response returned&quot;</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">Event::Headers</span>(<span class="ident">Client</span>(<span class="ident">response</span>))) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">response</span>)),
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;poll_response called after response returned&quot;</span>),
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">ensure_recv_open</span>()<span class="question-mark">?</span>;
 
                 <span class="ident">stream</span>.<span class="ident">recv_task</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">clone</span>());
@@ -1382,7 +1382,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">frame</span>: <span class="ident">frame::Headers</span>,
         <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">store::Ptr</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// Transition the state</span>
         <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">recv_close</span>()<span class="question-mark">?</span>;
 
@@ -1429,7 +1429,7 @@
         <span class="ident">capacity</span>: <span class="ident">WindowSize</span>,
         <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">store::Ptr</span>,
         <span class="ident">task</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
         <span class="macro">tracing::trace!</span>(<span class="string">&quot;release_capacity; size={}&quot;</span>, <span class="ident">capacity</span>);
 
         <span class="kw">if</span> <span class="ident">capacity</span> <span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">in_flight_recv_data</span> {
@@ -1460,7 +1460,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">release_closed_capacity</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">store::Ptr</span>, <span class="ident">task</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>) {
         <span class="macro">debug_assert_eq!</span>(<span class="ident">stream</span>.<span class="ident">ref_count</span>, <span class="number">0</span>);
 
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">in_flight_recv_data</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">in_flight_recv_data</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span>;
         }
 
@@ -1522,7 +1522,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">settings</span>: <span class="kw-2">&amp;</span><span class="ident">frame::Settings</span>,
         <span class="ident">store</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Store</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">proto::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">proto::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="ident">settings</span>.<span class="ident">initial_window_size</span>() {
             <span class="ident">val</span>
         } <span class="kw">else</span> {
@@ -1579,7 +1579,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">store::Ptr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">store::Ptr</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_recv_closed</span>() {
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
@@ -1587,7 +1587,7 @@
         <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">frame</span>: <span class="ident">frame::Data</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">store::Ptr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">frame</span>: <span class="ident">frame::Data</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">store::Ptr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">len</span>();
 
         <span class="comment">// This should have been enforced at the codec::FramedRead layer, so</span>
@@ -1679,7 +1679,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="ident">WindowSize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="ident">WindowSize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// Ensure that there is enough capacity on the connection...</span>
         <span class="self">self</span>.<span class="ident">consume_connection_window</span>(<span class="ident">sz</span>)<span class="question-mark">?</span>;
 
@@ -1695,7 +1695,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_connection_window</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="ident">WindowSize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_connection_window</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="ident">WindowSize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">window_size</span>() <span class="op">&lt;</span> <span class="ident">sz</span> {
             <span class="macro">tracing::debug!</span>(
                 <span class="string">&quot;connection error FLOW_CONTROL_ERROR -- window_size ({:?}) &lt; sz ({:?});&quot;</span>,
@@ -1717,7 +1717,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">frame</span>: <span class="ident">frame::PushPromise</span>,
         <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">store::Ptr</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">reserve_remote</span>()<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">is_over_size</span>() {
             <span class="comment">// A frame is over size if the decoded header block was bigger than</span>
@@ -1749,13 +1749,13 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">frame::PushPromise::validate_request</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>) {
             <span class="kw">use</span> <span class="ident">PushPromiseHeaderError</span>::<span class="kw-2">*</span>;
             <span class="kw">match</span> <span class="ident">e</span> {
-                <span class="ident">NotSafeAndCacheable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">proto_err!</span>(
+                <span class="ident">NotSafeAndCacheable</span> =&gt; <span class="macro">proto_err!</span>(
                     <span class="ident">stream</span>:
                     <span class="string">&quot;recv_push_promise: method {} is not safe and cacheable; promised_id={:?}&quot;</span>,
                     <span class="ident">req</span>.<span class="ident">method</span>(),
                     <span class="ident">promised_id</span>,
                 ),
-                <span class="ident">InvalidContentLength</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">proto_err!</span>(
+                <span class="ident">InvalidContentLength</span>(<span class="ident">e</span>) =&gt; <span class="macro">proto_err!</span>(
                     <span class="ident">stream</span>:
                     <span class="string">&quot;recv_push_promise; promised request has invalid content-length {:?}; promised_id={:?}&quot;</span>,
                     <span class="ident">e</span>,
@@ -1774,7 +1774,7 @@
     }
 
     <span class="doccomment">/// Ensures that `id` is not in the `Idle` state.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_not_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">StreamId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Reason</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_not_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">StreamId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Reason</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">next</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_stream_id</span> {
             <span class="kw">if</span> <span class="ident">id</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">next</span> {
                 <span class="macro">tracing::debug!</span>(
@@ -1828,11 +1828,11 @@
     <span class="doccomment">/// Get the max ID of streams we can receive.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This gets lowered if we send a GOAWAY frame.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_stream_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StreamId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_stream_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StreamId</span> {
         <span class="self">self</span>.<span class="ident">max_stream_id</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_stream_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StreamId</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_stream_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StreamId</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_stream_id</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">id</span>)
         } <span class="kw">else</span> {
@@ -1840,7 +1840,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">may_have_created_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">StreamId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">may_have_created_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">StreamId</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">next_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_stream_id</span> {
             <span class="comment">// Peer::is_local_init should have been called beforehand</span>
             <span class="macro">debug_assert_eq!</span>(<span class="ident">id</span>.<span class="ident">is_server_initiated</span>(), <span class="ident">next_id</span>.<span class="ident">is_server_initiated</span>(),);
@@ -1851,7 +1851,7 @@
     }
 
     <span class="doccomment">/// Returns true if the remote peer can reserve a stream with the given ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_can_reserve</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_can_reserve</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_push_enabled</span> {
             <span class="macro">proto_err!</span>(<span class="ident">conn</span>: <span class="string">&quot;recv_push_promise: push is disabled&quot;</span>);
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::library_go_away</span>(<span class="ident">Reason::PROTOCOL_ERROR</span>));
@@ -1888,7 +1888,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
         <span class="ident">B</span>: <span class="ident">Buf</span>,
@@ -1962,7 +1962,7 @@
         <span class="ident">store</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Store</span>,
         <span class="ident">counts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Counts</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
         <span class="ident">B</span>: <span class="ident">Buf</span>,
@@ -1981,7 +1981,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
         <span class="ident">B</span>: <span class="ident">Buf</span>,
@@ -2012,7 +2012,7 @@
         <span class="ident">store</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Store</span>,
         <span class="ident">counts</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Counts</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
         <span class="ident">B</span>: <span class="ident">Buf</span>,
@@ -2023,8 +2023,8 @@
 
             <span class="comment">// Get the next stream</span>
             <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">pending_window_updates</span>.<span class="ident">pop</span>(<span class="ident">store</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
+                <span class="prelude-val">Some</span>(<span class="ident">stream</span>) =&gt; <span class="ident">stream</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
             };
 
             <span class="ident">counts</span>.<span class="ident">transition</span>(<span class="ident">stream</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">stream</span><span class="op">|</span> {
@@ -2060,7 +2060,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_incoming</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Store</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_incoming</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Store</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Key</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">pending_accept</span>.<span class="ident">pop</span>(<span class="ident">store</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">ptr</span>.<span class="ident">key</span>())
     }
 
@@ -2068,11 +2068,11 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
         <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bytes</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// TODO: Return error when the stream is reset</span>
         <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">pop_front</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">Event::Data</span>(<span class="ident">payload</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">payload</span>))),
-            <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">Event::Data</span>(<span class="ident">payload</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">payload</span>))),
+            <span class="prelude-val">Some</span>(<span class="ident">event</span>) =&gt; {
                 <span class="comment">// Frame is trailer</span>
                 <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">push_front</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>, <span class="ident">event</span>);
 
@@ -2089,7 +2089,7 @@
                 <span class="comment">// No more data frames</span>
                 <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">schedule_recv</span>(<span class="ident">cx</span>, <span class="ident">stream</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">schedule_recv</span>(<span class="ident">cx</span>, <span class="ident">stream</span>),
         }
     }
 
@@ -2097,16 +2097,16 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
         <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderMap</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HeaderMap</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">pop_front</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">Event::Trailers</span>(<span class="ident">trailers</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">trailers</span>))),
-            <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">Event::Trailers</span>(<span class="ident">trailers</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">trailers</span>))),
+            <span class="prelude-val">Some</span>(<span class="ident">event</span>) =&gt; {
                 <span class="comment">// Frame is not trailers.. not ready to poll trailers yet.</span>
                 <span class="ident">stream</span>.<span class="ident">pending_recv</span>.<span class="ident">push_front</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>, <span class="ident">event</span>);
 
                 <span class="ident">Poll::Pending</span>
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">schedule_recv</span>(<span class="ident">cx</span>, <span class="ident">stream</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">schedule_recv</span>(<span class="ident">cx</span>, <span class="ident">stream</span>),
         }
     }
 
@@ -2114,7 +2114,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
         <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">proto::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">ensure_recv_open</span>()<span class="question-mark">?</span> {
             <span class="comment">// Request to get notified once more frames arrive</span>
             <span class="ident">stream</span>.<span class="ident">recv_task</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">clone</span>());
@@ -2129,12 +2129,12 @@
 <span class="comment">// ===== impl Open =====</span>
 
 <span class="kw">impl</span> <span class="ident">Open</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_push_promise</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_push_promise</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Open</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">PushPromise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">PushPromise</span> =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 }
@@ -2142,7 +2142,7 @@
 <span class="comment">// ===== impl RecvHeaderBlockError =====</span>
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecvHeaderBlockError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">Error</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">RecvHeaderBlockError::State</span>(<span class="ident">err</span>)
     }
 }

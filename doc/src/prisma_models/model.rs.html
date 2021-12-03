@@ -148,7 +148,7 @@
     <span class="doccomment">/// The identifier is nothing but an internal convention to have an anchor point for querying, or in other words,</span>
     <span class="doccomment">/// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as</span>
     <span class="doccomment">/// implementation detail that is used to reason over a fixed set of fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelProjection</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelProjection</span> {
         <span class="self">self</span>.<span class="ident">primary_identifier</span>.<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span>{
             <span class="kw">let</span> <span class="ident">dml_fields</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dml_model</span>.<span class="ident">first_unique_criterion</span>();
             <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">dml_fields</span>
@@ -163,51 +163,51 @@
         }).<span class="ident">clone</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Fields</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Fields</span> {
         <span class="self">self</span>.<span class="ident">fields</span>
             .<span class="ident">get</span>()
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">String::from</span>(<span class="string">&quot;Model fields must be set!&quot;</span>))
             .<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">Index</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Index</span>] {
         <span class="self">self</span>.<span class="ident">indexes</span>
             .<span class="ident">get</span>()
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">String::from</span>(<span class="string">&quot;Model indexes must be set!&quot;</span>))
             .<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Index</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Index</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">indexes</span>()
             .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">typ</span> <span class="op">=</span><span class="op">=</span> <span class="ident">IndexType::Unique</span>)
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">typ</span> <span class="op">==</span> <span class="ident">IndexType::Unique</span>)
             .<span class="ident">collect</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">db_name_opt</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name_opt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name_opt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">manifestation</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">as_ref</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_data_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InternalDataModelRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_data_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InternalDataModelRef</span> {
         <span class="self">self</span>.<span class="ident">internal_data_model</span>
             .<span class="ident">upgrade</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_scalar_db_field_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_scalar_db_field_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fields</span>()
             .<span class="ident">scalar</span>()
             .<span class="ident">into_iter</span>()
-            .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> (<span class="ident">field</span>.<span class="ident">db_name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">field</span>))
+            .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> (<span class="ident">field</span>.<span class="ident">db_name</span>() <span class="op">==</span> <span class="ident">name</span>).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">field</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Model</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Model&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
             .<span class="ident">field</span>(<span class="string">&quot;manifestation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">manifestation</span>)
@@ -230,8 +230,8 @@
 <span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Model</span> {}
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Model</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Model</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">name</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Model</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span>
     }
 }
 </code></pre></div>

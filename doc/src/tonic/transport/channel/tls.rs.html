@@ -112,7 +112,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ClientTlsConfig</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ClientTlsConfig&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;domain&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">domain</span>)
             .<span class="ident">field</span>(<span class="string">&quot;cert&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cert</span>)
@@ -124,7 +124,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">ClientTlsConfig</span> {
     <span class="doccomment">/// Creates a new `ClientTlsConfig` using Rustls.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ClientTlsConfig</span> {
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
             <span class="ident">cert</span>: <span class="prelude-val">None</span>,
@@ -134,7 +134,7 @@
     }
 
     <span class="doccomment">/// Sets the domain name against which to verify the server&#39;s TLS certificate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain_name</span>(<span class="self">self</span>, <span class="ident">domain_name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain_name</span>(<span class="self">self</span>, <span class="ident">domain_name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ClientTlsConfig</span> {
             <span class="ident">domain</span>: <span class="prelude-val">Some</span>(<span class="ident">domain_name</span>.<span class="ident">into</span>()),
             ..<span class="self">self</span>
@@ -144,7 +144,7 @@
     <span class="doccomment">/// Sets the CA Certificate against which to verify the server&#39;s TLS certificate.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This has no effect if `rustls_client_config` is used to configure Rustls.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ca_certificate</span>(<span class="self">self</span>, <span class="ident">ca_certificate</span>: <span class="ident">Certificate</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ca_certificate</span>(<span class="self">self</span>, <span class="ident">ca_certificate</span>: <span class="ident">Certificate</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ClientTlsConfig</span> {
             <span class="ident">cert</span>: <span class="prelude-val">Some</span>(<span class="ident">ca_certificate</span>),
             ..<span class="self">self</span>
@@ -154,7 +154,7 @@
     <span class="doccomment">/// Sets the client identity to present to the server.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This has no effect if `rustls_client_config` is used to configure Rustls.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity</span>(<span class="self">self</span>, <span class="ident">identity</span>: <span class="ident">Identity</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity</span>(<span class="self">self</span>, <span class="ident">identity</span>: <span class="ident">Identity</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ClientTlsConfig</span> {
             <span class="ident">identity</span>: <span class="prelude-val">Some</span>(<span class="ident">identity</span>),
             ..<span class="self">self</span>
@@ -164,23 +164,23 @@
     <span class="doccomment">/// Use options specified by the given `ClientConfig` to configure TLS.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This overrides all other TLS options set via other means.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rustls_client_config</span>(<span class="self">self</span>, <span class="ident">config</span>: <span class="ident">tokio_rustls::rustls::ClientConfig</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rustls_client_config</span>(<span class="self">self</span>, <span class="ident">config</span>: <span class="ident">tokio_rustls::rustls::ClientConfig</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ClientTlsConfig</span> {
             <span class="ident">rustls_raw</span>: <span class="prelude-val">Some</span>(<span class="ident">config</span>),
             ..<span class="self">self</span>
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tls_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TlsConnector</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tls_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="ident">Uri</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TlsConnector</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">domain</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">domain</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">uri</span>.<span class="ident">host</span>().<span class="ident">ok_or_else</span>(<span class="ident">Error::new_invalid_uri</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">domain</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">domain</span>.<span class="ident">clone</span>(),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">uri</span>.<span class="ident">host</span>().<span class="ident">ok_or_else</span>(<span class="ident">Error::new_invalid_uri</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">domain</span>) =&gt; <span class="ident">domain</span>.<span class="ident">clone</span>(),
         };
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rustls_raw</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="ident">TlsConnector::new_with_rustls_cert</span>(<span class="self">self</span>.<span class="ident">cert</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">identity</span>.<span class="ident">clone</span>(), <span class="ident">domain</span>)
             }
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TlsConnector::new_with_rustls_raw</span>(<span class="ident">c</span>.<span class="ident">clone</span>(), <span class="ident">domain</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="ident">TlsConnector::new_with_rustls_raw</span>(<span class="ident">c</span>.<span class="ident">clone</span>(), <span class="ident">domain</span>),
         }
     }
 }

@@ -698,7 +698,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::token</span> <span class="kw">as</span> <span class="ident">item</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Any</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">I</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Any</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Any</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
@@ -709,7 +709,7 @@
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span> {
         <span class="ident">uncons</span>(<span class="ident">input</span>)
     }
 }
@@ -729,7 +729,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Any</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Any</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span>,
 {
@@ -742,33 +742,33 @@
     <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">satisfy_impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="kw-2">mut</span> <span class="ident">predicate</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">satisfy_impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="kw-2">mut</span> <span class="ident">predicate</span>: <span class="ident">P</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">position</span>();
     <span class="kw">match</span> <span class="ident">uncons</span>(<span class="ident">input</span>) {
-        <span class="ident">EmptyOk</span>(<span class="ident">c</span>) <span class="op">|</span> <span class="ident">ConsumedOk</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">predicate</span>(<span class="ident">c</span>.<span class="ident">clone</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConsumedOk</span>(<span class="ident">c</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EmptyErr</span>(<span class="ident">I::Error::empty</span>(<span class="ident">position</span>).<span class="ident">into</span>()),
+        <span class="ident">EmptyOk</span>(<span class="ident">c</span>) <span class="op">|</span> <span class="ident">ConsumedOk</span>(<span class="ident">c</span>) =&gt; <span class="kw">match</span> <span class="ident">predicate</span>(<span class="ident">c</span>.<span class="ident">clone</span>()) {
+            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="ident">ConsumedOk</span>(<span class="ident">c</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">EmptyErr</span>(<span class="ident">I::Error::empty</span>(<span class="ident">position</span>).<span class="ident">into</span>()),
         },
-        <span class="ident">EmptyErr</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
-        <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConsumedErr</span>(<span class="ident">err</span>),
+        <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
+        <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">err</span>),
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
 {
     <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Item</span>;
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="ident">satisfy_impl</span>(<span class="ident">input</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
             <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">predicate</span>)(<span class="ident">c</span>.<span class="ident">clone</span>()) {
                 <span class="prelude-val">Some</span>(<span class="ident">c</span>)
@@ -791,10 +791,10 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">predicate</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">predicate</span>: <span class="ident">P</span>) -&gt; <span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
 {
     <span class="ident">Satisfy</span> {
         <span class="ident">predicate</span>: <span class="ident">predicate</span>,
@@ -811,13 +811,13 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">SatisfyMap</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">R</span>;
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="ident">satisfy_impl</span>(<span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">predicate</span>)
     }
 }
@@ -847,10 +847,10 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">satisfy_map</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">predicate</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SatisfyMap</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">satisfy_map</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">predicate</span>: <span class="ident">P</span>) -&gt; <span class="ident">SatisfyMap</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
+    <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
 {
     <span class="ident">SatisfyMap</span> {
         <span class="ident">predicate</span>: <span class="ident">predicate</span>,
@@ -878,8 +878,8 @@
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">satisfy_impl</span>(<span class="ident">input</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">c</span> { <span class="prelude-val">Some</span>(<span class="ident">c</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> })
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span> {
+        <span class="ident">satisfy_impl</span>(<span class="ident">input</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">c</span> { <span class="prelude-val">Some</span>(<span class="ident">c</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> })
     }
     <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
         <span class="ident">errors</span>.<span class="ident">error</span>.<span class="ident">add_expected</span>(<span class="ident">Info::Token</span>(<span class="self">self</span>.<span class="ident">c</span>.<span class="ident">clone</span>()));
@@ -899,7 +899,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Token</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="ident">I::Item</span>) -&gt; <span class="ident">Token</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span>,
     <span class="ident">I::Item</span>: <span class="ident">PartialEq</span>,
@@ -923,7 +923,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Tokens</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">T::Item</span>, <span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">T::Item</span>, <span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
     <span class="ident">I</span>: <span class="ident">Stream</span>,
 {
@@ -931,12 +931,12 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span>;
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">position</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">consumed</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>() {
             <span class="kw">match</span> <span class="ident">::stream::uncons</span>(<span class="ident">input</span>) {
-                <span class="ident">ConsumedOk</span>(<span class="ident">other</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="ident">other</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ConsumedOk</span>(<span class="ident">other</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="ident">other</span>) =&gt; {
                     <span class="kw">if</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">cmp</span>)(<span class="ident">c</span>, <span class="ident">other</span>.<span class="ident">clone</span>()) {
                         <span class="kw">return</span> <span class="kw">if</span> <span class="ident">consumed</span> {
                             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error::from_error</span>(
@@ -951,7 +951,7 @@
                     }
                     <span class="ident">consumed</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 }
-                <span class="ident">EmptyErr</span>(<span class="kw-2">mut</span> <span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">EmptyErr</span>(<span class="kw-2">mut</span> <span class="ident">error</span>) =&gt; {
                     <span class="ident">error</span>.<span class="ident">error</span>.<span class="ident">set_position</span>(<span class="ident">start</span>);
                     <span class="kw">return</span> <span class="kw">if</span> <span class="ident">consumed</span> {
                         <span class="ident">ConsumedErr</span>(<span class="ident">error</span>.<span class="ident">error</span>)
@@ -959,7 +959,7 @@
                         <span class="ident">EmptyErr</span>(<span class="ident">error</span>.<span class="ident">into</span>())
                     };
                 }
-                <span class="ident">ConsumedErr</span>(<span class="kw-2">mut</span> <span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ConsumedErr</span>(<span class="kw-2">mut</span> <span class="ident">error</span>) =&gt; {
                     <span class="ident">error</span>.<span class="ident">set_position</span>(<span class="ident">start</span>);
                     <span class="kw">return</span> <span class="ident">ConsumedErr</span>(<span class="ident">error</span>);
                 }
@@ -1003,9 +1003,9 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokens</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">cmp</span>: <span class="ident">C</span>, <span class="ident">expected</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span>, <span class="ident">tokens</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Tokens</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokens</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">cmp</span>: <span class="ident">C</span>, <span class="ident">expected</span>: <span class="ident">Info</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span>, <span class="ident">tokens</span>: <span class="ident">T</span>) -&gt; <span class="ident">Tokens</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">T::Item</span>, <span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">T::Item</span>, <span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
     <span class="ident">I</span>: <span class="ident">Stream</span>,
 {
@@ -1029,7 +1029,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Tokens2</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">T::Item</span>, <span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">T::Item</span>, <span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
     <span class="ident">I</span>: <span class="ident">Stream</span>,
 {
@@ -1038,12 +1038,12 @@
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">position</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">consumed</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>() {
             <span class="kw">match</span> <span class="ident">::stream::uncons</span>(<span class="ident">input</span>) {
-                <span class="ident">ConsumedOk</span>(<span class="ident">other</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="ident">other</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ConsumedOk</span>(<span class="ident">other</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="ident">other</span>) =&gt; {
                     <span class="kw">if</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">cmp</span>)(<span class="ident">c</span>, <span class="ident">other</span>.<span class="ident">clone</span>()) {
                         <span class="kw">return</span> <span class="kw">if</span> <span class="ident">consumed</span> {
                             <span class="kw">let</span> <span class="ident">errors</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error::from_error</span>(
@@ -1057,7 +1057,7 @@
                     }
                     <span class="ident">consumed</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 }
-                <span class="ident">EmptyErr</span>(<span class="kw-2">mut</span> <span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">EmptyErr</span>(<span class="kw-2">mut</span> <span class="ident">error</span>) =&gt; {
                     <span class="ident">error</span>.<span class="ident">error</span>.<span class="ident">set_position</span>(<span class="ident">start</span>);
                     <span class="kw">return</span> <span class="kw">if</span> <span class="ident">consumed</span> {
                         <span class="ident">ConsumedErr</span>(<span class="ident">error</span>.<span class="ident">error</span>)
@@ -1065,7 +1065,7 @@
                         <span class="ident">EmptyErr</span>(<span class="ident">error</span>)
                     };
                 }
-                <span class="ident">ConsumedErr</span>(<span class="kw-2">mut</span> <span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ConsumedErr</span>(<span class="kw-2">mut</span> <span class="ident">error</span>) =&gt; {
                     <span class="ident">error</span>.<span class="ident">set_position</span>(<span class="ident">start</span>);
                     <span class="kw">return</span> <span class="ident">ConsumedErr</span>(<span class="ident">error</span>);
                 }
@@ -1105,9 +1105,9 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokens2</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">cmp</span>: <span class="ident">C</span>, <span class="ident">tokens</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Tokens2</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokens2</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">cmp</span>: <span class="ident">C</span>, <span class="ident">tokens</span>: <span class="ident">T</span>) -&gt; <span class="ident">Tokens2</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">T::Item</span>, <span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">T::Item</span>, <span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
     <span class="ident">I</span>: <span class="ident">Stream</span>,
 {
@@ -1135,7 +1135,7 @@
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Position</span>, <span class="ident">I</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Position</span>, <span class="ident">I</span><span class="op">&gt;</span> {
         <span class="ident">EmptyOk</span>(<span class="ident">input</span>.<span class="ident">position</span>())
     }
 }
@@ -1156,7 +1156,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span>,
 {
@@ -1185,8 +1185,8 @@
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">satisfy</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">=</span><span class="op">=</span> <span class="ident">c</span>)).<span class="ident">parse_lazy</span>(<span class="ident">input</span>)
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span> {
+        <span class="ident">satisfy</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">==</span> <span class="ident">c</span>)).<span class="ident">parse_lazy</span>(<span class="ident">input</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
@@ -1208,7 +1208,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">one_of</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">tokens</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OneOf</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">one_of</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">tokens</span>: <span class="ident">T</span>) -&gt; <span class="ident">OneOf</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
     <span class="ident">I</span>: <span class="ident">Stream</span>,
@@ -1240,7 +1240,7 @@
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span> {
         <span class="ident">satisfy</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">!</span><span class="op">=</span> <span class="ident">c</span>)).<span class="ident">parse_lazy</span>(<span class="ident">input</span>)
     }
 }
@@ -1268,7 +1268,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">none_of</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">tokens</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NoneOf</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">none_of</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">tokens</span>: <span class="ident">T</span>) -&gt; <span class="ident">NoneOf</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">IntoIterator</span>,
     <span class="ident">I</span>: <span class="ident">Stream</span>,
@@ -1281,7 +1281,7 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">I</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>);
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span>,
@@ -1291,7 +1291,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span>;
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> {
         <span class="ident">EmptyOk</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>())
     }
 }
@@ -1309,7 +1309,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="ident">T</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span>,
     <span class="ident">T</span>: <span class="ident">Clone</span>,
@@ -1328,11 +1328,11 @@
     <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span>(), <span class="ident">I</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span>(), <span class="ident">I</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">uncons</span>() {
-            <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">err</span> <span class="op">=</span><span class="op">=</span> <span class="ident">StreamError::end_of_input</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EmptyOk</span>(()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">err</span> <span class="op">==</span> <span class="ident">StreamError::end_of_input</span>() =&gt; <span class="ident">EmptyOk</span>(()),
+            <span class="kw">_</span> =&gt; {
                 <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
                 <span class="ident">EmptyErr</span>(<span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error::empty</span>(<span class="ident">input</span>.<span class="ident">position</span>()).<span class="ident">into</span>())
             }
@@ -1364,7 +1364,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eof</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Eof</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eof</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Eof</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Stream</span>,
 {

@@ -248,7 +248,7 @@
     <span class="doccomment">/// [`Poll::Ready`]: std::task::Poll::Ready</span>
     <span class="doccomment">/// [`call`]: crate::Service::call</span>
     <span class="doccomment">/// [`poll_ready`]: crate::Service::poll_ready</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">service</span>: <span class="ident">T</span>, <span class="ident">bound</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">service</span>: <span class="ident">T</span>, <span class="ident">bound</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">T::Future</span>: <span class="ident">Send</span>,
@@ -265,7 +265,7 @@
     <span class="doccomment">/// This is useful if you do not want to spawn directly onto the tokio runtime</span>
     <span class="doccomment">/// but instead want to use your own executor. This will return the [`Buffer`] and</span>
     <span class="doccomment">/// the background `Worker` that you can then spawn.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pair</span>(<span class="ident">service</span>: <span class="ident">T</span>, <span class="ident">bound</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>, <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pair</span>(<span class="ident">service</span>: <span class="ident">T</span>, <span class="ident">bound</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>, <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>)
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">T::Error</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
@@ -283,7 +283,7 @@
         (<span class="ident">buffer</span>, <span class="ident">worker</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">get_worker_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::BoxError</span> {
+    <span class="kw">fn</span> <span class="ident">get_worker_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::BoxError</span> {
         <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">get_error_on_closed</span>()
     }
 }
@@ -297,7 +297,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::BoxError</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ResponseFuture</span><span class="op">&lt;</span><span class="ident">T::Future</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// First, check if the worker is still alive.</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">is_closed</span>() {
             <span class="comment">// If the inner service has errored, then we error here.</span>
@@ -321,7 +321,7 @@
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">Request</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">Request</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="macro">tracing::trace!</span>(<span class="string">&quot;sending request to buffer worker&quot;</span>);
         <span class="kw">let</span> <span class="ident">_permit</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">permit</span>
@@ -343,8 +343,8 @@
             <span class="ident">tx</span>,
             <span class="ident">_permit</span>,
         }) {
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ResponseFuture::failed</span>(<span class="self">self</span>.<span class="ident">get_worker_error</span>()),
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ResponseFuture::new</span>(<span class="ident">rx</span>),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">ResponseFuture::failed</span>(<span class="self">self</span>.<span class="ident">get_worker_error</span>()),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="ident">ResponseFuture::new</span>(<span class="ident">rx</span>),
         }
     }
 }
@@ -353,7 +353,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">tx</span>: <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">clone</span>(),
             <span class="ident">handle</span>: <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">clone</span>(),

@@ -85,13 +85,13 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">CurveID</span>,
 
     <span class="comment">// Precondition: `bytes` is the correct length.</span>
-    <span class="ident">check_private_key_bytes</span>: <span class="kw">fn</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
+    <span class="ident">check_private_key_bytes</span>: <span class="kw">fn</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
 
     <span class="ident">generate_private_key</span>:
-        <span class="kw">fn</span>(<span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
+        <span class="kw">fn</span>(<span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
 
     <span class="ident">public_from_private</span>:
-        <span class="kw">fn</span>(<span class="ident">public_out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">private_key</span>: <span class="kw-2">&amp;</span><span class="ident">Seed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
+        <span class="kw">fn</span>(<span class="ident">public_out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">private_key</span>: <span class="kw-2">&amp;</span><span class="ident">Seed</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
 }
 
 <span class="macro">derive_debug_via_id!</span>(<span class="ident">Curve</span>);

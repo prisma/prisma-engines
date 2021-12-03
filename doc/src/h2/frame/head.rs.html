@@ -122,7 +122,7 @@
 <span class="comment">// ===== impl Head =====</span>
 
 <span class="kw">impl</span> <span class="ident">Head</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">Kind</span>, <span class="ident">flag</span>: <span class="ident">u8</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Head</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">Kind</span>, <span class="ident">flag</span>: <span class="ident">u8</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>) -&gt; <span class="ident">Head</span> {
         <span class="ident">Head</span> {
             <span class="ident">kind</span>,
             <span class="ident">flag</span>,
@@ -131,7 +131,7 @@
     }
 
     <span class="doccomment">/// Parse an HTTP/2 frame header</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Head</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Head</span> {
         <span class="kw">let</span> (<span class="ident">stream_id</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">StreamId::parse</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>[<span class="number">5</span>..]);
 
         <span class="ident">Head</span> {
@@ -141,19 +141,19 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stream_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StreamId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stream_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StreamId</span> {
         <span class="self">self</span>.<span class="ident">stream_id</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Kind</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Kind</span> {
         <span class="self">self</span>.<span class="ident">kind</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">flag</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident"><span class="kw">super</span>::HEADER_LEN</span>
     }
 
@@ -170,19 +170,19 @@
 <span class="comment">// ===== impl Kind =====</span>
 
 <span class="kw">impl</span> <span class="ident">Kind</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Kind</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Kind</span> {
         <span class="kw">match</span> <span class="ident">byte</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Kind::Data</span>,
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Kind::Headers</span>,
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Kind::Priority</span>,
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Kind::Reset</span>,
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Kind::Settings</span>,
-            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Kind::PushPromise</span>,
-            <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Kind::Ping</span>,
-            <span class="number">7</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Kind::GoAway</span>,
-            <span class="number">8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Kind::WindowUpdate</span>,
-            <span class="number">9</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Kind::Continuation</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Kind::Unknown</span>,
+            <span class="number">0</span> =&gt; <span class="ident">Kind::Data</span>,
+            <span class="number">1</span> =&gt; <span class="ident">Kind::Headers</span>,
+            <span class="number">2</span> =&gt; <span class="ident">Kind::Priority</span>,
+            <span class="number">3</span> =&gt; <span class="ident">Kind::Reset</span>,
+            <span class="number">4</span> =&gt; <span class="ident">Kind::Settings</span>,
+            <span class="number">5</span> =&gt; <span class="ident">Kind::PushPromise</span>,
+            <span class="number">6</span> =&gt; <span class="ident">Kind::Ping</span>,
+            <span class="number">7</span> =&gt; <span class="ident">Kind::GoAway</span>,
+            <span class="number">8</span> =&gt; <span class="ident">Kind::WindowUpdate</span>,
+            <span class="number">9</span> =&gt; <span class="ident">Kind::Continuation</span>,
+            <span class="kw">_</span> =&gt; <span class="ident">Kind::Unknown</span>,
         }
     }
 }

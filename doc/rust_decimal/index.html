@@ -6,11 +6,11 @@ a scaling factor used to specify the decimal fraction and a 1
 bit sign. Because of this representation, trailing zeros are
 preserved and may be exposed when in string form. These can be
 truncated using the <code>normalize</code> or <code>round_dp</code> functions.</p>
-<h2 id="getting-started" class="section-header"><a href="#getting-started">Getting started</a></h2>
+<h3 id="getting-started" class="section-header"><a href="#getting-started">Getting started</a></h3>
 <p>To get started, add <code>rust_decimal</code> and optionally <code>rust_decimal_macros</code> to your <code>Cargo.toml</code>:</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
 rust_decimal = &quot;1.16&quot;
-rust_decimal_macros = &quot;1.16&quot;</code></pre></div><h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
+rust_decimal_macros = &quot;1.16&quot;</code></pre></div><h3 id="usage" class="section-header"><a href="#usage">Usage</a></h3>
 <p>Decimal numbers can be created in a few distinct ways. The easiest and most optimal
 method of creating a Decimal is to use the procedural macro within the
 <code>rust_decimal_macros</code> crate:</p>
@@ -52,7 +52,7 @@ method of creating a Decimal is to use the procedural macro within the
 <span class="kw">let</span> <span class="ident">tax</span> <span class="op">=</span> <span class="ident">Decimal::from_str</span>(<span class="string">&quot;0.085&quot;</span>).<span class="ident">unwrap</span>();
 <span class="kw">let</span> <span class="ident">total</span> <span class="op">=</span> <span class="ident">amount</span> <span class="op">+</span> (<span class="ident">amount</span> <span class="op">*</span> <span class="ident">tax</span>).<span class="ident">round_dp</span>(<span class="number">2</span>);
 <span class="macro">assert_eq!</span>(<span class="ident">total</span>.<span class="ident">to_string</span>(), <span class="string">&quot;27.26&quot;</span>);</code></pre></div>
-<h2 id="features" class="section-header"><a href="#features">Features</a></h2>
+<h3 id="features" class="section-header"><a href="#features">Features</a></h3>
 <ul>
 <li><a href="#c-repr">c-repr</a></li>
 <li><a href="#db-postgres">db-postgres</a></li>
@@ -66,33 +66,33 @@ method of creating a Decimal is to use the procedural macro within the
 <li><a href="#serde-arbitrary-precision">serde-arbitrary-precision</a></li>
 <li><a href="#std">std</a></li>
 </ul>
-<h3 id="c-repr" class="section-header"><a href="#c-repr"><code>c-repr</code></a></h3>
+<h4 id="c-repr" class="section-header"><a href="#c-repr"><code>c-repr</code></a></h4>
 <p>Forces <code>Decimal</code> to use <code>[repr(C)]</code>. The corresponding target layout is 128 bit aligned.</p>
-<h3 id="db-postgres" class="section-header"><a href="#db-postgres"><code>db-postgres</code></a></h3>
+<h4 id="db-postgres" class="section-header"><a href="#db-postgres"><code>db-postgres</code></a></h4>
 <p>This feature enables a PostgreSQL communication module. It allows for reading and writing the <code>Decimal</code>
 type by transparently serializing/deserializing into the <code>NUMERIC</code> data type within PostgreSQL.</p>
-<h3 id="db-tokio-postgres" class="section-header"><a href="#db-tokio-postgres"><code>db-tokio-postgres</code></a></h3>
+<h4 id="db-tokio-postgres" class="section-header"><a href="#db-tokio-postgres"><code>db-tokio-postgres</code></a></h4>
 <p>Enables the tokio postgres module allowing for async communication with PostgreSQL.</p>
-<h3 id="db-diesel-postgres" class="section-header"><a href="#db-diesel-postgres"><code>db-diesel-postgres</code></a></h3>
+<h4 id="db-diesel-postgres" class="section-header"><a href="#db-diesel-postgres"><code>db-diesel-postgres</code></a></h4>
 <p>Enable <code>diesel</code> PostgreSQL support.</p>
-<h3 id="legacy-ops" class="section-header"><a href="#legacy-ops"><code>legacy-ops</code></a></h3>
+<h4 id="legacy-ops" class="section-header"><a href="#legacy-ops"><code>legacy-ops</code></a></h4>
 <p>As of <code>1.10</code> the algorithms used to perform basic operations have changed which has benefits of significant speed improvements.
 To maintain backwards compatibility this can be opted out of by enabling the <code>legacy-ops</code> feature.</p>
-<h3 id="maths" class="section-header"><a href="#maths"><code>maths</code></a></h3>
+<h4 id="maths" class="section-header"><a href="#maths"><code>maths</code></a></h4>
 <p>The <code>maths</code> feature enables additional complex mathematical functions such as <code>pow</code>, <code>ln</code>, <code>enf</code>, <code>exp</code> etc.
 Documentation detailing the additional functions can be found on the
 <a href="https://docs.rs/rust_decimal/latest/rust_decimal/trait.MathematicalOps.html"><code>MathematicalOps</code></a> trait.</p>
 <p>Please note that <code>ln</code> and <code>log10</code> will panic on invalid input with <code>checked_ln</code> and <code>checked_log10</code> the preferred functions
 to curb against this. When the <code>maths</code> feature was first developed the library would return <code>0</code> on invalid input. To re-enable this
 non-panicing behavior, please use the feature: <code>maths-nopanic</code>.</p>
-<h3 id="rust-fuzz" class="section-header"><a href="#rust-fuzz"><code>rust-fuzz</code></a></h3>
+<h4 id="rust-fuzz" class="section-header"><a href="#rust-fuzz"><code>rust-fuzz</code></a></h4>
 <p>Enable <code>rust-fuzz</code> support by implementing the <code>Arbitrary</code> trait.</p>
-<h3 id="serde-float" class="section-header"><a href="#serde-float"><code>serde-float</code></a></h3>
+<h4 id="serde-float" class="section-header"><a href="#serde-float"><code>serde-float</code></a></h4>
 <p>Enable this so that JSON serialization of <code>Decimal</code> types are sent as a float instead of a string (default).</p>
 <p>e.g. with this turned on, JSON serialization would output:</p>
 <div class="example-wrap"><pre class="language-json"><code>{
   &quot;value&quot;: 1.234
-}</code></pre></div><h3 id="serde-str" class="section-header"><a href="#serde-str"><code>serde-str</code></a></h3>
+}</code></pre></div><h4 id="serde-str" class="section-header"><a href="#serde-str"><code>serde-str</code></a></h4>
 <p>This is typically useful for <code>bincode</code> or <code>csv</code> like implementations.</p>
 <p>Since <code>bincode</code> does not specify type information, we need to ensure that a type hint is provided in order to
 correctly be able to deserialize. Enabling this feature on its own will force deserialization to use <code>deserialize_str</code>
@@ -100,29 +100,29 @@ instead of <code>deserialize_any</code>.</p>
 <p>If, for some reason, you also have <code>serde-float</code> enabled then this will use <code>deserialize_f64</code> as a type hint. Because
 converting to <code>f64</code> <em>loses</em> precision, it’s highly recommended that you do NOT enable this feature when working with
 <code>bincode</code>. That being said, this will only use 8 bytes so is slightly more efficient in terms of storage size.</p>
-<h3 id="serde-arbitrary-precision" class="section-header"><a href="#serde-arbitrary-precision"><code>serde-arbitrary-precision</code></a></h3>
+<h4 id="serde-arbitrary-precision" class="section-header"><a href="#serde-arbitrary-precision"><code>serde-arbitrary-precision</code></a></h4>
 <p>This is used primarily with <code>serde_json</code> and consequently adds it as a “weak dependency”. This supports the
 <code>arbitrary_precision</code> feature inside <code>serde_json</code> when parsing decimals.</p>
 <p>This is recommended when parsing “float” looking data as it will prevent data loss.</p>
-<h3 id="std" class="section-header"><a href="#std"><code>std</code></a></h3>
+<h4 id="std" class="section-header"><a href="#std"><code>std</code></a></h4>
 <p>Enable <code>std</code> library support. This is enabled by default, however in the future will be opt in. For now, to support <code>no_std</code>
 libraries, this crate can be compiled with <code>--no-default-features</code>.</p>
-<h2 id="building" class="section-header"><a href="#building">Building</a></h2>
+<h3 id="building" class="section-header"><a href="#building">Building</a></h3>
 <p>Please refer to the <a href="BUILD.md">Build document</a> for more information on building and testing Rust Decimal.</p>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="prelude/index.html" title="rust_decimal::prelude mod">prelude</a></div><div class="item-right docblock-short"><p>A convenience module appropriate for glob imports (<code>use rust_decimal::prelude::*;</code>).</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Decimal.html" title="rust_decimal::Decimal struct">Decimal</a></div><div class="item-right docblock-short"><p><code>Decimal</code> represents a 128 bit representation of a fixed-precision decimal number.
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="prelude/index.html" title="rust_decimal::prelude mod">prelude</a></div><div class="item-right docblock-short"><p>A convenience module appropriate for glob imports (<code>use rust_decimal::prelude::*;</code>).</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Decimal.html" title="rust_decimal::Decimal struct">Decimal</a></div><div class="item-right docblock-short"><p><code>Decimal</code> represents a 128 bit representation of a fixed-precision decimal number.
 The finite set of values of type <code>Decimal</code> are of the form m / 10<sup>e</sup>,
 where m is an integer such that -2<sup>96</sup> &lt; m &lt; 2<sup>96</sup>, and e is an integer
 between 0 and 28 inclusive.</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.Error.html" title="rust_decimal::Error enum">Error</a></div><div class="item-right docblock-short"><p>Error type for the library.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.RoundingStrategy.html" title="rust_decimal::RoundingStrategy enum">RoundingStrategy</a></div><div class="item-right docblock-short"><p><code>RoundingStrategy</code> represents the different rounding strategies that can be used by
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Error.html" title="rust_decimal::Error enum">Error</a></div><div class="item-right docblock-short"><p>Error type for the library.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.RoundingStrategy.html" title="rust_decimal::RoundingStrategy enum">RoundingStrategy</a></div><div class="item-right docblock-short"><p><code>RoundingStrategy</code> represents the different rounding strategies that can be used by
 <code>round_dp_with_strategy</code>.</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Result.html" title="rust_decimal::Result type">Result</a></div><div class="item-right docblock-short"><p>Shortcut for <code>core::result::Result&lt;T, rust_decimal::Error&gt;</code>. Useful to distinguish
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Result.html" title="rust_decimal::Result type">Result</a></div><div class="item-right docblock-short"><p>Shortcut for <code>core::result::Result&lt;T, rust_decimal::Error&gt;</code>. Useful to distinguish
 between <code>rust_decimal</code> and <code>std</code> types.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="rust_decimal" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="rust_decimal" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

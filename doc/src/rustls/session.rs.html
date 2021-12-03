@@ -888,7 +888,7 @@
     <span class="doccomment">/// This function returns `Ok(0)` when the underlying `rd` does</span>
     <span class="doccomment">/// so.  This typically happens when a socket is cleanly closed,</span>
     <span class="doccomment">/// or a file is at EOF.</span>
-    <span class="kw">fn</span> <span class="ident">read_tls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rd</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Read</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">read_tls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rd</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Read</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Writes TLS messages to `wr`.</span>
     <span class="doccomment">///</span>
@@ -901,7 +901,7 @@
     <span class="doccomment">/// to check if output buffer is not empty.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`wants_write`]: #tymethod.wants_write</span>
-    <span class="kw">fn</span> <span class="ident">write_tls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">wr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Write</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">write_tls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">wr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Write</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Processes any new packets read by a previous call to `read_tls`.</span>
     <span class="doccomment">/// Errors from this function relate to TLS protocol errors, and</span>
@@ -910,20 +910,20 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Success from this function can mean new plaintext is available:</span>
     <span class="doccomment">/// obtain it using `read`.</span>
-    <span class="kw">fn</span> <span class="ident">process_new_packets</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">process_new_packets</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Returns true if the caller should call `read_tls` as soon</span>
     <span class="doccomment">/// as possible.</span>
-    <span class="kw">fn</span> <span class="ident">wants_read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">wants_read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 
     <span class="doccomment">/// Returns true if the caller should call `write_tls` as soon</span>
     <span class="doccomment">/// as possible.</span>
-    <span class="kw">fn</span> <span class="ident">wants_write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">wants_write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 
     <span class="doccomment">/// Returns true if the session is currently perform the TLS</span>
     <span class="doccomment">/// handshake.  During this time plaintext written to the</span>
     <span class="doccomment">/// session is buffered in memory.</span>
-    <span class="kw">fn</span> <span class="ident">is_handshaking</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">is_handshaking</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 
     <span class="doccomment">/// Sets a limit on the internal buffers used to buffer</span>
     <span class="doccomment">/// unsent plaintext (prior to completing the TLS handshake)</span>
@@ -951,19 +951,19 @@
     <span class="doccomment">/// if client authentication was completed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The return value is None until this value is available.</span>
-    <span class="kw">fn</span> <span class="ident">get_peer_certificates</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">get_peer_certificates</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Retrieves the protocol agreed with the peer via ALPN.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A return value of None after handshake completion</span>
     <span class="doccomment">/// means no protocol was agreed (because no protocols</span>
     <span class="doccomment">/// were offered or accepted by the peer).</span>
-    <span class="kw">fn</span> <span class="ident">get_alpn_protocol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">get_alpn_protocol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Retrieves the protocol version agreed with the peer.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This returns None until the version is agreed.</span>
-    <span class="kw">fn</span> <span class="ident">get_protocol_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ProtocolVersion</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">get_protocol_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ProtocolVersion</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Derives key material from the agreed session secrets.</span>
     <span class="doccomment">///</span>
@@ -983,12 +983,12 @@
         <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Retrieves the ciphersuite agreed with the peer.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This returns None until the ciphersuite is agreed.</span>
-    <span class="kw">fn</span> <span class="ident">get_negotiated_ciphersuite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">get_negotiated_ciphersuite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// This function uses `io` to complete any outstanding IO for</span>
     <span class="doccomment">/// this session.</span>
@@ -1012,7 +1012,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Errors from TLS record handling (ie, from `process_new_packets()`)</span>
     <span class="doccomment">/// are wrapped in an `io::ErrorKind::InvalidData`-kind error.</span>
-    <span class="kw">fn</span> <span class="ident">complete_io</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>), <span class="ident">io::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">complete_io</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>), <span class="ident">io::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">T</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span>,
@@ -1033,14 +1033,14 @@
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">eof</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">wants_read</span>() {
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">read_tls</span>(<span class="ident">io</span>)<span class="question-mark">?</span> {
-                    <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">eof</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                    <span class="ident">n</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rdlen</span> <span class="op">+</span><span class="op">=</span> <span class="ident">n</span>,
+                    <span class="number">0</span> =&gt; <span class="ident">eof</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                    <span class="ident">n</span> =&gt; <span class="ident">rdlen</span> <span class="op">+</span><span class="op">=</span> <span class="ident">n</span>,
                 }
             }
 
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">process_new_packets</span>() {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="comment">// In case we have an alert to send describing this error,</span>
                     <span class="comment">// try a last-gasp write -- but don&#39;t predate the primary</span>
                     <span class="comment">// error.</span>
@@ -1051,10 +1051,10 @@
             };
 
             <span class="kw">match</span> (<span class="ident">eof</span>, <span class="ident">until_handshaked</span>, <span class="self">self</span>.<span class="ident">is_handshaking</span>()) {
-                (<span class="kw">_</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">rdlen</span>, <span class="ident">wrlen</span>)),
-                (<span class="kw">_</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">rdlen</span>, <span class="ident">wrlen</span>)),
-                (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::from</span>(<span class="ident">io::ErrorKind::UnexpectedEof</span>)),
-                (..) <span class="op">=</span><span class="op">&gt;</span> {}
+                (<span class="kw">_</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">rdlen</span>, <span class="ident">wrlen</span>)),
+                (<span class="kw">_</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">rdlen</span>, <span class="ident">wrlen</span>)),
+                (<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::from</span>(<span class="ident">io::ErrorKind::UnexpectedEof</span>)),
+                (..) =&gt; {}
             }
         }
     }
@@ -1077,7 +1077,7 @@
 <span class="kw">static</span> <span class="ident">TLS12_DOWNGRADE_SENTINEL</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">0x44</span>, <span class="number">0x4f</span>, <span class="number">0x57</span>, <span class="number">0x4e</span>, <span class="number">0x47</span>, <span class="number">0x52</span>, <span class="number">0x44</span>, <span class="number">0x01</span>];
 
 <span class="kw">impl</span> <span class="ident">SessionRandoms</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">for_server</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionRandoms</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">for_server</span>() -&gt; <span class="ident">SessionRandoms</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">SessionRandoms</span> {
             <span class="ident">we_are_client</span>: <span class="bool-val">false</span>,
             <span class="ident">client</span>: [<span class="number">0u8</span>; <span class="number">32</span>],
@@ -1088,7 +1088,7 @@
         <span class="ident">ret</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">for_client</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionRandoms</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">for_client</span>() -&gt; <span class="ident">SessionRandoms</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">SessionRandoms</span> {
             <span class="ident">we_are_client</span>: <span class="bool-val">true</span>,
             <span class="ident">client</span>: [<span class="number">0u8</span>; <span class="number">32</span>],
@@ -1107,15 +1107,15 @@
             .<span class="ident">unwrap</span>();
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_tls12_downgrade_marker</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_tls12_downgrade_marker</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">we_are_client</span>);
         <span class="comment">// both the server random and TLS12_DOWNGRADE_SENTINEL are</span>
         <span class="comment">// public values and don&#39;t require constant time comparison</span>
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">server</span>[<span class="number">24</span>..] <span class="op">=</span><span class="op">=</span> <span class="ident">TLS12_DOWNGRADE_SENTINEL</span>
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">server</span>[<span class="number">24</span>..] <span class="op">==</span> <span class="ident">TLS12_DOWNGRADE_SENTINEL</span>
     }
 }
 
-<span class="kw">fn</span> <span class="ident">join_randoms</span>(<span class="ident">first</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">second</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">64</span>] {
+<span class="kw">fn</span> <span class="ident">join_randoms</span>(<span class="ident">first</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">second</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; [<span class="ident">u8</span>; <span class="number">64</span>] {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">randoms</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">64</span>];
     <span class="ident">randoms</span>
         .<span class="ident">as_mut</span>()
@@ -1140,7 +1140,7 @@
         <span class="ident">randoms</span>: <span class="kw-2">&amp;</span><span class="ident">SessionRandoms</span>,
         <span class="ident">hashalg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ring::digest::Algorithm</span>,
         <span class="ident">pms</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionSecrets</span> {
+    ) -&gt; <span class="ident">SessionSecrets</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">SessionSecrets</span> {
             <span class="ident">randoms</span>: <span class="ident">randoms</span>.<span class="ident">clone</span>(),
             <span class="ident">hash</span>: <span class="ident">hashalg</span>,
@@ -1163,7 +1163,7 @@
         <span class="ident">hs_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">hashalg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ring::digest::Algorithm</span>,
         <span class="ident">pms</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionSecrets</span> {
+    ) -&gt; <span class="ident">SessionSecrets</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">SessionSecrets</span> {
             <span class="ident">randoms</span>: <span class="ident">randoms</span>.<span class="ident">clone</span>(),
             <span class="ident">hash</span>: <span class="ident">hashalg</span>,
@@ -1184,7 +1184,7 @@
         <span class="ident">randoms</span>: <span class="kw-2">&amp;</span><span class="ident">SessionRandoms</span>,
         <span class="ident">hashalg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ring::digest::Algorithm</span>,
         <span class="ident">master_secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionSecrets</span> {
+    ) -&gt; <span class="ident">SessionSecrets</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">SessionSecrets</span> {
             <span class="ident">randoms</span>: <span class="ident">randoms</span>.<span class="ident">clone</span>(),
             <span class="ident">hash</span>: <span class="ident">hashalg</span>,
@@ -1197,7 +1197,7 @@
         <span class="ident">ret</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_key_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_key_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="ident">out</span>.<span class="ident">resize</span>(<span class="ident">len</span>, <span class="number">0u8</span>);
 
@@ -1215,13 +1215,13 @@
         <span class="ident">out</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_master_secret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_master_secret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="ident">ret</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_secret</span>);
         <span class="ident">ret</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handshake_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handshake_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="ident">out</span>.<span class="ident">resize</span>(<span class="number">12</span>, <span class="number">0u8</span>);
 
@@ -1235,11 +1235,11 @@
         <span class="ident">out</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handshake_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handshake_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">make_verify_data</span>(<span class="ident">handshake_hash</span>, <span class="string">b&quot;client finished&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handshake_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handshake_hash</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">make_verify_data</span>(<span class="ident">handshake_hash</span>, <span class="string">b&quot;server finished&quot;</span>)
     }
 
@@ -1297,7 +1297,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SessionCommon</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">mtu</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">client</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionCommon</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">mtu</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">client</span>: <span class="ident">bool</span>) -&gt; <span class="ident">SessionCommon</span> {
         <span class="ident">SessionCommon</span> {
             <span class="ident">negotiated_version</span>: <span class="prelude-val">None</span>,
             <span class="ident">is_client</span>: <span class="ident">client</span>,
@@ -1320,36 +1320,36 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_tls13</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_tls13</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">negotiated_version</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ProtocolVersion::TLSv1_3</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">ProtocolVersion::TLSv1_3</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_suite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_suite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">suite</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_suite_assert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedCipherSuite</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_suite_assert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedCipherSuite</span> {
         <span class="self">self</span>.<span class="ident">suite</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_suite</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedCipherSuite</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_suite</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedCipherSuite</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">suite</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">suite</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">suite</span>);
                 <span class="bool-val">true</span>
             }
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="kw">if</span> <span class="ident">s</span> <span class="op">=</span><span class="op">=</span> <span class="ident">suite</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="ident">suite</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">suite</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">suite</span>);
                 <span class="bool-val">true</span>
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_tls13_ccs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MiddleboxCCS</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_tls13_ccs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MiddleboxCCS</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="comment">// pass message to handshake state machine if any of these are true:</span>
         <span class="comment">// - TLS1.2 (where it&#39;s part of the state machine),</span>
         <span class="comment">// - prior to determining the version (it&#39;s illegal as a first message)</span>
@@ -1369,7 +1369,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt_incoming</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">encr</span>: <span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt_incoming</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">encr</span>: <span class="ident">Message</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>
             .<span class="ident">record_layer</span>
             .<span class="ident">wants_close_before_decrypt</span>()
@@ -1384,7 +1384,7 @@
         <span class="ident">rc</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_readable_plaintext</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_readable_plaintext</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">received_plaintext</span>.<span class="ident">is_empty</span>()
     }
 
@@ -1393,7 +1393,7 @@
         <span class="self">self</span>.<span class="ident">sendable_tls</span>.<span class="ident">set_limit</span>(<span class="ident">limit</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_alert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_alert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessagePayload::Alert</span>(<span class="kw-2">ref</span> <span class="ident">alert</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">payload</span> {
             <span class="comment">// Reject unknown AlertLevels.</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AlertLevel::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">alert</span>.<span class="ident">level</span> {
@@ -1402,14 +1402,14 @@
 
             <span class="comment">// If we get a CloseNotify, make a note to declare EOF to our</span>
             <span class="comment">// caller.</span>
-            <span class="kw">if</span> <span class="ident">alert</span>.<span class="ident">description</span> <span class="op">=</span><span class="op">=</span> <span class="ident">AlertDescription::CloseNotify</span> {
+            <span class="kw">if</span> <span class="ident">alert</span>.<span class="ident">description</span> <span class="op">==</span> <span class="ident">AlertDescription::CloseNotify</span> {
                 <span class="self">self</span>.<span class="ident">peer_eof</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }
 
             <span class="comment">// Warnings are nonfatal for TLS1.2, but outlawed in TLS1.3</span>
             <span class="comment">// (except, for no good reason, user_cancelled).</span>
-            <span class="kw">if</span> <span class="ident">alert</span>.<span class="ident">level</span> <span class="op">=</span><span class="op">=</span> <span class="ident">AlertLevel::Warning</span> {
+            <span class="kw">if</span> <span class="ident">alert</span>.<span class="ident">level</span> <span class="op">==</span> <span class="ident">AlertLevel::Warning</span> {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_tls13</span>() <span class="op">&amp;&amp;</span> <span class="ident">alert</span>.<span class="ident">description</span> <span class="op">!</span><span class="op">=</span> <span class="ident">AlertDescription::UserCanceled</span> {
                     <span class="self">self</span>.<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::DecodeError</span>);
                 } <span class="kw">else</span> {
@@ -1438,16 +1438,16 @@
     }
 
     <span class="doccomment">/// Like send_msg_encrypt, but operate on an appdata directly.</span>
-    <span class="kw">fn</span> <span class="ident">send_appdata_encrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">limit</span>: <span class="ident">Limit</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">send_appdata_encrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">limit</span>: <span class="ident">Limit</span>) -&gt; <span class="ident">usize</span> {
         <span class="comment">// Here, the limit on sendable_tls applies to encrypted data,</span>
         <span class="comment">// but we&#39;re respecting it for plaintext data -- so we&#39;ll</span>
         <span class="comment">// be out by whatever the cipher+record overhead is.  That&#39;s a</span>
         <span class="comment">// constant and predictable amount, so it&#39;s not a terrible issue.</span>
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">limit</span> {
-            <span class="ident">Limit::Yes</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
+            <span class="ident">Limit::Yes</span> =&gt; <span class="self">self</span>
                 .<span class="ident">sendable_tls</span>
                 .<span class="ident">apply_limit</span>(<span class="ident">payload</span>.<span class="ident">len</span>()),
-            <span class="ident">Limit::No</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">payload</span>.<span class="ident">len</span>(),
+            <span class="ident">Limit::No</span> =&gt; <span class="ident">payload</span>.<span class="ident">len</span>(),
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">plain_messages</span> <span class="op">=</span> <span class="ident">VecDeque::new</span>();
@@ -1488,18 +1488,18 @@
     <span class="doccomment">/// Are we done? ie, have we processed all received messages,</span>
     <span class="doccomment">/// and received a close_notify to indicate that no new messages</span>
     <span class="doccomment">/// will arrive?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_at_eof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_at_eof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">peer_eof</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">message_deframer</span>.<span class="ident">has_pending</span>()
     }
 
     <span class="doccomment">/// Read TLS content from `rd`.  This method does internal</span>
     <span class="doccomment">/// buffering, so `rd` can supply TLS messages in arbitrary-</span>
     <span class="doccomment">/// sized chunks (like a socket or pipe might).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_tls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rd</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Read</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_tls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rd</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Read</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">message_deframer</span>.<span class="ident">read</span>(<span class="ident">rd</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_tls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">wr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Write</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_tls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">wr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Write</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">sendable_tls</span>.<span class="ident">write_to</span>(<span class="ident">wr</span>)
     }
 
@@ -1508,11 +1508,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If internal buffers are too small, this function will not accept</span>
     <span class="doccomment">/// all the data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_some_plaintext</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_some_plaintext</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">send_plain</span>(<span class="ident">data</span>, <span class="ident">Limit::Yes</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_early_plaintext</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_early_plaintext</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">early_traffic</span>);
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">record_layer</span>.<span class="ident">is_encrypting</span>());
 
@@ -1529,15 +1529,15 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns the number of bytes written from `data`: this might</span>
     <span class="doccomment">/// be less than `data.len()` if buffer limits were exceeded.</span>
-    <span class="kw">fn</span> <span class="ident">send_plain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">limit</span>: <span class="ident">Limit</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">send_plain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">limit</span>: <span class="ident">Limit</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">traffic</span> {
             <span class="comment">// If we haven&#39;t completed handshaking, buffer</span>
             <span class="comment">// plaintext to send once we do.</span>
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">limit</span> {
-                <span class="ident">Limit::Yes</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
+                <span class="ident">Limit::Yes</span> =&gt; <span class="self">self</span>
                     .<span class="ident">sendable_plaintext</span>
                     .<span class="ident">append_limited_copy</span>(<span class="ident">data</span>),
-                <span class="ident">Limit::No</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
+                <span class="ident">Limit::No</span> =&gt; <span class="self">self</span>
                     .<span class="ident">sendable_plaintext</span>
                     .<span class="ident">append</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>()),
             };
@@ -1619,10 +1619,10 @@
         <span class="self">self</span>.<span class="ident">received_plaintext</span>.<span class="ident">append</span>(<span class="ident">bytes</span>.<span class="number">0</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">received_plaintext</span>.<span class="ident">read</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">connection_at_eof</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">received_plaintext</span>.<span class="ident">is_empty</span>() {
+        <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">connection_at_eof</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">received_plaintext</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                 <span class="ident">io::ErrorKind::ConnectionAborted</span>,
                 <span class="string">&quot;CloseNotify alert received&quot;</span>,
@@ -1663,10 +1663,10 @@
         <span class="self">self</span>.<span class="ident">send_msg</span>(<span class="ident">m</span>, <span class="self">self</span>.<span class="ident">record_layer</span>.<span class="ident">is_encrypting</span>());
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_quic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_quic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
         {
-            <span class="self">self</span>.<span class="ident">protocol</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Protocol::Quic</span>
+            <span class="self">self</span>.<span class="ident">protocol</span> <span class="op">==</span> <span class="ident">Protocol::Quic</span>
         }
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>))]</span>
         <span class="bool-val">false</span>
@@ -1688,7 +1688,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Quic</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">params</span>: <span class="prelude-val">None</span>,
             <span class="ident">alert</span>: <span class="prelude-val">None</span>,

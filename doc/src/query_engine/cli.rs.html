@@ -193,16 +193,16 @@
 
 <span class="kw">impl</span> <span class="ident">CliCommand</span> {
     <span class="doccomment">/// Create a CLI command from a `PrismaOpt` instance.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_opt</span>(<span class="ident">opts</span>: <span class="kw-2">&amp;</span><span class="ident">PrismaOpt</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::PrismaResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CliCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_opt</span>(<span class="ident">opts</span>: <span class="kw-2">&amp;</span><span class="ident">PrismaOpt</span>) -&gt; <span class="ident"><span class="kw">crate</span>::PrismaResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CliCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">subcommand</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">subcommand</span>.<span class="ident">as_ref</span>();
         <span class="kw">let</span> <span class="ident">subcommand</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">subcommand</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">cmd</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cmd</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">cmd</span>) =&gt; <span class="ident">cmd</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
         <span class="kw">match</span> <span class="ident">subcommand</span> {
-            <span class="ident">Subcommand::Cli</span>(<span class="kw-2">ref</span> <span class="ident">cliopts</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">cliopts</span> {
-                <span class="ident">CliOpt::Dmmf</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Subcommand::Cli</span>(<span class="kw-2">ref</span> <span class="ident">cliopts</span>) =&gt; <span class="kw">match</span> <span class="ident">cliopts</span> {
+                <span class="ident">CliOpt::Dmmf</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">build_mode</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">opts</span>.<span class="ident">legacy</span> {
                         <span class="ident">BuildMode::Legacy</span>
                     } <span class="kw">else</span> {
@@ -216,11 +216,11 @@
                         <span class="ident">config</span>: <span class="ident">opts</span>.<span class="ident">configuration</span>(<span class="bool-val">true</span>)<span class="question-mark">?</span>.<span class="ident">subject</span>,
                     })))
                 }
-                <span class="ident">CliOpt::GetConfig</span>(<span class="ident">input</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CliCommand::GetConfig</span>(<span class="ident">GetConfigRequest</span> {
+                <span class="ident">CliOpt::GetConfig</span>(<span class="ident">input</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CliCommand::GetConfig</span>(<span class="ident">GetConfigRequest</span> {
                     <span class="ident">config</span>: <span class="ident">opts</span>.<span class="ident">configuration</span>(<span class="ident">input</span>.<span class="ident">ignore_env_var_errors</span>)<span class="question-mark">?</span>,
                     <span class="ident">ignore_env_var_errors</span>: <span class="ident">input</span>.<span class="ident">ignore_env_var_errors</span>,
                 }))),
-                <span class="ident">CliOpt::ExecuteRequest</span>(<span class="ident">input</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CliCommand::ExecuteRequest</span>(<span class="ident">ExecuteRequest</span> {
+                <span class="ident">CliOpt::ExecuteRequest</span>(<span class="ident">input</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CliCommand::ExecuteRequest</span>(<span class="ident">ExecuteRequest</span> {
                     <span class="ident">query</span>: <span class="ident">input</span>.<span class="ident">query</span>.<span class="ident">clone</span>(),
                     <span class="ident">enable_raw_queries</span>: <span class="ident">opts</span>.<span class="ident">enable_raw_queries</span>,
                     <span class="ident">legacy</span>: <span class="ident">input</span>.<span class="ident">legacy</span>,
@@ -231,15 +231,15 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="self">self</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CliCommand::Dmmf</span>(<span class="ident">request</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::dmmf</span>(<span class="ident">request</span>).<span class="kw">await</span>,
-            <span class="ident">CliCommand::GetConfig</span>(<span class="ident">input</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::get_config</span>(<span class="ident">input</span>),
-            <span class="ident">CliCommand::ExecuteRequest</span>(<span class="ident">request</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::execute_request</span>(<span class="ident">request</span>).<span class="kw">await</span>,
+            <span class="ident">CliCommand::Dmmf</span>(<span class="ident">request</span>) =&gt; <span class="ident"><span class="self">Self</span>::dmmf</span>(<span class="ident">request</span>).<span class="kw">await</span>,
+            <span class="ident">CliCommand::GetConfig</span>(<span class="ident">input</span>) =&gt; <span class="ident"><span class="self">Self</span>::get_config</span>(<span class="ident">input</span>),
+            <span class="ident">CliCommand::ExecuteRequest</span>(<span class="ident">request</span>) =&gt; <span class="ident"><span class="self">Self</span>::execute_request</span>(<span class="ident">request</span>).<span class="kw">await</span>,
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dmmf</span>(<span class="ident">request</span>: <span class="ident">DmmfRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dmmf</span>(<span class="ident">request</span>: <span class="ident">DmmfRequest</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">datasource</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">config</span>.<span class="ident">datasources</span>.<span class="ident">first</span>();
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">datasource</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ds</span><span class="op">|</span> <span class="ident">ds</span>.<span class="ident">capabilities</span>())
@@ -265,7 +265,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">get_config</span>(<span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">GetConfigRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_config</span>(<span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">GetConfigRequest</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">req</span>.<span class="ident">config</span>;
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">req</span>.<span class="ident">ignore_env_var_errors</span> {
@@ -282,7 +282,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_request</span>(<span class="ident">request</span>: <span class="ident">ExecuteRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_request</span>(<span class="ident">request</span>: <span class="ident">ExecuteRequest</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">base64::decode</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">query</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">decoded_request</span> <span class="op">=</span> <span class="ident">String::from_utf8</span>(<span class="ident">decoded</span>)<span class="question-mark">?</span>;
 

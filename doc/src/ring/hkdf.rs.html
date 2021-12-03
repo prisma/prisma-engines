@@ -260,7 +260,7 @@
 <span class="kw">impl</span> <span class="ident">Algorithm</span> {
     <span class="doccomment">/// The underlying HMAC algorithm.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hmac_algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hmac::Algorithm</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hmac_algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">hmac::Algorithm</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -279,7 +279,7 @@
 <span class="kw">pub</span> <span class="kw">static</span> <span class="ident">HKDF_SHA512</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span>(<span class="ident">hmac::HMAC_SHA512</span>);
 
 <span class="kw">impl</span> <span class="ident">KeyType</span> <span class="kw">for</span> <span class="ident">Algorithm</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">digest_algorithm</span>().<span class="ident">output_len</span>
     }
 }
@@ -294,14 +294,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Constructing a `Salt` is relatively expensive so it is good to reuse a</span>
     <span class="doccomment">/// `Salt` object instead of re-constructing `Salt`s with the same value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="ident">Algorithm</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="ident">Algorithm</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
         <span class="ident">Salt</span>(<span class="ident">hmac::Key::new</span>(<span class="ident">algorithm</span>.<span class="number">0</span>, <span class="ident">value</span>))
     }
 
     <span class="doccomment">/// The [HKDF-Extract] operation.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [HKDF-Extract]: https://tools.ietf.org/html/rfc5869#section-2.2</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Prk</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Prk</span> {
         <span class="comment">// The spec says that if no salt is provided then a key of</span>
         <span class="comment">// `digest_alg.output_len` bytes of zeros is used. But, HMAC keys are</span>
         <span class="comment">// already zero-padded to the block length, which is larger than the output</span>
@@ -315,13 +315,13 @@
 
     <span class="doccomment">/// The algorithm used to derive this salt.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Algorithm</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Algorithm</span> {
         <span class="ident">Algorithm</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">algorithm</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Algorithm</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Salt</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Algorithm</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Algorithm</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">hmac::Key::from</span>(<span class="ident">Okm</span> {
             <span class="ident">prk</span>: <span class="ident">okm</span>.<span class="ident">prk</span>,
             <span class="ident">info</span>: <span class="ident">okm</span>.<span class="ident">info</span>,
@@ -334,7 +334,7 @@
 <span class="doccomment">/// The length of the OKM (Output Keying Material) for a `Prk::expand()` call.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">KeyType</span> {
     <span class="doccomment">/// The length that `Prk::expand()` should expand its input to.</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>;
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
 }
 
 <span class="doccomment">/// A HKDF PRK (pseudorandom key).</span>
@@ -347,7 +347,7 @@
     <span class="doccomment">/// Usually one can avoid using this. It is useful when the application</span>
     <span class="doccomment">/// intentionally wants to leak the PRK secret, e.g. to implement</span>
     <span class="doccomment">/// `SSLKEYLOGFILE` functionality.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_less_safe</span>(<span class="ident">algorithm</span>: <span class="ident">Algorithm</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_less_safe</span>(<span class="ident">algorithm</span>: <span class="ident">Algorithm</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">hmac::Key::new</span>(<span class="ident">algorithm</span>.<span class="ident">hmac_algorithm</span>(), <span class="ident">value</span>))
     }
 
@@ -361,7 +361,7 @@
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]],
         <span class="ident">len</span>: <span class="ident">L</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">L</span><span class="op">&gt;</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">L</span><span class="op">&gt;</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len_cached</span> <span class="op">=</span> <span class="ident">len</span>.<span class="ident">len</span>();
         <span class="kw">if</span> <span class="ident">len_cached</span> <span class="op">&gt;</span> <span class="number">255</span> <span class="op">*</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">algorithm</span>().<span class="ident">digest_algorithm</span>().<span class="ident">output_len</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
@@ -376,7 +376,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Algorithm</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Prk</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">Okm</span><span class="op">&lt;</span><span class="ident">Algorithm</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">Okm</span><span class="op">&lt;</span><span class="ident">Algorithm</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">hmac::Key::from</span>(<span class="ident">Okm</span> {
             <span class="ident">prk</span>: <span class="ident">okm</span>.<span class="ident">prk</span>,
             <span class="ident">info</span>: <span class="ident">okm</span>.<span class="ident">info</span>,
@@ -401,7 +401,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">KeyType</span><span class="op">&gt;</span> <span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">L</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The `OkmLength` given to `Prk::expand()`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">L</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">L</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">len</span>
     }
 
@@ -413,7 +413,7 @@
     <span class="doccomment">/// imposed by the HKDF specification due to the way HKDF&#39;s counter is</span>
     <span class="doccomment">/// constructed.)</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill</span>(<span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill</span>(<span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="ident">fill_okm</span>(<span class="self">self</span>.<span class="ident">prk</span>, <span class="self">self</span>.<span class="ident">info</span>, <span class="ident">out</span>, <span class="self">self</span>.<span class="ident">len_cached</span>)
     }
 }
@@ -423,7 +423,7 @@
     <span class="ident">info</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]],
     <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
     <span class="ident">len</span>: <span class="ident">usize</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">out</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">len</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
     }

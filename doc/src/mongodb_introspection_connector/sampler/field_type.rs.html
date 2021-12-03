@@ -167,120 +167,120 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FieldType</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_bson</span>(<span class="ident">bson</span>: <span class="kw-2">&amp;</span><span class="ident">Bson</span>, <span class="ident">composite_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_bson</span>(<span class="ident">bson</span>: <span class="kw-2">&amp;</span><span class="ident">Bson</span>, <span class="ident">composite_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">bson</span> {
-            <span class="ident">Bson::Double</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Double</span>),
-            <span class="ident">Bson::String</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::String</span>),
-            <span class="ident">Bson::Array</span>(<span class="ident">docs</span>) <span class="kw">if</span> <span class="ident">docs</span>.<span class="ident">is_empty</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">Bson::Array</span>(<span class="ident">docs</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Array</span>(<span class="ident">Box::new</span>(
+            <span class="ident">Bson::Double</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Double</span>),
+            <span class="ident">Bson::String</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::String</span>),
+            <span class="ident">Bson::Array</span>(<span class="ident">docs</span>) <span class="kw">if</span> <span class="ident">docs</span>.<span class="ident">is_empty</span>() =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">Bson::Array</span>(<span class="ident">docs</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Array</span>(<span class="ident">Box::new</span>(
                 <span class="ident">docs</span>.<span class="ident">first</span>()
                     .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">FieldType::from_bson</span>(<span class="ident">d</span>, <span class="ident">composite_name</span>))
                     .<span class="ident">unwrap_or</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;Unknown&quot;</span>)),
             ))),
-            <span class="ident">Bson::Document</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">composite_name</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Document</span>(<span class="ident">name</span>.<span class="ident">take</span>())),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Json</span>),
+            <span class="ident">Bson::Document</span>(<span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">composite_name</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Document</span>(<span class="ident">name</span>.<span class="ident">take</span>())),
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Json</span>),
             },
-            <span class="ident">Bson::Boolean</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Bool</span>),
-            <span class="ident">Bson::RegularExpression</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;RegularExpression&quot;</span>)),
-            <span class="ident">Bson::JavaScriptCode</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;JavaScriptCode&quot;</span>)),
-            <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;JavaScriptCodeWithScope&quot;</span>)),
-            <span class="ident">Bson::Int32</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Int32</span>),
-            <span class="ident">Bson::Int64</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Int64</span>),
-            <span class="ident">Bson::Timestamp</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Timestamp</span>),
-            <span class="ident">Bson::Binary</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::BinData</span>),
-            <span class="ident">Bson::ObjectId</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::ObjectId</span>),
-            <span class="ident">Bson::DateTime</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Date</span>),
-            <span class="ident">Bson::Symbol</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;Symbol&quot;</span>)),
-            <span class="ident">Bson::Decimal128</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Decimal</span>),
-            <span class="ident">Bson::Undefined</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;Undefined&quot;</span>)),
-            <span class="ident">Bson::MaxKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;MaxKey&quot;</span>)),
-            <span class="ident">Bson::MinKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;MinKey&quot;</span>)),
-            <span class="ident">Bson::DbPointer</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;DbPointer&quot;</span>)),
-            <span class="ident">Bson::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Bson::Boolean</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Bool</span>),
+            <span class="ident">Bson::RegularExpression</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;RegularExpression&quot;</span>)),
+            <span class="ident">Bson::JavaScriptCode</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;JavaScriptCode&quot;</span>)),
+            <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;JavaScriptCodeWithScope&quot;</span>)),
+            <span class="ident">Bson::Int32</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Int32</span>),
+            <span class="ident">Bson::Int64</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Int64</span>),
+            <span class="ident">Bson::Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Timestamp</span>),
+            <span class="ident">Bson::Binary</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::BinData</span>),
+            <span class="ident">Bson::ObjectId</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::ObjectId</span>),
+            <span class="ident">Bson::DateTime</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Date</span>),
+            <span class="ident">Bson::Symbol</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;Symbol&quot;</span>)),
+            <span class="ident">Bson::Decimal128</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Decimal</span>),
+            <span class="ident">Bson::Undefined</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;Undefined&quot;</span>)),
+            <span class="ident">Bson::MaxKey</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;MaxKey&quot;</span>)),
+            <span class="ident">Bson::MinKey</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;MinKey&quot;</span>)),
+            <span class="ident">Bson::DbPointer</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;DbPointer&quot;</span>)),
+            <span class="ident">Bson::Null</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Array</span>(<span class="kw">_</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FieldType</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;String&quot;</span>),
-            <span class="ident">FieldType::Double</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Double&quot;</span>),
-            <span class="ident">FieldType::BinData</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;BinData&quot;</span>),
-            <span class="ident">FieldType::ObjectId</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ObjectId&quot;</span>),
-            <span class="ident">FieldType::Bool</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Boolean&quot;</span>),
-            <span class="ident">FieldType::Date</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Date&quot;</span>),
-            <span class="ident">FieldType::Int32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Int32&quot;</span>),
-            <span class="ident">FieldType::Timestamp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Timestamp&quot;</span>),
-            <span class="ident">FieldType::Int64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Int64&quot;</span>),
-            <span class="ident">FieldType::Decimal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Decimal&quot;</span>),
-            <span class="ident">FieldType::Json</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Document&quot;</span>),
-            <span class="ident">FieldType::Document</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>),
-            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Array({})&quot;</span>, <span class="ident">r#type</span>),
-            <span class="ident">FieldType::Unsupported</span>(<span class="ident">r#type</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">r#type</span>),
+            <span class="ident">FieldType::String</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;String&quot;</span>),
+            <span class="ident">FieldType::Double</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Double&quot;</span>),
+            <span class="ident">FieldType::BinData</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;BinData&quot;</span>),
+            <span class="ident">FieldType::ObjectId</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ObjectId&quot;</span>),
+            <span class="ident">FieldType::Bool</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Boolean&quot;</span>),
+            <span class="ident">FieldType::Date</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Date&quot;</span>),
+            <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Int32&quot;</span>),
+            <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Timestamp&quot;</span>),
+            <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Int64&quot;</span>),
+            <span class="ident">FieldType::Decimal</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Decimal&quot;</span>),
+            <span class="ident">FieldType::Json</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Document&quot;</span>),
+            <span class="ident">FieldType::Document</span>(<span class="ident">s</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>),
+            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Array({})&quot;</span>, <span class="ident">r#type</span>),
+            <span class="ident">FieldType::Unsupported</span>(<span class="ident">r#type</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">r#type</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FieldType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">datamodel::CompositeTypeFieldType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r#type</span>: <span class="ident">FieldType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r#type</span>: <span class="ident">FieldType</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">r#type</span> {
-            <span class="ident">FieldType::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Double</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::BinData</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::ObjectId</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(
+            <span class="ident">FieldType::String</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Double</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::BinData</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::ObjectId</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(
                 <span class="ident">ScalarType::String</span>,
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;ObjectId&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::ObjectId</span>)),
             ),
-            <span class="ident">FieldType::Bool</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Date</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(
+            <span class="ident">FieldType::Bool</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Date</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(
                 <span class="ident">ScalarType::DateTime</span>,
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;Date&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::Date</span>)),
             ),
-            <span class="ident">FieldType::Int32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Timestamp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Int64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Decimal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Json</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Document</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::CompositeType</span>(<span class="ident">name</span>),
-            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::from</span>(<span class="kw-2">*</span><span class="ident">r#type</span>),
-            <span class="ident">FieldType::Unsupported</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::CompositeTypeFieldType::Unsupported</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()),
+            <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Decimal</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Json</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Document</span>(<span class="ident">name</span>) =&gt; <span class="ident">datamodel::CompositeTypeFieldType::CompositeType</span>(<span class="ident">name</span>),
+            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="ident">datamodel::CompositeTypeFieldType::from</span>(<span class="kw-2">*</span><span class="ident">r#type</span>),
+            <span class="ident">FieldType::Unsupported</span>(<span class="ident">name</span>) =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Unsupported</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FieldType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">datamodel::FieldType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r#type</span>: <span class="ident">FieldType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r#type</span>: <span class="ident">FieldType</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">r#type</span> {
-            <span class="ident">FieldType::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Double</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::BinData</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::ObjectId</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::Scalar</span>(
+            <span class="ident">FieldType::String</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Double</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::BinData</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::ObjectId</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(
                 <span class="ident">ScalarType::String</span>,
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;ObjectId&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::ObjectId</span>)),
             ),
-            <span class="ident">FieldType::Bool</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Date</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::Scalar</span>(
+            <span class="ident">FieldType::Bool</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Date</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(
                 <span class="ident">ScalarType::DateTime</span>,
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;Date&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::Date</span>)),
             ),
-            <span class="ident">FieldType::Int32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Timestamp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Int64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Decimal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Json</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Document</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::CompositeType</span>(<span class="ident">name</span>),
-            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::from</span>(<span class="kw-2">*</span><span class="ident">r#type</span>),
-            <span class="ident">FieldType::Unsupported</span>(<span class="ident">type_name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::FieldType::Unsupported</span>(<span class="ident">type_name</span>.<span class="ident">to_string</span>()),
+            <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Decimal</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Json</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Document</span>(<span class="ident">name</span>) =&gt; <span class="ident">datamodel::FieldType::CompositeType</span>(<span class="ident">name</span>),
+            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="ident">datamodel::FieldType::from</span>(<span class="kw-2">*</span><span class="ident">r#type</span>),
+            <span class="ident">FieldType::Unsupported</span>(<span class="ident">type_name</span>) =&gt; <span class="ident">datamodel::FieldType::Unsupported</span>(<span class="ident">type_name</span>.<span class="ident">to_string</span>()),
         }
     }
 }

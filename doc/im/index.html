@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Immutable Data Structures for Rust"><meta name="keywords" content="rust, rustlang, rust-lang, im"><title>im - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../im/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate im</h2><div class="block version"><div class="narrow-helper"></div><p>Version 13.0.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all im's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div><div id="sidebar-vars" data-name="im" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">im</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/im/lib.rs.html#5-481" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h1 id="immutable-data-structures-for-rust" class="section-header"><a href="#immutable-data-structures-for-rust">Immutable Data Structures for Rust</a></h1>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Immutable Data Structures for Rust"><meta name="keywords" content="rust, rustlang, rust-lang, im"><title>im - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../im/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate im</h2><div class="block version"><div class="narrow-helper"></div><p>Version 13.0.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all im's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div><div id="sidebar-vars" data-name="im" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">im</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/im/lib.rs.html#5-481" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="immutable-data-structures-for-rust" class="section-header"><a href="#immutable-data-structures-for-rust">Immutable Data Structures for Rust</a></h2>
 <p>This library implements several of the more commonly useful immutable data
 structures for Rust.</p>
-<h2 id="what-are-immutable-data-structures" class="section-header"><a href="#what-are-immutable-data-structures">What are immutable data structures?</a></h2>
+<h3 id="what-are-immutable-data-structures" class="section-header"><a href="#what-are-immutable-data-structures">What are immutable data structures?</a></h3>
 <p>Immutable data structures are data structures which can be copied and
 modified efficiently without altering the original. The most uncomplicated
 example of this is the venerable <a href="https://en.wikipedia.org/wiki/Cons#Lists">cons list</a>. This crate offers a
@@ -15,7 +15,7 @@ array mapped tries</a></li>
 <li><a href="./ordmap/struct.OrdMap.html">Ordered maps</a>/<a href="./ordset/struct.OrdSet.html">sets</a> based on
 <a href="https://en.wikipedia.org/wiki/B-tree">B-trees</a></li>
 </ul>
-<h2 id="why-would-i-want-this" class="section-header"><a href="#why-would-i-want-this">Why Would I Want This?</a></h2>
+<h3 id="why-would-i-want-this" class="section-header"><a href="#why-would-i-want-this">Why Would I Want This?</a></h3>
 <p>While immutable data structures can be a game changer for other
 programming languages, the most obvious benefit - avoiding the
 accidental mutation of data - is already handled so well by Rust’s
@@ -85,7 +85,7 @@ allowing you to defer careful thinking about the right data
 structure for the job until you need to start looking for
 optimisations - and you may find, especially for larger data sets,
 that immutable data structures are still the right choice.</p>
-<h2 id="values" class="section-header"><a href="#values">Values</a></h2>
+<h3 id="values" class="section-header"><a href="#values">Values</a></h3>
 <p>Because we need to make copies of shared nodes in these data structures
 before updating them, the values you store in them must implement
 <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a>.  For primitive values that implement
@@ -111,7 +111,7 @@ pointers to some data on the heap, and that data isn’t expensive to clone -
 you might actually lose more performance from the extra redirection of
 wrapping them in an <a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"><code>Rc</code></a> than you would from occasionally
 cloning them.</p>
-<h3 id="when-does-cloning-happen" class="section-header"><a href="#when-does-cloning-happen">When does cloning happen?</a></h3>
+<h4 id="when-does-cloning-happen" class="section-header"><a href="#when-does-cloning-happen">When does cloning happen?</a></h4>
 <p>So when will your values actually be cloned? The easy answer is only if you
 <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html#tymethod.clone"><code>clone</code></a> the data structure itself, and then only
 lazily as you change it. Values are stored in tree nodes inside the data
@@ -136,10 +136,10 @@ same allocated memory, until you start making changes.</p>
 also never cloned, and in this case it acts just like a mutable data
 structure, with minimal performance differences (but still non-zero, as we
 still have to check for shared nodes).</p>
-<h2 id="data-structures" class="section-header"><a href="#data-structures">Data Structures</a></h2>
+<h3 id="data-structures" class="section-header"><a href="#data-structures">Data Structures</a></h3>
 <p>We’ll attempt to provide a comprehensive guide to the available
 data structures below.</p>
-<h3 id="performance-notes" class="section-header"><a href="#performance-notes">Performance Notes</a></h3>
+<h4 id="performance-notes" class="section-header"><a href="#performance-notes">Performance Notes</a></h4>
 <p>“Big O notation” is the standard way of talking about the time
 complexity of data structure operations. If you’re not familiar
 with big O notation, here’s a quick cheat sheet:</p>
@@ -178,7 +178,7 @@ insert it into the tree. Please note that the O(1) with the
 asterisk attached is not a common notation; it’s just a convention
 I’ve used in these docs to save myself from having to type
 ‘amortised’ everywhere.</p>
-<h3 id="lists" class="section-header"><a href="#lists">Lists</a></h3>
+<h4 id="lists" class="section-header"><a href="#lists">Lists</a></h4>
 <p>Lists are sequences of single elements which maintain the order in
 which you inserted them. The only list in this library is
 <a href="./vector/enum.Vector.html"><code>Vector</code></a>, which offers the best all round
@@ -187,7 +187,7 @@ if there’s always another kind of list that’s better at something.</p>
 <p>| Type | Algorithm | Constraints | Order | Push | Pop | Split | Append | Lookup |
 | — | — | — | — | — | — | — |
 | <a href="./vector/enum.Vector.html"><code>Vector&lt;A&gt;</code></a> | <a href="https://infoscience.epfl.ch/record/213452/files/rrbvector.pdf">RRB tree</a> | <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> | insertion | O(1)* | O(1)* | O(log n) | O(log n) | O(log n) |</p>
-<h3 id="maps" class="section-header"><a href="#maps">Maps</a></h3>
+<h4 id="maps" class="section-header"><a href="#maps">Maps</a></h4>
 <p>Maps are mappings of keys to values, where the most common read
 operation is to find the value associated with a given key. Maps
 may or may not have a defined order. Any given key can only occur
@@ -197,7 +197,7 @@ overwrite the previous value.</p>
 | — | — | — | — | — | — |
 | <a href="./hashmap/struct.HashMap.html"><code>HashMap&lt;K, V&gt;</code></a> | <a href="https://en.wikipedia.org/wiki/Hash_array_mapped_trie">HAMT</a> | <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> + <a href="https://doc.rust-lang.org/std/hash/trait.Hash.html"><code>Hash</code></a> + <a href="https://doc.rust-lang.org/std/cmp/trait.Eq.html"><code>Eq</code></a> | undefined | O(log n) | O(log n) | O(log n) |
 | <a href="./ordmap/struct.OrdMap.html"><code>OrdMap&lt;K, V&gt;</code></a> | <a href="https://en.wikipedia.org/wiki/B-tree">B-tree</a> | <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> + <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a> | sorted | O(log n) | O(log n) | O(log n) |</p>
-<h3 id="sets" class="section-header"><a href="#sets">Sets</a></h3>
+<h4 id="sets" class="section-header"><a href="#sets">Sets</a></h4>
 <p>Sets are collections of unique values, and may or may not have a
 defined order. Their crucial property is that any given value can
 only exist once in a given set.</p>
@@ -205,7 +205,7 @@ only exist once in a given set.</p>
 | — | — | — | — | — | — |
 | <a href="./hashset/struct.HashSet.html"><code>HashSet&lt;A&gt;</code></a> | <a href="https://en.wikipedia.org/wiki/Hash_array_mapped_trie">HAMT</a> | <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> + <a href="https://doc.rust-lang.org/std/hash/trait.Hash.html"><code>Hash</code></a> + <a href="https://doc.rust-lang.org/std/cmp/trait.Eq.html"><code>Eq</code></a> | undefined | O(log n) | O(log n) | O(log n) |
 | <a href="./ordset/struct.OrdSet.html"><code>OrdSet&lt;A&gt;</code></a> | <a href="https://en.wikipedia.org/wiki/B-tree">B-tree</a> | <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a> + <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a> | sorted | O(log n) | O(log n) | O(log n) |</p>
-<h2 id="in-place-mutation" class="section-header"><a href="#in-place-mutation">In-place Mutation</a></h2>
+<h3 id="in-place-mutation" class="section-header"><a href="#in-place-mutation">In-place Mutation</a></h3>
 <p>All of these data structures support in-place copy-on-write
 mutation, which means that if you’re the sole user of a data
 structure, you can update it in place without taking the
@@ -234,7 +234,7 @@ think about this kind of managed scope, it’s all taken care of
 behind the scenes because of our low level access to the garbage
 collector (which, in our case, is just a simple
 <a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"><code>Rc</code></a>).</p>
-<h2 id="thread-safety" class="section-header"><a href="#thread-safety">Thread Safety</a></h2>
+<h3 id="thread-safety" class="section-header"><a href="#thread-safety">Thread Safety</a></h3>
 <p>The data structures in the <code>im</code> crate are thread safe, through
 <a href="https://doc.rust-lang.org/std/sync/struct.Arc.html"><code>Arc</code></a>. This comes with a slight performance impact, so
 that if you prioritise speed over thread safety, you may want to use the
@@ -243,38 +243,38 @@ that if you prioritise speed over thread safety, you may want to use the
 data structures in <code>im-rc</code> do not implement <a href="https://doc.rust-lang.org/std/marker/trait.Send.html"><code>Send</code></a> and
 <a href="https://doc.rust-lang.org/std/marker/trait.Sync.html"><code>Sync</code></a>. This yields approximately a 20-25% increase in
 general performance.</p>
-<h2 id="feature-flags" class="section-header"><a href="#feature-flags">Feature Flags</a></h2>
+<h3 id="feature-flags" class="section-header"><a href="#feature-flags">Feature Flags</a></h3>
 <p><code>im</code> comes with optional support for the following crates through Cargo
 feature flags. You can enable them in your <code>Cargo.toml</code> file like this:</p>
 <div class="example-wrap"><pre class="language-no_compile"><code>[dependencies]
-im = { version = &quot;*&quot;, features = [&quot;proptest&quot;, &quot;serde&quot;] }</code></pre></div><table><thead><tr><th>Feature</th><th>Description</th></tr></thead><tbody>
+im = { version = &quot;*&quot;, features = [&quot;proptest&quot;, &quot;serde&quot;] }</code></pre></div><div><table><thead><tr><th>Feature</th><th>Description</th></tr></thead><tbody>
 <tr><td><a href="https://crates.io/crates/proptest"><code>proptest</code></a></td><td>Strategies for all <code>im</code> datatypes under a <code>proptest</code> namespace, eg. <code>im::vector::proptest::vector()</code></td></tr>
 <tr><td><a href="https://crates.io/crates/quickcheck"><code>quickcheck</code></a></td><td><code>Arbitrary</code> implementations for all <code>im</code> datatypes (not available in <code>im-rc</code>)</td></tr>
 <tr><td><a href="https://crates.io/crates/rayon"><code>rayon</code></a></td><td>parallel iterator implementations for <code>Vector</code> (not available in <code>im-rc</code>)</td></tr>
 <tr><td><a href="https://crates.io/crates/serde"><code>serde</code></a></td><td><code>Serialize</code> and <code>Deserialize</code> implementations for all <code>im</code> datatypes</td></tr>
 </tbody></table>
-</div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="hashmap/index.html" title="im::hashmap mod">hashmap</a></div><div class="item-right docblock-short"><p>An unordered map.</p>
-</div><div class="item-left module-item"><a class="mod" href="hashset/index.html" title="im::hashset mod">hashset</a></div><div class="item-right docblock-short"><p>An unordered set.</p>
-</div><div class="item-left module-item"><a class="mod" href="iter/index.html" title="im::iter mod">iter</a></div><div class="item-right docblock-short"><p>Iterators over immutable data.</p>
-</div><div class="item-left module-item"><a class="mod" href="ordmap/index.html" title="im::ordmap mod">ordmap</a></div><div class="item-right docblock-short"><p>An ordered map.</p>
-</div><div class="item-left module-item"><a class="mod" href="ordset/index.html" title="im::ordset mod">ordset</a></div><div class="item-right docblock-short"><p>An ordered set.</p>
-</div><div class="item-left module-item"><a class="mod" href="vector/index.html" title="im::vector mod">vector</a></div><div class="item-right docblock-short"><p>A persistent vector.</p>
-</div></div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="macro" href="macro.get_in.html" title="im::get_in macro">get_in</a></div><div class="item-right docblock-short"><p>Get a value inside multiple levels of data structures.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.hashmap.html" title="im::hashmap macro">hashmap</a></div><div class="item-right docblock-short"><p>Construct a hash map from a sequence of key/value pairs.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.hashset.html" title="im::hashset macro">hashset</a></div><div class="item-right docblock-short"><p>Construct a set from a sequence of values.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.ordmap.html" title="im::ordmap macro">ordmap</a></div><div class="item-right docblock-short"><p>Construct a map from a sequence of key/value pairs.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.ordset.html" title="im::ordset macro">ordset</a></div><div class="item-right docblock-short"><p>Construct a set from a sequence of values.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.update_in.html" title="im::update_in macro">update_in</a></div><div class="item-right docblock-short"><p>Update a value inside multiple levels of data structures.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.vector.html" title="im::vector macro">vector</a></div><div class="item-right docblock-short"><p>Construct a vector from a sequence of elements.</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.HashMap.html" title="im::HashMap struct">HashMap</a></div><div class="item-right docblock-short"><p>An unordered map.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.HashSet.html" title="im::HashSet struct">HashSet</a></div><div class="item-right docblock-short"><p>An unordered set.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.OrdMap.html" title="im::OrdMap struct">OrdMap</a></div><div class="item-right docblock-short"><p>An ordered map.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.OrdSet.html" title="im::OrdSet struct">OrdSet</a></div><div class="item-right docblock-short"><p>An ordered set.</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.Vector.html" title="im::Vector enum">Vector</a></div><div class="item-right docblock-short"><p>A persistent vector.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="im" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="hashmap/index.html" title="im::hashmap mod">hashmap</a></div><div class="item-right docblock-short"><p>An unordered map.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="hashset/index.html" title="im::hashset mod">hashset</a></div><div class="item-right docblock-short"><p>An unordered set.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="iter/index.html" title="im::iter mod">iter</a></div><div class="item-right docblock-short"><p>Iterators over immutable data.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="ordmap/index.html" title="im::ordmap mod">ordmap</a></div><div class="item-right docblock-short"><p>An ordered map.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="ordset/index.html" title="im::ordset mod">ordset</a></div><div class="item-right docblock-short"><p>An ordered set.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="vector/index.html" title="im::vector mod">vector</a></div><div class="item-right docblock-short"><p>A persistent vector.</p>
+</div></div></div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.get_in.html" title="im::get_in macro">get_in</a></div><div class="item-right docblock-short"><p>Get a value inside multiple levels of data structures.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.hashmap.html" title="im::hashmap macro">hashmap</a></div><div class="item-right docblock-short"><p>Construct a hash map from a sequence of key/value pairs.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.hashset.html" title="im::hashset macro">hashset</a></div><div class="item-right docblock-short"><p>Construct a set from a sequence of values.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.ordmap.html" title="im::ordmap macro">ordmap</a></div><div class="item-right docblock-short"><p>Construct a map from a sequence of key/value pairs.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.ordset.html" title="im::ordset macro">ordset</a></div><div class="item-right docblock-short"><p>Construct a set from a sequence of values.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.update_in.html" title="im::update_in macro">update_in</a></div><div class="item-right docblock-short"><p>Update a value inside multiple levels of data structures.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.vector.html" title="im::vector macro">vector</a></div><div class="item-right docblock-short"><p>Construct a vector from a sequence of elements.</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.HashMap.html" title="im::HashMap struct">HashMap</a></div><div class="item-right docblock-short"><p>An unordered map.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.HashSet.html" title="im::HashSet struct">HashSet</a></div><div class="item-right docblock-short"><p>An unordered set.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OrdMap.html" title="im::OrdMap struct">OrdMap</a></div><div class="item-right docblock-short"><p>An ordered map.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OrdSet.html" title="im::OrdSet struct">OrdSet</a></div><div class="item-right docblock-short"><p>An ordered set.</p>
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Vector.html" title="im::Vector enum">Vector</a></div><div class="item-right docblock-short"><p>A persistent vector.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="im" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

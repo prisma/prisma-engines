@@ -709,7 +709,7 @@
 <span class="doccomment">/// Creates a new instance of an `RwLock&lt;T&gt;` which is unlocked.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This allows creating a `RwLock&lt;T&gt;` in a constant context on stable Rust.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">const_rwlock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">const_rwlock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">RwLock::const_new</span>(<span class="op">&lt;</span><span class="ident">RawRwLock</span> <span class="kw">as</span> <span class="ident">lock_api::RawRwLock</span><span class="op">&gt;</span><span class="ident">::INIT</span>, <span class="ident">val</span>)
 }
 

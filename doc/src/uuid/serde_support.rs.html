@@ -142,7 +142,7 @@
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">serializer</span>: <span class="ident">S</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">serializer</span>.<span class="ident">is_human_readable</span>() {
             <span class="ident">serializer</span>
                 .<span class="ident">serialize_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_hyphenated</span>().<span class="ident">encode_lower</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="number">0</span>; <span class="number">36</span>]))
@@ -155,8 +155,8 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">deserializer</span>: <span class="ident">D</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">de_error</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident"><span class="kw">crate</span>::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">E</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">de_error</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident"><span class="kw">crate</span>::Error</span>) -&gt; <span class="ident">E</span> {
             <span class="ident">E::custom</span>(<span class="macro">format_args!</span>(<span class="string">&quot;UUID parsing failed: {}&quot;</span>, <span class="ident">e</span>))
         }
 
@@ -169,21 +169,21 @@
                 <span class="kw">fn</span> <span class="ident">expecting</span>(
                     <span class="kw-2">&amp;</span><span class="self">self</span>,
                     <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-                ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+                ) -&gt; <span class="ident">fmt::Result</span> {
                     <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;a UUID string&quot;</span>)
                 }
 
                 <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(
                     <span class="self">self</span>,
                     <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+                ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">E</span><span class="op">&gt;</span> {
                     <span class="ident">value</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="ident">de_error</span>)
                 }
 
                 <span class="kw">fn</span> <span class="ident">visit_bytes</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(
                     <span class="self">self</span>,
                     <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-                ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+                ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">E</span><span class="op">&gt;</span> {
                     <span class="ident">Uuid::from_slice</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">de_error</span>)
                 }
             }
@@ -198,14 +198,14 @@
                 <span class="kw">fn</span> <span class="ident">expecting</span>(
                     <span class="kw-2">&amp;</span><span class="self">self</span>,
                     <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-                ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+                ) -&gt; <span class="ident">fmt::Result</span> {
                     <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;bytes&quot;</span>)
                 }
 
                 <span class="kw">fn</span> <span class="ident">visit_bytes</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(
                     <span class="self">self</span>,
                     <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-                ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+                ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">E</span><span class="op">&gt;</span> {
                     <span class="ident">Uuid::from_slice</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">de_error</span>)
                 }
             }

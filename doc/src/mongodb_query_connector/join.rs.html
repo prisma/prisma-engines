@@ -193,7 +193,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">JoinStage</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">source</span>: <span class="ident">RelationFieldRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">source</span>: <span class="ident">RelationFieldRef</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">source</span>,
             <span class="ident">alias</span>: <span class="prelude-val">None</span>,
@@ -222,7 +222,7 @@
     <span class="doccomment">/// `{ _id: 1, field: &quot;a&quot;, aliasHere: [{...}, {...}, ...] }` with alias `&quot;aliasHere&quot;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns: `(Join document, Unwind document)`</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Document</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; (<span class="ident">Document</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">nested_stages</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">nested</span>
             .<span class="ident">into_iter</span>()
@@ -259,9 +259,9 @@
                 <span class="kw">let</span> <span class="ident">left_var</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;$$left_{}&quot;</span>, <span class="ident">idx</span>);
 
                 <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">is_many_to_many</span>() {
-                    <span class="bool-val">true</span> <span class="kw">if</span> <span class="ident">right_field</span>.<span class="ident">is_list</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="macro">doc!</span> { <span class="string">&quot;$in&quot;</span>: [<span class="ident">left_var</span>, <span class="ident">right_ref</span>] },
-                    <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">doc!</span> { <span class="string">&quot;$in&quot;</span>: [<span class="ident">right_ref</span>, <span class="ident">left_var</span>] },
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">doc!</span> { <span class="string">&quot;$eq&quot;</span>: [<span class="ident">right_ref</span>, <span class="ident">left_var</span>] },
+                    <span class="bool-val">true</span> <span class="kw">if</span> <span class="ident">right_field</span>.<span class="ident">is_list</span>() =&gt; <span class="macro">doc!</span> { <span class="string">&quot;$in&quot;</span>: [<span class="ident">left_var</span>, <span class="ident">right_ref</span>] },
+                    <span class="bool-val">true</span> =&gt; <span class="macro">doc!</span> { <span class="string">&quot;$in&quot;</span>: [<span class="ident">right_ref</span>, <span class="ident">left_var</span>] },
+                    <span class="kw">_</span> =&gt; <span class="macro">doc!</span> { <span class="string">&quot;$eq&quot;</span>: [<span class="ident">right_ref</span>, <span class="ident">left_var</span>] },
                 }
             })
             .<span class="ident">collect</span>();

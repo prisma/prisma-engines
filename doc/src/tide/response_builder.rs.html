@@ -112,7 +112,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResponseBuilder</span>(<span class="ident">Response</span>);
 
 <span class="kw">impl</span> <span class="ident">ResponseBuilder</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">status</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">status</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span>,
         <span class="ident">S::Error</span>: <span class="ident">std::fmt::Debug</span>,
@@ -121,7 +121,7 @@
     }
 
     <span class="doccomment">/// Returns the inner Response</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">Response</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 
@@ -131,7 +131,7 @@
     <span class="doccomment">/// let response = Response::builder(200).header(&quot;header-name&quot;, &quot;header-value&quot;).build();</span>
     <span class="doccomment">/// assert_eq!(response[&quot;header-name&quot;], &quot;header-value&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">ToHeaderValues</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">ToHeaderValues</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert_header</span>(<span class="ident">key</span>, <span class="ident">value</span>);
         <span class="self">self</span>
     }
@@ -142,7 +142,7 @@
     <span class="doccomment">/// let response = Response::builder(200).content_type(mime::HTML).build();</span>
     <span class="doccomment">/// assert_eq!(response[&quot;content-type&quot;], &quot;text/html;charset=utf-8&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content_type</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content_type</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content_type</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content_type</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">set_content_type</span>(<span class="ident">content_type</span>);
         <span class="self">self</span>
     }
@@ -155,14 +155,14 @@
     <span class="doccomment">/// assert_eq!(response.take_body().into_string().await.unwrap(), &quot;{\&quot;any\&quot;:\&quot;Into&lt;Body&gt;\&quot;}&quot;);</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">body</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">body</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">set_body</span>(<span class="ident">body</span>);
         <span class="self">self</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResponseBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Response</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">Response</span> {
         <span class="self">self</span>.<span class="ident">build</span>()
     }
 }

@@ -5,7 +5,7 @@
 compile time so the leftmost non-space character is in the first column.</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
 indoc = &quot;1.0&quot;</code></pre></div><br>
-<h1 id="using-indoc" class="section-header"><a href="#using-indoc">Using indoc</a></h1>
+<h2 id="using-indoc" class="section-header"><a href="#using-indoc">Using indoc</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
@@ -47,7 +47,7 @@ indoc = &quot;1.0&quot;</code></pre></div><br>
     <span class="macro">assert_eq!</span>(<span class="ident">testing</span>[..], <span class="ident">expected</span>[..]);
 }</code></pre></div>
 <p><br><br></p>
-<h1 id="formatting-macros" class="section-header"><a href="#formatting-macros">Formatting macros</a></h1>
+<h2 id="formatting-macros" class="section-header"><a href="#formatting-macros">Formatting macros</a></h2>
 <p>The indoc crate exports four additional macros to substitute conveniently
 for the standard library’s formatting macros:</p>
 <ul>
@@ -69,7 +69,7 @@ for the standard library’s formatting macros:</p>
     }
 }</code></pre></div>
 <p><br><br></p>
-<h1 id="explanation" class="section-header"><a href="#explanation">Explanation</a></h1>
+<h2 id="explanation" class="section-header"><a href="#explanation">Explanation</a></h2>
 <p>The following rules characterize the behavior of the <code>indoc!()</code> macro:</p>
 <ol>
 <li>Count the leading spaces of each line, ignoring the first line and any
@@ -80,11 +80,11 @@ the first line.</li>
 <li>Remove the computed number of spaces from the beginning of each line.</li>
 </ol>
 </div></details><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="macro" href="macro.eprintdoc.html" title="indoc::eprintdoc macro">eprintdoc</a></div><div class="item-right docblock-short"><p>Unindent and call <code>eprint!</code>.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.formatdoc.html" title="indoc::formatdoc macro">formatdoc</a></div><div class="item-right docblock-short"><p>Unindent and call <code>format!</code>.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.indoc.html" title="indoc::indoc macro">indoc</a></div><div class="item-right docblock-short"><p>Unindent and produce <code>&amp;'static str</code>.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.printdoc.html" title="indoc::printdoc macro">printdoc</a></div><div class="item-right docblock-short"><p>Unindent and call <code>print!</code>.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.writedoc.html" title="indoc::writedoc macro">writedoc</a></div><div class="item-right docblock-short"><p>Unindent and call <code>write!</code>.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="indoc" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.eprintdoc.html" title="indoc::eprintdoc macro">eprintdoc</a></div><div class="item-right docblock-short"><p>Unindent and call <code>eprint!</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.formatdoc.html" title="indoc::formatdoc macro">formatdoc</a></div><div class="item-right docblock-short"><p>Unindent and call <code>format!</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.indoc.html" title="indoc::indoc macro">indoc</a></div><div class="item-right docblock-short"><p>Unindent and produce <code>&amp;'static str</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.printdoc.html" title="indoc::printdoc macro">printdoc</a></div><div class="item-right docblock-short"><p>Unindent and call <code>print!</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.writedoc.html" title="indoc::writedoc macro">writedoc</a></div><div class="item-right docblock-short"><p>Unindent and call <code>write!</code>.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="indoc" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

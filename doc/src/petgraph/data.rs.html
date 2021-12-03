@@ -456,13 +456,13 @@
     <span class="doccomment">/// Access node and edge weights (associated data).</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DataMap</span> : <span class="ident">Data</span> {
     @<span class="ident">section</span> <span class="self">self</span>
-    <span class="kw">fn</span> <span class="ident">node_weight</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edge_weight</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">node_weight</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">edge_weight</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span>;
 }
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">access0</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>.<span class="number">0</span>);
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>.<span class="number">0</span>);
 }
 
 <span class="macro">DataMap!</span>{<span class="ident">delegate_impl</span> []}
@@ -473,8 +473,8 @@
     <span class="doccomment">/// Access node and edge weights mutably.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DataMapMut</span> : <span class="ident">DataMap</span> {
     @<span class="ident">section</span> <span class="self">self</span>
-    <span class="kw">fn</span> <span class="ident">node_weight_mut</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edge_weight_mut</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">node_weight_mut</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">edge_weight_mut</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span>;
 }
 }
 
@@ -483,13 +483,13 @@
 
 <span class="doccomment">/// A graph that can be extended with further nodes and edges</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Build</span> : <span class="ident">Data</span> <span class="op">+</span> <span class="ident">NodeCount</span> {
-    <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::NodeWeight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NodeId</span>;
+    <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::NodeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span>;
     <span class="doccomment">/// Add a new edge. If parallel edges (duplicate) are not allowed and</span>
     <span class="doccomment">/// the edge already exists, return `None`.</span>
     <span class="kw">fn</span> <span class="ident">add_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
                 <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
                 <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeId</span><span class="op">&gt;</span> {
+                <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeId</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">update_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>))
     }
     <span class="doccomment">/// Add or update the edge from `a` to `b`. Return the id of the affected</span>
@@ -497,12 +497,12 @@
     <span class="kw">fn</span> <span class="ident">update_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
                    <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
                    <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                   <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::EdgeId</span>;
+                   <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeId</span>;
 }
 
 <span class="doccomment">/// A graph that can be created</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Create</span> : <span class="ident">Build</span> <span class="op">+</span> <span class="ident">Default</span> {
-    <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">Data</span> <span class="kw">for</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
@@ -516,10 +516,10 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>
 {
-    <span class="kw">fn</span> <span class="ident">node_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">node_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">node_weight</span>(<span class="ident">id</span>)
     }
-    <span class="kw">fn</span> <span class="ident">edge_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">edge_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">edge_weight</span>(<span class="ident">id</span>)
     }
 }
@@ -528,10 +528,10 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>
 {
-    <span class="kw">fn</span> <span class="ident">node_weight_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">node_weight_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">node_weight_mut</span>(<span class="ident">id</span>)
     }
-    <span class="kw">fn</span> <span class="ident">edge_weight_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">edge_weight_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">edge_weight_mut</span>(<span class="ident">id</span>)
     }
 }
@@ -541,10 +541,10 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>
 {
-    <span class="kw">fn</span> <span class="ident">node_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">node_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">node_weight</span>(<span class="ident">id</span>)
     }
-    <span class="kw">fn</span> <span class="ident">edge_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">edge_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">edge_weight</span>(<span class="ident">id</span>)
     }
 }
@@ -554,10 +554,10 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>
 {
-    <span class="kw">fn</span> <span class="ident">node_weight_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">node_weight_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">node_weight_mut</span>(<span class="ident">id</span>)
     }
-    <span class="kw">fn</span> <span class="ident">edge_weight_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">edge_weight_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">edge_weight_mut</span>(<span class="ident">id</span>)
     }
 }
@@ -566,20 +566,20 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
-    <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::NodeWeight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NodeId</span> {
+    <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::NodeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> {
         <span class="self">self</span>.<span class="ident">add_node</span>(<span class="ident">weight</span>)
     }
     <span class="kw">fn</span> <span class="ident">add_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
                 <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
                 <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeId</span><span class="op">&gt;</span>
+                <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeId</span><span class="op">&gt;</span>
     {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">add_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>))
     }
     <span class="kw">fn</span> <span class="ident">update_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
                    <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
                    <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                   <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::EdgeId</span>
+                   <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeId</span>
     {
         <span class="self">self</span>.<span class="ident">update_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>)
     }
@@ -590,20 +590,20 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
-    <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::NodeWeight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NodeId</span> {
+    <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::NodeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> {
         <span class="self">self</span>.<span class="ident">add_node</span>(<span class="ident">weight</span>)
     }
     <span class="kw">fn</span> <span class="ident">add_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
                 <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
                 <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeId</span><span class="op">&gt;</span>
+                <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeId</span><span class="op">&gt;</span>
     {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">add_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>))
     }
     <span class="kw">fn</span> <span class="ident">update_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
                    <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
                    <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                   <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::EdgeId</span>
+                   <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeId</span>
     {
         <span class="self">self</span>.<span class="ident">update_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>)
     }
@@ -614,13 +614,13 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
 {
-    <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::NodeWeight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NodeId</span> {
+    <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::NodeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> {
         <span class="self">self</span>.<span class="ident">add_node</span>(<span class="ident">weight</span>)
     }
     <span class="kw">fn</span> <span class="ident">add_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
                 <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
                 <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeId</span><span class="op">&gt;</span>
+                <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::EdgeId</span><span class="op">&gt;</span>
     {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">contains_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>) {
             <span class="prelude-val">None</span>
@@ -633,7 +633,7 @@
     <span class="kw">fn</span> <span class="ident">update_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
                    <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
                    <span class="ident">b</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>,
-                   <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::EdgeId</span>
+                   <span class="ident">weight</span>: <span class="ident"><span class="self">Self</span>::EdgeWeight</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeId</span>
     {
         <span class="self">self</span>.<span class="ident">add_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">weight</span>);
         (<span class="ident">a</span>, <span class="ident">b</span>)
@@ -645,7 +645,7 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
-    <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="ident">nodes</span>, <span class="ident">edges</span>)
     }
 }
@@ -655,7 +655,7 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
-    <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="ident">nodes</span>, <span class="ident">edges</span>)
     }
 }
@@ -665,7 +665,7 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
 {
-    <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="ident">nodes</span>, <span class="ident">edges</span>)
     }
 }
@@ -691,7 +691,7 @@
 
 <span class="doccomment">/// Create a graph from an iterator of elements.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromElements</span> : <span class="ident">Create</span> {
-    <span class="kw">fn</span> <span class="ident">from_elements</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">fn</span> <span class="ident">from_elements</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
         <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span>,
               <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span>, <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -700,10 +700,10 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">for</span> <span class="ident">element</span> <span class="kw">in</span> <span class="ident">iterable</span> {
             <span class="kw">match</span> <span class="ident">element</span> {
-                <span class="ident">Element::Node</span> { <span class="ident">weight</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Element::Node</span> { <span class="ident">weight</span> } =&gt; {
                     <span class="ident">map</span>.<span class="ident">push</span>(<span class="ident">gr</span>.<span class="ident">add_node</span>(<span class="ident">weight</span>));
                 }
-                <span class="ident">Element::Edge</span> { <span class="ident">source</span>, <span class="ident">target</span>, <span class="ident">weight</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Element::Edge</span> { <span class="ident">source</span>, <span class="ident">target</span>, <span class="ident">weight</span> } =&gt; {
                     <span class="ident">gr</span>.<span class="ident">add_edge</span>(<span class="ident">map</span>[<span class="ident">source</span>], <span class="ident">map</span>[<span class="ident">target</span>], <span class="ident">weight</span>);
                 }
             }
@@ -713,7 +713,7 @@
         
 }
 
-<span class="kw">fn</span> <span class="ident">from_elements_indexable</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">G</span>
+<span class="kw">fn</span> <span class="ident">from_elements_indexable</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="ident">G</span>
     <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">Create</span> <span class="op">+</span> <span class="ident">NodeIndexable</span>,
           <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident">G::NodeWeight</span>, <span class="ident">G::EdgeWeight</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
@@ -721,10 +721,10 @@
     <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="op">|</span><span class="ident">gr</span>: <span class="kw-2">&amp;</span><span class="ident">G</span>, <span class="ident">i</span><span class="op">|</span> <span class="ident">gr</span>.<span class="ident">from_index</span>(<span class="ident">i</span>);
     <span class="kw">for</span> <span class="ident">element</span> <span class="kw">in</span> <span class="ident">iterable</span> {
         <span class="kw">match</span> <span class="ident">element</span> {
-            <span class="ident">Element::Node</span> { <span class="ident">weight</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Element::Node</span> { <span class="ident">weight</span> } =&gt; {
                 <span class="ident">gr</span>.<span class="ident">add_node</span>(<span class="ident">weight</span>);
             }
-            <span class="ident">Element::Edge</span> { <span class="ident">source</span>, <span class="ident">target</span>, <span class="ident">weight</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Element::Edge</span> { <span class="ident">source</span>, <span class="ident">target</span>, <span class="ident">weight</span> } =&gt; {
                 <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">map</span>(<span class="kw-2">&amp;</span><span class="ident">gr</span>, <span class="ident">source</span>);
                 <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">map</span>(<span class="kw-2">&amp;</span><span class="ident">gr</span>, <span class="ident">target</span>);
                 <span class="ident">gr</span>.<span class="ident">add_edge</span>(<span class="ident">from</span>, <span class="ident">to</span>, <span class="ident">weight</span>);
@@ -738,7 +738,7 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from_elements</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">fn</span> <span class="ident">from_elements</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
         <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span>,
               <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span>, <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -751,7 +751,7 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from_elements</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">fn</span> <span class="ident">from_elements</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
         <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span>,
               <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span>, <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -764,7 +764,7 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from_elements</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">fn</span> <span class="ident">from_elements</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
         <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span>,
               <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span>, <span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -783,9 +783,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This filter adapts the edge source and target indices in the</span>
     <span class="doccomment">/// stream so that they are correct after the removals.</span>
-    <span class="kw">fn</span> <span class="ident">filter_elements</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FilterElements</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">filter_elements</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FilterElements</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span>,
-              <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Element</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+              <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Element</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="ident">FilterElements</span> {
             <span class="ident">iter</span>: <span class="self">self</span>,
@@ -813,20 +813,20 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span>, <span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">FilterElements</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Element</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-          <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Element</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+          <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Element</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Element</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">elt</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">elt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">elt</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">elt</span>) =&gt; <span class="ident">elt</span>,
             };
             <span class="kw">let</span> <span class="ident">keep</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">f</span>)(<span class="kw">match</span> <span class="ident">elt</span> {
-                <span class="ident">Element::Node</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">weight</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Element::Node</span> { <span class="ident">weight</span>: <span class="ident">weight</span> },
+                <span class="ident">Element::Node</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">weight</span> } =&gt; <span class="ident">Element::Node</span> { <span class="ident">weight</span>: <span class="ident">weight</span> },
                 <span class="ident">Element::Edge</span> { <span class="ident">source</span>, <span class="ident">target</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">weight</span> }
-                    <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Element::Edge</span> { <span class="ident">source</span>: <span class="ident">source</span>, <span class="ident">target</span>: <span class="ident">target</span>, <span class="ident">weight</span>: <span class="ident">weight</span> },
+                    =&gt; <span class="ident">Element::Edge</span> { <span class="ident">source</span>: <span class="ident">source</span>, <span class="ident">target</span>: <span class="ident">target</span>, <span class="ident">weight</span>: <span class="ident">weight</span> },
             });
             <span class="kw">let</span> <span class="ident">is_node</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Element::Node</span> { .. } <span class="op">=</span> <span class="ident">elt</span> { <span class="bool-val">true</span> } <span class="kw">else</span> { <span class="bool-val">false</span> };
             <span class="kw">if</span> <span class="op">!</span><span class="ident">keep</span> <span class="op">&amp;&amp;</span> <span class="ident">is_node</span> {
@@ -845,7 +845,7 @@
                     <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">source</span>,
                     <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">target</span>,
                     ..
-                } <span class="op">=</span><span class="op">&gt;</span> {
+                } =&gt; {
                     <span class="comment">// Find the node indices in the map of removed ones.</span>
                     <span class="comment">// If a node was removed, the edge is as well.</span>
                     <span class="comment">// Otherwise the counts are adjusted by the number of nodes</span>
@@ -854,15 +854,15 @@
                     <span class="comment">// binary search for 2, result is Err(1). One node has been</span>
                     <span class="comment">// removed before 2.</span>
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">binary_search</span>(<span class="ident">source</span>) {
-                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
-                        <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">source</span> <span class="op">-</span><span class="op">=</span> <span class="ident">i</span>,
+                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
+                        <span class="prelude-val">Err</span>(<span class="ident">i</span>) =&gt; <span class="kw-2">*</span><span class="ident">source</span> <span class="op">-</span><span class="op">=</span> <span class="ident">i</span>,
                     }
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">binary_search</span>(<span class="ident">target</span>) {
-                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
-                        <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">target</span> <span class="op">-</span><span class="op">=</span> <span class="ident">i</span>,
+                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
+                        <span class="prelude-val">Err</span>(<span class="ident">i</span>) =&gt; <span class="kw-2">*</span><span class="ident">target</span> <span class="op">-</span><span class="op">=</span> <span class="ident">i</span>,
                     }
                 }
-                <span class="ident">Element::Node</span> { .. } <span class="op">=</span><span class="op">&gt;</span> { }
+                <span class="ident">Element::Node</span> { .. } =&gt; { }
             }
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">elt</span>);
         }

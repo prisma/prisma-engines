@@ -159,7 +159,7 @@
 <span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Write</span>};
 
 <span class="kw">impl</span> <span class="ident">ErrorImpl</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">display</span>(<span class="ident">this</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">display</span>(<span class="ident">this</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident"><span class="self">Self</span>::error</span>(<span class="ident">this</span>))<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
@@ -171,7 +171,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">debug</span>(<span class="ident">this</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">debug</span>(<span class="ident">this</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::error</span>(<span class="ident">this</span>);
 
         <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
@@ -229,13 +229,13 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Write</span>,
 {
-    <span class="kw">fn</span> <span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">line</span>) <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;\n&#39;</span>).<span class="ident">enumerate</span>() {
             <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">started</span> {
                 <span class="self">self</span>.<span class="ident">started</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">number</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">number</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">inner</span>, <span class="string">&quot;{: &gt;5}: &quot;</span>, <span class="ident">number</span>)<span class="question-mark">?</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">write_str</span>(<span class="string">&quot;    &quot;</span>)<span class="question-mark">?</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">number</span>) =&gt; <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">inner</span>, <span class="string">&quot;{: &gt;5}: &quot;</span>, <span class="ident">number</span>)<span class="question-mark">?</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">write_str</span>(<span class="string">&quot;    &quot;</span>)<span class="question-mark">?</span>,
                 }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
                 <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">write_char</span>(<span class="string">&#39;\n&#39;</span>)<span class="question-mark">?</span>;

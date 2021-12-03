@@ -192,11 +192,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DatamodelFragment</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FragmentArgument</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TemplatingResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FragmentArgument</span><span class="op">&gt;</span>) -&gt; <span class="ident">TemplatingResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">fragment</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ident</span> {
-            <span class="string">&quot;id&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Id</span>(<span class="ident">IdFragment::from_args</span>(<span class="ident">args</span>)<span class="question-mark">?</span>),
-            <span class="string">&quot;m2m&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::M2m</span>(<span class="ident">M2mFragment::from_args</span>(<span class="ident">args</span>)<span class="question-mark">?</span>),
-            <span class="ident">ident</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TemplatingError::unknown_ident</span>(<span class="ident">ident</span>)),
+            <span class="string">&quot;id&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::Id</span>(<span class="ident">IdFragment::from_args</span>(<span class="ident">args</span>)<span class="question-mark">?</span>),
+            <span class="string">&quot;m2m&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::M2m</span>(<span class="ident">M2mFragment::from_args</span>(<span class="ident">args</span>)<span class="question-mark">?</span>),
+            <span class="ident">ident</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TemplatingError::unknown_ident</span>(<span class="ident">ident</span>)),
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">fragment</span>)
@@ -218,7 +218,7 @@
 
 <span class="kw">impl</span> <span class="ident">IdFragment</span> {
     <span class="doccomment">/// Note: This type of parsing can probably be done with nom as well, but may be less readable.</span>
-    <span class="kw">fn</span> <span class="ident">from_args</span>(<span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FragmentArgument</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TemplatingResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_args</span>(<span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FragmentArgument</span><span class="op">&gt;</span>) -&gt; <span class="ident">TemplatingResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">3</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TemplatingError::num_args</span>(<span class="string">&quot;id&quot;</span>, <span class="number">3</span>, <span class="ident">args</span>.<span class="ident">len</span>()));
         }
@@ -244,9 +244,9 @@
     <span class="doccomment">/// The function `f` may choose to return a new directive that will be inserted into the list of directives.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upsert_directive</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">f</span>: <span class="ident">F</span>)
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Directive</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Directive</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">directives</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">dir</span><span class="op">|</span> <span class="ident">dir</span>.<span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>);
+        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">directives</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">dir</span><span class="op">|</span> <span class="ident">dir</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="ident">name</span>);
         <span class="kw">let</span> <span class="ident">existing</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">directives</span>.<span class="ident">get_mut</span>(<span class="ident">pos</span>));
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">new</span>) <span class="op">=</span> <span class="ident">f</span>(<span class="ident">existing</span>) {
@@ -256,7 +256,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ToString</span> <span class="kw">for</span> <span class="ident">IdFragment</span> {
-    <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(
             <span class="string">&quot;{} {} {}&quot;</span>,
             <span class="self">self</span>.<span class="ident">field_name</span>,
@@ -274,7 +274,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Directive</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ident</span>: <span class="ident">ident</span>.<span class="ident">to_owned</span>(),
             <span class="ident">args</span>: <span class="ident">args</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
@@ -283,7 +283,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Directive</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">is_empty</span>() {
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">r#&quot;@{}&quot;#</span>, <span class="self">self</span>.<span class="ident">ident</span>)
         } <span class="kw">else</span> {
@@ -300,23 +300,23 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FragmentArgument</span> {
-    <span class="kw">fn</span> <span class="ident">into_value_string</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TemplatingResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_value_string</span>(<span class="self">self</span>) -&gt; <span class="ident">TemplatingResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FragmentArgument::Value</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-            <span class="ident">FragmentArgument::Directive</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">TemplatingError::argument_error</span>(
+            <span class="ident">FragmentArgument::Value</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
+            <span class="ident">FragmentArgument::Directive</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">TemplatingError::argument_error</span>(
                 <span class="string">&quot;unknown&quot;</span>,
                 <span class="macro">format!</span>(<span class="string">&quot;Expected Value argument, got: {:?}&quot;</span>, <span class="self">self</span>),
             )),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">into_directive</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TemplatingResult</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_directive</span>(<span class="self">self</span>) -&gt; <span class="ident">TemplatingResult</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FragmentArgument::Value</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">TemplatingError::argument_error</span>(
+            <span class="ident">FragmentArgument::Value</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">TemplatingError::argument_error</span>(
                 <span class="string">&quot;unknown&quot;</span>,
                 <span class="macro">format!</span>(<span class="string">&quot;Expected Directive argument, got: {:?}&quot;</span>, <span class="self">self</span>),
             )),
-            <span class="ident">FragmentArgument::Directive</span>(<span class="ident">dir</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">dir</span>),
+            <span class="ident">FragmentArgument::Directive</span>(<span class="ident">dir</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">dir</span>),
         }
     }
 }
@@ -340,7 +340,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">M2mFragment</span> {
-    <span class="kw">fn</span> <span class="ident">from_args</span>(<span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FragmentArgument</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TemplatingResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_args</span>(<span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FragmentArgument</span><span class="op">&gt;</span>) -&gt; <span class="ident">TemplatingResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">3</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TemplatingError::num_args</span>(<span class="string">&quot;m2m&quot;</span>, <span class="number">3</span>, <span class="ident">args</span>.<span class="ident">len</span>()));
         }

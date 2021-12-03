@@ -60,7 +60,7 @@
     <span class="kw">type</span> <span class="ident">IntoStream</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Creates a stream from a value.</span>
-    <span class="kw">fn</span> <span class="ident">into_stream</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::IntoStream</span>;
+    <span class="kw">fn</span> <span class="ident">into_stream</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoStream</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&gt;</span> <span class="ident">IntoStream</span> <span class="kw">for</span> <span class="ident">I</span> {
@@ -68,7 +68,7 @@
     <span class="kw">type</span> <span class="ident">IntoStream</span> <span class="op">=</span> <span class="ident">I</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_stream</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">I</span> {
+    <span class="kw">fn</span> <span class="ident">into_stream</span>(<span class="self">self</span>) -&gt; <span class="ident">I</span> {
         <span class="self">self</span>
     }
 }

@@ -108,14 +108,14 @@
 
 <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;This is serde&#39;s default behavior.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DuplicateInsertsFirstWinsSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>;
 
     <span class="doccomment">/// Insert the value into the set, if there is not already an existing value</span>
     <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>);
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DuplicateInsertsFirstWinsMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>;
 
     <span class="doccomment">/// Insert the value into the map, if there is not already an existing value</span>
     <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>);
@@ -128,10 +128,10 @@
     <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">size_hint</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">size</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::with_capacity_and_hasher</span>(<span class="ident">size</span>, <span class="ident">S::default</span>()),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::with_hasher</span>(<span class="ident">S::default</span>()),
+            <span class="prelude-val">Some</span>(<span class="ident">size</span>) =&gt; <span class="ident"><span class="self">Self</span>::with_capacity_and_hasher</span>(<span class="ident">size</span>, <span class="ident">S::default</span>()),
+            <span class="prelude-val">None</span> =&gt; <span class="ident"><span class="self">Self</span>::with_hasher</span>(<span class="ident">S::default</span>()),
         }
     }
 
@@ -148,7 +148,7 @@
     <span class="ident">T</span>: <span class="ident">Ord</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">_size_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">_size_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 
@@ -165,10 +165,10 @@
     <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">size_hint</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">size</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::with_capacity_and_hasher</span>(<span class="ident">size</span>, <span class="ident">S::default</span>()),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::with_hasher</span>(<span class="ident">S::default</span>()),
+            <span class="prelude-val">Some</span>(<span class="ident">size</span>) =&gt; <span class="ident"><span class="self">Self</span>::with_capacity_and_hasher</span>(<span class="ident">size</span>, <span class="ident">S::default</span>()),
+            <span class="prelude-val">None</span> =&gt; <span class="ident"><span class="self">Self</span>::with_hasher</span>(<span class="ident">S::default</span>()),
         }
     }
 
@@ -178,8 +178,8 @@
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">entry</span>(<span class="ident">key</span>) {
             <span class="comment">// we want to keep the first value, so do nothing</span>
-            <span class="ident">Entry::Occupied</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="ident">Entry::Vacant</span>(<span class="ident">vacant</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Entry::Occupied</span>(<span class="kw">_</span>) =&gt; {}
+            <span class="ident">Entry::Vacant</span>(<span class="ident">vacant</span>) =&gt; {
                 <span class="ident">vacant</span>.<span class="ident">insert</span>(<span class="ident">value</span>);
             }
         }
@@ -191,7 +191,7 @@
     <span class="ident">K</span>: <span class="ident">Ord</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">_size_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">_size_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 
@@ -201,8 +201,8 @@
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">entry</span>(<span class="ident">key</span>) {
             <span class="comment">// we want to keep the first value, so do nothing</span>
-            <span class="ident">Entry::Occupied</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="ident">Entry::Vacant</span>(<span class="ident">vacant</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Entry::Occupied</span>(<span class="kw">_</span>) =&gt; {}
+            <span class="ident">Entry::Vacant</span>(<span class="ident">vacant</span>) =&gt; {
                 <span class="ident">vacant</span>.<span class="ident">insert</span>(<span class="ident">value</span>);
             }
         }

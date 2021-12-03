@@ -1249,7 +1249,7 @@
         <span class="ident">tag</span>: <span class="ident">Property</span>,
         <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(<span class="ident">tag</span>.<span class="ident">is_issue</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">tag</span>.<span class="ident">is_issuewild</span>());
 
         <span class="ident">CAA</span> {
@@ -1266,7 +1266,7 @@
     <span class="doccomment">/// * `issuer_critical` - indicates that the corresponding property tag MUST be understood if the semantics of the CAA record are to be correctly interpreted by an issuer</span>
     <span class="doccomment">/// * `name` - authorized to issue certificates for the associated record label</span>
     <span class="doccomment">/// * `options` - additional options for the issuer, e.g. &#39;account&#39;, etc.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_issue</span>(<span class="ident">issuer_critical</span>: <span class="ident">bool</span>, <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_issue</span>(<span class="ident">issuer_critical</span>: <span class="ident">bool</span>, <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::issue</span>(<span class="ident">issuer_critical</span>, <span class="ident">Property::Issue</span>, <span class="ident">name</span>, <span class="ident">options</span>)
     }
 
@@ -1281,7 +1281,7 @@
         <span class="ident">issuer_critical</span>: <span class="ident">bool</span>,
         <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::issue</span>(<span class="ident">issuer_critical</span>, <span class="ident">Property::IssueWild</span>, <span class="ident">name</span>, <span class="ident">options</span>)
     }
 
@@ -1295,7 +1295,7 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If `value` is not `Value::Issuer`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_iodef</span>(<span class="ident">issuer_critical</span>: <span class="ident">bool</span>, <span class="ident">url</span>: <span class="ident">Url</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_iodef</span>(<span class="ident">issuer_critical</span>: <span class="ident">bool</span>, <span class="ident">url</span>: <span class="ident">Url</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">CAA</span> {
             <span class="ident">issuer_critical</span>,
             <span class="ident">tag</span>: <span class="ident">Property::Iodef</span>,
@@ -1304,17 +1304,17 @@
     }
 
     <span class="doccomment">/// Indicates that the corresponding property tag MUST be understood if the semantics of the CAA record are to be correctly interpreted by an issuer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">issuer_critical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">issuer_critical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">issuer_critical</span>
     }
 
     <span class="doccomment">/// The property tag, see struct documentation</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Property</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Property</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tag</span>
     }
 
     <span class="doccomment">/// a potentially associated value with the property tag, see struct documentation</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Value</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Value</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>
     }
 }
@@ -1347,46 +1347,46 @@
 
 <span class="kw">impl</span> <span class="ident">Property</span> {
     <span class="doccomment">/// Convert to string form</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Property::Issue</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;issue&quot;</span>,
-            <span class="ident">Property::IssueWild</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;issuewild&quot;</span>,
-            <span class="ident">Property::Iodef</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;iodef&quot;</span>,
-            <span class="ident">Property::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">property</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">property</span>,
+            <span class="ident">Property::Issue</span> =&gt; <span class="string">&quot;issue&quot;</span>,
+            <span class="ident">Property::IssueWild</span> =&gt; <span class="string">&quot;issuewild&quot;</span>,
+            <span class="ident">Property::Iodef</span> =&gt; <span class="string">&quot;iodef&quot;</span>,
+            <span class="ident">Property::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">property</span>) =&gt; <span class="ident">property</span>,
         }
     }
 
     <span class="doccomment">/// true if the property is `issue`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_issue</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_issue</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Property::Issue</span>)
     }
 
     <span class="doccomment">/// true if the property is `issueworld`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_issuewild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_issuewild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Property::IssueWild</span>)
     }
 
     <span class="doccomment">/// true if the property is `iodef`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_iodef</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_iodef</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Property::Iodef</span>)
     }
 
     <span class="doccomment">/// true if the property is not known to Trust-DNS</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unknown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unknown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Property::Unknown</span>(<span class="kw">_</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Property</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tag</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Property</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tag</span>: <span class="ident">String</span>) -&gt; <span class="ident">Property</span> {
         <span class="comment">// RFC6488 section 5.1 states that &quot;Matching of tag values is case</span>
         <span class="comment">// insensitive.&quot;</span>
         <span class="kw">let</span> <span class="ident">lower</span> <span class="op">=</span> <span class="ident">tag</span>.<span class="ident">to_ascii_lowercase</span>();
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">lower</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
-            <span class="string">&quot;issue&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Property::Issue</span>,
-            <span class="string">&quot;issuewild&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Property::IssueWild</span>,
-            <span class="string">&quot;iodef&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Property::Iodef</span>,
-            <span class="kw-2">&amp;</span><span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="string">&quot;issue&quot;</span> =&gt; <span class="kw">return</span> <span class="ident">Property::Issue</span>,
+            <span class="string">&quot;issuewild&quot;</span> =&gt; <span class="kw">return</span> <span class="ident">Property::IssueWild</span>,
+            <span class="string">&quot;iodef&quot;</span> =&gt; <span class="kw">return</span> <span class="ident">Property::Iodef</span>,
+            <span class="kw-2">&amp;</span><span class="kw">_</span> =&gt; (),
         }
 
         <span class="ident">Property::Unknown</span>(<span class="ident">tag</span>)
@@ -1412,17 +1412,17 @@
 
 <span class="kw">impl</span> <span class="ident">Value</span> {
     <span class="doccomment">/// true if this is an `Issuer`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_issuer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_issuer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Value::Issuer</span>(..))
     }
 
     <span class="doccomment">/// true if this is a `Url`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Value::Url</span>(..))
     }
 
     <span class="doccomment">/// true if this is an `Unknown`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unknown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unknown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Value::Unknown</span>(..))
     }
 }
@@ -1431,28 +1431,28 @@
     <span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="ident">Property</span>,
     <span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">value_len</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">value_len</span> <span class="op">=</span> <span class="ident">value_len</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">unverified</span>(<span class="comment">/*used purely as length safely*/</span>);
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">tag</span> {
-        <span class="ident">Property::Issue</span> <span class="op">|</span> <span class="ident">Property::IssueWild</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Property::Issue</span> <span class="op">|</span> <span class="ident">Property::IssueWild</span> =&gt; {
             <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_slice</span>(<span class="ident">value_len</span>)<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*read_issuer verified as safe*/</span>);
             <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">read_issuer</span>(<span class="ident">slice</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">Value::Issuer</span>(<span class="ident">value</span>.<span class="number">0</span>, <span class="ident">value</span>.<span class="number">1</span>))
         }
-        <span class="ident">Property::Iodef</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Property::Iodef</span> =&gt; {
             <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_slice</span>(<span class="ident">value_len</span>)<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*read_iodef verified as safe*/</span>);
             <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">read_iodef</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">Value::Url</span>(<span class="ident">url</span>))
         }
-        <span class="ident">Property::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Value::Unknown</span>(
+        <span class="ident">Property::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Value::Unknown</span>(
             <span class="ident">decoder</span>.<span class="ident">read_vec</span>(<span class="ident">value_len</span>)<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*unknown will fail in usage*/</span>),
         )),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">emit_value</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">emit_value</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span> {
-        <span class="ident">Value::Issuer</span>(<span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">key_values</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Value::Issuer</span>(<span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">key_values</span>) =&gt; {
             <span class="comment">// output the name</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">name</span> {
                 <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">to_string</span>();
@@ -1474,12 +1474,12 @@
 
             <span class="prelude-val">Ok</span>(())
         }
-        <span class="ident">Value::Url</span>(<span class="kw-2">ref</span> <span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Value::Url</span>(<span class="kw-2">ref</span> <span class="ident">url</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">as_str</span>();
             <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">as_bytes</span>();
             <span class="ident">encoder</span>.<span class="ident">emit_vec</span>(<span class="ident">bytes</span>)
         }
-        <span class="ident">Value::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">encoder</span>.<span class="ident">emit_vec</span>(<span class="ident">data</span>),
+        <span class="ident">Value::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">data</span>) =&gt; <span class="ident">encoder</span>.<span class="ident">emit_vec</span>(<span class="ident">data</span>),
     }
 }
 
@@ -1574,7 +1574,7 @@
 <span class="doccomment">/// This explicitly allows `-` in key names, diverging from the original RFC. To support this, key names will</span>
 <span class="doccomment">/// allow `-` as non-starting characters. Additionally, this significantly relaxes the characters allowed in the value</span>
 <span class="doccomment">/// to allow URL like characters (it does not validate URL syntax).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_issuer</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_issuer</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte_iter</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">iter</span>();
 
     <span class="comment">// we want to reuse the name parsing rules</span>
@@ -1597,11 +1597,11 @@
     <span class="kw">for</span> <span class="ident">ch</span> <span class="kw">in</span> <span class="ident">byte_iter</span> {
         <span class="kw">match</span> <span class="ident">state</span> {
             <span class="comment">// Name was already successfully parsed, otherwise we couldn&#39;t get here.</span>
-            <span class="ident">ParseNameKeyPairState::BeforeKey</span>(<span class="ident">key_values</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ParseNameKeyPairState::BeforeKey</span>(<span class="ident">key_values</span>) =&gt; {
                 <span class="kw">match</span> <span class="ident">char::from</span>(<span class="kw-2">*</span><span class="ident">ch</span>) {
                     <span class="comment">// gobble &#39;;&#39;, &#39; &#39;, and tab</span>
-                    <span class="string">&#39;;&#39;</span> <span class="op">|</span> <span class="string">&#39; &#39;</span> <span class="op">|</span> <span class="string">&#39;\u{0009}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::BeforeKey</span>(<span class="ident">key_values</span>),
-                    <span class="ident">ch</span> <span class="kw">if</span> <span class="ident">ch</span>.<span class="ident">is_alphanumeric</span>() <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;=&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">&#39;;&#39;</span> <span class="op">|</span> <span class="string">&#39; &#39;</span> <span class="op">|</span> <span class="string">&#39;\u{0009}&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::BeforeKey</span>(<span class="ident">key_values</span>),
+                    <span class="ident">ch</span> <span class="kw">if</span> <span class="ident">ch</span>.<span class="ident">is_alphanumeric</span>() <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;=&#39;</span> =&gt; {
                         <span class="comment">// We found the beginning of a new Key</span>
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">String::new</span>();
                         <span class="ident">key</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
@@ -1612,17 +1612,17 @@
                             <span class="ident">key_values</span>,
                         }
                     }
-                    <span class="ident">ch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;bad character in CAA issuer key: {}&quot;</span>, <span class="ident">ch</span>).<span class="ident">into</span>()),
+                    <span class="ident">ch</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;bad character in CAA issuer key: {}&quot;</span>, <span class="ident">ch</span>).<span class="ident">into</span>()),
                 }
             }
             <span class="ident">ParseNameKeyPairState::Key</span> {
                 <span class="ident">first_char</span>,
                 <span class="kw-2">mut</span> <span class="ident">key</span>,
                 <span class="ident">key_values</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">match</span> <span class="ident">char::from</span>(<span class="kw-2">*</span><span class="ident">ch</span>) {
                     <span class="comment">// transition to value</span>
-                    <span class="string">&#39;=&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">&#39;=&#39;</span> =&gt; {
                         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">String::new</span>();
                         <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::Value</span> {
                             <span class="ident">key</span>,
@@ -1631,9 +1631,9 @@
                         }
                     }
                     <span class="comment">// push onto the existing key</span>
-                    <span class="ident">ch</span> <span class="kw">if</span> (<span class="ident">ch</span>.<span class="ident">is_alphanumeric</span>() <span class="op">|</span><span class="op">|</span> (<span class="op">!</span><span class="ident">first_char</span> <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;-&#39;</span>))
+                    <span class="ident">ch</span> <span class="kw">if</span> (<span class="ident">ch</span>.<span class="ident">is_alphanumeric</span>() <span class="op">|</span><span class="op">|</span> (<span class="op">!</span><span class="ident">first_char</span> <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">==</span> <span class="string">&#39;-&#39;</span>))
                         <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;=&#39;</span>
-                        <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span>
+                        <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;;&#39;</span> =&gt;
                     {
                         <span class="ident">key</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
                         <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::Key</span> {
@@ -1642,22 +1642,22 @@
                             <span class="ident">key_values</span>,
                         }
                     }
-                    <span class="ident">ch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;bad character in CAA issuer key: {}&quot;</span>, <span class="ident">ch</span>).<span class="ident">into</span>()),
+                    <span class="ident">ch</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;bad character in CAA issuer key: {}&quot;</span>, <span class="ident">ch</span>).<span class="ident">into</span>()),
                 }
             }
             <span class="ident">ParseNameKeyPairState::Value</span> {
                 <span class="ident">key</span>,
                 <span class="kw-2">mut</span> <span class="ident">value</span>,
                 <span class="kw-2">mut</span> <span class="ident">key_values</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">match</span> <span class="ident">char::from</span>(<span class="kw-2">*</span><span class="ident">ch</span>) {
                     <span class="comment">// transition back to find another pair</span>
-                    <span class="string">&#39;;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">&#39;;&#39;</span> =&gt; {
                         <span class="ident">key_values</span>.<span class="ident">push</span>(<span class="ident">KeyValue</span> { <span class="ident">key</span>, <span class="ident">value</span> });
                         <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::BeforeKey</span>(<span class="ident">key_values</span>);
                     }
                     <span class="comment">// push onto the existing key</span>
-                    <span class="ident">ch</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">ch</span>.<span class="ident">is_control</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ch</span>.<span class="ident">is_whitespace</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">ch</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">ch</span>.<span class="ident">is_control</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ch</span>.<span class="ident">is_whitespace</span>() =&gt; {
                         <span class="ident">value</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
 
                         <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::Value</span> {
@@ -1666,7 +1666,7 @@
                             <span class="ident">key_values</span>,
                         }
                     }
-                    <span class="ident">ch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;bad character in CAA issuer value: &#39;{}&#39;&quot;</span>, <span class="ident">ch</span>).<span class="ident">into</span>()),
+                    <span class="ident">ch</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;bad character in CAA issuer value: &#39;{}&#39;&quot;</span>, <span class="ident">ch</span>).<span class="ident">into</span>()),
                 }
             }
         }
@@ -1675,16 +1675,16 @@
     <span class="comment">// valid final states are BeforeKey, where there was a final &#39;;&#39; but nothing followed it.</span>
     <span class="comment">//                        Value, where we collected the final chars of the value, but no more data</span>
     <span class="kw">let</span> <span class="ident">key_values</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">state</span> {
-        <span class="ident">ParseNameKeyPairState::BeforeKey</span>(<span class="ident">key_values</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">key_values</span>,
+        <span class="ident">ParseNameKeyPairState::BeforeKey</span>(<span class="ident">key_values</span>) =&gt; <span class="ident">key_values</span>,
         <span class="ident">ParseNameKeyPairState::Value</span> {
             <span class="ident">key</span>,
             <span class="ident">value</span>,
             <span class="kw-2">mut</span> <span class="ident">key_values</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> {
+        } =&gt; {
             <span class="ident">key_values</span>.<span class="ident">push</span>(<span class="ident">KeyValue</span> { <span class="ident">key</span>, <span class="ident">value</span> });
             <span class="ident">key_values</span>
         }
-        <span class="ident">ParseNameKeyPairState::Key</span> { <span class="ident">key</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ParseNameKeyPairState::Key</span> { <span class="ident">key</span>, .. } =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;key missing value: {}&quot;</span>, <span class="ident">key</span>).<span class="ident">into</span>());
         }
     };
@@ -1719,7 +1719,7 @@
 <span class="doccomment">///       request to the HTTP address specified using the protocol specified</span>
 <span class="doccomment">///       in [RFC6546].</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_iodef</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_iodef</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">str::from_utf8</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">url</span>)
@@ -1737,7 +1737,7 @@
 
 <span class="kw">impl</span> <span class="ident">KeyValue</span> {
     <span class="doccomment">/// Construct a new KeyValue pair</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">KeyValue</span> {
             <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">into</span>(),
             <span class="ident">value</span>: <span class="ident">value</span>.<span class="ident">into</span>(),
@@ -1745,12 +1745,12 @@
     }
 
     <span class="doccomment">/// Gets a reference to the key of the pair.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>
     }
 
     <span class="doccomment">/// Gets a reference to the value of the pair.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>
     }
 }
@@ -1833,7 +1833,7 @@
 <span class="doccomment">///      The length of the value field is specified implicitly as the</span>
 <span class="doccomment">///      remaining length of the enclosing Resource Record data field.</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">rdata_length</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">CAA</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">rdata_length</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">CAA</span><span class="op">&gt;</span> {
     <span class="comment">// the spec declares that other flags should be ignored for future compatibility...</span>
     <span class="kw">let</span> <span class="ident">issuer_critical</span>: <span class="ident">bool</span> <span class="op">=</span>
         <span class="ident">decoder</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*used as bitfield*/</span>) <span class="op">&amp;</span> <span class="number">0b1000_0000</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
@@ -1856,7 +1856,7 @@
 }
 
 <span class="comment">// TODO: change this to return &amp;str</span>
-<span class="kw">fn</span> <span class="ident">read_tag</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">len</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">read_tag</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">len</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">len</span>
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)
         .<span class="ident">verify_unwrap</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">15</span>)
@@ -1877,7 +1877,7 @@
 }
 
 <span class="doccomment">/// writes out the tag in binary form to the buffer, returning the number of bytes written</span>
-<span class="kw">fn</span> <span class="ident">emit_tag</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="ident">Property</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">emit_tag</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="ident">Property</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">tag</span>.<span class="ident">as_str</span>();
     <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">property</span>.<span class="ident">as_bytes</span>();
 
@@ -1902,7 +1902,7 @@
 }
 
 <span class="doccomment">/// Write the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">caa</span>: <span class="kw-2">&amp;</span><span class="ident">CAA</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">caa</span>: <span class="kw-2">&amp;</span><span class="ident">CAA</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flags</span> <span class="op">=</span> <span class="number">0_u8</span>;
 
     <span class="kw">if</span> <span class="ident">caa</span>.<span class="ident">issuer_critical</span> {
@@ -1923,12 +1923,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Property</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Property::Issue</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;issue&quot;</span>,
-            <span class="ident">Property::IssueWild</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;issuewild&quot;</span>,
-            <span class="ident">Property::Iodef</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;iodef&quot;</span>,
-            <span class="ident">Property::Unknown</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="ident">Property::Issue</span> =&gt; <span class="string">&quot;issue&quot;</span>,
+            <span class="ident">Property::IssueWild</span> =&gt; <span class="string">&quot;issuewild&quot;</span>,
+            <span class="ident">Property::Iodef</span> =&gt; <span class="string">&quot;iodef&quot;</span>,
+            <span class="ident">Property::Unknown</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
         };
 
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>)
@@ -1936,11 +1936,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\&quot;&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Value::Issuer</span>(<span class="kw">_</span>, <span class="ident">values</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Issuer</span>(<span class="kw">_</span>, <span class="ident">values</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">values</span>.<span class="ident">first</span>() {
                     <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
                 }
@@ -1949,8 +1949,8 @@
                     <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;; {}&quot;</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
                 }
             }
-            <span class="ident">Value::Url</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">url</span>)<span class="question-mark">?</span>,
-            <span class="ident">Value::Unknown</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">v</span>)<span class="question-mark">?</span>,
+            <span class="ident">Value::Url</span>(<span class="ident">url</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">url</span>)<span class="question-mark">?</span>,
+            <span class="ident">Value::Unknown</span>(<span class="ident">v</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">v</span>)<span class="question-mark">?</span>,
         }
 
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\&quot;&quot;</span>)
@@ -1958,7 +1958,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">KeyValue</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">value</span>.<span class="ident">is_empty</span>() {
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;={}&quot;</span>, <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
@@ -1970,7 +1970,7 @@
 
 <span class="comment">// FIXME: this needs to be verified to be correct, add tests...</span>
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">CAA</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">critical</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">issuer_critical</span> { <span class="string">&quot;1&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;0&quot;</span> };
 
         <span class="macro">write!</span>(

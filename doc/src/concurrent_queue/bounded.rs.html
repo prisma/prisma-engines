@@ -354,7 +354,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Bounded</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new bounded queue.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cap</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bounded</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cap</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Bounded</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="macro">assert!</span>(<span class="ident">cap</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;capacity must be positive&quot;</span>);
 
         <span class="comment">// Head is initialized to `{ lap: 0, mark: 0, index: 0 }`.</span>
@@ -386,7 +386,7 @@
     }
 
     <span class="doccomment">/// Attempts to push an item into the queue.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PushError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PushError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
 
         <span class="kw">loop</span> {
@@ -404,7 +404,7 @@
             <span class="kw">let</span> <span class="ident">stamp</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
 
             <span class="comment">// If the tail and the stamp match, we may attempt to push.</span>
-            <span class="kw">if</span> <span class="ident">tail</span> <span class="op">=</span><span class="op">=</span> <span class="ident">stamp</span> {
+            <span class="kw">if</span> <span class="ident">tail</span> <span class="op">==</span> <span class="ident">stamp</span> {
                 <span class="kw">let</span> <span class="ident">new_tail</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() {
                     <span class="comment">// Same lap, incremented index.</span>
                     <span class="comment">// Set to `{ lap: lap, mark: 0, index: index + 1 }`.</span>
@@ -422,7 +422,7 @@
                     <span class="ident">Ordering::SeqCst</span>,
                     <span class="ident">Ordering::Relaxed</span>,
                 ) {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
                         <span class="comment">// Write the value into the slot and update the stamp.</span>
                         <span class="kw">unsafe</span> {
                             <span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>().<span class="ident">write</span>(<span class="ident">MaybeUninit::new</span>(<span class="ident">value</span>));
@@ -430,16 +430,16 @@
                         <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">store</span>(<span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">Ordering::Release</span>);
                         <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">t</span>) =&gt; {
                         <span class="ident">tail</span> <span class="op">=</span> <span class="ident">t</span>;
                     }
                 }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">stamp</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span> {
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">stamp</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">==</span> <span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span> {
                 <span class="ident"><span class="kw">crate</span>::full_fence</span>();
                 <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
 
                 <span class="comment">// If the head lags one lap behind the tail as well...</span>
-                <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">tail</span> {
+                <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">==</span> <span class="ident">tail</span> {
                     <span class="comment">// ...then the queue is full.</span>
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PushError::Full</span>(<span class="ident">value</span>));
                 }
@@ -454,7 +454,7 @@
     }
 
     <span class="doccomment">/// Attempts to pop an item from the queue.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">PopError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">PopError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
 
         <span class="kw">loop</span> {
@@ -467,7 +467,7 @@
             <span class="kw">let</span> <span class="ident">stamp</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
 
             <span class="comment">// If the the stamp is ahead of the head by 1, we may attempt to pop.</span>
-            <span class="kw">if</span> <span class="ident">head</span> <span class="op">+</span> <span class="number">1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">stamp</span> {
+            <span class="kw">if</span> <span class="ident">head</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">stamp</span> {
                 <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() {
                     <span class="comment">// Same lap, incremented index.</span>
                     <span class="comment">// Set to `{ lap: lap, mark: 0, index: index + 1 }`.</span>
@@ -485,23 +485,23 @@
                     <span class="ident">Ordering::SeqCst</span>,
                     <span class="ident">Ordering::Relaxed</span>,
                 ) {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
                         <span class="comment">// Read the value from the slot and update the stamp.</span>
                         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>().<span class="ident">read</span>().<span class="ident">assume_init</span>() };
                         <span class="ident">slot</span>.<span class="ident">stamp</span>
                             .<span class="ident">store</span>(<span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>), <span class="ident">Ordering::Release</span>);
                         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">value</span>);
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">h</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">h</span>) =&gt; {
                         <span class="ident">head</span> <span class="op">=</span> <span class="ident">h</span>;
                     }
                 }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">stamp</span> <span class="op">=</span><span class="op">=</span> <span class="ident">head</span> {
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">stamp</span> <span class="op">==</span> <span class="ident">head</span> {
                 <span class="ident"><span class="kw">crate</span>::full_fence</span>();
                 <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
 
                 <span class="comment">// If the tail equals the head, that means the queue is empty.</span>
-                <span class="kw">if</span> (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">head</span> {
+                <span class="kw">if</span> (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>) <span class="op">==</span> <span class="ident">head</span> {
                     <span class="comment">// Check if the queue is closed.</span>
                     <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PopError::Closed</span>);
@@ -520,14 +520,14 @@
     }
 
     <span class="doccomment">/// Returns the number of items in the queue.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">loop</span> {
             <span class="comment">// Load the tail, then load the head.</span>
             <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
             <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
 
             <span class="comment">// If the tail didn&#39;t change, we&#39;ve got consistent values to work with.</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">tail</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">==</span> <span class="ident">tail</span> {
                 <span class="kw">let</span> <span class="ident">hix</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
                 <span class="kw">let</span> <span class="ident">tix</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
 
@@ -535,7 +535,7 @@
                     <span class="ident">tix</span> <span class="op">-</span> <span class="ident">hix</span>
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hix</span> <span class="op">&gt;</span> <span class="ident">tix</span> {
                     <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">hix</span> <span class="op">+</span> <span class="ident">tix</span>
-                } <span class="kw">else</span> <span class="kw">if</span> (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">head</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>) <span class="op">==</span> <span class="ident">head</span> {
                     <span class="number">0</span>
                 } <span class="kw">else</span> {
                     <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>()
@@ -545,7 +545,7 @@
     }
 
     <span class="doccomment">/// Returns `true` if the queue is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
         <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
 
@@ -553,11 +553,11 @@
         <span class="comment">//</span>
         <span class="comment">// Note: If the head changes just before we load the tail, that means there was a moment</span>
         <span class="comment">// when the queue was not empty, so it is safe to just return `false`.</span>
-        (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">head</span>
+        (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>) <span class="op">==</span> <span class="ident">head</span>
     }
 
     <span class="doccomment">/// Returns `true` if the queue is full.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
         <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
 
@@ -565,24 +565,24 @@
         <span class="comment">//</span>
         <span class="comment">// Note: If the tail changes just before we load the head, that means there was a moment</span>
         <span class="comment">// when the queue was not full, so it is safe to just return `false`.</span>
-        <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>
+        <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">==</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>
     }
 
     <span class="doccomment">/// Returns the capacity of the queue.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// Closes the queue.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `true` if this call closed the queue.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">fetch_or</span>(<span class="self">self</span>.<span class="ident">mark_bit</span>, <span class="ident">Ordering::SeqCst</span>);
-        <span class="ident">tail</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+        <span class="ident">tail</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Returns `true` if the queue is closed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
     }
 }

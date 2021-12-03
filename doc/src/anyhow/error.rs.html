@@ -993,7 +993,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">doc_cfg</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">error</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">error</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1039,7 +1039,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">msg</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">message</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">msg</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">message</span>: <span class="ident">M</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1048,7 +1048,7 @@
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_std</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">error</span>: <span class="ident">E</span>, <span class="ident">backtrace</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_std</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">error</span>: <span class="ident">E</span>, <span class="ident">backtrace</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1071,7 +1071,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_adhoc</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">message</span>: <span class="ident">M</span>, <span class="ident">backtrace</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_adhoc</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">message</span>: <span class="ident">M</span>, <span class="ident">backtrace</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1097,7 +1097,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_display</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">message</span>: <span class="ident">M</span>, <span class="ident">backtrace</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_display</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">message</span>: <span class="ident">M</span>, <span class="ident">backtrace</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1124,7 +1124,7 @@
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_context</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">context</span>: <span class="ident">C</span>, <span class="ident">error</span>: <span class="ident">E</span>, <span class="ident">backtrace</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_context</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">context</span>: <span class="ident">C</span>, <span class="ident">error</span>: <span class="ident">E</span>, <span class="ident">backtrace</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">C</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -1154,7 +1154,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_boxed</span>(
         <span class="ident">error</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
         <span class="ident">backtrace</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::wrapper::BoxedError</span>;
         <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">BoxedError</span>(<span class="ident">error</span>);
         <span class="kw">let</span> <span class="ident">vtable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ErrorVTable</span> {
@@ -1186,7 +1186,7 @@
         <span class="ident">error</span>: <span class="ident">E</span>,
         <span class="ident">vtable</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ErrorVTable</span>,
         <span class="ident">backtrace</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    ) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1260,7 +1260,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">context</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">context</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">context</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">context</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">C</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1322,7 +1322,7 @@
     <span class="doccomment">/// [tracking]: https://github.com/rust-lang/rust/issues/53487</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">backtrace</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">doc_cfg</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">nightly</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">backtrace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="macro">impl_backtrace!</span>() {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">backtrace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="macro">impl_backtrace!</span>() {
         <span class="kw">unsafe</span> { <span class="ident">ErrorImpl::backtrace</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">by_ref</span>()) }
     }
 
@@ -1350,7 +1350,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">doc_cfg</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Chain</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Chain</span> {
         <span class="kw">unsafe</span> { <span class="ident">ErrorImpl::chain</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">by_ref</span>()) }
     }
 
@@ -1361,7 +1361,7 @@
     <span class="doccomment">/// [`chain()`][Error::chain].</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">doc_cfg</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root_cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root_cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) {
         <span class="self">self</span>.<span class="ident">chain</span>().<span class="ident">last</span>().<span class="ident">unwrap</span>()
     }
 
@@ -1373,7 +1373,7 @@
     <span class="doccomment">/// context and downcasting, [see here].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [see here]: trait.Context.html#effect-on-downcasting</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1381,7 +1381,7 @@
     }
 
     <span class="doccomment">/// Attempt to downcast the error object to a concrete type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1392,13 +1392,13 @@
             <span class="comment">// somewhere inside the data structure.</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">anyhow_no_ptr_addr_of</span>))]</span>
             <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">vtable</span>(<span class="ident">inner</span>.<span class="ident">ptr</span>).<span class="ident">object_downcast</span>)(<span class="ident">inner</span>.<span class="ident">by_ref</span>(), <span class="ident">target</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">addr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">addr</span>.<span class="ident">by_mut</span>().<span class="ident">extend</span>(),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>),
+                <span class="prelude-val">Some</span>(<span class="ident">addr</span>) =&gt; <span class="ident">addr</span>.<span class="ident">by_mut</span>().<span class="ident">extend</span>(),
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>),
             };
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">anyhow_no_ptr_addr_of</span>)]</span>
             <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">vtable</span>(<span class="ident">inner</span>.<span class="ident">ptr</span>).<span class="ident">object_downcast_mut</span>)(<span class="ident">inner</span>, <span class="ident">target</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">addr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">addr</span>.<span class="ident">extend</span>(),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>),
+                <span class="prelude-val">Some</span>(<span class="ident">addr</span>) =&gt; <span class="ident">addr</span>.<span class="ident">extend</span>(),
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>),
             };
 
             <span class="comment">// Prepare to read E out of the data structure. We&#39;ll drop the rest</span>
@@ -1451,7 +1451,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # ;</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast_ref</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast_ref</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1465,7 +1465,7 @@
     }
 
     <span class="doccomment">/// Downcast this error object by mutable reference.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast_mut</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downcast_mut</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Display</span> <span class="op">+</span> <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1493,7 +1493,7 @@
     <span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">backtrace</span> <span class="op">=</span> <span class="macro">backtrace_if_absent!</span>(<span class="ident">error</span>);
         <span class="ident">Error::from_std</span>(<span class="ident">error</span>, <span class="ident">backtrace</span>)
     }
@@ -1504,7 +1504,7 @@
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Error</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw">unsafe</span> { <span class="ident">ErrorImpl::error</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">by_ref</span>()) }
     }
 }
@@ -1512,19 +1512,19 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">doc_cfg</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
 <span class="kw">impl</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw">unsafe</span> { <span class="ident">ErrorImpl::error_mut</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">by_mut</span>()) }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">unsafe</span> { <span class="ident">ErrorImpl::display</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">by_ref</span>(), <span class="ident">formatter</span>) }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">unsafe</span> { <span class="ident">ErrorImpl::debug</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">by_ref</span>(), <span class="ident">formatter</span>) }
     }
 }
@@ -1540,16 +1540,16 @@
 
 <span class="kw">struct</span> <span class="ident">ErrorVTable</span> {
     <span class="ident">object_drop</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Own</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>),
-    <span class="ident">object_ref</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
+    <span class="ident">object_ref</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) -&gt; <span class="ident">Ref</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">anyhow_no_ptr_addr_of</span>))]</span>
-    <span class="ident">object_mut</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Mut</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>),
-    <span class="ident">object_boxed</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Own</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    <span class="ident">object_downcast</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ref</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">object_mut</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Mut</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>),
+    <span class="ident">object_boxed</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Own</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
+    <span class="ident">object_downcast</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ref</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">anyhow_no_ptr_addr_of</span>)]</span>
-    <span class="ident">object_downcast_mut</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Mut</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mut</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">object_downcast_mut</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Mut</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mut</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">object_drop_rest</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Own</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">TypeId</span>),
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">backtrace</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>))]</span>
-    <span class="ident">object_backtrace</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>,
+    <span class="ident">object_backtrace</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>,
 }
 
 <span class="comment">// Safety: requires layout of *e to match ErrorImpl&lt;E&gt;.</span>
@@ -1571,7 +1571,7 @@
 }
 
 <span class="comment">// Safety: requires layout of *e to match ErrorImpl&lt;E&gt;.</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">object_ref</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">object_ref</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) -&gt; <span class="ident">Ref</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
@@ -1591,7 +1591,7 @@
 <span class="comment">// Safety: requires layout of *e to match ErrorImpl&lt;E&gt;, and for `e` to be derived</span>
 <span class="comment">// from a `&amp;mut`</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">anyhow_no_ptr_addr_of</span>))]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">object_mut</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Mut</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">object_mut</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Mut</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)
 <span class="kw">where</span>
     <span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
@@ -1600,7 +1600,7 @@
 }
 
 <span class="comment">// Safety: requires layout of *e to match ErrorImpl&lt;E&gt;.</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">object_boxed</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Own</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">object_boxed</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Own</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
@@ -1609,11 +1609,11 @@
 }
 
 <span class="comment">// Safety: requires layout of *e to match ErrorImpl&lt;E&gt;.</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">object_downcast</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ref</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">object_downcast</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ref</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">E</span>: <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">target</span> {
+    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">target</span> {
         <span class="comment">// Caller is looking for an E pointer and e is ErrorImpl&lt;E&gt;, take a</span>
         <span class="comment">// pointer to its E field.</span>
 
@@ -1636,11 +1636,11 @@
 
 <span class="comment">// Safety: requires layout of *e to match ErrorImpl&lt;E&gt;.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">anyhow_no_ptr_addr_of</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">object_downcast_mut</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Mut</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mut</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">object_downcast_mut</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Mut</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mut</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">E</span>: <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">target</span> {
+    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">target</span> {
         <span class="comment">// Caller is looking for an E pointer and e is ErrorImpl&lt;E&gt;, take a</span>
         <span class="comment">// pointer to its E field.</span>
         <span class="kw">let</span> <span class="ident">unerased</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">deref_mut</span>();
@@ -1651,22 +1651,22 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">backtrace</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">no_backtrace</span>(<span class="ident">e</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Backtrace</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">no_backtrace</span>(<span class="ident">e</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Backtrace</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">e</span>;
     <span class="prelude-val">None</span>
 }
 
 <span class="comment">// Safety: requires layout of *e to match ErrorImpl&lt;ContextError&lt;C, E&gt;&gt;.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">context_downcast</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ref</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">context_downcast</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ref</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="lifetime">&#39;static</span>,
     <span class="ident">E</span>: <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">target</span> {
+    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">target</span> {
         <span class="kw">let</span> <span class="ident">unerased</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">ContextError</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">deref</span>();
         <span class="prelude-val">Some</span>(<span class="ident">Ref::new</span>(<span class="kw-2">&amp;</span><span class="ident">unerased</span>.<span class="ident">_object</span>.<span class="ident">context</span>).<span class="ident">cast</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>())
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">target</span> {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">target</span> {
         <span class="kw">let</span> <span class="ident">unerased</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">ContextError</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">deref</span>();
         <span class="prelude-val">Some</span>(<span class="ident">Ref::new</span>(<span class="kw-2">&amp;</span><span class="ident">unerased</span>.<span class="ident">_object</span>.<span class="ident">error</span>).<span class="ident">cast</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>())
     } <span class="kw">else</span> {
@@ -1676,15 +1676,15 @@
 
 <span class="comment">// Safety: requires layout of *e to match ErrorImpl&lt;ContextError&lt;C, E&gt;&gt;.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">anyhow_no_ptr_addr_of</span>))]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">context_downcast_mut</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Mut</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mut</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">context_downcast_mut</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Mut</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mut</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="lifetime">&#39;static</span>,
     <span class="ident">E</span>: <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">target</span> {
+    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">target</span> {
         <span class="kw">let</span> <span class="ident">unerased</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">ContextError</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">deref_mut</span>();
         <span class="prelude-val">Some</span>(<span class="ident">Mut::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unerased</span>.<span class="ident">_object</span>.<span class="ident">context</span>).<span class="ident">cast</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>())
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">target</span> {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">target</span> {
         <span class="kw">let</span> <span class="ident">unerased</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">ContextError</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">deref_mut</span>();
         <span class="prelude-val">Some</span>(<span class="ident">Mut::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unerased</span>.<span class="ident">_object</span>.<span class="ident">error</span>).<span class="ident">cast</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>())
     } <span class="kw">else</span> {
@@ -1701,7 +1701,7 @@
 {
     <span class="comment">// Called after downcasting by value to either the C or the E and doing a</span>
     <span class="comment">// ptr::read to take ownership of that value.</span>
-    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">target</span> {
+    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">target</span> {
         <span class="kw">let</span> <span class="ident">unerased</span> <span class="op">=</span> <span class="ident">e</span>
             .<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">ContextError</span><span class="op">&lt;</span><span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
             .<span class="ident">boxed</span>();
@@ -1715,12 +1715,12 @@
 }
 
 <span class="comment">// Safety: requires layout of *e to match ErrorImpl&lt;ContextError&lt;C, Error&gt;&gt;.</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">context_chain_downcast</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ref</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">context_chain_downcast</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ref</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="lifetime">&#39;static</span>,
 {
     <span class="kw">let</span> <span class="ident">unerased</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">ContextError</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">deref</span>();
-    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">target</span> {
+    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">target</span> {
         <span class="prelude-val">Some</span>(<span class="ident">Ref::new</span>(<span class="kw-2">&amp;</span><span class="ident">unerased</span>.<span class="ident">_object</span>.<span class="ident">context</span>).<span class="ident">cast</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>())
     } <span class="kw">else</span> {
         <span class="comment">// Recurse down the context chain per the inner error&#39;s vtable.</span>
@@ -1731,12 +1731,12 @@
 
 <span class="comment">// Safety: requires layout of *e to match ErrorImpl&lt;ContextError&lt;C, Error&gt;&gt;.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">anyhow_no_ptr_addr_of</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">context_chain_downcast_mut</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Mut</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mut</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">context_chain_downcast_mut</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Mut</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>, <span class="ident">target</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mut</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="lifetime">&#39;static</span>,
 {
     <span class="kw">let</span> <span class="ident">unerased</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">ContextError</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">deref_mut</span>();
-    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">target</span> {
+    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">target</span> {
         <span class="prelude-val">Some</span>(<span class="ident">Mut::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unerased</span>.<span class="ident">_object</span>.<span class="ident">context</span>).<span class="ident">cast</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>())
     } <span class="kw">else</span> {
         <span class="comment">// Recurse down the context chain per the inner error&#39;s vtable.</span>
@@ -1752,7 +1752,7 @@
 {
     <span class="comment">// Called after downcasting by value to either the C or one of the causes</span>
     <span class="comment">// and doing a ptr::read to take ownership of that value.</span>
-    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">target</span> {
+    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">target</span> {
         <span class="kw">let</span> <span class="ident">unerased</span> <span class="op">=</span> <span class="ident">e</span>
             .<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">ContextError</span><span class="op">&lt;</span><span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
             .<span class="ident">boxed</span>();
@@ -1774,7 +1774,7 @@
 <span class="comment">// Safety: requires layout of *e to match ErrorImpl&lt;ContextError&lt;C, Error&gt;&gt;.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">backtrace</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_wraps</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">context_backtrace</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">context_backtrace</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Backtrace</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="lifetime">&#39;static</span>,
 {
@@ -1797,7 +1797,7 @@
 
 <span class="comment">// Reads the vtable out of `p`. This is the same as `p.as_ref().vtable`, but</span>
 <span class="comment">// avoids converting `p` into a reference.</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">vtable</span>(<span class="ident">p</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ErrorVTable</span> {
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">vtable</span>(<span class="ident">p</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ErrorVTable</span> {
     <span class="comment">// NOTE: This assumes that `ErrorVTable` is the first field of ErrorImpl.</span>
     <span class="kw-2">*</span>(<span class="ident">p</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ErrorVTable</span>)
 }
@@ -1811,7 +1811,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">erase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">erase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&gt;</span> {
         <span class="comment">// Erase the concrete type of E but preserve the vtable in self.vtable</span>
         <span class="comment">// for manipulating the resulting thin pointer. This is analogous to an</span>
         <span class="comment">// unsize coercion.</span>
@@ -1820,14 +1820,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ErrorImpl</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">error</span>(<span class="ident">this</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">error</span>(<span class="ident">this</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) {
         <span class="comment">// Use vtable to attach E&#39;s native StdError vtable for the right</span>
         <span class="comment">// original type E.</span>
         (<span class="ident">vtable</span>(<span class="ident">this</span>.<span class="ident">ptr</span>).<span class="ident">object_ref</span>)(<span class="ident">this</span>).<span class="ident">deref</span>()
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">error_mut</span>(<span class="ident">this</span>: <span class="ident">Mut</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">error_mut</span>(<span class="ident">this</span>: <span class="ident">Mut</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) {
         <span class="comment">// Use vtable to attach E&#39;s native StdError vtable for the right</span>
         <span class="comment">// original type E.</span>
 
@@ -1841,7 +1841,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">backtrace</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">backtrace</span>(<span class="ident">this</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Backtrace</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">backtrace</span>(<span class="ident">this</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Backtrace</span> {
         <span class="comment">// This unwrap can only panic if the underlying error&#39;s backtrace method</span>
         <span class="comment">// is nondeterministic, which would only happen in maliciously</span>
         <span class="comment">// constructed code.</span>
@@ -1858,7 +1858,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">chain</span>(<span class="ident">this</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Chain</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">chain</span>(<span class="ident">this</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Chain</span> {
         <span class="ident">Chain::new</span>(<span class="ident"><span class="self">Self</span>::error</span>(<span class="ident">this</span>))
     }
 }
@@ -1868,11 +1868,11 @@
     <span class="ident">E</span>: <span class="ident">StdError</span>,
 {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">backtrace</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">backtrace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Backtrace</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">backtrace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Backtrace</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="ident">ErrorImpl::backtrace</span>(<span class="self">self</span>.<span class="ident">erase</span>()) })
     }
 
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="ident">ErrorImpl::error</span>(<span class="self">self</span>.<span class="ident">erase</span>()).<span class="ident">source</span>() }
     }
 }
@@ -1881,7 +1881,7 @@
 <span class="kw">where</span>
     <span class="ident">E</span>: <span class="ident">Debug</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">unsafe</span> { <span class="ident">ErrorImpl::debug</span>(<span class="self">self</span>.<span class="ident">erase</span>(), <span class="ident">formatter</span>) }
     }
 }
@@ -1890,14 +1890,14 @@
 <span class="kw">where</span>
     <span class="ident">E</span>: <span class="ident">Display</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">unsafe</span> { <span class="ident">Display::fmt</span>(<span class="ident">ErrorImpl::error</span>(<span class="self">self</span>.<span class="ident">erase</span>()), <span class="ident">formatter</span>) }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">Error</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">outer</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="ident">error</span>);
         <span class="kw">unsafe</span> {
             <span class="comment">// Use vtable to attach ErrorImpl&lt;E&gt;&#39;s native StdError vtable for</span>
@@ -1908,27 +1908,27 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">Error</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Box</span>::<span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="ident">error</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">Error</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Box</span>::<span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="ident">error</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) {
         <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) {
         <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>
     }
 }

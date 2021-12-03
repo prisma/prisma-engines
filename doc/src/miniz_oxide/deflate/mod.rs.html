@@ -334,18 +334,18 @@ fn tdefl_compress_mem_to_mem(
 ) -&gt; usize*/</span>
 
 <span class="doccomment">/// Compress the input data to a vector, using the specified compression level (0-10).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compress_to_vec</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">level</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compress_to_vec</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">level</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
     <span class="ident">compress_to_vec_inner</span>(<span class="ident">input</span>, <span class="ident">level</span>, <span class="number">0</span>, <span class="number">0</span>)
 }
 
 <span class="doccomment">/// Compress the input data to a vector, using the specified compression level (0-10), and with a</span>
 <span class="doccomment">/// zlib wrapper.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compress_to_vec_zlib</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">level</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compress_to_vec_zlib</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">level</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
     <span class="ident">compress_to_vec_inner</span>(<span class="ident">input</span>, <span class="ident">level</span>, <span class="number">1</span>, <span class="number">0</span>)
 }
 
 <span class="doccomment">/// Simple function to compress data to a vec.</span>
-<span class="kw">fn</span> <span class="ident">compress_to_vec_inner</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">level</span>: <span class="ident">u8</span>, <span class="ident">window_bits</span>: <span class="ident">i32</span>, <span class="ident">strategy</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">compress_to_vec_inner</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">level</span>: <span class="ident">u8</span>, <span class="ident">window_bits</span>: <span class="ident">i32</span>, <span class="ident">strategy</span>: <span class="ident">i32</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
     <span class="comment">// The comp flags function sets the zlib flag if the window_bits parameter is &gt; 0.</span>
     <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">create_comp_flags_from_zip_params</span>(<span class="ident">level</span>.<span class="ident">into</span>(), <span class="ident">window_bits</span>, <span class="ident">strategy</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">compressor</span> <span class="op">=</span> <span class="ident">CompressorOxide::new</span>(<span class="ident">flags</span>);
@@ -365,18 +365,18 @@ fn tdefl_compress_mem_to_mem(
         <span class="ident">in_pos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">bytes_in</span>;
 
         <span class="kw">match</span> <span class="ident">status</span> {
-            <span class="ident">TDEFLStatus::Done</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TDEFLStatus::Done</span> =&gt; {
                 <span class="ident">output</span>.<span class="ident">truncate</span>(<span class="ident">out_pos</span>);
                 <span class="kw">break</span>;
             }
-            <span class="ident">TDEFLStatus::Okay</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TDEFLStatus::Okay</span> =&gt; {
                 <span class="comment">// We need more space, so resize the vector.</span>
                 <span class="kw">if</span> <span class="ident">output</span>.<span class="ident">len</span>().<span class="ident">saturating_sub</span>(<span class="ident">out_pos</span>) <span class="op">&lt;</span> <span class="number">30</span> {
                     <span class="ident">output</span>.<span class="ident">resize</span>(<span class="ident">output</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>, <span class="number">0</span>)
                 }
             }
             <span class="comment">// Not supposed to happen unless there is a bug.</span>
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Bug! Unexpectedly failed to compress!&quot;</span>),
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Bug! Unexpectedly failed to compress!&quot;</span>),
         }
     }
 

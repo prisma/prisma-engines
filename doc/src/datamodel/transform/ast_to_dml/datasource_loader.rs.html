@@ -324,7 +324,7 @@
         <span class="ident">ast_schema</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span>,
         <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
         <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Datasource</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Datasource</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sources</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">for</span> <span class="ident">src</span> <span class="kw">in</span> <span class="ident">ast_schema</span>.<span class="ident">sources</span>() {
@@ -351,7 +351,7 @@
         <span class="ident">ast_source</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SourceConfig</span>,
         <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
         <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Datasource</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Datasource</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">source_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast_source</span>.<span class="ident">name</span>.<span class="ident">name</span>;
         <span class="kw">let</span> <span class="ident">args</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ast_source</span>
             .<span class="ident">properties</span>
@@ -360,8 +360,8 @@
             .<span class="ident">collect</span>();
 
         <span class="kw">let</span> <span class="ident">provider_arg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="string">&quot;provider&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">provider</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">provider</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">provider</span>) =&gt; <span class="ident">provider</span>,
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_source_argument_not_found_error</span>(
                     <span class="string">&quot;provider&quot;</span>,
                     <span class="kw-2">&amp;</span><span class="ident">ast_source</span>.<span class="ident">name</span>.<span class="ident">name</span>,
@@ -380,7 +380,7 @@
         }
 
         <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">provider_arg</span>.<span class="ident">as_string_literal</span>() {
-            <span class="prelude-val">Some</span>((<span class="string">&quot;&quot;</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>((<span class="string">&quot;&quot;</span>, <span class="kw">_</span>)) =&gt; {
                 <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_source_validation_error</span>(
                     <span class="string">&quot;The provider argument in a datasource must not be empty&quot;</span>,
                     <span class="ident">source_name</span>,
@@ -388,7 +388,7 @@
                 ));
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_source_validation_error</span>(
                     <span class="string">&quot;The provider argument in a datasource must be a string literal&quot;</span>,
                     <span class="ident">source_name</span>,
@@ -396,12 +396,12 @@
                 ));
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
-            <span class="prelude-val">Some</span>((<span class="ident">provider</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">provider</span>,
+            <span class="prelude-val">Some</span>((<span class="ident">provider</span>, <span class="kw">_</span>)) =&gt; <span class="ident">provider</span>,
         };
 
         <span class="kw">let</span> <span class="ident">url_arg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">URL_KEY</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">url_arg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">url_arg</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">url_arg</span>) =&gt; <span class="ident">url_arg</span>,
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_source_argument_not_found_error</span>(
                     <span class="ident">URL_KEY</span>,
                     <span class="kw-2">&amp;</span><span class="ident">ast_source</span>.<span class="ident">name</span>.<span class="ident">name</span>,
@@ -412,8 +412,8 @@
         };
 
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">url_arg</span>.<span class="ident">as_str_from_env</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">str_from_env_var</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">str_from_env_var</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">str_from_env_var</span>) =&gt; <span class="ident">str_from_env_var</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                 <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
@@ -424,14 +424,14 @@
         <span class="kw">let</span> <span class="ident">shadow_database_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">StringFromEnvVar</span>, <span class="ident">Span</span>)<span class="op">&gt;</span> <span class="op">=</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shadow_database_url_arg</span>) <span class="op">=</span> <span class="ident">shadow_database_url_arg</span>.<span class="ident">as_ref</span>() {
                 <span class="kw">match</span> <span class="ident">shadow_database_url_arg</span>.<span class="ident">as_str_from_env</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">shadow_database_url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">shadow_database_url</span>)
+                    <span class="prelude-val">Ok</span>(<span class="ident">shadow_database_url</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">shadow_database_url</span>)
                         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">as_literal</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">lit</span><span class="op">|</span> <span class="ident">lit</span>.<span class="ident">is_empty</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>))
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">url</span><span class="op">|</span> (<span class="ident">url</span>, <span class="ident">shadow_database_url_arg</span>.<span class="ident">span</span>())),
 
                     <span class="comment">// We intentionally ignore the shadow database URL if it is defined in an env var that is missing.</span>
-                    <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::EnvironmentFunctionalEvaluationError</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::EnvironmentFunctionalEvaluationError</span> { .. }) =&gt; <span class="prelude-val">None</span>,
 
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                         <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
                         <span class="prelude-val">None</span>
                     }
@@ -446,15 +446,15 @@
         <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="ident">get_referential_integrity</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">preview_features</span>, <span class="ident">ast_source</span>, <span class="ident">diagnostics</span>);
 
         <span class="kw">let</span> <span class="ident">datasource_provider</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">DatasourceProvider</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">provider</span> {
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span> <span class="op">=</span><span class="op">=</span> <span class="ident">MYSQL_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">MySqlDatasourceProvider</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span> <span class="op">=</span><span class="op">=</span> <span class="ident">POSTGRES_SOURCE_NAME</span> <span class="op">|</span><span class="op">|</span> <span class="ident">p</span> <span class="op">=</span><span class="op">=</span> <span class="ident">POSTGRES_SOURCE_NAME_HEROKU</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">PostgresDatasourceProvider</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span> <span class="op">=</span><span class="op">=</span> <span class="ident">SQLITE_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">SqliteDatasourceProvider</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span> <span class="op">=</span><span class="op">=</span> <span class="ident">MSSQL_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">MsSqlDatasourceProvider</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span> <span class="op">=</span><span class="op">=</span> <span class="ident">MONGODB_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">MongoDbDatasourceProvider</span>,
-            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span> <span class="op">=</span><span class="op">=</span> <span class="ident">COCKROACHDB_SOURCE_NAME</span> <span class="op">&amp;&amp;</span> <span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::Cockroachdb</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span> <span class="op">==</span> <span class="ident">MYSQL_SOURCE_NAME</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">MySqlDatasourceProvider</span>,
+            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span> <span class="op">==</span> <span class="ident">POSTGRES_SOURCE_NAME</span> <span class="op">|</span><span class="op">|</span> <span class="ident">p</span> <span class="op">==</span> <span class="ident">POSTGRES_SOURCE_NAME_HEROKU</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">PostgresDatasourceProvider</span>,
+            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span> <span class="op">==</span> <span class="ident">SQLITE_SOURCE_NAME</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">SqliteDatasourceProvider</span>,
+            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span> <span class="op">==</span> <span class="ident">MSSQL_SOURCE_NAME</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">MsSqlDatasourceProvider</span>,
+            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span> <span class="op">==</span> <span class="ident">MONGODB_SOURCE_NAME</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">MongoDbDatasourceProvider</span>,
+            <span class="ident">p</span> <span class="kw">if</span> <span class="ident">p</span> <span class="op">==</span> <span class="ident">COCKROACHDB_SOURCE_NAME</span> <span class="op">&amp;&amp;</span> <span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::Cockroachdb</span>) =&gt; {
                 <span class="kw-2">&amp;</span><span class="ident">CockroachDbDatasourceProvider</span>
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> =&gt; {
                 <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_datasource_provider_not_known_error</span>(
                     <span class="ident">provider</span>,
                     <span class="ident">provider_arg</span>.<span class="ident">span</span>(),
@@ -524,7 +524,7 @@ generator client {
     <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
     <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">SourceConfig</span>,
     <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialIntegrity</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialIntegrity</span><span class="op">&gt;</span> {
     <span class="ident">args</span>.<span class="ident">get</span>(<span class="string">&quot;referentialIntegrity&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ReferentialIntegrity</span>) {
             <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_source_validation_error</span>(
@@ -536,9 +536,9 @@ generator client {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
             <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">as_str</span>() {
-                <span class="prelude-val">Ok</span>(<span class="string">&quot;prisma&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ReferentialIntegrity::Prisma</span>),
-                <span class="prelude-val">Ok</span>(<span class="string">&quot;foreignKeys&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ReferentialIntegrity::ForeignKeys</span>),
-                <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="string">&quot;prisma&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ReferentialIntegrity::Prisma</span>),
+                <span class="prelude-val">Ok</span>(<span class="string">&quot;foreignKeys&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ReferentialIntegrity::ForeignKeys</span>),
+                <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
                         <span class="string">&quot;Invalid referential integrity setting: \&quot;{}\&quot;. Supported values: \&quot;prisma\&quot;, \&quot;foreignKeys\&quot;&quot;</span>,
                         <span class="ident">s</span>
@@ -551,7 +551,7 @@ generator client {
 
                     <span class="prelude-val">None</span>
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">e</span>);
                     <span class="prelude-val">None</span>
                 }

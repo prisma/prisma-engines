@@ -126,7 +126,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">check_status</span>, <span class="ident">sys</span>, <span class="ident">Env</span>, <span class="ident">JsError</span>, <span class="ident">NapiRaw</span>, <span class="prelude-ty">Result</span>};
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FuturePromise</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>: <span class="ident">NapiRaw</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Env</span>, <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FuturePromise</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>: <span class="ident">NapiRaw</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Env</span>, <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> {
   <span class="ident">deferred</span>: <span class="ident">sys::napi_deferred</span>,
   <span class="ident">env</span>: <span class="ident">sys::napi_env</span>,
   <span class="ident">tsfn</span>: <span class="ident">sys::napi_threadsafe_function</span>,
@@ -136,11 +136,11 @@
   <span class="ident">_value</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>: <span class="ident">NapiRaw</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Env</span>, <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">FuturePromise</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>, <span class="ident">F</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>: <span class="ident">NapiRaw</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Env</span>, <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">FuturePromise</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>, <span class="ident">F</span><span class="op">&gt;</span> {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>: <span class="ident">NapiRaw</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Env</span>, <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">FuturePromise</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>, <span class="ident">F</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>: <span class="ident">NapiRaw</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Env</span>, <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">FuturePromise</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>, <span class="ident">F</span><span class="op">&gt;</span> {
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">raw_deferred</span>: <span class="ident">sys::napi_deferred</span>, <span class="ident">resolver</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">raw_deferred</span>: <span class="ident">sys::napi_deferred</span>, <span class="ident">resolver</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">async_resource_name</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
     <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">&quot;napi_resolve_promise_from_future&quot;</span>;
     <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
@@ -164,7 +164,7 @@
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TSFNValue</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TSFNValue</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tsfn_value</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
     <span class="kw">let</span> <span class="ident">async_resource_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">async_resource_name</span>;
     <span class="kw">let</span> <span class="ident">env</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">env</span>;
@@ -216,7 +216,7 @@
   .<span class="ident">expect</span>(<span class="string">&quot;Failed to release thread safe function&quot;</span>);
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">call_js_cb</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>: <span class="ident">NapiRaw</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Env</span>, <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">call_js_cb</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>: <span class="ident">NapiRaw</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Env</span>, <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span>(
   <span class="ident">raw_env</span>: <span class="ident">sys::napi_env</span>,
   <span class="ident">_js_callback</span>: <span class="ident">sys::napi_value</span>,
   <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
@@ -229,14 +229,14 @@
   <span class="kw">let</span> <span class="ident">deferred</span> <span class="op">=</span> <span class="ident">future_promise</span>.<span class="ident">deferred</span>;
   <span class="kw">let</span> <span class="ident">js_value_to_resolve</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">v</span><span class="op">|</span> (<span class="ident">resolver</span>)(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">env</span>, <span class="ident">v</span>));
   <span class="kw">match</span> <span class="ident">js_value_to_resolve</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    <span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; {
       <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">sys::napi_resolve_deferred</span>(<span class="ident">raw_env</span>, <span class="ident">deferred</span>, <span class="ident">v</span>.<span class="ident">raw</span>());
-      <span class="macro">debug_assert!</span>(<span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">sys::Status::napi_ok</span>, <span class="string">&quot;Resolve promise failed&quot;</span>);
+      <span class="macro">debug_assert!</span>(<span class="ident">status</span> <span class="op">==</span> <span class="ident">sys::Status::napi_ok</span>, <span class="string">&quot;Resolve promise failed&quot;</span>);
     }
-    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
       <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span>
         <span class="ident">sys::napi_reject_deferred</span>(<span class="ident">raw_env</span>, <span class="ident">deferred</span>, <span class="ident">JsError::from</span>(<span class="ident">e</span>).<span class="ident">into_value</span>(<span class="ident">raw_env</span>));
-      <span class="macro">debug_assert!</span>(<span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">sys::Status::napi_ok</span>, <span class="string">&quot;Reject promise failed&quot;</span>);
+      <span class="macro">debug_assert!</span>(<span class="ident">status</span> <span class="op">==</span> <span class="ident">sys::Status::napi_ok</span>, <span class="string">&quot;Reject promise failed&quot;</span>);
     }
   };
 }

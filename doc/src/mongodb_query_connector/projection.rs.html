@@ -20,7 +20,7 @@
 
 <span class="doccomment">/// Used as projection document for Mongo queries.</span>
 <span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> <span class="ident">ModelProjection</span> {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Document::new</span>();
 
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">scalar_fields</span>() {

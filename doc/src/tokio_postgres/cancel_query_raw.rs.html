@@ -40,7 +40,7 @@
     <span class="ident">tls</span>: <span class="ident">T</span>,
     <span class="ident">process_id</span>: <span class="ident">i32</span>,
     <span class="ident">secret_key</span>: <span class="ident">i32</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
     <span class="ident">T</span>: <span class="ident">TlsConnect</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,

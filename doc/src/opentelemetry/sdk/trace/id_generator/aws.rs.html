@@ -139,7 +139,7 @@
 
 <span class="kw">impl</span> <span class="ident">IdGenerator</span> <span class="kw">for</span> <span class="ident">XrayIdGenerator</span> {
     <span class="doccomment">/// Generates a new `TraceId` that can be converted to an X-Ray Trace ID</span>
-    <span class="kw">fn</span> <span class="ident">new_trace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TraceId</span> {
+    <span class="kw">fn</span> <span class="ident">new_trace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TraceId</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">default_trace_id</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;{:024x}&quot;</span>,
             <span class="self">self</span>.<span class="ident">sdk_default_generator</span>.<span class="ident">new_trace_id</span>().<span class="ident">to_u128</span>()
@@ -156,7 +156,7 @@
     }
 
     <span class="doccomment">/// Generates a new `SpanId` that can be converted to an X-Ray Segment ID</span>
-    <span class="kw">fn</span> <span class="ident">new_span_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SpanId</span> {
+    <span class="kw">fn</span> <span class="ident">new_span_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SpanId</span> {
         <span class="self">self</span>.<span class="ident">sdk_default_generator</span>.<span class="ident">new_span_id</span>()
     }
 }

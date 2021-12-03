@@ -62,7 +62,7 @@
 
 <span class="kw">impl</span> <span class="ident">ConfMethod</span> {
     <span class="doccomment">/// Retrieve handle to the default OpenSSL configuration file processing function.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConfMethod</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">ConfMethod</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">ffi::init</span>();
             <span class="comment">// `NCONF` stands for &quot;New Conf&quot;, as described in crypto/conf/conf_lib.c. This is</span>
@@ -76,12 +76,12 @@
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The caller must ensure that the pointer is valid.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_ptr</span>(<span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::CONF_METHOD</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConfMethod</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_ptr</span>(<span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::CONF_METHOD</span>) -&gt; <span class="ident">ConfMethod</span> {
         <span class="ident">ConfMethod</span>(<span class="ident">ptr</span>)
     }
 
     <span class="doccomment">/// Convert to raw pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::CONF_METHOD</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::CONF_METHOD</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -104,7 +104,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let conf = Conf::new(ConfMethod::default());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">method</span>: <span class="ident">ConfMethod</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Conf</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">method</span>: <span class="ident">ConfMethod</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Conf</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="ident">cvt_p</span>(<span class="ident">ffi::NCONF_new</span>(<span class="ident">method</span>.<span class="ident">as_ptr</span>())).<span class="ident">map</span>(<span class="ident">Conf</span>) }
     }
 }

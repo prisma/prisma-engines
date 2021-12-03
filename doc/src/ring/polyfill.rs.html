@@ -55,11 +55,11 @@
 <span class="doccomment">//! standard library soon.</span>
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">u64_from_usize</span>(<span class="ident">x</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">u64_from_usize</span>(<span class="ident">x</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
     <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">usize_from_u32</span>(<span class="ident">x</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">usize_from_u32</span>(<span class="ident">x</span>: <span class="ident">u32</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span>
 }
 

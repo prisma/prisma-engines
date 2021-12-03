@@ -3,7 +3,7 @@
 <p>You can use this crate to turn non-blocking data structures into async or blocking data
 structures. See a <a href="https://github.com/stjepang/event-listener/blob/master/examples/mutex.rs">simple mutex</a> implementation that exposes an async and a blocking interface
 for acquiring locks.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>Wait until another thread sets a boolean flag:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
@@ -51,8 +51,8 @@ for acquiring locks.</p>
     <span class="ident">listener</span>.<span class="ident">wait</span>();
 }</code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Event.html" title="event_listener::Event struct">Event</a></div><div class="item-right docblock-short"><p>A synchronization primitive for notifying async tasks and threads.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.EventListener.html" title="event_listener::EventListener struct">EventListener</a></div><div class="item-right docblock-short"><p>A guard waiting for a notification from an <a href="struct.Event.html" title="Event"><code>Event</code></a>.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="event_listener" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Event.html" title="event_listener::Event struct">Event</a></div><div class="item-right docblock-short"><p>A synchronization primitive for notifying async tasks and threads.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.EventListener.html" title="event_listener::EventListener struct">EventListener</a></div><div class="item-right docblock-short"><p>A guard waiting for a notification from an <a href="struct.Event.html" title="Event"><code>Event</code></a>.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="event_listener" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

@@ -109,7 +109,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mantissa</span><span class="op">&gt;</span> <span class="ident">ExtendedFloatArray</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="macro">perftools_inline!</span>{
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_extended_float</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+        -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="kw">let</span> <span class="ident">mant</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mant</span>[<span class="ident">index</span>];
         <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exp</span>[<span class="ident">index</span>];
@@ -117,7 +117,7 @@
     }}
 
     <span class="macro">perftools_inline!</span>{
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">mant</span>.<span class="ident">len</span>()
     }}
 }
@@ -142,17 +142,17 @@
 <span class="doccomment">/// Allow indexing of values without bounds checking</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mantissa</span><span class="op">&gt;</span> <span class="ident">ModeratePathPowers</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="macro">perftools_inline!</span>{
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_small</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_small</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">small</span>.<span class="ident">get_extended_float</span>(<span class="ident">index</span>)
     }}
 
     <span class="macro">perftools_inline!</span>{
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_large</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_large</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">large</span>.<span class="ident">get_extended_float</span>(<span class="ident">index</span>)
     }}
 
     <span class="macro">perftools_inline!</span>{
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_small_int</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">M</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_small_int</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">M</span> {
         <span class="self">self</span>.<span class="ident">small_int</span>[<span class="ident">index</span>]
     }}
 }
@@ -162,19 +162,19 @@
 <span class="doccomment">/// Cached powers as a trait for a floating-point type.</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait</span> <span class="ident">ModeratePathCache</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mantissa</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Get powers from radix.</span>
-    <span class="kw">fn</span> <span class="ident">get_powers</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ModeratePathPowers</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">get_powers</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ModeratePathPowers</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">ModeratePathCache</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
     <span class="macro">perftools_inline!</span>{
-    <span class="kw">fn</span> <span class="ident">get_powers</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ModeratePathPowers</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_powers</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ModeratePathPowers</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="ident">cached_float80::get_powers</span>(<span class="ident">radix</span>)
     }}
 }
 
 <span class="kw">impl</span> <span class="ident">ModeratePathCache</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> {
     <span class="macro">perftools_inline!</span>{
-    <span class="kw">fn</span> <span class="ident">get_powers</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ModeratePathPowers</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_powers</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ModeratePathPowers</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> {
         <span class="ident">cached_float160::get_powers</span>(<span class="ident">radix</span>)
     }}
 }

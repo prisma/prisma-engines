@@ -91,7 +91,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RecordSelection</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QueryResult</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selection</span>: <span class="ident">RecordSelection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selection</span>: <span class="ident">RecordSelection</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">QueryResult::RecordSelection</span>(<span class="ident">Box::new</span>(<span class="ident">selection</span>))
     }
 }

@@ -39,7 +39,7 @@
 <span class="kw">impl</span> <span class="ident">Sender</span> {
     <span class="doccomment">/// Create a new instance of `Sender`.</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">sender</span>: <span class="ident">async_channel::Sender</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">sender</span>: <span class="ident">async_channel::Sender</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">sender</span> }
     }
 

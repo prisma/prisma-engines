@@ -370,12 +370,12 @@ Context: {context}
 <span class="kw">impl</span> <span class="ident">UserFacingError</span> <span class="kw">for</span> <span class="ident">DatabaseDoesNotExist</span> {
     <span class="kw">const</span> <span class="ident">ERROR_CODE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;P1003&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">DatabaseDoesNotExist::Sqlite</span> {
                 <span class="ident">database_file_name</span>,
                 <span class="ident">database_file_path</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
+            } =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;Database {database_file_name} does not exist at {database_file_path}&quot;</span>,
                 <span class="ident">database_file_name</span> <span class="op">=</span> <span class="ident">database_file_name</span>,
                 <span class="ident">database_file_path</span> <span class="op">=</span> <span class="ident">database_file_path</span>
@@ -385,7 +385,7 @@ Context: {context}
                 <span class="ident">database_schema_name</span>,
                 <span class="ident">database_host</span>,
                 <span class="ident">database_port</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
+            } =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;Database `{database_name}.{database_schema_name}` does not exist on the database server at `{database_host}:{database_port}`.&quot;</span>,
                 <span class="ident">database_name</span> <span class="op">=</span> <span class="ident">database_name</span>,
                 <span class="ident">database_schema_name</span> <span class="op">=</span> <span class="ident">database_schema_name</span>,
@@ -396,7 +396,7 @@ Context: {context}
                 <span class="ident">database_name</span>,
                 <span class="ident">database_host</span>,
                 <span class="ident">database_port</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
+            } =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.&quot;</span>,
                 <span class="ident">database_name</span> <span class="op">=</span> <span class="ident">database_name</span>,
                 <span class="ident">database_host</span> <span class="op">=</span> <span class="ident">database_host</span>,
@@ -406,7 +406,7 @@ Context: {context}
                 <span class="ident">database_name</span>,
                 <span class="ident">database_host</span>,
                 <span class="ident">database_port</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
+            } =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.&quot;</span>,
                 <span class="ident">database_name</span> <span class="op">=</span> <span class="ident">database_name</span>,
                 <span class="ident">database_host</span> <span class="op">=</span> <span class="ident">database_host</span>,
@@ -481,9 +481,9 @@ Context: {context}
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ModelKind</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Table</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;table&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Table</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;table&quot;</span>),
         }
     }
 }

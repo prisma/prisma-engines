@@ -81,34 +81,34 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">TemplatingError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Error parsing ident `{}`: {}&quot;</span>, <span class="self">self</span>.<span class="ident">ident</span>, <span class="self">self</span>.<span class="ident">kind</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">TemplatingError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_args</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">expected</span>: <span class="ident">usize</span>, <span class="ident">got</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_args</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">expected</span>: <span class="ident">usize</span>, <span class="ident">got</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ident</span>: <span class="ident">ident</span>.<span class="ident">to_owned</span>(),
             <span class="ident">kind</span>: <span class="ident">TemplatingErrorKind::NumArgsError</span> { <span class="ident">expected</span>, <span class="ident">got</span> },
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unknown_ident</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unknown_ident</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ident</span>: <span class="ident">ident</span>.<span class="ident">to_owned</span>(),
             <span class="ident">kind</span>: <span class="ident">TemplatingErrorKind::UnknownIdentError</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nom_error</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">reason</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nom_error</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">reason</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ident</span>: <span class="ident">ident</span>.<span class="ident">to_owned</span>(),
             <span class="ident">kind</span>: <span class="ident">TemplatingErrorKind::NomError</span>(<span class="ident">reason</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">argument_error</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">reason</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">argument_error</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">reason</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ident</span>: <span class="ident">ident</span>.<span class="ident">to_owned</span>(),
             <span class="ident">kind</span>: <span class="ident">TemplatingErrorKind::ArgumentError</span>(<span class="ident">reason</span>),
@@ -135,7 +135,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Display</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">NomError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">NomError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ident</span>: <span class="string">&quot;Unknown&quot;</span>.<span class="ident">to_owned</span>(),
             <span class="ident">kind</span>: <span class="ident">TemplatingErrorKind::NomError</span>(<span class="ident">err</span>.<span class="ident">to_string</span>()),

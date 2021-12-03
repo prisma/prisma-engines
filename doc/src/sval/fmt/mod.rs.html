@@ -109,7 +109,7 @@ a `Debug` implementation that might exist on the type.
 
 This method doesn&#39;t need to allocate or perform any buffering.
 */</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_debug</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ToDebug</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_debug</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="ident">ToDebug</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">V</span>: <span class="ident">Value</span>,
 {
@@ -119,7 +119,7 @@ This method doesn&#39;t need to allocate or perform any buffering.
 <span class="doccomment">/**
 Format a [`Value`] using the given [`Formatter`].
 */</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Value</span>) -&gt; <span class="ident">fmt::Result</span> {
     <span class="ident">to_debug</span>(<span class="ident">value</span>).<span class="ident">fmt</span>(<span class="ident">f</span>)
 }
 </code></pre></div>

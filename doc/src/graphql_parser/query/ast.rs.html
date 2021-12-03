@@ -150,7 +150,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Document</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_static</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Document</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_static</span>(<span class="self">self</span>) -&gt; <span class="ident">Document</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// To support both reference and owned values in the AST,</span>
         <span class="comment">// all string data is represented with the ::common::Str&lt;&#39;a, T: Text&lt;&#39;a&gt;&gt; </span>
         <span class="comment">// wrapper type.</span>

@@ -447,13 +447,13 @@
     <span class="doccomment">/// # Ok(()) }) }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::with_state</span>(())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Server</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
@@ -494,7 +494,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # Ok(()) }) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_state</span>(<span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_state</span>(<span class="ident">state</span>: <span class="ident">State</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">router</span>: <span class="ident">Arc::new</span>(<span class="ident">Router::new</span>()),
             <span class="ident">middleware</span>: <span class="ident">Arc::new</span>(<span class="macro">vec!</span>[
@@ -553,7 +553,7 @@
     <span class="doccomment">/// There is no fallback route matching, i.e. either a resource is a full</span>
     <span class="doccomment">/// match or not, which means that the order of adding resources has no</span>
     <span class="doccomment">/// effect.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Route</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">State</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Route</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">State</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">router</span> <span class="op">=</span> <span class="ident">Arc::get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">router</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;Registering routes is not possible after the Server has started&quot;</span>);
         <span class="ident">Route::new</span>(<span class="ident">router</span>, <span class="ident">path</span>.<span class="ident">to_owned</span>())
@@ -568,7 +568,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Middleware can only be added at the &quot;top level&quot; of an application, and is processed in the</span>
     <span class="doccomment">/// order in which it is applied.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">middleware</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">middleware</span>: <span class="ident">M</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>,
     {
@@ -596,7 +596,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # Ok(()) }) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">listen</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">ToListener</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">listener</span>: <span class="ident">L</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">listen</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">ToListener</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">listener</span>: <span class="ident">L</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">listener</span>.<span class="ident">to_listener</span>()<span class="question-mark">?</span>;
         <span class="ident">listener</span>.<span class="ident">bind</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">for</span> <span class="ident">info</span> <span class="kw">in</span> <span class="ident">listener</span>.<span class="ident">info</span>().<span class="ident">iter</span>() {
@@ -638,7 +638,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bind</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">ToListener</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
         <span class="ident">listener</span>: <span class="ident">L</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">ToListener</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Listener</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">L</span> <span class="kw">as</span> <span class="ident">ToListener</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Listener</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">listener</span>.<span class="ident">to_listener</span>()<span class="question-mark">?</span>;
         <span class="ident">listener</span>.<span class="ident">bind</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">listener</span>)
@@ -667,7 +667,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # Ok(()) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">respond</span><span class="op">&lt;</span><span class="ident">Req</span>, <span class="ident">Res</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Req</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">http_types::Result</span><span class="op">&lt;</span><span class="ident">Res</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">respond</span><span class="op">&lt;</span><span class="ident">Req</span>, <span class="ident">Res</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Req</span>) -&gt; <span class="ident">http_types::Result</span><span class="op">&lt;</span><span class="ident">Res</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Req</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">http_types::Request</span><span class="op">&gt;</span>,
         <span class="ident">Res</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">http_types::Response</span><span class="op">&gt;</span>,
@@ -705,19 +705,19 @@
     <span class="doccomment">/// admin.at(&quot;/&quot;).get(|_| async { Ok(&quot;nested app with cloned state&quot;) });</span>
     <span class="doccomment">/// app.at(&quot;/&quot;).nest(admin);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">State</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">State</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">State</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Server&quot;</span>).<span class="ident">finish</span>()
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">State</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">router</span>: <span class="self">self</span>.<span class="ident">router</span>.<span class="ident">clone</span>(),
             <span class="ident">state</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">clone</span>(),
@@ -730,7 +730,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">State</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>, <span class="ident">InnerState</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>
     <span class="ident">Endpoint</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">InnerState</span><span class="op">&gt;</span>
 {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span> {
         <span class="kw">let</span> <span class="ident">Request</span> {
             <span class="ident">req</span>,
             <span class="kw-2">mut</span> <span class="ident">route_params</span>,
@@ -757,7 +757,7 @@
 
 <span class="attribute">#[<span class="ident"><span class="kw">crate</span>::utils::async_trait</span>]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">State</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">http_client::HttpClient</span> <span class="kw">for</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident"><span class="kw">crate</span>::http::Request</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::http::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::http::Response</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident"><span class="kw">crate</span>::http::Request</span>) -&gt; <span class="ident"><span class="kw">crate</span>::http::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::http::Response</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">respond</span>(<span class="ident">req</span>).<span class="kw">await</span>
     }
 }

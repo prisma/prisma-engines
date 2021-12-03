@@ -450,73 +450,73 @@
 ];
 
 <span class="kw">impl</span> <span class="ident">Connector</span> <span class="kw">for</span> <span class="ident">PostgresDatamodelConnector</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="string">&quot;Postgres&quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConnectorCapability</span>] {
+    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConnectorCapability</span>] {
         <span class="ident">CAPABILITIES</span>
     }
 
     <span class="doccomment">/// The maximum length of postgres identifiers, in bytes.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Reference: &lt;https://www.postgresql.org/docs/12/limits.html&gt;</span>
-    <span class="kw">fn</span> <span class="ident">constraint_name_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">constraint_name_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="number">63</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">referential_integrity</span>: <span class="kw-2">&amp;</span><span class="ident">ReferentialIntegrity</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">referential_integrity</span>: <span class="kw-2">&amp;</span><span class="ident">ReferentialIntegrity</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
 
         <span class="ident">referential_integrity</span>.<span class="ident">allowed_referential_actions</span>(<span class="ident">NoAction</span> <span class="op">|</span> <span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">Cascade</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">SetDefault</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ScalarType</span> {
+    <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="ident">ScalarType</span> {
         <span class="kw">let</span> <span class="ident">native_type</span>: <span class="ident">PostgresType</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">native_type</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">match</span> <span class="ident">native_type</span> {
             <span class="comment">//String</span>
-            <span class="ident">Text</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::String</span>,
-            <span class="ident">Char</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::String</span>,
-            <span class="ident">VarChar</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::String</span>,
-            <span class="ident">Bit</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::String</span>,
-            <span class="ident">VarBit</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::String</span>,
-            <span class="ident">Uuid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::String</span>,
-            <span class="ident">Xml</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::String</span>,
-            <span class="ident">Inet</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::String</span>,
-            <span class="ident">Citext</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::String</span>,
+            <span class="ident">Text</span> =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">Char</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">VarBit</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">Uuid</span> =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">Xml</span> =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">Inet</span> =&gt; <span class="ident">ScalarType::String</span>,
+            <span class="ident">Citext</span> =&gt; <span class="ident">ScalarType::String</span>,
             <span class="comment">//Boolean</span>
-            <span class="ident">Boolean</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::Boolean</span>,
+            <span class="ident">Boolean</span> =&gt; <span class="ident">ScalarType::Boolean</span>,
             <span class="comment">//Int</span>
-            <span class="ident">SmallInt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::Int</span>,
-            <span class="ident">Integer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::Int</span>,
-            <span class="ident">Oid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::Int</span>,
+            <span class="ident">SmallInt</span> =&gt; <span class="ident">ScalarType::Int</span>,
+            <span class="ident">Integer</span> =&gt; <span class="ident">ScalarType::Int</span>,
+            <span class="ident">Oid</span> =&gt; <span class="ident">ScalarType::Int</span>,
             <span class="comment">//BigInt</span>
-            <span class="ident">BigInt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::BigInt</span>,
+            <span class="ident">BigInt</span> =&gt; <span class="ident">ScalarType::BigInt</span>,
             <span class="comment">//Float</span>
-            <span class="ident">Real</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::Float</span>,
-            <span class="ident">DoublePrecision</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::Float</span>,
+            <span class="ident">Real</span> =&gt; <span class="ident">ScalarType::Float</span>,
+            <span class="ident">DoublePrecision</span> =&gt; <span class="ident">ScalarType::Float</span>,
             <span class="comment">//Decimal</span>
-            <span class="ident">Decimal</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::Decimal</span>,
-            <span class="ident">Money</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::Float</span>,
+            <span class="ident">Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::Decimal</span>,
+            <span class="ident">Money</span> =&gt; <span class="ident">ScalarType::Float</span>,
             <span class="comment">//DateTime</span>
-            <span class="ident">Timestamp</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">Timestamptz</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">Date</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">Time</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">Timetz</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::DateTime</span>,
+            <span class="ident">Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
+            <span class="ident">Timestamptz</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
+            <span class="ident">Date</span> =&gt; <span class="ident">ScalarType::DateTime</span>,
+            <span class="ident">Time</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
+            <span class="ident">Timetz</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
             <span class="comment">//Json</span>
-            <span class="ident">Json</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::Json</span>,
-            <span class="ident">JsonB</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::Json</span>,
+            <span class="ident">Json</span> =&gt; <span class="ident">ScalarType::Json</span>,
+            <span class="ident">JsonB</span> =&gt; <span class="ident">ScalarType::Json</span>,
             <span class="comment">//Bytes</span>
-            <span class="ident">ByteA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ScalarType::Bytes</span>,
+            <span class="ident">ByteA</span> =&gt; <span class="ident">ScalarType::Bytes</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">serde_json::Value</span> {
+    <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">serde_json::Value</span> {
         <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">SCALAR_TYPE_DEFAULTS</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">st</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">st</span> <span class="op">=</span><span class="op">=</span> <span class="ident">scalar_type</span>)
+            .<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">st</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">st</span> <span class="op">==</span> <span class="ident">scalar_type</span>)
             .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">native_type</span>)<span class="op">|</span> <span class="ident">native_type</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS&quot;</span>, <span class="ident">scalar_type</span>))
             .<span class="ident">unwrap</span>();
@@ -524,12 +524,12 @@
         <span class="ident">serde_json::to_value</span>(<span class="ident">native_type</span>).<span class="ident">expect</span>(<span class="string">&quot;PostgresType to JSON failed&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">native_type_is_default_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>, <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">native_type_is_default_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>, <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">native_type</span>: <span class="ident">PostgresType</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">native_type</span>).<span class="ident">expect</span>(<span class="string">&quot;PostgresType from JSON failed&quot;</span>);
 
         <span class="ident">SCALAR_TYPE_DEFAULTS</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">st</span>, <span class="ident">nt</span>)<span class="op">|</span> <span class="ident">scalar_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">st</span> <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">native_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">nt</span>)
+            .<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">st</span>, <span class="ident">nt</span>)<span class="op">|</span> <span class="ident">scalar_type</span> <span class="op">==</span> <span class="ident">st</span> <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">native_type</span> <span class="op">==</span> <span class="ident">nt</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">validate_native_type_arguments</span>(
@@ -542,19 +542,19 @@
         <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">native_instance_error</span>(<span class="ident">native_type_instance</span>);
 
         <span class="kw">match</span> <span class="ident">native_type</span> {
-            <span class="ident">Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">precision</span>, <span class="ident">scale</span>))) <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&gt;</span> <span class="ident">precision</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">precision</span>, <span class="ident">scale</span>))) <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&gt;</span> <span class="ident">precision</span> =&gt; {
                 <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_scale_larger_than_precision_error</span>())
             }
-            <span class="ident">Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">prec</span>, <span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">prec</span> <span class="op">&gt;</span> <span class="number">1000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">prec</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">errors</span>.<span class="ident">push</span>(
+            <span class="ident">Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">prec</span>, <span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">prec</span> <span class="op">&gt;</span> <span class="number">1000</span> <span class="op">|</span><span class="op">|</span> <span class="ident">prec</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">errors</span>.<span class="ident">push</span>(
                 <span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;Precision must be positive with a maximum value of 1000.&quot;</span>),
             ),
-            <span class="ident">Bit</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)) <span class="op">|</span> <span class="ident">VarBit</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Bit</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)) <span class="op">|</span> <span class="ident">VarBit</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; {
                 <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M must be a positive integer.&quot;</span>))
             }
-            <span class="ident">Timestamp</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="op">|</span> <span class="ident">Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="op">|</span> <span class="ident">Time</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="op">|</span> <span class="ident">Timetz</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="kw">if</span> <span class="ident">p</span> <span class="op">&gt;</span> <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Timestamp</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="op">|</span> <span class="ident">Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="op">|</span> <span class="ident">Time</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="op">|</span> <span class="ident">Timetz</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="kw">if</span> <span class="ident">p</span> <span class="op">&gt;</span> <span class="number">6</span> =&gt; {
                 <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M can range from 0 to 6.&quot;</span>))
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="kw">_</span> =&gt; (),
         }
     }
 
@@ -570,7 +570,7 @@
                     <span class="kw">let</span> <span class="ident">r#type</span>: <span class="ident">PostgresType</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">deserialize_native_type</span>();
                     <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="ident">native_type</span>);
 
-                    <span class="kw">if</span> <span class="ident">r#type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">PostgresType::Xml</span> {
+                    <span class="kw">if</span> <span class="ident">r#type</span> <span class="op">==</span> <span class="ident">PostgresType::Xml</span> {
                         <span class="kw">if</span> <span class="ident">index_definition</span>.<span class="ident">is_unique</span>() {
                             <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_unique</span>())
                         } <span class="kw">else</span> {
@@ -584,79 +584,79 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConstraintScope</span>] {
+    <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConstraintScope</span>] {
         <span class="ident">CONSTRAINT_SCOPES</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">NativeTypeConstructor</span>] {
+    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">NativeTypeConstructor</span>] {
         <span class="ident">NATIVE_TYPE_CONSTRUCTORS</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cloned_args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">clone</span>();
 
         <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="ident">SMALL_INT_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SmallInt</span>,
-            <span class="ident">INTEGER_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Integer</span>,
-            <span class="ident">BIG_INT_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BigInt</span>,
-            <span class="ident">DECIMAL_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Decimal</span>(<span class="ident">parse_two_opt_u32</span>(<span class="ident">args</span>, <span class="ident">DECIMAL_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">INET_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Inet</span>,
-            <span class="ident">MONEY_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Money</span>,
-            <span class="ident">CITEXT_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Citext</span>,
-            <span class="ident">OID_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Oid</span>,
-            <span class="ident">REAL_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Real</span>,
-            <span class="ident">DOUBLE_PRECISION_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DoublePrecision</span>,
-            <span class="ident">VARCHAR_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">VarChar</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">VARCHAR_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">CHAR_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Char</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">CHAR_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">TEXT_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Text</span>,
-            <span class="ident">BYTE_A_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ByteA</span>,
-            <span class="ident">TIMESTAMP_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Timestamp</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIMESTAMP_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">TIMESTAMP_TZ_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Timestamptz</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIMESTAMP_TZ_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">DATE_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Date</span>,
-            <span class="ident">TIME_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Time</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIME_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">TIME_TZ_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Timetz</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIME_TZ_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">BOOLEAN_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Boolean</span>,
-            <span class="ident">BIT_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bit</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">BIT_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">VAR_BIT_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">VarBit</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">VAR_BIT_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">UUID_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Uuid</span>,
-            <span class="ident">XML_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Xml</span>,
-            <span class="ident">JSON_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Json</span>,
-            <span class="ident">JSON_B_TYPE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">JsonB</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::new_native_type_parser_error</span>(<span class="ident">name</span>)),
+            <span class="ident">SMALL_INT_TYPE_NAME</span> =&gt; <span class="ident">SmallInt</span>,
+            <span class="ident">INTEGER_TYPE_NAME</span> =&gt; <span class="ident">Integer</span>,
+            <span class="ident">BIG_INT_TYPE_NAME</span> =&gt; <span class="ident">BigInt</span>,
+            <span class="ident">DECIMAL_TYPE_NAME</span> =&gt; <span class="ident">Decimal</span>(<span class="ident">parse_two_opt_u32</span>(<span class="ident">args</span>, <span class="ident">DECIMAL_TYPE_NAME</span>)<span class="question-mark">?</span>),
+            <span class="ident">INET_TYPE_NAME</span> =&gt; <span class="ident">Inet</span>,
+            <span class="ident">MONEY_TYPE_NAME</span> =&gt; <span class="ident">Money</span>,
+            <span class="ident">CITEXT_TYPE_NAME</span> =&gt; <span class="ident">Citext</span>,
+            <span class="ident">OID_TYPE_NAME</span> =&gt; <span class="ident">Oid</span>,
+            <span class="ident">REAL_TYPE_NAME</span> =&gt; <span class="ident">Real</span>,
+            <span class="ident">DOUBLE_PRECISION_TYPE_NAME</span> =&gt; <span class="ident">DoublePrecision</span>,
+            <span class="ident">VARCHAR_TYPE_NAME</span> =&gt; <span class="ident">VarChar</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">VARCHAR_TYPE_NAME</span>)<span class="question-mark">?</span>),
+            <span class="ident">CHAR_TYPE_NAME</span> =&gt; <span class="ident">Char</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">CHAR_TYPE_NAME</span>)<span class="question-mark">?</span>),
+            <span class="ident">TEXT_TYPE_NAME</span> =&gt; <span class="ident">Text</span>,
+            <span class="ident">BYTE_A_TYPE_NAME</span> =&gt; <span class="ident">ByteA</span>,
+            <span class="ident">TIMESTAMP_TYPE_NAME</span> =&gt; <span class="ident">Timestamp</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIMESTAMP_TYPE_NAME</span>)<span class="question-mark">?</span>),
+            <span class="ident">TIMESTAMP_TZ_TYPE_NAME</span> =&gt; <span class="ident">Timestamptz</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIMESTAMP_TZ_TYPE_NAME</span>)<span class="question-mark">?</span>),
+            <span class="ident">DATE_TYPE_NAME</span> =&gt; <span class="ident">Date</span>,
+            <span class="ident">TIME_TYPE_NAME</span> =&gt; <span class="ident">Time</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIME_TYPE_NAME</span>)<span class="question-mark">?</span>),
+            <span class="ident">TIME_TZ_TYPE_NAME</span> =&gt; <span class="ident">Timetz</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIME_TZ_TYPE_NAME</span>)<span class="question-mark">?</span>),
+            <span class="ident">BOOLEAN_TYPE_NAME</span> =&gt; <span class="ident">Boolean</span>,
+            <span class="ident">BIT_TYPE_NAME</span> =&gt; <span class="ident">Bit</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">BIT_TYPE_NAME</span>)<span class="question-mark">?</span>),
+            <span class="ident">VAR_BIT_TYPE_NAME</span> =&gt; <span class="ident">VarBit</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">VAR_BIT_TYPE_NAME</span>)<span class="question-mark">?</span>),
+            <span class="ident">UUID_TYPE_NAME</span> =&gt; <span class="ident">Uuid</span>,
+            <span class="ident">XML_TYPE_NAME</span> =&gt; <span class="ident">Xml</span>,
+            <span class="ident">JSON_TYPE_NAME</span> =&gt; <span class="ident">Json</span>,
+            <span class="ident">JSON_B_TYPE_NAME</span> =&gt; <span class="ident">JsonB</span>,
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::new_native_type_parser_error</span>(<span class="ident">name</span>)),
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">name</span>, <span class="ident">cloned_args</span>, <span class="kw-2">&amp;</span><span class="ident">native_type</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">native_type</span>: <span class="ident">PostgresType</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">native_type</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> (<span class="ident">constructor_name</span>, <span class="ident">args</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">native_type</span> {
-            <span class="ident">SmallInt</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">SMALL_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Integer</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">INTEGER_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">BigInt</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">BIG_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Decimal</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">DECIMAL_TYPE_NAME</span>, <span class="ident">args_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Real</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">REAL_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">DoublePrecision</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">DOUBLE_PRECISION_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">VarChar</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">VARCHAR_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Char</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">CHAR_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Text</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">TEXT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">ByteA</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">BYTE_A_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Timestamp</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">TIMESTAMP_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Timestamptz</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">TIMESTAMP_TZ_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Date</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">DATE_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Time</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">TIME_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Timetz</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">TIME_TZ_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Boolean</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">BOOLEAN_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Bit</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">BIT_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">VarBit</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">VAR_BIT_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
-            <span class="ident">Uuid</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">UUID_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Xml</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">XML_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Json</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">JSON_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">JsonB</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">JSON_B_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Money</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">MONEY_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Inet</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">INET_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Citext</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">CITEXT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
-            <span class="ident">Oid</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">OID_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">SmallInt</span> =&gt; (<span class="ident">SMALL_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">Integer</span> =&gt; (<span class="ident">INTEGER_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">BigInt</span> =&gt; (<span class="ident">BIG_INT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">Decimal</span>(<span class="ident">x</span>) =&gt; (<span class="ident">DECIMAL_TYPE_NAME</span>, <span class="ident">args_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">Real</span> =&gt; (<span class="ident">REAL_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">DoublePrecision</span> =&gt; (<span class="ident">DOUBLE_PRECISION_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">VarChar</span>(<span class="ident">x</span>) =&gt; (<span class="ident">VARCHAR_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">Char</span>(<span class="ident">x</span>) =&gt; (<span class="ident">CHAR_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">Text</span> =&gt; (<span class="ident">TEXT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">ByteA</span> =&gt; (<span class="ident">BYTE_A_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">Timestamp</span>(<span class="ident">x</span>) =&gt; (<span class="ident">TIMESTAMP_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">Timestamptz</span>(<span class="ident">x</span>) =&gt; (<span class="ident">TIMESTAMP_TZ_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">Date</span> =&gt; (<span class="ident">DATE_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">Time</span>(<span class="ident">x</span>) =&gt; (<span class="ident">TIME_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">Timetz</span>(<span class="ident">x</span>) =&gt; (<span class="ident">TIME_TZ_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">Boolean</span> =&gt; (<span class="ident">BOOLEAN_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">Bit</span>(<span class="ident">x</span>) =&gt; (<span class="ident">BIT_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">VarBit</span>(<span class="ident">x</span>) =&gt; (<span class="ident">VAR_BIT_TYPE_NAME</span>, <span class="ident">arg_vec_from_opt</span>(<span class="ident">x</span>)),
+            <span class="ident">Uuid</span> =&gt; (<span class="ident">UUID_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">Xml</span> =&gt; (<span class="ident">XML_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">Json</span> =&gt; (<span class="ident">JSON_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">JsonB</span> =&gt; (<span class="ident">JSON_B_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">Money</span> =&gt; (<span class="ident">MONEY_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">Inet</span> =&gt; (<span class="ident">INET_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">Citext</span> =&gt; (<span class="ident">CITEXT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
+            <span class="ident">Oid</span> =&gt; (<span class="ident">OID_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">constructor</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_native_type_constructor</span>(<span class="ident">constructor_name</span>) {
@@ -666,7 +666,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">validate_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">url</span>.<span class="ident">starts_with</span>(<span class="string">&quot;postgres://&quot;</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">url</span>.<span class="ident">starts_with</span>(<span class="string">&quot;postgresql://&quot;</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;must start with the protocol `postgresql://` or `postgres://`.&quot;</span>.<span class="ident">to_owned</span>());
         }

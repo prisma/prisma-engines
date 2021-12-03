@@ -138,12 +138,12 @@
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
     <span class="ident">model</span>: <span class="ident">ModelRef</span>,
     <span class="kw-2">mut</span> <span class="ident">field</span>: <span class="ident">ParsedField</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">graph</span>.<span class="ident">flag_transactional</span>();
 
     <span class="kw">let</span> <span class="ident">data_map</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::DATA</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">data</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ParsedInputMap::new</span>(),
+        <span class="prelude-val">Some</span>(<span class="ident">data</span>) =&gt; <span class="ident">data</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="ident">ParsedInputMap::new</span>(),
     };
 
     <span class="kw">let</span> <span class="ident">create_node</span> <span class="op">=</span> <span class="ident">create::create_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>), <span class="ident">data_map</span>)<span class="question-mark">?</span>;
@@ -160,8 +160,8 @@
             <span class="ident">model</span>.<span class="ident">primary_identifier</span>(),
             <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">read_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_ids</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_ids</span>.<span class="ident">pop</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">pid</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::AssertionError</span>(
+                    <span class="prelude-val">Some</span>(<span class="ident">pid</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::AssertionError</span>(
                         <span class="string">&quot;Expected a valid parent ID to be present for create follow-up read query.&quot;</span>.<span class="ident">to_string</span>(),
                     )),
                 }<span class="question-mark">?</span>;
@@ -185,17 +185,17 @@
     <span class="ident">_connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
     <span class="ident">model</span>: <span class="ident">ModelRef</span>,
     <span class="kw-2">mut</span> <span class="ident">field</span>: <span class="ident">ParsedField</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">graph</span>.<span class="ident">flag_transactional</span>();
 
     <span class="kw">let</span> <span class="ident">data_list</span>: <span class="ident">ParsedInputList</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::DATA</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">data</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
+        <span class="prelude-val">Some</span>(<span class="ident">data</span>) =&gt; <span class="ident">data</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
     };
 
     <span class="kw">let</span> <span class="ident">skip_duplicates</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::SKIP_DUPLICATES</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">arg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">arg</span>) =&gt; <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
     };
 
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">data_list</span>
@@ -225,7 +225,7 @@
     <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
     <span class="ident">model</span>: <span class="ident">ModelRef</span>,
     <span class="ident">data_map</span>: <span class="ident">ParsedInputMap</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">create_args</span> <span class="op">=</span> <span class="ident">WriteArgsParser::from</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">create_args</span>.<span class="ident">args</span>;
 

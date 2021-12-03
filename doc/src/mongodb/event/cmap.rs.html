@@ -341,7 +341,7 @@
 <span class="doccomment">/// even present). To facilitate populating the address field with an empty value when</span>
 <span class="doccomment">/// deserializing, we define a private `empty_address` function that the events can specify as the</span>
 <span class="doccomment">/// custom deserialization value for each address field.</span>
-<span class="kw">fn</span> <span class="ident">empty_address</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServerAddress</span> {
+<span class="kw">fn</span> <span class="ident">empty_address</span>() -&gt; <span class="ident">ServerAddress</span> {
     <span class="ident">ServerAddress::Tcp</span> {
         <span class="ident">host</span>: <span class="ident">Default::default</span>(),
         <span class="ident">port</span>: <span class="prelude-val">None</span>,
@@ -566,7 +566,7 @@
 
 <span class="doccomment">/// The default connection ID to use for deserialization of events from test files.</span>
 <span class="doccomment">/// This value will &quot;match&quot; any connection ID.</span>
-<span class="kw">fn</span> <span class="ident">default_connection_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">fn</span> <span class="ident">default_connection_id</span>() -&gt; <span class="ident">u32</span> {
     <span class="number">42</span>
 }
 

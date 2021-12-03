@@ -187,69 +187,69 @@
 }
 
 <span class="doccomment">/// Returns whether a buffer is Microsoft Word Document (DOC) data.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_doc</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_doc</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
     <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">7</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">0</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xD0</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">1</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xCF</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">2</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0x11</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">3</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xE0</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">4</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xA1</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">5</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xB1</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">6</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0x1A</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">7</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xE1</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">0</span>] <span class="op">==</span> <span class="number">0xD0</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">1</span>] <span class="op">==</span> <span class="number">0xCF</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">2</span>] <span class="op">==</span> <span class="number">0x11</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">3</span>] <span class="op">==</span> <span class="number">0xE0</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">4</span>] <span class="op">==</span> <span class="number">0xA1</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">5</span>] <span class="op">==</span> <span class="number">0xB1</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">6</span>] <span class="op">==</span> <span class="number">0x1A</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">7</span>] <span class="op">==</span> <span class="number">0xE1</span>
 }
 
 <span class="doccomment">/// Returns whether a buffer is Microsoft Word Open XML Format Document (DOCX) data.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_docx</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_docx</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
     <span class="kw">match</span> <span class="ident">msooxml</span>(<span class="ident">buf</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">typ</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">typ</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DocType::DOCX</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">typ</span>) =&gt; <span class="ident">typ</span> <span class="op">==</span> <span class="ident">DocType::DOCX</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
     }
 }
 
 <span class="doccomment">/// Returns whether a buffer is Microsoft Excel 97-2003 Worksheet (XLS) data.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_xls</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_xls</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
     <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">7</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">0</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xD0</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">1</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xCF</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">2</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0x11</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">3</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xE0</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">4</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xA1</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">5</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xB1</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">6</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0x1A</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">7</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xE1</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">0</span>] <span class="op">==</span> <span class="number">0xD0</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">1</span>] <span class="op">==</span> <span class="number">0xCF</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">2</span>] <span class="op">==</span> <span class="number">0x11</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">3</span>] <span class="op">==</span> <span class="number">0xE0</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">4</span>] <span class="op">==</span> <span class="number">0xA1</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">5</span>] <span class="op">==</span> <span class="number">0xB1</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">6</span>] <span class="op">==</span> <span class="number">0x1A</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">7</span>] <span class="op">==</span> <span class="number">0xE1</span>
 }
 
 <span class="doccomment">/// Returns whether a buffer is Microsoft Excel Open XML Format Spreadsheet (XLSX) data.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_xlsx</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_xlsx</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
     <span class="kw">match</span> <span class="ident">msooxml</span>(<span class="ident">buf</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">typ</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">typ</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DocType::XLSX</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">typ</span>) =&gt; <span class="ident">typ</span> <span class="op">==</span> <span class="ident">DocType::XLSX</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
     }
 }
 
 <span class="doccomment">/// Returns whether a buffer is Microsoft PowerPoint 97-2003 Presentation (PPT) data.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ppt</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ppt</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
     <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">7</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">0</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xD0</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">1</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xCF</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">2</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0x11</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">3</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xE0</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">4</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xA1</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">5</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xB1</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">6</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0x1A</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">7</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0xE1</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">0</span>] <span class="op">==</span> <span class="number">0xD0</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">1</span>] <span class="op">==</span> <span class="number">0xCF</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">2</span>] <span class="op">==</span> <span class="number">0x11</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">3</span>] <span class="op">==</span> <span class="number">0xE0</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">4</span>] <span class="op">==</span> <span class="number">0xA1</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">5</span>] <span class="op">==</span> <span class="number">0xB1</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">6</span>] <span class="op">==</span> <span class="number">0x1A</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">buf</span>[<span class="number">7</span>] <span class="op">==</span> <span class="number">0xE1</span>
 }
 
 <span class="doccomment">/// Returns whether a buffer is Microsoft PowerPoint Open XML Presentation (PPTX) data.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_pptx</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_pptx</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
     <span class="kw">match</span> <span class="ident">msooxml</span>(<span class="ident">buf</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">typ</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">typ</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DocType::PPTX</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">typ</span>) =&gt; <span class="ident">typ</span> <span class="op">==</span> <span class="ident">DocType::PPTX</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">msooxml</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DocType</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">msooxml</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DocType</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> [<span class="string">b&#39;P&#39;</span>, <span class="string">b&#39;K&#39;</span>, <span class="number">0x03</span>, <span class="number">0x04</span>];
 
     <span class="comment">// start by checking for ZIP local file header signature</span>
@@ -289,8 +289,8 @@
     <span class="ident">start_offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">26</span>;
     <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">search</span>(<span class="ident">buf</span>, <span class="ident">start_offset</span>, <span class="number">6000</span>);
     <span class="kw">match</span> <span class="ident">idx</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">idx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">start_offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">idx</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">26</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DocType::OOXLM</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">idx</span>) =&gt; <span class="ident">start_offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">idx</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">26</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DocType::OOXLM</span>),
     };
 
     <span class="kw">let</span> <span class="ident">typo</span> <span class="op">=</span> <span class="ident">check_msooml</span>(<span class="ident">buf</span>, <span class="ident">start_offset</span>);
@@ -301,7 +301,7 @@
     <span class="prelude-val">Some</span>(<span class="ident">DocType::OOXLM</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">compare_bytes</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">sub_slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">start_offset</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">compare_bytes</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">sub_slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">start_offset</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">let</span> <span class="ident">sl</span> <span class="op">=</span> <span class="ident">sub_slice</span>.<span class="ident">len</span>();
 
     <span class="kw">if</span> <span class="ident">start_offset</span> <span class="op">+</span> <span class="ident">sl</span> <span class="op">&gt;</span> <span class="ident">slice</span>.<span class="ident">len</span>() {
@@ -319,7 +319,7 @@
     <span class="bool-val">true</span>
 }
 
-<span class="kw">fn</span> <span class="ident">check_msooml</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">offset</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DocType</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">check_msooml</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">offset</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DocType</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">compare_bytes</span>(<span class="ident">buf</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;o&#39;</span>, <span class="string">b&#39;r&#39;</span>, <span class="string">b&#39;d&#39;</span>, <span class="string">b&#39;/&#39;</span>], <span class="ident">offset</span>) {
         <span class="prelude-val">Some</span>(<span class="ident">DocType::DOCX</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">compare_bytes</span>(<span class="ident">buf</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39;p&#39;</span>, <span class="string">b&#39;p&#39;</span>, <span class="string">b&#39;t&#39;</span>, <span class="string">b&#39;/&#39;</span>], <span class="ident">offset</span>) {
@@ -331,7 +331,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">search</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">range</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">search</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">range</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">start</span> <span class="op">+</span> <span class="ident">range</span>;
     <span class="kw">let</span> <span class="ident">signature</span>: <span class="kw-2">&amp;</span>[<span class="kw">_</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">b&#39;P&#39;</span>, <span class="string">b&#39;K&#39;</span>, <span class="number">0x03</span>, <span class="number">0x04</span>];
@@ -346,7 +346,7 @@
 
     <span class="ident">buf</span>[<span class="ident">start</span>..<span class="ident">end</span>]
         .<span class="ident">windows</span>(<span class="ident">signature</span>.<span class="ident">len</span>())
-        .<span class="ident">position</span>(<span class="op">|</span><span class="ident">window</span><span class="op">|</span> <span class="ident">window</span> <span class="op">=</span><span class="op">=</span> <span class="ident">signature</span>)
+        .<span class="ident">position</span>(<span class="op">|</span><span class="ident">window</span><span class="op">|</span> <span class="ident">window</span> <span class="op">==</span> <span class="ident">signature</span>)
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="infer" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

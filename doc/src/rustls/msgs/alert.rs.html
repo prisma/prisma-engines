@@ -41,7 +41,7 @@
         <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AlertMessagePayload</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AlertMessagePayload</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">AlertLevel::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">AlertDescription::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
 
@@ -50,7 +50,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AlertMessagePayload</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="number">1</span> <span class="op">+</span> <span class="number">1</span>
     }
 }

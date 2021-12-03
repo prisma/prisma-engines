@@ -542,7 +542,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DeliveryState</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">MAX_SIGNUM</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">None</span>).<span class="ident">collect</span>();
         <span class="self">Self</span> {
             <span class="ident">closed</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
@@ -566,7 +566,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Exfiltrator</span><span class="op">&gt;</span> <span class="ident">PendingSignals</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">exfiltrator</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">exfiltrator</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span> {
         <span class="comment">// Unfortunately, Default is not implemented for long arrays :-(</span>
         <span class="comment">//</span>
         <span class="comment">// Note that if the default impl panics, the already existing instances are leaked.</span>
@@ -592,12 +592,12 @@
         <span class="self">self</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">write</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SelfPipeWrite</span><span class="op">&gt;</span>,
         <span class="ident">signal</span>: <span class="ident">c_int</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SigId</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SigId</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 }
 
 <span class="comment">// Implemented manually because 1.36.0 doesn&#39;t yet support Debug for [X; BIG_NUMBER].</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Exfiltrator</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">PendingSignals</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FmtResult</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">FmtResult</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;PendingSignals&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;exfiltrator&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">exfiltrator</span>)
             <span class="comment">// While the array does not, the slice does implement Debug</span>
@@ -611,7 +611,7 @@
         <span class="self">self</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">write</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SelfPipeWrite</span><span class="op">&gt;</span>,
         <span class="ident">signal</span>: <span class="ident">c_int</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SigId</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SigId</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="macro">assert!</span>(<span class="ident">signal</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>);
         <span class="macro">assert!</span>(
             (<span class="ident">signal</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&lt;</span> <span class="ident">MAX_SIGNUM</span>,
@@ -652,7 +652,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Handle</span> {
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">write</span>: <span class="ident">W</span>, <span class="ident">pending</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">AddSignal</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">write</span>: <span class="ident">W</span>, <span class="ident">pending</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">AddSignal</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">W</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">SelfPipeWrite</span>,
     {
@@ -679,7 +679,7 @@
     <span class="doccomment">///   larger than any supported signal the OS supports.</span>
     <span class="doccomment">/// * If the relevant [`Exfiltrator`] does not support this particular signal. The default</span>
     <span class="doccomment">///   [`SignalOnly`] one supports all signals.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_signal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">signal</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_signal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">signal</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delivery_state</span>.<span class="ident">registered_signal_ids</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
         <span class="comment">// Already registered, ignoring</span>
         <span class="kw">if</span> <span class="ident">lock</span>[<span class="ident">signal</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">is_some</span>() {
@@ -714,7 +714,7 @@
     <span class="doccomment">/// Is it closed?</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See [`close`][Handle::close].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">delivery_state</span>.<span class="ident">closed</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
     }
 }
@@ -750,7 +750,7 @@
     <span class="doccomment">///   reading bytes from the read end</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// So UnixStream is a good choice for this.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_pipe</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">read</span>: <span class="ident">R</span>, <span class="ident">write</span>: <span class="ident">W</span>, <span class="ident">exfiltrator</span>: <span class="ident">E</span>, <span class="ident">signals</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_pipe</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span>, <span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">read</span>: <span class="ident">R</span>, <span class="ident">write</span>: <span class="ident">W</span>, <span class="ident">exfiltrator</span>: <span class="ident">E</span>, <span class="ident">signals</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
         <span class="ident">S</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>,
@@ -777,7 +777,7 @@
     <span class="doccomment">/// bytes in the pipe. If the event system reports the file descriptor</span>
     <span class="doccomment">/// ready for reading you can then call [`pending`][SignalDelivery::pending]</span>
     <span class="doccomment">/// to get the arrived signals.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">R</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">R</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">read</span>
     }
 
@@ -785,7 +785,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// See the [`get_read`][SignalDelivery::get_read] method for some additional</span>
     <span class="doccomment">/// information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_read_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_read_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">read</span>
     }
 
@@ -818,7 +818,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method returns immediately (does not block) and may produce an empty iterator if</span>
     <span class="doccomment">/// there are no signals ready.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pending</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pending</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">flush</span>();
         <span class="ident">Pending::new</span>(<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pending</span>))
     }
@@ -832,18 +832,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method doesn&#39;t check the reading end by itself but uses the passed in callback.</span>
     <span class="doccomment">/// This method blocks if and only if the callback blocks trying to read some bytes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_pending</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_signals</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_pending</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_signals</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
     {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">is_closed</span>() {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
         <span class="kw">match</span> <span class="ident">has_signals</span>(<span class="self">self</span>.<span class="ident">get_read_mut</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">pending</span>())),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+            <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">pending</span>())),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
         }
     }
 
@@ -851,7 +851,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This can be used to add further signals or close the whole</span>
     <span class="doccomment">/// signal delivery mechanism.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Handle</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Handle</span> {
         <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">clone</span>()
     }
 }
@@ -866,7 +866,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Exfiltrator</span><span class="op">&gt;</span> <span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">pending</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">PendingSignals</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">pending</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">PendingSignals</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">pending</span>,
             <span class="ident">position</span>: <span class="number">0</span>,
@@ -877,7 +877,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Exfiltrator</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">E::Output</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E::Output</span><span class="op">&gt;</span> {
         <span class="kw">while</span> <span class="self">self</span>.<span class="ident">position</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">pending</span>.<span class="ident">slots</span>.<span class="ident">len</span>() {
             <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">position</span>;
             <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pending</span>.<span class="ident">slots</span>[<span class="ident">sig</span>];
@@ -914,7 +914,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">SD</span>, <span class="ident">E</span>: <span class="ident">Exfiltrator</span><span class="op">&gt;</span> <span class="ident">SignalIterator</span><span class="op">&lt;</span><span class="ident">SD</span>, <span class="ident">E</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new infinite iterator for signals registered with the passed</span>
     <span class="doccomment">/// in [`SignalDelivery`] instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">signals</span>: <span class="ident">SD</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">signals</span>: <span class="ident">SD</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">SD</span>: <span class="ident">BorrowMut</span><span class="op">&lt;</span><span class="ident">SignalDelivery</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">R</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">AsRawFd</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
@@ -934,11 +934,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the iterator was closed by the [`close`][Handle::close] method of the associtated</span>
     <span class="doccomment">/// [`Handle`] this method will return [`PollResult::Closed`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_signal</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_signals</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PollResult</span><span class="op">&lt;</span><span class="ident">E::Output</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_signal</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">has_signals</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">F</span>) -&gt; <span class="ident">PollResult</span><span class="op">&lt;</span><span class="ident">E::Output</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">SD</span>: <span class="ident">BorrowMut</span><span class="op">&lt;</span><span class="ident">SignalDelivery</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">R</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">AsRawFd</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
     {
         <span class="comment">// The loop is necessary because it is possible that a signal was already consumed</span>
         <span class="comment">// by a previous pending iterator due to the asynchronous nature of signals and</span>
@@ -949,9 +949,9 @@
             }
 
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">signals</span>.<span class="ident">borrow_mut</span>().<span class="ident">poll_pending</span>(<span class="ident">has_signals</span>) {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">pending</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">iter</span> <span class="op">=</span> <span class="ident">pending</span>,
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">PollResult::Pending</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">PollResult::Err</span>(<span class="ident">err</span>),
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">pending</span>)) =&gt; <span class="self">self</span>.<span class="ident">iter</span> <span class="op">=</span> <span class="ident">pending</span>,
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="ident">PollResult::Pending</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">PollResult::Err</span>(<span class="ident">err</span>),
             }
         }
 
@@ -962,7 +962,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This can be used to add further signals or terminate the whole</span>
     <span class="doccomment">/// signal iteration using the [`close`][Handle::close] method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Handle</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Handle</span>
     <span class="kw">where</span>
         <span class="ident">SD</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">SignalDelivery</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">R</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">AsRawFd</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,

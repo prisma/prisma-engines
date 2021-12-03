@@ -387,9 +387,9 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::InvalidHexStringCharacter</span> { <span class="ident">c</span>, <span class="ident">index</span>, <span class="ident">hex</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::InvalidHexStringCharacter</span> { <span class="ident">c</span>, <span class="ident">index</span>, <span class="ident">hex</span> } =&gt; {
                 <span class="macro">write!</span>(
                     <span class="ident">fmt</span>,
                     <span class="string">&quot;invalid character &#39;{}&#39; was found at index {} in the provided hex string: \
@@ -397,7 +397,7 @@
                     <span class="ident">c</span>, <span class="ident">index</span>, <span class="ident">hex</span>
                 )
             }
-            <span class="ident">Error::InvalidHexStringLength</span> { <span class="ident">length</span>, <span class="ident">hex</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::InvalidHexStringLength</span> { <span class="ident">length</span>, <span class="ident">hex</span> } =&gt; {
                 <span class="macro">write!</span>(
                     <span class="ident">fmt</span>,
                     <span class="string">&quot;provided hex string representation must be exactly 12 bytes, instead got: \
@@ -418,7 +418,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ObjectId</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
@@ -426,13 +426,13 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">ObjectId</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::parse_str</span>(<span class="ident">s</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">12</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ObjectId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">12</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">12</span>]) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">id</span>: <span class="ident">bytes</span> }
     }
 }
@@ -441,7 +441,7 @@
     <span class="doccomment">/// Generates a new [`ObjectId`], represented in bytes.</span>
     <span class="doccomment">/// See the [docs](http://docs.mongodb.org/manual/reference/object-id/)</span>
     <span class="doccomment">/// for more information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ObjectId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">ObjectId</span> {
         <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">ObjectId::gen_timestamp</span>();
         <span class="kw">let</span> <span class="ident">process_id</span> <span class="op">=</span> <span class="ident">ObjectId::gen_process_id</span>();
         <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">ObjectId::gen_count</span>();
@@ -458,21 +458,21 @@
     }
 
     <span class="doccomment">/// Constructs a new ObjectId wrapper around the raw byte representation.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">12</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ObjectId</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">12</span>]) -&gt; <span class="ident">ObjectId</span> {
         <span class="ident">ObjectId</span> { <span class="ident">id</span>: <span class="ident">bytes</span> }
     }
 
     <span class="doccomment">/// Creates an ObjectID using a 12-byte (24-char) hexadecimal string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_str</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_str</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_ref</span>();
 
         <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">hex::decode</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">FromHexError::InvalidHexCharacter</span> { <span class="ident">c</span>, <span class="ident">index</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::InvalidHexStringCharacter</span> {
+            <span class="ident">FromHexError::InvalidHexCharacter</span> { <span class="ident">c</span>, <span class="ident">index</span> } =&gt; <span class="ident">Error::InvalidHexStringCharacter</span> {
                 <span class="ident">c</span>,
                 <span class="ident">index</span>,
                 <span class="ident">hex</span>: <span class="ident">s</span>.<span class="ident">to_string</span>(),
             },
-            <span class="ident">FromHexError::InvalidStringLength</span> <span class="op">|</span> <span class="ident">FromHexError::OddLength</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">FromHexError::InvalidStringLength</span> <span class="op">|</span> <span class="ident">FromHexError::OddLength</span> =&gt; {
                 <span class="ident">Error::InvalidHexStringLength</span> {
                     <span class="ident">length</span>: <span class="ident">s</span>.<span class="ident">len</span>(),
                     <span class="ident">hex</span>: <span class="ident">s</span>.<span class="ident">to_string</span>(),
@@ -492,7 +492,7 @@
     }
 
     <span class="doccomment">/// Retrieves the timestamp from an [`ObjectId`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::DateTime</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
         <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>[<span class="number">0</span>..<span class="number">4</span>]);
         <span class="kw">let</span> <span class="ident">seconds_since_epoch</span> <span class="op">=</span> <span class="ident">u32::from_be_bytes</span>(<span class="ident">buf</span>);
@@ -502,18 +502,18 @@
     }
 
     <span class="doccomment">/// Returns the raw byte representation of an ObjectId.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">12</span>] {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">12</span>] {
         <span class="self">self</span>.<span class="ident">id</span>
     }
 
     <span class="doccomment">/// Convert this [`ObjectId`] to its hex string representation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_hex</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_hex</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="ident">hex::encode</span>(<span class="self">self</span>.<span class="ident">id</span>)
     }
 
     <span class="doccomment">/// Generates a new timestamp representing the current seconds since epoch.</span>
     <span class="doccomment">/// Represented in Big Endian.</span>
-    <span class="kw">fn</span> <span class="ident">gen_timestamp</span>() <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">4</span>] {
+    <span class="kw">fn</span> <span class="ident">gen_timestamp</span>() -&gt; [<span class="ident">u8</span>; <span class="number">4</span>] {
         <span class="kw">let</span> <span class="ident">timestamp</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">SystemTime::now</span>()
             .<span class="ident">duration_since</span>(<span class="ident">SystemTime::UNIX_EPOCH</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;system clock is before 1970&quot;</span>)
@@ -524,7 +524,7 @@
     }
 
     <span class="doccomment">/// Generate a random 5-byte array.</span>
-    <span class="kw">fn</span> <span class="ident">gen_process_id</span>() <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">5</span>] {
+    <span class="kw">fn</span> <span class="ident">gen_process_id</span>() -&gt; [<span class="ident">u8</span>; <span class="number">5</span>] {
         <span class="macro">lazy_static!</span> {
             <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BUF</span>: [<span class="ident">u8</span>; <span class="number">5</span>] <span class="op">=</span> <span class="ident">thread_rng</span>().<span class="ident">gen</span>();
         }
@@ -534,7 +534,7 @@
 
     <span class="doccomment">/// Gets an incremental 3-byte count.</span>
     <span class="doccomment">/// Represented in Big Endian.</span>
-    <span class="kw">fn</span> <span class="ident">gen_count</span>() <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">3</span>] {
+    <span class="kw">fn</span> <span class="ident">gen_count</span>() -&gt; [<span class="ident">u8</span>; <span class="number">3</span>] {
         <span class="kw">let</span> <span class="ident">u_counter</span> <span class="op">=</span> <span class="ident">OID_COUNTER</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
 
         <span class="comment">// Mod result instead of OID_COUNTER to prevent threading issues.</span>
@@ -550,13 +550,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ObjectId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_hex</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ObjectId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;ObjectId&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_hex</span>()).<span class="ident">finish</span>()
     }
 }

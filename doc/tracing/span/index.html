@@ -12,7 +12,7 @@ to other spans.</li>
 originating from that callsite, such as its name, source code location,
 <a href="../struct.Level.html">verbosity level</a>, and the names of its fields.</li>
 </ul>
-<h1 id="creating-spans" class="section-header"><a href="#creating-spans">Creating Spans</a></h1>
+<h2 id="creating-spans" class="section-header"><a href="#creating-spans">Creating Spans</a></h2>
 <p>Spans are created using the <a href="../macro.span.html"><code>span!</code></a> macro. This macro is invoked with the
 following arguments, in order:</p>
 <ul>
@@ -34,14 +34,14 @@ the various options that exist when creating spans.</p>
 <p>The <a href="../macro.trace_span.html"><code>trace_span!</code></a>, <a href="../macro.debug_span.html"><code>debug_span!</code></a>, <a href="../macro.info_span.html"><code>info_span!</code></a>, <a href="../macro.warn_span.html"><code>warn_span!</code></a>, and
 <a href="../macro.error_span.html"><code>error_span!</code></a> exist as shorthand for constructing spans at various
 verbosity levels.</p>
-<h2 id="recording-span-creation" class="section-header"><a href="#recording-span-creation">Recording Span Creation</a></h2>
+<h3 id="recording-span-creation" class="section-header"><a href="#recording-span-creation">Recording Span Creation</a></h3>
 <p>The <a href="struct.Attributes.html"><code>Attributes</code></a> type contains data associated with a span, and is
 provided to the <a href="../subscriber/trait.Subscriber.html"><code>Subscriber</code></a> when a new span is created. It contains
 the span’s metadata, the ID of <a href="#span-relationships">the span’s parent</a> if one was
 explicitly set, and any fields whose values were recorded when the span was
 constructed. The subscriber, which is responsible for recording <code>tracing</code>
 data, can then store or record these values.</p>
-<h1 id="the-span-lifecycle" class="section-header"><a href="#the-span-lifecycle">The Span Lifecycle</a></h1><h2 id="entering-a-span" class="section-header"><a href="#entering-a-span">Entering a Span</a></h2>
+<h2 id="the-span-lifecycle" class="section-header"><a href="#the-span-lifecycle">The Span Lifecycle</a></h2><h3 id="entering-a-span" class="section-header"><a href="#entering-a-span">Entering a Span</a></h3>
 <p>A thread of execution is said to <em>enter</em> a span when it begins executing,
 and <em>exit</em> the span when it switches to another context. Spans may be
 entered through the <a href="struct.Span.html#method.enter"><code>enter</code></a>, <a href="struct.Span.html#method.entered"><code>entered</code></a>, and <a href="struct.Span.html#method.in_scope"><code>in_scope</code></a> methods.</p>
@@ -99,7 +99,7 @@ inside the span:</p>
      <code>Sync</code>, it is entirely valid for multiple threads to enter the
      same span concurrently.
  </pre>
-<h2 id="span-relationships" class="section-header"><a href="#span-relationships">Span Relationships</a></h2>
+<h3 id="span-relationships" class="section-header"><a href="#span-relationships">Span Relationships</a></h3>
 <p>Spans form a tree structure — unless it is a root span, all spans have a
 <em>parent</em>, and may have one or more <em>children</em>. When a new span is created,
 the current span becomes the new span’s parent. The total execution time of
@@ -153,7 +153,7 @@ spent in the listener task, so we would not consider those spans children of
 the listener span. Instead, we would record that the handler tasks follow
 from the listener, recording the causal relationship but treating the spans
 as separate durations.</p>
-<h2 id="closing-spans" class="section-header"><a href="#closing-spans">Closing Spans</a></h2>
+<h3 id="closing-spans" class="section-header"><a href="#closing-spans">Closing Spans</a></h3>
 <p>Execution may enter and exit a span multiple times before that span is
 <em>closed</em>. Consider, for example, a future which has an associated
 span and enters that span every time it is polled:</p>
@@ -167,7 +167,7 @@ span and enters that span every time it is polled:</p>
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> ();
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">_enter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">span</span>.<span class="ident">enter</span>();
         <span class="comment">// Do actual future work...</span>
     }
@@ -208,7 +208,7 @@ used to track the number of handles to a given span — if <code>drop_span</code
 been called one more time than the number of calls to <code>clone_span</code> for a
 given ID, then no more handles to the span with that ID exist. The
 subscriber may then treat it as closed.</p>
-<h1 id="when-to-use-spans" class="section-header"><a href="#when-to-use-spans">When to use spans</a></h1>
+<h2 id="when-to-use-spans" class="section-header"><a href="#when-to-use-spans">When to use spans</a></h2>
 <p>As a rule of thumb, spans should be used to represent discrete units of work
 (e.g., a given request’s lifetime in a server) or periods of time spent in a
 given context (e.g., time spent interacting with an instance of an external
@@ -235,18 +235,18 @@ create a single span around the entire loop; whereas if we wanted to know how
 much time was spent in each individual iteration, we would enter a new span
 on every iteration.</p>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Attributes.html" title="tracing::span::Attributes struct">Attributes</a></div><div class="item-right docblock-short"><p>Attributes provided to a <code>Subscriber</code> describing a new span when it is
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Attributes.html" title="tracing::span::Attributes struct">Attributes</a></div><div class="item-right docblock-short"><p>Attributes provided to a <code>Subscriber</code> describing a new span when it is
 created.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Entered.html" title="tracing::span::Entered struct">Entered</a></div><div class="item-right docblock-short"><p>A guard representing a span which has been entered and is currently
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Entered.html" title="tracing::span::Entered struct">Entered</a></div><div class="item-right docblock-short"><p>A guard representing a span which has been entered and is currently
 executing.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.EnteredSpan.html" title="tracing::span::EnteredSpan struct">EnteredSpan</a></div><div class="item-right docblock-short"><p>An owned version of <a href="struct.Entered.html" title="Entered"><code>Entered</code></a>, a guard representing a span which has been
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.EnteredSpan.html" title="tracing::span::EnteredSpan struct">EnteredSpan</a></div><div class="item-right docblock-short"><p>An owned version of <a href="struct.Entered.html" title="Entered"><code>Entered</code></a>, a guard representing a span which has been
 entered and is currently executing.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Id.html" title="tracing::span::Id struct">Id</a></div><div class="item-right docblock-short"><p>Identifies a span within the context of a subscriber.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Record.html" title="tracing::span::Record struct">Record</a></div><div class="item-right docblock-short"><p>A set of fields recorded by a span.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Span.html" title="tracing::span::Span struct">Span</a></div><div class="item-right docblock-short"><p>A handle representing a span, with the capability to enter the span if it
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Id.html" title="tracing::span::Id struct">Id</a></div><div class="item-right docblock-short"><p>Identifies a span within the context of a subscriber.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Record.html" title="tracing::span::Record struct">Record</a></div><div class="item-right docblock-short"><p>A set of fields recorded by a span.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Span.html" title="tracing::span::Span struct">Span</a></div><div class="item-right docblock-short"><p>A handle representing a span, with the capability to enter the span if it
 exists.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.AsId.html" title="tracing::span::AsId trait">AsId</a></div><div class="item-right docblock-short"><p>Trait implemented by types which have a span <code>Id</code>.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AsId.html" title="tracing::span::AsId trait">AsId</a></div><div class="item-right docblock-short"><p>Trait implemented by types which have a span <code>Id</code>.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

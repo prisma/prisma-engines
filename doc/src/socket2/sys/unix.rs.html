@@ -1961,10 +1961,10 @@
 
 <span class="doccomment">/// Helper macro to execute a system call that returns an `io::Result`.</span>
 <span class="macro">macro_rules!</span> <span class="ident">syscall</span> {
-    (<span class="macro-nonterminal">$</span><span class="kw">fn</span>: <span class="macro-nonterminal">ident</span> ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="op">*</span> ) ) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="kw">fn</span>: <span class="macro-nonterminal">ident</span> ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="op">*</span> ) ) =&gt; {{
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_unsafe</span>)]</span>
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">libc</span>::<span class="macro-nonterminal">$</span><span class="kw">fn</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>, )<span class="kw-2">*</span>) };
-        <span class="kw">if</span> <span class="ident">res</span> <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">res</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> {
             <span class="prelude-val">Err</span>(<span class="ident">std::io::Error::last_os_error</span>())
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
@@ -2097,7 +2097,7 @@
             )
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">nonblocking</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">nonblocking</span>(<span class="self">self</span>) -&gt; <span class="ident">Type</span> {
         <span class="ident">Type</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">libc::SOCK_NONBLOCK</span>)
     }
 
@@ -2131,7 +2131,7 @@
             )
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">cloexec</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">cloexec</span>(<span class="self">self</span>) -&gt; <span class="ident">Type</span> {
         <span class="self">self</span>.<span class="ident">_cloexec</span>()
     }
 
@@ -2145,7 +2145,7 @@
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>
     ))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">_cloexec</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">_cloexec</span>(<span class="self">self</span>) -&gt; <span class="ident">Type</span> {
         <span class="ident">Type</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">libc::SOCK_CLOEXEC</span>)
     }
 }
@@ -2201,7 +2201,7 @@
     <span class="doccomment">/// a record is terminated by sending a message with the end-of-record flag set.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// On Unix this corresponds to the MSG_EOR flag.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_end_of_record</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_end_of_record</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">libc::MSG_EOR</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
     }
 
@@ -2211,14 +2211,14 @@
     <span class="doccomment">/// mixed in with the normal data stream.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// On Unix this corresponds to the MSG_OOB flag.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_out_of_band</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_out_of_band</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">libc::MSG_OOB</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>))]</span>
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">RecvFlags</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RecvFlags&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;is_end_of_record&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_end_of_record</span>())
             .<span class="ident">field</span>(<span class="string">&quot;is_out_of_band&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_out_of_band</span>())
@@ -2234,7 +2234,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MaybeUninitSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MaybeUninitSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]) -&gt; <span class="ident">MaybeUninitSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">MaybeUninitSlice</span> {
             <span class="ident">vec</span>: <span class="ident">libc::iovec</span> {
                 <span class="ident">iov_base</span>: <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">cast</span>(),
@@ -2244,11 +2244,11 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>] {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>] {
         <span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts</span>(<span class="self">self</span>.<span class="ident">vec</span>.<span class="ident">iov_base</span>.<span class="ident">cast</span>(), <span class="self">self</span>.<span class="ident">vec</span>.<span class="ident">iov_len</span>) }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>] {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>] {
         <span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts_mut</span>(<span class="self">self</span>.<span class="ident">vec</span>.<span class="ident">iov_base</span>.<span class="ident">cast</span>(), <span class="self">self</span>.<span class="ident">vec</span>.<span class="ident">iov_len</span>) }
     }
 }
@@ -2263,7 +2263,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>))))]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_unsafe</span>)]</span> <span class="comment">// TODO: replace with `unsafe_op_in_unsafe_fn` once stable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unix</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SockAddr</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unix</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SockAddr</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>,
     {
@@ -2276,10 +2276,10 @@
 
                 <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">as_os_str</span>().<span class="ident">as_bytes</span>();
                 <span class="kw">let</span> <span class="ident">too_long</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bytes</span>.<span class="ident">first</span>() {
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
                     <span class="comment">// linux abstract namespaces aren&#39;t null-terminated</span>
-                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">storage</span>.<span class="ident">sun_path</span>.<span class="ident">len</span>(),
-                    <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">storage</span>.<span class="ident">sun_path</span>.<span class="ident">len</span>(),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) =&gt; <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">storage</span>.<span class="ident">sun_path</span>.<span class="ident">len</span>(),
+                    <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">storage</span>.<span class="ident">sun_path</span>.<span class="ident">len</span>(),
                 };
                 <span class="kw">if</span> <span class="ident">too_long</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
@@ -2307,8 +2307,8 @@
                 <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">sun_path_offset</span>
                     <span class="op">+</span> <span class="ident">bytes</span>.<span class="ident">len</span>()
                     <span class="op">+</span> <span class="kw">match</span> <span class="ident">bytes</span>.<span class="ident">first</span>() {
-                        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) <span class="op">|</span> <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-                        <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
+                        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="number">0</span>,
+                        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="number">1</span>,
                     };
                 <span class="kw-2">*</span><span class="ident">len</span> <span class="op">=</span> <span class="ident">length</span> <span class="kw">as</span> <span class="ident">socklen_t</span>;
 
@@ -2332,7 +2332,7 @@
         <span class="ident">docsrs</span>,
         <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>))))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">vsock</span>(<span class="ident">cid</span>: <span class="ident">u32</span>, <span class="ident">port</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SockAddr</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">vsock</span>(<span class="ident">cid</span>: <span class="ident">u32</span>, <span class="ident">port</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SockAddr</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">SockAddr::init</span>(<span class="op">|</span><span class="ident">storage</span>, <span class="ident">len</span><span class="op">|</span> {
                 <span class="comment">// Safety: `SockAddr::init` zeros the address, which is a valid</span>
@@ -2359,8 +2359,8 @@
         <span class="ident">docsrs</span>,
         <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>))))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">vsock_address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">family</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">libc::AF_VSOCK</span> <span class="kw">as</span> <span class="ident">sa_family_t</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">vsock_address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">family</span>() <span class="op">==</span> <span class="ident">libc::AF_VSOCK</span> <span class="kw">as</span> <span class="ident">sa_family_t</span> {
             <span class="comment">// Safety: if the ss_family field is AF_VSOCK then storage must be a sockaddr_vm.</span>
             <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc::sockaddr_vm</span>) };
             <span class="prelude-val">Some</span>((<span class="ident">addr</span>.<span class="ident">svm_cid</span>, <span class="ident">addr</span>.<span class="ident">svm_port</span>))
@@ -2372,37 +2372,37 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Socket</span> <span class="op">=</span> <span class="ident">c_int</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">socket_from_raw</span>(<span class="ident">socket</span>: <span class="ident">Socket</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::socket::Inner</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">socket_from_raw</span>(<span class="ident">socket</span>: <span class="ident">Socket</span>) -&gt; <span class="ident"><span class="kw">crate</span>::socket::Inner</span> {
     <span class="ident"><span class="kw">crate</span>::socket::Inner::from_raw_fd</span>(<span class="ident">socket</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">socket_as_raw</span>(<span class="ident">socket</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::socket::Inner</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Socket</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">socket_as_raw</span>(<span class="ident">socket</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::socket::Inner</span>) -&gt; <span class="ident">Socket</span> {
     <span class="ident">socket</span>.<span class="ident">as_raw_fd</span>()
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">socket_into_raw</span>(<span class="ident">socket</span>: <span class="ident"><span class="kw">crate</span>::socket::Inner</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Socket</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">socket_into_raw</span>(<span class="ident">socket</span>: <span class="ident"><span class="kw">crate</span>::socket::Inner</span>) -&gt; <span class="ident">Socket</span> {
     <span class="ident">socket</span>.<span class="ident">into_raw_fd</span>()
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">socket</span>(<span class="ident">family</span>: <span class="ident">c_int</span>, <span class="ident">ty</span>: <span class="ident">c_int</span>, <span class="ident">protocol</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Socket</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">socket</span>(<span class="ident">family</span>: <span class="ident">c_int</span>, <span class="ident">ty</span>: <span class="ident">c_int</span>, <span class="ident">protocol</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Socket</span><span class="op">&gt;</span> {
     <span class="macro">syscall!</span>(<span class="ident">socket</span>(<span class="ident">family</span>, <span class="ident">ty</span>, <span class="ident">protocol</span>))
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">socketpair</span>(<span class="ident">family</span>: <span class="ident">c_int</span>, <span class="ident">ty</span>: <span class="ident">c_int</span>, <span class="ident">protocol</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>[<span class="ident">Socket</span>; <span class="number">2</span>]<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">socketpair</span>(<span class="ident">family</span>: <span class="ident">c_int</span>, <span class="ident">ty</span>: <span class="ident">c_int</span>, <span class="ident">protocol</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>[<span class="ident">Socket</span>; <span class="number">2</span>]<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fds</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>];
     <span class="macro">syscall!</span>(<span class="ident">socketpair</span>(<span class="ident">family</span>, <span class="ident">ty</span>, <span class="ident">protocol</span>, <span class="ident">fds</span>.<span class="ident">as_mut_ptr</span>())).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fds</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">bind</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SockAddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">bind</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SockAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="macro">syscall!</span>(<span class="ident">bind</span>(<span class="ident">fd</span>, <span class="ident">addr</span>.<span class="ident">as_ptr</span>(), <span class="ident">addr</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="kw">_</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SockAddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SockAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="macro">syscall!</span>(<span class="ident">connect</span>(<span class="ident">fd</span>, <span class="ident">addr</span>.<span class="ident">as_ptr</span>(), <span class="ident">addr</span>.<span class="ident">len</span>())).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_connect</span>(<span class="ident">socket</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::Socket</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_connect</span>(<span class="ident">socket</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::Socket</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pollfd</span> <span class="op">=</span> <span class="ident">libc::pollfd</span> {
@@ -2421,32 +2421,32 @@
         <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">clamp</span>(<span class="ident">timeout</span>, <span class="number">1</span>, <span class="ident">c_int::max_value</span>() <span class="kw">as</span> <span class="ident">u128</span>) <span class="kw">as</span> <span class="ident">c_int</span>;
 
         <span class="kw">match</span> <span class="macro">syscall!</span>(<span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">pollfd</span>, <span class="number">1</span>, <span class="ident">timeout</span>)) {
-            <span class="prelude-val">Ok</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::ErrorKind::TimedOut</span>.<span class="ident">into</span>()),
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="number">0</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::ErrorKind::TimedOut</span>.<span class="ident">into</span>()),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
                 <span class="comment">// Error or hang up indicates an error (or failure to connect).</span>
                 <span class="kw">if</span> (<span class="ident">pollfd</span>.<span class="ident">revents</span> <span class="op">&amp;</span> <span class="ident">libc::POLLHUP</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">pollfd</span>.<span class="ident">revents</span> <span class="op">&amp;</span> <span class="ident">libc::POLLERR</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                     <span class="kw">match</span> <span class="ident">socket</span>.<span class="ident">take_error</span>() {
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">err</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                                 <span class="ident">io::ErrorKind::Other</span>,
                                 <span class="string">&quot;no error set after POLLHUP&quot;</span>,
                             ))
                         }
-                        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
                     }
                 }
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }
             <span class="comment">// Got interrupted, try again.</span>
-            <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">io::ErrorKind::Interrupted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+            <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io::ErrorKind::Interrupted</span> =&gt; <span class="kw">continue</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
         }
     }
 }
 
 <span class="comment">// TODO: use clamp from std lib, stable since 1.50.</span>
-<span class="kw">fn</span> <span class="ident">clamp</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">min</span>: <span class="ident">T</span>, <span class="ident">max</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+<span class="kw">fn</span> <span class="ident">clamp</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">min</span>: <span class="ident">T</span>, <span class="ident">max</span>: <span class="ident">T</span>) -&gt; <span class="ident">T</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Ord</span>,
 {
@@ -2459,32 +2459,32 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">listen</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">backlog</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">listen</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">backlog</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="macro">syscall!</span>(<span class="ident">listen</span>(<span class="ident">fd</span>, <span class="ident">backlog</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">accept</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">Socket</span>, <span class="ident">SockAddr</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">accept</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">Socket</span>, <span class="ident">SockAddr</span>)<span class="op">&gt;</span> {
     <span class="comment">// Safety: `accept` initialises the `SockAddr` for us.</span>
     <span class="kw">unsafe</span> { <span class="ident">SockAddr::init</span>(<span class="op">|</span><span class="ident">storage</span>, <span class="ident">len</span><span class="op">|</span> <span class="macro">syscall!</span>(<span class="ident">accept</span>(<span class="ident">fd</span>, <span class="ident">storage</span>.<span class="ident">cast</span>(), <span class="ident">len</span>))) }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">getsockname</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SockAddr</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">getsockname</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SockAddr</span><span class="op">&gt;</span> {
     <span class="comment">// Safety: `accept` initialises the `SockAddr` for us.</span>
     <span class="kw">unsafe</span> { <span class="ident">SockAddr::init</span>(<span class="op">|</span><span class="ident">storage</span>, <span class="ident">len</span><span class="op">|</span> <span class="macro">syscall!</span>(<span class="ident">getsockname</span>(<span class="ident">fd</span>, <span class="ident">storage</span>.<span class="ident">cast</span>(), <span class="ident">len</span>))) }
         .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">addr</span>)<span class="op">|</span> <span class="ident">addr</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">getpeername</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SockAddr</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">getpeername</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SockAddr</span><span class="op">&gt;</span> {
     <span class="comment">// Safety: `accept` initialises the `SockAddr` for us.</span>
     <span class="kw">unsafe</span> { <span class="ident">SockAddr::init</span>(<span class="op">|</span><span class="ident">storage</span>, <span class="ident">len</span><span class="op">|</span> <span class="macro">syscall!</span>(<span class="ident">getpeername</span>(<span class="ident">fd</span>, <span class="ident">storage</span>.<span class="ident">cast</span>(), <span class="ident">len</span>))) }
         .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">addr</span>)<span class="op">|</span> <span class="ident">addr</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_clone</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Socket</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_clone</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Socket</span><span class="op">&gt;</span> {
     <span class="macro">syscall!</span>(<span class="ident">fcntl</span>(<span class="ident">fd</span>, <span class="ident">libc::F_DUPFD_CLOEXEC</span>, <span class="number">0</span>))
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_nonblocking</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">nonblocking</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_nonblocking</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">nonblocking</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">nonblocking</span> {
         <span class="ident">fcntl_add</span>(<span class="ident">fd</span>, <span class="ident">libc::F_GETFL</span>, <span class="ident">libc::F_SETFL</span>, <span class="ident">libc::O_NONBLOCK</span>)
     } <span class="kw">else</span> {
@@ -2492,16 +2492,16 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">how</span>: <span class="ident">Shutdown</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">how</span>: <span class="ident">Shutdown</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">how</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">how</span> {
-        <span class="ident">Shutdown::Write</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">libc::SHUT_WR</span>,
-        <span class="ident">Shutdown::Read</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">libc::SHUT_RD</span>,
-        <span class="ident">Shutdown::Both</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">libc::SHUT_RDWR</span>,
+        <span class="ident">Shutdown::Write</span> =&gt; <span class="ident">libc::SHUT_WR</span>,
+        <span class="ident">Shutdown::Read</span> =&gt; <span class="ident">libc::SHUT_RD</span>,
+        <span class="ident">Shutdown::Both</span> =&gt; <span class="ident">libc::SHUT_RDWR</span>,
     };
     <span class="macro">syscall!</span>(<span class="ident">shutdown</span>(<span class="ident">fd</span>, <span class="ident">how</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">recv</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>], <span class="ident">flags</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">recv</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>], <span class="ident">flags</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="macro">syscall!</span>(<span class="ident">recv</span>(
         <span class="ident">fd</span>,
         <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">cast</span>(),
@@ -2515,7 +2515,7 @@
     <span class="ident">fd</span>: <span class="ident">Socket</span>,
     <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>],
     <span class="ident">flags</span>: <span class="ident">c_int</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">SockAddr</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">SockAddr</span>)<span class="op">&gt;</span> {
     <span class="comment">// Safety: `recvfrom` initialises the `SockAddr` for us.</span>
     <span class="kw">unsafe</span> {
         <span class="ident">SockAddr::init</span>(<span class="op">|</span><span class="ident">addr</span>, <span class="ident">addrlen</span><span class="op">|</span> {
@@ -2537,7 +2537,7 @@
     <span class="ident">fd</span>: <span class="ident">Socket</span>,
     <span class="ident">bufs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident"><span class="kw">crate</span>::MaybeUninitSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
     <span class="ident">flags</span>: <span class="ident">c_int</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">RecvFlags</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">RecvFlags</span>)<span class="op">&gt;</span> {
     <span class="ident">recvmsg</span>(<span class="ident">fd</span>, <span class="ident">ptr::null_mut</span>(), <span class="ident">bufs</span>, <span class="ident">flags</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">n</span>, <span class="kw">_</span>, <span class="ident">recv_flags</span>)<span class="op">|</span> (<span class="ident">n</span>, <span class="ident">recv_flags</span>))
 }
 
@@ -2546,7 +2546,7 @@
     <span class="ident">fd</span>: <span class="ident">Socket</span>,
     <span class="ident">bufs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident"><span class="kw">crate</span>::MaybeUninitSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
     <span class="ident">flags</span>: <span class="ident">c_int</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">RecvFlags</span>, <span class="ident">SockAddr</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">RecvFlags</span>, <span class="ident">SockAddr</span>)<span class="op">&gt;</span> {
     <span class="comment">// Safety: `recvmsg` initialises the address storage and we set the length</span>
     <span class="comment">// manually.</span>
     <span class="kw">unsafe</span> {
@@ -2568,7 +2568,7 @@
     <span class="ident">msg_name</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sockaddr_storage</span>,
     <span class="ident">bufs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident"><span class="kw">crate</span>::MaybeUninitSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
     <span class="ident">flags</span>: <span class="ident">c_int</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">libc::socklen_t</span>, <span class="ident">RecvFlags</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">libc::socklen_t</span>, <span class="ident">RecvFlags</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">msg_namelen</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">msg_name</span>.<span class="ident">is_null</span>() {
         <span class="number">0</span>
     } <span class="kw">else</span> {
@@ -2584,7 +2584,7 @@
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> (<span class="ident">n</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">msg</span>.<span class="ident">msg_namelen</span>, <span class="ident">RecvFlags</span>(<span class="ident">msg</span>.<span class="ident">msg_flags</span>)))
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">flags</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">flags</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="macro">syscall!</span>(<span class="ident">send</span>(
         <span class="ident">fd</span>,
         <span class="ident">buf</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>(),
@@ -2595,11 +2595,11 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_vectored</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>], <span class="ident">flags</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_vectored</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>], <span class="ident">flags</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="ident">sendmsg</span>(<span class="ident">fd</span>, <span class="ident">ptr::null</span>(), <span class="number">0</span>, <span class="ident">bufs</span>, <span class="ident">flags</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_to</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SockAddr</span>, <span class="ident">flags</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_to</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SockAddr</span>, <span class="ident">flags</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="macro">syscall!</span>(<span class="ident">sendto</span>(
         <span class="ident">fd</span>,
         <span class="ident">buf</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>(),
@@ -2617,7 +2617,7 @@
     <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
     <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SockAddr</span>,
     <span class="ident">flags</span>: <span class="ident">c_int</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="ident">sendmsg</span>(<span class="ident">fd</span>, <span class="ident">addr</span>.<span class="ident">as_storage_ptr</span>(), <span class="ident">addr</span>.<span class="ident">len</span>(), <span class="ident">bufs</span>, <span class="ident">flags</span>)
 }
 
@@ -2629,7 +2629,7 @@
     <span class="ident">msg_namelen</span>: <span class="ident">socklen_t</span>,
     <span class="ident">bufs</span>: <span class="kw-2">&amp;</span>[<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
     <span class="ident">flags</span>: <span class="ident">c_int</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="comment">// libc::msghdr contains unexported padding fields on Fuchsia.</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span>: <span class="ident">libc::msghdr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mem::zeroed</span>() };
     <span class="comment">// Safety: we&#39;re creating a `*mut` pointer from a reference, which is UB</span>
@@ -2644,12 +2644,12 @@
 }
 
 <span class="doccomment">/// Wrapper around `getsockopt` to deal with platform specific timeouts.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">timeout_opt</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">opt</span>: <span class="ident">c_int</span>, <span class="ident">val</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">timeout_opt</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">opt</span>: <span class="ident">c_int</span>, <span class="ident">val</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">unsafe</span> { <span class="ident">getsockopt</span>(<span class="ident">fd</span>, <span class="ident">opt</span>, <span class="ident">val</span>).<span class="ident">map</span>(<span class="ident">from_timeval</span>) }
 }
 
-<span class="kw">fn</span> <span class="ident">from_timeval</span>(<span class="ident">duration</span>: <span class="ident">libc::timeval</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">tv_sec</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">duration</span>.<span class="ident">tv_usec</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+<span class="kw">fn</span> <span class="ident">from_timeval</span>(<span class="ident">duration</span>: <span class="ident">libc::timeval</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">tv_sec</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">duration</span>.<span class="ident">tv_usec</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="prelude-val">None</span>
     } <span class="kw">else</span> {
         <span class="kw">let</span> <span class="ident">sec</span> <span class="op">=</span> <span class="ident">duration</span>.<span class="ident">tv_sec</span> <span class="kw">as</span> <span class="ident">u64</span>;
@@ -2664,20 +2664,20 @@
     <span class="ident">opt</span>: <span class="ident">c_int</span>,
     <span class="ident">val</span>: <span class="ident">c_int</span>,
     <span class="ident">duration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">into_timeval</span>(<span class="ident">duration</span>);
     <span class="kw">unsafe</span> { <span class="ident">setsockopt</span>(<span class="ident">fd</span>, <span class="ident">opt</span>, <span class="ident">val</span>, <span class="ident">duration</span>) }
 }
 
-<span class="kw">fn</span> <span class="ident">into_timeval</span>(<span class="ident">duration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">libc::timeval</span> {
+<span class="kw">fn</span> <span class="ident">into_timeval</span>(<span class="ident">duration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">libc::timeval</span> {
     <span class="kw">match</span> <span class="ident">duration</span> {
         <span class="comment">// https://github.com/rust-lang/libc/issues/1848</span>
         <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">target_env</span> <span class="op">=</span> <span class="string">&quot;musl&quot;</span>, <span class="ident">allow</span>(<span class="ident">deprecated</span>))]</span>
-        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">libc::timeval</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) =&gt; <span class="ident">libc::timeval</span> {
             <span class="ident">tv_sec</span>: <span class="ident">min</span>(<span class="ident">duration</span>.<span class="ident">as_secs</span>(), <span class="ident">libc::time_t::max_value</span>() <span class="kw">as</span> <span class="ident">u64</span>) <span class="kw">as</span> <span class="ident">libc::time_t</span>,
             <span class="ident">tv_usec</span>: <span class="ident">duration</span>.<span class="ident">subsec_micros</span>() <span class="kw">as</span> <span class="ident">libc::suseconds_t</span>,
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">libc::timeval</span> {
+        <span class="prelude-val">None</span> =&gt; <span class="ident">libc::timeval</span> {
             <span class="ident">tv_sec</span>: <span class="number">0</span>,
             <span class="ident">tv_usec</span>: <span class="number">0</span>,
         },
@@ -2686,7 +2686,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;haiku&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>)))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">keepalive_time</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">keepalive_time</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
     <span class="kw">unsafe</span> {
         <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(<span class="ident">fd</span>, <span class="ident">IPPROTO_TCP</span>, <span class="ident">KEEPALIVE_TIME</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">secs</span><span class="op">|</span> <span class="ident">Duration::from_secs</span>(<span class="ident">secs</span> <span class="kw">as</span> <span class="ident">u64</span>))
@@ -2694,7 +2694,7 @@
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_tcp_keepalive</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">keepalive</span>: <span class="kw-2">&amp;</span><span class="ident">TcpKeepalive</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_tcp_keepalive</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">keepalive</span>: <span class="kw-2">&amp;</span><span class="ident">TcpKeepalive</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;haiku&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>)))]</span>
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">time</span>) <span class="op">=</span> <span class="ident">keepalive</span>.<span class="ident">time</span> {
         <span class="kw">let</span> <span class="ident">secs</span> <span class="op">=</span> <span class="ident">into_secs</span>(<span class="ident">time</span>);
@@ -2726,12 +2726,12 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;haiku&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>)))]</span>
-<span class="kw">fn</span> <span class="ident">into_secs</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+<span class="kw">fn</span> <span class="ident">into_secs</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">c_int</span> {
     <span class="ident">min</span>(<span class="ident">duration</span>.<span class="ident">as_secs</span>(), <span class="ident">c_int::max_value</span>() <span class="kw">as</span> <span class="ident">u64</span>) <span class="kw">as</span> <span class="ident">c_int</span>
 }
 
 <span class="doccomment">/// Add `flag` to the current set flags of `F_GETFD`.</span>
-<span class="kw">fn</span> <span class="ident">fcntl_add</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">get_cmd</span>: <span class="ident">c_int</span>, <span class="ident">set_cmd</span>: <span class="ident">c_int</span>, <span class="ident">flag</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">fcntl_add</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">get_cmd</span>: <span class="ident">c_int</span>, <span class="ident">set_cmd</span>: <span class="ident">c_int</span>, <span class="ident">flag</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> <span class="macro">syscall!</span>(<span class="ident">fcntl</span>(<span class="ident">fd</span>, <span class="ident">get_cmd</span>))<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">previous</span> <span class="op">|</span> <span class="ident">flag</span>;
     <span class="kw">if</span> <span class="ident">new</span> <span class="op">!</span><span class="op">=</span> <span class="ident">previous</span> {
@@ -2743,7 +2743,7 @@
 }
 
 <span class="doccomment">/// Remove `flag` to the current set flags of `F_GETFD`.</span>
-<span class="kw">fn</span> <span class="ident">fcntl_remove</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">get_cmd</span>: <span class="ident">c_int</span>, <span class="ident">set_cmd</span>: <span class="ident">c_int</span>, <span class="ident">flag</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">fcntl_remove</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">get_cmd</span>: <span class="ident">c_int</span>, <span class="ident">set_cmd</span>: <span class="ident">c_int</span>, <span class="ident">flag</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> <span class="macro">syscall!</span>(<span class="ident">fcntl</span>(<span class="ident">fd</span>, <span class="ident">get_cmd</span>))<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">previous</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">flag</span>;
     <span class="kw">if</span> <span class="ident">new</span> <span class="op">!</span><span class="op">=</span> <span class="ident">previous</span> {
@@ -2755,7 +2755,7 @@
 }
 
 <span class="doccomment">/// Caller must ensure `T` is the correct type for `opt` and `val`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">getsockopt</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">opt</span>: <span class="ident">c_int</span>, <span class="ident">val</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">getsockopt</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">fd</span>: <span class="ident">Socket</span>, <span class="ident">opt</span>: <span class="ident">c_int</span>, <span class="ident">val</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">libc::socklen_t</span>;
     <span class="macro">syscall!</span>(<span class="ident">getsockopt</span>(
@@ -2778,7 +2778,7 @@
     <span class="ident">opt</span>: <span class="ident">c_int</span>,
     <span class="ident">val</span>: <span class="ident">c_int</span>,
     <span class="ident">payload</span>: <span class="ident">T</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">payload</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_void</span>;
     <span class="macro">syscall!</span>(<span class="ident">setsockopt</span>(
         <span class="ident">fd</span>,
@@ -2790,7 +2790,7 @@
     .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_in_addr</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">Ipv4Addr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">in_addr</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_in_addr</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">Ipv4Addr</span>) -&gt; <span class="ident">in_addr</span> {
     <span class="comment">// `s_addr` is stored as BE on all machines, and the array is in BE order.</span>
     <span class="comment">// So the native endian conversion method is used so that it&#39;s never</span>
     <span class="comment">// swapped.</span>
@@ -2799,17 +2799,17 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_in_addr</span>(<span class="ident">in_addr</span>: <span class="ident">in_addr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ipv4Addr</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_in_addr</span>(<span class="ident">in_addr</span>: <span class="ident">in_addr</span>) -&gt; <span class="ident">Ipv4Addr</span> {
     <span class="ident">Ipv4Addr::from</span>(<span class="ident">in_addr</span>.<span class="ident">s_addr</span>.<span class="ident">to_ne_bytes</span>())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_in6_addr</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">Ipv6Addr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">in6_addr</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_in6_addr</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">Ipv6Addr</span>) -&gt; <span class="ident">in6_addr</span> {
     <span class="ident">in6_addr</span> {
         <span class="ident">s6_addr</span>: <span class="ident">addr</span>.<span class="ident">octets</span>(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_in6_addr</span>(<span class="ident">addr</span>: <span class="ident">in6_addr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ipv6Addr</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_in6_addr</span>(<span class="ident">addr</span>: <span class="ident">in6_addr</span>) -&gt; <span class="ident">Ipv6Addr</span> {
     <span class="ident">Ipv6Addr::from</span>(<span class="ident">addr</span>.<span class="ident">s6_addr</span>)
 }
 
@@ -2851,7 +2851,7 @@
             )
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept4</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident"><span class="kw">crate</span>::Socket</span>, <span class="ident">SockAddr</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept4</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident"><span class="kw">crate</span>::Socket</span>, <span class="ident">SockAddr</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_accept4</span>(<span class="ident">flags</span>)
     }
 
@@ -2865,7 +2865,7 @@
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>
     ))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">_accept4</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident"><span class="kw">crate</span>::Socket</span>, <span class="ident">SockAddr</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">_accept4</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident"><span class="kw">crate</span>::Socket</span>, <span class="ident">SockAddr</span>)<span class="op">&gt;</span> {
         <span class="comment">// Safety: `accept4` initialises the `SockAddr` for us.</span>
         <span class="kw">unsafe</span> {
             <span class="ident">SockAddr::init</span>(<span class="op">|</span><span class="ident">storage</span>, <span class="ident">len</span><span class="op">|</span> {
@@ -2882,11 +2882,11 @@
     <span class="doccomment">/// On supported platforms you can use [`Type::cloexec`].</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">unix</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_cloexec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">close_on_exec</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_cloexec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">close_on_exec</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_set_cloexec</span>(<span class="ident">close_on_exec</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">_set_cloexec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">close_on_exec</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">_set_cloexec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">close_on_exec</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">close_on_exec</span> {
             <span class="ident">fcntl_add</span>(
                 <span class="self">self</span>.<span class="ident">as_raw</span>(),
@@ -2907,12 +2907,12 @@
     <span class="doccomment">/// Sets `SO_NOSIGPIPE` on the socket.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">any</span>(<span class="ident">doc</span>, <span class="ident">target_vendor</span> <span class="op">=</span> <span class="string">&quot;apple&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">target_vendor</span> <span class="op">=</span> <span class="string">&quot;apple&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_nosigpipe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nosigpipe</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_nosigpipe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nosigpipe</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_set_nosigpipe</span>(<span class="ident">nosigpipe</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_vendor</span> <span class="op">=</span> <span class="string">&quot;apple&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">_set_nosigpipe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nosigpipe</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">_set_nosigpipe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nosigpipe</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">setsockopt</span>(
                 <span class="self">self</span>.<span class="ident">as_raw</span>(),
@@ -2930,7 +2930,7 @@
     <span class="doccomment">/// [`set_mss`]: crate::Socket::set_mss</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">unix</span>, <span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>)))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mss</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mss</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">libc::IPPROTO_TCP</span>, <span class="ident">libc::TCP_MAXSEG</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">mss</span><span class="op">|</span> <span class="ident">mss</span> <span class="kw">as</span> <span class="ident">u32</span>)
@@ -2943,7 +2943,7 @@
     <span class="doccomment">/// available on TCP sockets.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">unix</span>, <span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>)))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mss</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mss</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mss</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mss</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">setsockopt</span>(
                 <span class="self">self</span>.<span class="ident">as_raw</span>(),
@@ -2977,7 +2977,7 @@
             )
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_listener</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_listener</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">libc::SOL_SOCKET</span>, <span class="ident">libc::SO_ACCEPTCONN</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
@@ -3006,7 +3006,7 @@
             <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>,
         )
     ))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Domain</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Domain</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">libc::SOL_SOCKET</span>, <span class="ident">libc::SO_DOMAIN</span>).<span class="ident">map</span>(<span class="ident">Domain</span>) }
     }
 
@@ -3033,12 +3033,12 @@
             )
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">protocol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Protocol</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">protocol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Protocol</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">libc::SOL_SOCKET</span>, <span class="ident">libc::SO_PROTOCOL</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">v</span>
             {
-                <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                <span class="ident">p</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Protocol</span>(<span class="ident">p</span>)),
+                <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="ident">p</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Protocol</span>(<span class="ident">p</span>)),
             })
         }
     }
@@ -3060,7 +3060,7 @@
             <span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>)
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">libc::SOL_SOCKET</span>, <span class="ident">libc::SO_MARK</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">mark</span><span class="op">|</span> <span class="ident">mark</span> <span class="kw">as</span> <span class="ident">u32</span>)
@@ -3085,7 +3085,7 @@
             <span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>)
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mark</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mark</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">setsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(
                 <span class="self">self</span>.<span class="ident">as_raw</span>(),
@@ -3110,7 +3110,7 @@
             <span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>)
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// TODO: replace with `MaybeUninit::uninit_array` once stable.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>; <span class="ident">libc::IFNAMSIZ</span>] <span class="op">=</span>
             <span class="kw">unsafe</span> { <span class="ident">MaybeUninit::uninit</span>().<span class="ident">assume_init</span>() };
@@ -3124,7 +3124,7 @@
                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">len</span>,
             ))<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">buf</span>[..<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>];
@@ -3151,7 +3151,7 @@
             <span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>)
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bind_device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">interface</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bind_device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">interface</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">value</span>, <span class="ident">len</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">interface</span>) <span class="op">=</span> <span class="ident">interface</span> {
             (<span class="ident">interface</span>.<span class="ident">as_ptr</span>(), <span class="ident">interface</span>.<span class="ident">len</span>())
         } <span class="kw">else</span> {
@@ -3179,7 +3179,7 @@
     <span class="doccomment">/// index.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">target_vendor</span> <span class="op">=</span> <span class="string">&quot;apple&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">target_vendor</span> <span class="op">=</span> <span class="string">&quot;apple&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bind_device_by_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">interface</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bind_device_by_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">interface</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU32</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">interface</span>.<span class="ident">map</span>(<span class="ident">NonZeroU32::get</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>);
         <span class="kw">unsafe</span> { <span class="ident">setsockopt</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">IPPROTO_IP</span>, <span class="ident">libc::IP_BOUND_IF</span>, <span class="ident">index</span>) }
     }
@@ -3191,7 +3191,7 @@
     <span class="doccomment">/// returns an interface index.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">target_vendor</span> <span class="op">=</span> <span class="string">&quot;apple&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">target_vendor</span> <span class="op">=</span> <span class="string">&quot;apple&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span>
             <span class="kw">unsafe</span> { <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">libc::c_uint</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">IPPROTO_IP</span>, <span class="ident">libc::IP_BOUND_IF</span>)<span class="question-mark">?</span> };
         <span class="prelude-val">Ok</span>(<span class="ident">NonZeroU32::new</span>(<span class="ident">index</span>))
@@ -3204,7 +3204,7 @@
     <span class="doccomment">/// [`set_cpu_affinity`]: crate::Socket::set_cpu_affinity</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cpu_affinity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cpu_affinity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">libc::SOL_SOCKET</span>, <span class="ident">libc::SO_INCOMING_CPU</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">cpu</span><span class="op">|</span> <span class="ident">cpu</span> <span class="kw">as</span> <span class="ident">usize</span>)
@@ -3216,7 +3216,7 @@
     <span class="doccomment">/// Sets the CPU affinity of the socket.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_cpu_affinity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cpu</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_cpu_affinity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cpu</span>: <span class="ident">usize</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">setsockopt</span>(
                 <span class="self">self</span>.<span class="ident">as_raw</span>(),
@@ -3244,7 +3244,7 @@
             <span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>))
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reuse_port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reuse_port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">libc::SOL_SOCKET</span>, <span class="ident">libc::SO_REUSEPORT</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">reuse</span><span class="op">|</span> <span class="ident">reuse</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
@@ -3268,7 +3268,7 @@
             <span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>))
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reuse_port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reuse</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reuse_port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reuse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">setsockopt</span>(
                 <span class="self">self</span>.<span class="ident">as_raw</span>(),
@@ -3295,7 +3295,7 @@
             <span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>)
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">freebind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">freebind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">libc::SOL_IP</span>, <span class="ident">libc::IP_FREEBIND</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">freebind</span><span class="op">|</span> <span class="ident">freebind</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
@@ -3320,7 +3320,7 @@
             <span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>)
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_freebind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">freebind</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_freebind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">freebind</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">setsockopt</span>(
                 <span class="self">self</span>.<span class="ident">as_raw</span>(),
@@ -3343,7 +3343,7 @@
         <span class="ident">docsrs</span>,
         <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>))))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">freebind_ipv6</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">freebind_ipv6</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">libc::SOL_IPV6</span>, <span class="ident">libc::IPV6_FREEBIND</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">freebind</span><span class="op">|</span> <span class="ident">freebind</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
@@ -3385,7 +3385,7 @@
         <span class="ident">docsrs</span>,
         <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;all&quot;</span>, <span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>))))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_freebind_ipv6</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">freebind</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_freebind_ipv6</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">freebind</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">setsockopt</span>(
                 <span class="self">self</span>.<span class="ident">as_raw</span>(),
@@ -3440,7 +3440,7 @@
         <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
         <span class="ident">offset</span>: <span class="ident">usize</span>,
         <span class="ident">length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroUsize</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">AsRawFd</span>,
     {
@@ -3453,13 +3453,13 @@
         <span class="ident">file</span>: <span class="ident">RawFd</span>,
         <span class="ident">offset</span>: <span class="ident">libc::off_t</span>,
         <span class="ident">length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroUsize</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="comment">// On macOS `length` is value-result parameter. It determines the number</span>
         <span class="comment">// of bytes to write and returns the number of bytes written.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">length</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">libc::off_t</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">libc::off_t</span>,
             <span class="comment">// A value of `0` means send all bytes.</span>
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="number">0</span>,
         };
         <span class="macro">syscall!</span>(<span class="ident">sendfile</span>(
             <span class="ident">file</span>,
@@ -3478,11 +3478,11 @@
         <span class="ident">file</span>: <span class="ident">RawFd</span>,
         <span class="ident">offset</span>: <span class="ident">libc::off_t</span>,
         <span class="ident">length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroUsize</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">length</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">libc::size_t</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">libc::size_t</span>,
             <span class="comment">// The maximum the Linux kernel will write in a single call.</span>
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0x7ffff000</span>, <span class="comment">// 2,147,479,552 bytes.</span>
+            <span class="prelude-val">None</span> =&gt; <span class="number">0x7ffff000</span>, <span class="comment">// 2,147,479,552 bytes.</span>
         };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">offset</span>;
         <span class="macro">syscall!</span>(<span class="ident">sendfile</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">file</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">offset</span>, <span class="ident">count</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">usize</span>)
@@ -3494,11 +3494,11 @@
         <span class="ident">file</span>: <span class="ident">RawFd</span>,
         <span class="ident">offset</span>: <span class="ident">libc::off_t</span>,
         <span class="ident">length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroUsize</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">nbytes</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">length</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">libc::size_t</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">libc::size_t</span>,
             <span class="comment">// A value of `0` means send all bytes.</span>
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="number">0</span>,
         };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sbytes</span>: <span class="ident">libc::off_t</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="macro">syscall!</span>(<span class="ident">sendfile</span>(
@@ -3534,7 +3534,7 @@
             <span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>)
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_tcp_user_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_tcp_user_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">timeout</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">to</span><span class="op">|</span> <span class="ident">min</span>(<span class="ident">to</span>.<span class="ident">as_millis</span>(), <span class="ident">libc::c_uint::MAX</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="kw">as</span> <span class="ident">libc::c_uint</span>)
             .<span class="ident">unwrap_or</span>(<span class="number">0</span>);
@@ -3564,11 +3564,11 @@
             <span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>)
         )))
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tcp_user_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tcp_user_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">getsockopt</span>::<span class="op">&lt;</span><span class="ident">libc::c_uint</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">as_raw</span>(), <span class="ident">libc::IPPROTO_TCP</span>, <span class="ident">libc::TCP_USER_TIMEOUT</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">millis</span><span class="op">|</span> {
-                    <span class="kw">if</span> <span class="ident">millis</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">millis</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="prelude-val">None</span>
                     } <span class="kw">else</span> {
                         <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="ident">millis</span> <span class="kw">as</span> <span class="ident">u64</span>))
@@ -3580,21 +3580,21 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unix</span>)))]</span>
 <span class="kw">impl</span> <span class="ident">AsRawFd</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::Socket</span> {
-    <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+    <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">c_int</span> {
         <span class="self">self</span>.<span class="ident">as_raw</span>()
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unix</span>)))]</span>
 <span class="kw">impl</span> <span class="ident">IntoRawFd</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::Socket</span> {
-    <span class="kw">fn</span> <span class="ident">into_raw_fd</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+    <span class="kw">fn</span> <span class="ident">into_raw_fd</span>(<span class="self">self</span>) -&gt; <span class="ident">c_int</span> {
         <span class="self">self</span>.<span class="ident">into_raw</span>()
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unix</span>)))]</span>
 <span class="kw">impl</span> <span class="ident">FromRawFd</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::Socket</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_fd</span>(<span class="ident">fd</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Socket</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_fd</span>(<span class="ident">fd</span>: <span class="ident">c_int</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Socket</span> {
         <span class="ident"><span class="kw">crate</span>::Socket::from_raw</span>(<span class="ident">fd</span>)
     }
 }

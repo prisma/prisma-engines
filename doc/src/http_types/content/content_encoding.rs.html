@@ -184,15 +184,15 @@
 
 <span class="kw">impl</span> <span class="ident">ContentEncoding</span> {
     <span class="doccomment">/// Create a new instance of `CacheControl`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">encoding</span>: <span class="ident">Encoding</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">encoding</span>: <span class="ident">Encoding</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">encoding</span> }
     }
 
     <span class="doccomment">/// Create a new instance from headers.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_headers</span>(<span class="ident">headers</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_headers</span>(<span class="ident">headers</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">headers</span>.<span class="ident">as_ref</span>().<span class="ident">get</span>(<span class="ident">CONTENT_ENCODING</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">headers</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">headers</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">headers</span>) =&gt; <span class="ident">headers</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="prelude-val">None</span>;
@@ -213,24 +213,24 @@
     }
 
     <span class="doccomment">/// Get the `HeaderName`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HeaderName</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HeaderName</span> {
         <span class="ident">CONTENT_ENCODING</span>
     }
 
     <span class="doccomment">/// Get the `HeaderValue`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HeaderValue</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HeaderValue</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into</span>()
     }
 
     <span class="doccomment">/// Access the encoding kind.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Encoding</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Encoding</span> {
         <span class="self">self</span>.<span class="ident">inner</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ToHeaderValues</span> <span class="kw">for</span> <span class="ident">ContentEncoding</span> {
     <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">option::IntoIter</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">to_header_values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_header_values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span> {
         <span class="comment">// A HeaderValue will always convert into itself.</span>
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">value</span>().<span class="ident">to_header_values</span>().<span class="ident">unwrap</span>())
     }
@@ -238,43 +238,43 @@
 
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">ContentEncoding</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Encoding</span>;
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">ContentEncoding</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inner</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Encoding</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ContentEncoding</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Encoding</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Encoding</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> <span class="op">==</span> <span class="ident">other</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Encoding</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ContentEncoding</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="ident">Encoding</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="op">&amp;&amp;</span><span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="ident">Encoding</span>) -&gt; <span class="ident">bool</span> {
+        <span class="op">&amp;&amp;</span><span class="self">self</span>.<span class="ident">inner</span> <span class="op">==</span> <span class="ident">other</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Encoding</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ContentEncoding</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">encoding</span>: <span class="ident">Encoding</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">encoding</span>: <span class="ident">Encoding</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">encoding</span> }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Encoding</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ContentEncoding</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">encoding</span>: <span class="kw-2">&amp;</span><span class="ident">Encoding</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">encoding</span>: <span class="kw-2">&amp;</span><span class="ident">Encoding</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">inner</span>: <span class="kw-2">*</span><span class="ident">encoding</span> }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EncodingProposal</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ContentEncoding</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">encoding</span>: <span class="ident">EncodingProposal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">encoding</span>: <span class="ident">EncodingProposal</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="ident">encoding</span>.<span class="ident">encoding</span>,
         }
@@ -282,7 +282,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">EncodingProposal</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ContentEncoding</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">encoding</span>: <span class="kw-2">&amp;</span><span class="ident">EncodingProposal</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">encoding</span>: <span class="kw-2">&amp;</span><span class="ident">EncodingProposal</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="ident">encoding</span>.<span class="ident">encoding</span>,
         }
@@ -290,7 +290,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ContentEncoding</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }

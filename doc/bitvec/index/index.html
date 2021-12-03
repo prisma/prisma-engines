@@ -11,7 +11,7 @@ guarantee that only it can produce seed values, and only trusted functions can
 transform their numeric values or types, until the program reaches the property
 it requires. This chain of assurance means that operations that interact with
 memory can be confident in the correctness of their actions and effects.</p>
-<h1 id="type-sequence" class="section-header"><a href="#type-sequence">Type Sequence</a></h1>
+<h2 id="type-sequence" class="section-header"><a href="#type-sequence">Type Sequence</a></h2>
 <p>The library produces <code>BitIdx</code> values from region computation. These types cannot
 be publicly constructed, and are only ever the result of pointer analysis. As
 such, they rely on correctness of the memory regions provided to library entry
@@ -22,13 +22,13 @@ associated verification function to prove that implementations are correct.
 <code>BitPos</code> is the only type that can describe memory operations, and is used to
 create selection masks of <code>BitSel</code> and <code>BitMask</code>.</p>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.BitIdx.html" title="bitvec::index::BitIdx struct">BitIdx</a></div><div class="item-right docblock-short"><p>A semantic index of a single bit within a register <code>R</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.BitMask.html" title="bitvec::index::BitMask struct">BitMask</a></div><div class="item-right docblock-short"><p>A multi-bit selection mask.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.BitPos.html" title="bitvec::index::BitPos struct">BitPos</a></div><div class="item-right docblock-short"><p>An electrical position of a single bit within a register <code>R</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.BitSel.html" title="bitvec::index::BitSel struct">BitSel</a></div><div class="item-right docblock-short"><p>A one-hot selection mask, to be applied to a register <code>R</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.BitTail.html" title="bitvec::index::BitTail struct">BitTail</a></div><div class="item-right docblock-short"><p>Semantic index of a dead bit <em>after</em> a live region.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.BitRegister.html" title="bitvec::index::BitRegister trait">BitRegister</a></div><div class="item-right docblock-short"><p>Marks that an integer can be used in a processor register.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.BitIdx.html" title="bitvec::index::BitIdx struct">BitIdx</a></div><div class="item-right docblock-short"><p>A semantic index of a single bit within a register <code>R</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.BitMask.html" title="bitvec::index::BitMask struct">BitMask</a></div><div class="item-right docblock-short"><p>A multi-bit selection mask.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.BitPos.html" title="bitvec::index::BitPos struct">BitPos</a></div><div class="item-right docblock-short"><p>An electrical position of a single bit within a register <code>R</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.BitSel.html" title="bitvec::index::BitSel struct">BitSel</a></div><div class="item-right docblock-short"><p>A one-hot selection mask, to be applied to a register <code>R</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.BitTail.html" title="bitvec::index::BitTail struct">BitTail</a></div><div class="item-right docblock-short"><p>Semantic index of a dead bit <em>after</em> a live region.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.BitRegister.html" title="bitvec::index::BitRegister trait">BitRegister</a></div><div class="item-right docblock-short"><p>Marks that an integer can be used in a processor register.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

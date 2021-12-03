@@ -4,7 +4,7 @@ implementation.  Libraries can use the metrics API provided by this crate, and t
 those libraries can choose the metrics implementation that is most suitable for its use case.</p>
 <p>If no metrics implementation is selected, the facade falls back to a “noop” implementation that
 ignores all metrics.  The overhead in this case is very small - an atomic load and comparison.</p>
-<h1 id="use" class="section-header"><a href="#use">Use</a></h1>
+<h2 id="use" class="section-header"><a href="#use">Use</a></h2>
 <p>The basic use of the facade crate is through the four metrics macros: <a href="macro.counter.html" title="counter!"><code>counter!</code></a>, <a href="macro.gauge.html" title="gauge!"><code>gauge!</code></a>,
 <a href="macro.timing.html" title="timing!"><code>timing!</code></a>, and <a href="macro.value.html" title="value!"><code>value!</code></a>.  These macros correspond to updating a counter, updating a gauge,
 updating a histogram based on a start/end, and updating a histogram with a single value.</p>
@@ -14,13 +14,13 @@ contextual consistency: if you’re recording a measurement of the time passed d
 operation, the end result is a single value, but it’s more of a “timing” value than just a
 “value”.  The <a href="macro.timing.html" title="timing!"><code>timing!</code></a> macro also has a branch to accept the start and end values which
 allows for a potentially clearer invocation.</p>
-<h2 id="in-libraries" class="section-header"><a href="#in-libraries">In libraries</a></h2>
+<h3 id="in-libraries" class="section-header"><a href="#in-libraries">In libraries</a></h3>
 <p>Libraries should link only to the <code>metrics</code> crate, and use the provided macros to record
 whatever metrics will be useful to downstream consumers.</p>
-<h3 id="examples" class="section-header"><a href="#examples">Examples</a></h3>
+<h4 id="examples" class="section-header"><a href="#examples">Examples</a></h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">timing</span>, <span class="ident">counter</span>};
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process</span>(<span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process</span>(<span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
     <span class="kw">let</span> <span class="ident">row_count</span> <span class="op">=</span> <span class="ident">run_query</span>(<span class="ident">query</span>);
     <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
@@ -30,22 +30,22 @@ whatever metrics will be useful to downstream consumers.</p>
 
     <span class="ident">row_count</span>
 }</code></pre></div>
-<h2 id="in-executables" class="section-header"><a href="#in-executables">In executables</a></h2>
+<h3 id="in-executables" class="section-header"><a href="#in-executables">In executables</a></h3>
 <p>Executables should choose a metrics implementation and initialize it early in the runtime of
 the program.  Metrics implementations will typically include a function to do this.  Any
 metrics recordered before the implementation is initialized will be ignored.</p>
 <p>The executable itself may use the <code>metrics</code> crate to record metrics well.</p>
-<h3 id="warning" class="section-header"><a href="#warning">Warning</a></h3>
+<h4 id="warning" class="section-header"><a href="#warning">Warning</a></h4>
 <p>The metrics system may only be initialized once.</p>
-<h1 id="available-metrics-implementations" class="section-header"><a href="#available-metrics-implementations">Available metrics implementations</a></h1>
+<h2 id="available-metrics-implementations" class="section-header"><a href="#available-metrics-implementations">Available metrics implementations</a></h2>
 <ul>
-<li><h1 id="native-recorder" class="section-header"><a href="#native-recorder">Native recorder:</a></h1>
+<li><h2 id="native-recorder" class="section-header"><a href="#native-recorder">Native recorder:</a></h2>
 <ul>
 <li><a href="https://docs.rs/metrics-runtime">metrics-runtime</a></li>
 </ul>
 </li>
 </ul>
-<h1 id="implementing-a-recorder" class="section-header"><a href="#implementing-a-recorder">Implementing a Recorder</a></h1>
+<h2 id="implementing-a-recorder" class="section-header"><a href="#implementing-a-recorder">Implementing a Recorder</a></h2>
 <p>Recorders implement the <a href="trait.Recorder.html" title="Recorder"><code>Recorder</code></a> trait.  Here’s a basic example which writes the
 metrics in text form via the <code>log</code> crate.</p>
 
@@ -75,10 +75,10 @@ function that wraps the creation and installation of the recorder:</p>
 
 <span class="kw">static</span> <span class="ident">RECORDER</span>: <span class="ident">LogRecorder</span> <span class="op">=</span> <span class="ident">LogRecorder</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SetRecorderError</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SetRecorderError</span><span class="op">&gt;</span> {
     <span class="ident">metrics::set_recorder</span>(<span class="kw-2">&amp;</span><span class="ident">RECORDER</span>)
 }</code></pre></div>
-<h1 id="use-with-std" class="section-header"><a href="#use-with-std">Use with <code>std</code></a></h1>
+<h2 id="use-with-std" class="section-header"><a href="#use-with-std">Use with <code>std</code></a></h2>
 <p><code>set_recorder</code> requires you to provide a <code>&amp;'static Recorder</code>, which can be hard to
 obtain if your recorder depends on some runtime configuration.  The <code>set_boxed_recorder</code>
 function is available with the <code>std</code> Cargo feature.  It is identical to <code>set_recorder</code> except
@@ -86,26 +86,26 @@ that it takes a <code>Box&lt;Recorder&gt;</code> rather than a <code>&amp;'stati
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">metrics::SetRecorderError</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SetRecorderError</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SetRecorderError</span><span class="op">&gt;</span> {
     <span class="ident">metrics::set_boxed_recorder</span>(<span class="ident">Box::new</span>(<span class="ident">LogRecorder</span>))
 }</code></pre></div>
 </div></details><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="macro" href="macro.counter.html" title="metrics::counter macro">counter</a></div><div class="item-right docblock-short"><p>Increments a counter by a value.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.gauge.html" title="metrics::gauge macro">gauge</a></div><div class="item-right docblock-short"><p>Update a gauge with a value.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.labels.html" title="metrics::labels macro">labels</a></div><div class="item-right docblock-short"><p>Helper macro for generating a set of labels.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.timing.html" title="metrics::timing macro">timing</a></div><div class="item-right docblock-short"><p>Records a timing.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.value.html" title="metrics::value macro">value</a></div><div class="item-right docblock-short"><p>Records a value.</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Key.html" title="metrics::Key struct">Key</a></div><div class="item-right docblock-short"><p>A metric key.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Label.html" title="metrics::Label struct">Label</a></div><div class="item-right docblock-short"><p>A key/value pair used to further describe a metric.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SetRecorderError.html" title="metrics::SetRecorderError struct">SetRecorderError</a></div><div class="item-right docblock-short"><p>The type returned by <a href="fn.set_recorder.html" title="set_recorder"><code>set_recorder</code></a> if <a href="fn.set_recorder.html" title="set_recorder"><code>set_recorder</code></a> has already been called.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Recorder.html" title="metrics::Recorder trait">Recorder</a></div><div class="item-right docblock-short"><p>A value that records metrics behind the facade.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.recorder.html" title="metrics::recorder fn">recorder</a></div><div class="item-right docblock-short"><p>Returns a reference to the recorder.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.set_recorder.html" title="metrics::set_recorder fn">set_recorder</a></div><div class="item-right docblock-short"><p>Sets the global recorder to a <code>&amp;'static Recorder</code>.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.set_recorder_racy.html" title="metrics::set_recorder_racy fn">set_recorder_racy</a><a title="unsafe function" href="#"><sup>⚠</sup></a></div><div class="item-right docblock-short"><p>A thread-unsafe version of <a href="fn.set_recorder.html" title="set_recorder"><code>set_recorder</code></a>.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.try_recorder.html" title="metrics::try_recorder fn">try_recorder</a></div><div class="item-right docblock-short"><p>Returns a reference to the recorder.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="metrics" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.counter.html" title="metrics::counter macro">counter</a></div><div class="item-right docblock-short"><p>Increments a counter by a value.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.gauge.html" title="metrics::gauge macro">gauge</a></div><div class="item-right docblock-short"><p>Update a gauge with a value.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.labels.html" title="metrics::labels macro">labels</a></div><div class="item-right docblock-short"><p>Helper macro for generating a set of labels.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.timing.html" title="metrics::timing macro">timing</a></div><div class="item-right docblock-short"><p>Records a timing.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.value.html" title="metrics::value macro">value</a></div><div class="item-right docblock-short"><p>Records a value.</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Key.html" title="metrics::Key struct">Key</a></div><div class="item-right docblock-short"><p>A metric key.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Label.html" title="metrics::Label struct">Label</a></div><div class="item-right docblock-short"><p>A key/value pair used to further describe a metric.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SetRecorderError.html" title="metrics::SetRecorderError struct">SetRecorderError</a></div><div class="item-right docblock-short"><p>The type returned by <a href="fn.set_recorder.html" title="set_recorder"><code>set_recorder</code></a> if <a href="fn.set_recorder.html" title="set_recorder"><code>set_recorder</code></a> has already been called.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Recorder.html" title="metrics::Recorder trait">Recorder</a></div><div class="item-right docblock-short"><p>A value that records metrics behind the facade.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.recorder.html" title="metrics::recorder fn">recorder</a></div><div class="item-right docblock-short"><p>Returns a reference to the recorder.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.set_recorder.html" title="metrics::set_recorder fn">set_recorder</a></div><div class="item-right docblock-short"><p>Sets the global recorder to a <code>&amp;'static Recorder</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.set_recorder_racy.html" title="metrics::set_recorder_racy fn">set_recorder_racy</a><a title="unsafe function" href="#"><sup>⚠</sup></a></div><div class="item-right docblock-short"><p>A thread-unsafe version of <a href="fn.set_recorder.html" title="set_recorder"><code>set_recorder</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.try_recorder.html" title="metrics::try_recorder fn">try_recorder</a></div><div class="item-right docblock-short"><p>Returns a reference to the recorder.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="metrics" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

@@ -258,7 +258,7 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_cert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">cert_der</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">ee_or_ca</span>: <span class="ident">EndEntityOrCA</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="ident">parse_cert_internal</span>(<span class="ident">cert_der</span>, <span class="ident">ee_or_ca</span>, <span class="ident">certificate_serial_number</span>)
 }
 
@@ -267,8 +267,8 @@
 <span class="doccomment">/// certificates.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_cert_internal</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">cert_der</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">ee_or_ca</span>: <span class="ident">EndEntityOrCA</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">serial_number</span>: <span class="kw">fn</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="ident">serial_number</span>: <span class="kw">fn</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">tbs</span>, <span class="ident">signed_data</span>) <span class="op">=</span> <span class="ident">cert_der</span>.<span class="ident">read_all</span>(<span class="ident">Error::BadDER</span>, <span class="op">|</span><span class="ident">cert_der</span><span class="op">|</span> {
         <span class="ident">der::nested</span>(
             <span class="ident">cert_der</span>,
@@ -337,8 +337,8 @@
                         <span class="kw">let</span> <span class="ident">extn_value</span> <span class="op">=</span>
                             <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">extension</span>, <span class="ident">der::Tag::OctetString</span>)<span class="question-mark">?</span>;
                         <span class="kw">match</span> <span class="ident">remember_extension</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cert</span>, <span class="ident">extn_id</span>, <span class="ident">extn_value</span>)<span class="question-mark">?</span> {
-                            <span class="ident">Understood::No</span> <span class="kw">if</span> <span class="ident">critical</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedCriticalExtension</span>),
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+                            <span class="ident">Understood::No</span> <span class="kw">if</span> <span class="ident">critical</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedCriticalExtension</span>),
+                            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
                         }
                     },
                 )
@@ -351,7 +351,7 @@
 
 <span class="comment">// mozilla::pkix supports v1, v2, v3, and v4, including both the implicit</span>
 <span class="comment">// (correct) and explicit (incorrect) encoding of v1. We allow only v3.</span>
-<span class="kw">fn</span> <span class="ident">version3</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">version3</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="ident">der::nested</span>(
         <span class="ident">input</span>,
         <span class="ident">der::Tag::ContextSpecificConstructed0</span>,
@@ -367,7 +367,7 @@
     )
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">certificate_serial_number</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">certificate_serial_number</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.1.2.2:</span>
     <span class="comment">// * Conforming CAs MUST NOT use serialNumber values longer than 20 octets.&quot;</span>
     <span class="comment">// * &quot;The serial number MUST be a positive integer [...]&quot;</span>
@@ -386,7 +386,7 @@
 
 <span class="kw">fn</span> <span class="ident">remember_extension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">cert</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Cert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">extn_id</span>: <span class="ident">untrusted::Input</span>, <span class="ident">value</span>: <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Understood</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Understood</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="comment">// We don&#39;t do anything with certificate policies so we can safely ignore</span>
     <span class="comment">// all policy-related stuff. We assume that the policy-related extensions</span>
     <span class="comment">// are not marked critical.</span>
@@ -404,34 +404,34 @@
         <span class="comment">// and other common browsers do not check KeyUsage for end-entities,</span>
         <span class="comment">// though it would be kind of nice to ensure that a KeyUsage without</span>
         <span class="comment">// the keyEncipherment bit could not be used for RSA key exchange.</span>
-        <span class="number">15</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="number">15</span> =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Understood::Yes</span>);
         },
 
         <span class="comment">// id-ce-subjectAltName 2.5.29.17</span>
-        <span class="number">17</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cert</span>.<span class="ident">subject_alt_name</span>,
+        <span class="number">17</span> =&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cert</span>.<span class="ident">subject_alt_name</span>,
 
         <span class="comment">// id-ce-basicConstraints 2.5.29.19</span>
-        <span class="number">19</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cert</span>.<span class="ident">basic_constraints</span>,
+        <span class="number">19</span> =&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cert</span>.<span class="ident">basic_constraints</span>,
 
         <span class="comment">// id-ce-nameConstraints 2.5.29.30</span>
-        <span class="number">30</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cert</span>.<span class="ident">name_constraints</span>,
+        <span class="number">30</span> =&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cert</span>.<span class="ident">name_constraints</span>,
 
         <span class="comment">// id-ce-extKeyUsage 2.5.29.37</span>
-        <span class="number">37</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cert</span>.<span class="ident">eku</span>,
+        <span class="number">37</span> =&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cert</span>.<span class="ident">eku</span>,
 
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">_</span> =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Understood::No</span>);
         },
     };
 
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">out</span> {
-        <span class="prelude-val">Some</span>(..) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(..) =&gt; {
             <span class="comment">// The certificate contains more than one instance of this</span>
             <span class="comment">// extension.</span>
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExtensionValueInvalid</span>);
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">None</span> =&gt; {
             <span class="comment">// All the extensions that we care about are wrapped in a SEQUENCE.</span>
             <span class="kw">let</span> <span class="ident">sequence_value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">read_all</span>(<span class="ident">Error::BadDER</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
                 <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">value</span>, <span class="ident">der::Tag::Sequence</span>)

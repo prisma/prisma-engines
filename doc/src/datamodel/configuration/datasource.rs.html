@@ -176,7 +176,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Datasource</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Datasource&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
             .<span class="ident">field</span>(<span class="string">&quot;provider&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">provider</span>)
@@ -191,33 +191,33 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Datasource</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorCapabilities</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorCapabilities</span> {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">active_connector</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>();
         <span class="ident">ConnectorCapabilities::new</span>(<span class="ident">capabilities</span>)
     }
 
     <span class="doccomment">/// The applicable referential integrity mode for this datasource.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::or_fun_call</span>)]</span> <span class="comment">// not applicable in this case</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referential_integrity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReferentialIntegrity</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referential_integrity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialIntegrity</span> {
         <span class="self">self</span>.<span class="ident">referential_integrity</span>
             .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">active_connector</span>.<span class="ident">default_referential_integrity</span>())
     }
 
     <span class="doccomment">/// Load the database URL, validating it and resolving env vars in the</span>
     <span class="doccomment">/// process. Also see `load_url_with_config_dir()`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_url</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">env</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Diagnostics</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_url</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">env</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Diagnostics</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">url</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">url</span>.<span class="ident">from_env_var</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">lit</span>), <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">lit</span>.<span class="ident">trim</span>().<span class="ident">is_empty</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">Some</span>(<span class="ident">lit</span>), <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">lit</span>.<span class="ident">trim</span>().<span class="ident">is_empty</span>() =&gt; {
                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;You must provide a nonempty URL&quot;</span>;
 
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_source_validation_error</span>(<span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>, <span class="self">self</span>.<span class="ident">url_span</span>).<span class="ident">into</span>());
             }
-            (<span class="prelude-val">Some</span>(<span class="ident">lit</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">lit</span>.<span class="ident">clone</span>(),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">env_var</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">env</span>(<span class="ident">env_var</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">var</span>) <span class="kw">if</span> <span class="ident">var</span>.<span class="ident">trim</span>().<span class="ident">is_empty</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">Some</span>(<span class="ident">lit</span>), <span class="kw">_</span>) =&gt; <span class="ident">lit</span>.<span class="ident">clone</span>(),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">env_var</span>)) =&gt; <span class="kw">match</span> <span class="ident">env</span>(<span class="ident">env_var</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">var</span>) <span class="kw">if</span> <span class="ident">var</span>.<span class="ident">trim</span>().<span class="ident">is_empty</span>() =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_source_validation_error</span>(
                         <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                         <span class="string">&quot;You must provide a nonempty URL. The environment variable `{}` resolved to an empty string.&quot;</span>,
@@ -228,8 +228,8 @@
                     )
                     .<span class="ident">into</span>())
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">var</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">var</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">var</span>) =&gt; <span class="ident">var</span>,
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_environment_functional_evaluation_error</span>(
                         <span class="ident">env_var</span>.<span class="ident">to_owned</span>(),
                         <span class="self">self</span>.<span class="ident">url_span</span>,
@@ -237,7 +237,7 @@
                     .<span class="ident">into</span>())
                 }
             },
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;Missing url in datasource&quot;</span>),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Missing url in datasource&quot;</span>),
         };
 
         <span class="self">self</span>.<span class="ident">active_connector</span>.<span class="ident">validate_url</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err_str</span><span class="op">|</span> {
@@ -258,9 +258,9 @@
     <span class="doccomment">/// context of Node-API integration.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// P.S. Don&#39;t forget to add new parameters here if needed!</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_url_with_config_dir</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>, <span class="ident">env</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Diagnostics</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_url_with_config_dir</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>, <span class="ident">env</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Diagnostics</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">load_url</span>(<span class="ident">env</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">active_connector</span>.<span class="ident">set_config_dir</span>(<span class="ident">config_dir</span>, <span class="kw-2">&amp;</span><span class="ident">url</span>);
@@ -269,22 +269,22 @@
     }
 
     <span class="doccomment">/// Load the shadow database URL, validating it and resolving env vars in the process.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_shadow_database_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Diagnostics</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_shadow_database_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">Diagnostics</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">url</span>, <span class="ident">url_span</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>
             .<span class="ident">shadow_database_url</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">url</span>, <span class="ident">span</span>)<span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">from_env_var</span>, <span class="ident">span</span>))
         {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            <span class="prelude-val">Some</span>((<span class="prelude-val">Some</span>(<span class="ident">lit</span>), <span class="kw">_</span>, <span class="ident">span</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">lit</span>.<span class="ident">clone</span>(), <span class="ident">span</span>),
-            <span class="prelude-val">Some</span>((<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">env_var</span>), <span class="ident">span</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">std::env::var</span>(<span class="ident">env_var</span>) {
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>((<span class="prelude-val">Some</span>(<span class="ident">lit</span>), <span class="kw">_</span>, <span class="ident">span</span>)) =&gt; (<span class="ident">lit</span>.<span class="ident">clone</span>(), <span class="ident">span</span>),
+            <span class="prelude-val">Some</span>((<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">env_var</span>), <span class="ident">span</span>)) =&gt; <span class="kw">match</span> <span class="ident">std::env::var</span>(<span class="ident">env_var</span>) {
                 <span class="comment">// We explicitly ignore empty and missing env vars, because the same schema (with the same env function) has to be usable for dev and deployment alike.</span>
-                <span class="prelude-val">Ok</span>(<span class="ident">var</span>) <span class="kw">if</span> <span class="ident">var</span>.<span class="ident">trim</span>().<span class="ident">is_empty</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                <span class="prelude-val">Ok</span>(<span class="ident">var</span>) <span class="kw">if</span> <span class="ident">var</span>.<span class="ident">trim</span>().<span class="ident">is_empty</span>() =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
 
-                <span class="prelude-val">Ok</span>(<span class="ident">var</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">var</span>, <span class="ident">span</span>),
+                <span class="prelude-val">Ok</span>(<span class="ident">var</span>) =&gt; (<span class="ident">var</span>, <span class="ident">span</span>),
             },
-            <span class="prelude-val">Some</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="ident">_span</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;Missing url in datasource&quot;</span>),
+            <span class="prelude-val">Some</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="ident">_span</span>)) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Missing url in datasource&quot;</span>),
         };
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">url</span>.<span class="ident">trim</span>().<span class="ident">is_empty</span>() {

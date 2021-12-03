@@ -109,7 +109,7 @@
 <span class="doccomment">/// Returns a new requester/receiver pair.</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">channel</span>(
     <span class="ident">handle</span>: <span class="ident">PoolWorkerHandle</span>,
-) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">ConnectionRequester</span>, <span class="ident">ConnectionRequestReceiver</span>) {
+) -&gt; (<span class="ident">ConnectionRequester</span>, <span class="ident">ConnectionRequestReceiver</span>) {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded_channel</span>();
     (
         <span class="ident">ConnectionRequester</span> {
@@ -131,7 +131,7 @@
 
 <span class="kw">impl</span> <span class="ident">ConnectionRequester</span> {
     <span class="doccomment">/// Request a connection from the pool that owns the receiver end of this requester.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectionRequestResult</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionRequestResult</span> {
         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
 
         <span class="comment">// this only errors if the receiver end is dropped, which can&#39;t happen because</span>
@@ -151,7 +151,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectionRequestReceiver</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionRequest</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionRequest</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">receiver</span>
             .<span class="ident">recv</span>()
             .<span class="kw">await</span>
@@ -171,7 +171,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">fulfill</span>(
         <span class="self">self</span>,
         <span class="ident">result</span>: <span class="ident">ConnectionRequestResult</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">ConnectionRequestResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">ConnectionRequestResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">result</span>)
     }
 }
@@ -191,10 +191,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectionRequestResult</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">unwrap_pooled_connection</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connection</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">unwrap_pooled_connection</span>(<span class="self">self</span>) -&gt; <span class="ident">Connection</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConnectionRequestResult::Pooled</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">c</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;attempted to unwrap pooled connection when was establishing&quot;</span>),
+            <span class="ident">ConnectionRequestResult::Pooled</span>(<span class="ident">c</span>) =&gt; <span class="kw-2">*</span><span class="ident">c</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;attempted to unwrap pooled connection when was establishing&quot;</span>),
         }
     }
 }

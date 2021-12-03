@@ -169,45 +169,45 @@
     <span class="comment">//         .expect(&quot;Model does not exist anymore. Parent model got deleted without deleting the child.&quot;)</span>
     <span class="comment">// }</span>
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_data_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InternalDataModelRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_data_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InternalDataModelRef</span> {
         <span class="self">self</span>.<span class="ident">container</span>.<span class="ident">internal_data_model</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">is_id</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">arity</span>, <span class="ident">FieldArity::List</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">arity</span>, <span class="ident">FieldArity::Required</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">is_unique</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_id</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">db_name</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_identifier_with_arity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">TypeIdentifier</span>, <span class="ident">FieldArity</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_identifier_with_arity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">TypeIdentifier</span>, <span class="ident">FieldArity</span>) {
         (<span class="self">self</span>.<span class="ident">type_identifier</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">arity</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_read_only</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_read_only</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">read_only</span>.<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> <span class="bool-val">false</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_numeric</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_numeric</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">type_identifier</span>.<span class="ident">is_numeric</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ScalarField</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ScalarField&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
             .<span class="ident">field</span>(<span class="string">&quot;type_identifier&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">type_identifier</span>)
@@ -244,18 +244,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">ScalarField</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">name</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">type_identifier</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">type_identifier</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">is_id</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_auto_generated_int_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">is_auto_generated_int_id</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">internal_enum</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">internal_enum</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_updated_at</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">is_updated_at</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">default_value</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">default_value</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_unique</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">is_unique</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">container</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">container</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">arity</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">arity</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">db_name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">db_name</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">type_identifier</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">type_identifier</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">is_id</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_auto_generated_int_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">is_auto_generated_int_id</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">internal_enum</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">internal_enum</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_updated_at</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">is_updated_at</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">default_value</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">default_value</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_unique</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">is_unique</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">container</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">container</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">arity</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">arity</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">db_name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">db_name</span>
     }
 }
 </code></pre></div>

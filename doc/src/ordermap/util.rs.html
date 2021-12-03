@@ -19,16 +19,16 @@
 <span class="kw">use</span> <span class="ident">std::iter::Enumerate</span>;
 <span class="kw">use</span> <span class="ident">std::mem::size_of</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">third</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">t</span>: (<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span> { <span class="ident">t</span>.<span class="number">2</span> }
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">third</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">t</span>: (<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>)) -&gt; <span class="ident">C</span> { <span class="ident">t</span>.<span class="number">2</span> }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enumerate</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Enumerate</span><span class="op">&lt;</span><span class="ident">I::IntoIter</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enumerate</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="ident">Enumerate</span><span class="op">&lt;</span><span class="ident">I::IntoIter</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">IntoIterator</span>
 {
     <span class="ident">iterable</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>()
 }
 
 <span class="doccomment">/// return the number of steps from a to b</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ptrdistance</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>, <span class="ident">b</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ptrdistance</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>, <span class="ident">b</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>) -&gt; <span class="ident">usize</span> {
     <span class="macro">debug_assert!</span>(<span class="ident">a</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">b</span> <span class="kw">as</span> <span class="ident">usize</span>);
     (<span class="ident">b</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">a</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">/</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()
 }

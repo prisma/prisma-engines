@@ -21,7 +21,7 @@ be used in libraries that can’t implement the trait themselves.</p>
 <span class="kw">struct</span> <span class="ident">FillDebug</span>;
 
 <span class="kw">impl</span> <span class="ident">Fill</span> <span class="kw">for</span> <span class="ident">FillDebug</span> {
-    <span class="kw">fn</span> <span class="ident">fill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">slot</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Slot</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">slot</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Slot</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">slot</span>.<span class="ident">fill_debug</span>(<span class="kw-2">&amp;</span><span class="number">42i64</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Debug</span>)
     }
 }
@@ -30,9 +30,9 @@ be used in libraries that can’t implement the trait themselves.</p>
 
 <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">value</span>.<span class="ident">to_i64</span>());</code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Slot.html" title="value_bag::fill::Slot struct">Slot</a></div><div class="item-right docblock-short"><p>A value slot to fill using the <a href="trait.Fill.html"><code>Fill</code></a> trait.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Fill.html" title="value_bag::fill::Fill trait">Fill</a></div><div class="item-right docblock-short"><p>A type that requires extra work to convert into a <a href="../struct.ValueBag.html"><code>ValueBag</code></a>.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="value_bag" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Slot.html" title="value_bag::fill::Slot struct">Slot</a></div><div class="item-right docblock-short"><p>A value slot to fill using the <a href="trait.Fill.html"><code>Fill</code></a> trait.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Fill.html" title="value_bag::fill::Fill trait">Fill</a></div><div class="item-right docblock-short"><p>A type that requires extra work to convert into a <a href="../struct.ValueBag.html"><code>ValueBag</code></a>.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="value_bag" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

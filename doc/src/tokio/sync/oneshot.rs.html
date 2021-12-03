@@ -1067,7 +1067,7 @@
     <span class="comment">// ===== impl RecvError =====</span>
 
     <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RecvError</span> {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
             <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;channel closed&quot;</span>)
         }
     }
@@ -1077,10 +1077,10 @@
     <span class="comment">// ===== impl TryRecvError =====</span>
 
     <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TryRecvError</span> {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                <span class="ident">TryRecvError::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;channel empty&quot;</span>),
-                <span class="ident">TryRecvError::Closed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;channel closed&quot;</span>),
+                <span class="ident">TryRecvError::Empty</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;channel empty&quot;</span>),
+                <span class="ident">TryRecvError::Closed</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;channel closed&quot;</span>),
             }
         }
     }
@@ -1108,13 +1108,13 @@
 <span class="kw">struct</span> <span class="ident">Task</span>(<span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">Task</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">will_wake</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">will_wake</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">with_task</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">will_wake</span>(<span class="ident">cx</span>.<span class="ident">waker</span>()))
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">with_task</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">with_task</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">R</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Waker</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Waker</span>) -&gt; <span class="ident">R</span>,
     {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">waker</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Waker</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ptr</span>).<span class="ident">as_ptr</span>();
@@ -1170,7 +1170,7 @@
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() -&gt; (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Inner</span> {
         <span class="ident">state</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">State::new</span>().<span class="ident">as_usize</span>()),
         <span class="ident">value</span>: <span class="ident">UnsafeCell::new</span>(<span class="prelude-val">None</span>),
@@ -1227,7 +1227,7 @@
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
 
         <span class="ident">inner</span>.<span class="ident">value</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="kw">unsafe</span> {
@@ -1343,7 +1343,7 @@
     <span class="doccomment">///     assert!(tx.send(&quot;never received&quot;).is_err());</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::load</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">state</span>, <span class="ident">Acquire</span>);
@@ -1390,7 +1390,7 @@
     <span class="doccomment">///     println!(&quot;the receiver dropped&quot;);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_closed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_closed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// Keep track of task budget</span>
         <span class="kw">let</span> <span class="ident">coop</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident"><span class="kw">crate</span>::coop::poll_proceed</span>(<span class="ident">cx</span>));
 
@@ -1576,14 +1576,14 @@
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TryRecvError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_recv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TryRecvError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">inner</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ref</span>() {
             <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::load</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">state</span>, <span class="ident">Acquire</span>);
 
             <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_complete</span>() {
                 <span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">inner</span>.<span class="ident">consume_value</span>() } {
-                    <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">value</span>),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>),
+                    <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">value</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>),
                 }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_closed</span>() {
                 <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>)
@@ -1611,7 +1611,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RecvError</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="comment">// If `inner` is `None`, then `poll()` has already completed.</span>
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">inner</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">get_ref</span>().<span class="ident">inner</span>.<span class="ident">as_ref</span>() {
             <span class="macro">ready!</span>(<span class="ident">inner</span>.<span class="ident">poll_recv</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>
@@ -1625,7 +1625,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Inner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">complete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">complete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">State::set_complete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>);
 
         <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">is_closed</span>() {
@@ -1642,7 +1642,7 @@
         <span class="bool-val">true</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RecvError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RecvError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Keep track of task budget</span>
         <span class="kw">let</span> <span class="ident">coop</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident"><span class="kw">crate</span>::coop::poll_proceed</span>(<span class="ident">cx</span>));
 
@@ -1652,8 +1652,8 @@
         <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_complete</span>() {
             <span class="ident">coop</span>.<span class="ident">made_progress</span>();
             <span class="kw">match</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">consume_value</span>() } {
-                <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">value</span>)),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">RecvError</span>(()))),
+                <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">value</span>)),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">RecvError</span>(()))),
             }
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_closed</span>() {
             <span class="ident">coop</span>.<span class="ident">made_progress</span>();
@@ -1672,8 +1672,8 @@
 
                         <span class="ident">coop</span>.<span class="ident">made_progress</span>();
                         <span class="kw">return</span> <span class="kw">match</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">consume_value</span>() } {
-                            <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">value</span>)),
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">RecvError</span>(()))),
+                            <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">value</span>)),
+                            <span class="prelude-val">None</span> =&gt; <span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">RecvError</span>(()))),
                         };
                     } <span class="kw">else</span> {
                         <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">rx_task</span>.<span class="ident">drop_task</span>() };
@@ -1693,8 +1693,8 @@
                 <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_complete</span>() {
                     <span class="ident">coop</span>.<span class="ident">made_progress</span>();
                     <span class="kw">match</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">consume_value</span>() } {
-                        <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">value</span>)),
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">RecvError</span>(()))),
+                        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">value</span>)),
+                        <span class="prelude-val">None</span> =&gt; <span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">RecvError</span>(()))),
                     }
                 } <span class="kw">else</span> {
                     <span class="ident">Pending</span>
@@ -1717,7 +1717,7 @@
     }
 
     <span class="doccomment">/// Consumes the value. This function does not check `state`.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">consume_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">consume_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">ptr</span>).<span class="ident">take</span>())
     }
 }
@@ -1725,7 +1725,7 @@
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Inner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Inner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
 
-<span class="kw">fn</span> <span class="ident">mut_load</span>(<span class="ident">this</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AtomicUsize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">mut_load</span>(<span class="ident">this</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AtomicUsize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">this</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">v</span>)
 }
 
@@ -1748,7 +1748,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Inner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">use</span> <span class="ident">std::sync::atomic::Ordering::Relaxed</span>;
 
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Inner&quot;</span>)
@@ -1763,15 +1763,15 @@
 <span class="kw">const</span> <span class="ident">TX_TASK_SET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0b01000</span>;
 
 <span class="kw">impl</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">State</span> {
         <span class="ident">State</span>(<span class="number">0</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_complete</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">VALUE_SENT</span> <span class="op">=</span><span class="op">=</span> <span class="ident">VALUE_SENT</span>
+    <span class="kw">fn</span> <span class="ident">is_complete</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">VALUE_SENT</span> <span class="op">==</span> <span class="ident">VALUE_SENT</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">set_complete</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">set_complete</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) -&gt; <span class="ident">State</span> {
         <span class="comment">// TODO: This could be `Release`, followed by an `Acquire` fence *if*</span>
         <span class="comment">// the `RX_TASK_SET` flag is set. However, `loom` does not support</span>
         <span class="comment">// fences yet.</span>
@@ -1779,57 +1779,57 @@
         <span class="ident">State</span>(<span class="ident">val</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_rx_task_set</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">RX_TASK_SET</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RX_TASK_SET</span>
+    <span class="kw">fn</span> <span class="ident">is_rx_task_set</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">RX_TASK_SET</span> <span class="op">==</span> <span class="ident">RX_TASK_SET</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">set_rx_task</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">set_rx_task</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) -&gt; <span class="ident">State</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">cell</span>.<span class="ident">fetch_or</span>(<span class="ident">RX_TASK_SET</span>, <span class="ident">AcqRel</span>);
         <span class="ident">State</span>(<span class="ident">val</span> <span class="op">|</span> <span class="ident">RX_TASK_SET</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">unset_rx_task</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">unset_rx_task</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) -&gt; <span class="ident">State</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">cell</span>.<span class="ident">fetch_and</span>(<span class="op">!</span><span class="ident">RX_TASK_SET</span>, <span class="ident">AcqRel</span>);
         <span class="ident">State</span>(<span class="ident">val</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">RX_TASK_SET</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">CLOSED</span> <span class="op">=</span><span class="op">=</span> <span class="ident">CLOSED</span>
+    <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">CLOSED</span> <span class="op">==</span> <span class="ident">CLOSED</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">set_closed</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">set_closed</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) -&gt; <span class="ident">State</span> {
         <span class="comment">// Acquire because we want all later writes (attempting to poll) to be</span>
         <span class="comment">// ordered after this.</span>
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">cell</span>.<span class="ident">fetch_or</span>(<span class="ident">CLOSED</span>, <span class="ident">Acquire</span>);
         <span class="ident">State</span>(<span class="ident">val</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">set_tx_task</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">set_tx_task</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) -&gt; <span class="ident">State</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">cell</span>.<span class="ident">fetch_or</span>(<span class="ident">TX_TASK_SET</span>, <span class="ident">AcqRel</span>);
         <span class="ident">State</span>(<span class="ident">val</span> <span class="op">|</span> <span class="ident">TX_TASK_SET</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">unset_tx_task</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">unset_tx_task</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) -&gt; <span class="ident">State</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">cell</span>.<span class="ident">fetch_and</span>(<span class="op">!</span><span class="ident">TX_TASK_SET</span>, <span class="ident">AcqRel</span>);
         <span class="ident">State</span>(<span class="ident">val</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">TX_TASK_SET</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_tx_task_set</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">TX_TASK_SET</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TX_TASK_SET</span>
+    <span class="kw">fn</span> <span class="ident">is_tx_task_set</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">TX_TASK_SET</span> <span class="op">==</span> <span class="ident">TX_TASK_SET</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">State</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">cell</span>.<span class="ident">load</span>(<span class="ident">order</span>);
         <span class="ident">State</span>(<span class="ident">val</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;State&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;is_complete&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_complete</span>())
             .<span class="ident">field</span>(<span class="string">&quot;is_closed&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_closed</span>())

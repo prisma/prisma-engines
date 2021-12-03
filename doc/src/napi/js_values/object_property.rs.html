@@ -113,20 +113,20 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PropertyAttributes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">sys::napi_property_attributes</span> {
-  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">PropertyAttributes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">PropertyAttributes</span>) -&gt; <span class="self">Self</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
-      <span class="ident">PropertyAttributes::Default</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::napi_property_attributes::napi_default</span>,
-      <span class="ident">PropertyAttributes::Writable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::napi_property_attributes::napi_writable</span>,
-      <span class="ident">PropertyAttributes::Enumerable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::napi_property_attributes::napi_enumerable</span>,
-      <span class="ident">PropertyAttributes::Configurable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::napi_property_attributes::napi_configurable</span>,
-      <span class="ident">PropertyAttributes::Static</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::napi_property_attributes::napi_static</span>,
+      <span class="ident">PropertyAttributes::Default</span> =&gt; <span class="ident">sys::napi_property_attributes::napi_default</span>,
+      <span class="ident">PropertyAttributes::Writable</span> =&gt; <span class="ident">sys::napi_property_attributes::napi_writable</span>,
+      <span class="ident">PropertyAttributes::Enumerable</span> =&gt; <span class="ident">sys::napi_property_attributes::napi_enumerable</span>,
+      <span class="ident">PropertyAttributes::Configurable</span> =&gt; <span class="ident">sys::napi_property_attributes::napi_configurable</span>,
+      <span class="ident">PropertyAttributes::Static</span> =&gt; <span class="ident">sys::napi_property_attributes::napi_static</span>,
     }
   }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> <span class="ident">Property</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> {
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">env</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;env</span> <span class="ident">Env</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;env</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">env</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;env</span> <span class="ident">Env</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;env</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">string_value</span> <span class="op">=</span> <span class="ident">CString::new</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
     <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
@@ -148,37 +148,37 @@
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_value</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">NapiRaw</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_value</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">NapiRaw</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
     <span class="self">self</span>.<span class="ident">raw_descriptor</span>.<span class="ident">value</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">T::raw</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>) };
     <span class="self">self</span>
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_method</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">callback</span>: <span class="ident">Callback</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_method</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">callback</span>: <span class="ident">Callback</span>) -&gt; <span class="self">Self</span> {
     <span class="self">self</span>.<span class="ident">raw_descriptor</span>.<span class="ident">method</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">callback</span>);
     <span class="self">self</span>
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_getter</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">callback</span>: <span class="ident">Callback</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_getter</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">callback</span>: <span class="ident">Callback</span>) -&gt; <span class="self">Self</span> {
     <span class="self">self</span>.<span class="ident">raw_descriptor</span>.<span class="ident">getter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">callback</span>);
     <span class="self">self</span>
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_setter</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">callback</span>: <span class="ident">Callback</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_setter</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">callback</span>: <span class="ident">Callback</span>) -&gt; <span class="self">Self</span> {
     <span class="self">self</span>.<span class="ident">raw_descriptor</span>.<span class="ident">setter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">callback</span>);
     <span class="self">self</span>
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_property_attributes</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">attributes</span>: <span class="ident">PropertyAttributes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_property_attributes</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">attributes</span>: <span class="ident">PropertyAttributes</span>) -&gt; <span class="self">Self</span> {
     <span class="self">self</span>.<span class="ident">raw_descriptor</span>.<span class="ident">attributes</span> <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">into</span>();
     <span class="self">self</span>
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::napi_property_descriptor</span> {
+  <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">sys::napi_property_descriptor</span> {
     <span class="self">self</span>.<span class="ident">raw_descriptor</span>
   }
 }

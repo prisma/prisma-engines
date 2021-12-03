@@ -3,7 +3,7 @@ version requirements. The version is queried by calling the Rust compiler
 with <code>--version</code>. The path to the compiler is determined first via the
 <code>RUSTC</code> environment variable. If it is not set, then <code>rustc</code> is used. If
 that fails, no determination is made, and calls return <code>None</code>.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>Set a <code>cfg</code> flag in <code>build.rs</code> if the running compiler was determined to be
 at least version <code>1.13.0</code>:</p>
 
@@ -19,9 +19,9 @@ is <em>at most</em> or <em>exactly</em> a certain version.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">version_check</span> <span class="kw">as</span> <span class="ident">rustc</span>;
 
 <span class="kw">match</span> <span class="ident">rustc::is_min_date</span>(<span class="string">&quot;2018-12-18&quot;</span>) {
-    <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Yep! It&#39;s recent!&quot;</span>,
-    <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;No, it&#39;s older.&quot;</span>,
-    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Couldn&#39;t determine the rustc version.&quot;</span>
+    <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) =&gt; <span class="string">&quot;Yep! It&#39;s recent!&quot;</span>,
+    <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) =&gt; <span class="string">&quot;No, it&#39;s older.&quot;</span>,
+    <span class="prelude-val">None</span> =&gt; <span class="string">&quot;Couldn&#39;t determine the rustc version.&quot;</span>
 };</code></pre></div>
 <p>See <a href="fn.is_max_date.html" title="is_max_date"><code>is_max_date</code></a> or <a href="fn.is_exact_date.html" title="is_exact_date"><code>is_exact_date</code></a> to check if the compiler was
 released <em>prior to</em> or <em>exactly on</em> a certain date.</p>
@@ -30,46 +30,46 @@ released <em>prior to</em> or <em>exactly on</em> a certain date.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">version_check</span> <span class="kw">as</span> <span class="ident">rustc</span>;
 
 <span class="kw">match</span> <span class="ident">rustc::is_feature_flaggable</span>() {
-    <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Yes! It&#39;s a dev or nightly release!&quot;</span>,
-    <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;No, it&#39;s stable or beta.&quot;</span>,
-    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Couldn&#39;t determine the rustc version.&quot;</span>
+    <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) =&gt; <span class="string">&quot;Yes! It&#39;s a dev or nightly release!&quot;</span>,
+    <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) =&gt; <span class="string">&quot;No, it&#39;s stable or beta.&quot;</span>,
+    <span class="prelude-val">None</span> =&gt; <span class="string">&quot;Couldn&#39;t determine the rustc version.&quot;</span>
 };</code></pre></div>
 <p>Check that the running compiler is on the stable channel:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">version_check</span> <span class="kw">as</span> <span class="ident">rustc</span>;
 
 <span class="kw">match</span> <span class="ident">rustc::Channel::read</span>() {
-    <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_stable</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;Yes! It&#39;s stable.&quot;</span>),
-    <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;No, the channel {} is not stable.&quot;</span>, <span class="ident">c</span>),
-    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;Couldn&#39;t determine the rustc version.&quot;</span>)
+    <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_stable</span>() =&gt; <span class="macro">format!</span>(<span class="string">&quot;Yes! It&#39;s stable.&quot;</span>),
+    <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;No, the channel {} is not stable.&quot;</span>, <span class="ident">c</span>),
+    <span class="prelude-val">None</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;Couldn&#39;t determine the rustc version.&quot;</span>)
 };</code></pre></div>
 <p>To interact with the version, release date, and release channel as structs,
 use <a href="struct.Version.html" title="Version"><code>Version</code></a>, <a href="struct.Date.html" title="Date"><code>Date</code></a>, and <a href="struct.Channel.html" title="Channel"><code>Channel</code></a>, respectively. The <a href="fn.triple.html" title="triple()"><code>triple()</code></a>
 function returns all three values efficiently.</p>
-<h1 id="alternatives" class="section-header"><a href="#alternatives">Alternatives</a></h1>
+<h2 id="alternatives" class="section-header"><a href="#alternatives">Alternatives</a></h2>
 <p>This crate is dead simple with no dependencies. If you need something more
 and don’t care about panicking if the version cannot be obtained, or if you
 don’t mind adding dependencies, see
 <a href="https://crates.io/crates/rustc_version">rustc_version</a>.</p>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Channel.html" title="version_check::Channel struct">Channel</a></div><div class="item-right docblock-short"><p>Release channel: “dev”, “nightly”, “beta”, or “stable”.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Date.html" title="version_check::Date struct">Date</a></div><div class="item-right docblock-short"><p>Release date including year, month, and day.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Version.html" title="version_check::Version struct">Version</a></div><div class="item-right docblock-short"><p>Version number: <code>major.minor.patch</code>, ignoring release channel.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.is_exact_date.html" title="version_check::is_exact_date fn">is_exact_date</a></div><div class="item-right docblock-short"><p>Checks that the running or installed <code>rustc</code> was released <strong>exactly</strong> on
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Channel.html" title="version_check::Channel struct">Channel</a></div><div class="item-right docblock-short"><p>Release channel: “dev”, “nightly”, “beta”, or “stable”.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Date.html" title="version_check::Date struct">Date</a></div><div class="item-right docblock-short"><p>Release date including year, month, and day.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Version.html" title="version_check::Version struct">Version</a></div><div class="item-right docblock-short"><p>Version number: <code>major.minor.patch</code>, ignoring release channel.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.is_exact_date.html" title="version_check::is_exact_date fn">is_exact_date</a></div><div class="item-right docblock-short"><p>Checks that the running or installed <code>rustc</code> was released <strong>exactly</strong> on
 some date.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.is_exact_version.html" title="version_check::is_exact_version fn">is_exact_version</a></div><div class="item-right docblock-short"><p>Checks that the running or installed <code>rustc</code> is <strong>exactly</strong> some version.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.is_feature_flaggable.html" title="version_check::is_feature_flaggable fn">is_feature_flaggable</a></div><div class="item-right docblock-short"><p>Checks whether the running or installed <code>rustc</code> supports feature flags.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.is_max_date.html" title="version_check::is_max_date fn">is_max_date</a></div><div class="item-right docblock-short"><p>Checks that the running or installed <code>rustc</code> was released <strong>on or before</strong>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.is_exact_version.html" title="version_check::is_exact_version fn">is_exact_version</a></div><div class="item-right docblock-short"><p>Checks that the running or installed <code>rustc</code> is <strong>exactly</strong> some version.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.is_feature_flaggable.html" title="version_check::is_feature_flaggable fn">is_feature_flaggable</a></div><div class="item-right docblock-short"><p>Checks whether the running or installed <code>rustc</code> supports feature flags.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.is_max_date.html" title="version_check::is_max_date fn">is_max_date</a></div><div class="item-right docblock-short"><p>Checks that the running or installed <code>rustc</code> was released <strong>on or before</strong>
 some date.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.is_max_version.html" title="version_check::is_max_version fn">is_max_version</a></div><div class="item-right docblock-short"><p>Checks that the running or installed <code>rustc</code> is <strong>at most</strong> some maximum
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.is_max_version.html" title="version_check::is_max_version fn">is_max_version</a></div><div class="item-right docblock-short"><p>Checks that the running or installed <code>rustc</code> is <strong>at most</strong> some maximum
 version.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.is_min_date.html" title="version_check::is_min_date fn">is_min_date</a></div><div class="item-right docblock-short"><p>Checks that the running or installed <code>rustc</code> was released <strong>on or after</strong>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.is_min_date.html" title="version_check::is_min_date fn">is_min_date</a></div><div class="item-right docblock-short"><p>Checks that the running or installed <code>rustc</code> was released <strong>on or after</strong>
 some date.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.is_min_version.html" title="version_check::is_min_version fn">is_min_version</a></div><div class="item-right docblock-short"><p>Checks that the running or installed <code>rustc</code> is <strong>at least</strong> some minimum
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.is_min_version.html" title="version_check::is_min_version fn">is_min_version</a></div><div class="item-right docblock-short"><p>Checks that the running or installed <code>rustc</code> is <strong>at least</strong> some minimum
 version.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.triple.html" title="version_check::triple fn">triple</a></div><div class="item-right docblock-short"><p>Reads the triple of <a href="struct.Version.html" title="Version"><code>Version</code></a>, <a href="struct.Channel.html" title="Channel"><code>Channel</code></a>, and <a href="struct.Date.html" title="Date"><code>Date</code></a> of the installed
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.triple.html" title="version_check::triple fn">triple</a></div><div class="item-right docblock-short"><p>Reads the triple of <a href="struct.Version.html" title="Version"><code>Version</code></a>, <a href="struct.Channel.html" title="Channel"><code>Channel</code></a>, and <a href="struct.Date.html" title="Date"><code>Date</code></a> of the installed
 or running <code>rustc</code>.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="version_check" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="version_check" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

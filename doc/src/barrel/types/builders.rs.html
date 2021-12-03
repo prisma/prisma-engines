@@ -198,7 +198,7 @@
 <span class="doccomment">/// and auto-increments on inserts.</span>
 <span class="doccomment">/// Maps to `primary` on `Pg` and manually enforces</span>
 <span class="doccomment">/// this behaviour for other Sql variants.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Primary</span>)
         .<span class="ident">nullable</span>(<span class="bool-val">true</span>) <span class="comment">// Primary keys are non-null implicitly</span>
         .<span class="ident">increments</span>(<span class="bool-val">false</span>) <span class="comment">// Primary keys are auto-increment implicitly</span>
@@ -212,7 +212,7 @@
 <span class="doccomment">/// Similar to `primary()`, but uses a standard</span>
 <span class="doccomment">/// layout UUID type, mapping to `uuid` on `Pg`</span>
 <span class="doccomment">/// and not supported by all Sql variants.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uuid</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uuid</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::UUID</span>)
         .<span class="ident">nullable</span>(<span class="bool-val">false</span>)
         .<span class="ident">unique</span>(<span class="bool-val">true</span>)
@@ -220,57 +220,57 @@
 }
 
 <span class="doccomment">/// Create a basic integer type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">integer</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">integer</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Integer</span>)
 }
 
 <span class="doccomment">/// Create an auto-incrementing integer type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serial</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serial</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Serial</span>)
 }
 
 <span class="doccomment">/// A 32-bit floating point type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">float</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">float</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Float</span>)
 }
 
 <span class="doccomment">/// A 64-bit floating point type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">double</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">double</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Double</span>)
 }
 
 <span class="doccomment">/// A boolean data type (true, false)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boolean</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boolean</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Boolean</span>)
 }
 
 <span class="doccomment">/// A variable-length string type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">varchar</span>(<span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">varchar</span>(<span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Varchar</span>(<span class="ident">len</span>))
 }
 
 <span class="doccomment">/// A fixed-length string type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">r#char</span>(<span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">r#char</span>(<span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Char</span>(<span class="ident">len</span>))
 }
 
 <span class="doccomment">/// A variable-length string type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Text</span>)
 }
 
 <span class="doccomment">/// A json-type column – not supported by all backends</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Json</span>)
 }
 
 <span class="doccomment">/// Embed binary data</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">binary</span><span class="op">&lt;</span><span class="lifetime">&#39;inner</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">binary</span><span class="op">&lt;</span><span class="lifetime">&#39;inner</span><span class="op">&gt;</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Binary</span>)
 }
 
 <span class="doccomment">/// Create a column that points to some foreign table</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">table</span>: <span class="ident">S</span>, <span class="ident">keys</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">table</span>: <span class="ident">S</span>, <span class="ident">keys</span>: <span class="ident">I</span>) -&gt; <span class="ident">Type</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WrapVec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -281,7 +281,7 @@
 <span class="doccomment">/// Like `foreign(...)` but letting you provide an external schema</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This function is important when making cross-schema references</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_schema</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">schema</span>: <span class="ident">S</span>, <span class="ident">table</span>: <span class="ident">S</span>, <span class="ident">keys</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_schema</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">schema</span>: <span class="ident">S</span>, <span class="ident">table</span>: <span class="ident">S</span>, <span class="ident">keys</span>: <span class="ident">I</span>) -&gt; <span class="ident">Type</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WrapVec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -294,32 +294,32 @@
 }
 
 <span class="doccomment">/// Any custom SQL type that is embedded into a migration</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom</span>(<span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom</span>(<span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Custom</span>(<span class="ident">sql</span>))
 }
 
 <span class="doccomment">/// An SQL date type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">date</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">date</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Date</span>)
 }
 
 <span class="doccomment">/// An SQL time type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Time</span>)
 }
 
 <span class="doccomment">/// An SQL datetime type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datetime</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datetime</span>() -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::DateTime</span>)
 }
 
 <span class="doccomment">/// Create an array of inner types</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">array</span>(<span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">array</span>(<span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">Type</span> {
     <span class="ident">Type::new</span>(<span class="ident">BaseType::Array</span>(<span class="ident">Box::new</span>(<span class="ident">inner</span>.<span class="ident">get_inner</span>())))
 }
 
 <span class="doccomment">/// Create an index over multiple, existing columns of the same type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">columns</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">columns</span>: <span class="ident">I</span>) -&gt; <span class="ident">Type</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">ToString</span>,
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
@@ -329,7 +329,7 @@
 }
 
 <span class="doccomment">/// Create a constraint over multiple, existing columns of the same type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_constraint</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">columns</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_constraint</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">columns</span>: <span class="ident">I</span>) -&gt; <span class="ident">Type</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">ToString</span>,
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
@@ -339,7 +339,7 @@
 }
 
 <span class="doccomment">/// Create a primary key over multiple, existing columns of the same type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_constraint</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">columns</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_constraint</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">columns</span>: <span class="ident">I</span>) -&gt; <span class="ident">Type</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">ToString</span>,
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
@@ -355,7 +355,7 @@
     <span class="ident">foreign_columns</span>: <span class="ident">T</span>,
     <span class="ident">on_delete</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>,
     <span class="ident">on_update</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span>
+) -&gt; <span class="ident">Type</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">ToString</span>,
     <span class="ident">A</span>: <span class="ident">ToString</span>,

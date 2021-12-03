@@ -370,25 +370,25 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CharacterSet</span> {
-    <span class="kw">fn</span> <span class="ident">encode_table</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>; <span class="number">64</span>] {
+    <span class="kw">fn</span> <span class="ident">encode_table</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>; <span class="number">64</span>] {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CharacterSet::Standard</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tables::STANDARD_ENCODE</span>,
-            <span class="ident">CharacterSet::UrlSafe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tables::URL_SAFE_ENCODE</span>,
-            <span class="ident">CharacterSet::Crypt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tables::CRYPT_ENCODE</span>,
-            <span class="ident">CharacterSet::Bcrypt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tables::BCRYPT_ENCODE</span>,
-            <span class="ident">CharacterSet::ImapMutf7</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tables::IMAP_MUTF7_ENCODE</span>,
-            <span class="ident">CharacterSet::BinHex</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tables::BINHEX_ENCODE</span>,
+            <span class="ident">CharacterSet::Standard</span> =&gt; <span class="ident">tables::STANDARD_ENCODE</span>,
+            <span class="ident">CharacterSet::UrlSafe</span> =&gt; <span class="ident">tables::URL_SAFE_ENCODE</span>,
+            <span class="ident">CharacterSet::Crypt</span> =&gt; <span class="ident">tables::CRYPT_ENCODE</span>,
+            <span class="ident">CharacterSet::Bcrypt</span> =&gt; <span class="ident">tables::BCRYPT_ENCODE</span>,
+            <span class="ident">CharacterSet::ImapMutf7</span> =&gt; <span class="ident">tables::IMAP_MUTF7_ENCODE</span>,
+            <span class="ident">CharacterSet::BinHex</span> =&gt; <span class="ident">tables::BINHEX_ENCODE</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">decode_table</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>; <span class="number">256</span>] {
+    <span class="kw">fn</span> <span class="ident">decode_table</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>; <span class="number">256</span>] {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CharacterSet::Standard</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tables::STANDARD_DECODE</span>,
-            <span class="ident">CharacterSet::UrlSafe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tables::URL_SAFE_DECODE</span>,
-            <span class="ident">CharacterSet::Crypt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tables::CRYPT_DECODE</span>,
-            <span class="ident">CharacterSet::Bcrypt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tables::BCRYPT_DECODE</span>,
-            <span class="ident">CharacterSet::ImapMutf7</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tables::IMAP_MUTF7_DECODE</span>,
-            <span class="ident">CharacterSet::BinHex</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tables::BINHEX_DECODE</span>,
+            <span class="ident">CharacterSet::Standard</span> =&gt; <span class="ident">tables::STANDARD_DECODE</span>,
+            <span class="ident">CharacterSet::UrlSafe</span> =&gt; <span class="ident">tables::URL_SAFE_DECODE</span>,
+            <span class="ident">CharacterSet::Crypt</span> =&gt; <span class="ident">tables::CRYPT_DECODE</span>,
+            <span class="ident">CharacterSet::Bcrypt</span> =&gt; <span class="ident">tables::BCRYPT_DECODE</span>,
+            <span class="ident">CharacterSet::ImapMutf7</span> =&gt; <span class="ident">tables::IMAP_MUTF7_DECODE</span>,
+            <span class="ident">CharacterSet::BinHex</span> =&gt; <span class="ident">tables::BINHEX_DECODE</span>,
         }
     }
 }
@@ -406,7 +406,7 @@
 
 <span class="kw">impl</span> <span class="ident">Config</span> {
     <span class="doccomment">/// Create a new `Config`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">char_set</span>: <span class="ident">CharacterSet</span>, <span class="ident">pad</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Config</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">char_set</span>: <span class="ident">CharacterSet</span>, <span class="ident">pad</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Config</span> {
         <span class="ident">Config</span> {
             <span class="ident">char_set</span>,
             <span class="ident">pad</span>,
@@ -415,7 +415,7 @@
     }
 
     <span class="doccomment">/// Sets whether to pad output with `=` characters.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">pad</span>(<span class="self">self</span>, <span class="ident">pad</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Config</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">pad</span>(<span class="self">self</span>, <span class="ident">pad</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Config</span> {
         <span class="ident">Config</span> { <span class="ident">pad</span>, ..<span class="self">self</span> }
     }
 
@@ -423,7 +423,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is useful when implementing</span>
     <span class="doccomment">/// [forgiving-base64 decode](https://infra.spec.whatwg.org/#forgiving-base64-decode).</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">decode_allow_trailing_bits</span>(<span class="self">self</span>, <span class="ident">allow</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Config</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">decode_allow_trailing_bits</span>(<span class="self">self</span>, <span class="ident">allow</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Config</span> {
         <span class="ident">Config</span> {
             <span class="ident">decode_allow_trailing_bits</span>: <span class="ident">allow</span>,
             ..<span class="self">self</span>

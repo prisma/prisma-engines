@@ -131,31 +131,31 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>))]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">USER</span>: <span class="ident">Payload</span> <span class="op">=</span> <span class="ident">USER_PAYLOAD</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">payload</span>: <span class="ident">Payload</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ping</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">payload</span>: <span class="ident">Payload</span>) -&gt; <span class="ident">Ping</span> {
         <span class="ident">Ping</span> {
             <span class="ident">ack</span>: <span class="bool-val">false</span>,
             <span class="ident">payload</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pong</span>(<span class="ident">payload</span>: <span class="ident">Payload</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ping</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pong</span>(<span class="ident">payload</span>: <span class="ident">Payload</span>) -&gt; <span class="ident">Ping</span> {
         <span class="ident">Ping</span> { <span class="ident">ack</span>: <span class="bool-val">true</span>, <span class="ident">payload</span> }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ack</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ack</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ack</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">payload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Payload</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">payload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Payload</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">payload</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_payload</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Payload</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_payload</span>(<span class="self">self</span>) -&gt; <span class="ident">Payload</span> {
         <span class="self">self</span>.<span class="ident">payload</span>
     }
 
     <span class="doccomment">/// Builds a `Ping` frame from a raw frame.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">head</span>: <span class="ident">Head</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ping</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">head</span>: <span class="ident">Head</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ping</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert_eq!</span>(<span class="ident">head</span>.<span class="ident">kind</span>(), <span class="ident"><span class="kw">crate</span>::frame::Kind::Ping</span>);
 
         <span class="comment">// PING frames are not associated with any individual stream. If a PING</span>
@@ -198,7 +198,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Ping</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">Ping</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">Ping</span>) -&gt; <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Frame::Ping</span>(<span class="ident">src</span>)
     }
 }

@@ -367,7 +367,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Panic</span>
     <span class="doccomment">/// It will panic if the scale exceed 37.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_scale</span>(<span class="ident">value</span>: <span class="ident">i128</span>, <span class="ident">scale</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_scale</span>(<span class="ident">value</span>: <span class="ident">i128</span>, <span class="ident">scale</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="comment">// scale cannot exceed 37 since a</span>
         <span class="comment">// max precision of 38 is possible here.</span>
         <span class="macro">assert!</span>(<span class="ident">scale</span> <span class="op">&lt;</span> <span class="number">38</span>);
@@ -376,35 +376,35 @@
     }
 
     <span class="doccomment">/// Extract the decimal part.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dec_part</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i128</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dec_part</span>(<span class="self">self</span>) -&gt; <span class="ident">i128</span> {
         <span class="kw">let</span> <span class="ident">scale</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pow_scale</span>();
         <span class="self">self</span>.<span class="ident">value</span> <span class="op">-</span> (<span class="self">self</span>.<span class="ident">value</span> <span class="op">/</span> <span class="ident">scale</span>) <span class="op">*</span> <span class="ident">scale</span>
     }
 
     <span class="doccomment">/// Extract the integer part.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">int_part</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i128</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">int_part</span>(<span class="self">self</span>) -&gt; <span class="ident">i128</span> {
         <span class="self">self</span>.<span class="ident">value</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">pow_scale</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pow_scale</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i128</span> {
+    <span class="kw">fn</span> <span class="ident">pow_scale</span>(<span class="self">self</span>) -&gt; <span class="ident">i128</span> {
         <span class="number">10i128</span>.<span class="ident">pow</span>(<span class="self">self</span>.<span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u32</span>)
     }
 
     <span class="doccomment">/// The scale (where is the decimal point) of the value.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scale</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scale</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">scale</span>
     }
 
     <span class="doccomment">/// The internal integer value</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i128</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="self">self</span>) -&gt; <span class="ident">i128</span> {
         <span class="self">self</span>.<span class="ident">value</span>
     }
 
     <span class="doccomment">/// The precision of the `Number` as a number of digits.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">precision</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">precision</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">int_part</span>();
 
@@ -413,27 +413,27 @@
             <span class="ident">result</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">result</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">result</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="number">1</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">scale</span>()
         } <span class="kw">else</span> {
             <span class="ident">result</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">scale</span>()
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">len</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">len</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">precision</span>() {
-            <span class="number">1</span>..<span class="op">=</span><span class="number">9</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
-            <span class="number">10</span>..<span class="op">=</span><span class="number">19</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">9</span>,
-            <span class="number">20</span>..<span class="op">=</span><span class="number">28</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">13</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">17</span>,
+            <span class="number">1</span>..<span class="op">=</span><span class="number">9</span> =&gt; <span class="number">5</span>,
+            <span class="number">10</span>..<span class="op">=</span><span class="number">19</span> =&gt; <span class="number">9</span>,
+            <span class="number">20</span>..<span class="op">=</span><span class="number">28</span> =&gt; <span class="number">13</span>,
+            <span class="kw">_</span> =&gt; <span class="number">17</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">scale</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">scale</span>: <span class="ident">u8</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
     {
-        <span class="kw">fn</span> <span class="ident">decode_d128</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+        <span class="kw">fn</span> <span class="ident">decode_d128</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u128</span> {
             <span class="kw">let</span> <span class="ident">low_part</span> <span class="op">=</span> <span class="ident">LittleEndian::read_u64</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="number">0</span>..]) <span class="kw">as</span> <span class="ident">u128</span>;
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">buf</span>[<span class="number">8</span>..].<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
@@ -441,9 +441,9 @@
             }
 
             <span class="kw">let</span> <span class="ident">high_part</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">buf</span>.<span class="ident">len</span>() {
-                <span class="number">12</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">LittleEndian::read_u32</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="number">8</span>..]) <span class="kw">as</span> <span class="ident">u128</span>,
-                <span class="number">16</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">LittleEndian::read_u64</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="number">8</span>..]) <span class="kw">as</span> <span class="ident">u128</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                <span class="number">12</span> =&gt; <span class="ident">LittleEndian::read_u32</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="number">8</span>..]) <span class="kw">as</span> <span class="ident">u128</span>,
+                <span class="number">16</span> =&gt; <span class="ident">LittleEndian::read_u64</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="number">8</span>..]) <span class="kw">as</span> <span class="ident">u128</span>,
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
             };
 
             <span class="comment">// swap high&amp;low for big endian</span>
@@ -456,33 +456,33 @@
 
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">sign</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-                <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="number">1i128</span>,
-                <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1i128</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Protocol</span>(<span class="string">&quot;decimal: invalid sign&quot;</span>.<span class="ident">into</span>())),
+                <span class="number">0</span> =&gt; <span class="op">-</span><span class="number">1i128</span>,
+                <span class="number">1</span> =&gt; <span class="number">1i128</span>,
+                <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Protocol</span>(<span class="string">&quot;decimal: invalid sign&quot;</span>.<span class="ident">into</span>())),
             };
 
             <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">len</span> {
-                <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">src</span>.<span class="ident">read_u32_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i128</span> <span class="op">*</span> <span class="ident">sign</span>,
-                <span class="number">9</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">src</span>.<span class="ident">read_u64_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i128</span> <span class="op">*</span> <span class="ident">sign</span>,
-                <span class="number">13</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="number">5</span> =&gt; <span class="ident">src</span>.<span class="ident">read_u32_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i128</span> <span class="op">*</span> <span class="ident">sign</span>,
+                <span class="number">9</span> =&gt; <span class="ident">src</span>.<span class="ident">read_u64_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i128</span> <span class="op">*</span> <span class="ident">sign</span>,
+                <span class="number">13</span> =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">12</span>]; <span class="comment">//u96</span>
                     <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bytes</span> {
                         <span class="kw-2">*</span><span class="ident">item</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span>;
                     }
                     <span class="ident">decode_d128</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>) <span class="kw">as</span> <span class="ident">i128</span> <span class="op">*</span> <span class="ident">sign</span>
                 }
-                <span class="number">17</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="number">17</span> =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
                     <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bytes</span> {
                         <span class="kw-2">*</span><span class="ident">item</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span>;
                     }
                     <span class="ident">decode_d128</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>) <span class="kw">as</span> <span class="ident">i128</span> <span class="op">*</span> <span class="ident">sign</span>
                 }
-                <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">x</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Protocol</span>(
                         <span class="macro">format!</span>(<span class="string">&quot;decimal/numeric: invalid length of {} received&quot;</span>, <span class="ident">x</span>).<span class="ident">into</span>(),
                     ))
@@ -495,7 +495,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Numeric</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="self">self</span>.<span class="ident">len</span>());
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">&lt;</span> <span class="number">0</span> {
@@ -507,13 +507,13 @@
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>().<span class="ident">abs</span>();
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">len</span>() {
-            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>),
-            <span class="number">9</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dst</span>.<span class="ident">put_u64_le</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>),
-            <span class="number">13</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">5</span> =&gt; <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>),
+            <span class="number">9</span> =&gt; <span class="ident">dst</span>.<span class="ident">put_u64_le</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>),
+            <span class="number">13</span> =&gt; {
                 <span class="ident">dst</span>.<span class="ident">put_u64_le</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>);
                 <span class="ident">dst</span>.<span class="ident">put_u32_le</span>((<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u32</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dst</span>.<span class="ident">put_u128_le</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u128</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">dst</span>.<span class="ident">put_u128_le</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u128</span>),
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -521,7 +521,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Numeric</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;{}.{:0pad$}&quot;</span>,
@@ -533,7 +533,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Numeric</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>)
     }
 }
@@ -541,33 +541,33 @@
 <span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Numeric</span> {}
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Numeric</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">f64</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">n</span>: <span class="ident">Numeric</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">n</span>: <span class="ident">Numeric</span>) -&gt; <span class="ident">f64</span> {
         <span class="ident">n</span>.<span class="ident">dec_part</span>() <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="ident">n</span>.<span class="ident">pow_scale</span>() <span class="kw">as</span> <span class="ident">f64</span> <span class="op">+</span> <span class="ident">n</span>.<span class="ident">int_part</span>() <span class="kw">as</span> <span class="ident">f64</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Numeric</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">i128</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">n</span>: <span class="ident">Numeric</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i128</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">n</span>: <span class="ident">Numeric</span>) -&gt; <span class="ident">i128</span> {
         <span class="ident">n</span>.<span class="ident">int_part</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Numeric</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u128</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">n</span>: <span class="ident">Numeric</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">n</span>: <span class="ident">Numeric</span>) -&gt; <span class="ident">u128</span> {
         <span class="ident">n</span>.<span class="ident">int_part</span>() <span class="kw">as</span> <span class="ident">u128</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Numeric</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">scale</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">scale</span>) {
-            <span class="ident">Ordering::Greater</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="number">10i128</span>.<span class="ident">pow</span>((<span class="self">self</span>.<span class="ident">scale</span> <span class="op">-</span> <span class="ident">other</span>.<span class="ident">scale</span>) <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">*</span> <span class="ident">other</span>.<span class="ident">value</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>
+            <span class="ident">Ordering::Greater</span> =&gt; {
+                <span class="number">10i128</span>.<span class="ident">pow</span>((<span class="self">self</span>.<span class="ident">scale</span> <span class="op">-</span> <span class="ident">other</span>.<span class="ident">scale</span>) <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">*</span> <span class="ident">other</span>.<span class="ident">value</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">value</span>
             }
-            <span class="ident">Ordering::Less</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="number">10i128</span>.<span class="ident">pow</span>((<span class="ident">other</span>.<span class="ident">scale</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">scale</span>) <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">value</span>
+            <span class="ident">Ordering::Less</span> =&gt; {
+                <span class="number">10i128</span>.<span class="ident">pow</span>((<span class="ident">other</span>.<span class="ident">scale</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">scale</span>) <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">value</span>
             }
-            <span class="ident">Ordering::Equal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">value</span>,
+            <span class="ident">Ordering::Equal</span> =&gt; <span class="self">self</span>.<span class="ident">value</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">value</span>,
         }
     }
 }
@@ -578,7 +578,7 @@
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ColumnData</span>;
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-    <span class="macro">from_sql!</span>(<span class="ident">Decimal</span>: <span class="ident">ColumnData::Numeric</span>(<span class="kw-2">ref</span> <span class="ident">num</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">num</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">num</span><span class="op">|</span> {
+    <span class="macro">from_sql!</span>(<span class="ident">Decimal</span>: <span class="ident">ColumnData::Numeric</span>(<span class="kw-2">ref</span> <span class="ident">num</span>) =&gt; <span class="ident">num</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">num</span><span class="op">|</span> {
         <span class="ident">Decimal::from_i128_with_scale</span>(
             <span class="ident">num</span>.<span class="ident">value</span>(),
             <span class="ident">num</span>.<span class="ident">scale</span>() <span class="kw">as</span> <span class="ident">u32</span>,
@@ -611,7 +611,7 @@
     <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-    <span class="macro">from_sql!</span>(<span class="ident">BigDecimal</span>: <span class="ident">ColumnData::Numeric</span>(<span class="kw-2">ref</span> <span class="ident">num</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">num</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">num</span><span class="op">|</span> {
+    <span class="macro">from_sql!</span>(<span class="ident">BigDecimal</span>: <span class="ident">ColumnData::Numeric</span>(<span class="kw-2">ref</span> <span class="ident">num</span>) =&gt; <span class="ident">num</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">num</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">int</span> <span class="op">=</span> <span class="ident">BigInt::from</span>(<span class="ident">num</span>.<span class="ident">value</span>());
 
         <span class="ident">BigDecimal::new</span>(<span class="ident">int</span>, <span class="ident">num</span>.<span class="ident">scale</span>() <span class="kw">as</span> <span class="ident">i64</span>)

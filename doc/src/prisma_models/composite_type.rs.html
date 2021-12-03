@@ -93,7 +93,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CompositeType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_data_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InternalDataModelRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_data_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InternalDataModelRef</span> {
         <span class="self">self</span>.<span class="ident">internal_data_model</span>
             .<span class="ident">upgrade</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;Invalid back-reference to internal data model.&quot;</span>)
@@ -108,8 +108,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">CompositeType</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">name</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span>
     }
 }
 </code></pre></div>

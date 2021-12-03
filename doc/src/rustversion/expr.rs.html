@@ -184,45 +184,45 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Expr</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rustc</span>: <span class="ident">Version</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rustc</span>: <span class="ident">Version</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Expr</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Stable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rustc</span>.<span class="ident">channel</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Channel::Stable</span>,
-            <span class="ident">Beta</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rustc</span>.<span class="ident">channel</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Channel::Beta</span>,
-            <span class="ident">Nightly</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">rustc</span>.<span class="ident">channel</span> {
-                <span class="ident">Channel::Nightly</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Channel::Dev</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-                <span class="ident">Channel::Stable</span> <span class="op">|</span> <span class="ident">Channel::Beta</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Stable</span> =&gt; <span class="ident">rustc</span>.<span class="ident">channel</span> <span class="op">==</span> <span class="ident">Channel::Stable</span>,
+            <span class="ident">Beta</span> =&gt; <span class="ident">rustc</span>.<span class="ident">channel</span> <span class="op">==</span> <span class="ident">Channel::Beta</span>,
+            <span class="ident">Nightly</span> =&gt; <span class="kw">match</span> <span class="ident">rustc</span>.<span class="ident">channel</span> {
+                <span class="ident">Channel::Nightly</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Channel::Dev</span> =&gt; <span class="bool-val">true</span>,
+                <span class="ident">Channel::Stable</span> <span class="op">|</span> <span class="ident">Channel::Beta</span> =&gt; <span class="bool-val">false</span>,
             },
-            <span class="ident">Date</span>(<span class="ident">date</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">rustc</span>.<span class="ident">channel</span> {
-                <span class="ident">Channel::Nightly</span>(<span class="ident">rustc</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rustc</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">date</span>,
-                <span class="ident">Channel::Stable</span> <span class="op">|</span> <span class="ident">Channel::Beta</span> <span class="op">|</span> <span class="ident">Channel::Dev</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Date</span>(<span class="ident">date</span>) =&gt; <span class="kw">match</span> <span class="ident">rustc</span>.<span class="ident">channel</span> {
+                <span class="ident">Channel::Nightly</span>(<span class="ident">rustc</span>) =&gt; <span class="ident">rustc</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">date</span>,
+                <span class="ident">Channel::Stable</span> <span class="op">|</span> <span class="ident">Channel::Beta</span> <span class="op">|</span> <span class="ident">Channel::Dev</span> =&gt; <span class="bool-val">false</span>,
             },
-            <span class="ident">Since</span>(<span class="ident">bound</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rustc</span> <span class="op">&gt;</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">bound</span>,
-            <span class="ident">Before</span>(<span class="ident">bound</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rustc</span> <span class="op">&lt;</span> <span class="kw-2">*</span><span class="ident">bound</span>,
-            <span class="ident">Release</span>(<span class="ident">release</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">rustc</span>.<span class="ident">channel</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Channel::Stable</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">rustc</span>.<span class="ident">minor</span> <span class="op">=</span><span class="op">=</span> <span class="ident">release</span>.<span class="ident">minor</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">release</span>.<span class="ident">patch</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">patch</span><span class="op">|</span> <span class="ident">rustc</span>.<span class="ident">patch</span> <span class="op">=</span><span class="op">=</span> <span class="ident">patch</span>)
+            <span class="ident">Since</span>(<span class="ident">bound</span>) =&gt; <span class="ident">rustc</span> <span class="op">&gt;</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">bound</span>,
+            <span class="ident">Before</span>(<span class="ident">bound</span>) =&gt; <span class="ident">rustc</span> <span class="op">&lt;</span> <span class="kw-2">*</span><span class="ident">bound</span>,
+            <span class="ident">Release</span>(<span class="ident">release</span>) =&gt; {
+                <span class="ident">rustc</span>.<span class="ident">channel</span> <span class="op">==</span> <span class="ident">Channel::Stable</span>
+                    <span class="op">&amp;&amp;</span> <span class="ident">rustc</span>.<span class="ident">minor</span> <span class="op">==</span> <span class="ident">release</span>.<span class="ident">minor</span>
+                    <span class="op">&amp;&amp;</span> <span class="ident">release</span>.<span class="ident">patch</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">patch</span><span class="op">|</span> <span class="ident">rustc</span>.<span class="ident">patch</span> <span class="op">==</span> <span class="ident">patch</span>)
             }
-            <span class="ident">Not</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">expr</span>.<span class="ident">eval</span>(<span class="ident">rustc</span>),
-            <span class="ident">Any</span>(<span class="ident">exprs</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">exprs</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">eval</span>(<span class="ident">rustc</span>)),
-            <span class="ident">All</span>(<span class="ident">exprs</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">exprs</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">eval</span>(<span class="ident">rustc</span>)),
+            <span class="ident">Not</span>(<span class="ident">expr</span>) =&gt; <span class="op">!</span><span class="ident">expr</span>.<span class="ident">eval</span>(<span class="ident">rustc</span>),
+            <span class="ident">Any</span>(<span class="ident">exprs</span>) =&gt; <span class="ident">exprs</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">eval</span>(<span class="ident">rustc</span>)),
+            <span class="ident">All</span>(<span class="ident">exprs</span>) =&gt; <span class="ident">exprs</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">eval</span>(<span class="ident">rustc</span>)),
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">iter</span>: <span class="ident">Iter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">iter</span>: <span class="ident">Iter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">iter</span>.<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;stable&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_stable</span>(<span class="ident">iter</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;beta&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Expr::Beta</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;nightly&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_nightly</span>(<span class="ident">iter</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;since&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_since</span>(<span class="ident">i</span>, <span class="ident">iter</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;before&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_before</span>(<span class="ident">i</span>, <span class="ident">iter</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;not&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_not</span>(<span class="ident">i</span>, <span class="ident">iter</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;any&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_any</span>(<span class="ident">i</span>, <span class="ident">iter</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;all&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_all</span>(<span class="ident">i</span>, <span class="ident">iter</span>),
-        <span class="ident">unexpected</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">==</span> <span class="string">&quot;stable&quot;</span> =&gt; <span class="ident">parse_stable</span>(<span class="ident">iter</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">==</span> <span class="string">&quot;beta&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Expr::Beta</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">==</span> <span class="string">&quot;nightly&quot;</span> =&gt; <span class="ident">parse_nightly</span>(<span class="ident">iter</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">==</span> <span class="string">&quot;since&quot;</span> =&gt; <span class="ident">parse_since</span>(<span class="ident">i</span>, <span class="ident">iter</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">==</span> <span class="string">&quot;before&quot;</span> =&gt; <span class="ident">parse_before</span>(<span class="ident">i</span>, <span class="ident">iter</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">==</span> <span class="string">&quot;not&quot;</span> =&gt; <span class="ident">parse_not</span>(<span class="ident">i</span>, <span class="ident">iter</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">==</span> <span class="string">&quot;any&quot;</span> =&gt; <span class="ident">parse_any</span>(<span class="ident">i</span>, <span class="ident">iter</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">i</span>)) <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">to_string</span>() <span class="op">==</span> <span class="string">&quot;all&quot;</span> =&gt; <span class="ident">parse_all</span>(<span class="ident">i</span>, <span class="ident">iter</span>),
+        <span class="ident">unexpected</span> =&gt; {
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">unexpected</span>
                 .<span class="ident">as_ref</span>()
                 .<span class="ident">map_or_else</span>(<span class="ident">Span::call_site</span>, <span class="ident">TokenTree::span</span>);
@@ -231,10 +231,10 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_nightly</span>(<span class="ident">iter</span>: <span class="ident">Iter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_nightly</span>(<span class="ident">iter</span>: <span class="ident">Iter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">paren</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">token::parse_optional_paren</span>(<span class="ident">iter</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">group</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">group</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Expr::Nightly</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">group</span>) =&gt; <span class="ident">group</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Expr::Nightly</span>),
     };
 
     <span class="kw">let</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">iter::new</span>(<span class="ident">paren</span>.<span class="ident">stream</span>());
@@ -245,10 +245,10 @@
     <span class="prelude-val">Ok</span>(<span class="ident">Expr::Date</span>(<span class="ident">date</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">parse_stable</span>(<span class="ident">iter</span>: <span class="ident">Iter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_stable</span>(<span class="ident">iter</span>: <span class="ident">Iter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">paren</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">token::parse_optional_paren</span>(<span class="ident">iter</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">group</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">group</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Expr::Stable</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">group</span>) =&gt; <span class="ident">group</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Expr::Stable</span>),
     };
 
     <span class="kw">let</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">iter::new</span>(<span class="ident">paren</span>.<span class="ident">stream</span>());
@@ -259,7 +259,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">Expr::Release</span>(<span class="ident">release</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">parse_since</span>(<span class="ident">introducer</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">iter</span>: <span class="ident">Iter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_since</span>(<span class="ident">introducer</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">iter</span>: <span class="ident">Iter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">paren</span> <span class="op">=</span> <span class="ident">token::parse_paren</span>(<span class="ident">introducer</span>, <span class="ident">iter</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">iter::new</span>(<span class="ident">paren</span>.<span class="ident">stream</span>());
@@ -270,7 +270,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">Expr::Since</span>(<span class="ident">bound</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">parse_before</span>(<span class="ident">introducer</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">iter</span>: <span class="ident">Iter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_before</span>(<span class="ident">introducer</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">iter</span>: <span class="ident">Iter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">paren</span> <span class="op">=</span> <span class="ident">token::parse_paren</span>(<span class="ident">introducer</span>, <span class="ident">iter</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">iter::new</span>(<span class="ident">paren</span>.<span class="ident">stream</span>());
@@ -281,7 +281,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">Expr::Before</span>(<span class="ident">bound</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">parse_not</span>(<span class="ident">introducer</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">iter</span>: <span class="ident">Iter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_not</span>(<span class="ident">introducer</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">iter</span>: <span class="ident">Iter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">paren</span> <span class="op">=</span> <span class="ident">token::parse_paren</span>(<span class="ident">introducer</span>, <span class="ident">iter</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">iter::new</span>(<span class="ident">paren</span>.<span class="ident">stream</span>());
@@ -292,7 +292,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">Expr::Not</span>(<span class="ident">Box::new</span>(<span class="ident">expr</span>)))
 }
 
-<span class="kw">fn</span> <span class="ident">parse_any</span>(<span class="ident">introducer</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">iter</span>: <span class="ident">Iter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_any</span>(<span class="ident">introducer</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">iter</span>: <span class="ident">Iter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">paren</span> <span class="op">=</span> <span class="ident">token::parse_paren</span>(<span class="ident">introducer</span>, <span class="ident">iter</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">iter::new</span>(<span class="ident">paren</span>.<span class="ident">stream</span>());
@@ -301,7 +301,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">Expr::Any</span>(<span class="ident">exprs</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()))
 }
 
-<span class="kw">fn</span> <span class="ident">parse_all</span>(<span class="ident">introducer</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">iter</span>: <span class="ident">Iter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_all</span>(<span class="ident">introducer</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">iter</span>: <span class="ident">Iter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">paren</span> <span class="op">=</span> <span class="ident">token::parse_paren</span>(<span class="ident">introducer</span>, <span class="ident">iter</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">iter::new</span>(<span class="ident">paren</span>.<span class="ident">stream</span>());
@@ -310,7 +310,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">Expr::All</span>(<span class="ident">exprs</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()))
 }
 
-<span class="kw">fn</span> <span class="ident">parse_comma_separated</span>(<span class="ident">iter</span>: <span class="ident">Iter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_comma_separated</span>(<span class="ident">iter</span>: <span class="ident">Iter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exprs</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
     <span class="kw">while</span> <span class="ident">iter</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {

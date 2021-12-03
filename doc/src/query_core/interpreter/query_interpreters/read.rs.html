@@ -272,13 +272,13 @@
     <span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
     <span class="ident">query</span>: <span class="ident">ReadQuery</span>,
     <span class="ident">parent_result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="ident">ManyRecords</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw">match</span> <span class="ident">query</span> {
-            <span class="ident">ReadQuery::RecordQuery</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">read_one</span>(<span class="ident">tx</span>, <span class="ident">q</span>).<span class="kw">await</span>,
-            <span class="ident">ReadQuery::ManyRecordsQuery</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">read_many</span>(<span class="ident">tx</span>, <span class="ident">q</span>).<span class="kw">await</span>,
-            <span class="ident">ReadQuery::RelatedRecordsQuery</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">read_related</span>(<span class="ident">tx</span>, <span class="ident">q</span>, <span class="ident">parent_result</span>).<span class="kw">await</span>,
-            <span class="ident">ReadQuery::AggregateRecordsQuery</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aggregate</span>(<span class="ident">tx</span>, <span class="ident">q</span>).<span class="kw">await</span>,
+            <span class="ident">ReadQuery::RecordQuery</span>(<span class="ident">q</span>) =&gt; <span class="ident">read_one</span>(<span class="ident">tx</span>, <span class="ident">q</span>).<span class="kw">await</span>,
+            <span class="ident">ReadQuery::ManyRecordsQuery</span>(<span class="ident">q</span>) =&gt; <span class="ident">read_many</span>(<span class="ident">tx</span>, <span class="ident">q</span>).<span class="kw">await</span>,
+            <span class="ident">ReadQuery::RelatedRecordsQuery</span>(<span class="ident">q</span>) =&gt; <span class="ident">read_related</span>(<span class="ident">tx</span>, <span class="ident">q</span>, <span class="ident">parent_result</span>).<span class="kw">await</span>,
+            <span class="ident">ReadQuery::AggregateRecordsQuery</span>(<span class="ident">q</span>) =&gt; <span class="ident">aggregate</span>(<span class="ident">tx</span>, <span class="ident">q</span>).<span class="kw">await</span>,
         }
     };
 
@@ -286,7 +286,7 @@
 }
 
 <span class="doccomment">/// Queries a single record.</span>
-<span class="kw">fn</span> <span class="ident">read_one</span>(<span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>, <span class="ident">query</span>: <span class="ident">RecordQuery</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">read_one</span>(<span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>, <span class="ident">query</span>: <span class="ident">RecordQuery</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">model</span>;
         <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">filter</span>.<span class="ident">expect</span>(<span class="string">&quot;Expected filter to be set for ReadOne query.&quot;</span>);
@@ -295,7 +295,7 @@
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">scalars</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">record</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">record</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">scalars</span>: <span class="ident">ManyRecords</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">into</span>();
                 <span class="kw">let</span> (<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>) <span class="op">=</span>
                     <span class="ident">extract_aggregation_rows_from_scalars</span>(<span class="ident">scalars</span>, <span class="ident">query</span>.<span class="ident">aggregation_selections</span>);
@@ -313,7 +313,7 @@
                 .<span class="ident">into</span>())
             }
 
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">QueryResult::RecordSelection</span>(<span class="ident">Box::new</span>(<span class="ident">RecordSelection</span> {
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryResult::RecordSelection</span>(<span class="ident">Box::new</span>(<span class="ident">RecordSelection</span> {
                 <span class="ident">name</span>: <span class="ident">query</span>.<span class="ident">name</span>,
                 <span class="ident">fields</span>: <span class="ident">query</span>.<span class="ident">selection_order</span>,
                 <span class="ident">scalars</span>: <span class="ident">ManyRecords::default</span>(),
@@ -337,7 +337,7 @@
 <span class="kw">fn</span> <span class="ident">read_many</span>(
     <span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
     <span class="kw-2">mut</span> <span class="ident">query</span>: <span class="ident">ManyRecordsQuery</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw">let</span> (<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">query</span>.<span class="ident">args</span>.<span class="ident">requires_inmemory_processing</span>() {
             <span class="kw">let</span> <span class="ident">processor</span> <span class="op">=</span> <span class="ident">InMemoryRecordProcessor::new_from_query_args</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">query</span>.<span class="ident">args</span>);
@@ -390,7 +390,7 @@
     <span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
     <span class="kw-2">mut</span> <span class="ident">query</span>: <span class="ident">RelatedRecordsQuery</span>,
     <span class="ident">parent_result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="ident">ManyRecords</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">parent_field</span>.<span class="ident">relation</span>();
         <span class="kw">let</span> <span class="ident">is_m2m</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">is_many_to_many</span>();
@@ -430,7 +430,7 @@
     <span class="ident">fut</span>.<span class="ident">boxed</span>()
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">aggregate</span>(<span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>, <span class="ident">query</span>: <span class="ident">AggregateRecordsQuery</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">aggregate</span>(<span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>, <span class="ident">query</span>: <span class="ident">AggregateRecordsQuery</span>) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">selection_order</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">selection_order</span>;
 
     <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> <span class="ident">tx</span>
@@ -447,7 +447,7 @@
     <span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
     <span class="ident">nested</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadQuery</span><span class="op">&gt;</span>,
     <span class="ident">parent_result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="ident">ManyRecords</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">parent_result</span>, <span class="prelude-val">Some</span>(<span class="ident">parent_records</span>) <span class="kw">if</span> <span class="ident">parent_records</span>.<span class="ident">records</span>.<span class="ident">is_empty</span>()) {
             <span class="comment">//this catches most cases where there is no parent to cause a nested query. but sometimes even with parent records,</span>
@@ -480,7 +480,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_aggregation_rows_from_scalars</span>(
     <span class="kw-2">mut</span> <span class="ident">scalars</span>: <span class="ident">ManyRecords</span>,
     <span class="ident">aggr_selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelAggregationSelection</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">ManyRecords</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelAggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+) -&gt; (<span class="ident">ManyRecords</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelAggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">aggr_selections</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> (<span class="ident">scalars</span>, <span class="prelude-val">None</span>);
     }
@@ -513,8 +513,8 @@
 
             <span class="comment">// Group the aggregation results by record</span>
             <span class="kw">match</span> <span class="ident">aggregation_rows</span>.<span class="ident">get_mut</span>(<span class="ident">r_index</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">inner_vec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inner_vec</span>.<span class="ident">push</span>(<span class="ident">aggr_result</span>),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aggregation_rows</span>.<span class="ident">push</span>(<span class="macro">vec!</span>[<span class="ident">aggr_result</span>]),
+                <span class="prelude-val">Some</span>(<span class="ident">inner_vec</span>) =&gt; <span class="ident">inner_vec</span>.<span class="ident">push</span>(<span class="ident">aggr_result</span>),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">aggregation_rows</span>.<span class="ident">push</span>(<span class="macro">vec!</span>[<span class="ident">aggr_result</span>]),
             }
         }
         <span class="ident">n_record_removed</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;

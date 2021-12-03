@@ -243,7 +243,7 @@
     <span class="ident">NoApplicationProtocol</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">join</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">join</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) -&gt; <span class="ident">String</span> {
     <span class="ident">items</span>
         .<span class="ident">iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">x</span>))
@@ -252,12 +252,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TLSError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">TLSError::InappropriateMessage</span> {
                 <span class="kw-2">ref</span> <span class="ident">expect_types</span>,
                 <span class="kw-2">ref</span> <span class="ident">got_type</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+            } =&gt; <span class="macro">write!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;received unexpected message: got {:?} when expecting {}&quot;</span>,
                 <span class="ident">got_type</span>,
@@ -266,28 +266,28 @@
             <span class="ident">TLSError::InappropriateHandshakeMessage</span> {
                 <span class="kw-2">ref</span> <span class="ident">expect_types</span>,
                 <span class="kw-2">ref</span> <span class="ident">got_type</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+            } =&gt; <span class="macro">write!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;received unexpected handshake message: got {:?} when expecting {}&quot;</span>,
                 <span class="ident">got_type</span>,
                 <span class="ident">join</span>::<span class="op">&lt;</span><span class="ident">HandshakeType</span><span class="op">&gt;</span>(<span class="ident">expect_types</span>)
             ),
-            <span class="ident">TLSError::CorruptMessagePayload</span>(<span class="kw-2">ref</span> <span class="ident">typ</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TLSError::CorruptMessagePayload</span>(<span class="kw-2">ref</span> <span class="ident">typ</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;received corrupt message of type {:?}&quot;</span>, <span class="ident">typ</span>)
             }
-            <span class="ident">TLSError::PeerIncompatibleError</span>(<span class="kw-2">ref</span> <span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer is incompatible: {}&quot;</span>, <span class="ident">why</span>),
-            <span class="ident">TLSError::PeerMisbehavedError</span>(<span class="kw-2">ref</span> <span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer misbehaved: {}&quot;</span>, <span class="ident">why</span>),
-            <span class="ident">TLSError::AlertReceived</span>(<span class="kw-2">ref</span> <span class="ident">alert</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;received fatal alert: {:?}&quot;</span>, <span class="ident">alert</span>),
-            <span class="ident">TLSError::WebPKIError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid certificate: {:?}&quot;</span>, <span class="ident">err</span>),
-            <span class="ident">TLSError::CorruptMessage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;received corrupt message&quot;</span>),
-            <span class="ident">TLSError::NoCertificatesPresented</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer sent no certificates&quot;</span>),
-            <span class="ident">TLSError::DecryptError</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;cannot decrypt peer&#39;s message&quot;</span>),
-            <span class="ident">TLSError::PeerSentOversizedRecord</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer sent excess record size&quot;</span>),
-            <span class="ident">TLSError::HandshakeNotComplete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;handshake not complete&quot;</span>),
-            <span class="ident">TLSError::NoApplicationProtocol</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer doesn&#39;t support any known protocol&quot;</span>),
-            <span class="ident">TLSError::InvalidSCT</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid certificate timestamp: {:?}&quot;</span>, <span class="ident">err</span>),
-            <span class="ident">TLSError::FailedToGetCurrentTime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;failed to get current time&quot;</span>),
-            <span class="ident">TLSError::General</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unexpected error: {}&quot;</span>, <span class="ident">err</span>), <span class="comment">// (please file a bug)</span>
+            <span class="ident">TLSError::PeerIncompatibleError</span>(<span class="kw-2">ref</span> <span class="ident">why</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer is incompatible: {}&quot;</span>, <span class="ident">why</span>),
+            <span class="ident">TLSError::PeerMisbehavedError</span>(<span class="kw-2">ref</span> <span class="ident">why</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer misbehaved: {}&quot;</span>, <span class="ident">why</span>),
+            <span class="ident">TLSError::AlertReceived</span>(<span class="kw-2">ref</span> <span class="ident">alert</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;received fatal alert: {:?}&quot;</span>, <span class="ident">alert</span>),
+            <span class="ident">TLSError::WebPKIError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid certificate: {:?}&quot;</span>, <span class="ident">err</span>),
+            <span class="ident">TLSError::CorruptMessage</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;received corrupt message&quot;</span>),
+            <span class="ident">TLSError::NoCertificatesPresented</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer sent no certificates&quot;</span>),
+            <span class="ident">TLSError::DecryptError</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;cannot decrypt peer&#39;s message&quot;</span>),
+            <span class="ident">TLSError::PeerSentOversizedRecord</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer sent excess record size&quot;</span>),
+            <span class="ident">TLSError::HandshakeNotComplete</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;handshake not complete&quot;</span>),
+            <span class="ident">TLSError::NoApplicationProtocol</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;peer doesn&#39;t support any known protocol&quot;</span>),
+            <span class="ident">TLSError::InvalidSCT</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid certificate timestamp: {:?}&quot;</span>, <span class="ident">err</span>),
+            <span class="ident">TLSError::FailedToGetCurrentTime</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;failed to get current time&quot;</span>),
+            <span class="ident">TLSError::General</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unexpected error: {}&quot;</span>, <span class="ident">err</span>), <span class="comment">// (please file a bug)</span>
         }
     }
 }

@@ -1331,7 +1331,7 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TokioAsyncResolver</span> <span class="op">=</span> <span class="ident">AsyncResolver</span><span class="op">&lt;</span><span class="ident">TokioConnection</span>, <span class="ident">TokioConnectionProvider</span><span class="op">&gt;</span>;
 
 <span class="macro">macro_rules!</span> <span class="ident">lookup_fn</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">path</span>) =&gt; {
         <span class="doccomment">/// Performs a lookup for the associated type.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// *hint* queries that end with a &#39;.&#39; are fully qualified names and are cheaper lookups</span>
@@ -1339,10 +1339,10 @@
         <span class="doccomment">/// # Arguments</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// * `query` - a string which parses to a domain name, failure to parse will return an error</span>
-        <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">N</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">query</span>.<span class="ident">into_name</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">name</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>());
                 }
             };
@@ -1358,13 +1358,13 @@
             .<span class="kw">await</span>
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) =&gt; {
         <span class="doccomment">/// Performs a lookup for the associated type.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Arguments</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// * `query` - a type which can be converted to `Name` via `From`.</span>
-        <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::from</span>(<span class="ident">query</span>);
             <span class="self">self</span>.<span class="ident">inner_lookup</span>(<span class="ident">name</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>, <span class="ident">DnsRequestOptions::default</span>())
                 .<span class="kw">await</span>
@@ -1387,7 +1387,7 @@
     <span class="doccomment">/// background task that runs resolutions for the `AsyncResolver`. See the</span>
     <span class="doccomment">/// documentation for `AsyncResolver` for more information on how to use</span>
     <span class="doccomment">/// the background future.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokio</span>(<span class="ident">config</span>: <span class="ident">ResolverConfig</span>, <span class="ident">options</span>: <span class="ident">ResolverOpts</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokio</span>(<span class="ident">config</span>: <span class="ident">ResolverConfig</span>, <span class="ident">options</span>: <span class="ident">ResolverOpts</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">config</span>, <span class="ident">options</span>, <span class="ident">TokioHandle</span>)
     }
 
@@ -1396,7 +1396,7 @@
     <span class="doccomment">/// This will use `/etc/resolv.conf` on Unix OSes and the registry on Windows.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokio_from_system_conf</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tokio_from_system_conf</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::from_system_conf</span>(<span class="ident">TokioHandle</span>)
     }
 }
@@ -1421,7 +1421,7 @@
         <span class="ident">config</span>: <span class="ident">ResolverConfig</span>,
         <span class="ident">options</span>: <span class="ident">ResolverOpts</span>,
         <span class="ident">runtime</span>: <span class="ident">R::Handle</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="ident">AsyncResolver</span>::<span class="op">&lt;</span><span class="ident">GenericConnection</span>, <span class="ident">GenericConnectionProvider</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new_with_conn</span>(
             <span class="ident">config</span>,
             <span class="ident">options</span>,
@@ -1436,7 +1436,7 @@
     <span class="doccomment">/// This will use `/etc/resolv.conf` on Unix OSes and the registry on Windows.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_system_conf</span>(<span class="ident">runtime</span>: <span class="ident">R::Handle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_system_conf</span>(<span class="ident">runtime</span>: <span class="ident">R::Handle</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::from_system_conf_with_provider</span>(<span class="ident">GenericConnectionProvider</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">runtime</span>))
     }
 }
@@ -1460,7 +1460,7 @@
         <span class="ident">config</span>: <span class="ident">ResolverConfig</span>,
         <span class="ident">options</span>: <span class="ident">ResolverOpts</span>,
         <span class="ident">conn_provider</span>: <span class="ident">P</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">NameServerPool::from_config_with_provider</span>(<span class="kw-2">&amp;</span><span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>, <span class="ident">conn_provider</span>);
         <span class="kw">let</span> <span class="ident">either</span>;
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">RetryDnsHandle::new</span>(<span class="ident">pool</span>, <span class="ident">options</span>.<span class="ident">attempts</span>);
@@ -1502,7 +1502,7 @@
     <span class="doccomment">/// This will use `/etc/resolv.conf` on Unix OSes and the registry on Windows.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_system_conf_with_provider</span>(<span class="ident">conn_provider</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_system_conf_with_provider</span>(<span class="ident">conn_provider</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">config</span>, <span class="ident">options</span>) <span class="op">=</span> <span class="ident"><span class="kw">super</span>::system_conf::read_system_conf</span>()<span class="question-mark">?</span>;
         <span class="ident"><span class="self">Self</span>::new_with_conn</span>(<span class="ident">config</span>, <span class="ident">options</span>, <span class="ident">conn_provider</span>)
     }
@@ -1524,10 +1524,10 @@
         <span class="ident">name</span>: <span class="ident">N</span>,
         <span class="ident">record_type</span>: <span class="ident">RecordType</span>,
         <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
+    ) -&gt; <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">name</span>.<span class="ident">into_name</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">name</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">future::Either::Left</span>(<span class="ident">future::err</span>(<span class="ident">err</span>.<span class="ident">into</span>())),
+            <span class="prelude-val">Ok</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">future::Either::Left</span>(<span class="ident">future::err</span>(<span class="ident">err</span>.<span class="ident">into</span>())),
         };
 
         <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">build_names</span>(<span class="ident">name</span>);
@@ -1545,7 +1545,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">build_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">build_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> {
         <span class="comment">// if it&#39;s fully qualified, we can short circuit the lookup logic</span>
         <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">is_fqdn</span>() {
             <span class="macro">vec!</span>[<span class="ident">name</span>]
@@ -1589,7 +1589,7 @@
         <span class="ident">name</span>: <span class="ident">Name</span>,
         <span class="ident">record_type</span>: <span class="ident">RecordType</span>,
         <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">L</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Lookup</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1605,7 +1605,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">lookup_ip</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span> <span class="op">+</span> <span class="ident">TryParseIp</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">host</span>: <span class="ident">N</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LookupIp</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LookupIp</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">finally_ip_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="ident">maybe_ip</span> <span class="op">=</span> <span class="ident">host</span>.<span class="ident">try_parse_ip</span>();
         <span class="kw">let</span> <span class="ident">maybe_name</span>: <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">host</span>.<span class="ident">into_name</span>();
@@ -1629,14 +1629,14 @@
         }
 
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">maybe_name</span>, <span class="ident">finally_ip_addr</span>.<span class="ident">as_ref</span>()) {
-            (<span class="prelude-val">Ok</span>(<span class="ident">name</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">name</span>,
-            (<span class="prelude-val">Err</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="ident">ip_addr</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">Ok</span>(<span class="ident">name</span>), <span class="kw">_</span>) =&gt; <span class="ident">name</span>,
+            (<span class="prelude-val">Err</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="ident">ip_addr</span>)) =&gt; {
                 <span class="comment">// it was a valid IP, return that...</span>
                 <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Query::query</span>(<span class="ident">ip_addr</span>.<span class="ident">name</span>().<span class="ident">clone</span>(), <span class="ident">ip_addr</span>.<span class="ident">record_type</span>());
                 <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="ident">Lookup::new_with_max_ttl</span>(<span class="ident">query</span>, <span class="ident">Arc::from</span>([<span class="ident">ip_addr</span>.<span class="ident">clone</span>()]));
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">lookup</span>.<span class="ident">into</span>());
             }
-            (<span class="prelude-val">Err</span>(<span class="ident">err</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">Err</span>(<span class="ident">err</span>), <span class="prelude-val">None</span>) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>());
             }
         };
@@ -1674,7 +1674,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">ResolveError</span><span class="op">&gt;</span>, <span class="ident">P</span>: <span class="ident">ConnectionProvider</span><span class="op">&lt;</span><span class="ident">Conn</span> <span class="op">=</span> <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span>
     <span class="kw">for</span> <span class="ident">AsyncResolver</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;AsyncResolver&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;request_tx&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;...&quot;</span>)
             .<span class="ident">finish</span>()
@@ -2319,11 +2319,11 @@
 
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">fn</span> <span class="ident">is_send_t</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_send_t</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span>() -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">is_sync_t</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sync</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_sync_t</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sync</span><span class="op">&gt;</span>() -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 

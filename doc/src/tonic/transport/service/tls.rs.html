@@ -301,7 +301,7 @@
         <span class="ident">ca_cert</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Certificate</span><span class="op">&gt;</span>,
         <span class="ident">identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Identity</span><span class="op">&gt;</span>,
         <span class="ident">domain</span>: <span class="ident">String</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>();
         <span class="ident">config</span>.<span class="ident">set_protocols</span>(<span class="kw-2">&amp;</span>[<span class="ident">Vec::from</span>(<span class="ident">ALPN_H2</span>)]);
 
@@ -313,8 +313,8 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls-roots&quot;</span>)]</span>
         {
             <span class="ident">config</span>.<span class="ident">root_store</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">rustls_native_certs::load_native_certs</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">store</span>) <span class="op">|</span> <span class="prelude-val">Err</span>((<span class="prelude-val">Some</span>(<span class="ident">store</span>), <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">store</span>,
-                <span class="prelude-val">Err</span>((<span class="prelude-val">None</span>, <span class="ident">error</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>.<span class="ident">into</span>()),
+                <span class="prelude-val">Ok</span>(<span class="ident">store</span>) <span class="op">|</span> <span class="prelude-val">Err</span>((<span class="prelude-val">Some</span>(<span class="ident">store</span>), <span class="kw">_</span>)) =&gt; <span class="ident">store</span>,
+                <span class="prelude-val">Err</span>((<span class="prelude-val">None</span>, <span class="ident">error</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>.<span class="ident">into</span>()),
             };
         }
 
@@ -340,14 +340,14 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_with_rustls_raw</span>(
         <span class="ident">config</span>: <span class="ident">tokio_rustls::rustls::ClientConfig</span>,
         <span class="ident">domain</span>: <span class="ident">String</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">config</span>: <span class="ident">Arc::new</span>(<span class="ident">config</span>),
             <span class="ident">domain</span>: <span class="ident">Arc::new</span>(<span class="ident">domain</span>),
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BoxedIo</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BoxedIo</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -361,8 +361,8 @@
             <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">io</span>.<span class="ident">get_ref</span>();
 
             <span class="kw">match</span> <span class="ident">session</span>.<span class="ident">get_alpn_protocol</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">b</span>) <span class="kw">if</span> <span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&quot;h2&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TlsError::H2NotNegotiated</span>.<span class="ident">into</span>()),
+                <span class="prelude-val">Some</span>(<span class="ident">b</span>) <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&quot;h2&quot;</span> =&gt; (),
+                <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TlsError::H2NotNegotiated</span>.<span class="ident">into</span>()),
             };
 
             <span class="ident">BoxedIo::new</span>(<span class="ident">io</span>)
@@ -373,7 +373,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TlsConnector</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;TlsConnector&quot;</span>).<span class="ident">finish</span>()
     }
 }
@@ -388,12 +388,12 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_with_rustls_identity</span>(
         <span class="ident">identity</span>: <span class="ident">Identity</span>,
         <span class="ident">client_ca_root</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Certificate</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">cert</span>, <span class="ident">key</span>) <span class="op">=</span> <span class="ident">rustls_keys::load_identity</span>(<span class="ident">identity</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">client_ca_root</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ServerConfig::new</span>(<span class="ident">NoClientAuth::new</span>()),
-            <span class="prelude-val">Some</span>(<span class="ident">cert</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; <span class="ident">ServerConfig::new</span>(<span class="ident">NoClientAuth::new</span>()),
+            <span class="prelude-val">Some</span>(<span class="ident">cert</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cert</span> <span class="op">=</span> <span class="ident">std::io::Cursor::new</span>(<span class="kw-2">&amp;</span><span class="ident">cert</span>.<span class="ident">pem</span>[..]);
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client_root_cert_store</span> <span class="op">=</span> <span class="ident">tokio_rustls::rustls::RootCertStore::empty</span>();
@@ -417,13 +417,13 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_with_rustls_raw</span>(
         <span class="ident">config</span>: <span class="ident">tokio_rustls::rustls::ServerConfig</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">config</span>),
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="ident">IO</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="ident">IO</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Connected</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -433,17 +433,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TlsAcceptor</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;TlsAcceptor&quot;</span>).<span class="ident">finish</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TlsError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TlsError::H2NotNegotiated</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;HTTP/2 was not negotiated.&quot;</span>),
-            <span class="ident">TlsError::CertificateParseError</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Error parsing TLS certificate.&quot;</span>),
-            <span class="ident">TlsError::PrivateKeyParseError</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+            <span class="ident">TlsError::H2NotNegotiated</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;HTTP/2 was not negotiated.&quot;</span>),
+            <span class="ident">TlsError::CertificateParseError</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Error parsing TLS certificate.&quot;</span>),
+            <span class="ident">TlsError::PrivateKeyParseError</span> =&gt; <span class="macro">write!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;Error parsing TLS private key - no RSA or PKCS8-encoded keys found.&quot;</span>
             ),
@@ -462,7 +462,7 @@
 
     <span class="kw">fn</span> <span class="ident">load_rustls_private_key</span>(
         <span class="kw-2">mut</span> <span class="ident">cursor</span>: <span class="ident">std::io::Cursor</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrivateKey</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrivateKey</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="comment">// First attempt to load the private key assuming it is PKCS8-encoded</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">keys</span>) <span class="op">=</span> <span class="ident">pemfile::pkcs8_private_keys</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>) {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">keys</span>.<span class="ident">is_empty</span>() {
@@ -484,20 +484,20 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">load_identity</span>(
         <span class="ident">identity</span>: <span class="ident">Identity</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Certificate</span><span class="op">&gt;</span>, <span class="ident">PrivateKey</span>), <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Certificate</span><span class="op">&gt;</span>, <span class="ident">PrivateKey</span>), <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cert</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cert</span> <span class="op">=</span> <span class="ident">std::io::Cursor::new</span>(<span class="kw-2">&amp;</span><span class="ident">identity</span>.<span class="ident">cert</span>.<span class="ident">pem</span>[..]);
             <span class="kw">match</span> <span class="ident">pemfile::certs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cert</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">certs</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">certs</span>,
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Box::new</span>(<span class="ident">TlsError::CertificateParseError</span>)),
+                <span class="prelude-val">Ok</span>(<span class="ident">certs</span>) =&gt; <span class="ident">certs</span>,
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Box::new</span>(<span class="ident">TlsError::CertificateParseError</span>)),
             }
         };
 
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">std::io::Cursor::new</span>(<span class="kw-2">&amp;</span><span class="ident">identity</span>.<span class="ident">key</span>[..]);
             <span class="kw">match</span> <span class="ident">load_rustls_private_key</span>(<span class="ident">key</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">key</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">key</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">key</span>) =&gt; <span class="ident">key</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>);
                 }
             }

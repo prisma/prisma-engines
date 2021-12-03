@@ -73,7 +73,7 @@
         <span class="string">&quot;overflowing_shr() overflow in shift right.&quot;</span>
     );
 
-    <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">shift</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">=</span><span class="op">=</span> <span class="ident">bits</span> {
+    <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">shift</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">==</span> <span class="ident">bits</span> {
         <span class="number">0</span>
     } <span class="kw">else</span> {
         <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">shift</span>

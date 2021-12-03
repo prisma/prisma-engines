@@ -342,12 +342,12 @@
 
 <span class="kw">impl</span> <span class="ident">TraceContextPropagator</span> {
     <span class="doccomment">/// Create a new `TraceContextPropagator`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">TraceContextPropagator</span> { <span class="ident">_private</span>: () }
     }
 
     <span class="doccomment">/// Extract span context from w3c trace-context header.</span>
-    <span class="kw">fn</span> <span class="ident">extract_span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">extractor</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Extractor</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SpanContext</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">extract_span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">extractor</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Extractor</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SpanContext</span>, ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">header_value</span> <span class="op">=</span> <span class="ident">extractor</span>.<span class="ident">get</span>(<span class="ident">TRACEPARENT_HEADER</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>).<span class="ident">trim</span>();
         <span class="kw">let</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">header_value</span>.<span class="ident">split_terminator</span>(<span class="string">&#39;-&#39;</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>();
         <span class="comment">// Ensure parts are not out of range.</span>
@@ -357,7 +357,7 @@
 
         <span class="comment">// Ensure version is within range, for version 0 there must be 4 parts.</span>
         <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">u8::from_str_radix</span>(<span class="ident">parts</span>[<span class="number">0</span>], <span class="number">16</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">version</span> <span class="op">&gt;</span> <span class="ident">MAX_VERSION</span> <span class="op">|</span><span class="op">|</span> <span class="ident">version</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">parts</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">4</span> {
+        <span class="kw">if</span> <span class="ident">version</span> <span class="op">&gt;</span> <span class="ident">MAX_VERSION</span> <span class="op">|</span><span class="op">|</span> <span class="ident">version</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">parts</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">4</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(());
         }
 
@@ -385,7 +385,7 @@
         <span class="kw">let</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">u8::from_str_radix</span>(<span class="ident">parts</span>[<span class="number">3</span>], <span class="number">16</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())<span class="question-mark">?</span>;
 
         <span class="comment">// Ensure opts are valid for version 0</span>
-        <span class="kw">if</span> <span class="ident">version</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">opts</span> <span class="op">&gt;</span> <span class="number">2</span> {
+        <span class="kw">if</span> <span class="ident">version</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">opts</span> <span class="op">&gt;</span> <span class="number">2</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(());
         }
 
@@ -432,13 +432,13 @@
     <span class="doccomment">/// the `SpanContext` and returns it. If no `SpanContext` was retrieved</span>
     <span class="doccomment">/// OR if the retrieved SpanContext is invalid then an empty `SpanContext`</span>
     <span class="doccomment">/// is returned.</span>
-    <span class="kw">fn</span> <span class="ident">extract_with_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">extractor</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Extractor</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Context</span> {
+    <span class="kw">fn</span> <span class="ident">extract_with_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">extractor</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Extractor</span>) -&gt; <span class="ident">Context</span> {
         <span class="self">self</span>.<span class="ident">extract_span_context</span>(<span class="ident">extractor</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sc</span><span class="op">|</span> <span class="ident">cx</span>.<span class="ident">with_remote_span_context</span>(<span class="ident">sc</span>))
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">cx</span>.<span class="ident">clone</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FieldIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">FieldIter::new</span>(<span class="ident">TRACE_CONTEXT_HEADER_FIELDS</span>.<span class="ident">as_ref</span>())
     }
 }
@@ -455,7 +455,7 @@
     <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
     <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extract_data</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">SpanContext</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">extract_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">SpanContext</span>)<span class="op">&gt;</span> {
         <span class="macro">vec!</span>[
             (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-00&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::default</span>(), <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
             (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::SAMPLED</span>, <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
@@ -469,7 +469,7 @@
     }
 
     <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extract_data_invalid</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">extract_data_invalid</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
         <span class="macro">vec!</span>[
             (<span class="string">&quot;0000-00000000000000000000000000000000-0000000000000000-01&quot;</span>, <span class="string">&quot;wrong version length&quot;</span>),
             (<span class="string">&quot;00-ab00000000000000000000000000000000-cd00000000000000-01&quot;</span>, <span class="string">&quot;wrong trace ID length&quot;</span>),
@@ -491,7 +491,7 @@
     }
 
     <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">inject_data</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">SpanContext</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">inject_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">SpanContext</span>)<span class="op">&gt;</span> {
         <span class="macro">vec!</span>[
             (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::SAMPLED</span>, <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
             (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-00&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::default</span>(), <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),

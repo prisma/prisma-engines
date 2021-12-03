@@ -220,7 +220,7 @@
     <span class="kw">type</span> <span class="ident">IoStack</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::park::either::Either</span><span class="op">&lt;</span><span class="ident">ProcessDriver</span>, <span class="ident">ParkThread</span><span class="op">&gt;</span>;
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">IoHandle</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::io::driver::Handle</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">create_io_stack</span>(<span class="ident">enabled</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">IoStack</span>, <span class="ident">IoHandle</span>, <span class="ident">SignalHandle</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">create_io_stack</span>(<span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">IoStack</span>, <span class="ident">IoHandle</span>, <span class="ident">SignalHandle</span>)<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::park::either::Either</span>;
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">loom</span>)]</span>
@@ -246,7 +246,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">IoHandle</span> <span class="op">=</span> ();
     <span class="kw">type</span> <span class="ident">IoStack</span> <span class="op">=</span> <span class="ident">ParkThread</span>;
 
-    <span class="kw">fn</span> <span class="ident">create_io_stack</span>(<span class="ident">_enabled</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">IoStack</span>, <span class="ident">IoHandle</span>, <span class="ident">SignalHandle</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">create_io_stack</span>(<span class="ident">_enabled</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">IoStack</span>, <span class="ident">IoHandle</span>, <span class="ident">SignalHandle</span>)<span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>((<span class="ident">ParkThread::new</span>(), <span class="ident">Default::default</span>(), <span class="ident">Default::default</span>()))
     }
 }
@@ -254,7 +254,7 @@
 <span class="comment">// ===== signal driver =====</span>
 
 <span class="macro">macro_rules!</span> <span class="ident">cfg_signal_internal_and_unix</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>:<span class="ident">item</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>:<span class="ident">item</span>)<span class="kw-2">*</span>) =&gt; {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
         <span class="macro">cfg_signal_internal!</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>)<span class="op">*</span> }
     }
@@ -264,7 +264,7 @@
     <span class="kw">type</span> <span class="ident">SignalDriver</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::signal::unix::driver::Driver</span>;
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">SignalHandle</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::signal::unix::driver::Handle</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">create_signal_driver</span>(<span class="ident">io_driver</span>: <span class="ident">IoDriver</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">SignalDriver</span>, <span class="ident">SignalHandle</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">create_signal_driver</span>(<span class="ident">io_driver</span>: <span class="ident">IoDriver</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">SignalDriver</span>, <span class="ident">SignalHandle</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">driver</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::signal::unix::driver::Driver::new</span>(<span class="ident">io_driver</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">driver</span>.<span class="ident">handle</span>();
         <span class="prelude-val">Ok</span>((<span class="ident">driver</span>, <span class="prelude-val">Some</span>(<span class="ident">handle</span>)))
@@ -277,7 +277,7 @@
     <span class="macro">cfg_io_driver!</span> {
         <span class="kw">type</span> <span class="ident">SignalDriver</span> <span class="op">=</span> <span class="ident">IoDriver</span>;
 
-        <span class="kw">fn</span> <span class="ident">create_signal_driver</span>(<span class="ident">io_driver</span>: <span class="ident">IoDriver</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">SignalDriver</span>, <span class="ident">SignalHandle</span>)<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">create_signal_driver</span>(<span class="ident">io_driver</span>: <span class="ident">IoDriver</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">SignalDriver</span>, <span class="ident">SignalHandle</span>)<span class="op">&gt;</span> {
             <span class="prelude-val">Ok</span>((<span class="ident">io_driver</span>, ()))
         }
     }
@@ -288,7 +288,7 @@
 <span class="macro">cfg_process_driver!</span> {
     <span class="kw">type</span> <span class="ident">ProcessDriver</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::process::unix::driver::Driver</span>;
 
-    <span class="kw">fn</span> <span class="ident">create_process_driver</span>(<span class="ident">signal_driver</span>: <span class="ident">SignalDriver</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProcessDriver</span> {
+    <span class="kw">fn</span> <span class="ident">create_process_driver</span>(<span class="ident">signal_driver</span>: <span class="ident">SignalDriver</span>) -&gt; <span class="ident">ProcessDriver</span> {
         <span class="ident"><span class="kw">crate</span>::process::unix::driver::Driver::new</span>(<span class="ident">signal_driver</span>)
     }
 }
@@ -297,7 +297,7 @@
     <span class="macro">cfg_io_driver!</span> {
         <span class="kw">type</span> <span class="ident">ProcessDriver</span> <span class="op">=</span> <span class="ident">SignalDriver</span>;
 
-        <span class="kw">fn</span> <span class="ident">create_process_driver</span>(<span class="ident">signal_driver</span>: <span class="ident">SignalDriver</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProcessDriver</span> {
+        <span class="kw">fn</span> <span class="ident">create_process_driver</span>(<span class="ident">signal_driver</span>: <span class="ident">SignalDriver</span>) -&gt; <span class="ident">ProcessDriver</span> {
             <span class="ident">signal_driver</span>
         }
     }
@@ -311,7 +311,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Clock</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::Clock</span>;
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">TimeHandle</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::time::driver::Handle</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">create_clock</span>(<span class="ident">enable_pausing</span>: <span class="ident">bool</span>, <span class="ident">start_paused</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Clock</span> {
+    <span class="kw">fn</span> <span class="ident">create_clock</span>(<span class="ident">enable_pausing</span>: <span class="ident">bool</span>, <span class="ident">start_paused</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Clock</span> {
         <span class="ident"><span class="kw">crate</span>::time::Clock::new</span>(<span class="ident">enable_pausing</span>, <span class="ident">start_paused</span>)
     }
 
@@ -319,7 +319,7 @@
         <span class="ident">enable</span>: <span class="ident">bool</span>,
         <span class="ident">io_stack</span>: <span class="ident">IoStack</span>,
         <span class="ident">clock</span>: <span class="ident">Clock</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">TimeDriver</span>, <span class="ident">TimeHandle</span>) {
+    ) -&gt; (<span class="ident">TimeDriver</span>, <span class="ident">TimeHandle</span>) {
         <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::park::either::Either</span>;
 
         <span class="kw">if</span> <span class="ident">enable</span> {
@@ -339,7 +339,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Clock</span> <span class="op">=</span> ();
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">TimeHandle</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">create_clock</span>(<span class="ident">_enable_pausing</span>: <span class="ident">bool</span>, <span class="ident">_start_paused</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Clock</span> {
+    <span class="kw">fn</span> <span class="ident">create_clock</span>(<span class="ident">_enable_pausing</span>: <span class="ident">bool</span>, <span class="ident">_start_paused</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Clock</span> {
         ()
     }
 
@@ -347,7 +347,7 @@
         <span class="ident">_enable</span>: <span class="ident">bool</span>,
         <span class="ident">io_stack</span>: <span class="ident">IoStack</span>,
         <span class="ident">_clock</span>: <span class="ident">Clock</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">TimeDriver</span>, <span class="ident">TimeHandle</span>) {
+    ) -&gt; (<span class="ident">TimeDriver</span>, <span class="ident">TimeHandle</span>) {
         (<span class="ident">io_stack</span>, ())
     }
 }
@@ -374,7 +374,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Driver</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cfg</span>: <span class="ident">Cfg</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">Resources</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cfg</span>: <span class="ident">Cfg</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">Resources</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">io_stack</span>, <span class="ident">io_handle</span>, <span class="ident">signal_handle</span>) <span class="op">=</span> <span class="ident">create_io_stack</span>(<span class="ident">cfg</span>.<span class="ident">enable_io</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">clock</span> <span class="op">=</span> <span class="ident">create_clock</span>(<span class="ident">cfg</span>.<span class="ident">enable_pause_time</span>, <span class="ident">cfg</span>.<span class="ident">start_paused</span>);
@@ -398,15 +398,15 @@
     <span class="kw">type</span> <span class="ident">Unpark</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">TimeDriver</span> <span class="kw">as</span> <span class="ident">Park</span><span class="op">&gt;</span><span class="ident">::Unpark</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">TimeDriver</span> <span class="kw">as</span> <span class="ident">Park</span><span class="op">&gt;</span><span class="ident">::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Unpark</span> {
+    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Unpark</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">unpark</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">park</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">park_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">park_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">park_timeout</span>(<span class="ident">duration</span>)
     }
 

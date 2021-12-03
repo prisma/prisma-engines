@@ -6,9 +6,9 @@
 </ol>
 <p>Queues also have the capability to get <a href="struct.ConcurrentQueue.html#method.close">closed</a> at any point. When closed, no more items can be
 pushed into the queue, although the remaining items can still be popped.</p>
-<p>These features make it easy to build channels similar to <a href="https://doc.rust-lang.org/1.56.1/std/sync/mpsc/index.html" title="std::sync::mpsc"><code>std::sync::mpsc</code></a> on top of this
+<p>These features make it easy to build channels similar to <a href="https://doc.rust-lang.org/1.57.0/std/sync/mpsc/index.html" title="std::sync::mpsc"><code>std::sync::mpsc</code></a> on top of this
 crate.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">concurrent_queue::ConcurrentQueue</span>;
 
 <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">ConcurrentQueue::unbounded</span>();
@@ -18,10 +18,10 @@ crate.</p>
 <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">pop</span>(), <span class="prelude-val">Ok</span>(<span class="number">1</span>));
 <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">pop</span>(), <span class="prelude-val">Ok</span>(<span class="number">2</span>));</code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.ConcurrentQueue.html" title="concurrent_queue::ConcurrentQueue struct">ConcurrentQueue</a></div><div class="item-right docblock-short"><p>A concurrent queue.</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.PopError.html" title="concurrent_queue::PopError enum">PopError</a></div><div class="item-right docblock-short"><p>Error which occurs when popping from an empty queue.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.PushError.html" title="concurrent_queue::PushError enum">PushError</a></div><div class="item-right docblock-short"><p>Error which occurs when pushing into a full or closed queue.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="concurrent_queue" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ConcurrentQueue.html" title="concurrent_queue::ConcurrentQueue struct">ConcurrentQueue</a></div><div class="item-right docblock-short"><p>A concurrent queue.</p>
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.PopError.html" title="concurrent_queue::PopError enum">PopError</a></div><div class="item-right docblock-short"><p>Error which occurs when popping from an empty queue.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.PushError.html" title="concurrent_queue::PushError enum">PushError</a></div><div class="item-right docblock-short"><p>Error which occurs when pushing into a full or closed queue.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="concurrent_queue" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

@@ -273,7 +273,7 @@
 
 <span class="doccomment">/// Builds the root `Mutation` type.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">ctx</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">OutputType</span>, <span class="ident">ObjectTypeStrongRef</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>) -&gt; (<span class="ident">OutputType</span>, <span class="ident">ObjectTypeStrongRef</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
         .<span class="ident">internal_data_model</span>
         .<span class="ident">models_cloned</span>()
@@ -364,7 +364,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">create_execute_raw_field</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutputField</span> {
+<span class="kw">fn</span> <span class="ident">create_execute_raw_field</span>() -&gt; <span class="ident">OutputField</span> {
     <span class="ident">field</span>(
         <span class="string">&quot;executeRaw&quot;</span>,
         <span class="macro">vec!</span>[
@@ -384,7 +384,7 @@
     )
 }
 
-<span class="kw">fn</span> <span class="ident">create_query_raw_field</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutputField</span> {
+<span class="kw">fn</span> <span class="ident">create_query_raw_field</span>() -&gt; <span class="ident">OutputField</span> {
     <span class="ident">field</span>(
         <span class="string">&quot;queryRaw&quot;</span>,
         <span class="macro">vec!</span>[
@@ -405,7 +405,7 @@
 }
 
 <span class="doccomment">/// Builds a create mutation field (e.g. createUser) for given model.</span>
-<span class="kw">fn</span> <span class="ident">create_item_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutputField</span> {
+<span class="kw">fn</span> <span class="ident">create_item_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">OutputField</span> {
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">arguments::create_one_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>).<span class="ident">unwrap_or_else</span>(<span class="ident">Vec::new</span>);
     <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">pluralize_internal</span>(<span class="macro">format!</span>(<span class="string">&quot;create{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>), <span class="macro">format!</span>(<span class="string">&quot;createOne{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>));
 
@@ -421,7 +421,7 @@
 }
 
 <span class="doccomment">/// Builds a delete mutation field (e.g. deleteUser) for given model.</span>
-<span class="kw">fn</span> <span class="ident">delete_item_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">delete_item_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
     <span class="ident">arguments::delete_one_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">args</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">pluralize_internal</span>(<span class="macro">format!</span>(<span class="string">&quot;delete{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>), <span class="macro">format!</span>(<span class="string">&quot;deleteOne{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>));
 
@@ -439,7 +439,7 @@
 }
 
 <span class="doccomment">/// Builds a delete many mutation field (e.g. deleteManyUsers) for given model.</span>
-<span class="kw">fn</span> <span class="ident">delete_many_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutputField</span> {
+<span class="kw">fn</span> <span class="ident">delete_many_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">OutputField</span> {
     <span class="kw">let</span> <span class="ident">arguments</span> <span class="op">=</span> <span class="ident">arguments::delete_many_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>);
     <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">pluralize_internal</span>(
         <span class="macro">format!</span>(<span class="string">&quot;deleteMany{}&quot;</span>, <span class="ident">pluralize</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>)),
@@ -458,7 +458,7 @@
 }
 
 <span class="doccomment">/// Builds an update mutation field (e.g. updateUser) for given model.</span>
-<span class="kw">fn</span> <span class="ident">update_item_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">update_item_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
     <span class="ident">arguments::update_one_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">args</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">pluralize_internal</span>(<span class="macro">format!</span>(<span class="string">&quot;update{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>), <span class="macro">format!</span>(<span class="string">&quot;updateOne{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>));
 
@@ -476,7 +476,7 @@
 }
 
 <span class="doccomment">/// Builds a create many mutation field (e.g. createManyUsers) for given model.</span>
-<span class="kw">fn</span> <span class="ident">create_many_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">create_many_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">arguments</span> <span class="op">=</span> <span class="ident">arguments::create_many_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>);
     <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;createMany{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>);
 
@@ -496,7 +496,7 @@
 }
 
 <span class="doccomment">/// Builds an update many mutation field (e.g. updateManyUsers) for given model.</span>
-<span class="kw">fn</span> <span class="ident">update_many_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutputField</span> {
+<span class="kw">fn</span> <span class="ident">update_many_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">OutputField</span> {
     <span class="kw">let</span> <span class="ident">arguments</span> <span class="op">=</span> <span class="ident">arguments::update_many_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>);
     <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">pluralize_internal</span>(
         <span class="macro">format!</span>(<span class="string">&quot;updateMany{}&quot;</span>, <span class="ident">pluralize</span>(<span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())),
@@ -515,7 +515,7 @@
 }
 
 <span class="doccomment">/// Builds an upsert mutation field (e.g. upsertUser) for given model.</span>
-<span class="kw">fn</span> <span class="ident">upsert_item_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">upsert_item_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
     <span class="ident">arguments::upsert_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">args</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">pluralize_internal</span>(<span class="macro">format!</span>(<span class="string">&quot;upsert{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>), <span class="macro">format!</span>(<span class="string">&quot;upsertOne{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>));
 

@@ -1,8 +1,8 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Rustls - a modern TLS library"><meta name="keywords" content="rust, rustlang, rust-lang, rustls"><title>rustls - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../rustls/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate rustls</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.19.1</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all rustls's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#statics">Statics</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><div id="sidebar-vars" data-name="rustls" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">rustls</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/rustls/lib.rs.html#1-334" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h1 id="rustls---a-modern-tls-library" class="section-header"><a href="#rustls---a-modern-tls-library">Rustls - a modern TLS library</a></h1>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Rustls - a modern TLS library"><meta name="keywords" content="rust, rustlang, rust-lang, rustls"><title>rustls - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../rustls/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate rustls</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.19.1</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all rustls's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#statics">Statics</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><div id="sidebar-vars" data-name="rustls" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">rustls</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/rustls/lib.rs.html#1-334" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="rustls---a-modern-tls-library" class="section-header"><a href="#rustls---a-modern-tls-library">Rustls - a modern TLS library</a></h2>
 <p>Rustls is a TLS library that aims to provide a good level of cryptographic security,
 requires no configuration to achieve that security, and provides no unsafe features or
 obsolete cryptography.</p>
-<h2 id="current-features" class="section-header"><a href="#current-features">Current features</a></h2>
+<h3 id="current-features" class="section-header"><a href="#current-features">Current features</a></h3>
 <ul>
 <li>TLS1.2 and TLS1.3.</li>
 <li>ECDSA, Ed25519 or RSA server authentication by clients.</li>
@@ -26,13 +26,13 @@ obsolete cryptography.</p>
 <li>SCT stapling by servers.</li>
 <li>SCT verification by clients.</li>
 </ul>
-<h2 id="possible-future-features" class="section-header"><a href="#possible-future-features">Possible future features</a></h2>
+<h3 id="possible-future-features" class="section-header"><a href="#possible-future-features">Possible future features</a></h3>
 <ul>
 <li>PSK support.</li>
 <li>OCSP verification by clients.</li>
 <li>Certificate pinning.</li>
 </ul>
-<h2 id="non-features" class="section-header"><a href="#non-features">Non-features</a></h2>
+<h3 id="non-features" class="section-header"><a href="#non-features">Non-features</a></h3>
 <p>The following things are broken, obsolete, badly designed, underspecified,
 dangerous and/or insane. Rustls does not support:</p>
 <ul>
@@ -51,16 +51,16 @@ dangerous and/or insane. Rustls does not support:</p>
 </ul>
 <p>There are plenty of other libraries that provide these features should you
 need them.</p>
-<h3 id="platform-support" class="section-header"><a href="#platform-support">Platform support</a></h3>
+<h4 id="platform-support" class="section-header"><a href="#platform-support">Platform support</a></h4>
 <p>Rustls uses <a href="https://crates.io/crates/ring"><code>ring</code></a> for implementing the
 cryptography in TLS. As a result, rustls only runs on platforms
 <a href="https://github.com/briansmith/ring#online-automated-testing">supported by <code>ring</code></a>.
 At the time of writing this means x86, x86-64, armv7, and aarch64.</p>
-<h2 id="design-overview" class="section-header"><a href="#design-overview">Design Overview</a></h2><h3 id="rustls-does-not-take-care-of-network-io" class="section-header"><a href="#rustls-does-not-take-care-of-network-io">Rustls does not take care of network IO</a></h3>
+<h3 id="design-overview" class="section-header"><a href="#design-overview">Design Overview</a></h3><h4 id="rustls-does-not-take-care-of-network-io" class="section-header"><a href="#rustls-does-not-take-care-of-network-io">Rustls does not take care of network IO</a></h4>
 <p>It doesn’t make or accept TCP connections, or do DNS, or read or write files.</p>
 <p>There’s example client and server code which uses mio to do all needed network
 IO.</p>
-<h3 id="rustls-provides-encrypted-pipes" class="section-header"><a href="#rustls-provides-encrypted-pipes">Rustls provides encrypted pipes</a></h3>
+<h4 id="rustls-provides-encrypted-pipes" class="section-header"><a href="#rustls-provides-encrypted-pipes">Rustls provides encrypted pipes</a></h4>
 <p>These are the <code>ServerSession</code> and <code>ClientSession</code> types.  You supply raw TLS traffic
 on the left (via the <code>read_tls()</code> and <code>write_tls()</code> methods) and then read/write the
 plaintext on the right:</p>
@@ -72,10 +72,10 @@ plaintext on the right:</p>
                     |          or           |
           &lt;---------+     ServerSession     &lt;---------+
                     |                       |
-    write_tls()     +-----------------------+      io::Write</code></pre></div><h3 id="rustls-takes-care-of-server-certificate-verification" class="section-header"><a href="#rustls-takes-care-of-server-certificate-verification">Rustls takes care of server certificate verification</a></h3>
+    write_tls()     +-----------------------+      io::Write</code></pre></div><h4 id="rustls-takes-care-of-server-certificate-verification" class="section-header"><a href="#rustls-takes-care-of-server-certificate-verification">Rustls takes care of server certificate verification</a></h4>
 <p>You do not need to provide anything other than a set of root certificates to trust.
 Certificate verification cannot be turned off or disabled in the main API.</p>
-<h2 id="getting-started" class="section-header"><a href="#getting-started">Getting started</a></h2>
+<h3 id="getting-started" class="section-header"><a href="#getting-started">Getting started</a></h3>
 <p>This is the minimum you need to do to make a TLS client connection.</p>
 <p>First, we make a <code>ClientConfig</code>.  You’re likely to make one of these per process,
 and use it for all connections made by that process.</p>
@@ -130,9 +130,9 @@ loop {
   }
 
   socket.wait_for_something_to_happen();
-}</code></pre></div><h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+}</code></pre></div><h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p><code>tlsserver</code> and <code>tlsclient</code> are full worked examples.  These both use mio.</p>
-<h1 id="crate-features" class="section-header"><a href="#crate-features">Crate features</a></h1>
+<h2 id="crate-features" class="section-header"><a href="#crate-features">Crate features</a></h2>
 <p>Here’s a list of what features are exposed by the rustls crate and what
 they mean.</p>
 <ul>
@@ -157,92 +157,92 @@ implementation.</p>
 </li>
 </ul>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="ciphersuite/index.html" title="rustls::ciphersuite mod">ciphersuite</a></div><div class="item-right docblock-short"><p>All defined ciphersuites appear in this module.</p>
-</div><div class="item-left module-item"><a class="mod" href="internal/index.html" title="rustls::internal mod">internal</a></div><div class="item-right docblock-short"><p>Internal classes which may be useful outside the library.
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="ciphersuite/index.html" title="rustls::ciphersuite mod">ciphersuite</a></div><div class="item-right docblock-short"><p>All defined ciphersuites appear in this module.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="internal/index.html" title="rustls::internal mod">internal</a></div><div class="item-right docblock-short"><p>Internal classes which may be useful outside the library.
 The contents of this section DO NOT form part of the stable interface.</p>
-</div><div class="item-left module-item"><a class="mod" href="manual/index.html" title="rustls::manual mod">manual</a></div><div class="item-right docblock-short"><p>This is the rustls manual.
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="manual/index.html" title="rustls::manual mod">manual</a></div><div class="item-right docblock-short"><p>This is the rustls manual.
 This documentation primarily aims to explain design decisions taken in rustls.</p>
-</div><div class="item-left module-item"><a class="mod" href="sign/index.html" title="rustls::sign mod">sign</a></div><div class="item-right docblock-short"><p>Message signing interfaces and implementations.</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.AllowAnyAnonymousOrAuthenticatedClient.html" title="rustls::AllowAnyAnonymousOrAuthenticatedClient struct">AllowAnyAnonymousOrAuthenticatedClient</a></div><div class="item-right docblock-short"><p>A <code>ClientCertVerifier</code> that will allow both anonymous and authenticated
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="sign/index.html" title="rustls::sign mod">sign</a></div><div class="item-right docblock-short"><p>Message signing interfaces and implementations.</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.AllowAnyAnonymousOrAuthenticatedClient.html" title="rustls::AllowAnyAnonymousOrAuthenticatedClient struct">AllowAnyAnonymousOrAuthenticatedClient</a></div><div class="item-right docblock-short"><p>A <code>ClientCertVerifier</code> that will allow both anonymous and authenticated
 clients, without any name checking.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.AllowAnyAuthenticatedClient.html" title="rustls::AllowAnyAuthenticatedClient struct">AllowAnyAuthenticatedClient</a></div><div class="item-right docblock-short"><p>A <code>ClientCertVerifier</code> that will ensure that every client provides a trusted
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.AllowAnyAuthenticatedClient.html" title="rustls::AllowAnyAuthenticatedClient struct">AllowAnyAuthenticatedClient</a></div><div class="item-right docblock-short"><p>A <code>ClientCertVerifier</code> that will ensure that every client provides a trusted
 certificate, without any name checking.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Certificate.html" title="rustls::Certificate struct">Certificate</a></div><div class="item-right docblock-short"><p>This type contains a single certificate by value.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ClientCertVerified.html" title="rustls::ClientCertVerified struct">ClientCertVerified</a></div><div class="item-right docblock-short"><p>Zero-sized marker type representing verification of a client cert chain.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ClientConfig.html" title="rustls::ClientConfig struct">ClientConfig</a></div><div class="item-right docblock-short"><p>Common configuration for (typically) all connections made by
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Certificate.html" title="rustls::Certificate struct">Certificate</a></div><div class="item-right docblock-short"><p>This type contains a single certificate by value.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ClientCertVerified.html" title="rustls::ClientCertVerified struct">ClientCertVerified</a></div><div class="item-right docblock-short"><p>Zero-sized marker type representing verification of a client cert chain.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ClientConfig.html" title="rustls::ClientConfig struct">ClientConfig</a></div><div class="item-right docblock-short"><p>Common configuration for (typically) all connections made by
 a program.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ClientHello.html" title="rustls::ClientHello struct">ClientHello</a></div><div class="item-right docblock-short"><p>A struct representing the received Client Hello</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ClientSession.html" title="rustls::ClientSession struct">ClientSession</a></div><div class="item-right docblock-short"><p>This represents a single TLS client session.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ClientSessionMemoryCache.html" title="rustls::ClientSessionMemoryCache struct">ClientSessionMemoryCache</a></div><div class="item-right docblock-short"><p>An implementor of <code>StoresClientSessions</code> that stores everything
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ClientHello.html" title="rustls::ClientHello struct">ClientHello</a></div><div class="item-right docblock-short"><p>A struct representing the received Client Hello</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ClientSession.html" title="rustls::ClientSession struct">ClientSession</a></div><div class="item-right docblock-short"><p>This represents a single TLS client session.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ClientSessionMemoryCache.html" title="rustls::ClientSessionMemoryCache struct">ClientSessionMemoryCache</a></div><div class="item-right docblock-short"><p>An implementor of <code>StoresClientSessions</code> that stores everything
 in memory.  It enforces a limit on the number of entries
 to bound memory usage.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.DangerousClientConfig.html" title="rustls::DangerousClientConfig struct">DangerousClientConfig</a></div><div class="item-right docblock-short"><p>Accessor for dangerous configuration options.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.HandshakeSignatureValid.html" title="rustls::HandshakeSignatureValid struct">HandshakeSignatureValid</a></div><div class="item-right docblock-short"><p>Marker types.  These are used to bind the fact some verification
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DangerousClientConfig.html" title="rustls::DangerousClientConfig struct">DangerousClientConfig</a></div><div class="item-right docblock-short"><p>Accessor for dangerous configuration options.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.HandshakeSignatureValid.html" title="rustls::HandshakeSignatureValid struct">HandshakeSignatureValid</a></div><div class="item-right docblock-short"><p>Marker types.  These are used to bind the fact some verification
 (certificate chain or handshake signature) has taken place into
 protocol states.  We use this to have the compiler check that there
 are no ‘goto fail’-style elisions of important checks before we
 reach the traffic stage.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.KeyLogFile.html" title="rustls::KeyLogFile struct">KeyLogFile</a></div><div class="item-right docblock-short"><p><code>KeyLog</code> implementation that opens a file whose name is
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.KeyLogFile.html" title="rustls::KeyLogFile struct">KeyLogFile</a></div><div class="item-right docblock-short"><p><code>KeyLog</code> implementation that opens a file whose name is
 given by the <code>SSLKEYLOGFILE</code> environment variable, and writes
 keys into it.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.NoClientAuth.html" title="rustls::NoClientAuth struct">NoClientAuth</a></div><div class="item-right docblock-short"><p>Turns off client authentication.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.NoClientSessionStorage.html" title="rustls::NoClientSessionStorage struct">NoClientSessionStorage</a></div><div class="item-right docblock-short"><p>An implementor of <code>StoresClientSessions</code> which does nothing.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.NoKeyLog.html" title="rustls::NoKeyLog struct">NoKeyLog</a></div><div class="item-right docblock-short"><p>KeyLog that does exactly nothing.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.NoServerSessionStorage.html" title="rustls::NoServerSessionStorage struct">NoServerSessionStorage</a></div><div class="item-right docblock-short"><p>Something which never stores sessions.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.OwnedTrustAnchor.html" title="rustls::OwnedTrustAnchor struct">OwnedTrustAnchor</a></div><div class="item-right docblock-short"><p>This is like a <code>webpki::TrustAnchor</code>, except it owns
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.NoClientAuth.html" title="rustls::NoClientAuth struct">NoClientAuth</a></div><div class="item-right docblock-short"><p>Turns off client authentication.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.NoClientSessionStorage.html" title="rustls::NoClientSessionStorage struct">NoClientSessionStorage</a></div><div class="item-right docblock-short"><p>An implementor of <code>StoresClientSessions</code> which does nothing.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.NoKeyLog.html" title="rustls::NoKeyLog struct">NoKeyLog</a></div><div class="item-right docblock-short"><p>KeyLog that does exactly nothing.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.NoServerSessionStorage.html" title="rustls::NoServerSessionStorage struct">NoServerSessionStorage</a></div><div class="item-right docblock-short"><p>Something which never stores sessions.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OwnedTrustAnchor.html" title="rustls::OwnedTrustAnchor struct">OwnedTrustAnchor</a></div><div class="item-right docblock-short"><p>This is like a <code>webpki::TrustAnchor</code>, except it owns
 rather than borrows its memory.  That prevents lifetimes
 leaking up the object tree.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.PrivateKey.html" title="rustls::PrivateKey struct">PrivateKey</a></div><div class="item-right docblock-short"><p>This type contains a private key by value.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ResolvesServerCertUsingSNI.html" title="rustls::ResolvesServerCertUsingSNI struct">ResolvesServerCertUsingSNI</a></div><div class="item-right docblock-short"><p>Something that resolves do different cert chains/keys based
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.PrivateKey.html" title="rustls::PrivateKey struct">PrivateKey</a></div><div class="item-right docblock-short"><p>This type contains a private key by value.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ResolvesServerCertUsingSNI.html" title="rustls::ResolvesServerCertUsingSNI struct">ResolvesServerCertUsingSNI</a></div><div class="item-right docblock-short"><p>Something that resolves do different cert chains/keys based
 on client-supplied server name (via SNI).</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.RootCertStore.html" title="rustls::RootCertStore struct">RootCertStore</a></div><div class="item-right docblock-short"><p>A container for root certificates able to provide a root-of-trust
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.RootCertStore.html" title="rustls::RootCertStore struct">RootCertStore</a></div><div class="item-right docblock-short"><p>A container for root certificates able to provide a root-of-trust
 for connection authentication.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ServerCertVerified.html" title="rustls::ServerCertVerified struct">ServerCertVerified</a></div><div class="item-right docblock-short"><p>Zero-sized marker type representing verification of a server cert chain.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ServerConfig.html" title="rustls::ServerConfig struct">ServerConfig</a></div><div class="item-right docblock-short"><p>Common configuration for a set of server sessions.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ServerSession.html" title="rustls::ServerSession struct">ServerSession</a></div><div class="item-right docblock-short"><p>This represents a single TLS server session.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ServerSessionMemoryCache.html" title="rustls::ServerSessionMemoryCache struct">ServerSessionMemoryCache</a></div><div class="item-right docblock-short"><p>An implementor of <code>StoresServerSessions</code> that stores everything
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ServerCertVerified.html" title="rustls::ServerCertVerified struct">ServerCertVerified</a></div><div class="item-right docblock-short"><p>Zero-sized marker type representing verification of a server cert chain.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ServerConfig.html" title="rustls::ServerConfig struct">ServerConfig</a></div><div class="item-right docblock-short"><p>Common configuration for a set of server sessions.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ServerSession.html" title="rustls::ServerSession struct">ServerSession</a></div><div class="item-right docblock-short"><p>This represents a single TLS server session.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ServerSessionMemoryCache.html" title="rustls::ServerSessionMemoryCache struct">ServerSessionMemoryCache</a></div><div class="item-right docblock-short"><p>An implementor of <code>StoresServerSessions</code> that stores everything
 in memory.  If enforces a limit on the number of stored sessions
 to bound memory usage.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Stream.html" title="rustls::Stream struct">Stream</a></div><div class="item-right docblock-short"><p>This type implements <code>io::Read</code> and <code>io::Write</code>, encapsulating
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Stream.html" title="rustls::Stream struct">Stream</a></div><div class="item-right docblock-short"><p>This type implements <code>io::Read</code> and <code>io::Write</code>, encapsulating
 a Session <code>S</code> and an underlying transport <code>T</code>, such as a socket.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.StreamOwned.html" title="rustls::StreamOwned struct">StreamOwned</a></div><div class="item-right docblock-short"><p>This type implements <code>io::Read</code> and <code>io::Write</code>, encapsulating
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.StreamOwned.html" title="rustls::StreamOwned struct">StreamOwned</a></div><div class="item-right docblock-short"><p>This type implements <code>io::Read</code> and <code>io::Write</code>, encapsulating
 and owning a Session <code>S</code> and an underlying blocking transport
 <code>T</code>, such as a socket.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SupportedCipherSuite.html" title="rustls::SupportedCipherSuite struct">SupportedCipherSuite</a></div><div class="item-right docblock-short"><p>A cipher suite supported by rustls.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Ticketer.html" title="rustls::Ticketer struct">Ticketer</a></div><div class="item-right docblock-short"><p>A concrete, safe ticket creation mechanism.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.WebPKIVerifier.html" title="rustls::WebPKIVerifier struct">WebPKIVerifier</a></div><div class="item-right docblock-short"><p>Default <code>ServerCertVerifier</code>, see the trait impl for more information.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.WriteEarlyData.html" title="rustls::WriteEarlyData struct">WriteEarlyData</a></div><div class="item-right docblock-short"><p>Stub that implements io::Write and dispatches to <code>write_early_data</code>.</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.BulkAlgorithm.html" title="rustls::BulkAlgorithm enum">BulkAlgorithm</a></div><div class="item-right docblock-short"><p>Bulk symmetric encryption scheme used by a cipher suite.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.CipherSuite.html" title="rustls::CipherSuite enum">CipherSuite</a></div><div class="item-right docblock-short"><p>The <code>CipherSuite</code> TLS protocol enum.  Values in this enum are taken
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SupportedCipherSuite.html" title="rustls::SupportedCipherSuite struct">SupportedCipherSuite</a></div><div class="item-right docblock-short"><p>A cipher suite supported by rustls.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Ticketer.html" title="rustls::Ticketer struct">Ticketer</a></div><div class="item-right docblock-short"><p>A concrete, safe ticket creation mechanism.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.WebPKIVerifier.html" title="rustls::WebPKIVerifier struct">WebPKIVerifier</a></div><div class="item-right docblock-short"><p>Default <code>ServerCertVerifier</code>, see the trait impl for more information.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.WriteEarlyData.html" title="rustls::WriteEarlyData struct">WriteEarlyData</a></div><div class="item-right docblock-short"><p>Stub that implements io::Write and dispatches to <code>write_early_data</code>.</p>
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.BulkAlgorithm.html" title="rustls::BulkAlgorithm enum">BulkAlgorithm</a></div><div class="item-right docblock-short"><p>Bulk symmetric encryption scheme used by a cipher suite.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.CipherSuite.html" title="rustls::CipherSuite enum">CipherSuite</a></div><div class="item-right docblock-short"><p>The <code>CipherSuite</code> TLS protocol enum.  Values in this enum are taken
 from the various RFCs covering TLS, and are listed by IANA.
 The <code>Unknown</code> item is used when processing unrecognised ordinals.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.ProtocolVersion.html" title="rustls::ProtocolVersion enum">ProtocolVersion</a></div><div class="item-right docblock-short"><p>The <code>ProtocolVersion</code> TLS protocol enum.  Values in this enum are taken
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ProtocolVersion.html" title="rustls::ProtocolVersion enum">ProtocolVersion</a></div><div class="item-right docblock-short"><p>The <code>ProtocolVersion</code> TLS protocol enum.  Values in this enum are taken
 from the various RFCs covering TLS, and are listed by IANA.
 The <code>Unknown</code> item is used when processing unrecognised ordinals.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.SignatureScheme.html" title="rustls::SignatureScheme enum">SignatureScheme</a></div><div class="item-right docblock-short"><p>The <code>SignatureScheme</code> TLS protocol enum.  Values in this enum are taken
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.SignatureScheme.html" title="rustls::SignatureScheme enum">SignatureScheme</a></div><div class="item-right docblock-short"><p>The <code>SignatureScheme</code> TLS protocol enum.  Values in this enum are taken
 from the various RFCs covering TLS, and are listed by IANA.
 The <code>Unknown</code> item is used when processing unrecognised ordinals.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.TLSError.html" title="rustls::TLSError enum">TLSError</a></div><div class="item-right docblock-short"><p>rustls reports protocol errors using this type.</p>
-</div></div><h2 id="statics" class="section-header"><a href="#statics">Statics</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="static" href="static.ALL_CIPHERSUITES.html" title="rustls::ALL_CIPHERSUITES static">ALL_CIPHERSUITES</a></div><div class="item-right docblock-short"><p>A list of all the cipher suites supported by rustls.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.ClientCertVerifier.html" title="rustls::ClientCertVerifier trait">ClientCertVerifier</a></div><div class="item-right docblock-short"><p>Something that can verify a client certificate chain</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.KeyLog.html" title="rustls::KeyLog trait">KeyLog</a></div><div class="item-right docblock-short"><p>This trait represents the ability to do something useful
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.TLSError.html" title="rustls::TLSError enum">TLSError</a></div><div class="item-right docblock-short"><p>rustls reports protocol errors using this type.</p>
+</div></div></div><h2 id="statics" class="section-header"><a href="#statics">Statics</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="static" href="static.ALL_CIPHERSUITES.html" title="rustls::ALL_CIPHERSUITES static">ALL_CIPHERSUITES</a></div><div class="item-right docblock-short"><p>A list of all the cipher suites supported by rustls.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ClientCertVerifier.html" title="rustls::ClientCertVerifier trait">ClientCertVerifier</a></div><div class="item-right docblock-short"><p>Something that can verify a client certificate chain</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.KeyLog.html" title="rustls::KeyLog trait">KeyLog</a></div><div class="item-right docblock-short"><p>This trait represents the ability to do something useful
 with key material, such as logging it to a file for debugging.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.ProducesTickets.html" title="rustls::ProducesTickets trait">ProducesTickets</a></div><div class="item-right docblock-short"><p>A trait for the ability to encrypt and decrypt tickets.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.ResolvesClientCert.html" title="rustls::ResolvesClientCert trait">ResolvesClientCert</a></div><div class="item-right docblock-short"><p>A trait for the ability to choose a certificate chain and
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ProducesTickets.html" title="rustls::ProducesTickets trait">ProducesTickets</a></div><div class="item-right docblock-short"><p>A trait for the ability to encrypt and decrypt tickets.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ResolvesClientCert.html" title="rustls::ResolvesClientCert trait">ResolvesClientCert</a></div><div class="item-right docblock-short"><p>A trait for the ability to choose a certificate chain and
 private key for the purposes of client authentication.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.ResolvesServerCert.html" title="rustls::ResolvesServerCert trait">ResolvesServerCert</a></div><div class="item-right docblock-short"><p>How to choose a certificate chain and signing key for use
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ResolvesServerCert.html" title="rustls::ResolvesServerCert trait">ResolvesServerCert</a></div><div class="item-right docblock-short"><p>How to choose a certificate chain and signing key for use
 in server authentication.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.ServerCertVerifier.html" title="rustls::ServerCertVerifier trait">ServerCertVerifier</a></div><div class="item-right docblock-short"><p>Something that can verify a server certificate chain, and verify
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ServerCertVerifier.html" title="rustls::ServerCertVerifier trait">ServerCertVerifier</a></div><div class="item-right docblock-short"><p>Something that can verify a server certificate chain, and verify
 signatures made by certificates.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Session.html" title="rustls::Session trait">Session</a></div><div class="item-right docblock-short"><p>Generalises <code>ClientSession</code> and <code>ServerSession</code></p>
-</div><div class="item-left module-item"><a class="trait" href="trait.StoresClientSessions.html" title="rustls::StoresClientSessions trait">StoresClientSessions</a></div><div class="item-right docblock-short"><p>A trait for the ability to store client session data.
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Session.html" title="rustls::Session trait">Session</a></div><div class="item-right docblock-short"><p>Generalises <code>ClientSession</code> and <code>ServerSession</code></p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.StoresClientSessions.html" title="rustls::StoresClientSessions trait">StoresClientSessions</a></div><div class="item-right docblock-short"><p>A trait for the ability to store client session data.
 The keys and values are opaque.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.StoresServerSessions.html" title="rustls::StoresServerSessions trait">StoresServerSessions</a></div><div class="item-right docblock-short"><p>A trait for the ability to store server session data.</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.DistinguishedNames.html" title="rustls::DistinguishedNames type">DistinguishedNames</a></div><div class="item-right docblock-short"></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="rustls" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.StoresServerSessions.html" title="rustls::StoresServerSessions trait">StoresServerSessions</a></div><div class="item-right docblock-short"><p>A trait for the ability to store server session data.</p>
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.DistinguishedNames.html" title="rustls::DistinguishedNames type">DistinguishedNames</a></div><div class="item-right docblock-short"></div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="rustls" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

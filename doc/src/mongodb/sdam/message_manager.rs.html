@@ -76,7 +76,7 @@
 
 <span class="kw">impl</span> <span class="ident">TopologyMessageManager</span> {
     <span class="doccomment">/// Constructs a new TopologyMessageManager.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> (<span class="ident">topology_check_requester</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">broadcast::channel</span>(<span class="number">1</span>);
         <span class="kw">let</span> (<span class="ident">topology_change_notifier</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">broadcast::channel</span>(<span class="number">1</span>);
 
@@ -98,11 +98,11 @@
         <span class="kw">let</span> <span class="kw">_</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">topology_change_notifier</span>.<span class="ident">send</span>(());
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">subscribe_to_topology_check_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TopologyMessageSubscriber</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">subscribe_to_topology_check_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyMessageSubscriber</span> {
         <span class="ident">TopologyMessageSubscriber::new</span>(<span class="self">self</span>.<span class="ident">topology_check_requester</span>.<span class="ident">subscribe</span>())
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">subscribe_to_topology_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TopologyMessageSubscriber</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">subscribe_to_topology_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyMessageSubscriber</span> {
         <span class="ident">TopologyMessageSubscriber::new</span>(<span class="self">self</span>.<span class="ident">topology_change_notifier</span>.<span class="ident">subscribe</span>())
     }
 }
@@ -112,13 +112,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TopologyMessageSubscriber</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">receiver</span>: <span class="ident">Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">receiver</span>: <span class="ident">Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">receiver</span> }
     }
 
     <span class="doccomment">/// Waits for either `timeout` to elapse or a message to be received.</span>
     <span class="doccomment">/// Returns true if a message was received, false for a timeout.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">wait_for_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">wait_for_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">RUNTIME</span>.<span class="ident">timeout</span>(<span class="ident">timeout</span>, <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">recv</span>()).<span class="kw">await</span>.<span class="ident">is_ok</span>()
     }
 }

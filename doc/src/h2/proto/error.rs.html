@@ -108,67 +108,67 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Reset</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">initiator</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::GoAway</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">initiator</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">initiator</span>.<span class="ident">is_local</span>(),
-            <span class="ident"><span class="self">Self</span>::Io</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident"><span class="self">Self</span>::Reset</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">initiator</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::GoAway</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">initiator</span>) =&gt; <span class="ident">initiator</span>.<span class="ident">is_local</span>(),
+            <span class="ident"><span class="self">Self</span>::Io</span>(..) =&gt; <span class="bool-val">true</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">user_go_away</span>(<span class="ident">reason</span>: <span class="ident">Reason</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">user_go_away</span>(<span class="ident">reason</span>: <span class="ident">Reason</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::GoAway</span>(<span class="ident">Bytes::new</span>(), <span class="ident">reason</span>, <span class="ident">Initiator::User</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">library_reset</span>(<span class="ident">stream_id</span>: <span class="ident">StreamId</span>, <span class="ident">reason</span>: <span class="ident">Reason</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">library_reset</span>(<span class="ident">stream_id</span>: <span class="ident">StreamId</span>, <span class="ident">reason</span>: <span class="ident">Reason</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Reset</span>(<span class="ident">stream_id</span>, <span class="ident">reason</span>, <span class="ident">Initiator::Library</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">library_go_away</span>(<span class="ident">reason</span>: <span class="ident">Reason</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">library_go_away</span>(<span class="ident">reason</span>: <span class="ident">Reason</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::GoAway</span>(<span class="ident">Bytes::new</span>(), <span class="ident">reason</span>, <span class="ident">Initiator::Library</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remote_reset</span>(<span class="ident">stream_id</span>: <span class="ident">StreamId</span>, <span class="ident">reason</span>: <span class="ident">Reason</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remote_reset</span>(<span class="ident">stream_id</span>: <span class="ident">StreamId</span>, <span class="ident">reason</span>: <span class="ident">Reason</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Reset</span>(<span class="ident">stream_id</span>, <span class="ident">reason</span>, <span class="ident">Initiator::Remote</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remote_go_away</span>(<span class="ident">debug_data</span>: <span class="ident">Bytes</span>, <span class="ident">reason</span>: <span class="ident">Reason</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remote_go_away</span>(<span class="ident">debug_data</span>: <span class="ident">Bytes</span>, <span class="ident">reason</span>: <span class="ident">Reason</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::GoAway</span>(<span class="ident">debug_data</span>, <span class="ident">reason</span>, <span class="ident">Initiator::Remote</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Initiator</span> {
-    <span class="kw">fn</span> <span class="ident">is_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::User</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Library</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident"><span class="self">Self</span>::Remote</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident"><span class="self">Self</span>::User</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Library</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident"><span class="self">Self</span>::Remote</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Reset</span>(<span class="kw">_</span>, <span class="ident">reason</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::GoAway</span>(<span class="kw">_</span>, <span class="ident">reason</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">reason</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
-            <span class="ident"><span class="self">Self</span>::Io</span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inner</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
-            <span class="ident"><span class="self">Self</span>::Io</span>(<span class="ident">kind</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">io::Error::from</span>(<span class="ident">kind</span>).<span class="ident">fmt</span>(<span class="ident">fmt</span>),
+            <span class="ident"><span class="self">Self</span>::Reset</span>(<span class="kw">_</span>, <span class="ident">reason</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::GoAway</span>(<span class="kw">_</span>, <span class="ident">reason</span>, <span class="kw">_</span>) =&gt; <span class="ident">reason</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
+            <span class="ident"><span class="self">Self</span>::Io</span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">inner</span>)) =&gt; <span class="ident">inner</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
+            <span class="ident"><span class="self">Self</span>::Io</span>(<span class="ident">kind</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">io::Error::from</span>(<span class="ident">kind</span>).<span class="ident">fmt</span>(<span class="ident">fmt</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::ErrorKind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">io::ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">io::ErrorKind</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Error::Io</span>(<span class="ident">src</span>.<span class="ident">into</span>(), <span class="prelude-val">None</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">io::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Error::Io</span>(<span class="ident">src</span>.<span class="ident">kind</span>(), <span class="ident">src</span>.<span class="ident">get_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">to_string</span>()))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SendError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">Error</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Connection</span>(<span class="ident">src</span>)
     }
 }

@@ -39,11 +39,11 @@
     <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">Queryable</span>,
     <span class="ident">connection_info</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectionInfo</span>,
     <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SqlSchemaDescriberBackend</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::SqlError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SqlSchemaDescriberBackend</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::SqlError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">version</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">connection_info</span>.<span class="ident">sql_family</span>() {
-        <span class="ident">SqlFamily::Postgres</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">SqlFamily::Postgres</span> =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">circumstances</span> <span class="op">=</span> <span class="ident">Default::default</span>();
 
             <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">version</span><span class="op">|</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;CockroachDB&quot;</span>)).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
@@ -55,9 +55,9 @@
                 <span class="ident">circumstances</span>,
             )) <span class="kw">as</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SqlSchemaDescriberBackend</span><span class="op">&gt;</span>
         }
-        <span class="ident">SqlFamily::Mysql</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::new</span>(<span class="ident">sql_schema_describer::mysql::SqlSchemaDescriber::new</span>(<span class="ident">connection</span>)),
-        <span class="ident">SqlFamily::Sqlite</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::new</span>(<span class="ident">sql_schema_describer::sqlite::SqlSchemaDescriber::new</span>(<span class="ident">connection</span>)),
-        <span class="ident">SqlFamily::Mssql</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::new</span>(<span class="ident">sql_schema_describer::mssql::SqlSchemaDescriber::new</span>(<span class="ident">connection</span>)),
+        <span class="ident">SqlFamily::Mysql</span> =&gt; <span class="ident">Box::new</span>(<span class="ident">sql_schema_describer::mysql::SqlSchemaDescriber::new</span>(<span class="ident">connection</span>)),
+        <span class="ident">SqlFamily::Sqlite</span> =&gt; <span class="ident">Box::new</span>(<span class="ident">sql_schema_describer::sqlite::SqlSchemaDescriber::new</span>(<span class="ident">connection</span>)),
+        <span class="ident">SqlFamily::Mssql</span> =&gt; <span class="ident">Box::new</span>(<span class="ident">sql_schema_describer::mssql::SqlSchemaDescriber::new</span>(<span class="ident">connection</span>)),
     })
 }
 </code></pre></div>

@@ -4,7 +4,7 @@ structured, event-based diagnostic information. This crate provides the
 <a href="attr.instrument.html"><code>#[instrument]</code></a> procedural macro attribute.</p>
 <p>Note that this macro is also re-exported by the main <code>tracing</code> crate.</p>
 <p><em>Compiler support: <a href="#supported-rust-versions">requires <code>rustc</code> 1.42+</a></em></p>
-<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
+<h3 id="usage" class="section-header"><a href="#usage">Usage</a></h3>
 <p>First, add this to your <code>Cargo.toml</code>:</p>
 <div class="example-wrap"><pre class="language-toml"><code>[dependencies]
 tracing-attributes = &quot;0.1.18&quot;</code></pre></div>
@@ -19,7 +19,7 @@ called. For example:</p>
     <span class="comment">// ...</span>
 }
 </code></pre></div>
-<h2 id="supported-rust-versions" class="section-header"><a href="#supported-rust-versions">Supported Rust Versions</a></h2>
+<h3 id="supported-rust-versions" class="section-header"><a href="#supported-rust-versions">Supported Rust Versions</a></h3>
 <p>Tracing is built against the latest stable release. The minimum supported
 version is 1.42. The current Tracing version is not guaranteed to build on
 Rust versions earlier than the minimum supported version.</p>
@@ -31,8 +31,8 @@ increased past 1.42, three minor versions prior. Increasing the minimum
 supported compiler version is not considered a semver breaking change as
 long as doing so complies with this policy.</p>
 </div></details><h2 id="attributes" class="section-header"><a href="#attributes">Attribute Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="attr" href="attr.instrument.html" title="tracing_attributes::instrument attr">instrument</a></div><div class="item-right docblock-short"><p>Instruments a function to create and enter a <code>tracing</code> <a href="https://docs.rs/tracing/latest/tracing/span/index.html">span</a> every time
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.instrument.html" title="tracing_attributes::instrument attr">instrument</a></div><div class="item-right docblock-short"><p>Instruments a function to create and enter a <code>tracing</code> <a href="https://docs.rs/tracing/latest/tracing/span/index.html">span</a> every time
 the function is called.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="tracing_attributes" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="tracing_attributes" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

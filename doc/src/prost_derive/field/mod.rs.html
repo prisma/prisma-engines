@@ -397,7 +397,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the meta items are invalid, an error will be returned.</span>
     <span class="doccomment">/// If the field should be ignored, `None` is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">attrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>, <span class="ident">inferred_tag</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">attrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>, <span class="ident">inferred_tag</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">prost_attrs</span>(<span class="ident">attrs</span>);
 
         <span class="comment">// TODO: check for ignore attribute.</span>
@@ -423,7 +423,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the meta items are invalid, an error will be returned.</span>
     <span class="doccomment">/// If the field should be ignored, `None` is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_oneof</span>(<span class="ident">attrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_oneof</span>(<span class="ident">attrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">prost_attrs</span>(<span class="ident">attrs</span>);
 
         <span class="comment">// TODO: check for ignore attribute.</span>
@@ -443,72 +443,72 @@
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">field</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">scalar</span>.<span class="ident">tag</span>],
-            <span class="ident">Field::Message</span>(<span class="kw-2">ref</span> <span class="ident">message</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">message</span>.<span class="ident">tag</span>],
-            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">map</span>.<span class="ident">tag</span>],
-            <span class="ident">Field::Oneof</span>(<span class="kw-2">ref</span> <span class="ident">oneof</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">oneof</span>.<span class="ident">tags</span>.<span class="ident">clone</span>(),
-            <span class="ident">Field::Group</span>(<span class="kw-2">ref</span> <span class="ident">group</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">group</span>.<span class="ident">tag</span>],
+            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">scalar</span>.<span class="ident">tag</span>],
+            <span class="ident">Field::Message</span>(<span class="kw-2">ref</span> <span class="ident">message</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">message</span>.<span class="ident">tag</span>],
+            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">map</span>.<span class="ident">tag</span>],
+            <span class="ident">Field::Oneof</span>(<span class="kw-2">ref</span> <span class="ident">oneof</span>) =&gt; <span class="ident">oneof</span>.<span class="ident">tags</span>.<span class="ident">clone</span>(),
+            <span class="ident">Field::Group</span>(<span class="kw-2">ref</span> <span class="ident">group</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">group</span>.<span class="ident">tag</span>],
         }
     }
 
     <span class="doccomment">/// Returns a statement which encodes the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">scalar</span>.<span class="ident">encode</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Message</span>(<span class="kw-2">ref</span> <span class="ident">message</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">message</span>.<span class="ident">encode</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">map</span>.<span class="ident">encode</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Oneof</span>(<span class="kw-2">ref</span> <span class="ident">oneof</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">oneof</span>.<span class="ident">encode</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Group</span>(<span class="kw-2">ref</span> <span class="ident">group</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">group</span>.<span class="ident">encode</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) =&gt; <span class="ident">scalar</span>.<span class="ident">encode</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Message</span>(<span class="kw-2">ref</span> <span class="ident">message</span>) =&gt; <span class="ident">message</span>.<span class="ident">encode</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) =&gt; <span class="ident">map</span>.<span class="ident">encode</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Oneof</span>(<span class="kw-2">ref</span> <span class="ident">oneof</span>) =&gt; <span class="ident">oneof</span>.<span class="ident">encode</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Group</span>(<span class="kw-2">ref</span> <span class="ident">group</span>) =&gt; <span class="ident">group</span>.<span class="ident">encode</span>(<span class="ident">ident</span>),
         }
     }
 
     <span class="doccomment">/// Returns an expression which evaluates to the result of merging a decoded</span>
     <span class="doccomment">/// value into the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">scalar</span>.<span class="ident">merge</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Message</span>(<span class="kw-2">ref</span> <span class="ident">message</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">message</span>.<span class="ident">merge</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">map</span>.<span class="ident">merge</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Oneof</span>(<span class="kw-2">ref</span> <span class="ident">oneof</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">oneof</span>.<span class="ident">merge</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Group</span>(<span class="kw-2">ref</span> <span class="ident">group</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">group</span>.<span class="ident">merge</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) =&gt; <span class="ident">scalar</span>.<span class="ident">merge</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Message</span>(<span class="kw-2">ref</span> <span class="ident">message</span>) =&gt; <span class="ident">message</span>.<span class="ident">merge</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) =&gt; <span class="ident">map</span>.<span class="ident">merge</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Oneof</span>(<span class="kw-2">ref</span> <span class="ident">oneof</span>) =&gt; <span class="ident">oneof</span>.<span class="ident">merge</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Group</span>(<span class="kw-2">ref</span> <span class="ident">group</span>) =&gt; <span class="ident">group</span>.<span class="ident">merge</span>(<span class="ident">ident</span>),
         }
     }
 
     <span class="doccomment">/// Returns an expression which evaluates to the encoded length of the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoded_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoded_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">scalar</span>.<span class="ident">encoded_len</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">map</span>.<span class="ident">encoded_len</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Message</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">msg</span>.<span class="ident">encoded_len</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Oneof</span>(<span class="kw-2">ref</span> <span class="ident">oneof</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">oneof</span>.<span class="ident">encoded_len</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Group</span>(<span class="kw-2">ref</span> <span class="ident">group</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">group</span>.<span class="ident">encoded_len</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) =&gt; <span class="ident">scalar</span>.<span class="ident">encoded_len</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) =&gt; <span class="ident">map</span>.<span class="ident">encoded_len</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Message</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) =&gt; <span class="ident">msg</span>.<span class="ident">encoded_len</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Oneof</span>(<span class="kw-2">ref</span> <span class="ident">oneof</span>) =&gt; <span class="ident">oneof</span>.<span class="ident">encoded_len</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Group</span>(<span class="kw-2">ref</span> <span class="ident">group</span>) =&gt; <span class="ident">group</span>.<span class="ident">encoded_len</span>(<span class="ident">ident</span>),
         }
     }
 
     <span class="doccomment">/// Returns a statement which clears the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">scalar</span>.<span class="ident">clear</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Message</span>(<span class="kw-2">ref</span> <span class="ident">message</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">message</span>.<span class="ident">clear</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">map</span>.<span class="ident">clear</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Oneof</span>(<span class="kw-2">ref</span> <span class="ident">oneof</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">oneof</span>.<span class="ident">clear</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Group</span>(<span class="kw-2">ref</span> <span class="ident">group</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">group</span>.<span class="ident">clear</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) =&gt; <span class="ident">scalar</span>.<span class="ident">clear</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Message</span>(<span class="kw-2">ref</span> <span class="ident">message</span>) =&gt; <span class="ident">message</span>.<span class="ident">clear</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) =&gt; <span class="ident">map</span>.<span class="ident">clear</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Oneof</span>(<span class="kw-2">ref</span> <span class="ident">oneof</span>) =&gt; <span class="ident">oneof</span>.<span class="ident">clear</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Group</span>(<span class="kw-2">ref</span> <span class="ident">group</span>) =&gt; <span class="ident">group</span>.<span class="ident">clear</span>(<span class="ident">ident</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">scalar</span>.<span class="ident">default</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span>(<span class="ident">::core::default::Default::default</span>()),
+            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) =&gt; <span class="ident">scalar</span>.<span class="ident">default</span>(),
+            <span class="kw">_</span> =&gt; <span class="macro">quote!</span>(<span class="ident">::core::default::Default::default</span>()),
         }
     }
 
     <span class="doccomment">/// Produces the fragment implementing debug for the given field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">scalar</span>.<span class="ident">debug</span>(<span class="macro">quote!</span>(<span class="ident">ScalarWrapper</span>));
                 <span class="macro">quote!</span> {
                     {
@@ -517,7 +517,7 @@
                     }
                 }
             }
-            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">debug</span>(<span class="macro">quote!</span>(<span class="ident">MapWrapper</span>));
                 <span class="macro">quote!</span> {
                     {
@@ -526,15 +526,15 @@
                     }
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span>(<span class="kw-2">&amp;</span>#<span class="ident">ident</span>),
+            <span class="kw">_</span> =&gt; <span class="macro">quote!</span>(<span class="kw-2">&amp;</span>#<span class="ident">ident</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">methods</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">methods</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">scalar</span>.<span class="ident">methods</span>(<span class="ident">ident</span>),
-            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">map</span>.<span class="ident">methods</span>(<span class="ident">ident</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) =&gt; <span class="ident">scalar</span>.<span class="ident">methods</span>(<span class="ident">ident</span>),
+            <span class="ident">Field::Map</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) =&gt; <span class="ident">map</span>.<span class="ident">methods</span>(<span class="ident">ident</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
@@ -550,22 +550,22 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Label</span> {
-    <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Label::Optional</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;optional&quot;</span>,
-            <span class="ident">Label::Required</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;required&quot;</span>,
-            <span class="ident">Label::Repeated</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;repeated&quot;</span>,
+            <span class="ident">Label::Optional</span> =&gt; <span class="string">&quot;optional&quot;</span>,
+            <span class="ident">Label::Required</span> =&gt; <span class="string">&quot;required&quot;</span>,
+            <span class="ident">Label::Repeated</span> =&gt; <span class="string">&quot;repeated&quot;</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">variants</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">Label</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">variants</span>() -&gt; <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">Label</span><span class="op">&gt;</span> {
         <span class="kw">const</span> <span class="ident">VARIANTS</span>: <span class="kw-2">&amp;</span>[<span class="ident">Label</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">Label::Optional</span>, <span class="ident">Label::Required</span>, <span class="ident">Label::Repeated</span>];
         <span class="ident">VARIANTS</span>.<span class="ident">iter</span>()
     }
 
     <span class="doccomment">/// Parses a string into a field label.</span>
     <span class="doccomment">/// If the string doesn&#39;t match a field label, `None` is returned.</span>
-    <span class="kw">fn</span> <span class="ident">from_attr</span>(<span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_attr</span>(<span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Meta::Path</span>(<span class="kw-2">ref</span> <span class="ident">path</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">attr</span> {
             <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">label</span> <span class="kw">in</span> <span class="ident">Label::variants</span>() {
                 <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="ident">label</span>.<span class="ident">as_str</span>()) {
@@ -578,42 +578,42 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Label</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">as_str</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Label</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">as_str</span>())
     }
 }
 
 <span class="doccomment">/// Get the items belonging to the &#39;prost&#39; list attribute, e.g. `#[prost(foo, bar=&quot;baz&quot;)]`.</span>
-<span class="kw">fn</span> <span class="ident">prost_attrs</span>(<span class="ident">attrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Meta</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">prost_attrs</span>(<span class="ident">attrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Meta</span><span class="op">&gt;</span> {
     <span class="ident">attrs</span>
         .<span class="ident">iter</span>()
         .<span class="ident">flat_map</span>(<span class="ident">Attribute::parse_meta</span>)
         .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">meta</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">meta</span> {
-            <span class="ident">Meta::List</span>(<span class="ident">MetaList</span> { <span class="ident">path</span>, <span class="ident">nested</span>, .. }) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Meta::List</span>(<span class="ident">MetaList</span> { <span class="ident">path</span>, <span class="ident">nested</span>, .. }) =&gt; {
                 <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;prost&quot;</span>) {
                     <span class="ident">nested</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
                 } <span class="kw">else</span> {
                     <span class="ident">Vec::new</span>()
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Vec::new</span>(),
+            <span class="kw">_</span> =&gt; <span class="ident">Vec::new</span>(),
         })
-        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> {
+        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="ident">attr</span> {
-                <span class="ident">NestedMeta::Meta</span>(<span class="ident">attr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">attr</span>),
-                <span class="ident">NestedMeta::Lit</span>(<span class="ident">lit</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;invalid prost attribute: {:?}&quot;</span>, <span class="ident">lit</span>),
+                <span class="ident">NestedMeta::Meta</span>(<span class="ident">attr</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">attr</span>),
+                <span class="ident">NestedMeta::Lit</span>(<span class="ident">lit</span>) =&gt; <span class="macro">bail!</span>(<span class="string">&quot;invalid prost attribute: {:?}&quot;</span>, <span class="ident">lit</span>),
             }
         })
         .<span class="ident">collect</span>()
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">option</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">option</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">fmt::Debug</span>,
 {
@@ -624,7 +624,7 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_bool</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_bool</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">b</span> {
         <span class="macro">bail!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">message</span>);
     } <span class="kw">else</span> {
@@ -635,15 +635,15 @@
 
 <span class="doccomment">/// Unpacks an attribute into a (key, boolean) pair, returning the boolean value.</span>
 <span class="doccomment">/// If the key doesn&#39;t match the attribute, `None` is returned.</span>
-<span class="kw">fn</span> <span class="ident">bool_attr</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">bool_attr</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">attr</span>.<span class="ident">path</span>().<span class="ident">is_ident</span>(<span class="ident">key</span>) {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
     }
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">attr</span> {
-        <span class="ident">Meta::Path</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
-        <span class="ident">Meta::List</span>(<span class="kw-2">ref</span> <span class="ident">meta_list</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Meta::Path</span>(..) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
+        <span class="ident">Meta::List</span>(<span class="kw-2">ref</span> <span class="ident">meta_list</span>) =&gt; {
             <span class="comment">// TODO(rustlang/rust#23121): slice pattern matching would make this much nicer.</span>
-            <span class="kw">if</span> <span class="ident">meta_list</span>.<span class="ident">nested</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+            <span class="kw">if</span> <span class="ident">meta_list</span>.<span class="ident">nested</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">NestedMeta::Lit</span>(<span class="ident">Lit::Bool</span>(<span class="ident">LitBool</span> { <span class="ident">value</span>, .. })) <span class="op">=</span> <span class="ident">meta_list</span>.<span class="ident">nested</span>[<span class="number">0</span>] {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>));
                 }
@@ -653,7 +653,7 @@
         <span class="ident">Meta::NameValue</span>(<span class="ident">MetaNameValue</span> {
             <span class="ident">lit</span>: <span class="ident">Lit::Str</span>(<span class="kw-2">ref</span> <span class="ident">lit</span>),
             ..
-        }) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">lit</span>
+        }) =&gt; <span class="ident">lit</span>
             .<span class="ident">value</span>()
             .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>()
             .<span class="ident">map_err</span>(<span class="ident">Error::from</span>)
@@ -661,13 +661,13 @@
         <span class="ident">Meta::NameValue</span>(<span class="ident">MetaNameValue</span> {
             <span class="ident">lit</span>: <span class="ident">Lit::Bool</span>(<span class="ident">LitBool</span> { <span class="ident">value</span>, .. }),
             ..
-        }) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>)),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;invalid {} attribute&quot;</span>, <span class="ident">key</span>),
+        }) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>)),
+        <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;invalid {} attribute&quot;</span>, <span class="ident">key</span>),
     }
 }
 
 <span class="doccomment">/// Checks if an attribute matches a word.</span>
-<span class="kw">fn</span> <span class="ident">word_attr</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">word_attr</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Meta::Path</span>(<span class="kw-2">ref</span> <span class="ident">path</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">attr</span> {
         <span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="ident">key</span>)
     } <span class="kw">else</span> {
@@ -675,39 +675,39 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">tag_attr</span>(<span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">tag_attr</span>(<span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">attr</span>.<span class="ident">path</span>().<span class="ident">is_ident</span>(<span class="string">&quot;tag&quot;</span>) {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
     }
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">attr</span> {
-        <span class="ident">Meta::List</span>(<span class="kw-2">ref</span> <span class="ident">meta_list</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Meta::List</span>(<span class="kw-2">ref</span> <span class="ident">meta_list</span>) =&gt; {
             <span class="comment">// TODO(rustlang/rust#23121): slice pattern matching would make this much nicer.</span>
-            <span class="kw">if</span> <span class="ident">meta_list</span>.<span class="ident">nested</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+            <span class="kw">if</span> <span class="ident">meta_list</span>.<span class="ident">nested</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">NestedMeta::Lit</span>(<span class="ident">Lit::Int</span>(<span class="kw-2">ref</span> <span class="ident">lit</span>)) <span class="op">=</span> <span class="ident">meta_list</span>.<span class="ident">nested</span>[<span class="number">0</span>] {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">lit</span>.<span class="ident">base10_parse</span>()<span class="question-mark">?</span>));
                 }
             }
             <span class="macro">bail!</span>(<span class="string">&quot;invalid tag attribute: {:?}&quot;</span>, <span class="ident">attr</span>);
         }
-        <span class="ident">Meta::NameValue</span>(<span class="kw-2">ref</span> <span class="ident">meta_name_value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">meta_name_value</span>.<span class="ident">lit</span> {
-            <span class="ident">Lit::Str</span>(<span class="kw-2">ref</span> <span class="ident">lit</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">lit</span>
+        <span class="ident">Meta::NameValue</span>(<span class="kw-2">ref</span> <span class="ident">meta_name_value</span>) =&gt; <span class="kw">match</span> <span class="ident">meta_name_value</span>.<span class="ident">lit</span> {
+            <span class="ident">Lit::Str</span>(<span class="kw-2">ref</span> <span class="ident">lit</span>) =&gt; <span class="ident">lit</span>
                 .<span class="ident">value</span>()
                 .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>()
                 .<span class="ident">map_err</span>(<span class="ident">Error::from</span>)
                 .<span class="ident">map</span>(<span class="ident">Option::Some</span>),
-            <span class="ident">Lit::Int</span>(<span class="kw-2">ref</span> <span class="ident">lit</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">lit</span>.<span class="ident">base10_parse</span>()<span class="question-mark">?</span>)),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;invalid tag attribute: {:?}&quot;</span>, <span class="ident">attr</span>),
+            <span class="ident">Lit::Int</span>(<span class="kw-2">ref</span> <span class="ident">lit</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">lit</span>.<span class="ident">base10_parse</span>()<span class="question-mark">?</span>)),
+            <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;invalid tag attribute: {:?}&quot;</span>, <span class="ident">attr</span>),
         },
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;invalid tag attribute: {:?}&quot;</span>, <span class="ident">attr</span>),
+        <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;invalid tag attribute: {:?}&quot;</span>, <span class="ident">attr</span>),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">tags_attr</span>(<span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">tags_attr</span>(<span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">attr</span>.<span class="ident">path</span>().<span class="ident">is_ident</span>(<span class="string">&quot;tags&quot;</span>) {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
     }
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">attr</span> {
-        <span class="ident">Meta::List</span>(<span class="kw-2">ref</span> <span class="ident">meta_list</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Meta::List</span>(<span class="kw-2">ref</span> <span class="ident">meta_list</span>) =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tags</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">meta_list</span>.<span class="ident">nested</span>.<span class="ident">len</span>());
             <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">meta_list</span>.<span class="ident">nested</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">NestedMeta::Lit</span>(<span class="ident">Lit::Int</span>(<span class="kw-2">ref</span> <span class="ident">lit</span>)) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">item</span> {
@@ -721,13 +721,13 @@
         <span class="ident">Meta::NameValue</span>(<span class="ident">MetaNameValue</span> {
             <span class="ident">lit</span>: <span class="ident">Lit::Str</span>(<span class="kw-2">ref</span> <span class="ident">lit</span>),
             ..
-        }) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">lit</span>
+        }) =&gt; <span class="ident">lit</span>
             .<span class="ident">value</span>()
             .<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">trim</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="ident">Error::from</span>))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
             .<span class="ident">map</span>(<span class="prelude-val">Some</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;invalid tag attribute: {:?}&quot;</span>, <span class="ident">attr</span>),
+        <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;invalid tag attribute: {:?}&quot;</span>, <span class="ident">attr</span>),
     }
 }
 </code></pre></div>

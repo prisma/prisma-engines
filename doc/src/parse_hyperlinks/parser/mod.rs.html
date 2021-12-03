@@ -964,19 +964,19 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Note: This function is depreciated and will be removed in some later release.</span>
 <span class="doccomment">/// Use `take_link()` instead.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_text2dest_label2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_text2dest_label2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">j</span> <span class="op">=</span> <span class="ident">i</span>;
     <span class="kw">loop</span> {
         <span class="kw">match</span> <span class="ident">take_link</span>(<span class="ident">j</span>) {
-            <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="kw">_</span>, <span class="ident">Link::Text2Dest</span>(<span class="ident">lte</span>, <span class="ident">ld</span>, <span class="ident">lti</span>)))) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="ident">lte</span>, <span class="ident">ld</span>, <span class="ident">lti</span>))),
-            <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="kw">_</span>, <span class="ident">Link::TextLabel2Dest</span>(<span class="ident">lte</span>, <span class="ident">ld</span>, <span class="ident">lti</span>)))) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="ident">lte</span>, <span class="ident">ld</span>, <span class="ident">lti</span>))),
-            <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="kw">_</span>, <span class="ident">Link::Label2Dest</span>(<span class="ident">ll</span>, <span class="ident">ld</span>, <span class="ident">lti</span>)))) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="ident">ll</span>, <span class="ident">ld</span>, <span class="ident">lti</span>))),
+            <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="kw">_</span>, <span class="ident">Link::Text2Dest</span>(<span class="ident">lte</span>, <span class="ident">ld</span>, <span class="ident">lti</span>)))) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="ident">lte</span>, <span class="ident">ld</span>, <span class="ident">lti</span>))),
+            <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="kw">_</span>, <span class="ident">Link::TextLabel2Dest</span>(<span class="ident">lte</span>, <span class="ident">ld</span>, <span class="ident">lti</span>)))) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="ident">lte</span>, <span class="ident">ld</span>, <span class="ident">lti</span>))),
+            <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="kw">_</span>, <span class="ident">Link::Label2Dest</span>(<span class="ident">ll</span>, <span class="ident">ld</span>, <span class="ident">lti</span>)))) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">j</span>, (<span class="ident">ll</span>, <span class="ident">ld</span>, <span class="ident">lti</span>))),
             <span class="comment">// We ignore `Link::Ref()` and `Link::RefAlias`. Instead we continue parsing.</span>
-            <span class="prelude-val">Ok</span>((<span class="ident">k</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>((<span class="ident">k</span>, <span class="kw">_</span>)) =&gt; {
                 <span class="ident">j</span> <span class="op">=</span> <span class="ident">k</span>;
                 <span class="kw">continue</span>;
             }
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
         };
     }
 }
@@ -1089,7 +1089,7 @@
 <span class="doccomment">/// assert_eq!(r.0, &quot;abc\nabc&quot;);</span>
 <span class="doccomment">/// assert_eq!(r.1, Link::Text2Dest(Cow::from(&quot;text2&quot;), Cow::from(&quot;destination2&quot;), Cow::from(&quot;title2&quot;)));</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">j</span> <span class="op">=</span> <span class="ident">i</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">skip_count</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_start</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -1191,17 +1191,17 @@
         <span class="comment">// This might not consume bytes and never fails.</span>
         <span class="kw">let</span> (<span class="ident">k</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">take_till</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span>
             <span class="comment">// After this, we should check for: `md_label2dest`, `rst_label2dest`, `rst_text2label`, `adoc_text2dest`.</span>
-            <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\n&#39;</span>
+            <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\n&#39;</span>
             <span class="comment">// After this, possible start for `adoc_text2dest` or `rst_text2label`:</span>
-            <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\t&#39;</span>
+            <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\t&#39;</span>
             <span class="comment">// These are candidates for `rst_text2label`, `rst_text_label2dest` `rst_text2dest`:</span>
-            <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;`&#39;</span>
+            <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;`&#39;</span>
             <span class="comment">// These could be the start of all `md_*` link types.</span>
-            <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;[&#39;</span>
+            <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;[&#39;</span>
             <span class="comment">// These could be the start of the `adoc_text2label` link type.</span>
-            <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;{&#39;</span>
+            <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;{&#39;</span>
             <span class="comment">// And this could be an HTML hyperlink:</span>
-            <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;&lt;&#39;</span>)(<span class="ident">j</span>)<span class="question-mark">?</span>;
+            <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;&lt;&#39;</span>)(<span class="ident">j</span>)<span class="question-mark">?</span>;
 
         <span class="ident">skip_count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">j</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">k</span>.<span class="ident">len</span>();
         <span class="ident">j</span> <span class="op">=</span> <span class="ident">k</span>;
@@ -1220,8 +1220,8 @@
     <span class="comment">// consume the whole line in case of success.</span>
     <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">l</span>, <span class="ident">link</span>) <span class="op">=</span> <span class="ident">res</span>;
     <span class="kw">match</span> <span class="ident">link</span> {
-        <span class="ident">Link::Label2Dest</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">Link::Label2Label</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Link::Label2Dest</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">Link::Label2Label</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {}
+        <span class="kw">_</span> =&gt; {
             <span class="comment">// Just consume, the result does not matter.</span>
             <span class="kw">let</span> (<span class="ident">m</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::combinator::opt</span>(<span class="ident">alt</span>((<span class="ident">rst_label2dest_link</span>, <span class="ident">md_label2dest_link</span>)))(<span class="ident">l</span>)<span class="question-mark">?</span>;
             <span class="ident">l</span> <span class="op">=</span> <span class="ident">m</span>;

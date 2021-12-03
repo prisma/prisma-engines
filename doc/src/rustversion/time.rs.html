@@ -63,7 +63,7 @@
 
 <span class="kw">const</span> <span class="ident">DAYS_BY_MONTH</span>: [<span class="ident">u8</span>; <span class="number">12</span>] <span class="op">=</span> [<span class="number">31</span>, <span class="number">28</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>];
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">today</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Date</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">today</span>() -&gt; <span class="ident">Date</span> {
     <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="ident">Date</span> {
         <span class="ident">year</span>: <span class="number">2020</span>,
         <span class="ident">month</span>: <span class="number">2</span>,
@@ -72,9 +72,9 @@
     <span class="ident">try_today</span>().<span class="ident">unwrap_or</span>(<span class="ident">default</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">try_today</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">try_today</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkg_name</span>) <span class="op">=</span> <span class="ident">env::var_os</span>(<span class="string">&quot;CARGO_PKG_NAME&quot;</span>) {
-        <span class="kw">if</span> <span class="ident">pkg_name</span>.<span class="ident">to_str</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;rustversion-tests&quot;</span>) {
+        <span class="kw">if</span> <span class="ident">pkg_name</span>.<span class="ident">to_str</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;rustversion-tests&quot;</span>) {
             <span class="kw">return</span> <span class="prelude-val">None</span>; <span class="comment">// Stable date for ui testing.</span>
         }
     }
@@ -96,7 +96,7 @@
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Date</span> { <span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span> });
         }
         <span class="ident">rem</span> <span class="op">-</span><span class="op">=</span> <span class="ident">days_in_month</span> <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="ident">year</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">month</span> <span class="op">=</span><span class="op">=</span> <span class="number">12</span>) <span class="kw">as</span> <span class="ident">u16</span>;
+        <span class="ident">year</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">month</span> <span class="op">==</span> <span class="number">12</span>) <span class="kw">as</span> <span class="ident">u16</span>;
         <span class="ident">month</span> <span class="op">=</span> <span class="ident">month</span> <span class="op">%</span> <span class="number">12</span> <span class="op">+</span> <span class="number">1</span>;
     }
 }

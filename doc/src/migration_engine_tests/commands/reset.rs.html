@@ -46,15 +46,15 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Reset</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Reset</span> { <span class="ident">api</span>, <span class="ident">rt</span>: <span class="prelude-val">None</span> }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_sync</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>, <span class="ident">rt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">tokio::runtime::Runtime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_sync</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>, <span class="ident">rt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">tokio::runtime::Runtime</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Reset</span> { <span class="ident">api</span>, <span class="ident">rt</span>: <span class="prelude-val">Some</span>(<span class="ident">rt</span>) }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ResetAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ResetAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">api</span>.<span class="ident">reset</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">ResetAssertion</span> { <span class="ident">_api</span>: <span class="self">self</span>.<span class="ident">api</span> })
@@ -62,7 +62,7 @@
 
     <span class="doccomment">/// Execute the command and expect it to succeed.</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_sync</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResetAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_sync</span>(<span class="self">self</span>) -&gt; <span class="ident">ResetAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">rt</span>.<span class="ident">unwrap</span>().<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">send</span>()).<span class="ident">unwrap</span>()
     }
 }
@@ -72,7 +72,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">ResetAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ResetAssertion {{ .. }}&quot;</span>)
     }
 }

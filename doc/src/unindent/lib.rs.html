@@ -232,7 +232,7 @@
 <span class="kw">use</span> <span class="ident">std::iter::Peekable</span>;
 <span class="kw">use</span> <span class="ident">std::slice::Split</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unindent</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unindent</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>();
     <span class="kw">let</span> <span class="ident">unindented</span> <span class="op">=</span> <span class="ident">unindent_bytes</span>(<span class="ident">bytes</span>);
     <span class="ident">String::from_utf8</span>(<span class="ident">unindented</span>).<span class="ident">unwrap</span>()
@@ -240,7 +240,7 @@
 
 <span class="comment">// Compute the maximal number of spaces that can be removed from every line, and</span>
 <span class="comment">// remove them.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unindent_bytes</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unindent_bytes</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
     <span class="comment">// Document may start either on the same line as opening quote or</span>
     <span class="comment">// on the next line</span>
     <span class="kw">let</span> <span class="ident">ignore_first_line</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">b&quot;\n&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">b&quot;\r\n&quot;</span>);
@@ -256,10 +256,10 @@
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">s</span>.<span class="ident">len</span>());
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">line</span>) <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">lines</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">1</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ignore_first_line</span>) {
+        <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">1</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">i</span> <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ignore_first_line</span>) {
             <span class="ident">result</span>.<span class="ident">push</span>(<span class="string">b&#39;\n&#39;</span>);
         }
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="comment">// Do not un-indent anything on same line as opening quote</span>
             <span class="ident">result</span>.<span class="ident">extend_from_slice</span>(<span class="ident">line</span>);
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">spaces</span> {
@@ -274,13 +274,13 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Unindent</span> {
     <span class="kw">type</span> <span class="ident">Output</span>;
 
-    <span class="kw">fn</span> <span class="ident">unindent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span>;
+    <span class="kw">fn</span> <span class="ident">unindent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">Unindent</span> <span class="kw">for</span> <span class="ident">str</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">String</span>;
 
-    <span class="kw">fn</span> <span class="ident">unindent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+    <span class="kw">fn</span> <span class="ident">unindent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident">unindent</span>(<span class="self">self</span>)
     }
 }
@@ -288,7 +288,7 @@
 <span class="kw">impl</span> <span class="ident">Unindent</span> <span class="kw">for</span> <span class="ident">String</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">String</span>;
 
-    <span class="kw">fn</span> <span class="ident">unindent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+    <span class="kw">fn</span> <span class="ident">unindent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident">unindent</span>(<span class="self">self</span>)
     }
 }
@@ -296,7 +296,7 @@
 <span class="kw">impl</span> <span class="ident">Unindent</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">unindent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+    <span class="kw">fn</span> <span class="ident">unindent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident">unindent_bytes</span>(<span class="self">self</span>)
     }
 }
@@ -304,13 +304,13 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Unindent</span><span class="op">&gt;</span> <span class="ident">Unindent</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T::Output</span>;
 
-    <span class="kw">fn</span> <span class="ident">unindent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+    <span class="kw">fn</span> <span class="ident">unindent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">unindent</span>()
     }
 }
 
 <span class="comment">// Number of leading spaces in the line, or None if the line is entirely spaces.</span>
-<span class="kw">fn</span> <span class="ident">count_spaces</span>(<span class="ident">line</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">count_spaces</span>(<span class="ident">line</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">ch</span>) <span class="kw">in</span> <span class="ident">line</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
         <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39; &#39;</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;\t&#39;</span> {
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>);
@@ -321,13 +321,13 @@
 
 <span class="comment">// Based on core::str::StrExt.</span>
 <span class="kw">trait</span> <span class="ident">BytesExt</span> {
-    <span class="kw">fn</span> <span class="ident">lines</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Lines</span>;
+    <span class="kw">fn</span> <span class="ident">lines</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Lines</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">BytesExt</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">lines</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Lines</span> {
-        <span class="kw">fn</span> <span class="ident">is_newline</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-            <span class="kw-2">*</span><span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;\n&#39;</span>
+    <span class="kw">fn</span> <span class="ident">lines</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Lines</span> {
+        <span class="kw">fn</span> <span class="ident">is_newline</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
+            <span class="kw-2">*</span><span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;\n&#39;</span>
         }
         <span class="kw">let</span> <span class="ident">bytestring</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">starts_with</span>(<span class="string">b&quot;\r\n&quot;</span>) {
             <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="number">1</span>..]
@@ -335,22 +335,22 @@
             <span class="self">self</span>
         };
         <span class="ident">Lines</span> {
-            <span class="ident">split</span>: <span class="ident">bytestring</span>.<span class="ident">split</span>(<span class="ident">is_newline</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>).<span class="ident">peekable</span>(),
+            <span class="ident">split</span>: <span class="ident">bytestring</span>.<span class="ident">split</span>(<span class="ident">is_newline</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">u8</span>) -&gt; <span class="ident">bool</span>).<span class="ident">peekable</span>(),
         }
     }
 }
 
 <span class="kw">struct</span> <span class="ident">Lines</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">split</span>: <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">Split</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span>, <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">split</span>: <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">Split</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span>, <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Lines</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>];
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">split</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">fragment</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">fragment</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">fragment</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">split</span>.<span class="ident">peek</span>().<span class="ident">is_none</span>() {
                     <span class="prelude-val">None</span>
                 } <span class="kw">else</span> {

@@ -58,7 +58,7 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::Builder</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">create_blocking_pool</span>(<span class="ident">builder</span>: <span class="kw-2">&amp;</span><span class="ident">Builder</span>, <span class="ident">thread_cap</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BlockingPool</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">create_blocking_pool</span>(<span class="ident">builder</span>: <span class="kw-2">&amp;</span><span class="ident">Builder</span>, <span class="ident">thread_cap</span>: <span class="ident">usize</span>) -&gt; <span class="ident">BlockingPool</span> {
     <span class="ident">BlockingPool::new</span>(<span class="ident">builder</span>, <span class="ident">thread_cap</span>)
 }
 

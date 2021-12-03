@@ -351,18 +351,18 @@
     <span class="doccomment">/// Returns `false` if this error should be a &#39;soft failure&#39;</span>
     <span class="doccomment">/// -- the SCT is unverifiable with this library and set of</span>
     <span class="doccomment">/// logs.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_be_fatal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_be_fatal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">Error::UnknownLog</span>
-                <span class="op">|</span> <span class="ident">Error::UnsupportedSCTVersion</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>
+                <span class="op">|</span> <span class="ident">Error::UnsupportedSCTVersion</span> =&gt; <span class="bool-val">false</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">true</span>
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">lookup</span>(<span class="ident">logs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">Log</span>], <span class="ident">id</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">lookup</span>(<span class="ident">logs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">Log</span>], <span class="ident">id</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">l</span>) <span class="kw">in</span> <span class="ident">logs</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">if</span> <span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">l</span>.<span class="ident">id</span> {
+        <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">l</span>.<span class="ident">id</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>);
         }
     }
@@ -370,7 +370,7 @@
     <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownLog</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">decode_u64</span>(<span class="ident">inp</span>: <span class="ident">untrusted::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">decode_u64</span>(<span class="ident">inp</span>: <span class="ident">untrusted::Input</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">inp</span>.<span class="ident">as_slice_less_safe</span>();
     <span class="macro">assert_eq!</span>(<span class="ident">b</span>.<span class="ident">len</span>(), <span class="number">8</span>);
     (<span class="ident">b</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">56</span> <span class="op">|</span>
@@ -383,7 +383,7 @@
         (<span class="ident">b</span>[<span class="number">7</span>] <span class="kw">as</span> <span class="ident">u64</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">decode_u16</span>(<span class="ident">inp</span>: <span class="ident">untrusted::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+<span class="kw">fn</span> <span class="ident">decode_u16</span>(<span class="ident">inp</span>: <span class="ident">untrusted::Input</span>) -&gt; <span class="ident">u16</span> {
     <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">inp</span>.<span class="ident">as_slice_less_safe</span>();
     <span class="macro">assert_eq!</span>(<span class="ident">b</span>.<span class="ident">len</span>(), <span class="number">2</span>);
     (<span class="ident">b</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span> <span class="op">|</span> (<span class="ident">b</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u16</span>)
@@ -428,13 +428,13 @@
 <span class="kw">const</span> <span class="ident">SCT_X509_ENTRY</span>: [<span class="ident">u8</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>];
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SCT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cert</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cert</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ring::signature::VerificationAlgorithm</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">sig_alg</span> {
-            <span class="ident">ECDSA_SHA256</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ring::signature::ECDSA_P256_SHA256_ASN1</span>,
-            <span class="ident">ECDSA_SHA384</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ring::signature::ECDSA_P384_SHA384_ASN1</span>,
-            <span class="ident">RSA_PKCS1_SHA256</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ring::signature::RSA_PKCS1_2048_8192_SHA256</span>,
-            <span class="ident">RSA_PKCS1_SHA384</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ring::signature::RSA_PKCS1_2048_8192_SHA384</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidSignature</span>)
+            <span class="ident">ECDSA_SHA256</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">ring::signature::ECDSA_P256_SHA256_ASN1</span>,
+            <span class="ident">ECDSA_SHA384</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">ring::signature::ECDSA_P384_SHA384_ASN1</span>,
+            <span class="ident">RSA_PKCS1_SHA256</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">ring::signature::RSA_PKCS1_2048_8192_SHA256</span>,
+            <span class="ident">RSA_PKCS1_SHA384</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">ring::signature::RSA_PKCS1_2048_8192_SHA384</span>,
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidSignature</span>)
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
@@ -453,7 +453,7 @@
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::InvalidSignature</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">enc</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SCT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">enc</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SCT</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inp</span> <span class="op">=</span> <span class="ident">untrusted::Input::from</span>(<span class="ident">enc</span>);
 
         <span class="ident">inp</span>.<span class="ident">read_all</span>(
@@ -509,7 +509,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_sct</span>(<span class="ident">cert</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
                   <span class="ident">sct</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
                   <span class="ident">at_time</span>: <span class="ident">u64</span>,
-                  <span class="ident">logs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">Log</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+                  <span class="ident">logs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">Log</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">sct</span> <span class="op">=</span> <span class="ident">SCT::parse</span>(<span class="ident">sct</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">lookup</span>(<span class="ident">logs</span>, <span class="kw-2">&amp;</span><span class="ident">sct</span>.<span class="ident">log_id</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">log</span> <span class="op">=</span> <span class="ident">logs</span>[<span class="ident">i</span>];

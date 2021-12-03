@@ -72,7 +72,7 @@
     <span class="doccomment">///    want to handle this as early as possible and in a single place.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// 2. The url may be modified with the config dir, in the case of Node-API.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_source</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_source</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Connector</span> <span class="op">+</span> <span class="ident">Sized</span>;
 }
@@ -80,10 +80,10 @@
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">catch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(
     <span class="ident">connection_info</span>: <span class="ident">quaint::prelude::ConnectionInfo</span>,
     <span class="ident">fut</span>: <span class="kw">impl</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident"><span class="kw">crate</span>::SqlError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">fut</span>.<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">o</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into_connector_error</span>(<span class="kw-2">&amp;</span><span class="ident">connection_info</span>)),
+        <span class="prelude-val">Ok</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">o</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into_connector_error</span>(<span class="kw-2">&amp;</span><span class="ident">connection_info</span>)),
     }
 }
 </code></pre></div>

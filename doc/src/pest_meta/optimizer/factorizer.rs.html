@@ -47,17 +47,17 @@
 
 <span class="kw">use</span> <span class="ident">ast</span>::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">factor</span>(<span class="ident">rule</span>: <span class="ident">Rule</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Rule</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">factor</span>(<span class="ident">rule</span>: <span class="ident">Rule</span>) -&gt; <span class="ident">Rule</span> {
     <span class="kw">match</span> <span class="ident">rule</span> {
-        <span class="ident">Rule</span> { <span class="ident">name</span>, <span class="ident">ty</span>, <span class="ident">expr</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Rule</span> {
+        <span class="ident">Rule</span> { <span class="ident">name</span>, <span class="ident">ty</span>, <span class="ident">expr</span> } =&gt; <span class="ident">Rule</span> {
             <span class="ident">name</span>,
             <span class="ident">ty</span>,
             <span class="ident">expr</span>: <span class="ident">expr</span>.<span class="ident">map_top_down</span>(<span class="op">|</span><span class="ident">expr</span><span class="op">|</span> {
                 <span class="comment">// TODO: Use box syntax when it gets stabilized.</span>
                 <span class="kw">match</span> <span class="ident">expr</span> {
-                    <span class="ident">Expr::Choice</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> (<span class="kw-2">*</span><span class="ident">lhs</span>, <span class="kw-2">*</span><span class="ident">rhs</span>) {
-                        (<span class="ident">Expr::Seq</span>(<span class="ident">l1</span>, <span class="ident">r1</span>), <span class="ident">Expr::Seq</span>(<span class="ident">l2</span>, <span class="ident">r2</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="kw">if</span> <span class="ident">l1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">l2</span> {
+                    <span class="ident">Expr::Choice</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>) =&gt; <span class="kw">match</span> (<span class="kw-2">*</span><span class="ident">lhs</span>, <span class="kw-2">*</span><span class="ident">rhs</span>) {
+                        (<span class="ident">Expr::Seq</span>(<span class="ident">l1</span>, <span class="ident">r1</span>), <span class="ident">Expr::Seq</span>(<span class="ident">l2</span>, <span class="ident">r2</span>)) =&gt; {
+                            <span class="kw">if</span> <span class="ident">l1</span> <span class="op">==</span> <span class="ident">l2</span> {
                                 <span class="ident">Expr::Seq</span>(<span class="ident">l1</span>, <span class="ident">Box::new</span>(<span class="ident">Expr::Choice</span>(<span class="ident">r1</span>, <span class="ident">r2</span>)))
                             } <span class="kw">else</span> {
                                 <span class="ident">Expr::Choice</span>(
@@ -66,9 +66,9 @@
                                 )
                             }
                         }
-                        (<span class="ident">lhs</span>, <span class="ident">rhs</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Expr::Choice</span>(<span class="ident">Box::new</span>(<span class="ident">lhs</span>), <span class="ident">Box::new</span>(<span class="ident">rhs</span>)),
+                        (<span class="ident">lhs</span>, <span class="ident">rhs</span>) =&gt; <span class="ident">Expr::Choice</span>(<span class="ident">Box::new</span>(<span class="ident">lhs</span>), <span class="ident">Box::new</span>(<span class="ident">rhs</span>)),
                     },
-                    <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr</span>,
+                    <span class="ident">expr</span> =&gt; <span class="ident">expr</span>,
                 }
             }),
         },

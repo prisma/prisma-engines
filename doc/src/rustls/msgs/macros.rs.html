@@ -77,8 +77,8 @@
     $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">comment</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
     @<span class="ident">U8</span>
         <span class="ident">EnumName</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>: <span class="ident">ident</span>;
-        <span class="ident">EnumVal</span> { $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>: <span class="ident">ident</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>: <span class="ident">expr</span> ),<span class="op">*</span> }
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">EnumVal</span> { $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>: <span class="ident">ident</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>: <span class="ident">expr</span> ),<span class="op">*</span> }
+    ) =&gt; {
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">comment</span>]</span>)<span class="op">*</span>
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
         <span class="kw">pub</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
@@ -86,11 +86,11 @@
             ,<span class="ident">Unknown</span>(<span class="ident">u8</span>)
         }
         <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_u8</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_u8</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
                 <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
                 <span class="kw">match</span> <span class="ident">x</span> {
-                    $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>),<span class="op">*</span>
-                    ,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>
+                    $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>),<span class="op">*</span>
+                    ,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>
                 }
             }
         }
@@ -99,11 +99,11 @@
                 <span class="self">self</span>.<span class="ident">get_u8</span>().<span class="ident">encode</span>(<span class="ident">bytes</span>);
             }
 
-            <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">u8::read</span>(<span class="ident">r</span>) {
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
-                    $( <span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>),<span class="op">*</span>
-                    ,<span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="ident">x</span>)
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+                    $( <span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>) =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>),<span class="op">*</span>
+                    ,<span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="ident">x</span>)
                 })
             }
         }
@@ -112,8 +112,8 @@
     $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">comment</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
     @<span class="ident">U16</span>
         <span class="ident">EnumName</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>: <span class="ident">ident</span>;
-        <span class="ident">EnumVal</span> { $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>: <span class="ident">ident</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>: <span class="ident">expr</span> ),<span class="op">*</span> }
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">EnumVal</span> { $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>: <span class="ident">ident</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>: <span class="ident">expr</span> ),<span class="op">*</span> }
+    ) =&gt; {
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">comment</span>]</span>)<span class="op">*</span>
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
         <span class="kw">pub</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
@@ -121,11 +121,11 @@
             ,<span class="ident">Unknown</span>(<span class="ident">u16</span>)
         }
         <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_u16</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_u16</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
                 <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
                 <span class="kw">match</span> <span class="ident">x</span> {
-                    $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>),<span class="op">*</span>
-                    ,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>
+                    $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>),<span class="op">*</span>
+                    ,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>
                 }
             }
         }
@@ -134,11 +134,11 @@
                 <span class="self">self</span>.<span class="ident">get_u16</span>().<span class="ident">encode</span>(<span class="ident">bytes</span>);
             }
 
-            <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">u16::read</span>(<span class="ident">r</span>) {
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
-                    $( <span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>),<span class="op">*</span>
-                    ,<span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="ident">x</span>)
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+                    $( <span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>) =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>),<span class="op">*</span>
+                    ,<span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="ident">x</span>)
                 })
             }
         }

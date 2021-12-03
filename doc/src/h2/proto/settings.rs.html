@@ -177,7 +177,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Settings</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">local</span>: <span class="ident">frame::Settings</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">local</span>: <span class="ident">frame::Settings</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Settings</span> {
             <span class="comment">// We assume the initial local SETTINGS were flushed during</span>
             <span class="comment">// the handshake process.</span>
@@ -191,7 +191,7 @@
         <span class="ident">frame</span>: <span class="ident">frame::Settings</span>,
         <span class="ident">codec</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>,
         <span class="ident">streams</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Streams</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
         <span class="ident">B</span>: <span class="ident">Buf</span>,
@@ -200,7 +200,7 @@
     {
         <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">is_ack</span>() {
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">local</span> {
-                <span class="ident">Local::WaitingAck</span>(<span class="ident">local</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Local::WaitingAck</span>(<span class="ident">local</span>) =&gt; {
                     <span class="macro">tracing::debug!</span>(<span class="string">&quot;received settings ACK; applying {:?}&quot;</span>, <span class="ident">local</span>);
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>) <span class="op">=</span> <span class="ident">local</span>.<span class="ident">max_frame_size</span>() {
@@ -215,7 +215,7 @@
                     <span class="self">self</span>.<span class="ident">local</span> <span class="op">=</span> <span class="ident">Local::Synced</span>;
                     <span class="prelude-val">Ok</span>(())
                 }
-                <span class="ident">Local::ToSend</span>(..) <span class="op">|</span> <span class="ident">Local::Synced</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Local::ToSend</span>(..) <span class="op">|</span> <span class="ident">Local::Synced</span> =&gt; {
                     <span class="comment">// We haven&#39;t sent any SETTINGS frames to be ACKed, so</span>
                     <span class="comment">// this is very bizarre! Remote is either buggy or malicious.</span>
                     <span class="macro">proto_err!</span>(<span class="ident">conn</span>: <span class="string">&quot;received unexpected settings ack&quot;</span>);
@@ -231,11 +231,11 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_settings</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">frame</span>: <span class="ident">frame::Settings</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_settings</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">frame</span>: <span class="ident">frame::Settings</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">frame</span>.<span class="ident">is_ack</span>());
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">local</span> {
-            <span class="ident">Local::ToSend</span>(..) <span class="op">|</span> <span class="ident">Local::WaitingAck</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">UserError::SendSettingsWhilePending</span>),
-            <span class="ident">Local::Synced</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Local::ToSend</span>(..) <span class="op">|</span> <span class="ident">Local::WaitingAck</span>(..) =&gt; <span class="prelude-val">Err</span>(<span class="ident">UserError::SendSettingsWhilePending</span>),
+            <span class="ident">Local::Synced</span> =&gt; {
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;queue to send local settings: {:?}&quot;</span>, <span class="ident">frame</span>);
                 <span class="self">self</span>.<span class="ident">local</span> <span class="op">=</span> <span class="ident">Local::ToSend</span>(<span class="ident">frame</span>);
                 <span class="prelude-val">Ok</span>(())
@@ -248,7 +248,7 @@
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
         <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>,
         <span class="ident">streams</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Streams</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
         <span class="ident">B</span>: <span class="ident">Buf</span>,
@@ -282,7 +282,7 @@
         <span class="self">self</span>.<span class="ident">remote</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">local</span> {
-            <span class="ident">Local::ToSend</span>(<span class="ident">settings</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Local::ToSend</span>(<span class="ident">settings</span>) =&gt; {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">dst</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>.<span class="ident">is_ready</span>() {
                     <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
                 }
@@ -294,7 +294,7 @@
 
                 <span class="self">self</span>.<span class="ident">local</span> <span class="op">=</span> <span class="ident">Local::WaitingAck</span>(<span class="ident">settings</span>.<span class="ident">clone</span>());
             }
-            <span class="ident">Local::WaitingAck</span>(..) <span class="op">|</span> <span class="ident">Local::Synced</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="ident">Local::WaitingAck</span>(..) <span class="op">|</span> <span class="ident">Local::Synced</span> =&gt; {}
         }
 
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))

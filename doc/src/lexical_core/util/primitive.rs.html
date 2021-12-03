@@ -252,92 +252,92 @@
 
 <span class="doccomment">/// Type that can be converted to primitive with `as`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsPrimitive</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">PartialOrd</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="kw">fn</span> <span class="ident">as_u8</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">as_u16</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span>;
-    <span class="kw">fn</span> <span class="ident">as_u32</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span>;
-    <span class="kw">fn</span> <span class="ident">as_u64</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>;
-    <span class="kw">fn</span> <span class="ident">as_u128</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span>;
-    <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>;
-    <span class="kw">fn</span> <span class="ident">as_i8</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i8</span>;
-    <span class="kw">fn</span> <span class="ident">as_i16</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i16</span>;
-    <span class="kw">fn</span> <span class="ident">as_i32</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span>;
-    <span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span>;
-    <span class="kw">fn</span> <span class="ident">as_i128</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i128</span>;
-    <span class="kw">fn</span> <span class="ident">as_isize</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">isize</span>;
-    <span class="kw">fn</span> <span class="ident">as_f32</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f32</span>;
-    <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>;
+    <span class="kw">fn</span> <span class="ident">as_u8</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span>;
+    <span class="kw">fn</span> <span class="ident">as_u16</span>(<span class="self">self</span>) -&gt; <span class="ident">u16</span>;
+    <span class="kw">fn</span> <span class="ident">as_u32</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+    <span class="kw">fn</span> <span class="ident">as_u64</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span>;
+    <span class="kw">fn</span> <span class="ident">as_u128</span>(<span class="self">self</span>) -&gt; <span class="ident">u128</span>;
+    <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span>;
+    <span class="kw">fn</span> <span class="ident">as_i8</span>(<span class="self">self</span>) -&gt; <span class="ident">i8</span>;
+    <span class="kw">fn</span> <span class="ident">as_i16</span>(<span class="self">self</span>) -&gt; <span class="ident">i16</span>;
+    <span class="kw">fn</span> <span class="ident">as_i32</span>(<span class="self">self</span>) -&gt; <span class="ident">i32</span>;
+    <span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="self">self</span>) -&gt; <span class="ident">i64</span>;
+    <span class="kw">fn</span> <span class="ident">as_i128</span>(<span class="self">self</span>) -&gt; <span class="ident">i128</span>;
+    <span class="kw">fn</span> <span class="ident">as_isize</span>(<span class="self">self</span>) -&gt; <span class="ident">isize</span>;
+    <span class="kw">fn</span> <span class="ident">as_f32</span>(<span class="self">self</span>) -&gt; <span class="ident">f32</span>;
+    <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="self">self</span>) -&gt; <span class="ident">f64</span>;
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">as_primitive</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> ($(
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) =&gt; ($(
         <span class="kw">impl</span> <span class="ident">AsPrimitive</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_u8</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+            <span class="kw">fn</span> <span class="ident">as_u8</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_u16</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+            <span class="kw">fn</span> <span class="ident">as_u16</span>(<span class="self">self</span>) -&gt; <span class="ident">u16</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">u16</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_u32</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+            <span class="kw">fn</span> <span class="ident">as_u32</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_u64</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+            <span class="kw">fn</span> <span class="ident">as_u64</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">u64</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_u128</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+            <span class="kw">fn</span> <span class="ident">as_u128</span>(<span class="self">self</span>) -&gt; <span class="ident">u128</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">u128</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+            <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">usize</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_i8</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i8</span> {
+            <span class="kw">fn</span> <span class="ident">as_i8</span>(<span class="self">self</span>) -&gt; <span class="ident">i8</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">i8</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_i16</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i16</span> {
+            <span class="kw">fn</span> <span class="ident">as_i16</span>(<span class="self">self</span>) -&gt; <span class="ident">i16</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">i16</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_i32</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+            <span class="kw">fn</span> <span class="ident">as_i32</span>(<span class="self">self</span>) -&gt; <span class="ident">i32</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">i32</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
+            <span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="self">self</span>) -&gt; <span class="ident">i64</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">i64</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_i128</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i128</span> {
+            <span class="kw">fn</span> <span class="ident">as_i128</span>(<span class="self">self</span>) -&gt; <span class="ident">i128</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">i128</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_isize</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">isize</span> {
+            <span class="kw">fn</span> <span class="ident">as_isize</span>(<span class="self">self</span>) -&gt; <span class="ident">isize</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">isize</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_f32</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f32</span> {
+            <span class="kw">fn</span> <span class="ident">as_f32</span>(<span class="self">self</span>) -&gt; <span class="ident">f32</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">f32</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+            <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="self">self</span>) -&gt; <span class="ident">f64</span> {
                 <span class="self">self</span> <span class="kw">as</span> <span class="ident">f64</span>
             }
         }
@@ -347,79 +347,79 @@
 <span class="macro">as_primitive!</span> { <span class="ident">u8</span> <span class="ident">u16</span> <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">u128</span> <span class="ident">usize</span> <span class="ident">i8</span> <span class="ident">i16</span> <span class="ident">i32</span> <span class="ident">i64</span> <span class="ident">i128</span> <span class="ident">isize</span> <span class="ident">f32</span> <span class="ident">f64</span> }
 
 <span class="macro">macro_rules!</span> <span class="ident">def_try_primitive</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> (
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) =&gt; (
         <span class="doccomment">/// Type that can be converted to primitive with `as`.</span>
         <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TryPrimitive</span>:
             <span class="ident">AsCast</span> <span class="op">+</span>
             $(<span class="ident">TryCast</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="op">+</span>)<span class="op">*</span>
         {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_u8</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_u8</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_u16</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_u16</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_u32</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_u32</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_u64</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_u64</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_u128</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_u128</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_usize</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_usize</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_i8</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_i8</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_i16</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_i16</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_i32</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_i32</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_i64</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_i64</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_i128</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_i128</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_isize</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_isize</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_f32</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_f32</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">try_f64</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_f64</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">try_cast</span>()
             }
         }
@@ -429,7 +429,7 @@
 <span class="macro">def_try_primitive!</span>(<span class="ident">u8</span> <span class="ident">u16</span> <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">u128</span> <span class="ident">usize</span> <span class="ident">i8</span> <span class="ident">i16</span> <span class="ident">i32</span> <span class="ident">i64</span> <span class="ident">i128</span> <span class="ident">isize</span> <span class="ident">f32</span> <span class="ident">f64</span>);
 
 <span class="macro">macro_rules!</span> <span class="ident">try_primitive</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> ($(
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) =&gt; ($(
         <span class="kw">impl</span> <span class="ident">TryPrimitive</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {}
     )<span class="kw-2">*</span>)
 }
@@ -443,7 +443,7 @@
 {}
 
 <span class="macro">macro_rules!</span> <span class="ident">primitive</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> ($(
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) =&gt; ($(
         <span class="kw">impl</span> <span class="ident">Primitive</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {}
     )<span class="kw-2">*</span>)
 }

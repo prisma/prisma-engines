@@ -173,7 +173,7 @@
     <span class="ident">Update</span>(<span class="ident">UpdateModifications</span>),
 }
 
-<span class="kw">fn</span> <span class="ident">serialize_true</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">serialize_true</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
     <span class="ident">s</span>.<span class="ident">serialize_bool</span>(<span class="bool-val">true</span>)
 }
 
@@ -224,7 +224,7 @@
 <span class="kw">impl</span> <span class="ident">FindAndModifyOptions</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_find_one_and_delete_options</span>(
         <span class="ident">opts</span>: <span class="ident">FindOneAndDeleteOptions</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FindAndModifyOptions</span> {
+    ) -&gt; <span class="ident">FindAndModifyOptions</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">modify_opts</span> <span class="op">=</span> <span class="ident">FindAndModifyOptions::builder</span>()
             .<span class="ident">modification</span>(<span class="ident">Modification::Delete</span>)
             .<span class="ident">build</span>();
@@ -241,7 +241,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_find_one_and_replace_options</span>(
         <span class="ident">replacement</span>: <span class="ident">Document</span>,
         <span class="ident">opts</span>: <span class="ident">FindOneAndReplaceOptions</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FindAndModifyOptions</span> {
+    ) -&gt; <span class="ident">FindAndModifyOptions</span> {
         <span class="kw">let</span> <span class="ident">replacement</span> <span class="op">=</span> <span class="ident">UpdateModifications::Document</span>(<span class="ident">replacement</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">modify_opts</span> <span class="op">=</span> <span class="ident">FindAndModifyOptions::builder</span>()
             .<span class="ident">modification</span>(<span class="ident">Modification::Update</span>(<span class="ident">replacement</span>))
@@ -263,7 +263,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_find_one_and_update_options</span>(
         <span class="ident">update</span>: <span class="ident">UpdateModifications</span>,
         <span class="ident">opts</span>: <span class="ident">FindOneAndUpdateOptions</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FindAndModifyOptions</span> {
+    ) -&gt; <span class="ident">FindAndModifyOptions</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">modify_opts</span> <span class="op">=</span> <span class="ident">FindAndModifyOptions::builder</span>()
             .<span class="ident">modification</span>(<span class="ident">Modification::Update</span>(<span class="ident">update</span>))
             .<span class="ident">build</span>();
@@ -283,11 +283,11 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">return_document_to_bool</span>(<span class="ident">return_document</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReturnDocument</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">return_document_to_bool</span>(<span class="ident">return_document</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReturnDocument</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">return_document</span>) <span class="op">=</span> <span class="ident">return_document</span> {
         <span class="kw">return</span> <span class="kw">match</span> <span class="ident">return_document</span> {
-            <span class="ident">ReturnDocument::After</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
-            <span class="ident">ReturnDocument::Before</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+            <span class="ident">ReturnDocument::After</span> =&gt; <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
+            <span class="ident">ReturnDocument::Before</span> =&gt; <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
         };
     }
     <span class="prelude-val">None</span>

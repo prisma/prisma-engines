@@ -1453,7 +1453,7 @@
 <span class="comment">// Because derive is too conservative, derive only implements Clone if T is Clone.</span>
 <span class="comment">// Collection&lt;T&gt; does not actually store any value of type T (so T does not need to be clone).</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Collection</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>(),
             <span class="ident">_phantom</span>: <span class="ident">Default::default</span>(),
@@ -1472,7 +1472,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Collection</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">db</span>: <span class="ident">Database</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CollectionOptions</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">db</span>: <span class="ident">Database</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CollectionOptions</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">unwrap_or_default</span>();
         <span class="kw">let</span> <span class="ident">selection_criteria</span> <span class="op">=</span> <span class="ident">options</span>
             .<span class="ident">selection_criteria</span>
@@ -1498,7 +1498,7 @@
     }
 
     <span class="doccomment">/// Gets a clone of the `Collection` with a different type `U`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone_with_type</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Collection</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone_with_type</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Collection</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
         <span class="ident">Collection</span> {
             <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>(),
             <span class="ident">_phantom</span>: <span class="ident">Default::default</span>(),
@@ -1506,12 +1506,12 @@
     }
 
     <span class="doccomment">/// Get the `Client` that this collection descended from.</span>
-    <span class="kw">fn</span> <span class="ident">client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Client</span> {
+    <span class="kw">fn</span> <span class="ident">client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Client</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">client</span>
     }
 
     <span class="doccomment">/// Gets the name of the `Collection`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">name</span>
     }
 
@@ -1521,7 +1521,7 @@
     <span class="doccomment">/// containing it, the &#39;.&#39; character, and the name of the collection itself. For example, if a</span>
     <span class="doccomment">/// collection named &quot;bar&quot; is created in a database named &quot;foo&quot;, the namespace of the collection</span>
     <span class="doccomment">/// is &quot;foo.bar&quot;.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">namespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Namespace</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">namespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Namespace</span> {
         <span class="ident">Namespace</span> {
             <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">db</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
             <span class="ident">coll</span>: <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
@@ -1529,17 +1529,17 @@
     }
 
     <span class="doccomment">/// Gets the selection criteria of the `Collection`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">selection_criteria</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">selection_criteria</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">selection_criteria</span>.<span class="ident">as_ref</span>()
     }
 
     <span class="doccomment">/// Gets the read concern of the `Collection`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReadConcern</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReadConcern</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read_concern</span>.<span class="ident">as_ref</span>()
     }
 
     <span class="doccomment">/// Gets the write concern of the `Collection`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">write_concern</span>.<span class="ident">as_ref</span>()
     }
 
@@ -1547,7 +1547,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropCollectionOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
@@ -1558,7 +1558,7 @@
     }
 
     <span class="doccomment">/// Drops the collection, deleting all data and indexes stored in it.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropCollectionOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropCollectionOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">drop_common</span>(<span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -1568,7 +1568,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropCollectionOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">drop_common</span>(<span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span>
     }
 
@@ -1580,7 +1580,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">pipeline</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Document</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AggregateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
         <span class="macro">resolve_options!</span>(
             <span class="self">self</span>,
@@ -1602,7 +1602,7 @@
         <span class="ident">pipeline</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Document</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AggregateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
         <span class="macro">resolve_read_concern_with_session!</span>(<span class="self">self</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">session</span>))<span class="question-mark">?</span>;
         <span class="macro">resolve_write_concern_with_session!</span>(<span class="self">self</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">session</span>))<span class="question-mark">?</span>;
@@ -1619,7 +1619,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">estimated_document_count</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EstimatedDocumentCountOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
         <span class="macro">resolve_options!</span>(<span class="self">self</span>, <span class="ident">options</span>, [<span class="ident">read_concern</span>, <span class="ident">selection_criteria</span>]);
 
@@ -1633,7 +1633,7 @@
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CountOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
@@ -1652,7 +1652,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CountOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">count_documents_common</span>(<span class="ident">filter</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -1665,7 +1665,7 @@
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CountOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">count_documents_common</span>(<span class="ident">filter</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span>
     }
 
@@ -1674,7 +1674,7 @@
         <span class="ident">query</span>: <span class="ident">Document</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DeleteOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeleteResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeleteResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
@@ -1689,7 +1689,7 @@
         <span class="ident">indexes</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexModel</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateIndexesResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateIndexesResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
@@ -1708,7 +1708,7 @@
         <span class="ident">index</span>: <span class="ident">IndexModel</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateIndexResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateIndexResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">create_indexes_common</span>(<span class="macro">vec!</span>[<span class="ident">index</span>], <span class="ident">options</span>, <span class="ident">session</span>)
             .<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1720,7 +1720,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">index</span>: <span class="ident">IndexModel</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateIndexResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateIndexResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">create_index_common</span>(<span class="ident">index</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -1730,7 +1730,7 @@
         <span class="ident">index</span>: <span class="ident">IndexModel</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateIndexResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateIndexResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">create_index_common</span>(<span class="ident">index</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span>
     }
 
@@ -1739,7 +1739,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">indexes</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexModel</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateIndexesResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateIndexesResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">create_indexes_common</span>(<span class="ident">indexes</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -1749,7 +1749,7 @@
         <span class="ident">indexes</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexModel</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateIndexesResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CreateIndexesResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">create_indexes_common</span>(<span class="ident">indexes</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span>
     }
 
@@ -1758,7 +1758,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">query</span>: <span class="ident">Document</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DeleteOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeleteResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeleteResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">delete_many_common</span>(<span class="ident">query</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -1769,7 +1769,7 @@
         <span class="ident">query</span>: <span class="ident">Document</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DeleteOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeleteResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeleteResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">delete_many_common</span>(<span class="ident">query</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span>
     }
 
@@ -1778,7 +1778,7 @@
         <span class="ident">query</span>: <span class="ident">Document</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DeleteOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeleteResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeleteResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
@@ -1798,7 +1798,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">query</span>: <span class="ident">Document</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DeleteOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeleteResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeleteResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">delete_one_common</span>(<span class="ident">query</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -1813,7 +1813,7 @@
         <span class="ident">query</span>: <span class="ident">Document</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DeleteOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeleteResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeleteResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">delete_one_common</span>(<span class="ident">query</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span>
     }
 
@@ -1823,7 +1823,7 @@
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DistinctOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
@@ -1845,7 +1845,7 @@
         <span class="ident">field_name</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DistinctOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">distinct_common</span>(<span class="ident">field_name</span>, <span class="ident">filter</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>)
             .<span class="kw">await</span>
     }
@@ -1858,7 +1858,7 @@
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DistinctOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">distinct_common</span>(<span class="ident">field_name</span>, <span class="ident">filter</span>, <span class="ident">options</span>, <span class="ident">session</span>)
             .<span class="kw">await</span>
     }
@@ -1868,7 +1868,7 @@
         <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
@@ -1886,9 +1886,9 @@
         <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">as_ref</span>();
-        <span class="kw">if</span> <span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;*&quot;</span> {
+        <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;*&quot;</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                 <span class="ident">message</span>: <span class="string">&quot;Cannot pass name \&quot;*\&quot; to drop_index since more than one index would be \
                           dropped.&quot;</span>
@@ -1904,7 +1904,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">drop_index_common</span>(<span class="ident">name</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -1914,12 +1914,12 @@
         <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">drop_index_common</span>(<span class="ident">name</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Drops all indexes associated with this collection.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">drop_indexes_common</span>(<span class="prelude-val">None</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -1928,7 +1928,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DropIndexOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">drop_indexes_common</span>(<span class="prelude-val">None</span>, <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span>
     }
 
@@ -1936,7 +1936,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_indexes</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ListIndexesOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">IndexModel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">IndexModel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">list_indexes</span> <span class="op">=</span> <span class="ident">ListIndexes::new</span>(<span class="self">self</span>.<span class="ident">namespace</span>(), <span class="ident">options</span>.<span class="ident">into</span>());
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>();
         <span class="ident">client</span>.<span class="ident">execute_cursor_operation</span>(<span class="ident">list_indexes</span>).<span class="kw">await</span>
@@ -1947,7 +1947,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ListIndexesOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">IndexModel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">IndexModel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">list_indexes</span> <span class="op">=</span> <span class="ident">ListIndexes::new</span>(<span class="self">self</span>.<span class="ident">namespace</span>(), <span class="ident">options</span>.<span class="ident">into</span>());
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>();
         <span class="ident">client</span>
@@ -1958,7 +1958,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_index_names_common</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cursor</span>: <span class="kw">impl</span> <span class="ident">TryStreamExt</span><span class="op">&lt;</span><span class="prelude-val">Ok</span> <span class="op">=</span> <span class="ident">IndexModel</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">cursor</span>
             .<span class="ident">try_filter_map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">future::ok</span>(<span class="ident">index</span>.<span class="ident">get_name</span>()))
             .<span class="ident">try_collect</span>()
@@ -1966,7 +1966,7 @@
     }
 
     <span class="doccomment">/// Gets the names of all indexes on the collection.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_index_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_index_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">list_indexes</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">list_index_names_common</span>(<span class="ident">cursor</span>).<span class="kw">await</span>
     }
@@ -1975,7 +1975,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_index_names_with_session</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">list_indexes_with_session</span>(<span class="prelude-val">None</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">list_index_names_common</span>(<span class="ident">cursor</span>.<span class="ident">stream</span>(<span class="ident">session</span>)).<span class="kw">await</span>
     }
@@ -1986,7 +1986,7 @@
         <span class="ident">update</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateModifications</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UpdateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">update</span>.<span class="ident">into</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">UpdateModifications::Document</span>(<span class="kw-2">ref</span> <span class="ident">d</span>) <span class="op">=</span> <span class="ident">update</span> {
@@ -2013,7 +2013,7 @@
         <span class="ident">query</span>: <span class="ident">Document</span>,
         <span class="ident">update</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateModifications</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UpdateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">update_many_common</span>(<span class="ident">query</span>, <span class="ident">update</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -2029,7 +2029,7 @@
         <span class="ident">update</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateModifications</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UpdateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">update_many_common</span>(<span class="ident">query</span>, <span class="ident">update</span>, <span class="ident">options</span>, <span class="ident">session</span>)
             .<span class="kw">await</span>
     }
@@ -2040,7 +2040,7 @@
         <span class="ident">update</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateModifications</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UpdateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">update</span>.<span class="ident">into</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">UpdateModifications::Document</span>(<span class="kw-2">ref</span> <span class="ident">d</span>) <span class="op">=</span> <span class="ident">update</span> {
             <span class="ident">bson_util::update_document_check</span>(<span class="ident">d</span>)<span class="question-mark">?</span>;
@@ -2071,7 +2071,7 @@
         <span class="ident">query</span>: <span class="ident">Document</span>,
         <span class="ident">update</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateModifications</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UpdateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">update_one_common</span>(<span class="ident">query</span>, <span class="ident">update</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -2093,7 +2093,7 @@
         <span class="ident">update</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateModifications</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UpdateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">update_one_common</span>(<span class="ident">query</span>, <span class="ident">update</span>, <span class="ident">options</span>, <span class="ident">session</span>)
             .<span class="kw">await</span>
     }
@@ -2103,7 +2103,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cursor_id</span>: <span class="ident">i64</span>,
         <span class="ident">pinned_connection</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">namespace</span>();
 
         <span class="self">self</span>.<span class="ident">client</span>()
@@ -2131,7 +2131,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
         <span class="macro">resolve_options!</span>(<span class="self">self</span>, <span class="ident">options</span>, [<span class="ident">read_concern</span>, <span class="ident">selection_criteria</span>]);
 
@@ -2147,7 +2147,7 @@
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
         <span class="macro">resolve_read_concern_with_session!</span>(<span class="self">self</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">session</span>))<span class="question-mark">?</span>;
         <span class="macro">resolve_selection_criteria_with_session!</span>(<span class="self">self</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">session</span>))<span class="question-mark">?</span>;
@@ -2163,7 +2163,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOneOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
         <span class="macro">resolve_options!</span>(<span class="self">self</span>, <span class="ident">options</span>, [<span class="ident">read_concern</span>, <span class="ident">selection_criteria</span>]);
 
@@ -2179,7 +2179,7 @@
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOneOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
         <span class="macro">resolve_read_concern_with_session!</span>(<span class="self">self</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">session</span>))<span class="question-mark">?</span>;
         <span class="macro">resolve_selection_criteria_with_session!</span>(<span class="self">self</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">session</span>))<span class="question-mark">?</span>;
@@ -2202,7 +2202,7 @@
         <span class="ident">filter</span>: <span class="ident">Document</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOneAndDeleteOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
@@ -2222,7 +2222,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">filter</span>: <span class="ident">Document</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOneAndDeleteOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">find_one_and_delete_common</span>(<span class="ident">filter</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -2238,7 +2238,7 @@
         <span class="ident">filter</span>: <span class="ident">Document</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOneAndDeleteOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">find_one_and_delete_common</span>(<span class="ident">filter</span>, <span class="ident">options</span>, <span class="ident">session</span>)
             .<span class="kw">await</span>
     }
@@ -2249,7 +2249,7 @@
         <span class="ident">update</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateModifications</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOneAndUpdateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">update</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">into</span>();
@@ -2275,7 +2275,7 @@
         <span class="ident">filter</span>: <span class="ident">Document</span>,
         <span class="ident">update</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateModifications</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOneAndUpdateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">find_one_and_update_common</span>(<span class="ident">filter</span>, <span class="ident">update</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>)
             .<span class="kw">await</span>
     }
@@ -2295,7 +2295,7 @@
         <span class="ident">update</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateModifications</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOneAndUpdateOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">find_one_and_update_common</span>(<span class="ident">filter</span>, <span class="ident">update</span>, <span class="ident">options</span>, <span class="ident">session</span>)
             .<span class="kw">await</span>
     }
@@ -2311,7 +2311,7 @@
         <span class="ident">replacement</span>: <span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOneAndReplaceOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">replacement</span> <span class="op">=</span> <span class="ident">to_document</span>(<span class="ident">replacement</span>.<span class="ident">borrow</span>())<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">into</span>();
@@ -2335,7 +2335,7 @@
         <span class="ident">filter</span>: <span class="ident">Document</span>,
         <span class="ident">replacement</span>: <span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOneAndReplaceOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">find_one_and_replace_common</span>(<span class="ident">filter</span>, <span class="ident">replacement</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>)
             .<span class="kw">await</span>
     }
@@ -2353,7 +2353,7 @@
         <span class="ident">replacement</span>: <span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FindOneAndReplaceOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">find_one_and_replace_common</span>(<span class="ident">filter</span>, <span class="ident">replacement</span>, <span class="ident">options</span>, <span class="ident">session</span>)
             .<span class="kw">await</span>
     }
@@ -2368,7 +2368,7 @@
         <span class="ident">docs</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InsertManyOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="kw-2">mut</span> <span class="ident">session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InsertManyResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InsertManyResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">docs</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
         <span class="macro">resolve_write_concern_with_session!</span>(<span class="self">self</span>, <span class="ident">options</span>, <span class="ident">session</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
@@ -2397,7 +2397,7 @@
                 .<span class="ident">execute_operation</span>(<span class="ident">insert</span>, <span class="ident">session</span>.<span class="ident">as_deref_mut</span>())
                 .<span class="kw">await</span>
             {
-                <span class="prelude-val">Ok</span>(<span class="ident">result</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">result</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">current_batch_size</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">inserted_ids</span>.<span class="ident">len</span>();
 
                     <span class="kw">let</span> <span class="ident">cumulative_result</span> <span class="op">=</span>
@@ -2410,8 +2410,8 @@
 
                     <span class="ident">n_attempted</span> <span class="op">+</span><span class="op">=</span> <span class="ident">current_batch_size</span>;
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">kind</span> {
-                    <span class="ident">ErrorKind::BulkWrite</span>(<span class="ident">bw</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">kind</span> {
+                    <span class="ident">ErrorKind::BulkWrite</span>(<span class="ident">bw</span>) =&gt; {
                         <span class="comment">// for ordered inserts this size will be incorrect, but knowing the batch</span>
                         <span class="comment">// size isn&#39;t needed for ordered failures since we</span>
                         <span class="comment">// return immediately from them anyways.</span>
@@ -2448,17 +2448,17 @@
                         }
                         <span class="ident">n_attempted</span> <span class="op">+</span><span class="op">=</span> <span class="ident">current_batch_size</span>;
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                    <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
                 },
             }
         }
 
         <span class="kw">match</span> <span class="ident">cumulative_failure</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">failure</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">failure</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
                 <span class="ident">ErrorKind::BulkWrite</span>(<span class="ident">failure</span>),
                 <span class="prelude-val">Some</span>(<span class="ident">error_labels</span>),
             )),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">cumulative_result</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">InsertManyResult::new</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">cumulative_result</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">InsertManyResult::new</span>)),
         }
     }
 
@@ -2475,7 +2475,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">docs</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InsertManyOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InsertManyResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InsertManyResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">insert_many_common</span>(<span class="ident">docs</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -2493,7 +2493,7 @@
         <span class="ident">docs</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InsertManyOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InsertManyResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InsertManyResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">insert_many_common</span>(<span class="ident">docs</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="ident">session</span>)).<span class="kw">await</span>
     }
 
@@ -2502,7 +2502,7 @@
         <span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InsertOneOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InsertOneResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InsertOneResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
@@ -2533,7 +2533,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">doc</span>: <span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InsertOneOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InsertOneResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InsertOneResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">insert_one_common</span>(<span class="ident">doc</span>.<span class="ident">borrow</span>(), <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -2551,7 +2551,7 @@
         <span class="ident">doc</span>: <span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InsertOneOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InsertOneResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InsertOneResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">insert_one_common</span>(<span class="ident">doc</span>.<span class="ident">borrow</span>(), <span class="ident">options</span>, <span class="ident">session</span>).<span class="kw">await</span>
     }
 
@@ -2561,7 +2561,7 @@
         <span class="ident">replacement</span>: <span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReplaceOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">replacement</span> <span class="op">=</span> <span class="ident">to_document</span>(<span class="ident">replacement</span>.<span class="ident">borrow</span>())<span class="question-mark">?</span>;
 
         <span class="ident">bson_util::replacement_document_check</span>(<span class="kw-2">&amp;</span><span class="ident">replacement</span>)<span class="question-mark">?</span>;
@@ -2592,7 +2592,7 @@
         <span class="ident">query</span>: <span class="ident">Document</span>,
         <span class="ident">replacement</span>: <span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReplaceOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">replace_one_common</span>(<span class="ident">query</span>, <span class="ident">replacement</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>)
             .<span class="kw">await</span>
     }
@@ -2610,7 +2610,7 @@
         <span class="ident">replacement</span>: <span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReplaceOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UpdateResult</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">replace_one_common</span>(<span class="ident">query</span>, <span class="ident">replacement</span>, <span class="ident">options</span>, <span class="ident">session</span>)
             .<span class="kw">await</span>
     }
@@ -2628,7 +2628,7 @@
 
 <span class="kw">impl</span> <span class="ident">Namespace</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">empty</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">db</span>: <span class="ident">String::new</span>(),
             <span class="ident">coll</span>: <span class="ident">String::new</span>(),
@@ -2637,13 +2637,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Namespace</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}.{}&quot;</span>, <span class="self">self</span>.<span class="ident">db</span>, <span class="self">self</span>.<span class="ident">coll</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Namespace</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -2654,11 +2654,11 @@
         <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>);
 
         <span class="kw">match</span> (<span class="ident">db</span>, <span class="ident">coll</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">db</span>), <span class="ident">coll</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">coll</span>.<span class="ident">is_empty</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+            (<span class="prelude-val">Some</span>(<span class="ident">db</span>), <span class="ident">coll</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">coll</span>.<span class="ident">is_empty</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
                 <span class="ident">db</span>: <span class="ident">db</span>.<span class="ident">to_string</span>(),
                 <span class="ident">coll</span>,
             }),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">D::Error::custom</span>(<span class="string">&quot;Missing one or more fields in namespace&quot;</span>)),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">D::Error::custom</span>(<span class="string">&quot;Missing one or more fields in namespace&quot;</span>)),
         }
     }
 }

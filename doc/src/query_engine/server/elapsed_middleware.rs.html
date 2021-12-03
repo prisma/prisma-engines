@@ -37,14 +37,14 @@
 
 <span class="kw">impl</span> <span class="ident">ElapsedMiddleware</span> {
     <span class="doccomment">/// Creates a new `ElapsedMiddleware`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">_priv</span>: () }
     }
 }
 
 <span class="attribute">#[<span class="ident">tide::utils::async_trait</span>]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">State</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">Middleware</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ElapsedMiddleware</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>, <span class="ident">next</span>: <span class="ident">Next</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tide::Result</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>, <span class="ident">next</span>: <span class="ident">Next</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span> {
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">next</span>.<span class="ident">run</span>(<span class="ident">req</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">elapsed</span> <span class="op">=</span> <span class="ident">Instant::now</span>().<span class="ident">duration_since</span>(<span class="ident">start</span>).<span class="ident">as_micros</span>() <span class="kw">as</span> <span class="ident">u64</span>;

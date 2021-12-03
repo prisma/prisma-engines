@@ -6,24 +6,24 @@ able to execute <a href="https://en.wikipedia.org/wiki/Chosen-ciphertext_attack"
 modern cryptographic implementations.</p>
 <p>See <a href="https://github.com/RustCrypto/AEADs">RustCrypto/AEADs</a> for cipher implementations which use this trait.</p>
 </div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
-<div class="item-table"><div class="item-left import-item"><code>pub use <a class="mod" href="../generic_array/index.html" title="mod generic_array">generic_array</a>;</code></div><div class="item-right docblock-short"></div></div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="consts/index.html" title="aead::consts mod">consts</a></div><div class="item-right docblock-short"><p>Type aliases for many constants.</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Error.html" title="aead::Error struct">Error</a></div><div class="item-right docblock-short"><p>Error type.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Payload.html" title="aead::Payload struct">Payload</a></div><div class="item-right docblock-short"><p>AEAD payloads are a combination of a message (plaintext or ciphertext)
+<div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use <a class="mod" href="../generic_array/index.html" title="mod generic_array">generic_array</a>;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="consts/index.html" title="aead::consts mod">consts</a></div><div class="item-right docblock-short"><p>Type aliases for many constants.</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Error.html" title="aead::Error struct">Error</a></div><div class="item-right docblock-short"><p>Error type.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Payload.html" title="aead::Payload struct">Payload</a></div><div class="item-right docblock-short"><p>AEAD payloads are a combination of a message (plaintext or ciphertext)
 and “additional associated data” (AAD) to be authenticated (in cleartext)
 along with the message.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Aead.html" title="aead::Aead trait">Aead</a></div><div class="item-right docblock-short"><p>Authenticated Encryption with Associated Data (AEAD) algorithm.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.AeadInPlace.html" title="aead::AeadInPlace trait">AeadInPlace</a></div><div class="item-right docblock-short"><p>In-place stateless AEAD trait.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.AeadMut.html" title="aead::AeadMut trait">AeadMut</a></div><div class="item-right docblock-short"><p>Stateful Authenticated Encryption with Associated Data algorithm.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.AeadMutInPlace.html" title="aead::AeadMutInPlace trait">AeadMutInPlace</a></div><div class="item-right docblock-short"><p>In-place stateful AEAD trait.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Buffer.html" title="aead::Buffer trait">Buffer</a></div><div class="item-right docblock-short"><p>In-place encryption/decryption byte buffers.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.NewAead.html" title="aead::NewAead trait">NewAead</a></div><div class="item-right docblock-short"><p>Instantiate either a stateless <a href="trait.Aead.html" title="Aead"><code>Aead</code></a> or stateful <a href="trait.AeadMut.html" title="AeadMut"><code>AeadMut</code></a> algorithm.</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Key.html" title="aead::Key type">Key</a></div><div class="item-right docblock-short"><p>Key for a <a href="trait.NewAead.html" title="NewAead"><code>NewAead</code></a> algorithm</p>
-</div><div class="item-left module-item"><a class="type" href="type.Nonce.html" title="aead::Nonce type">Nonce</a></div><div class="item-right docblock-short"><p>Nonce: single-use value for ensuring ciphertexts are unique</p>
-</div><div class="item-left module-item"><a class="type" href="type.Tag.html" title="aead::Tag type">Tag</a></div><div class="item-right docblock-short"><p>Tag: authentication code which ensures ciphertexts are authentic</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="aead" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Aead.html" title="aead::Aead trait">Aead</a></div><div class="item-right docblock-short"><p>Authenticated Encryption with Associated Data (AEAD) algorithm.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AeadInPlace.html" title="aead::AeadInPlace trait">AeadInPlace</a></div><div class="item-right docblock-short"><p>In-place stateless AEAD trait.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AeadMut.html" title="aead::AeadMut trait">AeadMut</a></div><div class="item-right docblock-short"><p>Stateful Authenticated Encryption with Associated Data algorithm.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AeadMutInPlace.html" title="aead::AeadMutInPlace trait">AeadMutInPlace</a></div><div class="item-right docblock-short"><p>In-place stateful AEAD trait.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Buffer.html" title="aead::Buffer trait">Buffer</a></div><div class="item-right docblock-short"><p>In-place encryption/decryption byte buffers.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.NewAead.html" title="aead::NewAead trait">NewAead</a></div><div class="item-right docblock-short"><p>Instantiate either a stateless <a href="trait.Aead.html" title="Aead"><code>Aead</code></a> or stateful <a href="trait.AeadMut.html" title="AeadMut"><code>AeadMut</code></a> algorithm.</p>
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Key.html" title="aead::Key type">Key</a></div><div class="item-right docblock-short"><p>Key for a <a href="trait.NewAead.html" title="NewAead"><code>NewAead</code></a> algorithm</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Nonce.html" title="aead::Nonce type">Nonce</a></div><div class="item-right docblock-short"><p>Nonce: single-use value for ensuring ciphertexts are unique</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Tag.html" title="aead::Tag type">Tag</a></div><div class="item-right docblock-short"><p>Tag: authentication code which ensures ciphertexts are authentic</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="aead" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

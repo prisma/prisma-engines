@@ -706,7 +706,7 @@
 <span class="macro">compile_error!</span>(<span class="string">&quot;The `aws-auth` feature flag is only supported on the tokio runtime.&quot;</span>);
 
 <span class="macro">macro_rules!</span> <span class="ident">define_if_single_runtime_enabled</span> {
-    ( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">def</span>:<span class="ident">item</span> )<span class="op">+</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    ( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">def</span>:<span class="ident">item</span> )<span class="op">+</span> ) =&gt; {
         $(
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
                 <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)),

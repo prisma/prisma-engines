@@ -106,7 +106,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EdDSAParameters</span>;
 
 <span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">EdDSAParameters</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ring::signature::ED25519&quot;</span>)
     }
 }
@@ -124,7 +124,7 @@
         <span class="ident">public_key</span>: <span class="ident">untrusted::Input</span>,
         <span class="ident">msg</span>: <span class="ident">untrusted::Input</span>,
         <span class="ident">signature</span>: <span class="ident">untrusted::Input</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">public_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="ident">ELEM_LEN</span>] <span class="op">=</span> <span class="ident">public_key</span>.<span class="ident">as_slice_less_safe</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> (<span class="ident">signature_r</span>, <span class="ident">signature_s</span>) <span class="op">=</span> <span class="ident">signature</span>.<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">signature_r</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="ident">ELEM_LEN</span>] <span class="op">=</span> <span class="ident">input</span>

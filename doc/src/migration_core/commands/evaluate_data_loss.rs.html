@@ -134,7 +134,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">evaluate_data_loss</span>(
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">EvaluateDataLossInput</span>,
     <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EvaluateDataLossOutput</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EvaluateDataLossOutput</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">checker</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">destructive_change_checker</span>();
 
     <span class="ident">error_on_changed_provider</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">migrations_directory_path</span>, <span class="ident">connector</span>.<span class="ident">connector_type</span>())<span class="question-mark">?</span>;

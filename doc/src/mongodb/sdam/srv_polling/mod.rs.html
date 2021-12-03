@@ -179,12 +179,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SrvPollingMonitor</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">topology</span>: <span class="ident">WeakTopology</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">topology</span>: <span class="ident">WeakTopology</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client_options</span> <span class="op">=</span> <span class="ident">topology</span>.<span class="ident">client_options</span>().<span class="ident">clone</span>();
 
         <span class="kw">let</span> <span class="ident">initial_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">client_options</span>.<span class="ident">original_srv_info</span>.<span class="ident">take</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">info</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">info</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">info</span>) =&gt; <span class="ident">info</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
         };
 
         <span class="prelude-val">Some</span>(<span class="self">Self</span> {
@@ -207,12 +207,12 @@
         });
     }
 
-    <span class="kw">fn</span> <span class="ident">rescan_interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Duration</span> {
+    <span class="kw">fn</span> <span class="ident">rescan_interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Duration</span> {
         <span class="ident">std::cmp::max</span>(<span class="self">self</span>.<span class="ident">rescan_interval</span>, <span class="ident">MIN_RESCAN_SRV_INTERVAL</span>)
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">fn</span> <span class="ident">should_poll</span>(<span class="ident">tt</span>: <span class="ident">TopologyType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">fn</span> <span class="ident">should_poll</span>(<span class="ident">tt</span>: <span class="ident">TopologyType</span>) -&gt; <span class="ident">bool</span> {
             <span class="macro">matches!</span>(<span class="ident">tt</span>, <span class="ident">TopologyType::Sharded</span> <span class="op">|</span> <span class="ident">TopologyType::Unknown</span>)
         }
 
@@ -220,8 +220,8 @@
             <span class="ident">RUNTIME</span>.<span class="ident">delay_for</span>(<span class="self">self</span>.<span class="ident">rescan_interval</span>()).<span class="kw">await</span>;
 
             <span class="kw">let</span> <span class="ident">topology</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">topology</span>.<span class="ident">upgrade</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">topology</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">topology</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">topology</span>) =&gt; <span class="ident">topology</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
             };
 
             <span class="kw">if</span> <span class="ident">should_poll</span>(<span class="ident">topology</span>.<span class="ident">topology_type</span>().<span class="kw">await</span>) {
@@ -240,13 +240,13 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_hosts</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">lookup</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LookupHosts</span><span class="op">&gt;</span>, <span class="ident">topology</span>: <span class="ident">Topology</span>) {
         <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">lookup</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">LookupHosts</span> { <span class="ident">hosts</span>, .. }) <span class="kw">if</span> <span class="ident">hosts</span>.<span class="ident">is_empty</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">LookupHosts</span> { <span class="ident">hosts</span>, .. }) <span class="kw">if</span> <span class="ident">hosts</span>.<span class="ident">is_empty</span>() =&gt; {
                 <span class="self">self</span>.<span class="ident">no_valid_hosts</span>(<span class="prelude-val">None</span>);
 
                 <span class="kw">return</span>;
             }
-            <span class="prelude-val">Ok</span>(<span class="ident">lookup</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">lookup</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">lookup</span>) =&gt; <span class="ident">lookup</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">no_valid_hosts</span>(<span class="prelude-val">Some</span>(<span class="ident">err</span>));
 
                 <span class="kw">return</span>;
@@ -264,7 +264,7 @@
             .<span class="kw">await</span>;
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">lookup_hosts</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LookupHosts</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">lookup_hosts</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LookupHosts</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mock</span>) <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">client_options</span>
@@ -279,7 +279,7 @@
         <span class="ident">resolver</span>.<span class="ident">get_srv_hosts</span>(<span class="ident">initial_hostname</span>.<span class="ident">as_str</span>()).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_or_create_srv_resolver</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SrvResolver</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_or_create_srv_resolver</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SrvResolver</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">resolver</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">resolver</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">resolver</span>);
         }
@@ -298,7 +298,7 @@
         <span class="self">self</span>.<span class="ident">rescan_interval</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">heartbeat_freq</span>();
     }
 
-    <span class="kw">fn</span> <span class="ident">heartbeat_freq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Duration</span> {
+    <span class="kw">fn</span> <span class="ident">heartbeat_freq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Duration</span> {
         <span class="self">self</span>.<span class="ident">client_options</span>
             .<span class="ident">heartbeat_freq</span>
             .<span class="ident">unwrap_or</span>(<span class="ident">DEFAULT_HEARTBEAT_FREQUENCY</span>)

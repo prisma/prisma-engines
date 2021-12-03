@@ -108,7 +108,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">time</span>: <span class="ident">std::time::SystemTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Time</span>, <span class="ident">ring::error::Unspecified</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">time</span>: <span class="ident">std::time::SystemTime</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Time</span>, <span class="ident">ring::error::Unspecified</span><span class="op">&gt;</span> {
         <span class="ident">time</span>.<span class="ident">duration_since</span>(<span class="ident">std::time::UNIX_EPOCH</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">Time::from_seconds_since_unix_epoch</span>(<span class="ident">d</span>.<span class="ident">as_secs</span>()))
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ring::error::Unspecified</span>)
@@ -120,7 +120,7 @@
     <span class="doccomment">/// `webpki::Time::try_from(time: &amp;std::time::SystemTime)` instead when</span>
     <span class="doccomment">/// `std::time::SystemTime` is available (when `#![no_std]` isn&#39;t being</span>
     <span class="doccomment">/// used).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_seconds_since_unix_epoch</span>(<span class="ident">secs</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Time</span> { <span class="ident">Time</span>(<span class="ident">secs</span>) }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_seconds_since_unix_epoch</span>(<span class="ident">secs</span>: <span class="ident">u64</span>) -&gt; <span class="ident">Time</span> { <span class="ident">Time</span>(<span class="ident">secs</span>) }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="webpki" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

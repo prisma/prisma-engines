@@ -391,7 +391,7 @@
 
 <span class="kw">impl</span> <span class="ident">Timer</span> {
     <span class="doccomment">/// Creates a new timer heap ready to create new timers.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Timer</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Timer</span> {
         <span class="ident">Timer</span> {
             <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Inner</span> {
                 <span class="ident">list</span>: <span class="ident">ArcList::new</span>(),
@@ -402,7 +402,7 @@
     }
 
     <span class="doccomment">/// Returns a handle to this timer heap, used to create new timeouts.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TimerHandle</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TimerHandle</span> {
         <span class="ident">TimerHandle</span> {
             <span class="ident">inner</span>: <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>),
         }
@@ -413,7 +413,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Event loops or threads typically want to sleep until the specified</span>
     <span class="doccomment">/// instant.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">timer_heap</span>.<span class="ident">peek</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">at</span>)
     }
 
@@ -432,9 +432,9 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance_to</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) {
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">timer_heap</span>.<span class="ident">peek</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">head</span>) <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">at</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">now</span> <span class="op">=</span><span class="op">&gt;</span> {}
-                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">head</span>) <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">at</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">now</span> =&gt; {}
+                <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
             };
 
             <span class="comment">// Flag the timer as fired and then notify its task, if any, that&#39;s</span>
@@ -447,8 +447,8 @@
                 .<span class="ident">state</span>
                 .<span class="ident">compare_exchange</span>(<span class="ident">bits</span>, <span class="ident">bits</span> <span class="op">|</span> <span class="number">0b01</span>, <span class="ident">SeqCst</span>, <span class="ident">SeqCst</span>)
             {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">heap_timer</span>.<span class="ident">node</span>.<span class="ident">waker</span>.<span class="ident">wake</span>(),
-                <span class="prelude-val">Err</span>(<span class="ident">_b</span>) <span class="op">=</span><span class="op">&gt;</span> {}
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="ident">heap_timer</span>.<span class="ident">node</span>.<span class="ident">waker</span>.<span class="ident">wake</span>(),
+                <span class="prelude-val">Err</span>(<span class="ident">_b</span>) =&gt; {}
             }
         }
     }
@@ -476,8 +476,8 @@
         <span class="comment">// then we jettison it form the timer heap.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">slot</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">heap_slot</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">slot</span>.<span class="ident">take</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">slot</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">slot</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">slot</span>) =&gt; <span class="ident">slot</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
         };
         <span class="self">self</span>.<span class="ident">timer_heap</span>.<span class="ident">remove</span>(<span class="ident">heap_slot</span>);
     }
@@ -491,14 +491,14 @@
 <span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Timer</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">waker</span>.<span class="ident">register</span>(<span class="ident">cx</span>.<span class="ident">waker</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">list</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">list</span>.<span class="ident">take</span>();
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span> <span class="ident">list</span>.<span class="ident">pop</span>() {
             <span class="kw">let</span> <span class="ident">at</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">node</span>.<span class="ident">at</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
             <span class="kw">match</span> <span class="ident">at</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">at</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">update_or_add</span>(<span class="ident">at</span>, <span class="ident">node</span>),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">remove</span>(<span class="ident">node</span>),
+                <span class="prelude-val">Some</span>(<span class="ident">at</span>) =&gt; <span class="self">self</span>.<span class="ident">update_or_add</span>(<span class="ident">at</span>, <span class="ident">node</span>),
+                <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">remove</span>(<span class="ident">node</span>),
             }
         }
         <span class="ident">Poll::Pending</span>
@@ -525,13 +525,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Timer</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Timer&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;heap&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;...&quot;</span>).<span class="ident">finish</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Timer</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
@@ -565,12 +565,12 @@
     <span class="doccomment">/// thread otherwise loses a race to call this method then it will fail</span>
     <span class="doccomment">/// returning an error. Once a call to `set_as_global_fallback` is</span>
     <span class="doccomment">/// successful then no future calls may succeed.</span>
-    <span class="kw">fn</span> <span class="ident">set_as_global_fallback</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SetDefaultError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">set_as_global_fallback</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SetDefaultError</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_usize</span>();
             <span class="kw">match</span> <span class="ident">HANDLE_FALLBACK</span>.<span class="ident">compare_exchange</span>(<span class="number">0</span>, <span class="ident">val</span>, <span class="ident">SeqCst</span>, <span class="ident">SeqCst</span>) {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                     <span class="ident">drop</span>(<span class="ident">TimerHandle::from_usize</span>(<span class="ident">val</span>));
                     <span class="prelude-val">Err</span>(<span class="ident">SetDefaultError</span>(()))
                 }
@@ -578,18 +578,18 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">into_usize</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">into_usize</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">unsafe</span> { <span class="ident">mem::transmute</span>::<span class="op">&lt;</span><span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>, <span class="ident">usize</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">inner</span>) }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_usize</span>(<span class="ident">val</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TimerHandle</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_usize</span>(<span class="ident">val</span>: <span class="ident">usize</span>) -&gt; <span class="ident">TimerHandle</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">mem::transmute</span>::<span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">val</span>);
         <span class="ident">TimerHandle</span> { <span class="ident">inner</span> }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">TimerHandle</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TimerHandle</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">TimerHandle</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fallback</span> <span class="op">=</span> <span class="ident">HANDLE_FALLBACK</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>);
 
         <span class="comment">// If the fallback hasn&#39;t been previously initialized then let&#39;s spin</span>
@@ -597,10 +597,10 @@
         <span class="comment">// actually create a helper thread then we&#39;ll just return a &quot;defunkt&quot;</span>
         <span class="comment">// handle which will return errors when timer objects are attempted to</span>
         <span class="comment">// be associated.</span>
-        <span class="kw">if</span> <span class="ident">fallback</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">fallback</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="ident">helper</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">global::HelperThread::new</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">helper</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">helper</span>,
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">TimerHandle</span> { <span class="ident">inner</span>: <span class="ident">Weak::new</span>() },
+                <span class="prelude-val">Ok</span>(<span class="ident">helper</span>) =&gt; <span class="ident">helper</span>,
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">TimerHandle</span> { <span class="ident">inner</span>: <span class="ident">Weak::new</span>() },
             };
 
             <span class="comment">// If we successfully set ourselves as the actual fallback then we</span>
@@ -632,7 +632,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TimerHandle</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;TimerHandle&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;inner&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;...&quot;</span>)
             .<span class="ident">finish</span>()

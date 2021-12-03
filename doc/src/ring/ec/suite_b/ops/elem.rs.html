@@ -157,7 +157,7 @@
     <span class="comment">// There&#39;s no need to convert `value` to the Montgomery domain since</span>
     <span class="comment">// 0 * R**2 (mod m) == 0, so neither the modulus nor the encoding are needed</span>
     <span class="comment">// as inputs for constructing a zero-valued element.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zero</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">limbs</span>: [<span class="number">0</span>; <span class="ident">MAX_LIMBS</span>],
             <span class="ident">m</span>: <span class="ident">PhantomData</span>,
@@ -171,7 +171,7 @@
     <span class="ident">f</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>, <span class="ident">b</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>),
     <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EA</span><span class="op">&gt;</span>,
     <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EB</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="op">&lt;</span>(<span class="ident">EA</span>, <span class="ident">EB</span>) <span class="kw">as</span> <span class="ident">ProductEncoding</span><span class="op">&gt;</span><span class="ident">::Output</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="op">&lt;</span>(<span class="ident">EA</span>, <span class="ident">EB</span>) <span class="kw">as</span> <span class="ident">ProductEncoding</span><span class="op">&gt;</span><span class="ident">::Output</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     (<span class="ident">EA</span>, <span class="ident">EB</span>): <span class="ident">ProductEncoding</span>,
 {
@@ -184,7 +184,7 @@
     <span class="ident">f</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>, <span class="ident">b</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>),
     <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EA</span><span class="op">&gt;</span>,
     <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EB</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">ER</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">ER</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Elem</span> {
         <span class="ident">limbs</span>: [<span class="number">0</span>; <span class="ident">MAX_LIMBS</span>],
         <span class="ident">m</span>: <span class="ident">PhantomData</span>,
@@ -209,7 +209,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unary_op</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span>: <span class="ident">Encoding</span><span class="op">&gt;</span>(
     <span class="ident">f</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>),
     <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Elem</span> {
         <span class="ident">limbs</span>: [<span class="number">0</span>; <span class="ident">MAX_LIMBS</span>],
         <span class="ident">m</span>: <span class="ident">PhantomData</span>,

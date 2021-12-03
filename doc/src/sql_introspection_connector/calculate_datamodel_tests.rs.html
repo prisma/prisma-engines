@@ -1117,7 +1117,7 @@
         <span class="ident">IndexType</span>, <span class="ident">PrimaryKey</span>, <span class="ident">PrimaryKeyColumn</span>, <span class="ident">Sequence</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>,
     };
 
-    <span class="kw">fn</span> <span class="ident">postgres_context</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IntrospectionContext</span> {
+    <span class="kw">fn</span> <span class="ident">postgres_context</span>() -&gt; <span class="ident">IntrospectionContext</span> {
         <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="ident">Datasource</span> {
             <span class="ident">name</span>: <span class="string">&quot;Postgres&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">active_provider</span>: <span class="string">&quot;postgresql&quot;</span>.<span class="ident">into</span>(),

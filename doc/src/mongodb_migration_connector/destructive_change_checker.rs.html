@@ -16,11 +16,11 @@
 
 <span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">DestructiveChangeChecker</span> <span class="kw">for</span> <span class="ident">MongoDbMigrationConnector</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_database_migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DestructiveChangeDiagnostics</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_database_migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DestructiveChangeDiagnostics</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">DestructiveChangeDiagnostics::new</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">pure_check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_database_migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DestructiveChangeDiagnostics</span> {
+    <span class="kw">fn</span> <span class="ident">pure_check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_database_migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>) -&gt; <span class="ident">DestructiveChangeDiagnostics</span> {
         <span class="ident">DestructiveChangeDiagnostics::new</span>()
     }
 }

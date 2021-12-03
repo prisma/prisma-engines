@@ -431,7 +431,7 @@
 <span class="kw">struct</span> <span class="ident">Ident</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>);
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Ident</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;`&quot;</span>)<span class="question-mark">?</span>;
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;`&quot;</span>)
@@ -445,11 +445,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">AlterTable</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ALTER TABLE &quot;</span>)<span class="question-mark">?</span>;
         <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">Ident</span>(<span class="self">self</span>.<span class="ident">table_name</span>.<span class="ident">as_ref</span>()), <span class="ident">f</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">changes</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">changes</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
             <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
             <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">changes</span>[<span class="number">0</span>], <span class="ident">f</span>)<span class="question-mark">?</span>;
 
@@ -480,17 +480,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">AlterTableClause</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AlterTableClause::RenameTo</span> { <span class="ident">next_name</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;RENAME TO {}&quot;</span>, <span class="ident">next_name</span>),
+            <span class="ident">AlterTableClause::RenameTo</span> { <span class="ident">next_name</span> } =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;RENAME TO {}&quot;</span>, <span class="ident">next_name</span>),
             <span class="ident">AlterTableClause::RenameIndex</span> {
                 <span class="ident">previous_name</span>,
                 <span class="ident">next_name</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;RENAME INDEX `{}` TO `{}`&quot;</span>, <span class="ident">previous_name</span>, <span class="ident">next_name</span>),
-            <span class="ident">AlterTableClause::DropColumn</span> { <span class="ident">column_name</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DROP COLUMN `{}`&quot;</span>, <span class="ident">column_name</span>),
-            <span class="ident">AlterTableClause::DropForeignKey</span> { <span class="ident">constraint_name</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DROP FOREIGN KEY `{}`&quot;</span>, <span class="ident">constraint_name</span>),
-            <span class="ident">AlterTableClause::DropPrimaryKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;DROP PRIMARY KEY&quot;</span>),
-            <span class="ident">AlterTableClause::AddForeignKey</span>(<span class="ident">fk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ADD {}&quot;</span>, <span class="ident">fk</span>),
+            } =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;RENAME INDEX `{}` TO `{}`&quot;</span>, <span class="ident">previous_name</span>, <span class="ident">next_name</span>),
+            <span class="ident">AlterTableClause::DropColumn</span> { <span class="ident">column_name</span> } =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DROP COLUMN `{}`&quot;</span>, <span class="ident">column_name</span>),
+            <span class="ident">AlterTableClause::DropForeignKey</span> { <span class="ident">constraint_name</span> } =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DROP FOREIGN KEY `{}`&quot;</span>, <span class="ident">constraint_name</span>),
+            <span class="ident">AlterTableClause::DropPrimaryKey</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;DROP PRIMARY KEY&quot;</span>),
+            <span class="ident">AlterTableClause::AddForeignKey</span>(<span class="ident">fk</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ADD {}&quot;</span>, <span class="ident">fk</span>),
         }
     }
 }
@@ -506,7 +506,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ForeignKey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">constraint_name</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">constraint_name</span> {
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CONSTRAINT `{constraint_name}` &quot;</span>, <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">constraint_name</span>,)<span class="question-mark">?</span>;
         }
@@ -545,13 +545,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ForeignKeyAction</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ForeignKeyAction::Cascade</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;CASCADE&quot;</span>,
-            <span class="ident">ForeignKeyAction::Restrict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;RESTRICT&quot;</span>,
-            <span class="ident">ForeignKeyAction::NoAction</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;NO ACTION&quot;</span>,
-            <span class="ident">ForeignKeyAction::SetNull</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SET NULL&quot;</span>,
-            <span class="ident">ForeignKeyAction::SetDefault</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SET DEFAULT&quot;</span>,
+            <span class="ident">ForeignKeyAction::Cascade</span> =&gt; <span class="string">&quot;CASCADE&quot;</span>,
+            <span class="ident">ForeignKeyAction::Restrict</span> =&gt; <span class="string">&quot;RESTRICT&quot;</span>,
+            <span class="ident">ForeignKeyAction::NoAction</span> =&gt; <span class="string">&quot;NO ACTION&quot;</span>,
+            <span class="ident">ForeignKeyAction::SetNull</span> =&gt; <span class="string">&quot;SET NULL&quot;</span>,
+            <span class="ident">ForeignKeyAction::SetDefault</span> =&gt; <span class="string">&quot;SET DEFAULT&quot;</span>,
         };
 
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>)
@@ -570,7 +570,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">Ident</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">column_name</span>), <span class="ident">f</span>)<span class="question-mark">?</span>;
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
         <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">column_type</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
@@ -611,7 +611,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">CreateIndex</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;CREATE {maybe_unique}INDEX `{index_name}` ON `{table_name}`(&quot;</span>,
@@ -654,7 +654,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">CreateTable</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;CREATE TABLE &quot;</span>)<span class="question-mark">?</span>;
         <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">Ident</span>(<span class="self">self</span>.<span class="ident">table_name</span>.<span class="ident">as_ref</span>()), <span class="ident">f</span>)<span class="question-mark">?</span>;
 
@@ -716,7 +716,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DropTable</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DROP TABLE `{}`&quot;</span>, <span class="self">self</span>.<span class="ident">table_name</span>)
     }
 }
@@ -728,7 +728,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DropIndex</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DROP INDEX `{}` ON `{}`&quot;</span>, <span class="self">self</span>.<span class="ident">index_name</span>, <span class="self">self</span>.<span class="ident">table_name</span>)
     }
 }
@@ -748,11 +748,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">IndexClause</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">r#type</span> {
-            <span class="ident">IndexType::Normal</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">IndexType::Unique</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;UNIQUE &quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">IndexType::Fulltext</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;FULLTEXT &quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">IndexType::Normal</span> =&gt; (),
+            <span class="ident">IndexType::Unique</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;UNIQUE &quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">IndexType::Fulltext</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;FULLTEXT &quot;</span>)<span class="question-mark">?</span>,
         }
 
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;INDEX &quot;</span>)<span class="question-mark">?</span>;

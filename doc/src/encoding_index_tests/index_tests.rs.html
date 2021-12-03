@@ -219,7 +219,7 @@
 <span class="macro">macro_rules!</span> <span class="ident">single_byte_tests</span> {
     (
         <span class="kw">mod</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parentmod</span>:<span class="ident">ident</span> <span class="comment">// XXX Rust issue #20701 prevents the use of `super`</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> (
+    ) =&gt; (
         <span class="kw">mod</span> <span class="ident">tests</span> {
             <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
             <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parentmod</span>::{<span class="ident">forward</span>, <span class="ident">backward</span>};
@@ -259,7 +259,7 @@
 <span class="doccomment">/// Makes a common test suite for multi-byte indices.</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">multi_byte_tests</span> {
-    (<span class="ident">make</span> <span class="ident">shared</span> <span class="ident">tests</span> <span class="ident">and</span> <span class="ident">benches</span> <span class="ident">with</span> <span class="ident">dups</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dups</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> ( <span class="comment">// internal macro</span>
+    (<span class="ident">make</span> <span class="ident">shared</span> <span class="ident">tests</span> <span class="ident">and</span> <span class="ident">benches</span> <span class="ident">with</span> <span class="ident">dups</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dups</span>:<span class="ident">expr</span>) =&gt; ( <span class="comment">// internal macro</span>
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">test_correct_table</span>() {
             <span class="kw">static</span> <span class="ident">DUPS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u16</span>] <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">dups</span>;
@@ -298,7 +298,7 @@
     (
         <span class="kw">mod</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parentmod</span>:<span class="ident">ident</span>, <span class="comment">// XXX Rust issue #20701</span>
         <span class="ident">dups</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dups</span>:<span class="ident">expr</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> (
+    ) =&gt; (
         <span class="kw">mod</span> <span class="ident">tests</span> {
             <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
             <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parentmod</span>::{<span class="ident">forward</span>, <span class="ident">backward</span>};
@@ -311,7 +311,7 @@
         <span class="kw">mod</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parentmod</span>:<span class="ident">ident</span>, <span class="comment">// XXX Rust issue #20701</span>
         <span class="ident">remap</span> <span class="op">=</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remap_min</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">remap_max</span>:<span class="ident">expr</span>],
         <span class="ident">dups</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dups</span>:<span class="ident">expr</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> (
+    ) =&gt; (
         <span class="kw">mod</span> <span class="ident">tests</span> {
             <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
             <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parentmod</span>::{<span class="ident">forward</span>, <span class="ident">backward</span>, <span class="ident">backward_remapped</span>};
@@ -356,7 +356,7 @@
         <span class="kw">mod</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parentmod</span>:<span class="ident">ident</span>,
         <span class="ident">key</span> <span class="op">=</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">minkey</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">maxkey</span>:<span class="ident">expr</span>], <span class="ident">key</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">keyubound</span>:<span class="ident">expr</span>,
         <span class="ident">value</span> <span class="op">=</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">minvalue</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">maxvalue</span>:<span class="ident">expr</span>], <span class="ident">value</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">valueubound</span>:<span class="ident">expr</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> (
+    ) =&gt; (
         <span class="kw">mod</span> <span class="ident">tests</span> {
             <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
             <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parentmod</span>::{<span class="ident">forward</span>, <span class="ident">backward</span>};
@@ -383,10 +383,10 @@
             <span class="kw">fn</span> <span class="ident">test_correct_table</span>() {
                 <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">MIN_KEY</span>..(<span class="ident">MAX_KEY</span><span class="op">+</span><span class="number">2</span>) {
                     <span class="kw">let</span> <span class="ident">j</span> <span class="op">=</span> <span class="ident">forward</span>(<span class="ident">i</span>);
-                    <span class="kw">if</span> <span class="ident">j</span> <span class="op">=</span><span class="op">=</span> <span class="number">0xffffffff</span> { <span class="kw">continue</span>; }
+                    <span class="kw">if</span> <span class="ident">j</span> <span class="op">==</span> <span class="number">0xffffffff</span> { <span class="kw">continue</span>; }
                     <span class="kw">let</span> <span class="ident">i_</span> <span class="op">=</span> <span class="ident">backward</span>(<span class="ident">j</span>);
-                    <span class="kw">if</span> <span class="ident">i_</span> <span class="op">=</span><span class="op">=</span> <span class="number">0xffffffff</span> { <span class="kw">continue</span>; }
-                    <span class="macro">assert!</span>(<span class="ident">i_</span> <span class="op">=</span><span class="op">=</span> <span class="ident">i</span>,
+                    <span class="kw">if</span> <span class="ident">i_</span> <span class="op">==</span> <span class="number">0xffffffff</span> { <span class="kw">continue</span>; }
+                    <span class="macro">assert!</span>(<span class="ident">i_</span> <span class="op">==</span> <span class="ident">i</span>,
                             <span class="string">&quot;backward(forward({})) = backward({}) = {} != {}&quot;</span>, <span class="ident">i</span>, <span class="ident">j</span>, <span class="ident">i_</span>, <span class="ident">i</span>);
                 }
             }

@@ -2,7 +2,7 @@
 <p>The global executor is lazily spawned on first use. It spawns as many threads
 as the number of cpus by default. You can override this using the
 <code>ASYNC_GLOBAL_EXECUTOR_THREADS</code> environment variable.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code>
 <span class="comment">// spawn a task on the multi-threaded executor</span>
 <span class="kw">let</span> <span class="ident">task1</span> <span class="op">=</span> <span class="ident">async_global_executor::spawn</span>(<span class="kw">async</span> {
@@ -19,21 +19,21 @@ as the number of cpus by default. You can override this using the
     <span class="macro">assert_eq!</span>(<span class="ident">task</span>.<span class="kw">await</span>, (<span class="number">3</span>, <span class="number">7</span>));
 });</code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.GlobalExecutorConfig.html" title="async_global_executor::GlobalExecutorConfig struct">GlobalExecutorConfig</a></div><div class="item-right docblock-short"><p>Configuration to init the thread pool for the multi-threaded global executor.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Task.html" title="async_global_executor::Task struct">Task</a></div><div class="item-right docblock-short"><p>A spawned task.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.block_on.html" title="async_global_executor::block_on fn">block_on</a></div><div class="item-right docblock-short"><p>Runs the global and the local executor on the current thread</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.init.html" title="async_global_executor::init fn">init</a></div><div class="item-right docblock-short"><p>Init the global executor, spawning as many threads as the number or cpus or
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.GlobalExecutorConfig.html" title="async_global_executor::GlobalExecutorConfig struct">GlobalExecutorConfig</a></div><div class="item-right docblock-short"><p>Configuration to init the thread pool for the multi-threaded global executor.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Task.html" title="async_global_executor::Task struct">Task</a></div><div class="item-right docblock-short"><p>A spawned task.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.block_on.html" title="async_global_executor::block_on fn">block_on</a></div><div class="item-right docblock-short"><p>Runs the global and the local executor on the current thread</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.init.html" title="async_global_executor::init fn">init</a></div><div class="item-right docblock-short"><p>Init the global executor, spawning as many threads as the number or cpus or
 the value specified by the <code>ASYNC_GLOBAL_EXECUTOR_THREADS</code> environment variable
 if specified.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.init_with_config.html" title="async_global_executor::init_with_config fn">init_with_config</a></div><div class="item-right docblock-short"><p>Init the global executor, spawning as many threads as specified or
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.init_with_config.html" title="async_global_executor::init_with_config fn">init_with_config</a></div><div class="item-right docblock-short"><p>Init the global executor, spawning as many threads as specified or
 the value specified by the specified environment variable.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.spawn.html" title="async_global_executor::spawn fn">spawn</a></div><div class="item-right docblock-short"><p>Spawns a task onto the multi-threaded global executor.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.spawn_blocking.html" title="async_global_executor::spawn_blocking fn">spawn_blocking</a></div><div class="item-right docblock-short"><p>Runs blocking code on a thread pool.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.spawn_local.html" title="async_global_executor::spawn_local fn">spawn_local</a></div><div class="item-right docblock-short"><p>Spawns a task onto the local executor.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.spawn_more_threads.html" title="async_global_executor::spawn_more_threads fn">spawn_more_threads</a></div><div class="item-right docblock-short"><p>Spawn more executor threads, up to configured max value.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.stop_current_thread.html" title="async_global_executor::stop_current_thread fn">stop_current_thread</a></div><div class="item-right docblock-short"><p>Stop the current executor thread, if we exceed the configured min value</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.stop_thread.html" title="async_global_executor::stop_thread fn">stop_thread</a></div><div class="item-right docblock-short"><p>Stop one of the executor threads, down to configured min value</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="async_global_executor" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.spawn.html" title="async_global_executor::spawn fn">spawn</a></div><div class="item-right docblock-short"><p>Spawns a task onto the multi-threaded global executor.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.spawn_blocking.html" title="async_global_executor::spawn_blocking fn">spawn_blocking</a></div><div class="item-right docblock-short"><p>Runs blocking code on a thread pool.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.spawn_local.html" title="async_global_executor::spawn_local fn">spawn_local</a></div><div class="item-right docblock-short"><p>Spawns a task onto the local executor.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.spawn_more_threads.html" title="async_global_executor::spawn_more_threads fn">spawn_more_threads</a></div><div class="item-right docblock-short"><p>Spawn more executor threads, up to configured max value.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.stop_current_thread.html" title="async_global_executor::stop_current_thread fn">stop_current_thread</a></div><div class="item-right docblock-short"><p>Stop the current executor thread, if we exceed the configured min value</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.stop_thread.html" title="async_global_executor::stop_thread fn">stop_thread</a></div><div class="item-right docblock-short"><p>Stop one of the executor threads, down to configured min value</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="async_global_executor" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

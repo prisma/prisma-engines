@@ -5,7 +5,7 @@ are not handled at this level. This module provides the building blocks to
 customize those things externally.</p>
 <p>If don’t have need to manage connections yourself, consider using the
 higher-level <a href="../index.html">Client</a> API.</p>
-<h2 id="example" class="section-header"><a href="#example">Example</a></h2>
+<h3 id="example" class="section-header"><a href="#example">Example</a></h3>
 <p>A simple example that uses the <code>SendRequest</code> struct to talk HTTP over a Tokio TCP stream</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tower::ServiceExt</span>;
@@ -14,7 +14,7 @@ higher-level <a href="../index.html">Client</a> API.</p>
 <span class="kw">use</span> <span class="ident">tokio::net::TcpStream</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">target_stream</span> <span class="op">=</span> <span class="ident">TcpStream::connect</span>(<span class="string">&quot;example.com:80&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">request_sender</span>, <span class="ident">connection</span>) <span class="op">=</span> <span class="ident">conn::handshake</span>(<span class="ident">target_stream</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -32,7 +32,7 @@ higher-level <a href="../index.html">Client</a> API.</p>
         .<span class="ident">method</span>(<span class="string">&quot;GET&quot;</span>)
         .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="string">&quot;&quot;</span>))<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">request_sender</span>.<span class="ident">send_request</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="macro">assert!</span>(<span class="ident">response</span>.<span class="ident">status</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">StatusCode::OK</span>);
+    <span class="macro">assert!</span>(<span class="ident">response</span>.<span class="ident">status</span>() <span class="op">==</span> <span class="ident">StatusCode::OK</span>);
 
     <span class="comment">// To send via the same connection again, it may not work as it may not be ready,</span>
     <span class="comment">// so we have to wait until the request_sender becomes ready.</span>
@@ -42,18 +42,18 @@ higher-level <a href="../index.html">Client</a> API.</p>
         .<span class="ident">method</span>(<span class="string">&quot;GET&quot;</span>)
         .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="string">&quot;&quot;</span>))<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">request_sender</span>.<span class="ident">send_request</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="macro">assert!</span>(<span class="ident">response</span>.<span class="ident">status</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">StatusCode::OK</span>);
+    <span class="macro">assert!</span>(<span class="ident">response</span>.<span class="ident">status</span>() <span class="op">==</span> <span class="ident">StatusCode::OK</span>);
     <span class="prelude-val">Ok</span>(())
 }
 </code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Builder.html" title="hyper::client::conn::Builder struct">Builder</a></div><div class="item-right docblock-short"><p>A builder to configure an HTTP connection.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Connection.html" title="hyper::client::conn::Connection struct">Connection</a></div><div class="item-right docblock-short"><p>A future that processes all HTTP state for the IO object.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Parts.html" title="hyper::client::conn::Parts struct">Parts</a></div><div class="item-right docblock-short"><p>Deconstructed parts of a <code>Connection</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ResponseFuture.html" title="hyper::client::conn::ResponseFuture struct">ResponseFuture</a></div><div class="item-right docblock-short"><p>A future returned by <code>SendRequest::send_request</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SendRequest.html" title="hyper::client::conn::SendRequest struct">SendRequest</a></div><div class="item-right docblock-short"><p>The sender side of an established connection.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.handshake.html" title="hyper::client::conn::handshake fn">handshake</a></div><div class="item-right docblock-short"><p>Returns a handshake future over some IO.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hyper" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Builder.html" title="hyper::client::conn::Builder struct">Builder</a></div><div class="item-right docblock-short"><p>A builder to configure an HTTP connection.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Connection.html" title="hyper::client::conn::Connection struct">Connection</a></div><div class="item-right docblock-short"><p>A future that processes all HTTP state for the IO object.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Parts.html" title="hyper::client::conn::Parts struct">Parts</a></div><div class="item-right docblock-short"><p>Deconstructed parts of a <code>Connection</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ResponseFuture.html" title="hyper::client::conn::ResponseFuture struct">ResponseFuture</a></div><div class="item-right docblock-short"><p>A future returned by <code>SendRequest::send_request</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SendRequest.html" title="hyper::client::conn::SendRequest struct">SendRequest</a></div><div class="item-right docblock-short"><p>The sender side of an established connection.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.handshake.html" title="hyper::client::conn::handshake fn">handshake</a></div><div class="item-right docblock-short"><p>Returns a handshake future over some IO.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hyper" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script>
 </body></html>

@@ -336,13 +336,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RawError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">re</span>: <span class="ident">RawError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SqlError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">re</span>: <span class="ident">RawError</span>) -&gt; <span class="ident">SqlError</span> {
         <span class="kw">match</span> <span class="ident">re</span> {
-            <span class="ident">RawError::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RawError::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> } =&gt; {
                 <span class="ident"><span class="self">Self</span>::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> }
             }
-            <span class="ident">RawError::ConnectionClosed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::ConnectionClosed</span>,
-            <span class="ident">RawError::Database</span> { <span class="ident">code</span>, <span class="ident">message</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::RawError</span> {
+            <span class="ident">RawError::ConnectionClosed</span> =&gt; <span class="ident"><span class="self">Self</span>::ConnectionClosed</span>,
+            <span class="ident">RawError::Database</span> { <span class="ident">code</span>, <span class="ident">message</span> } =&gt; <span class="ident"><span class="self">Self</span>::RawError</span> {
                 <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">String::from</span>(<span class="string">&quot;N/A&quot;</span>)),
                 <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">String::from</span>(<span class="string">&quot;N/A&quot;</span>)),
             },
@@ -351,16 +351,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">quaint::error::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">quaint::error::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">quaint::error::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
-            <span class="ident">quaint::error::ErrorKind::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">quaint::error::ErrorKind::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> } =&gt; {
                 <span class="ident"><span class="self">Self</span>::IncorrectNumberOfParameters</span> {
                     <span class="ident">expected</span>: <span class="kw-2">*</span><span class="ident">expected</span>,
                     <span class="ident">actual</span>: <span class="kw-2">*</span><span class="ident">actual</span>,
                 }
             }
-            <span class="ident">quaint::error::ErrorKind::ConnectionClosed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::ConnectionClosed</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Database</span> {
+            <span class="ident">quaint::error::ErrorKind::ConnectionClosed</span> =&gt; <span class="ident"><span class="self">Self</span>::ConnectionClosed</span>,
+            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Database</span> {
                 <span class="ident">code</span>: <span class="ident">e</span>.<span class="ident">original_code</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>),
                 <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">original_message</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>),
             },
@@ -370,7 +370,7 @@
 
 <span class="comment">// Catching the panics from the database driver for better error messages.</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Database</span> {
             <span class="ident">code</span>: <span class="prelude-val">None</span>,
             <span class="ident">message</span>: <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">downcast</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>()),
@@ -466,9 +466,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SqlError</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_connector_error</span>(<span class="self">self</span>, <span class="ident">connection_info</span>: <span class="kw-2">&amp;</span><span class="ident">quaint::prelude::ConnectionInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_connector_error</span>(<span class="self">self</span>, <span class="ident">connection_info</span>: <span class="kw-2">&amp;</span><span class="ident">quaint::prelude::ConnectionInfo</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SqlError::UniqueConstraintViolation</span> { <span class="ident">constraint</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+            <span class="ident">SqlError::UniqueConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; <span class="ident">ConnectorError</span> {
                 <span class="ident">user_facing_error</span>: <span class="prelude-val">Some</span>(<span class="ident">user_facing_errors::KnownError::new</span>(
                     <span class="ident">user_facing_errors::query_engine::UniqueKeyViolation</span> {
                         <span class="ident">constraint</span>: <span class="ident">constraint</span>.<span class="ident">clone</span>(),
@@ -476,30 +476,30 @@
                 )),
                 <span class="ident">kind</span>: <span class="ident">ErrorKind::UniqueConstraintViolation</span> { <span class="ident">constraint</span> },
             },
-            <span class="ident">SqlError::NullConstraintViolation</span> { <span class="ident">constraint</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SqlError::NullConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; {
                 <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::NullConstraintViolation</span> { <span class="ident">constraint</span> })
             }
-            <span class="ident">SqlError::ForeignKeyConstraintViolation</span> { <span class="ident">constraint</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SqlError::ForeignKeyConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; {
                 <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ForeignKeyConstraintViolation</span> { <span class="ident">constraint</span> })
             }
-            <span class="ident">SqlError::RecordDoesNotExist</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RecordDoesNotExist</span>),
-            <span class="ident">SqlError::TableDoesNotExist</span>(<span class="ident">table</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::TableDoesNotExist</span> { <span class="ident">table</span> }),
-            <span class="ident">SqlError::ColumnDoesNotExist</span>(<span class="ident">column</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ColumnDoesNotExist</span> { <span class="ident">column</span> }),
-            <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+            <span class="ident">SqlError::RecordDoesNotExist</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RecordDoesNotExist</span>),
+            <span class="ident">SqlError::TableDoesNotExist</span>(<span class="ident">table</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::TableDoesNotExist</span> { <span class="ident">table</span> }),
+            <span class="ident">SqlError::ColumnDoesNotExist</span>(<span class="ident">column</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ColumnDoesNotExist</span> { <span class="ident">column</span> }),
+            <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>) =&gt; <span class="ident">ConnectorError</span> {
                 <span class="ident">user_facing_error</span>: <span class="ident">user_facing_errors::quaint::render_quaint_error</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>, <span class="ident">connection_info</span>),
                 <span class="ident">kind</span>: <span class="ident">ErrorKind::ConnectionError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
             },
-            <span class="ident">SqlError::ColumnReadFailure</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ColumnReadFailure</span>(<span class="ident">e</span>)),
-            <span class="ident">SqlError::FieldCannotBeNull</span> { <span class="ident">field</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::FieldCannotBeNull</span> { <span class="ident">field</span> }),
-            <span class="ident">SqlError::DomainError</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::DomainError</span>(<span class="ident">e</span>)),
-            <span class="ident">SqlError::RecordNotFoundForWhere</span>(<span class="ident">info</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SqlError::ColumnReadFailure</span>(<span class="ident">e</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ColumnReadFailure</span>(<span class="ident">e</span>)),
+            <span class="ident">SqlError::FieldCannotBeNull</span> { <span class="ident">field</span> } =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::FieldCannotBeNull</span> { <span class="ident">field</span> }),
+            <span class="ident">SqlError::DomainError</span>(<span class="ident">e</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::DomainError</span>(<span class="ident">e</span>)),
+            <span class="ident">SqlError::RecordNotFoundForWhere</span>(<span class="ident">info</span>) =&gt; {
                 <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RecordNotFoundForWhere</span>(<span class="ident">info</span>))
             }
             <span class="ident">SqlError::RelationViolation</span> {
                 <span class="ident">relation_name</span>,
                 <span class="ident">model_a_name</span>,
                 <span class="ident">model_b_name</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RelationViolation</span> {
+            } =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RelationViolation</span> {
                 <span class="ident">relation_name</span>,
                 <span class="ident">model_a_name</span>,
                 <span class="ident">model_b_name</span>,
@@ -508,29 +508,29 @@
                 <span class="ident">relation_name</span>,
                 <span class="ident">parent_name</span>,
                 <span class="ident">child_name</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RecordsNotConnected</span> {
+            } =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RecordsNotConnected</span> {
                 <span class="ident">relation_name</span>,
                 <span class="ident">parent_name</span>,
                 <span class="ident">child_name</span>,
             }),
-            <span class="ident">SqlError::ConversionError</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">e</span>)),
-            <span class="ident">SqlError::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SqlError::ConversionError</span>(<span class="ident">e</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">e</span>)),
+            <span class="ident">SqlError::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> } =&gt; {
                 <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> })
             }
-            <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">quaint_error</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">QuaintKind</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">downcast_ref</span>();
                 <span class="kw">match</span> <span class="ident">quaint_error</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">quaint_error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">quaint_error</span>) =&gt; <span class="ident">ConnectorError</span> {
                         <span class="ident">user_facing_error</span>: <span class="ident">user_facing_errors::quaint::render_quaint_error</span>(
                             <span class="ident">quaint_error</span>,
                             <span class="ident">connection_info</span>,
                         ),
                         <span class="ident">kind</span>: <span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>),
                     },
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>)),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>)),
                 }
             }
-            <span class="ident">SqlError::RawError</span> { <span class="ident">code</span>, <span class="ident">message</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+            <span class="ident">SqlError::RawError</span> { <span class="ident">code</span>, <span class="ident">message</span> } =&gt; <span class="ident">ConnectorError</span> {
                 <span class="ident">user_facing_error</span>: <span class="prelude-val">Some</span>(<span class="ident">user_facing_errors::KnownError::new</span>(
                     <span class="ident">user_facing_errors::query_engine::RawQueryFailed</span> {
                         <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">clone</span>(),
@@ -539,13 +539,13 @@
                 )),
                 <span class="ident">kind</span>: <span class="ident">ErrorKind::RawError</span> { <span class="ident">code</span>, <span class="ident">message</span> },
             },
-            <span class="ident">SqlError::ConnectionClosed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+            <span class="ident">SqlError::ConnectionClosed</span> =&gt; <span class="ident">ConnectorError</span> {
                 <span class="ident">user_facing_error</span>: <span class="prelude-val">Some</span>(<span class="ident">user_facing_errors::KnownError::new</span>(
                     <span class="ident">user_facing_errors::common::ConnectionClosed</span>,
                 )),
                 <span class="ident">kind</span>: <span class="ident">ErrorKind::ConnectionClosed</span>,
             },
-            <span class="ident">SqlError::TransactionAlreadyClosed</span>(<span class="ident">message</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+            <span class="ident">SqlError::TransactionAlreadyClosed</span>(<span class="ident">message</span>) =&gt; <span class="ident">ConnectorError</span> {
                 <span class="ident">user_facing_error</span>: <span class="prelude-val">Some</span>(<span class="ident">user_facing_errors::KnownError::new</span>(
                     <span class="ident">user_facing_errors::common::TransactionAlreadyClosed</span> {
                         <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">clone</span>(),
@@ -553,7 +553,7 @@
                 )),
                 <span class="ident">kind</span>: <span class="ident">ErrorKind::TransactionAlreadyClosed</span> { <span class="ident">message</span> },
             },
-            <span class="ident">SqlError::QueryParameterLimitExceeded</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SqlError::QueryParameterLimitExceeded</span>(<span class="ident">e</span>) =&gt; {
                 <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::QueryParameterLimitExceeded</span>(<span class="ident">e</span>))
             }
         }
@@ -561,76 +561,76 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">prisma_models::ConversionFailure</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">prisma_models::ConversionFailure</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">prisma_models::ConversionFailure</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::ConversionError</span>(<span class="ident">e</span>.<span class="ident">into</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">quaint::error::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">quaint::error::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">quaint::error::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">QuaintKind::from</span>(<span class="ident">e</span>) {
-            <span class="ident">QuaintKind::QueryError</span>(<span class="ident">qe</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::QueryError</span>(<span class="ident">qe</span>),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::IoError</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::ConnectionError</span>(<span class="ident">e</span>),
-            <span class="ident">QuaintKind::NotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::RecordDoesNotExist</span>,
-            <span class="ident">QuaintKind::UniqueConstraintViolation</span> { <span class="ident">constraint</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::UniqueConstraintViolation</span> {
+            <span class="ident">QuaintKind::QueryError</span>(<span class="ident">qe</span>) =&gt; <span class="ident"><span class="self">Self</span>::QueryError</span>(<span class="ident">qe</span>),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::IoError</span>(<span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">QuaintKind::NotFound</span> =&gt; <span class="ident"><span class="self">Self</span>::RecordDoesNotExist</span>,
+            <span class="ident">QuaintKind::UniqueConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; <span class="ident"><span class="self">Self</span>::UniqueConstraintViolation</span> {
                 <span class="ident">constraint</span>: <span class="ident">constraint</span>.<span class="ident">into</span>(),
             },
 
-            <span class="ident">QuaintKind::NullConstraintViolation</span> { <span class="ident">constraint</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NullConstraintViolation</span> {
+            <span class="ident">QuaintKind::NullConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; <span class="ident"><span class="self">Self</span>::NullConstraintViolation</span> {
                 <span class="ident">constraint</span>: <span class="ident">constraint</span>.<span class="ident">into</span>(),
             },
 
-            <span class="ident">QuaintKind::ForeignKeyConstraintViolation</span> { <span class="ident">constraint</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::ForeignKeyConstraintViolation</span> {
+            <span class="ident">QuaintKind::ForeignKeyConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; <span class="ident"><span class="self">Self</span>::ForeignKeyConstraintViolation</span> {
                 <span class="ident">constraint</span>: <span class="ident">constraint</span>.<span class="ident">into</span>(),
             },
 
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::ConnectionError</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::ConnectionError</span>(<span class="ident">e</span>),
-            <span class="ident">QuaintKind::ColumnReadFailure</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::ColumnReadFailure</span>(<span class="ident">e</span>),
-            <span class="ident">QuaintKind::ColumnNotFound</span> { <span class="ident">column</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ColumnDoesNotExist</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">column</span>)),
-            <span class="ident">QuaintKind::TableDoesNotExist</span> { <span class="ident">table</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::TableDoesNotExist</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">table</span>)),
-            <span class="ident">QuaintKind::ConnectionClosed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionClosed</span>,
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::TransactionAlreadyClosed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::TransactionAlreadyClosed</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>)),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::IncorrectNumberOfParameters</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::ConversionError</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConversionError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::ResultIndexOutOfBounds</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::ResultTypeMismatch</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::LengthMismatch</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::ValueOutOfRange</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::UUIDError</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConversionError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::DatabaseUrlIsInvalid</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::DatabaseDoesNotExist</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::AuthenticationFailed</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::DatabaseAccessDenied</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::DatabaseAlreadyExists</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::InvalidConnectionArguments</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::ConnectTimeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::SocketTimeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::PoolTimeout</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::TlsError</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::ConnectionError</span>(<span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">QuaintKind::ColumnReadFailure</span>(<span class="ident">e</span>) =&gt; <span class="ident"><span class="self">Self</span>::ColumnReadFailure</span>(<span class="ident">e</span>),
+            <span class="ident">QuaintKind::ColumnNotFound</span> { <span class="ident">column</span> } =&gt; <span class="ident">SqlError::ColumnDoesNotExist</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">column</span>)),
+            <span class="ident">QuaintKind::TableDoesNotExist</span> { <span class="ident">table</span> } =&gt; <span class="ident">SqlError::TableDoesNotExist</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">table</span>)),
+            <span class="ident">QuaintKind::ConnectionClosed</span> =&gt; <span class="ident">SqlError::ConnectionClosed</span>,
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::TransactionAlreadyClosed</span>(<span class="kw">_</span>) =&gt; <span class="ident">SqlError::TransactionAlreadyClosed</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>)),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::IncorrectNumberOfParameters</span> { .. } =&gt; <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::ConversionError</span>(<span class="kw">_</span>) =&gt; <span class="ident">SqlError::ConversionError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::ResultIndexOutOfBounds</span> { .. } =&gt; <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::ResultTypeMismatch</span> { .. } =&gt; <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::LengthMismatch</span> { .. } =&gt; <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::ValueOutOfRange</span> { .. } =&gt; <span class="ident">SqlError::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::UUIDError</span>(<span class="kw">_</span>) =&gt; <span class="ident">SqlError::ConversionError</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::DatabaseUrlIsInvalid</span> { .. } =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::DatabaseDoesNotExist</span> { .. } =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::AuthenticationFailed</span> { .. } =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::DatabaseAccessDenied</span> { .. } =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::DatabaseAlreadyExists</span> { .. } =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::InvalidConnectionArguments</span> =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::ConnectTimeout</span> =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::SocketTimeout</span> =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::PoolTimeout</span> { .. } =&gt; <span class="ident">SqlError::ConnectionError</span>(<span class="ident">e</span>),
+            <span class="ident">e</span> @ <span class="ident">QuaintKind::TlsError</span> { .. } =&gt; <span class="ident"><span class="self">Self</span>::ConnectionError</span>(<span class="ident">e</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DomainError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">DomainError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SqlError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">DomainError</span>) -&gt; <span class="ident">SqlError</span> {
         <span class="ident">SqlError::DomainError</span>(<span class="ident">e</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">serde_json::error::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">serde_json::error::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SqlError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">serde_json::error::Error</span>) -&gt; <span class="ident">SqlError</span> {
         <span class="ident">SqlError::ConversionError</span>(<span class="ident">e</span>.<span class="ident">into</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">uuid::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">uuid::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SqlError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">uuid::Error</span>) -&gt; <span class="ident">SqlError</span> {
         <span class="ident">SqlError::ColumnReadFailure</span>(<span class="ident">e</span>.<span class="ident">into</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FromUtf8Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">FromUtf8Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SqlError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">FromUtf8Error</span>) -&gt; <span class="ident">SqlError</span> {
         <span class="ident">SqlError::ColumnReadFailure</span>(<span class="ident">e</span>.<span class="ident">into</span>())
     }
 }

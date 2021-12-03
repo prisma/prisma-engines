@@ -80,11 +80,11 @@
 
 <span class="kw">mod</span> <span class="ident">error</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SQLITE_STATIC</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sqlite3_destructor_type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SQLITE_STATIC</span>() -&gt; <span class="ident">sqlite3_destructor_type</span> {
     <span class="prelude-val">None</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SQLITE_TRANSIENT</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sqlite3_destructor_type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SQLITE_TRANSIENT</span>() -&gt; <span class="ident">sqlite3_destructor_type</span> {
     <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="ident">mem::transmute</span>(<span class="op">-</span><span class="number">1isize</span>) })
 }
 
@@ -134,13 +134,13 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">sqlite3_index_constraint_usage</span> <span class="op">=</span> <span class="ident">sqlite3_index_info_sqlite3_index_constraint_usage</span>;
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">sqlite3_vtab</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">unsafe</span> { <span class="ident">mem::zeroed</span>() }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">sqlite3_vtab_cursor</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">unsafe</span> { <span class="ident">mem::zeroed</span>() }
     }
 }

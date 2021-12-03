@@ -66,7 +66,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 
 <span class="doccomment">/// User &lt;-1---m-&gt; posts</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_posts</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_posts</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">r#&quot;model User {
             #id(id, Int, @id)
@@ -90,7 +90,7 @@
 }
 
 <span class="doccomment">/// A &lt;-1?---m-&gt; B</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">a1_to_bm_opt</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">a1_to_bm_opt</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">r#&quot;model A {
             #id(id, Int, @id)
@@ -107,7 +107,7 @@
     <span class="ident">schema</span>.<span class="ident">to_owned</span>()
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">numeric_text_optional_one2m</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">numeric_text_optional_one2m</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">r#&quot;model A {
             #id(id, Int, @id)

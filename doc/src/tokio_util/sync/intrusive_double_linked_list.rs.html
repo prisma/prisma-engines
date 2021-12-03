@@ -812,7 +812,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new node with the associated data</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">data</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">data</span>: <span class="ident">T</span>) -&gt; <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">Self</span> {
             <span class="ident">prev</span>: <span class="prelude-val">None</span>,
             <span class="ident">next</span>: <span class="prelude-val">None</span>,
@@ -825,13 +825,13 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">data</span>
     }
 }
@@ -846,7 +846,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates an empty linked list</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">LinkedList</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
             <span class="ident">head</span>: <span class="prelude-val">None</span>,
             <span class="ident">tail</span>: <span class="prelude-val">None</span>,
@@ -894,10 +894,10 @@
                 <span class="comment">// Need to insert before the current node</span>
                 <span class="ident">current_node</span>.<span class="ident">as_mut</span>().<span class="ident">prev</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>.<span class="ident">into</span>());
                 <span class="kw">match</span> <span class="ident">prev</span> {
-                    <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">prev</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">prev</span>) =&gt; {
                         <span class="ident">prev</span>.<span class="ident">as_mut</span>().<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>.<span class="ident">into</span>());
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">None</span> =&gt; {
                         <span class="comment">// We are inserting at the beginning of the list</span>
                         <span class="self">self</span>.<span class="ident">head</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>.<span class="ident">into</span>());
                     }
@@ -925,7 +925,7 @@
     <span class="doccomment">/// the linked list.</span>
     <span class="doccomment">/// The returned pointer is only guaranteed to be valid as long as the list</span>
     <span class="doccomment">/// is not mutated</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peek_first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peek_first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Safety: When the node was inserted it was promised that it is alive</span>
         <span class="comment">// until it gets removed from the list.</span>
         <span class="comment">// The returned node has a pointer which constrains it to the lifetime</span>
@@ -942,7 +942,7 @@
     <span class="doccomment">/// the linked list.</span>
     <span class="doccomment">/// The returned pointer is only guaranteed to be valid as long as the list</span>
     <span class="doccomment">/// is not mutated</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peek_last</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peek_last</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Safety: When the node was inserted it was promised that it is alive</span>
         <span class="comment">// until it gets removed from the list.</span>
         <span class="comment">// The returned node has a pointer which constrains it to the lifetime</span>
@@ -955,7 +955,7 @@
     }
 
     <span class="doccomment">/// Removes the first node from the linked list</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_first</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_first</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::debug_assert_with_mut_call</span>)]</span>
 
         <span class="comment">// Safety: When the node was inserted it was promised that it is alive</span>
@@ -966,12 +966,12 @@
 
             <span class="kw">let</span> <span class="ident">first_ref</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">as_mut</span>();
             <span class="kw">match</span> <span class="ident">first_ref</span>.<span class="ident">next</span> {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="comment">// This was the only node in the list</span>
                     <span class="macro">debug_assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="ident">first_ref</span>.<span class="ident">into</span>()), <span class="self">self</span>.<span class="ident">tail</span>);
                     <span class="self">self</span>.<span class="ident">tail</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                 }
-                <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">next</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">next</span>) =&gt; {
                     <span class="ident">next</span>.<span class="ident">as_mut</span>().<span class="ident">prev</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                 }
             }
@@ -983,7 +983,7 @@
     }
 
     <span class="doccomment">/// Removes the last node from the linked list and returns it</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_last</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_last</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::debug_assert_with_mut_call</span>)]</span>
 
         <span class="comment">// Safety: When the node was inserted it was promised that it is alive</span>
@@ -994,12 +994,12 @@
 
             <span class="kw">let</span> <span class="ident">last_ref</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">as_mut</span>();
             <span class="kw">match</span> <span class="ident">last_ref</span>.<span class="ident">prev</span> {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="comment">// This was the last node in the list</span>
                     <span class="macro">debug_assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="ident">last_ref</span>.<span class="ident">into</span>()), <span class="self">self</span>.<span class="ident">head</span>);
                     <span class="self">self</span>.<span class="ident">head</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                 }
-                <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">prev</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">prev</span>) =&gt; {
                     <span class="ident">prev</span>.<span class="ident">as_mut</span>().<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                 }
             }
@@ -1011,7 +1011,7 @@
     }
 
     <span class="doccomment">/// Returns whether the linked list does not contain any node</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">is_some</span>() {
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
@@ -1025,11 +1025,11 @@
     <span class="doccomment">/// It is also only safe if it is known that the `node` is either part of this</span>
     <span class="doccomment">/// list, or of no list at all. If `node` is part of another list, the</span>
     <span class="doccomment">/// behavior is undefined.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ListNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::debug_assert_with_mut_call</span>)]</span>
 
         <span class="kw">match</span> <span class="ident">node</span>.<span class="ident">prev</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="comment">// This might be the first node in the list. If it is not, the</span>
                 <span class="comment">// node is not in the list at all. Since our precondition is that</span>
                 <span class="comment">// the node must either be in this list or in no list, we check that</span>
@@ -1040,20 +1040,20 @@
                 }
                 <span class="self">self</span>.<span class="ident">head</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">next</span>;
             }
-            <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">prev</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">prev</span>) =&gt; {
                 <span class="macro">debug_assert_eq!</span>(<span class="ident">prev</span>.<span class="ident">as_ref</span>().<span class="ident">next</span>, <span class="prelude-val">Some</span>(<span class="ident">node</span>.<span class="ident">into</span>()));
                 <span class="ident">prev</span>.<span class="ident">as_mut</span>().<span class="ident">next</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">next</span>;
             }
         }
 
         <span class="kw">match</span> <span class="ident">node</span>.<span class="ident">next</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="comment">// This must be the last node in our list. Otherwise the list</span>
                 <span class="comment">// is inconsistent.</span>
                 <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">tail</span>, <span class="prelude-val">Some</span>(<span class="ident">node</span>.<span class="ident">into</span>()));
                 <span class="self">self</span>.<span class="ident">tail</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">prev</span>;
             }
-            <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">next</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">next</span>) =&gt; {
                 <span class="macro">debug_assert_eq!</span>(<span class="ident">next</span>.<span class="ident">as_mut</span>().<span class="ident">prev</span>, <span class="prelude-val">Some</span>(<span class="ident">node</span>.<span class="ident">into</span>()));
                 <span class="ident">next</span>.<span class="ident">as_mut</span>().<span class="ident">prev</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">prev</span>;
             }
@@ -1138,7 +1138,7 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">fn</span> <span class="ident">collect_list</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Copy</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">list</span>: <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">collect_list</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Copy</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">list</span>: <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="ident">list</span>.<span class="ident">drain</span>(<span class="op">|</span><span class="ident">node</span><span class="op">|</span> {
             <span class="ident">result</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">node</span>);
@@ -1146,7 +1146,7 @@
         <span class="ident">result</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">collect_reverse_list</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Copy</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">list</span>: <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">collect_reverse_list</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Copy</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">list</span>: <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="ident">list</span>.<span class="ident">reverse_drain</span>(<span class="op">|</span><span class="ident">node</span><span class="op">|</span> {
             <span class="ident">result</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">node</span>);

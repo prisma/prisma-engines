@@ -4,7 +4,7 @@
 <span id="4">4</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">loom</span>, <span class="ident">test</span>))]</span>
 <span class="macro">macro_rules!</span> <span class="ident">thread_local</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tts</span>:<span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro">loom::thread_local!</span>{ $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tts</span>)<span class="op">+</span> } }
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tts</span>:<span class="ident">tt</span>)<span class="op">+</span>) =&gt; { <span class="macro">loom::thread_local!</span>{ $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tts</span>)<span class="op">+</span> } }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

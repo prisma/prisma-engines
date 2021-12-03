@@ -529,70 +529,70 @@
 <span class="kw">use</span> <span class="ident">tracing::debug</span>;
 
 <span class="comment">//checks</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_old_migration_table</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_Migration&quot;</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;revision&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;name&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;datamodel&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;status&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;applied&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;rolled_back&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;datamodel_steps&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;database_migration&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;errors&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;started_at&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;finished_at&quot;</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_old_migration_table</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">table</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;_Migration&quot;</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;revision&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;name&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;datamodel&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;status&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;applied&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;rolled_back&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;datamodel_steps&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;database_migration&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;errors&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;started_at&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;finished_at&quot;</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_new_migration_table</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_prisma_migrations&quot;</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;id&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;checksum&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;finished_at&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;migration_name&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;logs&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;rolled_back_at&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;started_at&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;applied_steps_count&quot;</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_new_migration_table</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">table</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;_prisma_migrations&quot;</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;id&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;checksum&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;finished_at&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;migration_name&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;logs&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;rolled_back_at&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;started_at&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;applied_steps_count&quot;</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_relay_table</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_RelayId&quot;</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>[<span class="number">0</span>].<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;id&quot;</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>[<span class="number">1</span>].<span class="ident">name</span>.<span class="ident">to_lowercase</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;stablemodelidentifier&quot;</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_relay_table</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">table</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;_RelayId&quot;</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>[<span class="number">0</span>].<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;id&quot;</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>[<span class="number">1</span>].<span class="ident">name</span>.<span class="ident">to_lowercase</span>() <span class="op">==</span> <span class="string">&quot;stablemodelidentifier&quot;</span>
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_prisma_1_or_11_list_table</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">3</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>[<span class="number">0</span>].<span class="ident">name</span>.<span class="ident">to_lowercase</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;nodeid&quot;</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>[<span class="number">1</span>].<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;position&quot;</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>[<span class="number">2</span>].<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;value&quot;</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_prisma_1_or_11_list_table</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">3</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>[<span class="number">0</span>].<span class="ident">name</span>.<span class="ident">to_lowercase</span>() <span class="op">==</span> <span class="string">&quot;nodeid&quot;</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>[<span class="number">1</span>].<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;position&quot;</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>[<span class="number">2</span>].<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;value&quot;</span>
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_prisma_1_point_1_or_2_join_table</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2</span> <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span> <span class="op">&amp;&amp;</span> <span class="ident">common_prisma_m_to_n_relation_conditions</span>(<span class="ident">table</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_prisma_1_point_1_or_2_join_table</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span> <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span> <span class="op">&amp;&amp;</span> <span class="ident">common_prisma_m_to_n_relation_conditions</span>(<span class="ident">table</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_prisma_1_point_0_join_table</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">3</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_prisma_1_point_0_join_table</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">3</span>
         <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;id&quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;id&quot;</span>)
         <span class="op">&amp;&amp;</span> <span class="ident">common_prisma_m_to_n_relation_conditions</span>(<span class="ident">table</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">common_prisma_m_to_n_relation_conditions</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="kw">fn</span> <span class="ident">is_a</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">column</span>.<span class="ident">to_lowercase</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;a&quot;</span>
+<span class="kw">fn</span> <span class="ident">common_prisma_m_to_n_relation_conditions</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_a</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">column</span>.<span class="ident">to_lowercase</span>() <span class="op">==</span> <span class="string">&quot;a&quot;</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">is_b</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">column</span>.<span class="ident">to_lowercase</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;b&quot;</span>
+    <span class="kw">fn</span> <span class="ident">is_b</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">column</span>.<span class="ident">to_lowercase</span>() <span class="op">==</span> <span class="string">&quot;b&quot;</span>
     }
 
     <span class="ident">table</span>.<span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&#39;_&#39;</span>)
         <span class="comment">//UNIQUE INDEX [A,B]</span>
         <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
-            <span class="ident">i</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2</span>
+            <span class="ident">i</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span>
                 <span class="op">&amp;&amp;</span> <span class="ident">is_a</span>(<span class="ident">i</span>.<span class="ident">columns</span>[<span class="number">0</span>].<span class="ident">name</span>())
                 <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">i</span>.<span class="ident">columns</span>[<span class="number">1</span>].<span class="ident">name</span>())
                 <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">is_unique</span>()
@@ -601,10 +601,10 @@
         <span class="op">&amp;&amp;</span> <span class="ident">table</span>
             .<span class="ident">indices</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">i</span>.<span class="ident">columns</span>[<span class="number">0</span>].<span class="ident">name</span>()) <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">tpe</span> <span class="op">=</span><span class="op">=</span> <span class="ident">IndexType::Normal</span>)
+            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">i</span>.<span class="ident">columns</span>[<span class="number">0</span>].<span class="ident">name</span>()) <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">tpe</span> <span class="op">==</span> <span class="ident">IndexType::Normal</span>)
 
         <span class="comment">// 2 FKs</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">foreign_keys</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">foreign_keys</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span>
         <span class="comment">// Lexicographically lower model referenced by A</span>
         <span class="op">&amp;&amp;</span> <span class="kw">if</span> <span class="ident">table</span>.<span class="ident">foreign_keys</span>[<span class="number">0</span>].<span class="ident">referenced_table</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">table</span>.<span class="ident">foreign_keys</span>[<span class="number">1</span>].<span class="ident">referenced_table</span> {
             <span class="ident">is_a</span>(<span class="kw-2">&amp;</span><span class="ident">table</span>.<span class="ident">foreign_keys</span>[<span class="number">0</span>].<span class="ident">columns</span>[<span class="number">0</span>]) <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="kw-2">&amp;</span><span class="ident">table</span>.<span class="ident">foreign_keys</span>[<span class="number">1</span>].<span class="ident">columns</span>[<span class="number">0</span>])
@@ -619,7 +619,7 @@
     <span class="ident">opposite_foreign_key</span>: <span class="kw-2">&amp;</span><span class="ident">ForeignKey</span>,
     <span class="ident">relation_name</span>: <span class="ident">String</span>,
     <span class="ident">is_self_relation</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationField</span> {
+) -&gt; <span class="ident">RelationField</span> {
     <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">RelationInfo</span> {
         <span class="ident">name</span>: <span class="ident">relation_name</span>,
         <span class="ident">fk_name</span>: <span class="prelude-val">None</span>,
@@ -633,22 +633,22 @@
     <span class="kw">let</span> <span class="ident">basename</span> <span class="op">=</span> <span class="ident">opposite_foreign_key</span>.<span class="ident">referenced_table</span>.<span class="ident">clone</span>();
 
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">is_self_relation</span> {
-        <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">basename</span>, <span class="ident">opposite_foreign_key</span>.<span class="ident">columns</span>[<span class="number">0</span>]),
-        <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">basename</span>,
+        <span class="bool-val">true</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">basename</span>, <span class="ident">opposite_foreign_key</span>.<span class="ident">columns</span>[<span class="number">0</span>]),
+        <span class="bool-val">false</span> =&gt; <span class="ident">basename</span>,
     };
 
     <span class="ident">RelationField::new</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">FieldArity::List</span>, <span class="ident">FieldArity::List</span>, <span class="ident">relation_info</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_index</span>(<span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="ident">Index</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IndexDefinition</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_index</span>(<span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="ident">Index</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">IndexDefinition</span> {
     <span class="macro">debug!</span>(<span class="string">&quot;Handling index  {:?}&quot;</span>, <span class="ident">index</span>);
     <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">tpe</span> {
-        <span class="ident">IndexType::Unique</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::dml::IndexType::Unique</span>,
-        <span class="ident">IndexType::Normal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::dml::IndexType::Normal</span>,
-        <span class="ident">IndexType::Fulltext</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">IndexType::Unique</span> =&gt; <span class="ident">datamodel::dml::IndexType::Unique</span>,
+        <span class="ident">IndexType::Normal</span> =&gt; <span class="ident">datamodel::dml::IndexType::Normal</span>,
+        <span class="ident">IndexType::Fulltext</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) =&gt; {
             <span class="ident">datamodel::dml::IndexType::Fulltext</span>
         }
-        <span class="ident">IndexType::Fulltext</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datamodel::dml::IndexType::Normal</span>,
+        <span class="ident">IndexType::Fulltext</span> =&gt; <span class="ident">datamodel::dml::IndexType::Normal</span>,
     };
 
     <span class="comment">//We do not populate name in client by default. It increases datamodel noise,</span>
@@ -658,8 +658,8 @@
 
     <span class="kw">let</span> <span class="ident">using</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
         <span class="ident">index</span>.<span class="ident">algorithm</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">algo</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">algo</span> {
-            <span class="ident">SQLIndexAlgorithm::BTree</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexAlgorithm::BTree</span>,
-            <span class="ident">SQLIndexAlgorithm::Hash</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexAlgorithm::Hash</span>,
+            <span class="ident">SQLIndexAlgorithm::BTree</span> =&gt; <span class="ident">IndexAlgorithm::BTree</span>,
+            <span class="ident">SQLIndexAlgorithm::Hash</span> =&gt; <span class="ident">IndexAlgorithm::Hash</span>,
         })
     } <span class="kw">else</span> {
         <span class="prelude-val">None</span>
@@ -676,8 +676,8 @@
                     (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
                 } <span class="kw">else</span> {
                     <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sort</span> {
-                        <span class="ident">SQLSortOrder::Asc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SortOrder::Asc</span>,
-                        <span class="ident">SQLSortOrder::Desc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SortOrder::Desc</span>,
+                        <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
+                        <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
                     });
                     (<span class="ident">sort_order</span>, <span class="ident">c</span>.<span class="ident">length</span>)
                 };
@@ -689,22 +689,22 @@
             })
             .<span class="ident">collect</span>(),
         <span class="ident">tpe</span>,
-        <span class="ident">defined_on_field</span>: <span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">defined_on_field</span>: <span class="ident">index</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span>,
         <span class="ident">algorithm</span>: <span class="ident">using</span>,
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ScalarField</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">ScalarField</span> {
     <span class="macro">debug!</span>(<span class="string">&quot;Handling column {:?}&quot;</span>, <span class="ident">column</span>);
 
     <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="ident">calculate_scalar_field_type_with_native_types</span>(<span class="ident">column</span>, <span class="ident">ctx</span>);
 
     <span class="kw">let</span> <span class="ident">is_id</span> <span class="op">=</span> <span class="ident">is_id</span>(<span class="ident">column</span>, <span class="ident">table</span>);
     <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">column</span>.<span class="ident">tpe</span>.<span class="ident">arity</span> {
-        <span class="kw">_</span> <span class="kw">if</span> <span class="ident">is_id</span> <span class="op">&amp;&amp;</span> <span class="ident">column</span>.<span class="ident">auto_increment</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldArity::Required</span>,
-        <span class="ident">ColumnArity::Required</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldArity::Required</span>,
-        <span class="ident">ColumnArity::Nullable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldArity::Optional</span>,
-        <span class="ident">ColumnArity::List</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldArity::List</span>,
+        <span class="kw">_</span> <span class="kw">if</span> <span class="ident">is_id</span> <span class="op">&amp;&amp;</span> <span class="ident">column</span>.<span class="ident">auto_increment</span> =&gt; <span class="ident">FieldArity::Required</span>,
+        <span class="ident">ColumnArity::Required</span> =&gt; <span class="ident">FieldArity::Required</span>,
+        <span class="ident">ColumnArity::Nullable</span> =&gt; <span class="ident">FieldArity::Optional</span>,
+        <span class="ident">ColumnArity::List</span> =&gt; <span class="ident">FieldArity::List</span>,
     };
 
     <span class="kw">let</span> <span class="ident">default_value</span> <span class="op">=</span> <span class="ident">calculate_default</span>(<span class="ident">table</span>, <span class="ident">column</span>, <span class="kw-2">&amp;</span><span class="ident">arity</span>);
@@ -728,15 +728,15 @@
     <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>,
     <span class="ident">foreign_key</span>: <span class="kw-2">&amp;</span><span class="ident">ForeignKey</span>,
     <span class="ident">m2m_table_names</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RelationField</span>, <span class="ident">SqlError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RelationField</span>, <span class="ident">SqlError</span><span class="op">&gt;</span> {
     <span class="macro">debug!</span>(<span class="string">&quot;Handling foreign key  {:?}&quot;</span>, <span class="ident">foreign_key</span>);
 
     <span class="kw">let</span> <span class="ident">map_action</span> <span class="op">=</span> <span class="op">|</span><span class="ident">action</span>: <span class="ident">ForeignKeyAction</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">action</span> {
-        <span class="ident">ForeignKeyAction::NoAction</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ReferentialAction::NoAction</span>,
-        <span class="ident">ForeignKeyAction::Restrict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ReferentialAction::Restrict</span>,
-        <span class="ident">ForeignKeyAction::Cascade</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ReferentialAction::Cascade</span>,
-        <span class="ident">ForeignKeyAction::SetNull</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ReferentialAction::SetNull</span>,
-        <span class="ident">ForeignKeyAction::SetDefault</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ReferentialAction::SetDefault</span>,
+        <span class="ident">ForeignKeyAction::NoAction</span> =&gt; <span class="ident">ReferentialAction::NoAction</span>,
+        <span class="ident">ForeignKeyAction::Restrict</span> =&gt; <span class="ident">ReferentialAction::Restrict</span>,
+        <span class="ident">ForeignKeyAction::Cascade</span> =&gt; <span class="ident">ReferentialAction::Cascade</span>,
+        <span class="ident">ForeignKeyAction::SetNull</span> =&gt; <span class="ident">ReferentialAction::SetNull</span>,
+        <span class="ident">ForeignKeyAction::SetDefault</span> =&gt; <span class="ident">ReferentialAction::SetDefault</span>,
     };
 
     <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">RelationInfo</span> {
@@ -752,17 +752,17 @@
     <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Column</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">foreign_key</span>
         .<span class="ident">columns</span>
         .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">tc</span><span class="op">|</span> <span class="ident">tc</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">c</span>).<span class="ident">unwrap</span>())
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">tc</span><span class="op">|</span> <span class="ident">tc</span>.<span class="ident">name</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">c</span>).<span class="ident">unwrap</span>())
         .<span class="ident">collect</span>();
 
     <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="op">!</span><span class="ident">c</span>.<span class="ident">is_required</span>()) {
-        <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldArity::Optional</span>,
-        <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldArity::Required</span>,
+        <span class="bool-val">true</span> =&gt; <span class="ident">FieldArity::Optional</span>,
+        <span class="bool-val">false</span> =&gt; <span class="ident">FieldArity::Required</span>,
     };
 
     <span class="kw">let</span> <span class="ident">calculated_arity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_required</span>()) {
-        <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldArity::Required</span>,
-        <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">arity</span>,
+        <span class="bool-val">true</span> =&gt; <span class="ident">FieldArity::Required</span>,
+        <span class="bool-val">false</span> =&gt; <span class="ident">arity</span>,
     };
 
     <span class="prelude-val">Ok</span>(<span class="ident">RelationField::new</span>(
@@ -779,12 +779,12 @@
     <span class="ident">other_model</span>: <span class="kw-2">&amp;</span><span class="ident">Model</span>,
     <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>,
     <span class="ident">relation_info</span>: <span class="kw-2">&amp;</span><span class="ident">RelationInfo</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RelationField</span>, <span class="ident">SqlError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RelationField</span>, <span class="ident">SqlError</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">schema</span>.<span class="ident">table</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>) {
-        <span class="prelude-val">Err</span>(<span class="ident">table_name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::SchemaInconsistent</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">table_name</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">SqlError::SchemaInconsistent</span> {
             <span class="ident">explanation</span>: <span class="macro">format!</span>(<span class="string">&quot;Table {} not found.&quot;</span>, <span class="ident">table_name</span>),
         }),
-        <span class="prelude-val">Ok</span>(<span class="ident">table</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">table</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">new_relation_info</span> <span class="op">=</span> <span class="ident">RelationInfo</span> {
                 <span class="ident">name</span>: <span class="ident">relation_info</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
                 <span class="ident">fk_name</span>: <span class="prelude-val">None</span>,
@@ -810,13 +810,13 @@
             );
 
             <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation_field</span>.<span class="ident">arity</span> {
-                <span class="ident">FieldArity::Required</span> <span class="op">|</span> <span class="ident">FieldArity::Optional</span> <span class="kw">if</span> <span class="ident">other_is_unique</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldArity::Optional</span>,
-                <span class="ident">FieldArity::Required</span> <span class="op">|</span> <span class="ident">FieldArity::Optional</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldArity::List</span>,
-                <span class="ident">FieldArity::List</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldArity::Optional</span>,
+                <span class="ident">FieldArity::Required</span> <span class="op">|</span> <span class="ident">FieldArity::Optional</span> <span class="kw">if</span> <span class="ident">other_is_unique</span> =&gt; <span class="ident">FieldArity::Optional</span>,
+                <span class="ident">FieldArity::Required</span> <span class="op">|</span> <span class="ident">FieldArity::Optional</span> =&gt; <span class="ident">FieldArity::List</span>,
+                <span class="ident">FieldArity::List</span> =&gt; <span class="ident">FieldArity::Optional</span>,
             };
 
             <span class="comment">//if the backrelation name would be duplicate, probably due to being a selfrelation</span>
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other_model</span>.<span class="ident">name</span> <span class="op">&amp;&amp;</span> <span class="ident">relation_field</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">model</span>.<span class="ident">name</span> {
+            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">other_model</span>.<span class="ident">name</span> <span class="op">&amp;&amp;</span> <span class="ident">relation_field</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">model</span>.<span class="ident">name</span> {
                 <span class="macro">format!</span>(<span class="string">&quot;other_{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>())
             } <span class="kw">else</span> {
                 <span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>()
@@ -827,31 +827,31 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_default</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>, <span class="ident">arity</span>: <span class="kw-2">&amp;</span><span class="ident">FieldArity</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DMLDef</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_default</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>, <span class="ident">arity</span>: <span class="kw-2">&amp;</span><span class="ident">FieldArity</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DMLDef</span><span class="op">&gt;</span> {
     <span class="kw">match</span> (<span class="ident">column</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()), <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">tpe</span>.<span class="ident">family</span>) {
-        (<span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">arity</span> <span class="op">=</span><span class="op">=</span> <span class="ident">FieldArity::List</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-        (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::Int</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">auto_increment</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>())),
-        (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::BigInt</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">auto_increment</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>())),
-        (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::Int</span>) <span class="kw">if</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>, <span class="ident">table</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">arity</span> <span class="op">==</span> <span class="ident">FieldArity::List</span> =&gt; <span class="prelude-val">None</span>,
+        (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::Int</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">auto_increment</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>())),
+        (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::BigInt</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">auto_increment</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>())),
+        (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::Int</span>) <span class="kw">if</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>, <span class="ident">table</span>) =&gt; {
             <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>()))
         }
-        (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::BigInt</span>) <span class="kw">if</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>, <span class="ident">table</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::BigInt</span>) <span class="kw">if</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>, <span class="ident">table</span>) =&gt; {
             <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>()))
         }
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>)), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>())),
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Now</span>), <span class="ident">ColumnTypeFamily::DateTime</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_autoincrement</span>())),
+        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Now</span>), <span class="ident">ColumnTypeFamily::DateTime</span>) =&gt; {
             <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(<span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_now</span>()), <span class="ident">column</span>))
         }
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="ident">default_string</span>)), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(
+        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="ident">default_string</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(
             <span class="ident">DMLDef::new_expression</span>(<span class="ident">VG::new_dbgenerated</span>(<span class="ident">default_string</span>.<span class="ident">clone</span>())),
             <span class="ident">column</span>,
         )),
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">val</span>)), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(<span class="ident">DMLDef::new_single</span>(<span class="ident">val</span>.<span class="ident">clone</span>()), <span class="ident">column</span>)),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">val</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(<span class="ident">DMLDef::new_single</span>(<span class="ident">val</span>.<span class="ident">clone</span>()), <span class="ident">column</span>)),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">set_default</span>(<span class="kw-2">mut</span> <span class="ident">default</span>: <span class="ident">DMLDef</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DMLDef</span> {
+<span class="kw">fn</span> <span class="ident">set_default</span>(<span class="kw-2">mut</span> <span class="ident">default</span>: <span class="ident">DMLDef</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>) -&gt; <span class="ident">DMLDef</span> {
     <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">df</span><span class="op">|</span> <span class="ident">df</span>.<span class="ident">constraint_name</span>());
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">db_name</span> {
@@ -861,7 +861,7 @@
     <span class="ident">default</span>
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_id</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>, <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_id</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>, <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) -&gt; <span class="ident">bool</span> {
     <span class="ident">table</span>
         .<span class="ident">primary_key</span>
         .<span class="ident">as_ref</span>()
@@ -869,7 +869,7 @@
         .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>, <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>, <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) -&gt; <span class="ident">bool</span> {
     <span class="ident">table</span>
         .<span class="ident">primary_key</span>
         .<span class="ident">as_ref</span>()
@@ -882,7 +882,7 @@
     <span class="ident">fk</span>: <span class="kw-2">&amp;</span><span class="ident">ForeignKey</span>,
     <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>,
     <span class="ident">m2m_table_names</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">SqlError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">SqlError</span><span class="op">&gt;</span> {
     <span class="comment">//this is not called for prisma many to many relations. for them the name is just the name of the join table.</span>
     <span class="kw">let</span> <span class="ident">referenced_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">fk</span>.<span class="ident">referenced_table</span>;
     <span class="kw">let</span> <span class="ident">model_with_fk</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">table</span>.<span class="ident">name</span>;
@@ -892,20 +892,20 @@
         .<span class="ident">foreign_keys</span>
         .<span class="ident">clone</span>()
         .<span class="ident">into_iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">fk</span>.<span class="ident">referenced_table</span> <span class="op">=</span><span class="op">=</span> <span class="ident">referenced_model</span>)
+        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">fk</span>.<span class="ident">referenced_table</span> <span class="op">==</span> <span class="ident">referenced_model</span>)
         .<span class="ident">collect</span>();
 
     <span class="ident">fk_to_same_model</span>.<span class="ident">clear_duplicates</span>();
 
     <span class="kw">match</span> <span class="ident">schema</span>.<span class="ident">table</span>(<span class="ident">referenced_model</span>) {
-        <span class="prelude-val">Err</span>(<span class="ident">table_name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::SchemaInconsistent</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">table_name</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">SqlError::SchemaInconsistent</span> {
             <span class="ident">explanation</span>: <span class="macro">format!</span>(<span class="string">&quot;Table {} not found.&quot;</span>, <span class="ident">table_name</span>),
         }),
-        <span class="prelude-val">Ok</span>(<span class="ident">other_table</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">other_table</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">fk_from_other_model_to_this_exist</span> <span class="op">=</span> <span class="ident">other_table</span>
                 .<span class="ident">foreign_keys</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">fk</span>.<span class="ident">referenced_table</span> <span class="op">=</span><span class="op">=</span> <span class="ident">model_with_fk</span>);
+                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">fk</span>.<span class="ident">referenced_table</span> <span class="op">==</span> <span class="ident">model_with_fk</span>);
 
             <span class="kw">let</span> <span class="ident">unambiguous_name</span> <span class="op">=</span> <span class="ident">RelationNames::name_for_unambiguous_relation</span>(<span class="ident">model_with_fk</span>, <span class="ident">referenced_model</span>);
 
@@ -924,34 +924,34 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field_type_for_native_type</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldType</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field_type_for_native_type</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>) -&gt; <span class="ident">FieldType</span> {
     <span class="macro">debug!</span>(<span class="string">&quot;Calculating field type for &#39;{}&#39;&quot;</span>, <span class="ident">column</span>.<span class="ident">name</span>);
     <span class="kw">let</span> <span class="ident">fdt</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">tpe</span>.<span class="ident">full_data_type</span>.<span class="ident">to_owned</span>();
 
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">tpe</span>.<span class="ident">family</span> {
-        <span class="ident">ColumnTypeFamily::Int</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::BigInt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Float</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Decimal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Boolean</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::DateTime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Json</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Uuid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Binary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldType::Enum</span>(<span class="ident">name</span>.<span class="ident">to_owned</span>()),
-        <span class="ident">ColumnTypeFamily::Unsupported</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FieldType::Unsupported</span>(<span class="ident">fdt</span>),
+        <span class="ident">ColumnTypeFamily::Int</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+        <span class="ident">ColumnTypeFamily::BigInt</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+        <span class="ident">ColumnTypeFamily::Float</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+        <span class="ident">ColumnTypeFamily::Decimal</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+        <span class="ident">ColumnTypeFamily::Boolean</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+        <span class="ident">ColumnTypeFamily::String</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+        <span class="ident">ColumnTypeFamily::DateTime</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+        <span class="ident">ColumnTypeFamily::Json</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+        <span class="ident">ColumnTypeFamily::Uuid</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+        <span class="ident">ColumnTypeFamily::Binary</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+        <span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">name</span>) =&gt; <span class="ident">FieldType::Enum</span>(<span class="ident">name</span>.<span class="ident">to_owned</span>()),
+        <span class="ident">ColumnTypeFamily::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">FieldType::Unsupported</span>(<span class="ident">fdt</span>),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field_type_with_native_types</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldType</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field_type_with_native_types</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">FieldType</span> {
     <span class="macro">debug!</span>(<span class="string">&quot;Calculating native field type for &#39;{}&#39;&quot;</span>, <span class="ident">column</span>.<span class="ident">name</span>);
     <span class="kw">let</span> <span class="ident">scalar_type</span> <span class="op">=</span> <span class="ident">calculate_scalar_field_type_for_native_type</span>(<span class="ident">column</span>);
 
     <span class="kw">match</span> <span class="ident">scalar_type</span> {
-        <span class="ident">FieldType::Scalar</span>(<span class="ident">scal_type</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">tpe</span>.<span class="ident">native_type</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">scalar_type</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">FieldType::Scalar</span>(<span class="ident">scal_type</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">tpe</span>.<span class="ident">native_type</span> {
+            <span class="prelude-val">None</span> =&gt; <span class="ident">scalar_type</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">native_type_instance</span> <span class="op">=</span> <span class="ident">ctx</span>
                     .<span class="ident">source</span>
                     .<span class="ident">active_connector</span>
@@ -960,7 +960,7 @@
                 <span class="ident">FieldType::Scalar</span>(<span class="ident">scal_type</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">native_type_instance</span>))
             }
         },
-        <span class="ident">field_type</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">field_type</span>,
+        <span class="ident">field_type</span> =&gt; <span class="ident">field_type</span>,
     }
 }
 
@@ -971,7 +971,7 @@
 
     <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">datamodel</span>.<span class="ident">models</span>() {
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">relation_fields</span>() {
-            <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">count</span>() <span class="op">&gt;</span> <span class="number">1</span> {
+            <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">count</span>() <span class="op">&gt;</span> <span class="number">1</span> {
                 <span class="ident">duplicated_relation_fields</span>.<span class="ident">push</span>((
                     <span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
                     <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
@@ -990,15 +990,15 @@
         });
 }
 <span class="doccomment">/// Returns whether the elements of the two slices match, regardless of ordering.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns_match</span>(<span class="ident">a_cols</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>], <span class="ident">b_cols</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">a_cols</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">b_cols</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">a_cols</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">a_col</span><span class="op">|</span> <span class="ident">b_cols</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">b_col</span><span class="op">|</span> <span class="ident">a_col</span> <span class="op">=</span><span class="op">=</span> <span class="ident">b_col</span>))
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns_match</span>(<span class="ident">a_cols</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>], <span class="ident">b_cols</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) -&gt; <span class="ident">bool</span> {
+    <span class="ident">a_cols</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">b_cols</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">a_cols</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">a_col</span><span class="op">|</span> <span class="ident">b_cols</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">b_col</span><span class="op">|</span> <span class="ident">a_col</span> <span class="op">==</span> <span class="ident">b_col</span>))
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replace_relation_info_field_names</span>(<span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">old_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
     <span class="ident">target</span>
         .<span class="ident">iter_mut</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">v</span> <span class="op">=</span><span class="op">=</span> <span class="ident">old_name</span> {
+            <span class="kw">if</span> <span class="ident">v</span> <span class="op">==</span> <span class="ident">old_name</span> {
                 <span class="kw-2">*</span><span class="ident">v</span> <span class="op">=</span> <span class="ident">new_name</span>.<span class="ident">to_string</span>()
             }
         })
@@ -1009,7 +1009,7 @@
     <span class="ident">target</span>
         .<span class="ident">iter_mut</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">old_name</span> {
+            <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">old_name</span> {
                 <span class="ident">field</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">new_name</span>.<span class="ident">to_string</span>()
             }
         })
@@ -1020,7 +1020,7 @@
     <span class="ident">target</span>
         .<span class="ident">iter_mut</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">old_name</span> {
+            <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">old_name</span> {
                 <span class="ident">field</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">new_name</span>.<span class="ident">to_string</span>()
             }
         })

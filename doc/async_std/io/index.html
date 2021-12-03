@@ -4,7 +4,7 @@ when doing input and output. The most core part of this module is
 the <a href="trait.Read.html"><code>Read</code></a> and <a href="trait.Write.html"><code>Write</code></a> traits, which provide the
 most general interface for reading and writing input and output.</p>
 <p>This module is an async version of <a href="https://doc.rust-lang.org/std/io/index.html"><code>std::io</code></a>.</p>
-<h1 id="read-and-write" class="section-header"><a href="#read-and-write">Read and Write</a></h1>
+<h2 id="read-and-write" class="section-header"><a href="#read-and-write">Read and Write</a></h2>
 <p>Because they are traits, <a href="trait.Read.html"><code>Read</code></a> and <a href="trait.Write.html"><code>Write</code></a> are implemented by a number
 of other types, and you can implement them for your types too. As such,
 you’ll see a few different types of I/O throughout the documentation in
@@ -25,7 +25,7 @@ example, <a href="trait.Read.html"><code>Read</code></a> adds a <a href="trait.R
 <p><a href="trait.Read.html"><code>Read</code></a> and <a href="trait.Write.html"><code>Write</code></a> are so important, implementors of the two traits have a
 nickname: readers and writers. So you’ll sometimes see ‘a reader’ instead
 of ‘a type that implements the <a href="trait.Read.html"><code>Read</code></a> trait’. Much easier!</p>
-<h2 id="seek-and-bufread" class="section-header"><a href="#seek-and-bufread">Seek and BufRead</a></h2>
+<h3 id="seek-and-bufread" class="section-header"><a href="#seek-and-bufread">Seek and BufRead</a></h3>
 <p>Beyond that, there are two important traits that are provided: <a href="trait.Seek.html"><code>Seek</code></a>
 and <a href="trait.BufRead.html"><code>BufRead</code></a>. Both of these build on top of a reader to control
 how the reading happens. <a href="trait.Seek.html"><code>Seek</code></a> lets you control where the next byte is
@@ -47,7 +47,7 @@ coming from:</p>
 <span class="macro">println!</span>(<span class="string">&quot;The bytes: {:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">buffer</span>[..<span class="ident">n</span>]);</code></pre></div>
 <p><a href="trait.BufRead.html"><code>BufRead</code></a> uses an internal buffer to provide a number of other ways to read, but
 to show it off, we’ll need to talk about buffers in general. Keep reading!</p>
-<h2 id="bufreader-and-bufwriter" class="section-header"><a href="#bufreader-and-bufwriter">BufReader and BufWriter</a></h2>
+<h3 id="bufreader-and-bufwriter" class="section-header"><a href="#bufreader-and-bufwriter">BufReader and BufWriter</a></h3>
 <p>Byte-based interfaces are unwieldy and can be inefficient, as we’d need to be
 making near-constant calls to the operating system. To help with this,
 <code>std::io</code> comes with two structs, <a href="struct.BufReader.html"><code>BufReader</code></a> and <a href="struct.BufWriter.html"><code>BufWriter</code></a>, which wrap
@@ -83,7 +83,7 @@ to <a href="trait.Write.html#tymethod.write"><code>write</code></a>:</p>
     <span class="ident">writer</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span>[<span class="number">42</span>]).<span class="kw">await</span><span class="question-mark">?</span>;
 } <span class="comment">// the buffer is flushed once writer goes out of scope</span>
 <span class="comment">//</span></code></pre></div>
-<h2 id="standard-input-and-output" class="section-header"><a href="#standard-input-and-output">Standard input and output</a></h2>
+<h3 id="standard-input-and-output" class="section-header"><a href="#standard-input-and-output">Standard input and output</a></h3>
 <p>A very common source of input is standard input:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">async_std::io</span>;
@@ -110,7 +110,7 @@ or <code>match</code> on the return value to catch any possible errors:</p>
 <span class="ident">io::stdout</span>().<span class="ident">write</span>(<span class="kw-2">&amp;</span>[<span class="number">42</span>]).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 <p>Of course, using <a href="fn.stdout.html"><code>io::stdout</code></a> directly is less common than something like
 <a href="../macro.println.html"><code>println!</code></a>.</p>
-<h2 id="iterator-types" class="section-header"><a href="#iterator-types">Iterator types</a></h2>
+<h3 id="iterator-types" class="section-header"><a href="#iterator-types">Iterator types</a></h3>
 <p>A large number of the structures provided by <code>std::io</code> are for various
 ways of iterating over I/O. For example, <a href="struct.Lines.html"><code>Lines</code></a> is used to split over
 lines:</p>
@@ -126,7 +126,7 @@ lines:</p>
 <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">line</span>) <span class="op">=</span> <span class="ident">lines</span>.<span class="ident">next</span>().<span class="kw">await</span> {
     <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">line</span><span class="question-mark">?</span>);
 }</code></pre></div>
-<h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<h3 id="functions" class="section-header"><a href="#functions">Functions</a></h3>
 <p>There are a number of <a href="#functions-1">functions</a> that offer access to various
 features. For example, we can use three of these functions to copy everything
 from standard input to standard output:</p>
@@ -134,7 +134,7 @@ from standard input to standard output:</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">async_std::io</span>;
 
 <span class="ident">io::copy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io::stdin</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io::stdout</span>()).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
-<h2 id="ioresult" class="section-header"><a href="#ioresult">io::Result</a></h2>
+<h3 id="ioresult" class="section-header"><a href="#ioresult">io::Result</a></h3>
 <p>Last, but certainly not least, is <a href="type.Result.html"><code>io::Result</code></a>. This type is used
 as the return type of many <code>std::io</code> functions that can cause an error, and
 can be returned from your own functions as well. Many of the examples in this
@@ -143,7 +143,7 @@ module use the <a href="https://doc.rust-lang.org/stable/book/appendix-02-operat
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="kw">use</span> <span class="ident">async_std::io</span>;
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_input</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_input</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">String::new</span>();
 
     <span class="ident">io::stdin</span>().<span class="ident">read_line</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -156,7 +156,7 @@ module use the <a href="https://doc.rust-lang.org/stable/book/appendix-02-operat
 common type for functions which don’t have a ‘real’ return value, but do want to
 return errors if they happen. In this case, the only purpose of this function is
 to read the line and print it, so we use <code>()</code>.</p>
-<h2 id="platform-specific-behavior" class="section-header"><a href="#platform-specific-behavior">Platform-specific behavior</a></h2>
+<h3 id="platform-specific-behavior" class="section-header"><a href="#platform-specific-behavior">Platform-specific behavior</a></h3>
 <p>Many I/O functions throughout the standard library are documented to indicate
 what various library or syscalls they are delegated to. This is done to help
 applications both understand what’s happening under the hood as well as investigate
@@ -164,51 +164,51 @@ any possibly unclear semantics. Note, however, that this is informative, not a b
 contract. The implementation of many of these functions are subject to change over
 time and may call fewer or more syscalls/library functions.</p>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="prelude/index.html" title="async_std::io::prelude mod">prelude</a></div><div class="item-right docblock-short"><p>The async I/O prelude.</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.BufReader.html" title="async_std::io::BufReader struct">BufReader</a></div><div class="item-right docblock-short"><p>Adds buffering to any reader.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.BufWriter.html" title="async_std::io::BufWriter struct">BufWriter</a></div><div class="item-right docblock-short"><p>Wraps a writer and buffers its output.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Bytes.html" title="async_std::io::Bytes struct">Bytes</a></div><div class="item-right docblock-short"><p>A stream over <code>u8</code> values of a reader.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Chain.html" title="async_std::io::Chain struct">Chain</a></div><div class="item-right docblock-short"><p>Adaptor to chain together two readers.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Cursor.html" title="async_std::io::Cursor struct">Cursor</a></div><div class="item-right docblock-short"><p>A <code>Cursor</code> wraps an in-memory buffer and provides it with a
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="prelude/index.html" title="async_std::io::prelude mod">prelude</a></div><div class="item-right docblock-short"><p>The async I/O prelude.</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.BufReader.html" title="async_std::io::BufReader struct">BufReader</a></div><div class="item-right docblock-short"><p>Adds buffering to any reader.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.BufWriter.html" title="async_std::io::BufWriter struct">BufWriter</a></div><div class="item-right docblock-short"><p>Wraps a writer and buffers its output.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Bytes.html" title="async_std::io::Bytes struct">Bytes</a></div><div class="item-right docblock-short"><p>A stream over <code>u8</code> values of a reader.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Chain.html" title="async_std::io::Chain struct">Chain</a></div><div class="item-right docblock-short"><p>Adaptor to chain together two readers.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Cursor.html" title="async_std::io::Cursor struct">Cursor</a></div><div class="item-right docblock-short"><p>A <code>Cursor</code> wraps an in-memory buffer and provides it with a
 <a href="trait.Seek.html"><code>Seek</code></a> implementation.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Empty.html" title="async_std::io::Empty struct">Empty</a></div><div class="item-right docblock-short"><p>A reader that contains no data.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Error.html" title="async_std::io::Error struct">Error</a></div><div class="item-right docblock-short"><p>The error type for I/O operations of the <a href="https://doc.rust-lang.org/1.56.1/std/io/trait.Read.html"><code>Read</code></a>, <a href="https://doc.rust-lang.org/1.56.1/std/io/trait.Write.html"><code>Write</code></a>, <a href="https://doc.rust-lang.org/1.56.1/std/io/trait.Seek.html"><code>Seek</code></a>, and
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Empty.html" title="async_std::io::Empty struct">Empty</a></div><div class="item-right docblock-short"><p>A reader that contains no data.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Error.html" title="async_std::io::Error struct">Error</a></div><div class="item-right docblock-short"><p>The error type for I/O operations of the <a href="https://doc.rust-lang.org/1.57.0/std/io/trait.Read.html"><code>Read</code></a>, <a href="https://doc.rust-lang.org/1.57.0/std/io/trait.Write.html"><code>Write</code></a>, <a href="https://doc.rust-lang.org/1.57.0/std/io/trait.Seek.html"><code>Seek</code></a>, and
 associated traits.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.IntoInnerError.html" title="async_std::io::IntoInnerError struct">IntoInnerError</a></div><div class="item-right docblock-short"><p>An error returned by <code>into_inner</code> which combines an error that
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.IntoInnerError.html" title="async_std::io::IntoInnerError struct">IntoInnerError</a></div><div class="item-right docblock-short"><p>An error returned by <code>into_inner</code> which combines an error that
 happened while writing out the buffer, and the buffered writer object
 which may be used to recover from the condition.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.IoSlice.html" title="async_std::io::IoSlice struct">IoSlice</a></div><div class="item-right docblock-short"><p>A buffer type used with <code>Write::write_vectored</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.IoSliceMut.html" title="async_std::io::IoSliceMut struct">IoSliceMut</a></div><div class="item-right docblock-short"><p>A buffer type used with <code>Read::read_vectored</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Lines.html" title="async_std::io::Lines struct">Lines</a></div><div class="item-right docblock-short"><p>A stream of lines in a byte stream.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Repeat.html" title="async_std::io::Repeat struct">Repeat</a></div><div class="item-right docblock-short"><p>A reader which yields one byte over and over and over and over and over and…</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Sink.html" title="async_std::io::Sink struct">Sink</a></div><div class="item-right docblock-short"><p>A writer that consumes and drops all data.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Split.html" title="async_std::io::Split struct">Split</a></div><div class="item-right docblock-short"><p>A stream over the contents of an instance of <a href="trait.BufRead.html"><code>BufRead</code></a> split on a particular byte.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Stderr.html" title="async_std::io::Stderr struct">Stderr</a></div><div class="item-right docblock-short"><p>A handle to the standard error of the current process.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Stdin.html" title="async_std::io::Stdin struct">Stdin</a></div><div class="item-right docblock-short"><p>A handle to the standard input of the current process.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Stdout.html" title="async_std::io::Stdout struct">Stdout</a></div><div class="item-right docblock-short"><p>A handle to the standard output of the current process.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Take.html" title="async_std::io::Take struct">Take</a></div><div class="item-right docblock-short"><p>Reader adaptor which limits the bytes read from an underlying reader.</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.ErrorKind.html" title="async_std::io::ErrorKind enum">ErrorKind</a></div><div class="item-right docblock-short"><p>A list specifying general categories of I/O error.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.SeekFrom.html" title="async_std::io::SeekFrom enum">SeekFrom</a></div><div class="item-right docblock-short"><p>Enumeration of possible methods to seek within an I/O object.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.BufRead.html" title="async_std::io::BufRead trait">BufRead</a></div><div class="item-right docblock-short"><p>Read bytes asynchronously.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Read.html" title="async_std::io::Read trait">Read</a></div><div class="item-right docblock-short"><p>Read bytes asynchronously.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.ReadExt.html" title="async_std::io::ReadExt trait">ReadExt</a></div><div class="item-right docblock-short"><p>Extension methods for <a href="../trait.Read.html"><code>Read</code></a>.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Seek.html" title="async_std::io::Seek trait">Seek</a></div><div class="item-right docblock-short"><p>Seek bytes asynchronously.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Write.html" title="async_std::io::Write trait">Write</a></div><div class="item-right docblock-short"><p>Write bytes asynchronously.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.WriteExt.html" title="async_std::io::WriteExt trait">WriteExt</a></div><div class="item-right docblock-short"><p>Extension methods for <a href="../trait.Write.html"><code>Write</code></a>.</p>
-</div></div><h2 id="functions-1" class="section-header"><a href="#functions-1">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.copy.html" title="async_std::io::copy fn">copy</a></div><div class="item-right docblock-short"><p>Copies the entire contents of a reader into a writer.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.empty.html" title="async_std::io::empty fn">empty</a></div><div class="item-right docblock-short"><p>Creates a reader that contains no data.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.repeat.html" title="async_std::io::repeat fn">repeat</a></div><div class="item-right docblock-short"><p>Creates an instance of a reader that infinitely repeats one byte.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.sink.html" title="async_std::io::sink fn">sink</a></div><div class="item-right docblock-short"><p>Creates a writer that consumes and drops all data.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.stderr.html" title="async_std::io::stderr fn">stderr</a></div><div class="item-right docblock-short"><p>Constructs a new handle to the standard error of the current process.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.stdin.html" title="async_std::io::stdin fn">stdin</a></div><div class="item-right docblock-short"><p>Constructs a new handle to the standard input of the current process.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.stdout.html" title="async_std::io::stdout fn">stdout</a></div><div class="item-right docblock-short"><p>Constructs a new handle to the standard output of the current process.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.timeout.html" title="async_std::io::timeout fn">timeout</a></div><div class="item-right docblock-short"><p>Awaits an I/O future or times out after a duration of time.</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Result.html" title="async_std::io::Result type">Result</a></div><div class="item-right docblock-short"><p>A specialized <a href="https://doc.rust-lang.org/1.56.1/core/result/enum.Result.html"><code>Result</code></a> type for I/O operations.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="async_std" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.IoSlice.html" title="async_std::io::IoSlice struct">IoSlice</a></div><div class="item-right docblock-short"><p>A buffer type used with <code>Write::write_vectored</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.IoSliceMut.html" title="async_std::io::IoSliceMut struct">IoSliceMut</a></div><div class="item-right docblock-short"><p>A buffer type used with <code>Read::read_vectored</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Lines.html" title="async_std::io::Lines struct">Lines</a></div><div class="item-right docblock-short"><p>A stream of lines in a byte stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Repeat.html" title="async_std::io::Repeat struct">Repeat</a></div><div class="item-right docblock-short"><p>A reader which yields one byte over and over and over and over and over and…</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Sink.html" title="async_std::io::Sink struct">Sink</a></div><div class="item-right docblock-short"><p>A writer that consumes and drops all data.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Split.html" title="async_std::io::Split struct">Split</a></div><div class="item-right docblock-short"><p>A stream over the contents of an instance of <a href="trait.BufRead.html"><code>BufRead</code></a> split on a particular byte.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Stderr.html" title="async_std::io::Stderr struct">Stderr</a></div><div class="item-right docblock-short"><p>A handle to the standard error of the current process.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Stdin.html" title="async_std::io::Stdin struct">Stdin</a></div><div class="item-right docblock-short"><p>A handle to the standard input of the current process.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Stdout.html" title="async_std::io::Stdout struct">Stdout</a></div><div class="item-right docblock-short"><p>A handle to the standard output of the current process.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Take.html" title="async_std::io::Take struct">Take</a></div><div class="item-right docblock-short"><p>Reader adaptor which limits the bytes read from an underlying reader.</p>
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ErrorKind.html" title="async_std::io::ErrorKind enum">ErrorKind</a></div><div class="item-right docblock-short"><p>A list specifying general categories of I/O error.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.SeekFrom.html" title="async_std::io::SeekFrom enum">SeekFrom</a></div><div class="item-right docblock-short"><p>Enumeration of possible methods to seek within an I/O object.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.BufRead.html" title="async_std::io::BufRead trait">BufRead</a></div><div class="item-right docblock-short"><p>Read bytes asynchronously.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Read.html" title="async_std::io::Read trait">Read</a></div><div class="item-right docblock-short"><p>Read bytes asynchronously.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ReadExt.html" title="async_std::io::ReadExt trait">ReadExt</a></div><div class="item-right docblock-short"><p>Extension methods for <a href="../trait.Read.html"><code>Read</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Seek.html" title="async_std::io::Seek trait">Seek</a></div><div class="item-right docblock-short"><p>Seek bytes asynchronously.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Write.html" title="async_std::io::Write trait">Write</a></div><div class="item-right docblock-short"><p>Write bytes asynchronously.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.WriteExt.html" title="async_std::io::WriteExt trait">WriteExt</a></div><div class="item-right docblock-short"><p>Extension methods for <a href="../trait.Write.html"><code>Write</code></a>.</p>
+</div></div></div><h2 id="functions-1" class="section-header"><a href="#functions-1">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.copy.html" title="async_std::io::copy fn">copy</a></div><div class="item-right docblock-short"><p>Copies the entire contents of a reader into a writer.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.empty.html" title="async_std::io::empty fn">empty</a></div><div class="item-right docblock-short"><p>Creates a reader that contains no data.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.repeat.html" title="async_std::io::repeat fn">repeat</a></div><div class="item-right docblock-short"><p>Creates an instance of a reader that infinitely repeats one byte.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.sink.html" title="async_std::io::sink fn">sink</a></div><div class="item-right docblock-short"><p>Creates a writer that consumes and drops all data.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.stderr.html" title="async_std::io::stderr fn">stderr</a></div><div class="item-right docblock-short"><p>Constructs a new handle to the standard error of the current process.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.stdin.html" title="async_std::io::stdin fn">stdin</a></div><div class="item-right docblock-short"><p>Constructs a new handle to the standard input of the current process.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.stdout.html" title="async_std::io::stdout fn">stdout</a></div><div class="item-right docblock-short"><p>Constructs a new handle to the standard output of the current process.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.timeout.html" title="async_std::io::timeout fn">timeout</a></div><div class="item-right docblock-short"><p>Awaits an I/O future or times out after a duration of time.</p>
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Result.html" title="async_std::io::Result type">Result</a></div><div class="item-right docblock-short"><p>A specialized <a href="https://doc.rust-lang.org/1.57.0/core/result/enum.Result.html"><code>Result</code></a> type for I/O operations.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="async_std" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

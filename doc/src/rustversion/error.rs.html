@@ -67,11 +67,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">msg</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">msg</span>: <span class="kw">impl</span> <span class="ident">Display</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new2</span>(<span class="ident">span</span>, <span class="ident">span</span>, <span class="ident">msg</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new2</span>(<span class="ident">begin</span>: <span class="ident">Span</span>, <span class="ident">end</span>: <span class="ident">Span</span>, <span class="ident">msg</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new2</span>(<span class="ident">begin</span>: <span class="ident">Span</span>, <span class="ident">end</span>: <span class="ident">Span</span>, <span class="ident">msg</span>: <span class="kw">impl</span> <span class="ident">Display</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Error</span> {
             <span class="ident">begin</span>,
             <span class="ident">end</span>,
@@ -79,7 +79,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group</span>(<span class="ident">group</span>: <span class="ident">Group</span>, <span class="ident">msg</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group</span>(<span class="ident">group</span>: <span class="ident">Group</span>, <span class="ident">msg</span>: <span class="kw">impl</span> <span class="ident">Display</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">group</span>.<span class="ident">stream</span>().<span class="ident">into_iter</span>();
         <span class="kw">let</span> <span class="ident">delimiter</span> <span class="op">=</span> <span class="ident">group</span>.<span class="ident">span</span>();
         <span class="kw">let</span> <span class="ident">begin</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">map_or</span>(<span class="ident">delimiter</span>, <span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">span</span>());
@@ -87,7 +87,7 @@
         <span class="ident"><span class="self">Self</span>::new2</span>(<span class="ident">begin</span>, <span class="ident">end</span>, <span class="ident">msg</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_compile_error</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_compile_error</span>(<span class="self">self</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="comment">// compile_error! { $msg }</span>
         <span class="ident">TokenStream::from_iter</span>(<span class="macro">vec!</span>[
             <span class="ident">TokenTree::Ident</span>(<span class="ident">Ident::new</span>(<span class="string">&quot;compile_error&quot;</span>, <span class="self">self</span>.<span class="ident">begin</span>)),

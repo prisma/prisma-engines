@@ -65,19 +65,19 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_read_bytes::SqlReadBytes</span>;
 
 <span class="comment">// Decode a partially length-prefixed type.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
 {
     <span class="kw">match</span> <span class="ident">len</span> {
         <span class="comment">// Fixed size</span>
-        <span class="ident">len</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">0xffff</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">len</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">0xffff</span> =&gt; {
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u16_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">u64</span>;
 
             <span class="kw">match</span> <span class="ident">len</span> {
                 <span class="comment">// NULL</span>
-                <span class="number">0xffff</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="number">0xffff</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>);
 
                     <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">len</span> {
@@ -89,26 +89,26 @@
             }
         }
         <span class="comment">// Unknown size, length-prefixed blobs</span>
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">_</span> =&gt; {
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u64_le</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">len</span> {
                 <span class="comment">// NULL</span>
-                <span class="number">0xffffffffffffffff</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                <span class="number">0xffffffffffffffff</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
                 <span class="comment">// Unknown size</span>
-                <span class="number">0xfffffffffffffffe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Vec::new</span>(),
+                <span class="number">0xfffffffffffffffe</span> =&gt; <span class="ident">Vec::new</span>(),
                 <span class="comment">// Known size</span>
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>),
+                <span class="kw">_</span> =&gt; <span class="ident">Vec::with_capacity</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>),
             };
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk_data_left</span> <span class="op">=</span> <span class="number">0</span>;
 
             <span class="kw">loop</span> {
-                <span class="kw">if</span> <span class="ident">chunk_data_left</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">chunk_data_left</span> <span class="op">==</span> <span class="number">0</span> {
                     <span class="comment">// We have no chunk. Start a new one.</span>
                     <span class="kw">let</span> <span class="ident">chunk_size</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u32_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
 
-                    <span class="kw">if</span> <span class="ident">chunk_size</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">chunk_size</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="kw">break</span>; <span class="comment">// found a sentinel, we&#39;re done</span>
                     } <span class="kw">else</span> {
                         <span class="ident">chunk_data_left</span> <span class="op">=</span> <span class="ident">chunk_size</span>

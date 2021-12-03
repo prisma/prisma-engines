@@ -8,11 +8,11 @@
 <span id="8"> 8</span>
 <span id="9"> 9</span>
 <span id="10">10</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_with_tokio</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span>: <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">fut</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">O</span> {
+</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_with_tokio</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span>: <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">fut</span>: <span class="ident">F</span>) -&gt; <span class="ident">O</span> {
     <span class="ident">test_tokio_runtime</span>().<span class="ident">block_on</span>(<span class="ident">fut</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_tokio_runtime</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">tokio::runtime::Runtime</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_tokio_runtime</span>() -&gt; <span class="ident">tokio::runtime::Runtime</span> {
     <span class="ident">tokio::runtime::Builder::new_current_thread</span>()
         .<span class="ident">enable_all</span>()
         .<span class="ident">build</span>()

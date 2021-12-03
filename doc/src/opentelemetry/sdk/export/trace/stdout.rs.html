@@ -211,13 +211,13 @@
 }
 
 <span class="doccomment">/// Create a new stdout exporter pipeline builder.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_pipeline</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PipelineBuilder</span><span class="op">&lt;</span><span class="ident">Stdout</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_pipeline</span>() -&gt; <span class="ident">PipelineBuilder</span><span class="op">&lt;</span><span class="ident">Stdout</span><span class="op">&gt;</span> {
     <span class="ident">PipelineBuilder::default</span>()
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PipelineBuilder</span><span class="op">&lt;</span><span class="ident">Stdout</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Return the default pipeline builder.</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">pretty_print</span>: <span class="bool-val">false</span>,
             <span class="ident">trace_config</span>: <span class="prelude-val">None</span>,
@@ -228,19 +228,19 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span> <span class="ident">PipelineBuilder</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Specify the pretty print setting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_pretty_print</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pretty_print</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_pretty_print</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pretty_print</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">pretty_print</span> <span class="op">=</span> <span class="ident">pretty_print</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Assign the SDK trace configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_trace_config</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="ident">sdk::trace::Config</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_trace_config</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="ident">sdk::trace::Config</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">trace_config</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">config</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify the writer to use.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_writer</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">writer</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PipelineBuilder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_writer</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">writer</span>: <span class="ident">T</span>) -&gt; <span class="ident">PipelineBuilder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">PipelineBuilder</span> {
             <span class="ident">pretty_print</span>: <span class="self">self</span>.<span class="ident">pretty_print</span>,
             <span class="ident">trace_config</span>: <span class="self">self</span>.<span class="ident">trace_config</span>,
@@ -254,7 +254,7 @@
     <span class="ident">W</span>: <span class="ident">Write</span> <span class="op">+</span> <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
     <span class="doccomment">/// Install the stdout exporter pipeline with the recommended defaults.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">install_simple</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sdk::trace::Tracer</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">install_simple</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">sdk::trace::Tracer</span> {
         <span class="kw">let</span> <span class="ident">exporter</span> <span class="op">=</span> <span class="ident">Exporter::new</span>(<span class="self">self</span>.<span class="ident">writer</span>, <span class="self">self</span>.<span class="ident">pretty_print</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">provider_builder</span> <span class="op">=</span>
@@ -283,7 +283,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span> <span class="ident">Exporter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new stdout `Exporter`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">writer</span>: <span class="ident">W</span>, <span class="ident">pretty_print</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">writer</span>: <span class="ident">W</span>, <span class="ident">pretty_print</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">writer</span>,
             <span class="ident">pretty_print</span>,
@@ -297,7 +297,7 @@
     <span class="ident">W</span>: <span class="ident">Write</span> <span class="op">+</span> <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
     <span class="doccomment">/// Export spans to stdout</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SpanData</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExportResult</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SpanData</span><span class="op">&gt;</span>) -&gt; <span class="ident">ExportResult</span> {
         <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">batch</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pretty_print</span> {
                 <span class="self">self</span>.<span class="ident">writer</span>
@@ -320,7 +320,7 @@
 <span class="kw">struct</span> <span class="ident">Error</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">std::io::Error</span>);
 
 <span class="kw">impl</span> <span class="ident">ExportError</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">exporter_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">exporter_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;stdout&quot;</span>
     }
 }

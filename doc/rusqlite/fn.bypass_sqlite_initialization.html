@@ -9,7 +9,7 @@ single-thread mode.</p>
 initialized in either multi-thread or serialized mode, call this function
 prior to attempting to open a connection and rusqlite’s initialization
 process will by skipped.</p>
-<h1 id="safety" class="section-header"><a href="#safety">Safety</a></h1>
+<h2 id="safety" class="section-header"><a href="#safety">Safety</a></h2>
 <p>This function is unsafe because if you call it and SQLite has actually been
 configured to run in single-thread mode,
 you may encounter memory errors or data corruption or any number of terrible

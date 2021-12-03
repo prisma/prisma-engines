@@ -177,7 +177,7 @@
 
 <span class="kw">impl</span> <span class="ident">ContentType</span> {
     <span class="doccomment">/// Create a new instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">media_type</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">media_type</span>: <span class="ident">U</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">U</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span>,
         <span class="ident">U::Error</span>: <span class="ident">std::fmt::Debug</span>,
@@ -195,10 +195,10 @@
     <span class="doccomment">/// order to always return fully qualified URLs, a base URL must be passed to</span>
     <span class="doccomment">/// reference the current environment. In HTTP/1.1 and above this value can</span>
     <span class="doccomment">/// always be determined from the request.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_headers</span>(<span class="ident">headers</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_headers</span>(<span class="ident">headers</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">headers</span>.<span class="ident">as_ref</span>().<span class="ident">get</span>(<span class="ident">CONTENT_TYPE</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">headers</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">headers</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">headers</span>) =&gt; <span class="ident">headers</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
         <span class="comment">// If we successfully parsed the header then there&#39;s always at least one</span>
@@ -218,12 +218,12 @@
     }
 
     <span class="doccomment">/// Get the `HeaderName`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HeaderName</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HeaderName</span> {
         <span class="ident">CONTENT_TYPE</span>
     }
 
     <span class="doccomment">/// Get the `HeaderValue`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HeaderValue</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HeaderValue</span> {
         <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">media_type</span>);
         <span class="comment">// SAFETY: the internal string is validated to be ASCII.</span>
         <span class="kw">unsafe</span> { <span class="ident">HeaderValue::from_bytes_unchecked</span>(<span class="ident">output</span>.<span class="ident">into</span>()) }
@@ -231,19 +231,19 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ContentType</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Mime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">media_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Mime</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">media_type</span> <span class="op">==</span> <span class="ident">other</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Mime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ContentType</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="ident">Mime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="op">&amp;&amp;</span><span class="self">self</span>.<span class="ident">media_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="ident">Mime</span>) -&gt; <span class="ident">bool</span> {
+        <span class="op">&amp;&amp;</span><span class="self">self</span>.<span class="ident">media_type</span> <span class="op">==</span> <span class="ident">other</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ContentType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">media_type</span>: <span class="ident">Mime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">media_type</span>: <span class="ident">Mime</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">media_type</span> }
     }
 }
@@ -254,7 +254,7 @@
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::headers::Headers</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">smoke</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">smoke</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="ident">ContentType::new</span>(<span class="ident">Mime::from_str</span>(<span class="string">&quot;text/*&quot;</span>)<span class="question-mark">?</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers::new</span>();

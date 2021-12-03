@@ -24,7 +24,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DiagnoseMigrationHistory</span>;
 
 <span class="kw">impl</span> <span class="ident">DiagnoseMigrationHistory</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">DiagnoseMigrationHistoryInput</span> {
             <span class="ident">migrations_directory_path</span>: <span class="self">self</span>.<span class="ident">migrations_directory_path</span>.<span class="ident">clone</span>(),
             <span class="ident">opt_in_to_shadow_database</span>: <span class="bool-val">true</span>,

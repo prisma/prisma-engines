@@ -223,7 +223,7 @@
 <span class="doccomment">/// * query string to pass to MySql (named parameters replaced with `?`).</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_named_params</span>(
     <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>), <span class="ident">MixedParamsError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>), <span class="ident">MixedParamsError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">TopLevel</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">have_positional</span> <span class="op">=</span> <span class="bool-val">false</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur_param</span> <span class="op">=</span> <span class="number">0</span>;
@@ -232,28 +232,28 @@
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">c</span>) <span class="kw">in</span> <span class="ident">query</span>.<span class="ident">char_indices</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rematch</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">match</span> <span class="ident">state</span> {
-            <span class="ident">TopLevel</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="string">&#39;:&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">MaybeInNamedParam</span>,
-                <span class="string">&#39;\&#39;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="string">&#39;\&#39;&#39;</span>, <span class="string">&#39;\&#39;&#39;</span>),
-                <span class="string">&#39;&quot;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="string">&#39;&quot;&#39;</span>, <span class="string">&#39;&quot;&#39;</span>),
-                <span class="string">&#39;?&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">have_positional</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="ident">TopLevel</span> =&gt; <span class="kw">match</span> <span class="ident">c</span> {
+                <span class="string">&#39;:&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">MaybeInNamedParam</span>,
+                <span class="string">&#39;\&#39;&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="string">&#39;\&#39;&#39;</span>, <span class="string">&#39;\&#39;&#39;</span>),
+                <span class="string">&#39;&quot;&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="string">&#39;&quot;&#39;</span>, <span class="string">&#39;&quot;&#39;</span>),
+                <span class="string">&#39;?&#39;</span> =&gt; <span class="ident">have_positional</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                <span class="kw">_</span> =&gt; (),
             },
-            <span class="ident">InStringLiteral</span>(<span class="ident">separator</span>, <span class="ident">prev_char</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="ident">separator</span> <span class="op">&amp;&amp;</span> <span class="ident">prev_char</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;\\&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">TopLevel</span>,
-                <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="ident">separator</span>, <span class="ident">x</span>),
+            <span class="ident">InStringLiteral</span>(<span class="ident">separator</span>, <span class="ident">prev_char</span>) =&gt; <span class="kw">match</span> <span class="ident">c</span> {
+                <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">separator</span> <span class="op">&amp;&amp;</span> <span class="ident">prev_char</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;\\&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">TopLevel</span>,
+                <span class="ident">x</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="ident">separator</span>, <span class="ident">x</span>),
             },
-            <span class="ident">MaybeInNamedParam</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span> <span class="op">|</span> <span class="string">&#39;_&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">MaybeInNamedParam</span> =&gt; <span class="kw">match</span> <span class="ident">c</span> {
+                <span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span> <span class="op">|</span> <span class="string">&#39;_&#39;</span> =&gt; {
                     <span class="ident">params</span>.<span class="ident">push</span>((<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>, <span class="number">0</span>, <span class="ident">String::with_capacity</span>(<span class="number">16</span>)));
                     <span class="ident">params</span>[<span class="ident">cur_param</span>].<span class="number">2</span>.<span class="ident">push</span>(<span class="ident">c</span>);
                     <span class="ident">state</span> <span class="op">=</span> <span class="ident">InNamedParam</span>;
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rematch</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                <span class="kw">_</span> =&gt; <span class="ident">rematch</span> <span class="op">=</span> <span class="bool-val">true</span>,
             },
-            <span class="ident">InNamedParam</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span> <span class="op">|</span> <span class="string">&#39;0&#39;</span>..<span class="op">=</span><span class="string">&#39;9&#39;</span> <span class="op">|</span> <span class="string">&#39;_&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">params</span>[<span class="ident">cur_param</span>].<span class="number">2</span>.<span class="ident">push</span>(<span class="ident">c</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">InNamedParam</span> =&gt; <span class="kw">match</span> <span class="ident">c</span> {
+                <span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span> <span class="op">|</span> <span class="string">&#39;0&#39;</span>..<span class="op">=</span><span class="string">&#39;9&#39;</span> <span class="op">|</span> <span class="string">&#39;_&#39;</span> =&gt; <span class="ident">params</span>[<span class="ident">cur_param</span>].<span class="number">2</span>.<span class="ident">push</span>(<span class="ident">c</span>),
+                <span class="kw">_</span> =&gt; {
                     <span class="ident">params</span>[<span class="ident">cur_param</span>].<span class="number">1</span> <span class="op">=</span> <span class="ident">i</span>;
                     <span class="ident">cur_param</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="ident">rematch</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -262,10 +262,10 @@
         }
         <span class="kw">if</span> <span class="ident">rematch</span> {
             <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="string">&#39;:&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">MaybeInNamedParam</span>,
-                <span class="string">&#39;\&#39;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="string">&#39;\&#39;&#39;</span>, <span class="string">&#39;\&#39;&#39;</span>),
-                <span class="string">&#39;&quot;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="string">&#39;&quot;&#39;</span>, <span class="string">&#39;&quot;&#39;</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">TopLevel</span>,
+                <span class="string">&#39;:&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">MaybeInNamedParam</span>,
+                <span class="string">&#39;\&#39;&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="string">&#39;\&#39;&#39;</span>, <span class="string">&#39;\&#39;&#39;</span>),
+                <span class="string">&#39;&quot;&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">InStringLiteral</span>(<span class="string">&#39;&quot;&#39;</span>, <span class="string">&#39;&quot;&#39;</span>),
+                <span class="kw">_</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">TopLevel</span>,
             }
         }
     }

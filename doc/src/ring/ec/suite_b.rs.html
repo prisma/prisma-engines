@@ -269,7 +269,7 @@
 <span class="kw">fn</span> <span class="ident">verify_affine_point_is_on_the_curve</span>(
     <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">CommonOps</span>,
     (<span class="ident">x</span>, <span class="ident">y</span>): (<span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>),
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="ident">verify_affine_point_is_on_the_curve_scaled</span>(<span class="ident">ops</span>, (<span class="ident">x</span>, <span class="ident">y</span>), <span class="kw-2">&amp;</span><span class="ident">ops</span>.<span class="ident">a</span>, <span class="kw-2">&amp;</span><span class="ident">ops</span>.<span class="ident">b</span>)
 }
 
@@ -285,7 +285,7 @@
 <span class="kw">fn</span> <span class="ident">verify_jacobian_point_is_on_the_curve</span>(
     <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">CommonOps</span>,
     <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Point</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">point_z</span>(<span class="ident">p</span>);
 
     <span class="comment">// Verify that the point is not at infinity.</span>
@@ -375,7 +375,7 @@
     (<span class="ident">x</span>, <span class="ident">y</span>): (<span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>),
     <span class="ident">a_scaled</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
     <span class="ident">b_scaled</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">elem_squared</span>(<span class="ident">y</span>);
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rhs</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">elem_squared</span>(<span class="ident">x</span>);
@@ -395,7 +395,7 @@
     <span class="ident">template</span>: <span class="kw-2">&amp;</span><span class="ident">pkcs8::Template</span>,
     <span class="ident">input</span>: <span class="ident">untrusted::Input</span>,
     <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ec::KeyPair</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ec::KeyPair</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">ec_private_key</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">pkcs8::unwrap_key</span>(<span class="ident">template</span>, <span class="ident">pkcs8::Version::V1Only</span>, <span class="ident">input</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> (<span class="ident">private_key</span>, <span class="ident">public_key</span>) <span class="op">=</span>
         <span class="ident">ec_private_key</span>.<span class="ident">read_all</span>(<span class="ident">error::KeyRejected::invalid_encoding</span>(), <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
@@ -413,7 +413,7 @@
 <span class="kw">fn</span> <span class="ident">key_pair_from_pkcs8_</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">template</span>: <span class="kw-2">&amp;</span><span class="ident">pkcs8::Template</span>,
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">der::small_nonnegative_integer</span>(<span class="ident">input</span>)
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
@@ -451,7 +451,7 @@
     <span class="ident">private_key_bytes</span>: <span class="ident">untrusted::Input</span>,
     <span class="ident">public_key_bytes</span>: <span class="ident">untrusted::Input</span>,
     <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ec::KeyPair</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ec::KeyPair</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">seed</span> <span class="op">=</span> <span class="ident">ec::Seed::from_bytes</span>(<span class="ident">curve</span>, <span class="ident">private_key_bytes</span>, <span class="ident">cpu_features</span>)
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_component</span>())<span class="question-mark">?</span>;
 

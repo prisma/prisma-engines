@@ -119,15 +119,15 @@
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RelationInfo</span> {
     <span class="comment">//ignores the relation name for reintrospection, ignores referential actions that are compared in the relation field.</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">to</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">to</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">fields</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">fields</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">references</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">references</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">to</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">to</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">fields</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">fields</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">references</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">references</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">RelationInfo</span> {
     <span class="doccomment">/// Creates a new relation info for the</span>
     <span class="doccomment">/// given target model.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationInfo</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">RelationInfo</span> {
         <span class="ident">RelationInfo</span> {
             <span class="ident">to</span>: <span class="ident">String::from</span>(<span class="ident">to</span>),
             <span class="ident">fields</span>: <span class="ident">Vec::new</span>(),
@@ -171,20 +171,20 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ReferentialAction</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ReferentialAction::Cascade</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Cascade&quot;</span>),
-            <span class="ident">ReferentialAction::Restrict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Restrict&quot;</span>),
-            <span class="ident">ReferentialAction::NoAction</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;NoAction&quot;</span>),
-            <span class="ident">ReferentialAction::SetNull</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SetNull&quot;</span>),
-            <span class="ident">ReferentialAction::SetDefault</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SetDefault&quot;</span>),
+            <span class="ident">ReferentialAction::Cascade</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Cascade&quot;</span>),
+            <span class="ident">ReferentialAction::Restrict</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Restrict&quot;</span>),
+            <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;NoAction&quot;</span>),
+            <span class="ident">ReferentialAction::SetNull</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SetNull&quot;</span>),
+            <span class="ident">ReferentialAction::SetDefault</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SetDefault&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ReferentialAction</span> {
     <span class="comment">// True, if the action modifies the related items.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">triggers_modification</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">triggers_modification</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::NoAction</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Restrict</span>)
     }
 }

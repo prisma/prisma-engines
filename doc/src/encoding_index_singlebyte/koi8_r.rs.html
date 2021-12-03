@@ -112,7 +112,7 @@
 
 <span class="doccomment">/// Returns the index code point for pointer `code` in this index.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forward</span>(<span class="ident">code</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forward</span>(<span class="ident">code</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u16</span> {
     <span class="ident">FORWARD_TABLE</span>[(<span class="ident">code</span> <span class="op">-</span> <span class="number">0x80</span>) <span class="kw">as</span> <span class="ident">usize</span>]
 }
 
@@ -162,7 +162,7 @@
 
 <span class="doccomment">/// Returns the index pointer for code point `code` in this index.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">backward</span>(<span class="ident">code</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">backward</span>(<span class="ident">code</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u8</span> {
     <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">code</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">5</span>) <span class="kw">as</span> <span class="ident">usize</span>;
     <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="number">302</span> {<span class="ident">BACKWARD_TABLE_UPPER</span>[<span class="ident">offset</span>] <span class="kw">as</span> <span class="ident">usize</span>} <span class="kw">else</span> {<span class="number">0</span>};
     <span class="ident">BACKWARD_TABLE_LOWER</span>[<span class="ident">offset</span> <span class="op">+</span> ((<span class="ident">code</span> <span class="op">&amp;</span> <span class="number">31</span>) <span class="kw">as</span> <span class="ident">usize</span>)]

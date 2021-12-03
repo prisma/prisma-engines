@@ -198,10 +198,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// A barrier will block `n`-1 tasks which call [`Barrier::wait`] and then wake up all</span>
     <span class="doccomment">/// tasks at once when the `n`th task calls `wait`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="kw-2">mut</span> <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Barrier</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="kw-2">mut</span> <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Barrier</span> {
         <span class="kw">let</span> (<span class="ident">waker</span>, <span class="ident">wait</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::sync::watch::channel</span>(<span class="number">0</span>);
 
-        <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="comment">// if n is 0, it&#39;s not clear what behavior the user wants.</span>
             <span class="comment">// in std::sync::Barrier, an n of 0 exhibits the same behavior as n == 1, where every</span>
             <span class="comment">// .wait() immediately unblocks, so we adopt that here as well.</span>
@@ -227,7 +227,7 @@
     <span class="doccomment">/// A single (arbitrary) future will receive a [`BarrierWaitResult`] that returns `true` from</span>
     <span class="doccomment">/// [`BarrierWaitResult::is_leader`] when returning from this function, and all other tasks</span>
     <span class="doccomment">/// will receive a result that will return `false` from `is_leader`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BarrierWaitResult</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BarrierWaitResult</span> {
         <span class="comment">// NOTE: we are taking a _synchronous_ lock here.</span>
         <span class="comment">// It is okay to do so because the critical section is fast and never yields, so it cannot</span>
         <span class="comment">// deadlock even if another future is concurrently holding the lock.</span>
@@ -239,7 +239,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">lock</span>();
             <span class="kw">let</span> <span class="ident">generation</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">generation</span>;
             <span class="ident">state</span>.<span class="ident">arrived</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">arrived</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">n</span> {
+            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">arrived</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">n</span> {
                 <span class="comment">// we are the leader for this generation</span>
                 <span class="comment">// wake everyone, increment the generation, and return</span>
                 <span class="ident">state</span>
@@ -280,7 +280,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Only one task will have `true` returned from their result, all other tasks will have</span>
     <span class="doccomment">/// `false` returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_leader</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_leader</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }

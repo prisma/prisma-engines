@@ -271,7 +271,7 @@
 <span class="doccomment">/// # Ok(()) }) }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">server::Server</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">server::Server</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">Server::new</span>()
 }
 
@@ -307,7 +307,7 @@
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # Ok(()) }) }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_state</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">server::Server</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_state</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="ident">State</span>) -&gt; <span class="ident">server::Server</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">State</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {

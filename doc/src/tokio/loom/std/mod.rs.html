@@ -142,7 +142,7 @@
 
     <span class="kw">static</span> <span class="ident">COUNTER</span>: <span class="ident">AtomicU32</span> <span class="op">=</span> <span class="ident">AtomicU32::new</span>(<span class="number">1</span>);
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">seed</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">seed</span>() -&gt; <span class="ident">u64</span> {
         <span class="kw">let</span> <span class="ident">rand_state</span> <span class="op">=</span> <span class="ident">RandomState::new</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">rand_state</span>.<span class="ident">build_hasher</span>();
@@ -192,12 +192,12 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">sys</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">num_cpus</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">num_cpus</span>() -&gt; <span class="ident">usize</span> {
         <span class="ident">usize::max</span>(<span class="number">1</span>, <span class="ident">num_cpus::get</span>())
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">num_cpus</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">num_cpus</span>() -&gt; <span class="ident">usize</span> {
         <span class="number">1</span>
     }
 }

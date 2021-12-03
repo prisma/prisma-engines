@@ -12,7 +12,7 @@ good candidate).</p>
 <code>tokio-uds</code> libraries should work.</p>
 <p>If it looks too low-level for your needs, the <a href="../../iterator/index.html" title="crate::iterator"><code>iterator</code></a> module contains some
 higher-lever interface that also uses a self-pipe pattern under the hood.</p>
-<h1 id="correct-order-of-handling" class="section-header"><a href="#correct-order-of-handling">Correct order of handling</a></h1>
+<h2 id="correct-order-of-handling" class="section-header"><a href="#correct-order-of-handling">Correct order of handling</a></h2>
 <p>A care needs to be taken to avoid race conditions, especially when handling the same signal in
 a loop. Specifically, another signal might come when the action for the previous signal is
 being taken. The correct order is first to clear the content of the pipe (read some/all data
@@ -29,7 +29,7 @@ cleaning is the same action), but in case of asynchronous handling it matters.</
 first, then the pipe written. On the read end, first the pipe needs to be cleaned, then the
 flag and then the action taken. This is what the <a href="../../iterator/struct.SignalsInfo.html" title="crate::iterator::SignalsInfo"><code>SignalsInfo</code></a>
 structure does internally.</p>
-<h1 id="write-collating" class="section-header"><a href="#write-collating">Write collating</a></h1>
+<h2 id="write-collating" class="section-header"><a href="#write-collating">Write collating</a></h2>
 <p>While unlikely if handled correctly, it is possible the write end is full when a signal comes.
 In such case the signal handler simply does nothing. If the write end is full, the read end is
 readable and therefore will wake up. On the other hand, blocking in the signal handler would
@@ -37,7 +37,7 @@ definitely be a bad idea.</p>
 <p>However, this also means the number of bytes read from the end might be lower than the number
 of signals that arrived. This should not generally be a problem, since the OS already collates
 signals of the same kind together.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>This example waits for at last one <code>SIGUSR1</code> signal to come before continuing (and
 terminating). It sends the signal to itself, so it correctly terminates.</p>
 
@@ -47,7 +47,7 @@ terminating). It sends the signal to itself, so it correctly terminates.</p>
 <span class="kw">use</span> <span class="ident">signal_hook::consts::SIGUSR1</span>;
 <span class="kw">use</span> <span class="ident">signal_hook::low_level</span>::{<span class="ident">pipe</span>, <span class="ident">raise</span>};
 
-<span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">read</span>, <span class="ident">write</span>) <span class="op">=</span> <span class="ident">UnixStream::pair</span>()<span class="question-mark">?</span>;
     <span class="ident">pipe::register</span>(<span class="ident">SIGUSR1</span>, <span class="ident">write</span>)<span class="question-mark">?</span>;
     <span class="comment">// This will write into the pipe write end through the signal handler</span>
@@ -58,8 +58,8 @@ terminating). It sends the signal to itself, so it correctly terminates.</p>
     <span class="prelude-val">Ok</span>(())
 }</code></pre></div>
 </div></details><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.register.html" title="signal_hook::low_level::pipe::register fn">register</a></div><div class="item-right docblock-short"><p>Registers a write to a self-pipe whenever there’s the signal.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.register_raw.html" title="signal_hook::low_level::pipe::register_raw fn">register_raw</a></div><div class="item-right docblock-short"><p>Registers a write to a self-pipe whenever there’s the signal.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="signal_hook" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.register.html" title="signal_hook::low_level::pipe::register fn">register</a></div><div class="item-right docblock-short"><p>Registers a write to a self-pipe whenever there’s the signal.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.register_raw.html" title="signal_hook::low_level::pipe::register_raw fn">register_raw</a></div><div class="item-right docblock-short"><p>Registers a write to a self-pipe whenever there’s the signal.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="signal_hook" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script>
 </body></html>

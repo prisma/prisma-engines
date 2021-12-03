@@ -118,10 +118,10 @@
     <span class="doccomment">/// It will return `Err(InvalidOutputSize)` in case if hasher can not return</span>
     <span class="doccomment">/// specified output size. It will always return an error if output size</span>
     <span class="doccomment">/// equals to zero.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">output_size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidOutputSize</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">output_size</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidOutputSize</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get output size of the hasher instance provided to the `new` method</span>
-    <span class="kw">fn</span> <span class="ident">output_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>;
+    <span class="kw">fn</span> <span class="ident">output_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
 
     <span class="doccomment">/// Retrieve result via closure and consume hasher.</span>
     <span class="doccomment">///</span>
@@ -141,7 +141,7 @@
     <span class="doccomment">/// they have size of 2 and 3 words respectively.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">finalize_boxed</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">finalize_boxed</span>(<span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">output_size</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">n</span>].<span class="ident">into_boxed_slice</span>();
         <span class="self">self</span>.<span class="ident">finalize_variable</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="ident">res</span>));
@@ -154,7 +154,7 @@
     <span class="doccomment">/// they have size of 2 and 3 words respectively.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">finalize_boxed_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">finalize_boxed_reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">output_size</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">n</span>].<span class="ident">into_boxed_slice</span>();
         <span class="self">self</span>.<span class="ident">finalize_variable_reset</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="ident">res</span>));
@@ -177,10 +177,10 @@
     <span class="doccomment">/// It will return `Err(InvalidOutputSize)` in case if hasher can not return</span>
     <span class="doccomment">/// specified output size. It will always return an error if output size</span>
     <span class="doccomment">/// equals to zero.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">output_size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidOutputSize</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">output_size</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidOutputSize</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get output size of the hasher instance provided to the `new` method</span>
-    <span class="kw">fn</span> <span class="ident">output_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>;
+    <span class="kw">fn</span> <span class="ident">output_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
 
     <span class="doccomment">/// Retrieve result into provided buffer and leave hasher in a dirty state.</span>
     <span class="doccomment">///</span>
@@ -191,11 +191,11 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">VariableOutputDirty</span> <span class="op">+</span> <span class="ident">Reset</span><span class="op">&gt;</span> <span class="ident">VariableOutput</span> <span class="kw">for</span> <span class="ident">D</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">output_size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidOutputSize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">output_size</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidOutputSize</span><span class="op">&gt;</span> {
         <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">VariableOutputDirty</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">output_size</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">output_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">output_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">VariableOutputDirty</span><span class="op">&gt;</span><span class="ident">::output_size</span>(<span class="self">self</span>)
     }
 

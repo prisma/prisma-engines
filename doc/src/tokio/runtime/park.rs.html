@@ -306,7 +306,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Parker</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">driver</span>: <span class="ident">Driver</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parker</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">driver</span>: <span class="ident">Driver</span>) -&gt; <span class="ident">Parker</span> {
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">driver</span>.<span class="ident">unpark</span>();
 
         <span class="ident">Parker</span> {
@@ -324,7 +324,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Parker</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parker</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Parker</span> {
         <span class="ident">Parker</span> {
             <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Inner</span> {
                 <span class="ident">state</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">EMPTY</span>),
@@ -340,18 +340,18 @@
     <span class="kw">type</span> <span class="ident">Unpark</span> <span class="op">=</span> <span class="ident">Unparker</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Unparker</span> {
+    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Unparker</span> {
         <span class="ident">Unparker</span> {
             <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">park</span>();
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">park_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">park_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="comment">// Only parking with zero is supported...</span>
         <span class="macro">assert_eq!</span>(<span class="ident">duration</span>, <span class="ident">Duration::from_millis</span>(<span class="number">0</span>));
 
@@ -405,8 +405,8 @@
             .<span class="ident">state</span>
             .<span class="ident">compare_exchange</span>(<span class="ident">EMPTY</span>, <span class="ident">PARKED_CONDVAR</span>, <span class="ident">SeqCst</span>, <span class="ident">SeqCst</span>)
         {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="prelude-val">Err</span>(<span class="ident">NOTIFIED</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+            <span class="prelude-val">Err</span>(<span class="ident">NOTIFIED</span>) =&gt; {
                 <span class="comment">// We must read here, even though we know it will be `NOTIFIED`.</span>
                 <span class="comment">// This is because `unpark` may have been called again since we read</span>
                 <span class="comment">// `NOTIFIED` in the `compare_exchange` above. We must perform an</span>
@@ -418,7 +418,7 @@
 
                 <span class="kw">return</span>;
             }
-            <span class="prelude-val">Err</span>(<span class="ident">actual</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;inconsistent park state; actual = {}&quot;</span>, <span class="ident">actual</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;inconsistent park state; actual = {}&quot;</span>, <span class="ident">actual</span>),
         }
 
         <span class="kw">loop</span> {
@@ -442,8 +442,8 @@
             .<span class="ident">state</span>
             .<span class="ident">compare_exchange</span>(<span class="ident">EMPTY</span>, <span class="ident">PARKED_DRIVER</span>, <span class="ident">SeqCst</span>, <span class="ident">SeqCst</span>)
         {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="prelude-val">Err</span>(<span class="ident">NOTIFIED</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+            <span class="prelude-val">Err</span>(<span class="ident">NOTIFIED</span>) =&gt; {
                 <span class="comment">// We must read here, even though we know it will be `NOTIFIED`.</span>
                 <span class="comment">// This is because `unpark` may have been called again since we read</span>
                 <span class="comment">// `NOTIFIED` in the `compare_exchange` above. We must perform an</span>
@@ -455,16 +455,16 @@
 
                 <span class="kw">return</span>;
             }
-            <span class="prelude-val">Err</span>(<span class="ident">actual</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;inconsistent park state; actual = {}&quot;</span>, <span class="ident">actual</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;inconsistent park state; actual = {}&quot;</span>, <span class="ident">actual</span>),
         }
 
         <span class="comment">// TODO: don&#39;t unwrap</span>
         <span class="ident">driver</span>.<span class="ident">park</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">swap</span>(<span class="ident">EMPTY</span>, <span class="ident">SeqCst</span>) {
-            <span class="ident">NOTIFIED</span> <span class="op">=</span><span class="op">&gt;</span> {}      <span class="comment">// got a notification, hurray!</span>
-            <span class="ident">PARKED_DRIVER</span> <span class="op">=</span><span class="op">&gt;</span> {} <span class="comment">// no notification, alas</span>
-            <span class="ident">n</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;inconsistent park_timeout state: {}&quot;</span>, <span class="ident">n</span>),
+            <span class="ident">NOTIFIED</span> =&gt; {}      <span class="comment">// got a notification, hurray!</span>
+            <span class="ident">PARKED_DRIVER</span> =&gt; {} <span class="comment">// no notification, alas</span>
+            <span class="ident">n</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;inconsistent park_timeout state: {}&quot;</span>, <span class="ident">n</span>),
         }
     }
 
@@ -475,11 +475,11 @@
         <span class="comment">// is already `NOTIFIED`. That is why this must be a swap rather than a</span>
         <span class="comment">// compare-and-swap that returns if it reads `NOTIFIED` on failure.</span>
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">swap</span>(<span class="ident">NOTIFIED</span>, <span class="ident">SeqCst</span>) {
-            <span class="ident">EMPTY</span> <span class="op">=</span><span class="op">&gt;</span> {}    <span class="comment">// no one was waiting</span>
-            <span class="ident">NOTIFIED</span> <span class="op">=</span><span class="op">&gt;</span> {} <span class="comment">// already unparked</span>
-            <span class="ident">PARKED_CONDVAR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">unpark_condvar</span>(),
-            <span class="ident">PARKED_DRIVER</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">unpark_driver</span>(),
-            <span class="ident">actual</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;inconsistent state in unpark; actual = {}&quot;</span>, <span class="ident">actual</span>),
+            <span class="ident">EMPTY</span> =&gt; {}    <span class="comment">// no one was waiting</span>
+            <span class="ident">NOTIFIED</span> =&gt; {} <span class="comment">// already unparked</span>
+            <span class="ident">PARKED_CONDVAR</span> =&gt; <span class="self">self</span>.<span class="ident">unpark_condvar</span>(),
+            <span class="ident">PARKED_DRIVER</span> =&gt; <span class="self">self</span>.<span class="ident">unpark_driver</span>(),
+            <span class="ident">actual</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;inconsistent state in unpark; actual = {}&quot;</span>, <span class="ident">actual</span>),
         }
     }
 

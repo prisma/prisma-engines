@@ -150,7 +150,7 @@
 }
 
 <span class="doccomment">/// Converts pem encoded RSA public key to der.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pem_to_der</span>(<span class="ident">pem</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">PubKeyFileType</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pem_to_der</span>(<span class="ident">pem</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">PubKeyFileType</span>) {
     <span class="kw">let</span> <span class="ident">pkcs1_re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(
         <span class="string">&quot;-----BEGIN RSA PUBLIC KEY-----\
          ([^-]*)\
@@ -186,7 +186,7 @@
     (<span class="ident">der</span>, <span class="ident">key_file_type</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">big_uint_to_usize</span>(<span class="ident">x</span>: <span class="ident">BigUint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">big_uint_to_usize</span>(<span class="ident">x</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">y</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">let</span> <span class="ident">x_le</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">to_bytes_le</span>();
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">b</span>) <span class="kw">in</span> <span class="ident">x_le</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>().<span class="ident">take</span>(<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>()) {
@@ -196,7 +196,7 @@
 }
 
 <span class="doccomment">/// der bytes -&gt; (len, rest of der bytes)</span>
-<span class="kw">fn</span> <span class="ident">parse_len</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">BigUint</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+<span class="kw">fn</span> <span class="ident">parse_len</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="ident">BigUint</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
     <span class="kw">if</span> <span class="ident">der</span>[<span class="number">0</span>] <span class="op">&amp;</span> <span class="number">0x80</span> <span class="op">&gt;</span> <span class="number">0</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> (<span class="ident">der</span>[<span class="number">0</span>] <span class="op">&amp;</span> (<span class="op">!</span><span class="number">0x80</span>)) <span class="kw">as</span> <span class="ident">usize</span>;
         (<span class="ident">BigUint::from_bytes_be</span>(<span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="number">1</span>..<span class="op">=</span><span class="ident">len</span>]), <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="ident">len</span> <span class="op">+</span> <span class="number">1</span>..])
@@ -206,7 +206,7 @@
 }
 
 <span class="doccomment">/// der bytes -&gt; (sequence bytes, rest of der bytes)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_sequence</span>(<span class="kw-2">mut</span> <span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_sequence</span>(<span class="kw-2">mut</span> <span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
     <span class="macro">assert_eq!</span>(<span class="ident">der</span>[<span class="number">0</span>], <span class="number">0x30</span>, <span class="string">&quot;expecting SEQUENCE in primitive encoding&quot;</span>);
     <span class="ident">der</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="number">1</span>..];
     <span class="kw">let</span> (<span class="ident">sequence_len</span>, <span class="ident">der</span>) <span class="op">=</span> <span class="ident">parse_len</span>(<span class="ident">der</span>);
@@ -215,7 +215,7 @@
 }
 
 <span class="doccomment">/// der bytes -&gt; (unused bits, bytes of bit string, rest of der bytes)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_bit_string</span>(<span class="kw-2">mut</span> <span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u8</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_bit_string</span>(<span class="kw-2">mut</span> <span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="ident">u8</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
     <span class="macro">assert_eq!</span>(<span class="ident">der</span>[<span class="number">0</span>], <span class="number">0x03</span>, <span class="string">&quot;expecting BIT STRING in primitive encoding&quot;</span>);
     <span class="ident">der</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="number">1</span>..];
     <span class="kw">let</span> (<span class="ident">bit_string_len</span>, <span class="ident">der</span>) <span class="op">=</span> <span class="ident">parse_len</span>(<span class="ident">der</span>);
@@ -225,7 +225,7 @@
 }
 
 <span class="doccomment">/// der bytes -&gt; (uint, rest of der bytes)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_uint</span>(<span class="kw-2">mut</span> <span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">BigUint</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_uint</span>(<span class="kw-2">mut</span> <span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="ident">BigUint</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
     <span class="macro">assert_eq!</span>(<span class="ident">der</span>[<span class="number">0</span>], <span class="number">0x02</span>, <span class="string">&quot;expecting INTEGER&quot;</span>);
     <span class="ident">der</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="number">1</span>..];
     <span class="kw">let</span> (<span class="ident">uint_len</span>, <span class="ident">der</span>) <span class="op">=</span> <span class="ident">parse_len</span>(<span class="ident">der</span>);
@@ -235,7 +235,7 @@
 }
 
 <span class="doccomment">/// Extracts modulus and exponent from pkcs1 der public key representation</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_pub_key_pkcs1</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">BigUint</span>, <span class="ident">BigUint</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_pub_key_pkcs1</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="ident">BigUint</span>, <span class="ident">BigUint</span>) {
     <span class="kw">let</span> (<span class="ident">pub_key_fields</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">parse_sequence</span>(<span class="ident">der</span>);
     <span class="kw">let</span> (<span class="ident">modulus</span>, <span class="ident">pub_key_fields</span>) <span class="op">=</span> <span class="ident">parse_uint</span>(<span class="ident">pub_key_fields</span>);
     <span class="kw">let</span> (<span class="ident">exponent</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">parse_uint</span>(<span class="ident">pub_key_fields</span>);
@@ -243,7 +243,7 @@
 }
 
 <span class="doccomment">/// Extracts modulus and exponent from pkcs8 der public key representation</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_pub_key_pkcs8</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">BigUint</span>, <span class="ident">BigUint</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_pub_key_pkcs8</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="ident">BigUint</span>, <span class="ident">BigUint</span>) {
     <span class="kw">let</span> (<span class="ident">seq_data</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">parse_sequence</span>(<span class="ident">der</span>);
     <span class="comment">// ignore algorithm</span>
     <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">der</span>) <span class="op">=</span> <span class="ident">parse_sequence</span>(<span class="ident">seq_data</span>);
@@ -253,10 +253,10 @@
 }
 
 <span class="doccomment">/// Extracts modulus and exponent from specified der public key representation</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_pub_key</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">file_type</span>: <span class="ident">PubKeyFileType</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">BigUint</span>, <span class="ident">BigUint</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_pub_key</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">file_type</span>: <span class="ident">PubKeyFileType</span>) -&gt; (<span class="ident">BigUint</span>, <span class="ident">BigUint</span>) {
     <span class="kw">match</span> <span class="ident">file_type</span> {
-        <span class="ident">PubKeyFileType::Pkcs1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_pub_key_pkcs1</span>(<span class="ident">der</span>),
-        <span class="ident">PubKeyFileType::Pkcs8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_pub_key_pkcs8</span>(<span class="ident">der</span>),
+        <span class="ident">PubKeyFileType::Pkcs1</span> =&gt; <span class="ident">parse_pub_key_pkcs1</span>(<span class="ident">der</span>),
+        <span class="ident">PubKeyFileType::Pkcs8</span> =&gt; <span class="ident">parse_pub_key_pkcs8</span>(<span class="ident">der</span>),
     }
 }
 

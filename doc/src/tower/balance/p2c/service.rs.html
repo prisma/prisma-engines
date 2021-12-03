@@ -385,7 +385,7 @@
     <span class="ident">D::Key</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>,
     <span class="ident">D::Service</span>: <span class="ident">fmt::Debug</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Balance&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;discover&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">discover</span>)
             .<span class="ident">field</span>(<span class="string">&quot;services&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">services</span>)
@@ -420,12 +420,12 @@
     <span class="op">&lt;</span><span class="ident">D::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Constructs a load balancer that uses operating system entropy.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">discover</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">discover</span>: <span class="ident">D</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_rng</span>(<span class="ident">discover</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rand::thread_rng</span>()).<span class="ident">expect</span>(<span class="string">&quot;ThreadRNG must be valid&quot;</span>)
     }
 
     <span class="doccomment">/// Constructs a load balancer seeded with the provided random number generator.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_rng</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Rng</span><span class="op">&gt;</span>(<span class="ident">discover</span>: <span class="ident">D</span>, <span class="ident">rng</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">rand::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_rng</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Rng</span><span class="op">&gt;</span>(<span class="ident">discover</span>: <span class="ident">D</span>, <span class="ident">rng</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">rand::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">SmallRng::from_rng</span>(<span class="ident">rng</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">rng</span>,
@@ -438,12 +438,12 @@
     }
 
     <span class="doccomment">/// Returns the number of endpoints currently tracked by the balancer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">services</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// Returns whether or not the balancer is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">services</span>.<span class="ident">is_empty</span>()
     }
 }
@@ -463,19 +463,19 @@
     <span class="kw">fn</span> <span class="ident">update_pending_from_discover</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Discover</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Discover</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">debug!</span>(<span class="string">&quot;updating from discover&quot;</span>);
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">discover</span>).<span class="ident">poll_discover</span>(<span class="ident">cx</span>))
                 .<span class="ident">transpose</span>()
                 .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">error::Discover</span>(<span class="ident">e</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>
             {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
-                <span class="prelude-val">Some</span>(<span class="ident">Change::Remove</span>(<span class="ident">key</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+                <span class="prelude-val">Some</span>(<span class="ident">Change::Remove</span>(<span class="ident">key</span>)) =&gt; {
                     <span class="macro">trace!</span>(<span class="string">&quot;remove&quot;</span>);
                     <span class="self">self</span>.<span class="ident">services</span>.<span class="ident">evict</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">Change::Insert</span>(<span class="ident">key</span>, <span class="ident">svc</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">Change::Insert</span>(<span class="ident">key</span>, <span class="ident">svc</span>)) =&gt; {
                     <span class="macro">trace!</span>(<span class="string">&quot;insert&quot;</span>);
                     <span class="comment">// If this service already existed in the set, it will be</span>
                     <span class="comment">// replaced as the new one becomes ready.</span>
@@ -488,17 +488,17 @@
     <span class="kw">fn</span> <span class="ident">promote_pending_to_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">services</span>.<span class="ident">poll_pending</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) =&gt; {
                     <span class="comment">// There are no remaining pending services.</span>
                     <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">services</span>.<span class="ident">pending_len</span>(), <span class="number">0</span>);
                     <span class="kw">break</span>;
                 }
-                <span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Poll::Pending</span> =&gt; {
                     <span class="comment">// None of the pending services are ready.</span>
                     <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">services</span>.<span class="ident">pending_len</span>() <span class="op">&gt;</span> <span class="number">0</span>);
                     <span class="kw">break</span>;
                 }
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">error</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">error</span>)) =&gt; {
                     <span class="comment">// An individual service was lost; continue processing</span>
                     <span class="comment">// pending services.</span>
                     <span class="macro">debug!</span>(<span class="op">%</span><span class="ident">error</span>, <span class="string">&quot;dropping failed endpoint&quot;</span>);
@@ -513,11 +513,11 @@
     }
 
     <span class="doccomment">/// Performs P2C on inner services to find a suitable endpoint.</span>
-    <span class="kw">fn</span> <span class="ident">p2c_ready_index</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">p2c_ready_index</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">services</span>.<span class="ident">ready_len</span>() {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="number">0</span>),
-            <span class="ident">len</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="number">1</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">0</span>),
+            <span class="ident">len</span> =&gt; {
                 <span class="comment">// Get two distinct random indexes (in a random order) and</span>
                 <span class="comment">// compare the loads of the service at each index.</span>
                 <span class="kw">let</span> <span class="ident">idxs</span> <span class="op">=</span> <span class="ident">rand::seq::index::sample</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">rng</span>, <span class="ident">len</span>, <span class="number">2</span>);
@@ -535,7 +535,7 @@
                     <span class="ident">a</span>.<span class="ident">load</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">aload</span>,
                     <span class="ident">b</span>.<span class="ident">index</span> <span class="op">=</span> <span class="ident">bidx</span>,
                     <span class="ident">b</span>.<span class="ident">load</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">bload</span>,
-                    <span class="ident">chosen</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">chosen</span> <span class="op">=</span><span class="op">=</span> <span class="ident">aidx</span> { <span class="string">&quot;a&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;b&quot;</span> },
+                    <span class="ident">chosen</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">chosen</span> <span class="op">==</span> <span class="ident">aidx</span> { <span class="string">&quot;a&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;b&quot;</span> },
                     <span class="string">&quot;p2c&quot;</span>,
                 );
                 <span class="prelude-val">Some</span>(<span class="ident">chosen</span>)
@@ -544,12 +544,12 @@
     }
 
     <span class="doccomment">/// Accesses a ready endpoint by index and returns its current load.</span>
-    <span class="kw">fn</span> <span class="ident">ready_index_load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="ident">D::Service</span> <span class="kw">as</span> <span class="ident">Load</span><span class="op">&gt;</span><span class="ident">::Metric</span> {
+    <span class="kw">fn</span> <span class="ident">ready_index_load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="op">&lt;</span><span class="ident">D::Service</span> <span class="kw">as</span> <span class="ident">Load</span><span class="op">&gt;</span><span class="ident">::Metric</span> {
         <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">svc</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">services</span>.<span class="ident">get_ready_index</span>(<span class="ident">index</span>).<span class="ident">expect</span>(<span class="string">&quot;invalid index&quot;</span>);
         <span class="ident">svc</span>.<span class="ident">load</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">discover_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">D</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">discover_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">D</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">discover</span>
     }
 }
@@ -567,10 +567,10 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::BoxError</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">future::MapErr</span><span class="op">&lt;</span>
         <span class="op">&lt;</span><span class="ident">D::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Future</span>,
-        <span class="kw">fn</span>(<span class="op">&lt;</span><span class="ident">D::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::BoxError</span>,
+        <span class="kw">fn</span>(<span class="op">&lt;</span><span class="ident">D::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>) -&gt; <span class="ident"><span class="kw">crate</span>::BoxError</span>,
     <span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// `ready_index` may have already been set by a prior invocation. These</span>
         <span class="comment">// updates cannot disturb the order of existing ready services.</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">update_pending_from_discover</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>;
@@ -585,16 +585,16 @@
             <span class="comment">// another service can be selected.</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">ready_index</span>.<span class="ident">take</span>() {
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">services</span>.<span class="ident">check_ready_index</span>(<span class="ident">cx</span>, <span class="ident">index</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; {
                         <span class="comment">// The service remains ready.</span>
                         <span class="self">self</span>.<span class="ident">ready_index</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>);
                         <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
                     }
-                    <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) =&gt; {
                         <span class="comment">// The service is no longer ready. Try to find a new one.</span>
                         <span class="macro">trace!</span>(<span class="string">&quot;ready service became unavailable&quot;</span>);
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">Failed</span>(<span class="kw">_</span>, <span class="ident">error</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">Failed</span>(<span class="kw">_</span>, <span class="ident">error</span>)) =&gt; {
                         <span class="comment">// The ready endpoint failed, so log the error and try</span>
                         <span class="comment">// to find a new one.</span>
                         <span class="macro">debug!</span>(<span class="op">%</span><span class="ident">error</span>, <span class="string">&quot;endpoint failed&quot;</span>);
@@ -614,7 +614,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">Req</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">Req</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ready_index</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;called before ready&quot;</span>);
         <span class="self">self</span>.<span class="ident">services</span>
             .<span class="ident">call_ready_index</span>(<span class="ident">index</span>, <span class="ident">request</span>)
@@ -625,7 +625,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">UnreadyService</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">S</span>), (<span class="ident">K</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">S::Error</span><span class="op">&gt;</span>)<span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span> <span class="ident">this</span>.<span class="ident">cancel</span>.<span class="ident">poll</span>(<span class="ident">cx</span>) {
@@ -643,8 +643,8 @@
         <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">service</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;polled after ready&quot;</span>);
 
         <span class="kw">match</span> <span class="ident">res</span> {
-            <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>((<span class="ident">key</span>, <span class="ident">svc</span>))),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>((<span class="ident">key</span>, <span class="ident">Error::Inner</span>(<span class="ident">e</span>)))),
+            <span class="prelude-val">Ok</span>(()) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>((<span class="ident">key</span>, <span class="ident">svc</span>))),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>((<span class="ident">key</span>, <span class="ident">Error::Inner</span>(<span class="ident">e</span>)))),
         }
     }
 }
@@ -654,7 +654,7 @@
     <span class="ident">K</span>: <span class="ident">fmt::Debug</span>,
     <span class="ident">S</span>: <span class="ident">fmt::Debug</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="self">Self</span> {
             <span class="ident">key</span>,
             <span class="ident">cancel</span>,

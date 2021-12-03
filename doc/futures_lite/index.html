@@ -3,7 +3,7 @@
 warts in its API, fills in some obvious gaps, and removes almost all unsafe code from it.</p>
 <p>In short, this crate aims to be more enjoyable than <a href="https://docs.rs/futures">futures</a> but still fully compatible with
 it.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures_lite::future</span>;
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
@@ -12,14 +12,14 @@ it.</p>
     })
 }</code></pre></div>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="future/index.html" title="futures_lite::future mod">future</a></div><div class="item-right docblock-short"><p>Combinators for the <a href="https://doc.rust-lang.org/1.56.1/core/future/future/trait.Future.html" title="Future"><code>Future</code></a> trait.</p>
-</div><div class="item-left module-item"><a class="mod" href="io/index.html" title="futures_lite::io mod">io</a></div><div class="item-right docblock-short"><p>Tools and combinators for I/O.</p>
-</div><div class="item-left module-item"><a class="mod" href="prelude/index.html" title="futures_lite::prelude mod">prelude</a></div><div class="item-right docblock-short"><p>Traits <a href="https://doc.rust-lang.org/1.56.1/core/future/future/trait.Future.html" title="Future"><code>Future</code></a>, <a href="../futures_core/stream/trait.Stream.html" title="Stream"><code>Stream</code></a>, <a href="../futures_io/if_std/trait.AsyncRead.html" title="AsyncRead"><code>AsyncRead</code></a>, <a href="../futures_io/if_std/trait.AsyncWrite.html" title="AsyncWrite"><code>AsyncWrite</code></a>, <a href="../futures_io/if_std/trait.AsyncBufRead.html" title="AsyncBufRead"><code>AsyncBufRead</code></a>,
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="future/index.html" title="futures_lite::future mod">future</a></div><div class="item-right docblock-short"><p>Combinators for the <a href="https://doc.rust-lang.org/1.57.0/core/future/future/trait.Future.html" title="Future"><code>Future</code></a> trait.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="io/index.html" title="futures_lite::io mod">io</a></div><div class="item-right docblock-short"><p>Tools and combinators for I/O.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="prelude/index.html" title="futures_lite::prelude mod">prelude</a></div><div class="item-right docblock-short"><p>Traits <a href="https://doc.rust-lang.org/1.57.0/core/future/future/trait.Future.html" title="Future"><code>Future</code></a>, <a href="../futures_core/stream/trait.Stream.html" title="Stream"><code>Stream</code></a>, <a href="../futures_io/if_std/trait.AsyncRead.html" title="AsyncRead"><code>AsyncRead</code></a>, <a href="../futures_io/if_std/trait.AsyncWrite.html" title="AsyncWrite"><code>AsyncWrite</code></a>, <a href="../futures_io/if_std/trait.AsyncBufRead.html" title="AsyncBufRead"><code>AsyncBufRead</code></a>,
 <a href="../futures_io/if_std/trait.AsyncSeek.html" title="AsyncSeek"><code>AsyncSeek</code></a>, and their extensions.</p>
-</div><div class="item-left module-item"><a class="mod" href="stream/index.html" title="futures_lite::stream mod">stream</a></div><div class="item-right docblock-short"><p>Combinators for the <a href="../futures_core/stream/trait.Stream.html" title="Stream"><code>Stream</code></a> trait.</p>
-</div></div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="macro" href="macro.pin.html" title="futures_lite::pin macro">pin</a></div><div class="item-right docblock-short"><p>Pins a variable of type <code>T</code> on the stack and rebinds it as <code>Pin&lt;&amp;mut T&gt;</code>.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.ready.html" title="futures_lite::ready macro">ready</a></div><div class="item-right docblock-short"><p>Unwraps <code>Poll&lt;T&gt;</code> or returns <a href="https://doc.rust-lang.org/1.56.1/core/task/poll/enum.Poll.html#variant.Pending" title="core::task::Poll::Pending"><code>Pending</code></a>.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="futures_lite" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="stream/index.html" title="futures_lite::stream mod">stream</a></div><div class="item-right docblock-short"><p>Combinators for the <a href="../futures_core/stream/trait.Stream.html" title="Stream"><code>Stream</code></a> trait.</p>
+</div></div></div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.pin.html" title="futures_lite::pin macro">pin</a></div><div class="item-right docblock-short"><p>Pins a variable of type <code>T</code> on the stack and rebinds it as <code>Pin&lt;&amp;mut T&gt;</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.ready.html" title="futures_lite::ready macro">ready</a></div><div class="item-right docblock-short"><p>Unwraps <code>Poll&lt;T&gt;</code> or returns <a href="https://doc.rust-lang.org/1.57.0/core/task/poll/enum.Poll.html#variant.Pending" title="core::task::Poll::Pending"><code>Pending</code></a>.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="futures_lite" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

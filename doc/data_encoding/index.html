@@ -14,7 +14,7 @@ bases of size 2, 4, 8, 16, 32, and 64. It supports:</p>
 <li>no-alloc environments with <code>default-features = false</code></li>
 </ul>
 <p>You may use the <a href="https://crates.io/crates/data-encoding-bin">binary</a> or the <a href="https://data-encoding.rs">website</a> to play around.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>This crate provides predefined encodings as <a href="index.html#constants">constants</a>. These constants are of type
 <a href="struct.Encoding.html"><code>Encoding</code></a>. This type provides encoding and decoding functions with in-place or allocating
 variants. Here is an example using the allocating encoding function of <a href="constant.BASE64.html"><code>BASE64</code></a>:</p>
@@ -52,7 +52,7 @@ type:</p>
     <span class="ident">symbols</span>: <span class="string">&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;</span>,
     <span class="ident">padding</span>: <span class="string">&#39;=&#39;</span>,
 };</code></pre></div>
-<h1 id="properties" class="section-header"><a href="#properties">Properties</a></h1>
+<h2 id="properties" class="section-header"><a href="#properties">Properties</a></h2>
 <p>The <a href="constant.HEXUPPER.html"><code>HEXUPPER</code></a>, <a href="constant.BASE32.html"><code>BASE32</code></a>, <a href="constant.BASE32HEX.html"><code>BASE32HEX</code></a>, <a href="constant.BASE64.html"><code>BASE64</code></a>, and <a href="constant.BASE64URL.html"><code>BASE64URL</code></a> predefined encodings
 are conform to <a href="https://tools.ietf.org/html/rfc4648">RFC4648</a>.</p>
 <p>In general, the encoding and decoding functions satisfy the following properties:</p>
@@ -74,7 +74,7 @@ function which may be more or less permissive. In this crate, the decoding funct
 encodings rejects all inputs that are not a possible output of the encoding function. Here are
 some concrete examples of decoding differences between this crate, the <code>base64</code> crate, and the
 <code>base64</code> GNU program:</p>
-<table><thead><tr><th>Input</th><th><code>data-encoding</code></th><th><code>base64</code></th><th>GNU <code>base64</code></th></tr></thead><tbody>
+<div><table><thead><tr><th>Input</th><th><code>data-encoding</code></th><th><code>base64</code></th><th>GNU <code>base64</code></th></tr></thead><tbody>
 <tr><td><code>AAB=</code></td><td><code>Trailing(2)</code></td><td><code>Last(2)</code></td><td><code>\x00\x00</code></td></tr>
 <tr><td><code>AA\nB=</code></td><td><code>Length(4)</code></td><td><code>Length</code></td><td><code>\x00\x00</code></td></tr>
 <tr><td><code>AAB</code></td><td><code>Length(0)</code></td><td><code>Last(2)</code></td><td>Invalid input</td></tr>
@@ -83,45 +83,47 @@ some concrete examples of decoding differences between this crate, the <code>bas
 <tr><td><code>-_\r\n</code></td><td><code>Symbol(0)</code></td><td><code>Byte(0)</code></td><td>Invalid input</td></tr>
 <tr><td><code>AA==AA==</code></td><td><code>[0, 0]</code></td><td><code>Byte(2)</code></td><td><code>\x00\x00</code></td></tr>
 </tbody></table>
+</div>
 <p>We can summarize these discrepancies as follows:</p>
-<table><thead><tr><th>Discrepancy</th><th><code>data-encoding</code></th><th><code>base64</code></th><th>GNU <code>base64</code></th></tr></thead><tbody>
+<div><table><thead><tr><th>Discrepancy</th><th><code>data-encoding</code></th><th><code>base64</code></th><th>GNU <code>base64</code></th></tr></thead><tbody>
 <tr><td>Check trailing bits</td><td>Yes</td><td>Yes</td><td>No</td></tr>
 <tr><td>Ignored characters</td><td>None</td><td>None</td><td><code>\n</code></td></tr>
 <tr><td>Translated characters</td><td>None</td><td>None</td><td>None</td></tr>
 <tr><td>Check padding</td><td>Yes</td><td>No</td><td>Yes</td></tr>
 <tr><td>Support concatenated input</td><td>Yes</td><td>No</td><td>Yes</td></tr>
 </tbody></table>
+</div>
 <p>This crate permits to disable checking trailing bits. It permits to ignore some characters. It
 permits to translate characters. It permits to use unpadded encodings. However, for padded
 encodings, support for concatenated inputs cannot be disabled. This is simply because it doesn’t
 make sense to use padding if it is not to support concatenated inputs.</p>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.DecodeError.html" title="data_encoding::DecodeError struct">DecodeError</a></div><div class="item-right docblock-short"><p>Decoding error</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.DecodePartial.html" title="data_encoding::DecodePartial struct">DecodePartial</a></div><div class="item-right docblock-short"><p>Decoding error with partial result</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Encoding.html" title="data_encoding::Encoding struct">Encoding</a></div><div class="item-right docblock-short"><p>Base-conversion encoding</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Specification.html" title="data_encoding::Specification struct">Specification</a></div><div class="item-right docblock-short"><p>Base-conversion specification</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SpecificationError.html" title="data_encoding::SpecificationError struct">SpecificationError</a></div><div class="item-right docblock-short"><p>Specification error</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Translate.html" title="data_encoding::Translate struct">Translate</a></div><div class="item-right docblock-short"><p>How to translate characters when decoding</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Wrap.html" title="data_encoding::Wrap struct">Wrap</a></div><div class="item-right docblock-short"><p>How to wrap the output when encoding</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.BitOrder.html" title="data_encoding::BitOrder enum">BitOrder</a></div><div class="item-right docblock-short"><p>Order in which bits are read from a byte</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.DecodeKind.html" title="data_encoding::DecodeKind enum">DecodeKind</a></div><div class="item-right docblock-short"><p>Decoding error kind</p>
-</div></div><h2 id="constants" class="section-header"><a href="#constants">Constants</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="constant" href="constant.BASE32.html" title="data_encoding::BASE32 constant">BASE32</a></div><div class="item-right docblock-short"><p>Padded base32 encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.BASE32HEX.html" title="data_encoding::BASE32HEX constant">BASE32HEX</a></div><div class="item-right docblock-short"><p>Padded base32hex encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.BASE32HEX_NOPAD.html" title="data_encoding::BASE32HEX_NOPAD constant">BASE32HEX_NOPAD</a></div><div class="item-right docblock-short"><p>Unpadded base32hex encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.BASE32_DNSCURVE.html" title="data_encoding::BASE32_DNSCURVE constant">BASE32_DNSCURVE</a></div><div class="item-right docblock-short"><p>DNSCurve base32 encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.BASE32_DNSSEC.html" title="data_encoding::BASE32_DNSSEC constant">BASE32_DNSSEC</a></div><div class="item-right docblock-short"><p>DNSSEC base32 encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.BASE32_NOPAD.html" title="data_encoding::BASE32_NOPAD constant">BASE32_NOPAD</a></div><div class="item-right docblock-short"><p>Unpadded base32 encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.BASE64.html" title="data_encoding::BASE64 constant">BASE64</a></div><div class="item-right docblock-short"><p>Padded base64 encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.BASE64URL.html" title="data_encoding::BASE64URL constant">BASE64URL</a></div><div class="item-right docblock-short"><p>Padded base64url encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.BASE64URL_NOPAD.html" title="data_encoding::BASE64URL_NOPAD constant">BASE64URL_NOPAD</a></div><div class="item-right docblock-short"><p>Unpadded base64url encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.BASE64_MIME.html" title="data_encoding::BASE64_MIME constant">BASE64_MIME</a></div><div class="item-right docblock-short"><p>MIME base64 encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.BASE64_NOPAD.html" title="data_encoding::BASE64_NOPAD constant">BASE64_NOPAD</a></div><div class="item-right docblock-short"><p>Unpadded base64 encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.HEXLOWER.html" title="data_encoding::HEXLOWER constant">HEXLOWER</a></div><div class="item-right docblock-short"><p>Lowercase hexadecimal encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.HEXLOWER_PERMISSIVE.html" title="data_encoding::HEXLOWER_PERMISSIVE constant">HEXLOWER_PERMISSIVE</a></div><div class="item-right docblock-short"><p>Lowercase hexadecimal encoding with case-insensitive decoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.HEXUPPER.html" title="data_encoding::HEXUPPER constant">HEXUPPER</a></div><div class="item-right docblock-short"><p>Uppercase hexadecimal encoding</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.HEXUPPER_PERMISSIVE.html" title="data_encoding::HEXUPPER_PERMISSIVE constant">HEXUPPER_PERMISSIVE</a></div><div class="item-right docblock-short"><p>Uppercase hexadecimal encoding with case-insensitive decoding</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="data_encoding" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DecodeError.html" title="data_encoding::DecodeError struct">DecodeError</a></div><div class="item-right docblock-short"><p>Decoding error</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DecodePartial.html" title="data_encoding::DecodePartial struct">DecodePartial</a></div><div class="item-right docblock-short"><p>Decoding error with partial result</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Encoding.html" title="data_encoding::Encoding struct">Encoding</a></div><div class="item-right docblock-short"><p>Base-conversion encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Specification.html" title="data_encoding::Specification struct">Specification</a></div><div class="item-right docblock-short"><p>Base-conversion specification</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SpecificationError.html" title="data_encoding::SpecificationError struct">SpecificationError</a></div><div class="item-right docblock-short"><p>Specification error</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Translate.html" title="data_encoding::Translate struct">Translate</a></div><div class="item-right docblock-short"><p>How to translate characters when decoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Wrap.html" title="data_encoding::Wrap struct">Wrap</a></div><div class="item-right docblock-short"><p>How to wrap the output when encoding</p>
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.BitOrder.html" title="data_encoding::BitOrder enum">BitOrder</a></div><div class="item-right docblock-short"><p>Order in which bits are read from a byte</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.DecodeKind.html" title="data_encoding::DecodeKind enum">DecodeKind</a></div><div class="item-right docblock-short"><p>Decoding error kind</p>
+</div></div></div><h2 id="constants" class="section-header"><a href="#constants">Constants</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BASE32.html" title="data_encoding::BASE32 constant">BASE32</a></div><div class="item-right docblock-short"><p>Padded base32 encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BASE32HEX.html" title="data_encoding::BASE32HEX constant">BASE32HEX</a></div><div class="item-right docblock-short"><p>Padded base32hex encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BASE32HEX_NOPAD.html" title="data_encoding::BASE32HEX_NOPAD constant">BASE32HEX_NOPAD</a></div><div class="item-right docblock-short"><p>Unpadded base32hex encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BASE32_DNSCURVE.html" title="data_encoding::BASE32_DNSCURVE constant">BASE32_DNSCURVE</a></div><div class="item-right docblock-short"><p>DNSCurve base32 encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BASE32_DNSSEC.html" title="data_encoding::BASE32_DNSSEC constant">BASE32_DNSSEC</a></div><div class="item-right docblock-short"><p>DNSSEC base32 encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BASE32_NOPAD.html" title="data_encoding::BASE32_NOPAD constant">BASE32_NOPAD</a></div><div class="item-right docblock-short"><p>Unpadded base32 encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BASE64.html" title="data_encoding::BASE64 constant">BASE64</a></div><div class="item-right docblock-short"><p>Padded base64 encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BASE64URL.html" title="data_encoding::BASE64URL constant">BASE64URL</a></div><div class="item-right docblock-short"><p>Padded base64url encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BASE64URL_NOPAD.html" title="data_encoding::BASE64URL_NOPAD constant">BASE64URL_NOPAD</a></div><div class="item-right docblock-short"><p>Unpadded base64url encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BASE64_MIME.html" title="data_encoding::BASE64_MIME constant">BASE64_MIME</a></div><div class="item-right docblock-short"><p>MIME base64 encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BASE64_NOPAD.html" title="data_encoding::BASE64_NOPAD constant">BASE64_NOPAD</a></div><div class="item-right docblock-short"><p>Unpadded base64 encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.HEXLOWER.html" title="data_encoding::HEXLOWER constant">HEXLOWER</a></div><div class="item-right docblock-short"><p>Lowercase hexadecimal encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.HEXLOWER_PERMISSIVE.html" title="data_encoding::HEXLOWER_PERMISSIVE constant">HEXLOWER_PERMISSIVE</a></div><div class="item-right docblock-short"><p>Lowercase hexadecimal encoding with case-insensitive decoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.HEXUPPER.html" title="data_encoding::HEXUPPER constant">HEXUPPER</a></div><div class="item-right docblock-short"><p>Uppercase hexadecimal encoding</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.HEXUPPER_PERMISSIVE.html" title="data_encoding::HEXUPPER_PERMISSIVE constant">HEXUPPER_PERMISSIVE</a></div><div class="item-right docblock-short"><p>Uppercase hexadecimal encoding with case-insensitive decoding</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="data_encoding" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

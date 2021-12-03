@@ -396,18 +396,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">ResolveErrorKind</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ResolveErrorKind</span>::<span class="kw-2">*</span>;
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Message</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message</span>(<span class="ident">msg</span>),
-            <span class="ident">Msg</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Msg</span>(<span class="ident">msg</span>.<span class="ident">clone</span>()),
+            <span class="ident">Message</span>(<span class="ident">msg</span>) =&gt; <span class="ident">Message</span>(<span class="ident">msg</span>),
+            <span class="ident">Msg</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) =&gt; <span class="ident">Msg</span>(<span class="ident">msg</span>.<span class="ident">clone</span>()),
             <span class="ident">NoRecordsFound</span> {
                 <span class="kw-2">ref</span> <span class="ident">query</span>,
                 <span class="kw-2">ref</span> <span class="ident">soa</span>,
                 <span class="ident">negative_ttl</span>,
                 <span class="ident">response_code</span>,
                 <span class="ident">trusted</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">NoRecordsFound</span> {
+            } =&gt; <span class="ident">NoRecordsFound</span> {
                 <span class="ident">query</span>: <span class="ident">query</span>.<span class="ident">clone</span>(),
                 <span class="ident">soa</span>: <span class="ident">soa</span>.<span class="ident">clone</span>(),
                 <span class="ident">negative_ttl</span>: <span class="kw-2">*</span><span class="ident">negative_ttl</span>,
@@ -415,9 +415,9 @@
                 <span class="ident">trusted</span>: <span class="kw-2">*</span><span class="ident">trusted</span>,
             },
             <span class="comment">// foreign</span>
-            <span class="ident">Io</span>(<span class="ident">io</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ResolveErrorKind::from</span>(<span class="ident">std::io::Error::from</span>(<span class="ident">io</span>.<span class="ident">kind</span>())),
-            <span class="ident">Proto</span>(<span class="ident">proto</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ResolveErrorKind::from</span>(<span class="ident">proto</span>.<span class="ident">clone</span>()),
-            <span class="ident">Timeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Timeout</span>,
+            <span class="ident">Io</span>(<span class="ident">io</span>) =&gt; <span class="ident">ResolveErrorKind::from</span>(<span class="ident">std::io::Error::from</span>(<span class="ident">io</span>.<span class="ident">kind</span>())),
+            <span class="ident">Proto</span>(<span class="ident">proto</span>) =&gt; <span class="ident">ResolveErrorKind::from</span>(<span class="ident">proto</span>.<span class="ident">clone</span>()),
+            <span class="ident">Timeout</span> =&gt; <span class="ident">Timeout</span>,
         }
     }
 }
@@ -437,7 +437,7 @@
         <span class="ident">negative_ttl</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
         <span class="ident">response_code</span>: <span class="ident">ResponseCode</span>,
         <span class="ident">trusted</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveError</span> {
+    ) -&gt; <span class="ident">ResolveError</span> {
         <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
             <span class="ident">query</span>,
             <span class="ident">soa</span>,
@@ -449,14 +449,14 @@
     }
 
     <span class="doccomment">/// Get the kind of the error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>
     }
 
     <span class="doccomment">/// A conversion to determine if the response is an error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_response</span>(<span class="ident">response</span>: <span class="ident">DnsResponse</span>, <span class="ident">trust_nx</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_response</span>(<span class="ident">response</span>: <span class="ident">DnsResponse</span>, <span class="ident">trust_nx</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">response_code</span>() {
-            <span class="ident">ResponseCode::ServFail</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ResponseCode::ServFail</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Nameserver responded with SERVFAIL&quot;</span>;
                 <span class="macro">debug!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">note</span>);
 
@@ -474,7 +474,7 @@
                 <span class="prelude-val">Err</span>(<span class="ident">ResolveError::from</span>(<span class="ident">error_kind</span>))
             }
             <span class="comment">// Some NXDOMAIN responses contain CNAME referals, that will not be an error</span>
-            <span class="ident">ResponseCode::NXDomain</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">contains_answer</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ResponseCode::NXDomain</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">contains_answer</span>() =&gt; {
                 <span class="kw">let</span> <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Nameserver responded with NXDomain&quot;</span>;
                 <span class="macro">debug!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">note</span>);
 
@@ -497,7 +497,7 @@
                 <span class="prelude-val">Err</span>(<span class="ident">ResolveError::from</span>(<span class="ident">error_kind</span>))
             }
             <span class="comment">// No answers are available, CNAME referals are not failures</span>
-            <span class="ident">ResponseCode::NoError</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">contains_answer</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ResponseCode::NoError</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">contains_answer</span>() =&gt; {
                 <span class="kw">let</span> <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Nameserver responded with NoError and no records&quot;</span>;
                 <span class="macro">debug!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">note</span>);
 
@@ -519,45 +519,45 @@
 
                 <span class="prelude-val">Err</span>(<span class="ident">ResolveError::from</span>(<span class="ident">error_kind</span>))
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">response</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">response</span>),
         }
     }
 
     <span class="doccomment">/// Compare two errors to see if one contains a server response.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cmp_specificity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cmp_specificity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">kind</span>();
         <span class="kw">let</span> <span class="ident">other</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">kind</span>();
 
         <span class="kw">match</span> (<span class="ident">kind</span>, <span class="ident">other</span>) {
-            (<span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. }, <span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. }, <span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. }) =&gt; {
                 <span class="kw">return</span> <span class="ident">Ordering::Equal</span>
             }
-            (<span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. }, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Ordering::Greater</span>,
-            (<span class="kw">_</span>, <span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Ordering::Less</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            (<span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. }, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Greater</span>,
+            (<span class="kw">_</span>, <span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. }) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Less</span>,
+            <span class="kw">_</span> =&gt; (),
         }
 
         <span class="kw">match</span> (<span class="ident">kind</span>, <span class="ident">other</span>) {
-            (<span class="ident">ResolveErrorKind::Io</span> { .. }, <span class="ident">ResolveErrorKind::Io</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Ordering::Equal</span>,
-            (<span class="ident">ResolveErrorKind::Io</span> { .. }, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Ordering::Greater</span>,
-            (<span class="kw">_</span>, <span class="ident">ResolveErrorKind::Io</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Ordering::Less</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            (<span class="ident">ResolveErrorKind::Io</span> { .. }, <span class="ident">ResolveErrorKind::Io</span> { .. }) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Equal</span>,
+            (<span class="ident">ResolveErrorKind::Io</span> { .. }, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Greater</span>,
+            (<span class="kw">_</span>, <span class="ident">ResolveErrorKind::Io</span> { .. }) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Less</span>,
+            <span class="kw">_</span> =&gt; (),
         }
 
         <span class="kw">match</span> (<span class="ident">kind</span>, <span class="ident">other</span>) {
-            (<span class="ident">ResolveErrorKind::Proto</span> { .. }, <span class="ident">ResolveErrorKind::Proto</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">ResolveErrorKind::Proto</span> { .. }, <span class="ident">ResolveErrorKind::Proto</span> { .. }) =&gt; {
                 <span class="kw">return</span> <span class="ident">Ordering::Equal</span>
             }
-            (<span class="ident">ResolveErrorKind::Proto</span> { .. }, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Ordering::Greater</span>,
-            (<span class="kw">_</span>, <span class="ident">ResolveErrorKind::Proto</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Ordering::Less</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            (<span class="ident">ResolveErrorKind::Proto</span> { .. }, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Greater</span>,
+            (<span class="kw">_</span>, <span class="ident">ResolveErrorKind::Proto</span> { .. }) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Less</span>,
+            <span class="kw">_</span> =&gt; (),
         }
 
         <span class="kw">match</span> (<span class="ident">kind</span>, <span class="ident">other</span>) {
-            (<span class="ident">ResolveErrorKind::Timeout</span>, <span class="ident">ResolveErrorKind::Timeout</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Ordering::Equal</span>,
-            (<span class="ident">ResolveErrorKind::Timeout</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Ordering::Greater</span>,
-            (<span class="kw">_</span>, <span class="ident">ResolveErrorKind::Timeout</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Ordering::Less</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            (<span class="ident">ResolveErrorKind::Timeout</span>, <span class="ident">ResolveErrorKind::Timeout</span>) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Equal</span>,
+            (<span class="ident">ResolveErrorKind::Timeout</span>, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Greater</span>,
+            (<span class="kw">_</span>, <span class="ident">ResolveErrorKind::Timeout</span>) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Less</span>,
+            <span class="kw">_</span> =&gt; (),
         }
 
         <span class="ident">Ordering::Equal</span>
@@ -565,20 +565,20 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RetryableError</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">should_retry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">should_retry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>(), <span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">trusted</span>, .. } <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">trusted</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">attempted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">attempted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span>() {
-            <span class="ident">ResolveErrorKind::Proto</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">e</span>.<span class="ident">kind</span>(), <span class="ident">ProtoErrorKind::Busy</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">ResolveErrorKind::Proto</span>(<span class="ident">e</span>) =&gt; <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">e</span>.<span class="ident">kind</span>(), <span class="ident">ProtoErrorKind::Busy</span>),
+            <span class="kw">_</span> =&gt; <span class="bool-val">true</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">cfg_if::cfg_if!</span> {
             <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-backtrace&quot;</span>)]</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">backtrace</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">backtrack</span> {
@@ -595,7 +595,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ResolveErrorKind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">kind</span>: <span class="ident">ResolveErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">kind</span>: <span class="ident">ResolveErrorKind</span>) -&gt; <span class="ident">ResolveError</span> {
         <span class="ident">ResolveError</span> {
             <span class="ident">kind</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-backtrace&quot;</span>)]</span>
@@ -605,7 +605,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">ResolveError</span> {
         <span class="ident">ResolveErrorKind::Message</span>(<span class="ident">msg</span>).<span class="ident">into</span>()
     }
 }
@@ -613,46 +613,46 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ipconfig::error::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ipconfig::error::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ipconfig::error::Error</span>) -&gt; <span class="ident">ResolveError</span> {
         <span class="ident">ResolveErrorKind::Msg</span>(<span class="macro">format!</span>(<span class="string">&quot;failed to read from registry: {}&quot;</span>, <span class="ident">e</span>)).<span class="ident">into</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">msg</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">msg</span>: <span class="ident">String</span>) -&gt; <span class="ident">ResolveError</span> {
         <span class="ident">ResolveErrorKind::Msg</span>(<span class="ident">msg</span>).<span class="ident">into</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">ResolveError</span> {
         <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
-            <span class="ident">io::ErrorKind::TimedOut</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ResolveErrorKind::Timeout</span>.<span class="ident">into</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ResolveErrorKind::from</span>(<span class="ident">e</span>).<span class="ident">into</span>(),
+            <span class="ident">io::ErrorKind::TimedOut</span> =&gt; <span class="ident">ResolveErrorKind::Timeout</span>.<span class="ident">into</span>(),
+            <span class="kw">_</span> =&gt; <span class="ident">ResolveErrorKind::from</span>(<span class="ident">e</span>).<span class="ident">into</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ProtoError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ProtoError</span>) -&gt; <span class="ident">ResolveError</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">kind</span>() {
-            <span class="ident">ProtoErrorKind::Timeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ResolveErrorKind::Timeout</span>.<span class="ident">into</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ResolveErrorKind::from</span>(<span class="ident">e</span>).<span class="ident">into</span>(),
+            <span class="ident">ProtoErrorKind::Timeout</span> =&gt; <span class="ident">ResolveErrorKind::Timeout</span>.<span class="ident">into</span>(),
+            <span class="kw">_</span> =&gt; <span class="ident">ResolveErrorKind::from</span>(<span class="ident">e</span>).<span class="ident">into</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">io::Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ResolveError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ResolveError</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
-            <span class="ident">ResolveErrorKind::Timeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::TimedOut</span>, <span class="ident">e</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="ident">e</span>),
+            <span class="ident">ResolveErrorKind::Timeout</span> =&gt; <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::TimedOut</span>, <span class="ident">e</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="ident">e</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">sync::PoisonError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">sync::PoisonError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">sync::PoisonError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ResolveErrorKind::Msg</span>(<span class="macro">format!</span>(<span class="string">&quot;lock was poisoned, this is non-recoverable: {}&quot;</span>, <span class="ident">e</span>)).<span class="ident">into</span>()
     }
 }

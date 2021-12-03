@@ -113,7 +113,7 @@
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;correct&quot;</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">standalone_mantissa</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Iter1</span>, <span class="ident">Iter2</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">integer</span>: <span class="ident">Iter1</span>, <span class="kw-2">mut</span> <span class="ident">fraction</span>: <span class="ident">Iter2</span>, <span class="ident">radix</span>: <span class="ident">u32</span>)
-    <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">T</span>, <span class="ident">usize</span>)
+    -&gt; (<span class="ident">T</span>, <span class="ident">usize</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">UnsignedInteger</span>,
           <span class="ident">Iter1</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">u8</span><span class="op">&gt;</span>,
           <span class="ident">Iter2</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">u8</span><span class="op">&gt;</span>
@@ -130,8 +130,8 @@
     <span class="comment">// calculate the number of truncated digits.</span>
     <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">integer</span>.<span class="ident">next</span>() {
         <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">add_digit</span>(<span class="ident">value</span>, <span class="macro">to_digit!</span>(<span class="kw-2">*</span><span class="ident">c</span>, <span class="ident">radix</span>).<span class="ident">unwrap</span>(), <span class="ident">radix</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>,
-            <span class="prelude-val">None</span>    <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
+            <span class="prelude-val">None</span>    =&gt; {
                 <span class="kw">let</span> <span class="ident">truncated</span> <span class="op">=</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">integer</span>.<span class="ident">count</span>() <span class="op">+</span> <span class="ident">fraction</span>.<span class="ident">count</span>();
                 <span class="kw">return</span> (<span class="ident">value</span>, <span class="ident">truncated</span>);
             },
@@ -139,8 +139,8 @@
     }
     <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">fraction</span>.<span class="ident">next</span>() {
         <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">add_digit</span>(<span class="ident">value</span>, <span class="macro">to_digit!</span>(<span class="kw-2">*</span><span class="ident">c</span>, <span class="ident">radix</span>).<span class="ident">unwrap</span>(), <span class="ident">radix</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>,
-            <span class="prelude-val">None</span>    <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
+            <span class="prelude-val">None</span>    =&gt; {
                 <span class="kw">let</span> <span class="ident">truncated</span> <span class="op">=</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">fraction</span>.<span class="ident">count</span>();
                 <span class="kw">return</span> (<span class="ident">value</span>, <span class="ident">truncated</span>);
             },
@@ -153,7 +153,7 @@
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;correct&quot;</span>))]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">standalone_mantissa</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Iter</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">iter</span>: <span class="ident">Iter</span>, <span class="ident">radix</span>: <span class="ident">u32</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+    -&gt; <span class="ident">T</span>
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Integer</span>,
           <span class="ident">Iter</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">u8</span><span class="op">&gt;</span>
 {
@@ -170,7 +170,7 @@
 <span class="macro">perftools_inline!</span>{
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;correct&quot;</span>))]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">standalone_mantissa_n</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Iter</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Iter</span>, <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">max</span>: <span class="ident">usize</span>)
-    <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">T</span>, <span class="ident">usize</span>)
+    -&gt; (<span class="ident">T</span>, <span class="ident">usize</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Integer</span>,
           <span class="ident">Iter</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">u8</span><span class="op">&gt;</span>
 {

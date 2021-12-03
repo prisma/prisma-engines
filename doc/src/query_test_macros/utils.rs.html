@@ -16,14 +16,14 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">query_tests_setup</span>::{<span class="ident">ConnectorTag</span>, <span class="ident">ConnectorTagInterface</span>};
 <span class="kw">use</span> <span class="ident">quote::quote</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quote_connector</span>(<span class="ident">tag</span>: <span class="ident">ConnectorTag</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro2::TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quote_connector</span>(<span class="ident">tag</span>: <span class="ident">ConnectorTag</span>) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
     <span class="kw">let</span> (<span class="ident">connector</span>, <span class="ident">version</span>) <span class="op">=</span> <span class="ident">tag</span>.<span class="ident">as_parse_pair</span>();
 
     <span class="kw">match</span> <span class="ident">version</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">version</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">version</span>) =&gt; <span class="macro">quote!</span> {
             <span class="ident">ConnectorTag::try_from</span>((#<span class="ident">connector</span>, <span class="prelude-val">Some</span>(#<span class="ident">version</span>))).<span class="ident">unwrap</span>()
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span> {
+        <span class="prelude-val">None</span> =&gt; <span class="macro">quote!</span> {
             <span class="ident">ConnectorTag::try_from</span>(#<span class="ident">connector</span>).<span class="ident">unwrap</span>()
         },
     }

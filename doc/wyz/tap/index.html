@@ -6,7 +6,7 @@ a provided function on a borrow of the value.</p>
 signatures) to be chained.</p>
 <p>The traits in this crate provide methods that run some function, <code>Fn(&amp;T)</code> or
 <code>Fn(&amp;mut T)</code>, on a value <code>T</code> without changing the binding status of that value.</p>
-<h1 id="value-tapping" class="section-header"><a href="#value-tapping">Value Tapping</a></h1>
+<h2 id="value-tapping" class="section-header"><a href="#value-tapping">Value Tapping</a></h2>
 <p>The primary trait of this crate is <a href="trait.Tap.html"><code>Tap</code></a>, which provides two methods: <a href="trait.Tap.html"><code>tap</code></a>
 and <a href="trait.Tap.html#method.tap_mut"><code>tap_mut</code></a>. These provide immutable or mutable, respectively, borrows of
 the tapped value to a user-provided function. The user function must not have a
@@ -16,12 +16,12 @@ return value.</p>
 access to the main value.</p>
 <p>Tap methods never change the type of the object on which they are called. The
 <code>mut</code>-suffixed methods <em>are</em> permitted to change the <em>value</em> of their object.</p>
-<h1 id="trait-tapping" class="section-header"><a href="#trait-tapping">Trait Tapping</a></h1>
+<h2 id="trait-tapping" class="section-header"><a href="#trait-tapping">Trait Tapping</a></h2>
 <p>Rust does not have subtyping in the object-oriented sense; rather, it uses
 traits to indicate relationships between types and bring behavior of an interior
 type to the exterior type. This crate provides taps that use the standard
 conversion traits in order to assist in running tap methods generically.</p>
-<h2 id="borrowed-tapping" class="section-header"><a href="#borrowed-tapping">Borrowed Tapping</a></h2>
+<h3 id="borrowed-tapping" class="section-header"><a href="#borrowed-tapping">Borrowed Tapping</a></h3>
 <p>The traits <code>std::borrow::Borrow</code> and <code>std::borrow::BorrowMut</code> allow container
 types to behave as their contained types in borrowed contexts. The <a href="trait.TapBorrow.html"><code>TapBorrow</code></a>
 trait provides methods, <a href="trait.TapBorrow.html#method.tap_borrow"><code>tap_borrow</code></a> and <a href="trait.TapBorrow.html#method.tap_borrow_mut"><code>tap_borrow_mut</code></a>, which depend on
@@ -30,7 +30,7 @@ borrowed interior type.</p>
 <p>This is useful for inspecting the interior of a <code>Cow</code> or other data structures
 that abstract away the exact container type but provide uniform access to the
 underlying data.</p>
-<h2 id="polymorphic-tapping" class="section-header"><a href="#polymorphic-tapping">Polymorphic Tapping</a></h2>
+<h3 id="polymorphic-tapping" class="section-header"><a href="#polymorphic-tapping">Polymorphic Tapping</a></h3>
 <p>The traits <code>std::convert::AsRef</code> and <code>std::convert::AsMut</code> allow composed types
 to be used by reference as their component types. The <a href="trait.TapAsRef.html"><code>TapAsRef</code></a> trait
 provides methods, <a href="trait.TapAsRef.html#method.tap_ref"><code>tap_ref</code></a> and <a href="trait.TapAsRef.html#method.tap_ref_mut"><code>tap_ref_mut</code></a>, which depend on <code>AsRef</code> and
@@ -45,7 +45,7 @@ times with different targets. As such, the referent type must be specified in
 the tapped function. This can be done with a named method, or by marking the
 type of the closure argument: <code>|x: &amp;Referent| ...</code>.</p>
 </blockquote>
-<h2 id="dereferenced-tapping" class="section-header"><a href="#dereferenced-tapping">Dereferenced Tapping</a></h2>
+<h3 id="dereferenced-tapping" class="section-header"><a href="#dereferenced-tapping">Dereferenced Tapping</a></h3>
 <p>The traits <code>std::ops::Deref</code> and <code>std::ops::DerefMut</code> may be used to make owning
 containers transparently defer to their contained data. This is used by <code>Vec</code>
 and <code>String</code>, for example, to behave like <code>[T]</code> and <code>str</code> implicitly.</p>
@@ -54,15 +54,15 @@ and <code>String</code>, for example, to behave like <code>[T]</code> and <code>
 provided function on the produced <code>Deref::Target</code> value.</p>
 <p>Since <code>Deref</code> may only be implemented once, this trait does not require any
 extra type information in its tap calls.</p>
-<h1 id="conditional-tapping" class="section-header"><a href="#conditional-tapping">Conditional Tapping</a></h1>
+<h2 id="conditional-tapping" class="section-header"><a href="#conditional-tapping">Conditional Tapping</a></h2>
 <p>Additional traits are provided to only invoke the tap when certain conditions
 are met in the value being tapped.</p>
-<h2 id="boolean-tapping" class="section-header"><a href="#boolean-tapping">Boolean Tapping</a></h2>
+<h3 id="boolean-tapping" class="section-header"><a href="#boolean-tapping">Boolean Tapping</a></h3>
 <p>The [<code>TapBool</code>] trait, with methods [<code>tap_true</code>], [<code>tap_false</code>], and their
 associated <code>_mut</code> variants, run the provided function only when the value is of
 the correct variant. This trait is implemented on <code>bool</code> by default, and is
 left open so that user crates may implement it on their own <code>bool</code>-like types.</p>
-<h2 id="optional-tapping" class="section-header"><a href="#optional-tapping">Optional Tapping</a></h2>
+<h3 id="optional-tapping" class="section-header"><a href="#optional-tapping">Optional Tapping</a></h3>
 <p>The <a href="trait.TapOption.html"><code>TapOption</code></a> trait, with methods <a href="trait.TapOption.html#method.tap_some"><code>tap_some</code></a>, <a href="trait.TapOption.html#method.tap_some_mut"><code>tap_some_mut</code></a>, and
 <a href="trait.TapOption.html#method.tap_none"><code>tap_none</code></a>, run the provided function only when the <code>Option</code> is of the
 matching variant. The <code>tap_some</code> methods pass <code>&amp;T</code> or <code>&amp;mut T</code> to their
@@ -71,11 +71,11 @@ function; <code>tap_none</code> passes nothing.</p>
 change the <code>Option</code> from <code>Some</code> to <code>None</code>. If this behavior is desired, use
 <code>tap_mut</code> to modify the <code>Option</code> wrapper directly, rather than <code>tap_some_mut</code> to
 change the interior value.</p>
-<h2 id="result-tapping" class="section-header"><a href="#result-tapping">Result Tapping</a></h2>
+<h3 id="result-tapping" class="section-header"><a href="#result-tapping">Result Tapping</a></h3>
 <p>This acts exactly like <code>TapOption</code>, except that the alternate case has a value
 that may be modified. It thus has methods <a href="trait.TapResult.html#method.tap_ok"><code>tap_ok</code></a>, <a href="trait.TapResult.html#method.tap_err"><code>tap_err</code></a>, and the
 associated <code>_mut</code> variants.</p>
-<h2 id="debug-tapping" class="section-header"><a href="#debug-tapping">Debug Tapping</a></h2>
+<h3 id="debug-tapping" class="section-header"><a href="#debug-tapping">Debug Tapping</a></h3>
 <p>All methods in the crate have a sibling method with the exact same name and
 signature, except that the name is suffixed with <code>_dbg</code>. This method runs the
 normal tap in a debug build, and is removed in release builds.</p>
@@ -85,13 +85,13 @@ normal tap in a debug build, and is removed in release builds.</p>
 <span class="prelude-val">Some</span>(<span class="number">5i32</span>).<span class="ident">tap_some_dbg</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="macro">debug!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">n</span>));</code></pre></div>
 <p>This emits a debug trace when the crate is built in debug mode, and does nothing
 when the crate is built in release mode.</p>
-<h1 id="usage" class="section-header"><a href="#usage">Usage</a></h1>
+<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
 <p>Import the trait or traits you wish to use, with <code>use wyz::tap::Tap;</code>, and then
 attach <code>.tap</code> methods on the end of any expression you want to inspect or
 modify. These methods never change the type or binding status of the object to
 which they are attached, and can be added or removed without affecting
 neighboring code.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>This uses <code>tap_mut</code> to modify a vector using methods that cannot be chained, and
 without converting to an iterator and re-collecting.</p>
 
@@ -134,12 +134,12 @@ without converting to an iterator and re-collecting.</p>
 <span class="macro">assert_eq!</span>(<span class="ident">err_ct</span>, <span class="number">1</span>);
 <span class="comment">//  printed &quot;ERROR: failure&quot;</span></code></pre></div>
 </div></details><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Tap.html" title="wyz::tap::Tap trait">Tap</a></div><div class="item-right docblock-short"><p>Value Tap</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.TapAsRef.html" title="wyz::tap::TapAsRef trait">TapAsRef</a></div><div class="item-right docblock-short"><p>Referential Tap</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.TapBorrow.html" title="wyz::tap::TapBorrow trait">TapBorrow</a></div><div class="item-right docblock-short"><p>Borrowing Tap</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.TapDeref.html" title="wyz::tap::TapDeref trait">TapDeref</a></div><div class="item-right docblock-short"><p>Dereferencing Tap</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.TapOption.html" title="wyz::tap::TapOption trait">TapOption</a></div><div class="item-right docblock-short"><p>Optional Tap</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.TapResult.html" title="wyz::tap::TapResult trait">TapResult</a></div><div class="item-right docblock-short"><p>Result Tap</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wyz" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Tap.html" title="wyz::tap::Tap trait">Tap</a></div><div class="item-right docblock-short"><p>Value Tap</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.TapAsRef.html" title="wyz::tap::TapAsRef trait">TapAsRef</a></div><div class="item-right docblock-short"><p>Referential Tap</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.TapBorrow.html" title="wyz::tap::TapBorrow trait">TapBorrow</a></div><div class="item-right docblock-short"><p>Borrowing Tap</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.TapDeref.html" title="wyz::tap::TapDeref trait">TapDeref</a></div><div class="item-right docblock-short"><p>Dereferencing Tap</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.TapOption.html" title="wyz::tap::TapOption trait">TapOption</a></div><div class="item-right docblock-short"><p>Optional Tap</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.TapResult.html" title="wyz::tap::TapResult trait">TapResult</a></div><div class="item-right docblock-short"><p>Result Tap</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wyz" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

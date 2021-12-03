@@ -261,7 +261,7 @@
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # Ok(()) }) }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">metadata</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Metadata</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">metadata</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Metadata</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>();
     <span class="ident">spawn_blocking</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">std::fs::metadata</span>(<span class="ident">path</span>)).<span class="kw">await</span>
 }
@@ -306,7 +306,7 @@
         <span class="doccomment">/// #</span>
         <span class="doccomment">/// # Ok(()) }) }</span>
         <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FileType</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FileType</span> {
             <span class="macro">unreachable!</span>(<span class="string">&quot;this impl only appears in the rendered docs&quot;</span>)
         }
 
@@ -326,7 +326,7 @@
         <span class="doccomment">/// #</span>
         <span class="doccomment">/// # Ok(()) }) }</span>
         <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dir</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dir</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
             <span class="macro">unreachable!</span>(<span class="string">&quot;this impl only appears in the rendered docs&quot;</span>)
         }
 
@@ -346,7 +346,7 @@
         <span class="doccomment">/// #</span>
         <span class="doccomment">/// # Ok(()) }) }</span>
         <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
             <span class="macro">unreachable!</span>(<span class="string">&quot;this impl only appears in the rendered docs&quot;</span>)
         }
 
@@ -364,7 +364,7 @@
         <span class="doccomment">/// #</span>
         <span class="doccomment">/// # Ok(()) }) }</span>
         <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
             <span class="macro">unreachable!</span>(<span class="string">&quot;this impl only appears in the rendered docs&quot;</span>)
         }
 
@@ -382,7 +382,7 @@
         <span class="doccomment">/// #</span>
         <span class="doccomment">/// # Ok(()) }) }</span>
         <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Permissions</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Permissions</span> {
             <span class="macro">unreachable!</span>(<span class="string">&quot;this impl only appears in the rendered docs&quot;</span>)
         }
 
@@ -405,7 +405,7 @@
         <span class="doccomment">/// #</span>
         <span class="doccomment">/// # Ok(()) }) }</span>
         <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modified</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modified</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span> {
             <span class="macro">unreachable!</span>(<span class="string">&quot;this impl only appears in the rendered docs&quot;</span>)
         }
 
@@ -428,7 +428,7 @@
         <span class="doccomment">/// #</span>
         <span class="doccomment">/// # Ok(()) }) }</span>
         <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accessed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accessed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span> {
             <span class="macro">unreachable!</span>(<span class="string">&quot;this impl only appears in the rendered docs&quot;</span>)
         }
 
@@ -451,7 +451,7 @@
         <span class="doccomment">/// #</span>
         <span class="doccomment">/// # Ok(()) }) }</span>
         <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">created</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">created</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span> {
             <span class="macro">unreachable!</span>(<span class="string">&quot;this impl only appears in the rendered docs&quot;</span>)
         }
     }

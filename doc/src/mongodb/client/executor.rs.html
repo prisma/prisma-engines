@@ -953,7 +953,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">op</span>: <span class="ident">T</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::O</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::O</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">execute_operation_with_details</span>(<span class="ident">op</span>, <span class="ident">session</span>)
             .<span class="kw">await</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">details</span><span class="op">|</span> <span class="ident">details</span>.<span class="ident">output</span>.<span class="ident">operation_output</span>)
@@ -963,7 +963,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">op</span>: <span class="ident">T</span>,
         <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExecutionDetails</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExecutionDetails</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Box::pin</span>(<span class="kw">async</span> {
             <span class="comment">// TODO RUST-9: allow unacknowledged write concerns</span>
             <span class="kw">if</span> <span class="op">!</span><span class="ident">op</span>.<span class="ident">is_acknowledged</span>() {
@@ -974,7 +974,7 @@
             }
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">implicit_session</span> <span class="op">=</span> <span class="prelude-val">None</span>;
             <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">session</span>.<span class="ident">into</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">session</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">session</span>) =&gt; {
                     <span class="kw">if</span> <span class="op">!</span><span class="ident">Arc::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">client</span>().<span class="ident">inner</span>) {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                             <span class="ident">message</span>: <span class="string">&quot;the session provided to an operation must be created from \
@@ -996,7 +996,7 @@
                     }
                     <span class="prelude-val">Some</span>(<span class="ident">session</span>)
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="ident">implicit_session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">start_implicit_session</span>(<span class="kw-2">&amp;</span><span class="ident">op</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                     <span class="ident">implicit_session</span>.<span class="ident">as_mut</span>()
                 }
@@ -1013,7 +1013,7 @@
     <span class="doccomment">/// Execute the given operation, returning the cursor created by the operation.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Server selection be will performed using the criteria specified on the operation, if any.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_cursor_operation</span><span class="op">&lt;</span><span class="ident">Op</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">op</span>: <span class="ident">Op</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_cursor_operation</span><span class="op">&lt;</span><span class="ident">Op</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">op</span>: <span class="ident">Op</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Op</span>: <span class="ident">Operation</span><span class="op">&lt;</span><span class="ident">O</span> <span class="op">=</span> <span class="ident">CursorSpecification</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
@@ -1035,7 +1035,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">op</span>: <span class="ident">Op</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Op</span>: <span class="ident">Operation</span><span class="op">&lt;</span><span class="ident">O</span> <span class="op">=</span> <span class="ident">CursorSpecification</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
@@ -1057,14 +1057,14 @@
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">is_load_balanced</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_load_balanced</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">load_balanced</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">pin_connection_for_cursor</span><span class="op">&lt;</span><span class="ident">Op</span>, <span class="ident">T</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">details</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ExecutionOutput</span><span class="op">&lt;</span><span class="ident">Op</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Op</span>: <span class="ident">Operation</span><span class="op">&lt;</span><span class="ident">O</span> <span class="op">=</span> <span class="ident">CursorSpecification</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -1081,7 +1081,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">op</span>: <span class="ident">T</span>,
         <span class="kw-2">mut</span> <span class="ident">session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExecutionOutput</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExecutionOutput</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// If the current transaction has been committed/aborted and it is not being</span>
         <span class="comment">// re-committed/re-aborted, reset the transaction&#39;s state to TransactionState::None.</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="op">=</span> <span class="ident">session</span> {
@@ -1089,7 +1089,7 @@
                 <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span>,
                 <span class="ident">TransactionState::Committed</span> { .. }
             ) <span class="op">&amp;&amp;</span> <span class="ident">op</span>.<span class="ident">name</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">CommitTransaction::NAME</span>
-                <span class="op">|</span><span class="op">|</span> <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TransactionState::Aborted</span>
+                <span class="op">|</span><span class="op">|</span> <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span> <span class="op">==</span> <span class="ident">TransactionState::Aborted</span>
                     <span class="op">&amp;&amp;</span> <span class="ident">op</span>.<span class="ident">name</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">AbortTransaction::NAME</span>
             {
                 <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">reset</span>();
@@ -1102,16 +1102,16 @@
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">op</span>.<span class="ident">selection_criteria</span>());
 
         <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">select_server</span>(<span class="ident">selection_criteria</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">server</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">server</span>,
-            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">server</span>) =&gt; <span class="ident">server</span>,
+            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; {
                 <span class="ident">err</span>.<span class="ident">add_labels_and_update_pin</span>(<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">session</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
             }
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">get_connection</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>, <span class="kw-2">&amp;</span><span class="ident">op</span>, <span class="kw-2">&amp;</span><span class="ident">server</span>.<span class="ident">pool</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>,
-            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>,
+            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; {
                 <span class="ident">err</span>.<span class="ident">add_labels_and_update_pin</span>(<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">session</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_pool_cleared</span>() {
@@ -1125,17 +1125,17 @@
         <span class="kw">let</span> <span class="ident">retryability</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_retryability</span>(<span class="kw-2">&amp;</span><span class="ident">conn</span>, <span class="kw-2">&amp;</span><span class="ident">op</span>, <span class="kw-2">&amp;</span><span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">txn_number</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">session</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">TransactionState::None</span> {
                     <span class="prelude-val">Some</span>(<span class="ident">session</span>.<span class="ident">txn_number</span>())
                 } <span class="kw">else</span> {
                     <span class="kw">match</span> <span class="ident">retryability</span> {
-                        <span class="ident">Retryability::Write</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">session</span>.<span class="ident">get_and_increment_txn_number</span>()),
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                        <span class="ident">Retryability::Write</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">session</span>.<span class="ident">get_and_increment_txn_number</span>()),
+                        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                     }
                 }
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">match</span> <span class="self">self</span>
@@ -1148,15 +1148,15 @@
             )
             .<span class="kw">await</span>
         {
-            <span class="prelude-val">Ok</span>(<span class="ident">operation_output</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ExecutionOutput</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">operation_output</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ExecutionOutput</span> {
                 <span class="ident">operation_output</span>,
                 <span class="ident">connection</span>: <span class="ident">conn</span>,
             }),
-            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; {
                 <span class="comment">// Retryable writes are only supported by storage engines with document-level</span>
                 <span class="comment">// locking, so users need to disable retryable writes if using mmapv1.</span>
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ErrorKind::Command</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">command_error</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">err</span>.<span class="ident">kind</span> {
-                    <span class="kw">if</span> <span class="ident">command_error</span>.<span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">20</span>
+                    <span class="kw">if</span> <span class="ident">command_error</span>.<span class="ident">code</span> <span class="op">==</span> <span class="number">20</span>
                         <span class="op">&amp;&amp;</span> <span class="ident">command_error</span>.<span class="ident">message</span>.<span class="ident">starts_with</span>(<span class="string">&quot;Transaction numbers&quot;</span>)
                     {
                         <span class="ident">command_error</span>.<span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;This MongoDB deployment does not support \
@@ -1179,8 +1179,8 @@
                 <span class="comment">// release the selected server to decrement its operation count</span>
                 <span class="ident">drop</span>(<span class="ident">server</span>);
 
-                <span class="kw">if</span> <span class="ident">retryability</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Retryability::Read</span> <span class="op">&amp;&amp;</span> <span class="ident">err</span>.<span class="ident">is_read_retryable</span>()
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">retryability</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Retryability::Write</span> <span class="op">&amp;&amp;</span> <span class="ident">err</span>.<span class="ident">is_write_retryable</span>()
+                <span class="kw">if</span> <span class="ident">retryability</span> <span class="op">==</span> <span class="ident">Retryability::Read</span> <span class="op">&amp;&amp;</span> <span class="ident">err</span>.<span class="ident">is_read_retryable</span>()
+                    <span class="op">|</span><span class="op">|</span> <span class="ident">retryability</span> <span class="op">==</span> <span class="ident">Retryability::Write</span> <span class="op">&amp;&amp;</span> <span class="ident">err</span>.<span class="ident">is_write_retryable</span>()
                 {
                     <span class="self">self</span>.<span class="ident">execute_retry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">op</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">session</span>, <span class="ident">txn_number</span>, <span class="ident">err</span>)
                         .<span class="kw">await</span>
@@ -1197,23 +1197,23 @@
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
         <span class="ident">txn_number</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
         <span class="ident">first_error</span>: <span class="ident">Error</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExecutionOutput</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExecutionOutput</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">op</span>.<span class="ident">update_for_retry</span>();
 
         <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">select_server</span>(<span class="ident">op</span>.<span class="ident">selection_criteria</span>()).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">server</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">server</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">server</span>) =&gt; <span class="ident">server</span>,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">first_error</span>);
             }
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">get_connection</span>(<span class="ident">session</span>, <span class="ident">op</span>, <span class="kw-2">&amp;</span><span class="ident">server</span>.<span class="ident">pool</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">first_error</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">first_error</span>),
         };
 
         <span class="kw">let</span> <span class="ident">retryability</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_retryability</span>(<span class="kw-2">&amp;</span><span class="ident">conn</span>, <span class="ident">op</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">retryability</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Retryability::None</span> {
+        <span class="kw">if</span> <span class="ident">retryability</span> <span class="op">==</span> <span class="ident">Retryability::None</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">first_error</span>);
         }
 
@@ -1221,11 +1221,11 @@
             .<span class="ident">execute_operation_on_connection</span>(<span class="ident">op</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">conn</span>, <span class="ident">session</span>, <span class="ident">txn_number</span>, <span class="kw-2">&amp;</span><span class="ident">retryability</span>)
             .<span class="kw">await</span>
         {
-            <span class="prelude-val">Ok</span>(<span class="ident">operation_output</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ExecutionOutput</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">operation_output</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ExecutionOutput</span> {
                 <span class="ident">operation_output</span>,
                 <span class="ident">connection</span>: <span class="ident">conn</span>,
             }),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">inner</span>
                     .<span class="ident">topology</span>
                     .<span class="ident">handle_application_error</span>(
@@ -1253,13 +1253,13 @@
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
         <span class="ident">txn_number</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
         <span class="ident">retryability</span>: <span class="kw-2">&amp;</span><span class="ident">Retryability</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::O</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::O</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">wc</span>) <span class="op">=</span> <span class="ident">op</span>.<span class="ident">write_concern</span>() {
             <span class="ident">wc</span>.<span class="ident">validate</span>()<span class="question-mark">?</span>;
         }
 
         <span class="kw">let</span> <span class="ident">stream_description</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">stream_description</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">is_sharded</span> <span class="op">=</span> <span class="ident">stream_description</span>.<span class="ident">initial_server_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ServerType::Mongos</span>;
+        <span class="kw">let</span> <span class="ident">is_sharded</span> <span class="op">=</span> <span class="ident">stream_description</span>.<span class="ident">initial_server_type</span> <span class="op">==</span> <span class="ident">ServerType::Mongos</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">build</span>(<span class="ident">stream_description</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">inner</span>
             .<span class="ident">topology</span>
@@ -1267,7 +1267,7 @@
             .<span class="kw">await</span>;
 
         <span class="kw">match</span> <span class="ident">session</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="kw">if</span> <span class="ident">op</span>.<span class="ident">supports_sessions</span>() <span class="op">&amp;&amp;</span> <span class="ident">op</span>.<span class="ident">is_acknowledged</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="kw">if</span> <span class="ident">op</span>.<span class="ident">supports_sessions</span>() <span class="op">&amp;&amp;</span> <span class="ident">op</span>.<span class="ident">is_acknowledged</span>() =&gt; {
                 <span class="ident">cmd</span>.<span class="ident">set_session</span>(<span class="ident">session</span>);
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">txn_number</span>) <span class="op">=</span> <span class="ident">txn_number</span> {
                     <span class="ident">cmd</span>.<span class="ident">set_txn_number</span>(<span class="ident">txn_number</span>);
@@ -1294,7 +1294,7 @@
                     <span class="ident">cmd</span>.<span class="ident">set_snapshot_read_concern</span>(<span class="ident">session</span>);
                 }
                 <span class="kw">match</span> <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span> {
-                    <span class="ident">TransactionState::Starting</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">TransactionState::Starting</span> =&gt; {
                         <span class="ident">cmd</span>.<span class="ident">set_start_transaction</span>();
                         <span class="ident">cmd</span>.<span class="ident">set_autocommit</span>();
                         <span class="ident">cmd</span>.<span class="ident">set_txn_read_concern</span>(<span class="kw-2">*</span><span class="ident">session</span>);
@@ -1305,8 +1305,8 @@
                         }
                         <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">TransactionState::InProgress</span>;
                     }
-                    <span class="ident">TransactionState::InProgress</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cmd</span>.<span class="ident">set_autocommit</span>(),
-                    <span class="ident">TransactionState::Committed</span> { .. } <span class="op">|</span> <span class="ident">TransactionState::Aborted</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">TransactionState::InProgress</span> =&gt; <span class="ident">cmd</span>.<span class="ident">set_autocommit</span>(),
+                    <span class="ident">TransactionState::Committed</span> { .. } <span class="op">|</span> <span class="ident">TransactionState::Aborted</span> =&gt; {
                         <span class="ident">cmd</span>.<span class="ident">set_autocommit</span>();
 
                         <span class="comment">// Append the recovery token to the command if we are committing or aborting</span>
@@ -1317,24 +1317,24 @@
                             }
                         }
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                    <span class="kw">_</span> =&gt; {}
                 }
                 <span class="ident">session</span>.<span class="ident">update_last_use</span>();
             }
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">session</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">op</span>.<span class="ident">supports_sessions</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">session</span>.<span class="ident">is_implicit</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">session</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">op</span>.<span class="ident">supports_sessions</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">session</span>.<span class="ident">is_implicit</span>() =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{} does not support sessions&quot;</span>, <span class="ident">cmd</span>.<span class="ident">name</span>),
                 }
                 .<span class="ident">into</span>());
             }
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">session</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">op</span>.<span class="ident">is_acknowledged</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">session</span>.<span class="ident">is_implicit</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">session</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">op</span>.<span class="ident">is_acknowledged</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">session</span>.<span class="ident">is_implicit</span>() =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: <span class="string">&quot;Cannot use ClientSessions with unacknowledged write concern&quot;</span>
                         .<span class="ident">to_string</span>(),
                 }
                 .<span class="ident">into</span>());
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">_</span> =&gt; {}
         }
 
         <span class="kw">let</span> <span class="ident">session_cluster_time</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">session</span><span class="op">|</span> <span class="ident">session</span>.<span class="ident">cluster_time</span>());
@@ -1385,9 +1385,9 @@
 
         <span class="kw">let</span> <span class="ident">start_time</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
         <span class="kw">let</span> <span class="ident">command_result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">connection</span>.<span class="ident">send_raw_command</span>(<span class="ident">raw_cmd</span>, <span class="ident">request_id</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">response</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">response</span>) =&gt; {
                 <span class="kw">match</span> <span class="ident">T::Response::deserialize_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">r</span>) =&gt; {
                         <span class="self">self</span>.<span class="ident">update_cluster_time</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>, <span class="ident">session</span>).<span class="kw">await</span>;
                         <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">is_success</span>() {
                             <span class="comment">// Retrieve recovery token from successful response.</span>
@@ -1413,23 +1413,23 @@
                                 }))
                         }
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">deserialize_error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">deserialize_error</span>) =&gt; {
                         <span class="comment">// if we failed to deserialize the whole response, try deserializing</span>
                         <span class="comment">// a generic command response without the operation&#39;s body.</span>
                         <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">body</span>::<span class="op">&lt;</span><span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CommandErrorBody</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>() {
-                            <span class="prelude-val">Ok</span>(<span class="ident">error_response</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Ok</span>(<span class="ident">error_response</span>) =&gt; {
                                 <span class="self">self</span>.<span class="ident">update_cluster_time</span>(<span class="kw-2">&amp;</span><span class="ident">error_response</span>, <span class="ident">session</span>).<span class="kw">await</span>;
                                 <span class="kw">match</span> <span class="ident">error_response</span>.<span class="ident">body</span> {
                                     <span class="comment">// if the response was ok: 0, return the command error.</span>
                                     <span class="prelude-val">Some</span>(<span class="ident">command_error_response</span>)
-                                        <span class="kw">if</span> <span class="op">!</span><span class="ident">error_response</span>.<span class="ident">is_success</span>() <span class="op">=</span><span class="op">&gt;</span>
+                                        <span class="kw">if</span> <span class="op">!</span><span class="ident">error_response</span>.<span class="ident">is_success</span>() =&gt;
                                     {
                                         <span class="prelude-val">Err</span>(<span class="ident">command_error_response</span>.<span class="ident">into</span>())
                                     }
                                     <span class="comment">// if the response was ok: 0 but we couldnt deserialize the</span>
                                     <span class="comment">// command error,</span>
                                     <span class="comment">// return a generic error indicating so.</span>
-                                    <span class="prelude-val">None</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">error_response</span>.<span class="ident">is_success</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="prelude-val">None</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">error_response</span>.<span class="ident">is_success</span>() =&gt; {
                                         <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
                                             <span class="ident">message</span>: <span class="string">&quot;got command error but failed to deserialize \
                                                       response&quot;</span>
@@ -1437,7 +1437,7 @@
                                         }))
                                     }
                                     <span class="comment">// for ok: 1 just return the original deserialization error.</span>
-                                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="kw">_</span> =&gt; {
                                         <span class="ident">Client::update_recovery_token</span>(
                                             <span class="ident">is_sharded</span>,
                                             <span class="kw-2">&amp;</span><span class="ident">error_response</span>,
@@ -1450,18 +1450,18 @@
                             }
                             <span class="comment">// We failed to deserialize even that, so just return the original</span>
                             <span class="comment">// deserialization error.</span>
-                            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">deserialize_error</span>),
+                            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">deserialize_error</span>),
                         }
                     }
                 }
             }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
         };
 
         <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">start_time</span>.<span class="ident">elapsed</span>();
 
         <span class="kw">match</span> <span class="ident">command_result</span> {
-            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">emit_command_event</span>(<span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">command_failed_event</span> <span class="op">=</span> <span class="ident">CommandFailedEvent</span> {
                         <span class="ident">duration</span>,
@@ -1484,7 +1484,7 @@
                 <span class="ident">err</span>.<span class="ident">add_labels_and_update_pin</span>(<span class="prelude-val">Some</span>(<span class="ident">connection</span>), <span class="ident">session</span>, <span class="prelude-val">Some</span>(<span class="ident">retryability</span>))<span class="question-mark">?</span>;
                 <span class="ident">op</span>.<span class="ident">handle_error</span>(<span class="ident">err</span>)
             }
-            <span class="prelude-val">Ok</span>(<span class="ident">response</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">response</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">emit_command_event</span>(<span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">reply</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">should_redact</span> {
                         <span class="ident">Document::new</span>()
@@ -1507,8 +1507,8 @@
                 });
 
                 <span class="kw">match</span> <span class="ident">op</span>.<span class="ident">handle_response</span>(<span class="ident">response</span>.<span class="ident">deserialized</span>, <span class="ident">connection</span>.<span class="ident">stream_description</span>()<span class="question-mark">?</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">response</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">response</span>),
-                    <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">response</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">response</span>),
+                    <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; {
                         <span class="ident">err</span>.<span class="ident">add_labels_and_update_pin</span>(
                             <span class="prelude-val">Some</span>(<span class="ident">connection</span>),
                             <span class="ident">session</span>,
@@ -1522,19 +1522,19 @@
     }
 
     <span class="doccomment">/// Start an implicit session if the operation and write concern are compatible with sessions.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_implicit_session</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_implicit_session</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_session_support_status</span>().<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="ident">SessionSupportStatus::Supported</span> {
                 <span class="ident">logical_session_timeout</span>,
-            } <span class="kw">if</span> <span class="ident">op</span>.<span class="ident">supports_sessions</span>() <span class="op">&amp;&amp;</span> <span class="ident">op</span>.<span class="ident">is_acknowledged</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
+            } <span class="kw">if</span> <span class="ident">op</span>.<span class="ident">supports_sessions</span>() <span class="op">&amp;&amp;</span> <span class="ident">op</span>.<span class="ident">is_acknowledged</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
                 <span class="self">self</span>.<span class="ident">start_session_with_timeout</span>(<span class="ident">logical_session_timeout</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>)
                     .<span class="kw">await</span>,
             )),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">select_data_bearing_server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">select_data_bearing_server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">topology_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">topology_type</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">criteria</span> <span class="op">=</span> <span class="ident">SelectionCriteria::Predicate</span>(<span class="ident">Arc::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">server_info</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">server_type</span> <span class="op">=</span> <span class="ident">server_info</span>.<span class="ident">server_type</span>();
@@ -1548,34 +1548,34 @@
     <span class="doccomment">/// Gets whether the topology supports sessions, and if so, returns the topology&#39;s logical</span>
     <span class="doccomment">/// session timeout. If it has yet to be determined if the topology supports sessions, this</span>
     <span class="doccomment">/// method will perform a server selection that will force that determination to be made.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_session_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionSupportStatus</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_session_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionSupportStatus</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">initial_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">session_support_status</span>().<span class="kw">await</span>;
 
         <span class="comment">// Need to guarantee that we&#39;re connected to at least one server that can determine if</span>
         <span class="comment">// sessions are supported or not.</span>
         <span class="kw">match</span> <span class="ident">initial_status</span> {
-            <span class="ident">SessionSupportStatus::Undetermined</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SessionSupportStatus::Undetermined</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">select_data_bearing_server</span>().<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">session_support_status</span>().<span class="kw">await</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">initial_status</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">initial_status</span>),
         }
     }
 
     <span class="doccomment">/// Gets whether the topology supports transactions. If it has yet to be determined if the</span>
     <span class="doccomment">/// topology supports transactions, this method will perform a server selection that will force</span>
     <span class="doccomment">/// that determination to be made.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TransactionSupportStatus</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TransactionSupportStatus</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">initial_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">transaction_support_status</span>().<span class="kw">await</span>;
 
         <span class="comment">// Need to guarantee that we&#39;re connected to at least one server that can determine if</span>
         <span class="comment">// sessions are supported or not.</span>
         <span class="kw">match</span> <span class="ident">initial_status</span> {
-            <span class="ident">TransactionSupportStatus::Undetermined</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TransactionSupportStatus::Undetermined</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">select_data_bearing_server</span>().<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">transaction_support_status</span>().<span class="kw">await</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">initial_status</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">initial_status</span>),
         }
     }
 
@@ -1585,27 +1585,27 @@
         <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>,
         <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Retryability</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Retryability</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">session</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">session</span><span class="op">|</span> <span class="ident">session</span>.<span class="ident">in_transaction</span>())
             .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
         {
             <span class="kw">match</span> <span class="ident">op</span>.<span class="ident">retryability</span>() {
-                <span class="ident">Retryability::Read</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">retry_reads</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Retryability::Read</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">retry_reads</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Retryability::Read</span>);
                 }
-                <span class="ident">Retryability::Write</span> <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">stream_description</span>()<span class="question-mark">?</span>.<span class="ident">supports_retryable_writes</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Retryability::Write</span> <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">stream_description</span>()<span class="question-mark">?</span>.<span class="ident">supports_retryable_writes</span>() =&gt; {
                     <span class="comment">// commitTransaction and abortTransaction should be retried regardless of the</span>
                     <span class="comment">// value for retry_writes set on the Client</span>
-                    <span class="kw">if</span> <span class="ident">op</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">CommitTransaction::NAME</span>
-                        <span class="op">|</span><span class="op">|</span> <span class="ident">op</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">AbortTransaction::NAME</span>
+                    <span class="kw">if</span> <span class="ident">op</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">CommitTransaction::NAME</span>
+                        <span class="op">|</span><span class="op">|</span> <span class="ident">op</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">AbortTransaction::NAME</span>
                         <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">retry_writes</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)
                     {
                         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Retryability::Write</span>);
                     }
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                <span class="kw">_</span> =&gt; {}
             }
         }
         <span class="prelude-val">Ok</span>(<span class="ident">Retryability::None</span>)
@@ -1647,18 +1647,18 @@
     <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
     <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
     <span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectionPool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">session_pinned</span> <span class="op">=</span> <span class="ident">session</span>
         .<span class="ident">as_ref</span>()
         .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">transaction</span>.<span class="ident">pinned_connection</span>());
     <span class="kw">match</span> (<span class="ident">session_pinned</span>, <span class="ident">op</span>.<span class="ident">pinned_connection</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">c</span>), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">c</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">take_connection</span>().<span class="kw">await</span>,
-        (<span class="prelude-val">Some</span>(<span class="ident">session_handle</span>), <span class="prelude-val">Some</span>(<span class="ident">op_handle</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">Some</span>(<span class="ident">c</span>), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">c</span>)) =&gt; <span class="ident">c</span>.<span class="ident">take_connection</span>().<span class="kw">await</span>,
+        (<span class="prelude-val">Some</span>(<span class="ident">session_handle</span>), <span class="prelude-val">Some</span>(<span class="ident">op_handle</span>)) =&gt; {
             <span class="comment">// An operation executing in a transaction should be sharing the same pinned connection.</span>
             <span class="macro">debug_assert_eq!</span>(<span class="ident">session_handle</span>.<span class="ident">id</span>(), <span class="ident">op_handle</span>.<span class="ident">id</span>());
             <span class="ident">session_handle</span>.<span class="ident">take_connection</span>().<span class="kw">await</span>
         }
-        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pool</span>.<span class="ident">check_out</span>().<span class="kw">await</span>,
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">pool</span>.<span class="ident">check_out</span>().<span class="kw">await</span>,
     }
 }
 
@@ -1681,7 +1681,7 @@
         <span class="ident">conn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Connection</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
         <span class="ident">retryability</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Retryability</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">transaction_state</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="kw-2">&amp;</span><span class="ident">TransactionState::None</span>, <span class="op">|</span><span class="ident">session</span><span class="op">|</span> {
             <span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span>
         });
@@ -1691,12 +1691,12 @@
             <span class="prelude-val">None</span>
         };
         <span class="kw">match</span> <span class="ident">transaction_state</span> {
-            <span class="ident">TransactionState::Starting</span> <span class="op">|</span> <span class="ident">TransactionState::InProgress</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TransactionState::Starting</span> <span class="op">|</span> <span class="ident">TransactionState::InProgress</span> =&gt; {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_network_error</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_server_selection_error</span>() {
                     <span class="self">self</span>.<span class="ident">add_label</span>(<span class="ident">TRANSIENT_TRANSACTION_ERROR</span>);
                 }
             }
-            <span class="ident">TransactionState::Committed</span> { .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TransactionState::Committed</span> { .. } =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_wire_version</span>) <span class="op">=</span> <span class="ident">max_wire_version</span> {
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_add_retryable_write_label</span>(<span class="ident">max_wire_version</span>) {
                         <span class="self">self</span>.<span class="ident">add_label</span>(<span class="ident">RETRYABLE_WRITE_ERROR</span>);
@@ -1706,15 +1706,15 @@
                     <span class="self">self</span>.<span class="ident">add_label</span>(<span class="ident">UNKNOWN_TRANSACTION_COMMIT_RESULT</span>);
                 }
             }
-            <span class="ident">TransactionState::Aborted</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TransactionState::Aborted</span> =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_wire_version</span>) <span class="op">=</span> <span class="ident">max_wire_version</span> {
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_add_retryable_write_label</span>(<span class="ident">max_wire_version</span>) {
                         <span class="self">self</span>.<span class="ident">add_label</span>(<span class="ident">RETRYABLE_WRITE_ERROR</span>);
                     }
                 }
             }
-            <span class="ident">TransactionState::None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">retryability</span> <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Retryability::Write</span>) {
+            <span class="ident">TransactionState::None</span> =&gt; {
+                <span class="kw">if</span> <span class="ident">retryability</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Retryability::Write</span>) {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_wire_version</span>) <span class="op">=</span> <span class="ident">max_wire_version</span> {
                         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_add_retryable_write_label</span>(<span class="ident">max_wire_version</span>) {
                             <span class="self">self</span>.<span class="ident">add_label</span>(<span class="ident">RETRYABLE_WRITE_ERROR</span>);

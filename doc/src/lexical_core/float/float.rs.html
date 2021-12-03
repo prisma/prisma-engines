@@ -1218,13 +1218,13 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Get the mantissa component.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mantissa</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">M</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mantissa</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">M</span> {
         <span class="self">self</span>.<span class="ident">mant</span>
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Get the exponent component.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exponent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exponent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
         <span class="self">self</span>.<span class="ident">exp</span>
     }}
 
@@ -1242,7 +1242,7 @@
     <span class="doccomment">///     2. Normalization of the result (not done here).</span>
     <span class="doccomment">///     3. Addition of exponents.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+        -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="comment">// Logic check, values must be decently normalized prior to multiplication.</span>
         <span class="macro">debug_assert!</span>((<span class="self">self</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">M::HIMASK</span> <span class="op">!</span><span class="op">=</span> <span class="ident">M::ZERO</span>) <span class="op">&amp;&amp;</span> (<span class="ident">b</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">M::HIMASK</span> <span class="op">!</span><span class="op">=</span> <span class="ident">M::ZERO</span>));
@@ -1283,9 +1283,9 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Get if extended-float is normalized, MSB is set.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_normalized</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+        -&gt; <span class="ident">bool</span>
     {
-        <span class="self">self</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">M::NORMALIZED_MASK</span> <span class="op">=</span><span class="op">=</span> <span class="ident">M::NORMALIZED_MASK</span>
+        <span class="self">self</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">M::NORMALIZED_MASK</span> <span class="op">==</span> <span class="ident">M::NORMALIZED_MASK</span>
     }}
 
     <span class="macro">perftools_inline!</span>{
@@ -1296,7 +1296,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Get the number of bytes shifted.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span>
+        -&gt; <span class="ident">u32</span>
     {
         <span class="comment">// Note:</span>
         <span class="comment">// Using the cltz intrinsic via leading_zeros is way faster (~10x)</span>
@@ -1322,7 +1322,7 @@
     <span class="doccomment">/// This may lead to lossy rounding, and will not use custom rounding</span>
     <span class="doccomment">/// rules to accommodate for this.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalize_to</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span>
+        -&gt; <span class="ident">i32</span>
     {
         <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">M::BITS</span>.<span class="ident">as_u32</span>(), <span class="string">&quot;ExtendedFloat::normalize_to() attempting to shift beyond type size.&quot;</span>);
 
@@ -1345,7 +1345,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Get normalized boundaries for float.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalized_boundaries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)
-        <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>)
+        -&gt; (<span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>)
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">upper</span> <span class="op">=</span> <span class="ident">ExtendedFloat</span> {
             <span class="ident">mant</span>: (<span class="self">self</span>.<span class="ident">mant</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>) <span class="op">+</span> <span class="ident">M::ONE</span>,
@@ -1355,7 +1355,7 @@
 
         <span class="comment">// Use a boolean hack to get 2 if they&#39;re equal, else 1, without</span>
         <span class="comment">// any branching.</span>
-        <span class="kw">let</span> <span class="ident">is_hidden</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mant</span> <span class="op">=</span><span class="op">=</span> <span class="ident">as_cast</span>::<span class="op">&lt;</span><span class="ident">M</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">f64::HIDDEN_BIT_MASK</span>);
+        <span class="kw">let</span> <span class="ident">is_hidden</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mant</span> <span class="op">==</span> <span class="ident">as_cast</span>::<span class="op">&lt;</span><span class="ident">M</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">f64::HIDDEN_BIT_MASK</span>);
         <span class="kw">let</span> <span class="ident">l_shift</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">is_hidden</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">1</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lower</span> <span class="op">=</span> <span class="ident">ExtendedFloat</span> {
@@ -1402,7 +1402,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Create extended float from 8-bit unsigned integer.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_int</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Integer</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="ident">T</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+        -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="ident">from_int</span>(<span class="ident">i</span>)
     }}
@@ -1410,7 +1410,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Create extended float from 8-bit unsigned integer.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">i</span>: <span class="ident">u8</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+        -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="ident"><span class="self">Self</span>::from_int</span>(<span class="ident">i</span>)
     }}
@@ -1418,7 +1418,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Create extended float from 16-bit unsigned integer.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u16</span>(<span class="ident">i</span>: <span class="ident">u16</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+        -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="ident"><span class="self">Self</span>::from_int</span>(<span class="ident">i</span>)
     }}
@@ -1426,7 +1426,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Create extended float from 32-bit unsigned integer.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u32</span>(<span class="ident">i</span>: <span class="ident">u32</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+        -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="ident"><span class="self">Self</span>::from_int</span>(<span class="ident">i</span>)
     }}
@@ -1434,7 +1434,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Create extended float from 64-bit unsigned integer.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u64</span>(<span class="ident">i</span>: <span class="ident">u64</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+        -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="ident"><span class="self">Self</span>::from_int</span>(<span class="ident">i</span>)
     }}
@@ -1442,7 +1442,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Create extended float from native float.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_float</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Float</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+        -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="ident">from_float</span>(<span class="ident">f</span>)
     }}
@@ -1450,7 +1450,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Create extended float from 32-bit float.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_f32</span>(<span class="ident">f</span>: <span class="ident">f32</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+        -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="ident"><span class="self">Self</span>::from_float</span>(<span class="ident">f</span>)
     }}
@@ -1458,7 +1458,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Create extended float from 64-bit float.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_f64</span>(<span class="ident">f</span>: <span class="ident">f64</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
+        -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="ident"><span class="self">Self</span>::from_float</span>(<span class="ident">f</span>)
     }}
@@ -1468,7 +1468,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Convert into lower-precision native float.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_float</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F</span>
+        -&gt; <span class="ident">F</span>
     {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rounding&quot;</span>))]</span> {
             <span class="self">self</span>.<span class="ident">into_rounded_float</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">RoundingKind::NearestTieEven</span>, <span class="ident">Sign::Positive</span>)
@@ -1482,7 +1482,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Convert into lower-precision 32-bit float.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_f32</span>(<span class="self">self</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f32</span>
+        -&gt; <span class="ident">f32</span>
         <span class="kw">where</span> <span class="ident">f32</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">into_float</span>()
@@ -1491,7 +1491,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Convert into lower-precision 64-bit float.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_f64</span>(<span class="self">self</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>
+        -&gt; <span class="ident">f64</span>
         <span class="kw">where</span> <span class="ident">f64</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">into_float</span>()
@@ -1502,16 +1502,16 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Into rounded float where the rounding kind has been converted.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_rounded_float_impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">RoundingKind</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F</span>
+        -&gt; <span class="ident">F</span>
         <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="comment">// Normalize the actual float rounding here.</span>
         <span class="kw">let</span> <span class="ident">cb</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">kind</span> {
-            <span class="ident">RoundingKind::NearestTieEven</span>     <span class="op">=</span><span class="op">&gt;</span> <span class="ident">round_nearest_tie_even</span>,
-            <span class="ident">RoundingKind::NearestTieAwayZero</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">round_nearest_tie_away_zero</span>,
-            <span class="ident">RoundingKind::Upward</span>             <span class="op">=</span><span class="op">&gt;</span> <span class="ident">round_upward</span>,
-            <span class="ident">RoundingKind::Downward</span>           <span class="op">=</span><span class="op">&gt;</span> <span class="ident">round_downward</span>,
-            <span class="kw">_</span>                                <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>()
+            <span class="ident">RoundingKind::NearestTieEven</span>     =&gt; <span class="ident">round_nearest_tie_even</span>,
+            <span class="ident">RoundingKind::NearestTieAwayZero</span> =&gt; <span class="ident">round_nearest_tie_away_zero</span>,
+            <span class="ident">RoundingKind::Upward</span>             =&gt; <span class="ident">round_upward</span>,
+            <span class="ident">RoundingKind::Downward</span>           =&gt; <span class="ident">round_downward</span>,
+            <span class="kw">_</span>                                =&gt; <span class="macro">unreachable!</span>()
         };
 
         <span class="self">self</span>.<span class="ident">round_to_native</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">cb</span>);
@@ -1521,7 +1521,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Convert into lower-precision native float with custom rounding rules.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_rounded_float</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">RoundingKind</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F</span>
+        -&gt; <span class="ident">F</span>
         <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">into_rounded_float_impl</span>(<span class="ident">internal_rounding</span>(<span class="ident">kind</span>, <span class="ident">sign</span>))
@@ -1530,7 +1530,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Convert into lower-precision 32-bit float with custom rounding rules.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_rounded_f32</span>(<span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">RoundingKind</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f32</span>
+        -&gt; <span class="ident">f32</span>
         <span class="kw">where</span> <span class="ident">f32</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">into_rounded_float</span>(<span class="ident">kind</span>, <span class="ident">sign</span>)
@@ -1539,7 +1539,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Convert into lower-precision 64-bit float with custom rounding rules.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_rounded_f64</span>(<span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">RoundingKind</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>
+        -&gt; <span class="ident">f64</span>
         <span class="kw">where</span> <span class="ident">f64</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">into_rounded_float</span>(<span class="ident">kind</span>, <span class="ident">sign</span>)
@@ -1550,7 +1550,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Convert to lower-precision native float.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_float</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F</span>
+        -&gt; <span class="ident">F</span>
     {
         <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">into_float</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>()
     }}
@@ -1558,7 +1558,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Convert to lower-precision 32-bit float.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_f32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f32</span>
+        -&gt; <span class="ident">f32</span>
         <span class="kw">where</span> <span class="ident">f32</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">as_float</span>()
@@ -1567,7 +1567,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Convert to lower-precision 64-bit float.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>
+        -&gt; <span class="ident">f64</span>
         <span class="kw">where</span> <span class="ident">f64</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">as_float</span>()
@@ -1578,7 +1578,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Convert to lower-precision native float with custom rounding rules.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_rounded_float</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">RoundingKind</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F</span>
+        -&gt; <span class="ident">F</span>
         <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">into_rounded_float</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">kind</span>, <span class="ident">sign</span>)
@@ -1587,7 +1587,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Convert to lower-precision 32-bit float with custom rounding rules.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_rounded_f32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">RoundingKind</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f32</span>
+        -&gt; <span class="ident">f32</span>
         <span class="kw">where</span> <span class="ident">f32</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">as_rounded_float</span>(<span class="ident">kind</span>, <span class="ident">sign</span>)
@@ -1596,7 +1596,7 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Convert to lower-precision 64-bit float with custom rounding rules.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_rounded_f64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">RoundingKind</span>, <span class="ident">sign</span>: <span class="ident">Sign</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span>
+        -&gt; <span class="ident">f64</span>
         <span class="kw">where</span> <span class="ident">f64</span>: <span class="ident">FloatRounding</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">as_rounded_float</span>(<span class="ident">kind</span>, <span class="ident">sign</span>)
@@ -1606,7 +1606,7 @@
 <span class="kw">impl</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> {
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Create extended float from 64-bit unsigned integer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u128</span>(<span class="ident">i</span>: <span class="ident">u128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u128</span>(<span class="ident">i</span>: <span class="ident">u128</span>) -&gt; <span class="ident">ExtendedFloat</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::from_int</span>(<span class="ident">i</span>)
     }}
 }
@@ -1638,8 +1638,8 @@
         <span class="macro">assert!</span>(<span class="ident">x</span>.<span class="ident">is_normalized</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">mant</span>.<span class="ident">is_zero</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">ExtendedFloat</span> {<span class="ident">mant</span>: <span class="ident">mant</span> <span class="kw">as</span> <span class="ident">u128</span>, <span class="ident">exp</span>: <span class="ident">exp</span>};
-        <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">shift</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">shift</span><span class="op">+</span><span class="number">64</span> };
-        <span class="kw">let</span> <span class="ident">r_exp</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">r_exp</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">r_exp</span><span class="op">-</span><span class="number">64</span> };
+        <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">shift</span> <span class="op">==</span> <span class="number">0</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">shift</span><span class="op">+</span><span class="number">64</span> };
+        <span class="kw">let</span> <span class="ident">r_exp</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">r_exp</span> <span class="op">==</span> <span class="number">0</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">r_exp</span><span class="op">-</span><span class="number">64</span> };
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">x</span>.<span class="ident">is_normalized</span>());
         <span class="macro">assert_eq!</span>(<span class="ident">x</span>.<span class="ident">normalize</span>(), <span class="ident">shift</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">x</span>, <span class="ident">ExtendedFloat</span> {<span class="ident">mant</span>: (<span class="ident">r_mant</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">64</span>, <span class="ident">exp</span>: <span class="ident">r_exp</span>});
@@ -1715,8 +1715,8 @@
         <span class="macro">assert_eq!</span>(<span class="ident">x</span>, <span class="ident">ExtendedFloat</span> {<span class="ident">mant</span>: <span class="ident">r_mant</span>, <span class="ident">exp</span>: <span class="ident">r_exp</span>});
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">ExtendedFloat</span> {<span class="ident">mant</span>: <span class="ident">mant</span> <span class="kw">as</span> <span class="ident">u128</span>, <span class="ident">exp</span>: <span class="ident">exp</span>};
-        <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">shift</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">shift</span><span class="op">+</span><span class="number">64</span> };
-        <span class="kw">let</span> <span class="ident">r_exp</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">r_exp</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">r_exp</span><span class="op">-</span><span class="number">64</span> };
+        <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">shift</span> <span class="op">==</span> <span class="number">0</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">shift</span><span class="op">+</span><span class="number">64</span> };
+        <span class="kw">let</span> <span class="ident">r_exp</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">r_exp</span> <span class="op">==</span> <span class="number">0</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">r_exp</span><span class="op">-</span><span class="number">64</span> };
         <span class="macro">assert_eq!</span>(<span class="ident">x</span>.<span class="ident">normalize_to</span>(<span class="ident">n</span>), <span class="ident">shift</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">x</span>, <span class="ident">ExtendedFloat</span> {<span class="ident">mant</span>: (<span class="ident">r_mant</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">64</span>, <span class="ident">exp</span>: <span class="ident">r_exp</span>});
     }

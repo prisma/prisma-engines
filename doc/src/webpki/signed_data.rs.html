@@ -787,7 +787,7 @@
 <span class="doccomment">/// structure that can be passed to `verify_signed_data`.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_signed_data</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">SignedData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">SignedData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">data</span>, <span class="ident">tbs</span>) <span class="op">=</span>
         <span class="ident">der</span>.<span class="ident">read_partial</span>(<span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">der::Tag::Sequence</span>))<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">der</span>, <span class="ident">der::Tag::Sequence</span>)<span class="question-mark">?</span>;
@@ -815,7 +815,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">verify_signed_data</span>(
     <span class="ident">supported_algorithms</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">SignatureAlgorithm</span>], <span class="ident">spki_value</span>: <span class="ident">untrusted::Input</span>,
     <span class="ident">signed_data</span>: <span class="kw-2">&amp;</span><span class="ident">SignedData</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="comment">// We need to verify the signature in `signed_data` using the public key</span>
     <span class="comment">// in `public_key`. In order to know which *ring* signature verification</span>
     <span class="comment">// algorithm to use, we need to know the public key algorithm (ECDSA,</span>
@@ -846,11 +846,11 @@
             <span class="ident">signed_data</span>.<span class="ident">data</span>,
             <span class="ident">signed_data</span>.<span class="ident">signature</span>,
         ) {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedSignatureAlgorithmForPublicKey</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedSignatureAlgorithmForPublicKey</span>) =&gt; {
                 <span class="ident">found_signature_alg_match</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="kw">continue</span>;
             },
-            <span class="ident">result</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">result</span> =&gt; {
                 <span class="kw">return</span> <span class="ident">result</span>;
             },
         }
@@ -866,7 +866,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">verify_signature</span>(
     <span class="ident">signature_alg</span>: <span class="kw-2">&amp;</span><span class="ident">SignatureAlgorithm</span>, <span class="ident">spki_value</span>: <span class="ident">untrusted::Input</span>, <span class="ident">msg</span>: <span class="ident">untrusted::Input</span>,
     <span class="ident">signature</span>: <span class="ident">untrusted::Input</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">spki</span> <span class="op">=</span> <span class="ident">parse_spki_value</span>(<span class="ident">spki_value</span>)<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="op">!</span><span class="ident">signature_alg</span>
         .<span class="ident">public_key_alg_id</span>
@@ -891,7 +891,7 @@
 <span class="comment">// key value. The caller needs to check whether these match the</span>
 <span class="comment">// `PublicKeyAlgorithm` for the `SignatureAlgorithm` that is matched when</span>
 <span class="comment">// parsing the signature.</span>
-<span class="kw">fn</span> <span class="ident">parse_spki_value</span>(<span class="ident">input</span>: <span class="ident">untrusted::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SubjectPublicKeyInfo</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_spki_value</span>(<span class="ident">input</span>: <span class="ident">untrusted::Input</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SubjectPublicKeyInfo</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="ident">input</span>.<span class="ident">read_all</span>(<span class="ident">Error::BadDER</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">algorithm_id_value</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">der::Tag::Sequence</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">key_value</span> <span class="op">=</span> <span class="ident">der::bit_string_with_no_unused_bits</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
@@ -1007,8 +1007,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AlgorithmIdentifier</span> {
-    <span class="kw">fn</span> <span class="ident">matches_algorithm_id_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoded</span>: <span class="ident">untrusted::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">encoded</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">asn1_id_value</span>
+    <span class="kw">fn</span> <span class="ident">matches_algorithm_id_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoded</span>: <span class="ident">untrusted::Input</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">encoded</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">asn1_id_value</span>
     }
 }
 
@@ -1072,7 +1072,7 @@
     <span class="comment">// TODO: The expected results need to be modified for SHA-1 deprecation.</span>
 
     <span class="macro">macro_rules!</span> <span class="ident">test_verify_signed_data</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fn_name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected_result</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fn_name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected_result</span>:<span class="ident">expr</span>) =&gt; {
             <span class="attribute">#[<span class="ident">test</span>]</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fn_name</span>() { <span class="ident">test_verify_signed_data</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected_result</span>); }
         };
@@ -1125,7 +1125,7 @@
 
     <span class="comment">// XXX: This is testing code that isn&#39;t even in this module.</span>
     <span class="macro">macro_rules!</span> <span class="ident">test_verify_signed_data_signature_outer</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fn_name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected_result</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fn_name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected_result</span>:<span class="ident">expr</span>) =&gt; {
             <span class="attribute">#[<span class="ident">test</span>]</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fn_name</span>() { <span class="ident">test_verify_signed_data_signature_outer</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected_result</span>); }
         };
@@ -1144,7 +1144,7 @@
 
     <span class="comment">// XXX: This is testing code that is not even in this module.</span>
     <span class="macro">macro_rules!</span> <span class="ident">test_parse_spki_bad_outer</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fn_name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fn_name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span>:<span class="ident">expr</span>) =&gt; {
             <span class="attribute">#[<span class="ident">test</span>]</span>
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fn_name</span>() { <span class="ident">test_parse_spki_bad_outer</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">file_name</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span>) }
         };
@@ -1375,7 +1375,7 @@
         <span class="ident">signature</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_test_signed_data</span>(<span class="ident">file_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TestSignedData</span> {
+    <span class="kw">fn</span> <span class="ident">parse_test_signed_data</span>(<span class="ident">file_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">TestSignedData</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">std::path::PathBuf::from</span>(<span class="string">&quot;third-party/chromium/data/verify_signed_data&quot;</span>)
             .<span class="ident">join</span>(<span class="ident">file_name</span>);
         <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">std::fs::File::open</span>(<span class="ident">path</span>).<span class="ident">unwrap</span>();
@@ -1396,12 +1396,12 @@
 
     <span class="kw">type</span> <span class="ident">FileLines</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::io::Lines</span><span class="op">&lt;</span><span class="ident">std::io::BufReader</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">std::fs::File</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">read_pem_section</span>(<span class="ident">lines</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FileLines</span>, <span class="ident">section_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read_pem_section</span>(<span class="ident">lines</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FileLines</span>, <span class="ident">section_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="comment">// Skip comments and header</span>
         <span class="kw">let</span> <span class="ident">begin_section</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;-----BEGIN {}-----&quot;</span>, <span class="ident">section_name</span>);
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="ident">lines</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="ident">line</span> <span class="op">=</span><span class="op">=</span> <span class="ident">begin_section</span> {
+            <span class="kw">if</span> <span class="ident">line</span> <span class="op">==</span> <span class="ident">begin_section</span> {
                 <span class="kw">break</span>;
             }
         }
@@ -1411,7 +1411,7 @@
         <span class="kw">let</span> <span class="ident">end_section</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;-----END {}-----&quot;</span>, <span class="ident">section_name</span>);
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="ident">lines</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="ident">line</span> <span class="op">=</span><span class="op">=</span> <span class="ident">end_section</span> {
+            <span class="kw">if</span> <span class="ident">line</span> <span class="op">==</span> <span class="ident">end_section</span> {
                 <span class="kw">break</span>;
             }
             <span class="ident">base64</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">line</span>);

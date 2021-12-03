@@ -126,27 +126,27 @@
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
-                <span class="ident">EncoderState::Start</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EncoderState::Head</span>(<span class="self">self</span>.<span class="ident">compute_head</span>()<span class="question-mark">?</span>),
+                <span class="ident">EncoderState::Start</span> =&gt; <span class="ident">EncoderState::Head</span>(<span class="self">self</span>.<span class="ident">compute_head</span>()<span class="question-mark">?</span>),
 
-                <span class="ident">EncoderState::Head</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">cursor</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">EncoderState::Head</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">cursor</span>) =&gt; {
                     <span class="macro">read_to_end!</span>(<span class="ident">Pin::new</span>(<span class="ident">cursor</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>));
 
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">method</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Method::Head</span> {
+                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">method</span> <span class="op">==</span> <span class="ident">Method::Head</span> {
                         <span class="ident">EncoderState::End</span>
                     } <span class="kw">else</span> {
                         <span class="ident">EncoderState::Body</span>(<span class="ident">BodyEncoder::new</span>(<span class="self">self</span>.<span class="ident">response</span>.<span class="ident">take_body</span>()))
                     }
                 }
 
-                <span class="ident">EncoderState::Body</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">EncoderState::Body</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>) =&gt; {
                     <span class="macro">read_to_end!</span>(<span class="ident">Pin::new</span>(<span class="ident">encoder</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>));
                     <span class="ident">EncoderState::End</span>
                 }
 
-                <span class="ident">EncoderState::End</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>)),
+                <span class="ident">EncoderState::End</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>)),
             }
         }
     }
@@ -154,7 +154,7 @@
 
 <span class="kw">impl</span> <span class="ident">Encoder</span> {
     <span class="doccomment">/// Create a new instance of Encoder.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">response</span>: <span class="ident">Response</span>, <span class="ident">method</span>: <span class="ident">Method</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">response</span>: <span class="ident">Response</span>, <span class="ident">method</span>: <span class="ident">Method</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">method</span>,
             <span class="ident">response</span>,
@@ -178,7 +178,7 @@
     }
 
     <span class="doccomment">/// Encode the headers to a buffer, the first time we poll.</span>
-    <span class="kw">fn</span> <span class="ident">compute_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">compute_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">128</span>);
         <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">response</span>.<span class="ident">status</span>().<span class="ident">canonical_reason</span>();
         <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">response</span>.<span class="ident">status</span>();

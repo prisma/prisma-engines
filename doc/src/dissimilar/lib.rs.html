@@ -1011,9 +1011,9 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;tmp</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;tmp</span>, <span class="lifetime">&#39;b</span>: <span class="lifetime">&#39;tmp</span><span class="op">&gt;</span> <span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;tmp</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">text</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;tmp</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Diff::Equal</span>(<span class="ident">range</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) <span class="op">|</span> <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">range</span>,
+            <span class="ident">Diff::Equal</span>(<span class="ident">range</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) <span class="op">|</span> <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) =&gt; <span class="ident">range</span>,
         }
     }
 
@@ -1038,17 +1038,17 @@
 
     <span class="kw">fn</span> <span class="ident">for_each</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Range</span>)) {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Diff::Equal</span>(<span class="ident">range1</span>, <span class="ident">range2</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Diff::Equal</span>(<span class="ident">range1</span>, <span class="ident">range2</span>) =&gt; {
                 <span class="ident">f</span>(<span class="ident">range1</span>);
                 <span class="ident">f</span>(<span class="ident">range2</span>);
             }
-            <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>(<span class="ident">range</span>),
-            <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>(<span class="ident">range</span>),
+            <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) =&gt; <span class="ident">f</span>(<span class="ident">range</span>),
+            <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) =&gt; <span class="ident">f</span>(<span class="ident">range</span>),
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">text1</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">text2</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Chunk</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">text1</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">text2</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Chunk</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">text1</span> <span class="op">=</span> <span class="ident">Range::new</span>(<span class="ident">text1</span>, ..);
     <span class="kw">let</span> <span class="ident">text2</span> <span class="op">=</span> <span class="ident">Range::new</span>(<span class="ident">text2</span>, ..);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">solution</span> <span class="op">=</span> <span class="ident">main</span>(<span class="ident">text1</span>, <span class="ident">text2</span>);
@@ -1065,7 +1065,7 @@
     <span class="ident">utf8</span>: <span class="ident">bool</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">main</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">text1</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">text2</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Solution</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">main</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">text1</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">text2</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) -&gt; <span class="ident">Solution</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">whole1</span> <span class="op">=</span> <span class="ident">text1</span>;
     <span class="kw">let</span> <span class="ident">whole2</span> <span class="op">=</span> <span class="ident">text2</span>;
 
@@ -1110,12 +1110,12 @@
 
 <span class="comment">// Find the differences between two texts. Assumes that the texts do not have</span>
 <span class="comment">// any common prefix or suffix.</span>
-<span class="kw">fn</span> <span class="ident">compute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">text1</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">text2</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">compute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">text1</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">text2</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> (<span class="ident">text1</span>.<span class="ident">is_empty</span>(), <span class="ident">text2</span>.<span class="ident">is_empty</span>()) {
-        (<span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Vec::new</span>(),
-        (<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="macro">vec!</span>[<span class="ident">Diff::Insert</span>(<span class="ident">text2</span>)],
-        (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="macro">vec!</span>[<span class="ident">Diff::Delete</span>(<span class="ident">text1</span>)],
-        (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {}
+        (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="kw">return</span> <span class="ident">Vec::new</span>(),
+        (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="kw">return</span> <span class="macro">vec!</span>[<span class="ident">Diff::Insert</span>(<span class="ident">text2</span>)],
+        (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="kw">return</span> <span class="macro">vec!</span>[<span class="ident">Diff::Delete</span>(<span class="ident">text1</span>)],
+        (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {}
     }
 
     <span class="comment">// Check for entire shorter text inside the longer text.</span>
@@ -1137,7 +1137,7 @@
         }
     }
 
-    <span class="kw">if</span> <span class="ident">text1</span>.<span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">text2</span>.<span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+    <span class="kw">if</span> <span class="ident">text1</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">1</span> <span class="op">|</span><span class="op">|</span> <span class="ident">text2</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">1</span> {
         <span class="comment">// Single character string.</span>
         <span class="comment">// After the previous check, the character can&#39;t be an equality.</span>
         <span class="kw">return</span> <span class="macro">vec!</span>[<span class="ident">Diff::Delete</span>(<span class="ident">text1</span>), <span class="ident">Diff::Insert</span>(<span class="ident">text2</span>)];
@@ -1150,7 +1150,7 @@
 <span class="comment">// recursively constructed diff.</span>
 <span class="comment">//</span>
 <span class="comment">// See Myers 1986 paper: An O(ND) Difference Algorithm and Its Variations.</span>
-<span class="kw">fn</span> <span class="ident">bisect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">text1</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">text2</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">bisect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">text1</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">text2</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">max_d</span> <span class="op">=</span> (<span class="ident">text1</span>.<span class="ident">len</span> <span class="op">+</span> <span class="ident">text2</span>.<span class="ident">len</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">2</span>;
     <span class="kw">let</span> <span class="ident">v_offset</span> <span class="op">=</span> <span class="ident">max_d</span>;
     <span class="kw">let</span> <span class="ident">v_len</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">max_d</span>;
@@ -1173,7 +1173,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k1</span> <span class="op">=</span> <span class="op">-</span><span class="ident">d</span> <span class="op">+</span> <span class="ident">k1start</span>;
         <span class="kw">while</span> <span class="ident">k1</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">d</span> <span class="op">-</span> <span class="ident">k1end</span> {
             <span class="kw">let</span> <span class="ident">k1_offset</span> <span class="op">=</span> (<span class="ident">v_offset</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">k1</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x1</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">k1</span> <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="ident">d</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">k1</span> <span class="op">!</span><span class="op">=</span> <span class="ident">d</span> <span class="op">&amp;&amp;</span> <span class="ident">v1</span>[<span class="ident">k1_offset</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">&lt;</span> <span class="ident">v1</span>[<span class="ident">k1_offset</span> <span class="op">+</span> <span class="number">1</span>]) {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x1</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">k1</span> <span class="op">==</span> <span class="op">-</span><span class="ident">d</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">k1</span> <span class="op">!</span><span class="op">=</span> <span class="ident">d</span> <span class="op">&amp;&amp;</span> <span class="ident">v1</span>[<span class="ident">k1_offset</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">&lt;</span> <span class="ident">v1</span>[<span class="ident">k1_offset</span> <span class="op">+</span> <span class="number">1</span>]) {
                 <span class="ident">v1</span>[<span class="ident">k1_offset</span> <span class="op">+</span> <span class="number">1</span>]
             } <span class="kw">else</span> {
                 <span class="ident">v1</span>[<span class="ident">k1_offset</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">+</span> <span class="number">1</span>
@@ -1209,7 +1209,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k2</span> <span class="op">=</span> <span class="op">-</span><span class="ident">d</span> <span class="op">+</span> <span class="ident">k2start</span>;
         <span class="kw">while</span> <span class="ident">k2</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">d</span> <span class="op">-</span> <span class="ident">k2end</span> {
             <span class="kw">let</span> <span class="ident">k2_offset</span> <span class="op">=</span> (<span class="ident">v_offset</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">k2</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x2</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">k2</span> <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="ident">d</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">k2</span> <span class="op">!</span><span class="op">=</span> <span class="ident">d</span> <span class="op">&amp;&amp;</span> <span class="ident">v2</span>[<span class="ident">k2_offset</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">&lt;</span> <span class="ident">v2</span>[<span class="ident">k2_offset</span> <span class="op">+</span> <span class="number">1</span>]) {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x2</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">k2</span> <span class="op">==</span> <span class="op">-</span><span class="ident">d</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">k2</span> <span class="op">!</span><span class="op">=</span> <span class="ident">d</span> <span class="op">&amp;&amp;</span> <span class="ident">v2</span>[<span class="ident">k2_offset</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">&lt;</span> <span class="ident">v2</span>[<span class="ident">k2_offset</span> <span class="op">+</span> <span class="number">1</span>]) {
                 <span class="ident">v2</span>[<span class="ident">k2_offset</span> <span class="op">+</span> <span class="number">1</span>]
             } <span class="kw">else</span> {
                 <span class="ident">v2</span>[<span class="ident">k2_offset</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">+</span> <span class="number">1</span>
@@ -1257,7 +1257,7 @@
     <span class="ident">text2</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
     <span class="ident">x</span>: <span class="ident">usize</span>,
     <span class="ident">y</span>: <span class="ident">usize</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">text1a</span>, <span class="ident">text1b</span>) <span class="op">=</span> <span class="ident">text1</span>.<span class="ident">split_at</span>(<span class="ident">x</span>);
     <span class="kw">let</span> (<span class="ident">text2a</span>, <span class="ident">text2b</span>) <span class="op">=</span> <span class="ident">text2</span>.<span class="ident">split_at</span>(<span class="ident">y</span>);
 
@@ -1269,7 +1269,7 @@
 }
 
 <span class="comment">// Determine the length of the common prefix of two strings.</span>
-<span class="kw">fn</span> <span class="ident">common_prefix</span>(<span class="ident">text1</span>: <span class="ident">Range</span>, <span class="ident">text2</span>: <span class="ident">Range</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">common_prefix</span>(<span class="ident">text1</span>: <span class="ident">Range</span>, <span class="ident">text2</span>: <span class="ident">Range</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">for</span> ((<span class="ident">i</span>, <span class="ident">ch1</span>), <span class="ident">ch2</span>) <span class="kw">in</span> <span class="ident">text1</span>.<span class="ident">char_indices</span>().<span class="ident">zip</span>(<span class="ident">text2</span>.<span class="ident">chars</span>()) {
         <span class="kw">if</span> <span class="ident">ch1</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ch2</span> {
             <span class="kw">return</span> <span class="ident">i</span>;
@@ -1279,7 +1279,7 @@
 }
 
 <span class="comment">// Determine the length of the common suffix of two strings.</span>
-<span class="kw">fn</span> <span class="ident">common_suffix</span>(<span class="ident">text1</span>: <span class="ident">Range</span>, <span class="ident">text2</span>: <span class="ident">Range</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">common_suffix</span>(<span class="ident">text1</span>: <span class="ident">Range</span>, <span class="ident">text2</span>: <span class="ident">Range</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">for</span> ((<span class="ident">i</span>, <span class="ident">ch1</span>), <span class="ident">ch2</span>) <span class="kw">in</span> <span class="ident">text1</span>.<span class="ident">char_indices</span>().<span class="ident">rev</span>().<span class="ident">zip</span>(<span class="ident">text2</span>.<span class="ident">chars</span>().<span class="ident">rev</span>()) {
         <span class="kw">if</span> <span class="ident">ch1</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ch2</span> {
             <span class="kw">return</span> <span class="ident">text1</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">i</span> <span class="op">-</span> <span class="ident">ch1</span>.<span class="ident">len_utf8</span>();
@@ -1288,7 +1288,7 @@
     <span class="ident">cmp::min</span>(<span class="ident">text1</span>.<span class="ident">len</span>, <span class="ident">text2</span>.<span class="ident">len</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">common_prefix_bytes</span>(<span class="ident">text1</span>: <span class="ident">Range</span>, <span class="ident">text2</span>: <span class="ident">Range</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">common_prefix_bytes</span>(<span class="ident">text1</span>: <span class="ident">Range</span>, <span class="ident">text2</span>: <span class="ident">Range</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">for</span> (<span class="ident">i</span>, (<span class="ident">b1</span>, <span class="ident">b2</span>)) <span class="kw">in</span> <span class="ident">text1</span>.<span class="ident">bytes</span>().<span class="ident">zip</span>(<span class="ident">text2</span>.<span class="ident">bytes</span>()).<span class="ident">enumerate</span>() {
         <span class="kw">if</span> <span class="ident">b1</span> <span class="op">!</span><span class="op">=</span> <span class="ident">b2</span> {
             <span class="kw">return</span> <span class="ident">i</span>;
@@ -1297,7 +1297,7 @@
     <span class="ident">cmp::min</span>(<span class="ident">text1</span>.<span class="ident">len</span>, <span class="ident">text2</span>.<span class="ident">len</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">common_suffix_bytes</span>(<span class="ident">text1</span>: <span class="ident">Range</span>, <span class="ident">text2</span>: <span class="ident">Range</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">common_suffix_bytes</span>(<span class="ident">text1</span>: <span class="ident">Range</span>, <span class="ident">text2</span>: <span class="ident">Range</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">for</span> (<span class="ident">i</span>, (<span class="ident">b1</span>, <span class="ident">b2</span>)) <span class="kw">in</span> <span class="ident">text1</span>.<span class="ident">bytes</span>().<span class="ident">rev</span>().<span class="ident">zip</span>(<span class="ident">text2</span>.<span class="ident">bytes</span>().<span class="ident">rev</span>()).<span class="ident">enumerate</span>() {
         <span class="kw">if</span> <span class="ident">b1</span> <span class="op">!</span><span class="op">=</span> <span class="ident">b2</span> {
             <span class="kw">return</span> <span class="ident">i</span>;
@@ -1310,7 +1310,7 @@
 <span class="comment">//</span>
 <span class="comment">// Returns the number of characters common to the end of the first string and</span>
 <span class="comment">// the start of the second string.</span>
-<span class="kw">fn</span> <span class="ident">common_overlap</span>(<span class="kw-2">mut</span> <span class="ident">text1</span>: <span class="ident">Range</span>, <span class="kw-2">mut</span> <span class="ident">text2</span>: <span class="ident">Range</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">common_overlap</span>(<span class="kw-2">mut</span> <span class="ident">text1</span>: <span class="ident">Range</span>, <span class="kw-2">mut</span> <span class="ident">text2</span>: <span class="ident">Range</span>) -&gt; <span class="ident">usize</span> {
     <span class="comment">// Eliminate the null case.</span>
     <span class="kw">if</span> <span class="ident">text1</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">text2</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="number">0</span>;
@@ -1322,7 +1322,7 @@
         <span class="ident">text2</span> <span class="op">=</span> <span class="ident">text2</span>.<span class="ident">substring</span>(..<span class="ident">text1</span>.<span class="ident">len</span>);
     }
     <span class="comment">// Quick check for the worst case.</span>
-    <span class="kw">if</span> <span class="ident">bytes</span>(<span class="ident">text1</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">bytes</span>(<span class="ident">text2</span>) {
+    <span class="kw">if</span> <span class="ident">bytes</span>(<span class="ident">text1</span>) <span class="op">==</span> <span class="ident">bytes</span>(<span class="ident">text2</span>) {
         <span class="kw">return</span> <span class="ident">text1</span>.<span class="ident">len</span>;
     }
 
@@ -1334,12 +1334,12 @@
     <span class="kw">loop</span> {
         <span class="kw">let</span> <span class="ident">pattern</span> <span class="op">=</span> <span class="ident">text1</span>.<span class="ident">substring</span>(<span class="ident">text1</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">length</span>..);
         <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">text2</span>.<span class="ident">find</span>(<span class="ident">pattern</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">found</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">found</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">best</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">found</span>) =&gt; <span class="ident">found</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">best</span>,
         };
         <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">found</span>;
-        <span class="kw">if</span> <span class="ident">found</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
-            <span class="op">|</span><span class="op">|</span> <span class="ident">bytes</span>(<span class="ident">text1</span>.<span class="ident">substring</span>(<span class="ident">text1</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">length</span>..)) <span class="op">=</span><span class="op">=</span> <span class="ident">bytes</span>(<span class="ident">text2</span>.<span class="ident">substring</span>(..<span class="ident">length</span>))
+        <span class="kw">if</span> <span class="ident">found</span> <span class="op">==</span> <span class="number">0</span>
+            <span class="op">|</span><span class="op">|</span> <span class="ident">bytes</span>(<span class="ident">text1</span>.<span class="ident">substring</span>(<span class="ident">text1</span>.<span class="ident">len</span> <span class="op">-</span> <span class="ident">length</span>..)) <span class="op">==</span> <span class="ident">bytes</span>(<span class="ident">text2</span>.<span class="ident">substring</span>(..<span class="ident">length</span>))
         {
             <span class="ident">best</span> <span class="op">=</span> <span class="ident">length</span>;
             <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -1348,7 +1348,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">cleanup_char_boundary</span>(<span class="ident">solution</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Solution</span>) {
-    <span class="kw">fn</span> <span class="ident">boundary_down</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">boundary_down</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">while</span> <span class="op">!</span><span class="ident">doc</span>.<span class="ident">is_char_boundary</span>(<span class="ident">pos</span> <span class="op">-</span> <span class="ident">adjust</span>) {
             <span class="ident">adjust</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -1356,7 +1356,7 @@
         <span class="ident">adjust</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">boundary_up</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">boundary_up</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pos</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">while</span> <span class="op">!</span><span class="ident">doc</span>.<span class="ident">is_char_boundary</span>(<span class="ident">pos</span> <span class="op">+</span> <span class="ident">adjust</span>) {
             <span class="ident">adjust</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -1380,7 +1380,7 @@
     <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">mut</span> <span class="ident">diff</span>)) <span class="op">=</span> <span class="ident">solution</span>.<span class="ident">diffs</span>.<span class="ident">get</span>(<span class="ident">read</span>) {
         <span class="ident">read</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">diff</span> {
-            <span class="ident">Diff::Equal</span>(<span class="ident">range1</span>, <span class="ident">range2</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Diff::Equal</span>(<span class="ident">range1</span>, <span class="ident">range2</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="ident">boundary_up</span>(<span class="ident">range1</span>.<span class="ident">doc</span>, <span class="ident">range1</span>.<span class="ident">offset</span>);
                 <span class="comment">// If the whole range is sub-character, skip it.</span>
                 <span class="kw">if</span> <span class="ident">range1</span>.<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">adjust</span> {
@@ -1396,9 +1396,9 @@
                 <span class="ident">last_delete</span> <span class="op">=</span> <span class="ident">Range::empty</span>();
                 <span class="ident">last_insert</span> <span class="op">=</span> <span class="ident">Range::empty</span>();
             }
-            <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) =&gt; {
                 <span class="ident">skip_overlap</span>(<span class="kw-2">&amp;</span><span class="ident">last_delete</span>, <span class="ident">range</span>);
-                <span class="kw">if</span> <span class="ident">range</span>.<span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">range</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
                     <span class="kw">continue</span>;
                 }
                 <span class="kw">let</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="ident">boundary_down</span>(<span class="ident">range</span>.<span class="ident">doc</span>, <span class="ident">range</span>.<span class="ident">offset</span>);
@@ -1408,9 +1408,9 @@
                 <span class="ident">range</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">adjust</span>;
                 <span class="ident">last_delete</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">range</span>;
             }
-            <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) =&gt; {
                 <span class="ident">skip_overlap</span>(<span class="kw-2">&amp;</span><span class="ident">last_insert</span>, <span class="ident">range</span>);
-                <span class="kw">if</span> <span class="ident">range</span>.<span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">range</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
                     <span class="kw">continue</span>;
                 }
                 <span class="kw">let</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="ident">boundary_down</span>(<span class="ident">range</span>.<span class="ident">doc</span>, <span class="ident">range</span>.<span class="ident">offset</span>);
@@ -1448,7 +1448,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len_deletions2</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">this_diff</span>) <span class="op">=</span> <span class="ident">diffs</span>.<span class="ident">get</span>(<span class="ident">pointer</span>) {
         <span class="kw">match</span> <span class="ident">this_diff</span> {
-            <span class="ident">Diff::Equal</span>(<span class="ident">text1</span>, <span class="ident">text2</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Diff::Equal</span>(<span class="ident">text1</span>, <span class="ident">text2</span>) =&gt; {
                 <span class="ident">equalities</span>.<span class="ident">push_back</span>(<span class="ident">pointer</span>);
                 <span class="ident">len_insertions1</span> <span class="op">=</span> <span class="ident">len_insertions2</span>;
                 <span class="ident">len_deletions1</span> <span class="op">=</span> <span class="ident">len_deletions2</span>;
@@ -1458,8 +1458,8 @@
                 <span class="ident">pointer</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="kw">continue</span>;
             }
-            <span class="ident">Diff::Delete</span>(<span class="ident">text</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">len_deletions2</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>,
-            <span class="ident">Diff::Insert</span>(<span class="ident">text</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">len_insertions2</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>,
+            <span class="ident">Diff::Delete</span>(<span class="ident">text</span>) =&gt; <span class="ident">len_deletions2</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>,
+            <span class="ident">Diff::Insert</span>(<span class="ident">text</span>) =&gt; <span class="ident">len_insertions2</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>,
         }
         <span class="comment">// Eliminate an equality that is smaller or equal to the edits on both</span>
         <span class="comment">// sides of it.</span>
@@ -1584,7 +1584,7 @@
                 <span class="op">+</span> <span class="ident">cleanup_semantic_score</span>(<span class="ident">edit</span>.<span class="ident">text</span>(), <span class="ident">next_equal1</span>);
             <span class="kw">while</span> <span class="op">!</span><span class="ident">edit</span>.<span class="ident">text</span>().<span class="ident">is_empty</span>()
                 <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next_equal1</span>.<span class="ident">is_empty</span>()
-                <span class="op">&amp;&amp;</span> <span class="ident">edit</span>.<span class="ident">text</span>().<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">next_equal1</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>()
+                <span class="op">&amp;&amp;</span> <span class="ident">edit</span>.<span class="ident">text</span>().<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="ident">next_equal1</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>()
             {
                 <span class="kw">let</span> <span class="ident">increment</span> <span class="op">=</span> <span class="ident">edit</span>.<span class="ident">text</span>().<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">len_utf8</span>();
                 <span class="ident">prev_equal1</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">increment</span>;
@@ -1629,7 +1629,7 @@
 <span class="comment">// falls on logical boundaries.</span>
 <span class="comment">//</span>
 <span class="comment">// Scores range from 6 (best) to 0 (worst).</span>
-<span class="kw">fn</span> <span class="ident">cleanup_semantic_score</span>(<span class="ident">one</span>: <span class="ident">Range</span>, <span class="ident">two</span>: <span class="ident">Range</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">cleanup_semantic_score</span>(<span class="ident">one</span>: <span class="ident">Range</span>, <span class="ident">two</span>: <span class="ident">Range</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">if</span> <span class="ident">one</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">two</span>.<span class="ident">is_empty</span>() {
         <span class="comment">// Edges are the best.</span>
         <span class="kw">return</span> <span class="number">6</span>;
@@ -1702,7 +1702,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">text_insert</span> <span class="op">=</span> <span class="ident">Range::empty</span>();
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">this_diff</span>) <span class="op">=</span> <span class="ident">diffs</span>.<span class="ident">get</span>(<span class="ident">pointer</span>) {
             <span class="kw">match</span> <span class="ident">this_diff</span> {
-                <span class="ident">Diff::Insert</span>(<span class="ident">text</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Diff::Insert</span>(<span class="ident">text</span>) =&gt; {
                     <span class="ident">count_insert</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="kw">if</span> <span class="ident">text_insert</span>.<span class="ident">is_empty</span>() {
                         <span class="ident">text_insert</span> <span class="op">=</span> <span class="ident">text</span>;
@@ -1710,7 +1710,7 @@
                         <span class="ident">text_insert</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>;
                     }
                 }
-                <span class="ident">Diff::Delete</span>(<span class="ident">text</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Diff::Delete</span>(<span class="ident">text</span>) =&gt; {
                     <span class="ident">count_delete</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="kw">if</span> <span class="ident">text_delete</span>.<span class="ident">is_empty</span>() {
                         <span class="ident">text_delete</span> <span class="op">=</span> <span class="ident">text</span>;
@@ -1718,7 +1718,7 @@
                         <span class="ident">text_delete</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>;
                     }
                 }
-                <span class="ident">Diff::Equal</span>(<span class="ident">text</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Diff::Equal</span>(<span class="ident">text</span>, <span class="kw">_</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">count_both</span> <span class="op">=</span> <span class="ident">count_delete</span> <span class="op">+</span> <span class="ident">count_insert</span>;
                     <span class="kw">if</span> <span class="ident">count_both</span> <span class="op">&gt;</span> <span class="number">1</span> {
                         <span class="kw">let</span> <span class="ident">both_types</span> <span class="op">=</span> <span class="ident">count_delete</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">count_insert</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
@@ -1731,11 +1731,11 @@
                             <span class="kw">if</span> <span class="ident">common_length</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                                 <span class="kw">if</span> <span class="ident">pointer</span> <span class="op">&gt;</span> <span class="number">0</span> {
                                     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">diffs</span>[<span class="ident">pointer</span> <span class="op">-</span> <span class="number">1</span>] {
-                                        <span class="ident">Diff::Equal</span>(<span class="ident">this_diff1</span>, <span class="ident">this_diff2</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                        <span class="ident">Diff::Equal</span>(<span class="ident">this_diff1</span>, <span class="ident">this_diff2</span>) =&gt; {
                                             <span class="ident">this_diff1</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">common_length</span>;
                                             <span class="ident">this_diff2</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">common_length</span>;
                                         }
-                                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(
+                                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(
                                             <span class="string">&quot;previous diff should have been an equality&quot;</span>
                                         ),
                                     }
@@ -1827,22 +1827,22 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Chunk</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">text</span>) <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Chunk::Equal</span>(<span class="ident">text</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;Equal&quot;</span>, <span class="ident">text</span>),
-            <span class="ident">Chunk::Delete</span>(<span class="ident">text</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;Delete&quot;</span>, <span class="ident">text</span>),
-            <span class="ident">Chunk::Insert</span>(<span class="ident">text</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;Insert&quot;</span>, <span class="ident">text</span>),
+            <span class="ident">Chunk::Equal</span>(<span class="ident">text</span>) =&gt; (<span class="string">&quot;Equal&quot;</span>, <span class="ident">text</span>),
+            <span class="ident">Chunk::Delete</span>(<span class="ident">text</span>) =&gt; (<span class="string">&quot;Delete&quot;</span>, <span class="ident">text</span>),
+            <span class="ident">Chunk::Insert</span>(<span class="ident">text</span>) =&gt; (<span class="string">&quot;Insert&quot;</span>, <span class="ident">text</span>),
         };
         <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;{}({:?})&quot;</span>, <span class="ident">name</span>, <span class="ident">text</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">bytes</span>) <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Diff::Equal</span>(<span class="ident">range</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;Equal&quot;</span>, <span class="ident">bytes</span>(<span class="ident">range</span>)),
-            <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;Delete&quot;</span>, <span class="ident">bytes</span>(<span class="ident">range</span>)),
-            <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;Insert&quot;</span>, <span class="ident">bytes</span>(<span class="ident">range</span>)),
+            <span class="ident">Diff::Equal</span>(<span class="ident">range</span>, <span class="kw">_</span>) =&gt; (<span class="string">&quot;Equal&quot;</span>, <span class="ident">bytes</span>(<span class="ident">range</span>)),
+            <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) =&gt; (<span class="string">&quot;Delete&quot;</span>, <span class="ident">bytes</span>(<span class="ident">range</span>)),
+            <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) =&gt; (<span class="string">&quot;Insert&quot;</span>, <span class="ident">bytes</span>(<span class="ident">range</span>)),
         };
         <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">String::from_utf8_lossy</span>(<span class="ident">bytes</span>);
         <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;{}({:?})&quot;</span>, <span class="ident">name</span>, <span class="ident">text</span>)
@@ -1850,11 +1850,11 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Chunk</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">diff</span>: <span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">diff</span>: <span class="ident">Diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">diff</span> {
-            <span class="ident">Diff::Equal</span>(<span class="ident">range</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Chunk::Equal</span>(<span class="ident">str</span>(<span class="ident">range</span>)),
-            <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Chunk::Delete</span>(<span class="ident">str</span>(<span class="ident">range</span>)),
-            <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Chunk::Insert</span>(<span class="ident">str</span>(<span class="ident">range</span>)),
+            <span class="ident">Diff::Equal</span>(<span class="ident">range</span>, <span class="kw">_</span>) =&gt; <span class="ident">Chunk::Equal</span>(<span class="ident">str</span>(<span class="ident">range</span>)),
+            <span class="ident">Diff::Delete</span>(<span class="ident">range</span>) =&gt; <span class="ident">Chunk::Delete</span>(<span class="ident">str</span>(<span class="ident">range</span>)),
+            <span class="ident">Diff::Insert</span>(<span class="ident">range</span>) =&gt; <span class="ident">Chunk::Insert</span>(<span class="ident">str</span>(<span class="ident">range</span>)),
         }
     }
 }

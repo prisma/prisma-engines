@@ -9,17 +9,17 @@ and the
 <a href="https://www.w3.org/TR/html52/textlevel-semantics.html#the-a-element">HTML 5.2: section 4.5.</a>
 specification.</p>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="iterator/index.html" title="parse_hyperlinks::iterator mod">iterator</a></div><div class="item-right docblock-short"><p>Module providing an iterator over the hyperlinks found in the input text.
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="iterator/index.html" title="parse_hyperlinks::iterator mod">iterator</a></div><div class="item-right docblock-short"><p>Module providing an iterator over the hyperlinks found in the input text.
 Consult the documentation of <code>parser::take_link()</code> to see a list of
 supported markup languages. The iterator resolves link references.</p>
-</div><div class="item-left module-item"><a class="mod" href="parser/index.html" title="parse_hyperlinks::parser mod">parser</a></div><div class="item-right docblock-short"><p>This module implements parsers to extract hyperlinks and link reference
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="parser/index.html" title="parse_hyperlinks::parser mod">parser</a></div><div class="item-right docblock-short"><p>This module implements parsers to extract hyperlinks and link reference
 definitions from text input.</p>
-</div><div class="item-left module-item"><a class="mod" href="renderer/index.html" title="parse_hyperlinks::renderer mod">renderer</a></div><div class="item-right docblock-short"><p>A set of functions providing markup source code to HTML renderer, that make
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="renderer/index.html" title="parse_hyperlinks::renderer mod">renderer</a></div><div class="item-right docblock-short"><p>A set of functions providing markup source code to HTML renderer, that make
 hyperlinks clickable.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.take_until_unbalanced.html" title="parse_hyperlinks::take_until_unbalanced fn">take_until_unbalanced</a></div><div class="item-right docblock-short"><p>A parser similar to <code>nom::bytes::complete::take_until()</code>, but that does not
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.take_until_unbalanced.html" title="parse_hyperlinks::take_until_unbalanced fn">take_until_unbalanced</a></div><div class="item-right docblock-short"><p>A parser similar to <code>nom::bytes::complete::take_until()</code>, but that does not
 stop at balanced opening and closing tags. It is designed to work inside the
 <code>nom::sequence::delimited()</code> parser.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="parse_hyperlinks" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="parse_hyperlinks" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

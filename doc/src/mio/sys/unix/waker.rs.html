@@ -199,7 +199,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">Waker</span> {
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">selector</span>: <span class="kw-2">&amp;</span><span class="ident">Selector</span>, <span class="ident">token</span>: <span class="ident">Token</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">selector</span>: <span class="kw-2">&amp;</span><span class="ident">Selector</span>, <span class="ident">token</span>: <span class="ident">Token</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span> {
             <span class="macro">syscall!</span>(<span class="ident">eventfd</span>(<span class="number">0</span>, <span class="ident">libc::EFD_CLOEXEC</span> <span class="op">|</span> <span class="ident">libc::EFD_NONBLOCK</span>)).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">fd</span><span class="op">|</span> {
                 <span class="comment">// Turn the file descriptor into a file first so we&#39;re ensured</span>
                 <span class="comment">// it&#39;s closed when dropped, e.g. when register below fails.</span>
@@ -210,29 +210,29 @@
             })
         }
 
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wake</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wake</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">buf</span>: [<span class="ident">u8</span>; <span class="number">8</span>] <span class="op">=</span> <span class="number">1u64</span>.<span class="ident">to_ne_bytes</span>();
             <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fd</span>).<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>) {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">io::ErrorKind::WouldBlock</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+                <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io::ErrorKind::WouldBlock</span> =&gt; {
                     <span class="comment">// Writing only blocks if the counter is going to overflow.</span>
                     <span class="comment">// So we&#39;ll reset the counter to 0 and wake it again.</span>
                     <span class="self">self</span>.<span class="ident">reset</span>()<span class="question-mark">?</span>;
                     <span class="self">self</span>.<span class="ident">wake</span>()
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
             }
         }
 
         <span class="doccomment">/// Reset the eventfd object, only need to call this if `wake` fails.</span>
-        <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: [<span class="ident">u8</span>; <span class="number">8</span>] <span class="op">=</span> <span class="number">0u64</span>.<span class="ident">to_ne_bytes</span>();
             <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fd</span>).<span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>) {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
                 <span class="comment">// If the `Waker` hasn&#39;t been awoken yet this will return a</span>
                 <span class="comment">// `WouldBlock` error which we can safely ignore.</span>
-                <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">io::ErrorKind::WouldBlock</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io::ErrorKind::WouldBlock</span> =&gt; <span class="prelude-val">Ok</span>(()),
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
             }
         }
     }
@@ -261,7 +261,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">Waker</span> {
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">selector</span>: <span class="kw-2">&amp;</span><span class="ident">Selector</span>, <span class="ident">token</span>: <span class="ident">Token</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">selector</span>: <span class="kw-2">&amp;</span><span class="ident">Selector</span>, <span class="ident">token</span>: <span class="ident">Token</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span> {
             <span class="ident">selector</span>.<span class="ident">try_clone</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">selector</span><span class="op">|</span> {
                 <span class="ident">selector</span>
                     .<span class="ident">setup_waker</span>(<span class="ident">token</span>)
@@ -269,7 +269,7 @@
             })
         }
 
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wake</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wake</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">selector</span>.<span class="ident">wake</span>(<span class="self">self</span>.<span class="ident">token</span>)
         }
     }
@@ -304,7 +304,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">Waker</span> {
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">selector</span>: <span class="kw-2">&amp;</span><span class="ident">Selector</span>, <span class="ident">token</span>: <span class="ident">Token</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">selector</span>: <span class="kw-2">&amp;</span><span class="ident">Selector</span>, <span class="ident">token</span>: <span class="ident">Token</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fds</span> <span class="op">=</span> [<span class="op">-</span><span class="number">1</span>; <span class="number">2</span>];
             <span class="macro">syscall!</span>(<span class="ident">pipe2</span>(<span class="ident">fds</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">libc::O_NONBLOCK</span> <span class="op">|</span> <span class="ident">libc::O_CLOEXEC</span>))<span class="question-mark">?</span>;
             <span class="comment">// Turn the file descriptors into files first so we&#39;re ensured</span>
@@ -316,7 +316,7 @@
                 .<span class="ident">map</span>(<span class="op">|</span>()<span class="op">|</span> <span class="ident">Waker</span> { <span class="ident">sender</span>, <span class="ident">receiver</span> })
         }
 
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wake</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wake</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="comment">// The epoll emulation on some illumos systems currently requires</span>
             <span class="comment">// the pipe buffer to be completely empty for an edge-triggered</span>
             <span class="comment">// wakeup on the pipe read side.</span>
@@ -324,15 +324,15 @@
             <span class="self">self</span>.<span class="ident">empty</span>();
 
             <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sender</span>).<span class="ident">write</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>]) {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-                <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">io::ErrorKind::WouldBlock</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+                <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io::ErrorKind::WouldBlock</span> =&gt; {
                     <span class="comment">// The reading end is full so we&#39;ll empty the buffer and try</span>
                     <span class="comment">// again.</span>
                     <span class="self">self</span>.<span class="ident">empty</span>();
                     <span class="self">self</span>.<span class="ident">wake</span>()
                 }
-                <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">io::ErrorKind::Interrupted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">wake</span>(),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io::ErrorKind::Interrupted</span> =&gt; <span class="self">self</span>.<span class="ident">wake</span>(),
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
             }
         }
 
@@ -342,8 +342,8 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4096</span>];
             <span class="kw">loop</span> {
                 <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">receiver</span>).<span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
+                    <span class="prelude-val">Ok</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> =&gt; <span class="kw">continue</span>,
+                    <span class="kw">_</span> =&gt; <span class="kw">return</span>,
                 }
             }
         }

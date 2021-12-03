@@ -890,7 +890,7 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Radium</span> {
     <span class="kw">type</span> <span class="ident">Item</span>;
     <span class="doccomment">/// Creates a new value of this type.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="self">Self</span>;
 
     <span class="doccomment">/// If the underlying value is atomic, calls [`fence`] with the given</span>
     <span class="doccomment">/// [`Ordering`]. Otherwise, does nothing.</span>
@@ -903,12 +903,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is safe because the mutable reference to `self` guarantees that no</span>
     <span class="doccomment">/// other references exist to this value.</span>
-    <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Item</span>;
+    <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Item</span>;
 
     <span class="doccomment">/// Consumes the wrapper and returns the contained value.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is safe as passing by value ensures no other references exist.</span>
-    <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Item</span>;
+    <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>;
 
     <span class="doccomment">/// Load a value from this object.</span>
     <span class="doccomment">///</span>
@@ -917,7 +917,7 @@
     <span class="doccomment">/// See also: [`AtomicUsize::load`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`AtomicUsize::load`]: core::sync::atomic::AtomicUsize::load</span>
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Item</span>;
+    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>;
 
     <span class="doccomment">/// Store a value in this object.</span>
     <span class="doccomment">///</span>
@@ -935,7 +935,7 @@
     <span class="doccomment">/// See also: [`AtomicUsize::swap`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`AtomicUsize::swap`]: core::sync::atomic::AtomicUsize::swap</span>
-    <span class="kw">fn</span> <span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Item</span>;
+    <span class="kw">fn</span> <span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>;
 
     <span class="doccomment">/// Stores a value into this object if the currently-stored value is the</span>
     <span class="doccomment">/// same as the `current` value.</span>
@@ -949,7 +949,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`AtomicUsize::compare_and_swap`]: core::sync::atomic::AtomicUsize::compare_and_swap</span>
     <span class="kw">fn</span> <span class="ident">compare_and_swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">new</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Item</span>;
+        -&gt; <span class="ident"><span class="self">Self</span>::Item</span>;
 
     <span class="doccomment">/// Stores a value into this object if the currently-stored value is the</span>
     <span class="doccomment">/// same as the `current` value.</span>
@@ -969,7 +969,7 @@
         <span class="ident">new</span>: <span class="ident"><span class="self">Self</span>::Item</span>,
         <span class="ident">success</span>: <span class="ident">Ordering</span>,
         <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Stores a value into this object if the currently-stored value is the</span>
     <span class="doccomment">/// same as the `current` value.</span>
@@ -991,7 +991,7 @@
         <span class="ident">new</span>: <span class="ident"><span class="self">Self</span>::Item</span>,
         <span class="ident">success</span>: <span class="ident">Ordering</span>,
         <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Performs a bitwise &quot;and&quot; on the currently-stored value and the argument</span>
     <span class="doccomment">/// `value`, and stores the result in `self`.</span>
@@ -1003,7 +1003,7 @@
     <span class="doccomment">/// See also: [`AtomicUsize::fetch_and`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`AtomicUsize::fetch_and`]: core::sync::atomic::AtomicUsize::fetch_and</span>
-    <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Item</span>
+    <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
     <span class="kw">where</span>
         <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::BitOps</span>;
 
@@ -1017,7 +1017,7 @@
     <span class="doccomment">/// See also: [`AtomicUsize::fetch_nand`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`AtomicUsize::fetch_nand`]: core::sync::atomic::AtomicUsize::fetch_nand</span>
-    <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Item</span>
+    <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
     <span class="kw">where</span>
         <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::BitOps</span>;
 
@@ -1031,7 +1031,7 @@
     <span class="doccomment">/// See also: [`AtomicUsize::fetch_or`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`AtomicUsize::fetch_or`]: core::sync::atomic::AtomicUsize::fetch_or</span>
-    <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Item</span>
+    <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
     <span class="kw">where</span>
         <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::BitOps</span>;
 
@@ -1045,7 +1045,7 @@
     <span class="doccomment">/// See also: [`AtomicUsize::fetch_xor`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`AtomicUsize::fetch_xor`]: core::sync::atomic::AtomicUsize::fetch_xor</span>
-    <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Item</span>
+    <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
     <span class="kw">where</span>
         <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::BitOps</span>;
 
@@ -1059,7 +1059,7 @@
     <span class="doccomment">/// See also: [`AtomicUsize::fetch_add`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`AtomicUsize::fetch_add`]: core::sync::atomic::AtomicUsize::fetch_add</span>
-    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Item</span>
+    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
     <span class="kw">where</span>
         <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::NumericOps</span>;
 
@@ -1073,7 +1073,7 @@
     <span class="doccomment">/// See also: [`AtomicUsize::fetch_sub`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`AtomicUsize::fetch_sub`]: core::sync::atomic::AtomicUsize::fetch_sub</span>
-    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Item</span>
+    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
     <span class="kw">where</span>
         <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::NumericOps</span>;
 }
@@ -1140,9 +1140,9 @@
 
 <span class="macro">macro_rules!</span> <span class="ident">radium</span> {
     <span class="comment">// Emit the universal `Radium` trait function bodies for atomic types.</span>
-    ( <span class="ident">atom</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    ( <span class="ident">atom</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) =&gt; {
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>) -&gt; <span class="self">Self</span> {
             <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">value</span>)
         }
 
@@ -1152,17 +1152,17 @@
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">get_mut</span>()
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">into_inner</span>()
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">load</span>(<span class="ident">order</span>)
         }
 
@@ -1172,7 +1172,7 @@
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">swap</span>(<span class="ident">value</span>, <span class="ident">order</span>)
         }
 
@@ -1182,7 +1182,7 @@
             <span class="ident">current</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
             <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
             <span class="ident">order</span>: <span class="ident">Ordering</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        ) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">compare_and_swap</span>(<span class="ident">current</span>, <span class="ident">new</span>, <span class="ident">order</span>)
         }
 
@@ -1193,7 +1193,7 @@
             <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
             <span class="ident">success</span>: <span class="ident">Ordering</span>,
             <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">compare_exchange</span>(<span class="ident">current</span>, <span class="ident">new</span>, <span class="ident">success</span>, <span class="ident">failure</span>)
         }
 
@@ -1204,51 +1204,51 @@
             <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
             <span class="ident">success</span>: <span class="ident">Ordering</span>,
             <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">compare_exchange_weak</span>(<span class="ident">current</span>, <span class="ident">new</span>, <span class="ident">success</span>, <span class="ident">failure</span>)
         }
     };
 
     <span class="comment">// Emit the `Radium` trait function bodies for bit-wise types.</span>
-    ( <span class="ident">atom_bit</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    ( <span class="ident">atom_bit</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) =&gt; {
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">fetch_and</span>(<span class="ident">value</span>, <span class="ident">order</span>)
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">fetch_nand</span>(<span class="ident">value</span>, <span class="ident">order</span>)
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">fetch_or</span>(<span class="ident">value</span>, <span class="ident">order</span>)
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">fetch_xor</span>(<span class="ident">value</span>, <span class="ident">order</span>)
         }
     };
 
     <span class="comment">// Emit the `Radium` trait function bodies for integral types.</span>
-    ( <span class="ident">atom_int</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    ( <span class="ident">atom_int</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) =&gt; {
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">fetch_add</span>(<span class="ident">value</span>, <span class="ident">order</span>)
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">fetch_sub</span>(<span class="ident">value</span>, <span class="ident">order</span>)
         }
     };
 
     <span class="comment">// Emit the universal `Radium` trait function bodies for `Cell&lt;_&gt;`.</span>
-    ( <span class="ident">cell</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    ( <span class="ident">cell</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) =&gt; {
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>) -&gt; <span class="self">Self</span> {
             <span class="ident">Cell::new</span>(<span class="ident">value</span>)
         }
 
@@ -1256,17 +1256,17 @@
         <span class="kw">fn</span> <span class="ident">fence</span>(<span class="kw">_</span>: <span class="ident">Ordering</span>) {}
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">get_mut</span>()
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">into_inner</span>()
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">get</span>()
         }
 
@@ -1276,7 +1276,7 @@
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">replace</span>(<span class="ident">value</span>)
         }
 
@@ -1286,8 +1286,8 @@
             <span class="ident">current</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
             <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
             <span class="kw">_</span>: <span class="ident">Ordering</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">current</span> {
+        ) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="ident">current</span> {
                 <span class="self">self</span>.<span class="ident">replace</span>(<span class="ident">new</span>)
             } <span class="kw">else</span> {
                 <span class="self">self</span>.<span class="ident">get</span>()
@@ -1301,8 +1301,8 @@
             <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
             <span class="kw">_</span>: <span class="ident">Ordering</span>,
             <span class="kw">_</span>: <span class="ident">Ordering</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">current</span> {
+        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="ident">current</span> {
                 <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">replace</span>(<span class="ident">new</span>))
             } <span class="kw">else</span> {
                 <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">get</span>())
@@ -1316,49 +1316,49 @@
             <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
             <span class="ident">success</span>: <span class="ident">Ordering</span>,
             <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
             <span class="ident">Radium::compare_exchange</span>(<span class="self">self</span>, <span class="ident">current</span>, <span class="ident">new</span>, <span class="ident">success</span>, <span class="ident">failure</span>)
         }
     };
 
     <span class="comment">// Emit the `Radium` trait function bodies for bit-wise types.</span>
-    ( <span class="ident">cell_bit</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    ( <span class="ident">cell_bit</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) =&gt; {
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">replace</span>(<span class="self">self</span>.<span class="ident">get</span>() <span class="op">&amp;</span> <span class="ident">value</span>)
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">replace</span>(<span class="op">!</span>(<span class="self">self</span>.<span class="ident">get</span>() <span class="op">&amp;</span> <span class="ident">value</span>))
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">replace</span>(<span class="self">self</span>.<span class="ident">get</span>() <span class="op">|</span> <span class="ident">value</span>)
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">replace</span>(<span class="self">self</span>.<span class="ident">get</span>() <span class="op">^</span> <span class="ident">value</span>)
         }
     };
 
     <span class="comment">// Emit the `Radium` trait function bodies for integral types.</span>
-    ( <span class="ident">cell_int</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    ( <span class="ident">cell_int</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) =&gt; {
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">replace</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">wrapping_add</span>(<span class="ident">value</span>))
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
+        <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
             <span class="self">self</span>.<span class="ident">replace</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">wrapping_sub</span>(<span class="ident">value</span>))
         }
     };
 
     <span class="comment">// Implement `Radium` for integral fundamentals.</span>
-    ( <span class="ident">int</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>:<span class="ident">ident</span> $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> , <span class="macro-nonterminal">$</span><span class="macro-nonterminal">atom</span>:<span class="ident">ty</span> ; )<span class="op">*</span> ) <span class="op">=</span><span class="op">&gt;</span> { $(
+    ( <span class="ident">int</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>:<span class="ident">ident</span> $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> , <span class="macro-nonterminal">$</span><span class="macro-nonterminal">atom</span>:<span class="ident">ty</span> ; )<span class="op">*</span> ) =&gt; { $(
         <span class="kw">impl</span> <span class="ident">marker::BitOps</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {}
         <span class="kw">impl</span> <span class="ident">marker::NumericOps</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {}
 
@@ -1403,7 +1403,7 @@
     <span class="doccomment">/// Radium::fetch_add(&amp;atom, true, Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="ident">bool</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="ident">bool</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
@@ -1414,7 +1414,7 @@
     <span class="doccomment">/// Radium::fetch_sub(&amp;atom, true, Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="ident">bool</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="ident">bool</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 }
@@ -1432,7 +1432,7 @@
     <span class="doccomment">/// Radium::fetch_add(&amp;cell, true, Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="ident">bool</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="ident">bool</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
@@ -1443,7 +1443,7 @@
     <span class="doccomment">/// Radium::fetch_sub(&amp;cell, true, Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="ident">bool</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="ident">bool</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 }
@@ -1461,7 +1461,7 @@
     <span class="doccomment">/// Radium::fetch_and(&amp;atom, ptr::null_mut(), Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
@@ -1472,7 +1472,7 @@
     <span class="doccomment">/// Radium::fetch_nand(&amp;atom, ptr::null_mut(), Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
@@ -1483,7 +1483,7 @@
     <span class="doccomment">/// Radium::fetch_or(&amp;atom, ptr::null_mut(), Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
@@ -1494,7 +1494,7 @@
     <span class="doccomment">/// Radium::fetch_xor(&amp;atom, ptr::null_mut(), Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
@@ -1505,7 +1505,7 @@
     <span class="doccomment">/// Radium::fetch_add(&amp;atom, ptr::null_mut(), Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
@@ -1516,7 +1516,7 @@
     <span class="doccomment">/// Radium::fetch_sub(&amp;atom, ptr::null_mut(), Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 }
@@ -1533,7 +1533,7 @@
     <span class="doccomment">/// Radium::fetch_and(&amp;cell, ptr::null_mut(), Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
@@ -1544,7 +1544,7 @@
     <span class="doccomment">/// Radium::fetch_nand(&amp;cell, ptr::null_mut(), Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
@@ -1555,7 +1555,7 @@
     <span class="doccomment">/// Radium::fetch_or(&amp;cell, ptr::null_mut(), Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
@@ -1566,7 +1566,7 @@
     <span class="doccomment">/// Radium::fetch_xor(&amp;cell, ptr::null_mut(), Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
@@ -1577,7 +1577,7 @@
     <span class="doccomment">/// Radium::fetch_add(&amp;cell, ptr::null_mut(), Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
@@ -1588,7 +1588,7 @@
     <span class="doccomment">/// Radium::fetch_sub(&amp;cell, ptr::null_mut(), Ordering::Relaxed);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 }

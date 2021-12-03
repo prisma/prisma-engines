@@ -804,14 +804,14 @@
 <span class="doccomment">/// current scope. To force individual variants to use a custom name when expanded, each variant</span>
 <span class="doccomment">/// can also take the form of a normal tuple-style enum variant with a single field.</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_dispatch</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_dispatch</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">new_block</span> <span class="op">=</span> <span class="ident">attributed_parser::parse_attributed</span>(<span class="ident">item</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">expanded</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">new_block</span> {
-        <span class="ident">attributed_parser::ParsedItem::Trait</span>(<span class="ident">traitdef</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">attributed_parser::ParsedItem::Trait</span>(<span class="ident">traitdef</span>) =&gt; {
             <span class="ident">cache::cache_trait</span>(<span class="ident">traitdef</span>.<span class="ident">to_owned</span>());
             <span class="ident">item</span>
         }
-        <span class="ident">attributed_parser::ParsedItem::EnumDispatch</span>(<span class="ident">enumdef</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">attributed_parser::ParsedItem::EnumDispatch</span>(<span class="ident">enumdef</span>) =&gt; {
             <span class="ident">cache::cache_enum_dispatch</span>(<span class="ident">enumdef</span>.<span class="ident">clone</span>());
             <span class="ident">syn::ItemEnum::from</span>(<span class="ident">enumdef</span>.<span class="ident">to_owned</span>())
                 .<span class="ident">into_token_stream</span>()
@@ -838,28 +838,28 @@
                     <span class="ident">arguments</span>: <span class="ident">attr_generics</span>
                 } <span class="op">=</span> <span class="ident">p</span>.<span class="ident">segments</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>();
                 <span class="kw">let</span> <span class="ident">attr_generics</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">attr_generics</span>.<span class="ident">clone</span>() {
-                    <span class="ident">syn::PathArguments::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
-                    <span class="ident">syn::PathArguments::AngleBracketed</span>(<span class="ident">args</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">syn::PathArguments::None</span> =&gt; <span class="macro">vec!</span>[],
+                    <span class="ident">syn::PathArguments::AngleBracketed</span>(<span class="ident">args</span>) =&gt; {
                         <span class="macro">assert!</span>(<span class="ident">args</span>.<span class="ident">colon2_token</span>.<span class="ident">is_none</span>());
                         <span class="ident">args</span>.<span class="ident">args</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">generic_arg</span><span class="op">|</span> {
                             <span class="kw">match</span> <span class="ident">generic_arg</span> {
-                                <span class="ident">syn::GenericArgument::Type</span>(<span class="ident">syn::Type::Path</span>(<span class="ident">t</span>)) <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">qself</span>.<span class="ident">is_none</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>.<span class="ident">path</span>.<span class="ident">get_ident</span>().<span class="ident">expect</span>(<span class="string">&quot;Generic binding paths in #[enum_dispatch(...)] are not supported&quot;</span>).<span class="ident">clone</span>()),
-                                <span class="ident">syn::GenericArgument::Type</span>(<span class="ident">syn::Type::Infer</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                                <span class="ident">syn::GenericArgument::Type</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Generics in #[enum_dispatch(...)] must be identifiers&quot;</span>),
-                                <span class="ident">syn::GenericArgument::Lifetime</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Lifetime generics in #[enum_dispatch(...)] are not supported&quot;</span>),
-                                <span class="ident">syn::GenericArgument::Binding</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Generic equality constraints in #[enum_dispatch(...)] are not supported&quot;</span>),
-                                <span class="ident">syn::GenericArgument::Constraint</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Generic trait constraints in #[enum_dispatch(...)] are not supported&quot;</span>),
-                                <span class="ident">syn::GenericArgument::Const</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Const expression generics in #[enum_dispatch(...)] are not supported&quot;</span>),
+                                <span class="ident">syn::GenericArgument::Type</span>(<span class="ident">syn::Type::Path</span>(<span class="ident">t</span>)) <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">qself</span>.<span class="ident">is_none</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">t</span>.<span class="ident">path</span>.<span class="ident">get_ident</span>().<span class="ident">expect</span>(<span class="string">&quot;Generic binding paths in #[enum_dispatch(...)] are not supported&quot;</span>).<span class="ident">clone</span>()),
+                                <span class="ident">syn::GenericArgument::Type</span>(<span class="ident">syn::Type::Infer</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
+                                <span class="ident">syn::GenericArgument::Type</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Generics in #[enum_dispatch(...)] must be identifiers&quot;</span>),
+                                <span class="ident">syn::GenericArgument::Lifetime</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Lifetime generics in #[enum_dispatch(...)] are not supported&quot;</span>),
+                                <span class="ident">syn::GenericArgument::Binding</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Generic equality constraints in #[enum_dispatch(...)] are not supported&quot;</span>),
+                                <span class="ident">syn::GenericArgument::Constraint</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Generic trait constraints in #[enum_dispatch(...)] are not supported&quot;</span>),
+                                <span class="ident">syn::GenericArgument::Const</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Const expression generics in #[enum_dispatch(...)] are not supported&quot;</span>),
                             }
                         }).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                     }
-                    <span class="ident">syn::PathArguments::Parenthesized</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Expected angle bracketed generic arguments, found parenthesized arguments&quot;</span>),
+                    <span class="ident">syn::PathArguments::Parenthesized</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected angle bracketed generic arguments, found parenthesized arguments&quot;</span>),
                 };
                 <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">new_block</span> {
-                    <span class="ident">attributed_parser::ParsedItem::Trait</span>(<span class="ident">traitdef</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">attributed_parser::ParsedItem::Trait</span>(<span class="ident">traitdef</span>) =&gt; {
                         <span class="ident">cache::defer_link</span>((<span class="ident">attr_name</span>, <span class="ident">attr_generics</span>.<span class="ident">len</span>()), (<span class="kw-2">&amp;</span><span class="ident">traitdef</span>.<span class="ident">ident</span>, <span class="ident">traitdef</span>.<span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">count</span>()))
                     }
-                    <span class="ident">attributed_parser::ParsedItem::EnumDispatch</span>(<span class="ident">enumdef</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">attributed_parser::ParsedItem::EnumDispatch</span>(<span class="ident">enumdef</span>) =&gt; {
                         <span class="ident">cache::defer_link</span>((<span class="ident">attr_name</span>, <span class="ident">attr_generics</span>.<span class="ident">len</span>()), (<span class="kw-2">&amp;</span><span class="ident">enumdef</span>.<span class="ident">ident</span>, <span class="ident">enumdef</span>.<span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">count</span>()))
                     }
                 }
@@ -869,14 +869,14 @@
     <span class="comment">// span information is not stored in the cache. Saving the newly retrieved definition prevents</span>
     <span class="comment">// *all* of the span information from being lost.</span>
     <span class="kw">match</span> <span class="ident">new_block</span> {
-        <span class="ident">attributed_parser::ParsedItem::Trait</span>(<span class="ident">traitdef</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">attributed_parser::ParsedItem::Trait</span>(<span class="ident">traitdef</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">additional_enums</span> <span class="op">=</span>
                 <span class="ident">cache::fulfilled_by_trait</span>(<span class="kw-2">&amp;</span><span class="ident">traitdef</span>.<span class="ident">ident</span>, <span class="ident">traitdef</span>.<span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">count</span>());
             <span class="kw">for</span> <span class="ident">enumdef</span> <span class="kw">in</span> <span class="ident">additional_enums</span> {
                 <span class="ident">expanded</span>.<span class="ident">append_all</span>(<span class="ident">add_enum_impls</span>(<span class="ident">enumdef</span>, <span class="ident">traitdef</span>.<span class="ident">clone</span>()));
             }
         }
-        <span class="ident">attributed_parser::ParsedItem::EnumDispatch</span>(<span class="ident">enumdef</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">attributed_parser::ParsedItem::EnumDispatch</span>(<span class="ident">enumdef</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">additional_traits</span> <span class="op">=</span>
                 <span class="ident">cache::fulfilled_by_enum</span>(<span class="kw-2">&amp;</span><span class="ident">enumdef</span>.<span class="ident">ident</span>, <span class="ident">enumdef</span>.<span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">count</span>());
             <span class="kw">for</span> <span class="ident">traitdef</span> <span class="kw">in</span> <span class="ident">additional_traits</span> {

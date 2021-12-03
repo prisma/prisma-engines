@@ -242,7 +242,7 @@
 
 <span class="doccomment">/// Calculate a scalar factor of 2 above the halfway point.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">nth_bit</span>(<span class="ident">n</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">nth_bit</span>(<span class="ident">n</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="number">8</span>;
     <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">&lt;</span> <span class="ident">bits</span>, <span class="string">&quot;nth_bit() overflow in shl.&quot;</span>);
 
@@ -251,11 +251,11 @@
 
 <span class="doccomment">/// Generate a bitwise mask for the lower `n` bits.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">lower_n_mask</span>(<span class="ident">n</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">lower_n_mask</span>(<span class="ident">n</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="number">8</span>;
     <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">bits</span>, <span class="string">&quot;lower_n_mask() overflow in shl.&quot;</span>);
 
-    <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="ident">bits</span> {
+    <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">bits</span> {
         <span class="ident">u64::max_value</span>()
     } <span class="kw">else</span> {
         (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">n</span>) <span class="op">-</span> <span class="number">1</span>
@@ -264,11 +264,11 @@
 
 <span class="doccomment">/// Calculate the halfway point for the lower `n` bits.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">lower_n_halfway</span>(<span class="ident">n</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">lower_n_halfway</span>(<span class="ident">n</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="number">8</span>;
     <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">bits</span>, <span class="string">&quot;lower_n_halfway() overflow in shl.&quot;</span>);
 
-    <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="number">0</span>
     } <span class="kw">else</span> {
         <span class="ident">nth_bit</span>(<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>)
@@ -277,7 +277,7 @@
 
 <span class="doccomment">/// Calculate a bitwise mask with `n` 1 bits starting at the `bit` position.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">internal_n_mask</span>(<span class="ident">bit</span>: <span class="ident">u64</span>, <span class="ident">n</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">internal_n_mask</span>(<span class="ident">bit</span>: <span class="ident">u64</span>, <span class="ident">n</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="number">8</span>;
     <span class="macro">debug_assert!</span>(<span class="ident">bit</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">bits</span>, <span class="string">&quot;internal_n_halfway() overflow in shl.&quot;</span>);
     <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">bits</span>, <span class="string">&quot;internal_n_halfway() overflow in shl.&quot;</span>);
@@ -292,7 +292,7 @@
 <span class="comment">//</span>
 <span class="comment">// Return if we are above halfway and if we are halfway.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">round_nearest</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">shift</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">bool</span>, <span class="ident">bool</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">round_nearest</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">shift</span>: <span class="ident">i32</span>) -&gt; (<span class="ident">bool</span>, <span class="ident">bool</span>) {
     <span class="comment">// Extract the truncated bits using mask.</span>
     <span class="comment">// Calculate if the value of the truncated bits are either above</span>
     <span class="comment">// the mid-way point, or equal to it.</span>
@@ -304,7 +304,7 @@
 
     <span class="kw">let</span> <span class="ident">truncated_bits</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">mask</span>;
     <span class="kw">let</span> <span class="ident">is_above</span> <span class="op">=</span> <span class="ident">truncated_bits</span> <span class="op">&gt;</span> <span class="ident">halfway</span>;
-    <span class="kw">let</span> <span class="ident">is_halfway</span> <span class="op">=</span> <span class="ident">truncated_bits</span> <span class="op">=</span><span class="op">=</span> <span class="ident">halfway</span>;
+    <span class="kw">let</span> <span class="ident">is_halfway</span> <span class="op">=</span> <span class="ident">truncated_bits</span> <span class="op">==</span> <span class="ident">halfway</span>;
 
     <span class="comment">// Bit shift so the leading bit is in the hidden bit.</span>
     <span class="ident">overflowing_shr</span>(<span class="ident">fp</span>, <span class="ident">shift</span>);
@@ -316,7 +316,7 @@
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tie_even</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">is_above</span>: <span class="ident">bool</span>, <span class="ident">is_halfway</span>: <span class="ident">bool</span>) {
     <span class="comment">// Extract the last bit after shifting (and determine if it is odd).</span>
-    <span class="kw">let</span> <span class="ident">is_odd</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">let</span> <span class="ident">is_odd</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">==</span> <span class="number">1</span>;
 
     <span class="comment">// Calculate if we need to roundup.</span>
     <span class="comment">// We need to roundup if we are above halfway, or if we are odd</span>
@@ -343,7 +343,7 @@
 <span class="comment">//</span>
 <span class="comment">// Return if we have any truncated bytes.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">round_toward</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">shift</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">round_toward</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">shift</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">let</span> <span class="ident">mask</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">lower_n_mask</span>(<span class="ident">shift</span> <span class="kw">as</span> <span class="ident">u64</span>);
     <span class="kw">let</span> <span class="ident">truncated_bits</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">mask</span>;
 
@@ -405,7 +405,7 @@
         <span class="ident">algorithm</span>(<span class="ident">fp</span>, <span class="ident">F::DEFAULT_SHIFT</span>);
     }
 
-    <span class="kw">if</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">F::CARRY_MASK</span> <span class="op">=</span><span class="op">=</span> <span class="ident">F::CARRY_MASK</span> {
+    <span class="kw">if</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">F::CARRY_MASK</span> <span class="op">==</span> <span class="ident">F::CARRY_MASK</span> {
         <span class="comment">// Roundup carried over to 1 past the hidden bit.</span>
         <span class="ident">shr</span>(<span class="ident">fp</span>, <span class="number">1</span>);
     }
@@ -432,7 +432,7 @@
             <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> (<span class="ident">F::MANTISSA_SIZE</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u64</span>;
             <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> (<span class="ident">diff</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u64</span>;
             <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="ident">internal_n_mask</span>(<span class="ident">bit</span>, <span class="ident">n</span>);
-            <span class="kw">if</span> (<span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">mask</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> (<span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">mask</span>) <span class="op">==</span> <span class="number">0</span> {
                 <span class="comment">// If we have no 1-bit in the hidden-bit position,</span>
                 <span class="comment">// which is index 0, we need to shift 1.</span>
                 <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="ident">diff</span> <span class="op">+</span> <span class="number">1</span>;

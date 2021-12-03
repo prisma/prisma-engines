@@ -80,7 +80,7 @@
     <span class="ident">include_tagged</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
     <span class="ident">exclude_tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
     <span class="ident">capabilities</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Capabilities</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+) -&gt; <span class="ident">bool</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">capabilities</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">args</span>.<span class="ident">capabilities</span>().<span class="ident">contains</span>(<span class="ident">capabilities</span>) {
         <span class="macro">println!</span>(<span class="string">&quot;Test skipped&quot;</span>);
         <span class="kw">return</span> <span class="bool-val">true</span>;

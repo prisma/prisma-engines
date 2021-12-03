@@ -53,7 +53,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TokenReturnValue</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
     {
@@ -61,9 +61,9 @@
         <span class="kw">let</span> <span class="ident">param_name</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_b_varchar</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">udf</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="number">0x01</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="number">0x02</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Protocol</span>(<span class="string">&quot;ReturnValue: invalid status&quot;</span>.<span class="ident">into</span>())),
+            <span class="number">0x01</span> =&gt; <span class="bool-val">false</span>,
+            <span class="number">0x02</span> =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Protocol</span>(<span class="string">&quot;ReturnValue: invalid status&quot;</span>.<span class="ident">into</span>())),
         };
 
         <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">BaseMetaDataColumn::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>;

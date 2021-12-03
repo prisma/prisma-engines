@@ -615,37 +615,37 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This uses the operating system&#39;s RNG as the source of random numbers. If you&#39;d like to use a</span>
     <span class="doccomment">/// custom generator, generate random bytes and pass them to [`Uuid::from_bytes`] instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">uuid</span>: <span class="ident">uuid::Uuid::new_v4</span>(),
         }
     }
 
     <span class="doccomment">/// Creates a [`Uuid`] using the supplied big-endian bytes.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">16</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">16</span>]) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_external_uuid</span>(<span class="ident">uuid::Uuid::from_bytes</span>(<span class="ident">bytes</span>))
     }
 
     <span class="doccomment">/// Creates a [`Uuid`] from the provided hex string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_str</span>(<span class="ident">input</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_str</span>(<span class="ident">input</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span> <span class="ident">uuid::Uuid::parse_str</span>(<span class="ident">input</span>.<span class="ident">as_ref</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::InvalidUuidString</span> {
             <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
         })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_external_uuid</span>(<span class="ident">uuid</span>))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_external_uuid</span>(<span class="ident">uuid</span>: <span class="ident">uuid::Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_external_uuid</span>(<span class="ident">uuid</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">uuid</span> }
     }
 
     <span class="doccomment">/// Returns an array of 16 bytes containing the [`Uuid`]&#39;s data.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">16</span>] {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">bytes</span>(<span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">16</span>] {
         <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">uuid</span>.<span class="ident">as_bytes</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
@@ -655,19 +655,19 @@
 <span class="kw">impl</span> <span class="ident">Uuid</span> {
     <span class="doccomment">/// Create a [`Uuid`] from a [`uuid::Uuid`](https://docs.rs/uuid/0.8/uuid/struct.Uuid.html) from</span>
     <span class="doccomment">/// the [`uuid`](https://docs.rs/uuid/0.8) crate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_uuid_0_8</span>(<span class="ident">uuid</span>: <span class="ident">uuid::Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_uuid_0_8</span>(<span class="ident">uuid</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_external_uuid</span>(<span class="ident">uuid</span>)
     }
 
     <span class="doccomment">/// Convert this [`Uuid`] to a [`uuid::Uuid`](https://docs.rs/uuid/0.8/uuid/struct.Uuid.html) from</span>
     <span class="doccomment">/// the [`uuid`](https://docs.rs/uuid/0.8) crate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_uuid_0_8</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">uuid::Uuid</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_uuid_0_8</span>(<span class="self">self</span>) -&gt; <span class="ident">uuid::Uuid</span> {
         <span class="self">self</span>.<span class="ident">uuid</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
     {
@@ -676,7 +676,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -685,40 +685,40 @@
             <span class="comment">// When using the BSON deserializer, the newtype name will ensure the subtype is only</span>
             <span class="comment">// ever BinarySubtype::Uuid.</span>
             <span class="ident">Bson::Binary</span>(<span class="ident">b</span>)
-                <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">b</span>.<span class="ident">subtype</span>, <span class="ident">BinarySubtype::Uuid</span> <span class="op">|</span> <span class="ident">BinarySubtype::Generic</span>) <span class="op">=</span><span class="op">&gt;</span>
+                <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">b</span>.<span class="ident">subtype</span>, <span class="ident">BinarySubtype::Uuid</span> <span class="op">|</span> <span class="ident">BinarySubtype::Generic</span>) =&gt;
             {
                 <span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span>
                     <span class="ident">uuid::Uuid::from_slice</span>(<span class="ident">b</span>.<span class="ident">bytes</span>.<span class="ident">as_slice</span>()).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_external_uuid</span>(<span class="ident">uuid</span>))
             }
-            <span class="ident">Bson::Binary</span>(<span class="ident">b</span>) <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">subtype</span> <span class="op">=</span><span class="op">=</span> <span class="ident">BinarySubtype::UuidOld</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Bson::Binary</span>(<span class="ident">b</span>) <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">subtype</span> <span class="op">==</span> <span class="ident">BinarySubtype::UuidOld</span> =&gt; {
                 <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::custom</span>(
                     <span class="string">&quot;received legacy UUID (subtype 3) but expected regular UUID (subtype 4)&quot;</span>,
                 ))
             }
-            <span class="ident">Bson::String</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Bson::String</span>(<span class="ident">s</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span> <span class="ident">uuid::Uuid::from_str</span>(<span class="ident">s</span>.<span class="ident">as_str</span>()).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_external_uuid</span>(<span class="ident">uuid</span>))
             }
-            <span class="ident">b</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::invalid_type</span>(<span class="ident">b</span>.<span class="ident">as_unexpected</span>(), <span class="kw-2">&amp;</span><span class="string">&quot;a UUID&quot;</span>)),
+            <span class="ident">b</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::invalid_type</span>(<span class="ident">b</span>.<span class="ident">as_unexpected</span>(), <span class="kw-2">&amp;</span><span class="string">&quot;a UUID&quot;</span>)),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">uuid</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">std::fmt::Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">uuid</span>, <span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Binary</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uuid</span>: <span class="ident">Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uuid</span>: <span class="ident">Uuid</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Binary</span> {
             <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Uuid</span>,
             <span class="ident">bytes</span>: <span class="ident">uuid</span>.<span class="ident">bytes</span>().<span class="ident">to_vec</span>(),
@@ -727,21 +727,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">u</span>: <span class="ident">Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">u</span>: <span class="ident">Uuid</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Bson::Binary</span>(<span class="ident">u</span>.<span class="ident">into</span>())
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">uuid::Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">u</span>: <span class="ident">uuid::Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">u</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_external_uuid</span>(<span class="ident">u</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">uuid::Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">Uuid</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">s</span>.<span class="ident">to_uuid_0_8</span>()
     }
 }
@@ -785,7 +785,7 @@
 
 <span class="kw">impl</span> <span class="ident">Binary</span> {
     <span class="doccomment">/// Serializes a [`Uuid`] into BSON [`Binary`] type</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_uuid</span>(<span class="ident">uuid</span>: <span class="ident">Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_uuid</span>(<span class="ident">uuid</span>: <span class="ident">Uuid</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Binary::from</span>(<span class="ident">uuid</span>)
     }
 
@@ -795,10 +795,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// See the documentation for [`UuidRepresentation`] for more information on the possible</span>
     <span class="doccomment">/// representations.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_uuid_with_representation</span>(<span class="ident">uuid</span>: <span class="ident">Uuid</span>, <span class="ident">rep</span>: <span class="ident">UuidRepresentation</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_uuid_with_representation</span>(<span class="ident">uuid</span>: <span class="ident">Uuid</span>, <span class="ident">rep</span>: <span class="ident">UuidRepresentation</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">rep</span> {
-            <span class="ident">UuidRepresentation::Standard</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Binary::from_uuid</span>(<span class="ident">uuid</span>),
-            <span class="ident">UuidRepresentation::CSharpLegacy</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UuidRepresentation::Standard</span> =&gt; <span class="ident">Binary::from_uuid</span>(<span class="ident">uuid</span>),
+            <span class="ident">UuidRepresentation::CSharpLegacy</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">uuid</span>.<span class="ident">bytes</span>().<span class="ident">to_vec</span>();
                 <span class="ident">bytes</span>[<span class="number">0</span>..<span class="number">4</span>].<span class="ident">reverse</span>();
                 <span class="ident">bytes</span>[<span class="number">4</span>..<span class="number">6</span>].<span class="ident">reverse</span>();
@@ -808,11 +808,11 @@
                     <span class="ident">bytes</span>,
                 }
             }
-            <span class="ident">UuidRepresentation::PythonLegacy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Binary</span> {
+            <span class="ident">UuidRepresentation::PythonLegacy</span> =&gt; <span class="ident">Binary</span> {
                 <span class="ident">subtype</span>: <span class="ident">BinarySubtype::UuidOld</span>,
                 <span class="ident">bytes</span>: <span class="ident">uuid</span>.<span class="ident">bytes</span>().<span class="ident">to_vec</span>(),
             },
-            <span class="ident">UuidRepresentation::JavaLegacy</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UuidRepresentation::JavaLegacy</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">uuid</span>.<span class="ident">bytes</span>().<span class="ident">to_vec</span>();
                 <span class="ident">bytes</span>[<span class="number">0</span>..<span class="number">8</span>].<span class="ident">reverse</span>();
                 <span class="ident">bytes</span>[<span class="number">8</span>..<span class="number">16</span>].<span class="ident">reverse</span>();
@@ -830,7 +830,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// See the documentation for [`UuidRepresentation`] for more information on the possible</span>
     <span class="doccomment">/// representations.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_uuid_with_representation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rep</span>: <span class="ident">UuidRepresentation</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_uuid_with_representation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rep</span>: <span class="ident">UuidRepresentation</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> {
         <span class="comment">// If representation is non-standard, then its subtype must be UuidOld</span>
         <span class="kw">if</span> <span class="ident">rep</span> <span class="op">!</span><span class="op">=</span> <span class="ident">UuidRepresentation::Standard</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">subtype</span> <span class="op">!</span><span class="op">=</span> <span class="ident">BinarySubtype::UuidOld</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::RepresentationMismatch</span> {
@@ -840,7 +840,7 @@
             });
         }
         <span class="comment">// If representation is standard, then its subtype must be Uuid</span>
-        <span class="kw">if</span> <span class="ident">rep</span> <span class="op">=</span><span class="op">=</span> <span class="ident">UuidRepresentation::Standard</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">subtype</span> <span class="op">!</span><span class="op">=</span> <span class="ident">BinarySubtype::Uuid</span> {
+        <span class="kw">if</span> <span class="ident">rep</span> <span class="op">==</span> <span class="ident">UuidRepresentation::Standard</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">subtype</span> <span class="op">!</span><span class="op">=</span> <span class="ident">BinarySubtype::Uuid</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::RepresentationMismatch</span> {
                 <span class="ident">requested_representation</span>: <span class="ident">rep</span>,
                 <span class="ident">actual_binary_subtype</span>: <span class="self">self</span>.<span class="ident">subtype</span>,
@@ -856,15 +856,15 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
         <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>);
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">rep</span> {
-            <span class="ident">UuidRepresentation::Standard</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Uuid::from_bytes</span>(<span class="ident">buf</span>),
-            <span class="ident">UuidRepresentation::CSharpLegacy</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UuidRepresentation::Standard</span> =&gt; <span class="ident">Uuid::from_bytes</span>(<span class="ident">buf</span>),
+            <span class="ident">UuidRepresentation::CSharpLegacy</span> =&gt; {
                 <span class="ident">buf</span>[<span class="number">0</span>..<span class="number">4</span>].<span class="ident">reverse</span>();
                 <span class="ident">buf</span>[<span class="number">4</span>..<span class="number">6</span>].<span class="ident">reverse</span>();
                 <span class="ident">buf</span>[<span class="number">6</span>..<span class="number">8</span>].<span class="ident">reverse</span>();
                 <span class="ident">Uuid::from_bytes</span>(<span class="ident">buf</span>)
             }
-            <span class="ident">UuidRepresentation::PythonLegacy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Uuid::from_bytes</span>(<span class="ident">buf</span>),
-            <span class="ident">UuidRepresentation::JavaLegacy</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UuidRepresentation::PythonLegacy</span> =&gt; <span class="ident">Uuid::from_bytes</span>(<span class="ident">buf</span>),
+            <span class="ident">UuidRepresentation::JavaLegacy</span> =&gt; {
                 <span class="ident">buf</span>[<span class="number">0</span>..<span class="number">8</span>].<span class="ident">reverse</span>();
                 <span class="ident">buf</span>[<span class="number">8</span>..<span class="number">16</span>].<span class="ident">reverse</span>();
                 <span class="ident">Uuid::from_bytes</span>(<span class="ident">buf</span>)
@@ -874,7 +874,7 @@
 
     <span class="doccomment">/// Deserializes a BSON [`Binary`] type into a [`Uuid`] using the standard</span>
     <span class="doccomment">/// representation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_uuid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_uuid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">to_uuid_with_representation</span>(<span class="ident">UuidRepresentation::Standard</span>)
     }
 }
@@ -882,7 +882,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)))]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">uuid::Uuid</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Binary</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uuid</span>: <span class="ident">uuid::Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uuid</span>: <span class="ident">uuid::Uuid</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Binary</span> {
             <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Uuid</span>,
             <span class="ident">bytes</span>: <span class="ident">uuid</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>(),
@@ -924,23 +924,23 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::InvalidUuidString</span> { <span class="ident">message</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::InvalidUuidString</span> { <span class="ident">message</span> } =&gt; {
                 <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">message</span>)
             }
             <span class="ident">Error::RepresentationMismatch</span> {
                 <span class="ident">expected_binary_subtype</span>,
                 <span class="ident">actual_binary_subtype</span>,
                 <span class="ident">requested_representation</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="macro">write!</span>(
                     <span class="ident">fmt</span>,
                     <span class="string">&quot;expected {:?} when converting to UUID with {:?}, isntead got {:?}&quot;</span>,
                     <span class="ident">expected_binary_subtype</span>, <span class="ident">requested_representation</span>, <span class="ident">actual_binary_subtype</span>
                 )
             }
-            <span class="ident">Error::InvalidLength</span> { <span class="ident">length</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::InvalidLength</span> { <span class="ident">length</span> } =&gt; {
                 <span class="macro">write!</span>(
                     <span class="ident">fmt</span>,
                     <span class="string">&quot;expected UUID to contain 16 bytes, instead got {}&quot;</span>,

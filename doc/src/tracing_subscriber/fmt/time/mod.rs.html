@@ -167,7 +167,7 @@
     <span class="doccomment">/// When `format_time` is called, implementors should get the current time using their desired</span>
     <span class="doccomment">/// mechanism, and write it out to the given `fmt::Write`. Implementors must insert a trailing</span>
     <span class="doccomment">/// space themselves if they wish to separate the time from subsequent log message text.</span>
-    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span>;
+    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span>;
 }
 
 <span class="doccomment">/// Returns a new `SystemTime` timestamp provider.</span>
@@ -181,7 +181,7 @@
 <span class="doccomment">/// tracing_subscriber::fmt::time::SystemTime::default()</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SystemTime</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time</span>() -&gt; <span class="ident">SystemTime</span> {
     <span class="ident">SystemTime::default</span>()
 }
 
@@ -199,7 +199,7 @@
 <span class="doccomment">/// tracing_subscriber::fmt::time::Uptime::default()</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uptime</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Uptime</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uptime</span>() -&gt; <span class="ident">Uptime</span> {
     <span class="ident">Uptime::default</span>()
 }
 
@@ -207,19 +207,19 @@
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">FormatTime</span>,
 {
-    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">format_time</span>(<span class="ident">w</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FormatTime</span> <span class="kw">for</span> () {
-    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FormatTime</span> <span class="kw">for</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
-    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+<span class="kw">impl</span> <span class="ident">FormatTime</span> <span class="kw">for</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         (<span class="kw-2">*</span><span class="self">self</span>)(<span class="ident">w</span>)
     }
 }
@@ -237,7 +237,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Uptime</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Uptime</span> {
             <span class="ident">epoch</span>: <span class="ident">Instant::now</span>(),
         }
@@ -245,13 +245,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Uptime</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">epoch</span>: <span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">epoch</span>: <span class="ident">Instant</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Uptime</span> { <span class="ident">epoch</span> }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FormatTime</span> <span class="kw">for</span> <span class="ident">SystemTime</span> {
-    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">w</span>,
             <span class="string">&quot;{}&quot;</span>,
@@ -261,7 +261,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FormatTime</span> <span class="kw">for</span> <span class="ident">Uptime</span> {
-    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">epoch</span>.<span class="ident">elapsed</span>();
         <span class="macro">write!</span>(<span class="ident">w</span>, <span class="string">&quot;{:4}.{:09}s&quot;</span>, <span class="ident">e</span>.<span class="ident">as_secs</span>(), <span class="ident">e</span>.<span class="ident">subsec_nanos</span>())
     }

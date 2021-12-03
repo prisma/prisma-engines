@@ -1162,147 +1162,147 @@
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::result::Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">::core::result::Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">description</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> {
     <span class="doccomment">/// A short description of the error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::Io</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;An I/O error occurred while reading.&quot;</span>,
-            <span class="ident">Error::PcRelativePointerButSectionBaseIsUndefined</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::Io</span> =&gt; <span class="string">&quot;An I/O error occurred while reading.&quot;</span>,
+            <span class="ident">Error::PcRelativePointerButSectionBaseIsUndefined</span> =&gt; {
                 <span class="string">&quot;Found a PC relative pointer, but the section base is undefined.&quot;</span>
             }
-            <span class="ident">Error::TextRelativePointerButTextBaseIsUndefined</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::TextRelativePointerButTextBaseIsUndefined</span> =&gt; {
                 <span class="string">&quot;Found a `.text` relative pointer, but the `.text` base is undefined.&quot;</span>
             }
-            <span class="ident">Error::DataRelativePointerButDataBaseIsUndefined</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::DataRelativePointerButDataBaseIsUndefined</span> =&gt; {
                 <span class="string">&quot;Found a data relative pointer, but the data base is undefined.&quot;</span>
             }
-            <span class="ident">Error::FuncRelativePointerInBadContext</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::FuncRelativePointerInBadContext</span> =&gt; {
                 <span class="string">&quot;Found a function relative pointer in a context that does not have a function base.&quot;</span>
             }
-            <span class="ident">Error::CannotParseOmitPointerEncoding</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::CannotParseOmitPointerEncoding</span> =&gt; {
                 <span class="string">&quot;Cannot parse a pointer with a `DW_EH_PE_omit` encoding.&quot;</span>
             }
-            <span class="ident">Error::BadUnsignedLeb128</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;An error parsing an unsigned LEB128 value&quot;</span>,
-            <span class="ident">Error::BadSignedLeb128</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;An error parsing a signed LEB128 value&quot;</span>,
-            <span class="ident">Error::AbbreviationTagZero</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::BadUnsignedLeb128</span> =&gt; <span class="string">&quot;An error parsing an unsigned LEB128 value&quot;</span>,
+            <span class="ident">Error::BadSignedLeb128</span> =&gt; <span class="string">&quot;An error parsing a signed LEB128 value&quot;</span>,
+            <span class="ident">Error::AbbreviationTagZero</span> =&gt; {
                 <span class="string">&quot;An abbreviation declared that its tag is zero,
                  but zero is reserved for null records&quot;</span>
             }
-            <span class="ident">Error::AttributeFormZero</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::AttributeFormZero</span> =&gt; {
                 <span class="string">&quot;An attribute specification declared that its form is zero,
                  but zero is reserved for null records&quot;</span>
             }
-            <span class="ident">Error::BadHasChildren</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::BadHasChildren</span> =&gt; {
                 <span class="string">&quot;The abbreviation&#39;s has-children byte was not one of
                  `DW_CHILDREN_{yes,no}`&quot;</span>
             }
-            <span class="ident">Error::BadLength</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The specified length is impossible&quot;</span>,
-            <span class="ident">Error::UnknownForm</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Found an unknown `DW_FORM_*` type&quot;</span>,
-            <span class="ident">Error::ExpectedZero</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Expected a zero, found something else&quot;</span>,
-            <span class="ident">Error::DuplicateAbbreviationCode</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::BadLength</span> =&gt; <span class="string">&quot;The specified length is impossible&quot;</span>,
+            <span class="ident">Error::UnknownForm</span> =&gt; <span class="string">&quot;Found an unknown `DW_FORM_*` type&quot;</span>,
+            <span class="ident">Error::ExpectedZero</span> =&gt; <span class="string">&quot;Expected a zero, found something else&quot;</span>,
+            <span class="ident">Error::DuplicateAbbreviationCode</span> =&gt; {
                 <span class="string">&quot;Found an abbreviation code that has already been used&quot;</span>
             }
-            <span class="ident">Error::DuplicateArange</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Found a duplicate arange&quot;</span>,
-            <span class="ident">Error::UnknownReservedLength</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Found an unknown reserved length value&quot;</span>,
-            <span class="ident">Error::UnknownVersion</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Found an unknown DWARF version&quot;</span>,
-            <span class="ident">Error::UnknownAbbreviation</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Found a record with an unknown abbreviation code&quot;</span>,
-            <span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Hit the end of input before it was expected&quot;</span>,
-            <span class="ident">Error::UnexpectedNull</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Read a null entry before it was expected.&quot;</span>,
-            <span class="ident">Error::UnknownStandardOpcode</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Found an unknown standard opcode&quot;</span>,
-            <span class="ident">Error::UnknownExtendedOpcode</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Found an unknown extended opcode&quot;</span>,
-            <span class="ident">Error::UnsupportedAddressSize</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The specified address size is not supported&quot;</span>,
-            <span class="ident">Error::UnsupportedOffsetSize</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The specified offset size is not supported&quot;</span>,
-            <span class="ident">Error::UnsupportedFieldSize</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The specified field size is not supported&quot;</span>,
-            <span class="ident">Error::MinimumInstructionLengthZero</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::DuplicateArange</span> =&gt; <span class="string">&quot;Found a duplicate arange&quot;</span>,
+            <span class="ident">Error::UnknownReservedLength</span> =&gt; <span class="string">&quot;Found an unknown reserved length value&quot;</span>,
+            <span class="ident">Error::UnknownVersion</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Found an unknown DWARF version&quot;</span>,
+            <span class="ident">Error::UnknownAbbreviation</span> =&gt; <span class="string">&quot;Found a record with an unknown abbreviation code&quot;</span>,
+            <span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Hit the end of input before it was expected&quot;</span>,
+            <span class="ident">Error::UnexpectedNull</span> =&gt; <span class="string">&quot;Read a null entry before it was expected.&quot;</span>,
+            <span class="ident">Error::UnknownStandardOpcode</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Found an unknown standard opcode&quot;</span>,
+            <span class="ident">Error::UnknownExtendedOpcode</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Found an unknown extended opcode&quot;</span>,
+            <span class="ident">Error::UnsupportedAddressSize</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;The specified address size is not supported&quot;</span>,
+            <span class="ident">Error::UnsupportedOffsetSize</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;The specified offset size is not supported&quot;</span>,
+            <span class="ident">Error::UnsupportedFieldSize</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;The specified field size is not supported&quot;</span>,
+            <span class="ident">Error::MinimumInstructionLengthZero</span> =&gt; {
                 <span class="string">&quot;The minimum instruction length must not be zero.&quot;</span>
             }
-            <span class="ident">Error::MaximumOperationsPerInstructionZero</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::MaximumOperationsPerInstructionZero</span> =&gt; {
                 <span class="string">&quot;The maximum operations per instruction must not be zero.&quot;</span>
             }
-            <span class="ident">Error::LineRangeZero</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The line range must not be zero.&quot;</span>,
-            <span class="ident">Error::OpcodeBaseZero</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The opcode base must not be zero.&quot;</span>,
-            <span class="ident">Error::BadUtf8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Found an invalid UTF-8 string.&quot;</span>,
-            <span class="ident">Error::NotCieId</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Expected to find the CIE ID, but found something else.&quot;</span>,
-            <span class="ident">Error::NotCiePointer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Expected to find a CIE pointer, but found the CIE ID instead.&quot;</span>,
-            <span class="ident">Error::NotFdePointer</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::LineRangeZero</span> =&gt; <span class="string">&quot;The line range must not be zero.&quot;</span>,
+            <span class="ident">Error::OpcodeBaseZero</span> =&gt; <span class="string">&quot;The opcode base must not be zero.&quot;</span>,
+            <span class="ident">Error::BadUtf8</span> =&gt; <span class="string">&quot;Found an invalid UTF-8 string.&quot;</span>,
+            <span class="ident">Error::NotCieId</span> =&gt; <span class="string">&quot;Expected to find the CIE ID, but found something else.&quot;</span>,
+            <span class="ident">Error::NotCiePointer</span> =&gt; <span class="string">&quot;Expected to find a CIE pointer, but found the CIE ID instead.&quot;</span>,
+            <span class="ident">Error::NotFdePointer</span> =&gt; {
                 <span class="string">&quot;Expected to find an FDE pointer, but found a CIE pointer instead.&quot;</span>
             }
-            <span class="ident">Error::BadBranchTarget</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Invalid branch target in DWARF expression&quot;</span>,
-            <span class="ident">Error::InvalidPushObjectAddress</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::BadBranchTarget</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Invalid branch target in DWARF expression&quot;</span>,
+            <span class="ident">Error::InvalidPushObjectAddress</span> =&gt; {
                 <span class="string">&quot;DW_OP_push_object_address used but no object address given&quot;</span>
             }
-            <span class="ident">Error::NotEnoughStackItems</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Not enough items on stack when evaluating expression&quot;</span>,
-            <span class="ident">Error::TooManyIterations</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Too many iterations to evaluate DWARF expression&quot;</span>,
-            <span class="ident">Error::InvalidExpression</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Invalid opcode in DWARF expression&quot;</span>,
-            <span class="ident">Error::UnsupportedEvaluation</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Unsupported operation when evaluating expression&quot;</span>,
-            <span class="ident">Error::InvalidPiece</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::NotEnoughStackItems</span> =&gt; <span class="string">&quot;Not enough items on stack when evaluating expression&quot;</span>,
+            <span class="ident">Error::TooManyIterations</span> =&gt; <span class="string">&quot;Too many iterations to evaluate DWARF expression&quot;</span>,
+            <span class="ident">Error::InvalidExpression</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Invalid opcode in DWARF expression&quot;</span>,
+            <span class="ident">Error::UnsupportedEvaluation</span> =&gt; <span class="string">&quot;Unsupported operation when evaluating expression&quot;</span>,
+            <span class="ident">Error::InvalidPiece</span> =&gt; {
                 <span class="string">&quot;DWARF expression has piece followed by non-piece expression at end&quot;</span>
             }
-            <span class="ident">Error::InvalidExpressionTerminator</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Expected DW_OP_piece or DW_OP_bit_piece&quot;</span>,
-            <span class="ident">Error::DivisionByZero</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Division or modulus by zero when evaluating expression&quot;</span>,
-            <span class="ident">Error::TypeMismatch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Type mismatch when evaluating expression&quot;</span>,
-            <span class="ident">Error::IntegralTypeRequired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Integral type expected when evaluating expression&quot;</span>,
-            <span class="ident">Error::UnsupportedTypeOperation</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::InvalidExpressionTerminator</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Expected DW_OP_piece or DW_OP_bit_piece&quot;</span>,
+            <span class="ident">Error::DivisionByZero</span> =&gt; <span class="string">&quot;Division or modulus by zero when evaluating expression&quot;</span>,
+            <span class="ident">Error::TypeMismatch</span> =&gt; <span class="string">&quot;Type mismatch when evaluating expression&quot;</span>,
+            <span class="ident">Error::IntegralTypeRequired</span> =&gt; <span class="string">&quot;Integral type expected when evaluating expression&quot;</span>,
+            <span class="ident">Error::UnsupportedTypeOperation</span> =&gt; {
                 <span class="string">&quot;An expression operation used types that are not supported&quot;</span>
             }
-            <span class="ident">Error::InvalidShiftExpression</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::InvalidShiftExpression</span> =&gt; {
                 <span class="string">&quot;The shift value in an expression must be a non-negative integer.&quot;</span>
             }
-            <span class="ident">Error::UnknownCallFrameInstruction</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;An unknown DW_CFA_* instructiion&quot;</span>,
-            <span class="ident">Error::InvalidAddressRange</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::UnknownCallFrameInstruction</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;An unknown DW_CFA_* instructiion&quot;</span>,
+            <span class="ident">Error::InvalidAddressRange</span> =&gt; {
                 <span class="string">&quot;The end of an address range must not be before the beginning.&quot;</span>
             }
-            <span class="ident">Error::InvalidLocationAddressRange</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::InvalidLocationAddressRange</span> =&gt; {
                 <span class="string">&quot;The end offset of a location list entry must not be before the beginning.&quot;</span>
             }
-            <span class="ident">Error::CfiInstructionInInvalidContext</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::CfiInstructionInInvalidContext</span> =&gt; {
                 <span class="string">&quot;Encountered a call frame instruction in a context in which it is not valid.&quot;</span>
             }
-            <span class="ident">Error::PopWithEmptyStack</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::PopWithEmptyStack</span> =&gt; {
                 <span class="string">&quot;When evaluating call frame instructions, found a `DW_CFA_restore_state` stack pop \
                  instruction, but the stack was empty, and had nothing to pop.&quot;</span>
             }
-            <span class="ident">Error::NoUnwindInfoForAddress</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Do not have unwind info for the given address.&quot;</span>,
-            <span class="ident">Error::UnsupportedOffset</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::NoUnwindInfoForAddress</span> =&gt; <span class="string">&quot;Do not have unwind info for the given address.&quot;</span>,
+            <span class="ident">Error::UnsupportedOffset</span> =&gt; {
                 <span class="string">&quot;An offset value was larger than the maximum supported value.&quot;</span>
             }
-            <span class="ident">Error::UnknownPointerEncoding</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::UnknownPointerEncoding</span> =&gt; {
                 <span class="string">&quot;The given pointer encoding is either unknown or invalid.&quot;</span>
             }
-            <span class="ident">Error::NoEntryAtGivenOffset</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Did not find an entry at the given offset.&quot;</span>,
-            <span class="ident">Error::OffsetOutOfBounds</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The given offset is out of bounds.&quot;</span>,
-            <span class="ident">Error::UnknownAugmentation</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Found an unknown CFI augmentation.&quot;</span>,
-            <span class="ident">Error::UnsupportedPointerEncoding</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::NoEntryAtGivenOffset</span> =&gt; <span class="string">&quot;Did not find an entry at the given offset.&quot;</span>,
+            <span class="ident">Error::OffsetOutOfBounds</span> =&gt; <span class="string">&quot;The given offset is out of bounds.&quot;</span>,
+            <span class="ident">Error::UnknownAugmentation</span> =&gt; <span class="string">&quot;Found an unknown CFI augmentation.&quot;</span>,
+            <span class="ident">Error::UnsupportedPointerEncoding</span> =&gt; {
                 <span class="string">&quot;We do not support the given pointer encoding yet.&quot;</span>
             }
-            <span class="ident">Error::UnsupportedRegister</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Registers larger than `u16` are not supported.&quot;</span>,
-            <span class="ident">Error::TooManyRegisterRules</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::UnsupportedRegister</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Registers larger than `u16` are not supported.&quot;</span>,
+            <span class="ident">Error::TooManyRegisterRules</span> =&gt; {
                 <span class="string">&quot;The CFI program defined more register rules than we have storage for.&quot;</span>
             }
-            <span class="ident">Error::CfiStackFull</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::CfiStackFull</span> =&gt; {
                 <span class="string">&quot;Attempted to push onto the CFI stack, but it was already at full capacity.&quot;</span>
             }
-            <span class="ident">Error::VariableLengthSearchTable</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::VariableLengthSearchTable</span> =&gt; {
                 <span class="string">&quot;The `.eh_frame_hdr` binary search table claims to be variable-length encoded, \
                  which makes binary search impossible.&quot;</span>
             }
-            <span class="ident">Error::UnsupportedUnitType</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The `DW_UT_*` value for this unit is not supported yet&quot;</span>,
-            <span class="ident">Error::UnsupportedAddressIndex</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Ranges involving AddressIndex are not supported yet&quot;</span>,
-            <span class="ident">Error::UnsupportedSegmentSize</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Nonzero segment size not supported yet&quot;</span>,
-            <span class="ident">Error::MissingUnitDie</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::UnsupportedUnitType</span> =&gt; <span class="string">&quot;The `DW_UT_*` value for this unit is not supported yet&quot;</span>,
+            <span class="ident">Error::UnsupportedAddressIndex</span> =&gt; <span class="string">&quot;Ranges involving AddressIndex are not supported yet&quot;</span>,
+            <span class="ident">Error::UnsupportedSegmentSize</span> =&gt; <span class="string">&quot;Nonzero segment size not supported yet&quot;</span>,
+            <span class="ident">Error::MissingUnitDie</span> =&gt; {
                 <span class="string">&quot;A compilation unit or type unit is missing its top level DIE.&quot;</span>
             }
-            <span class="ident">Error::UnsupportedAttributeForm</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;A DIE attribute used an unsupported form.&quot;</span>,
-            <span class="ident">Error::MissingFileEntryFormatPath</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Missing DW_LNCT_path in file entry format.&quot;</span>,
-            <span class="ident">Error::ExpectedStringAttributeValue</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::UnsupportedAttributeForm</span> =&gt; <span class="string">&quot;A DIE attribute used an unsupported form.&quot;</span>,
+            <span class="ident">Error::MissingFileEntryFormatPath</span> =&gt; <span class="string">&quot;Missing DW_LNCT_path in file entry format.&quot;</span>,
+            <span class="ident">Error::ExpectedStringAttributeValue</span> =&gt; {
                 <span class="string">&quot;Expected an attribute value to be a string form.&quot;</span>
             }
-            <span class="ident">Error::InvalidImplicitConst</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;DW_FORM_implicit_const used in an invalid context.&quot;</span>,
+            <span class="ident">Error::InvalidImplicitConst</span> =&gt; <span class="string">&quot;DW_FORM_implicit_const used in an invalid context.&quot;</span>,
         }
     }
 }
@@ -1312,7 +1312,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident">io::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Error::Io</span>
     }
 }
@@ -1334,34 +1334,34 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Section</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Returns the section id for this type.</span>
-    <span class="kw">fn</span> <span class="ident">id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SectionId</span>;
+    <span class="kw">fn</span> <span class="ident">id</span>() -&gt; <span class="ident">SectionId</span>;
 
     <span class="doccomment">/// Returns the ELF section name for this type.</span>
-    <span class="kw">fn</span> <span class="ident">section_name</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">section_name</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="ident"><span class="self">Self</span>::id</span>().<span class="ident">name</span>()
     }
 
     <span class="doccomment">/// Returns the ELF section name (if any) for this type when used in a dwo</span>
     <span class="doccomment">/// file.</span>
-    <span class="kw">fn</span> <span class="ident">dwo_section_name</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">dwo_section_name</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::id</span>().<span class="ident">dwo_name</span>()
     }
 
     <span class="doccomment">/// Try to load the section using the given loader function.</span>
-    <span class="kw">fn</span> <span class="ident">load</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">core::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">load</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">core::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">SectionId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">core::result::Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">SectionId</span>) -&gt; <span class="ident">core::result::Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span>,
     {
         <span class="ident">f</span>(<span class="ident"><span class="self">Self</span>::id</span>()).<span class="ident">map</span>(<span class="ident">From::from</span>)
     }
 
     <span class="doccomment">/// Returns the `Reader` for this section.</span>
-    <span class="kw">fn</span> <span class="ident">reader</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">R</span>
+    <span class="kw">fn</span> <span class="ident">reader</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">R</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">Reader</span>;
 
     <span class="doccomment">/// Returns the `Reader` for this section.</span>
-    <span class="kw">fn</span> <span class="ident">lookup_offset_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ReaderOffsetId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">SectionId</span>, <span class="ident">R::Offset</span>)<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">lookup_offset_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ReaderOffsetId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">SectionId</span>, <span class="ident">R::Offset</span>)<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">Reader</span>,
     {
@@ -1372,9 +1372,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Register</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_u64</span>(<span class="ident">x</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Register</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_u64</span>(<span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Register</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u16</span>;
-        <span class="kw">if</span> <span class="ident">u64::from</span>(<span class="ident">y</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">x</span> {
+        <span class="kw">if</span> <span class="ident">u64::from</span>(<span class="ident">y</span>) <span class="op">==</span> <span class="ident">x</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">Register</span>(<span class="ident">y</span>))
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedRegister</span>(<span class="ident">x</span>))
@@ -1396,12 +1396,12 @@
 
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_initial_length</span>() {
-            <span class="prelude-val">Ok</span>((<span class="ident">length</span>, <span class="ident">format</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>((<span class="ident">length</span>, <span class="ident">format</span>)) =&gt; {
                 <span class="macro">assert_eq!</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="number">0</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">format</span>, <span class="ident">Format::Dwarf32</span>);
                 <span class="macro">assert_eq!</span>(<span class="number">0x7856_3412</span>, <span class="ident">length</span>);
             }
-            <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
+            <span class="ident">otherwise</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
         }
     }
 
@@ -1417,18 +1417,18 @@
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_initial_length</span>() {
-            <span class="prelude-val">Ok</span>((<span class="ident">length</span>, <span class="ident">format</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>((<span class="ident">length</span>, <span class="ident">format</span>)) =&gt; {
                 <span class="macro">assert_eq!</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="number">0</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">format</span>, <span class="ident">Format::Dwarf64</span>);
                 <span class="macro">assert_eq!</span>(<span class="number">0xffde_bc9a_7856_3412</span>, <span class="ident">length</span>);
             }
-            <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
+            <span class="ident">otherwise</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
         }
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>)]</span>
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_initial_length</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedOffset</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedOffset</span>) =&gt; {}
+            <span class="ident">otherwise</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
         };
     }
 
@@ -1439,8 +1439,8 @@
 
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_initial_length</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownReservedLength</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">true</span>),
-            <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownReservedLength</span>) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
+            <span class="ident">otherwise</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
         };
     }
 
@@ -1450,8 +1450,8 @@
 
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_initial_length</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">true</span>),
-            <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
+            <span class="ident">otherwise</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
         };
     }
 
@@ -1466,8 +1466,8 @@
 
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_initial_length</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">true</span>),
-            <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
+            <span class="ident">otherwise</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
         };
     }
 
@@ -1478,11 +1478,11 @@
 
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_offset</span>(<span class="ident">Format::Dwarf32</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; {
                 <span class="macro">assert_eq!</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="number">0</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">val</span>, <span class="number">0x0123_4567</span>);
             }
-            <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
+            <span class="ident">otherwise</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
         };
     }
 
@@ -1493,11 +1493,11 @@
 
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_offset</span>(<span class="ident">Format::Dwarf64</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; {
                 <span class="macro">assert_eq!</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="number">0</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">val</span>, <span class="number">0x0123_4567</span>);
             }
-            <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
+            <span class="ident">otherwise</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
         };
     }
 
@@ -1509,11 +1509,11 @@
 
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_offset</span>(<span class="ident">Format::Dwarf64</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; {
                 <span class="macro">assert_eq!</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="number">0</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">val</span>, <span class="number">0x0123_4567_89ab_cdef</span>);
             }
-            <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
+            <span class="ident">otherwise</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
         };
     }
 
@@ -1525,8 +1525,8 @@
 
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_offset</span>(<span class="ident">Format::Dwarf64</span>) {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedOffset</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">true</span>),
-            <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedOffset</span>) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
+            <span class="ident">otherwise</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
         };
     }
 }

@@ -771,7 +771,7 @@
 
 <span class="doccomment">/// Generate the provided code if and only if `pub` is present.</span>
 <span class="macro">macro_rules!</span> <span class="ident">if_pub</span> {
-    (<span class="kw">pub</span> $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="kw-2">*</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="kw">pub</span> $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="kw-2">*</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This function exists since [`Default::default()`] cannot be used in a `const` context.</span>
@@ -781,19 +781,19 @@
         <span class="doccomment">/// affected. As such it will not be considered a breaking change.</span>
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>)<span class="op">*</span>
     };
-    ($(<span class="macro-nonterminal">$</span><span class="kw">_</span>:<span class="macro-nonterminal">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {};
+    ($(<span class="macro-nonterminal">$</span><span class="kw">_</span>:<span class="macro-nonterminal">tt</span>)<span class="kw-2">*</span>) =&gt; {};
 }
 
 <span class="doccomment">/// Implement `Default` for the given type. This also generates an inherent implementation of a</span>
 <span class="doccomment">/// `default` method that is `const fn`, permitting the default value to be used in const contexts.</span>
 <span class="comment">// Every modifier should use this macro rather than a derived `Default`.</span>
 <span class="macro">macro_rules!</span> <span class="ident">impl_const_default</span> {
-    ($($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> $(@<span class="macro-nonterminal">$</span><span class="kw">pub</span>:<span class="macro-nonterminal">ident</span>)<span class="question-mark">?</span> <span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">expr</span>;)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {$(
+    ($($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> $(@<span class="macro-nonterminal">$</span><span class="kw">pub</span>:<span class="macro-nonterminal">ident</span>)<span class="question-mark">?</span> <span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">expr</span>;)<span class="kw-2">*</span>) =&gt; {$(
         <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">type</span> {
             <span class="macro">if_pub!</span> {
                 $(<span class="macro-nonterminal">$</span><span class="kw">pub</span>)<span class="question-mark">?</span>
                 $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span>)<span class="kw-2">*</span>;
-                <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+                <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
                     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>
                 }
             }
@@ -801,7 +801,7 @@
 
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span>)<span class="op">*</span>
         <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="kw">type</span> {
-            <span class="kw">fn</span> <span class="macro-nonterminal">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+            <span class="kw">fn</span> <span class="macro-nonterminal">default</span>() -&gt; <span class="self">Self</span> {
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>
             }
         }
@@ -810,44 +810,44 @@
 
 <span class="macro">impl_const_default!</span> {
     <span class="doccomment">/// Creates a modifier that indicates the value is [padded with zeroes](Padding::Zero).</span>
-    @<span class="kw">pub</span> <span class="ident">Day</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::Zero</span> };
+    @<span class="kw">pub</span> <span class="ident">Day</span> =&gt; <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::Zero</span> };
     <span class="doccomment">/// Creates a modifier that indicates the value uses the</span>
     <span class="doccomment">/// [`Numerical`](Self::Numerical) representation.</span>
-    <span class="ident">MonthRepr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Numerical</span>;
+    <span class="ident">MonthRepr</span> =&gt; <span class="ident"><span class="self">Self</span>::Numerical</span>;
     <span class="doccomment">/// Creates an instance of this type that indicates the value uses the</span>
     <span class="doccomment">/// [`Numerical`](MonthRepr::Numerical) representation, is [padded with zeroes](Padding::Zero),</span>
     <span class="doccomment">/// and is case-sensitive when parsing.</span>
-    @<span class="kw">pub</span> <span class="ident">Month</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    @<span class="kw">pub</span> <span class="ident">Month</span> =&gt; <span class="self">Self</span> {
         <span class="ident">padding</span>: <span class="ident">Padding::Zero</span>,
         <span class="ident">repr</span>: <span class="ident">MonthRepr::Numerical</span>,
         <span class="ident">case_sensitive</span>: <span class="bool-val">true</span>,
     };
     <span class="doccomment">/// Creates a modifier that indicates the value is [padded with zeroes](Padding::Zero).</span>
-    @<span class="kw">pub</span> <span class="ident">Ordinal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::Zero</span> };
+    @<span class="kw">pub</span> <span class="ident">Ordinal</span> =&gt; <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::Zero</span> };
     <span class="doccomment">/// Creates a modifier that indicates the value uses the [`Long`](Self::Long) representation.</span>
-    <span class="ident">WeekdayRepr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Long</span>;
+    <span class="ident">WeekdayRepr</span> =&gt; <span class="ident"><span class="self">Self</span>::Long</span>;
     <span class="doccomment">/// Creates a modifier that indicates the value uses the [`Long`](WeekdayRepr::Long)</span>
     <span class="doccomment">/// representation and is case-sensitive when parsing. If the representation is changed to a</span>
     <span class="doccomment">/// numerical one, the instance defaults to one-based indexing.</span>
-    @<span class="kw">pub</span> <span class="ident">Weekday</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    @<span class="kw">pub</span> <span class="ident">Weekday</span> =&gt; <span class="self">Self</span> {
         <span class="ident">repr</span>: <span class="ident">WeekdayRepr::Long</span>,
         <span class="ident">one_indexed</span>: <span class="bool-val">true</span>,
         <span class="ident">case_sensitive</span>: <span class="bool-val">true</span>,
     };
     <span class="doccomment">/// Creates a modifier that indicates that the value uses the [`Iso`](Self::Iso) representation.</span>
-    <span class="ident">WeekNumberRepr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Iso</span>;
+    <span class="ident">WeekNumberRepr</span> =&gt; <span class="ident"><span class="self">Self</span>::Iso</span>;
     <span class="doccomment">/// Creates a modifier that indicates that the value is [padded with zeroes](Padding::Zero)</span>
             <span class="doccomment">/// and uses the [`Iso`](WeekNumberRepr::Iso) representation.</span>
-    @<span class="kw">pub</span> <span class="ident">WeekNumber</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    @<span class="kw">pub</span> <span class="ident">WeekNumber</span> =&gt; <span class="self">Self</span> {
         <span class="ident">padding</span>: <span class="ident">Padding::Zero</span>,
         <span class="ident">repr</span>: <span class="ident">WeekNumberRepr::Iso</span>,
     };
     <span class="doccomment">/// Creates a modifier that indicates the value uses the [`Full`](Self::Full) representation.</span>
-    <span class="ident">YearRepr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Full</span>;
+    <span class="ident">YearRepr</span> =&gt; <span class="ident"><span class="self">Self</span>::Full</span>;
     <span class="doccomment">/// Creates a modifier that indicates the value uses the [`Full`](YearRepr::Full)</span>
     <span class="doccomment">/// representation, is [padded with zeroes](Padding::Zero), uses the Gregorian calendar as its</span>
     <span class="doccomment">/// base, and only includes the year&#39;s sign if necessary.</span>
-    @<span class="kw">pub</span> <span class="ident">Year</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    @<span class="kw">pub</span> <span class="ident">Year</span> =&gt; <span class="self">Self</span> {
         <span class="ident">padding</span>: <span class="ident">Padding::Zero</span>,
         <span class="ident">repr</span>: <span class="ident">YearRepr::Full</span>,
         <span class="ident">iso_week_based</span>: <span class="bool-val">false</span>,
@@ -855,38 +855,38 @@
     };
     <span class="doccomment">/// Creates a modifier that indicates the value is [padded with zeroes](Padding::Zero) and</span>
     <span class="doccomment">/// has the 24-hour representation.</span>
-    @<span class="kw">pub</span> <span class="ident">Hour</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    @<span class="kw">pub</span> <span class="ident">Hour</span> =&gt; <span class="self">Self</span> {
         <span class="ident">padding</span>: <span class="ident">Padding::Zero</span>,
         <span class="ident">is_12_hour_clock</span>: <span class="bool-val">false</span>,
     };
     <span class="doccomment">/// Creates a modifier that indicates the value is [padded with zeroes](Padding::Zero).</span>
-    @<span class="kw">pub</span> <span class="ident">Minute</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::Zero</span> };
+    @<span class="kw">pub</span> <span class="ident">Minute</span> =&gt; <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::Zero</span> };
     <span class="doccomment">/// Creates a modifier that indicates the value uses the upper-case representation and is</span>
     <span class="doccomment">/// case-sensitive when parsing.</span>
-    @<span class="kw">pub</span> <span class="ident">Period</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    @<span class="kw">pub</span> <span class="ident">Period</span> =&gt; <span class="self">Self</span> {
         <span class="ident">is_uppercase</span>: <span class="bool-val">true</span>,
         <span class="ident">case_sensitive</span>: <span class="bool-val">true</span>,
     };
     <span class="doccomment">/// Creates a modifier that indicates the value is [padded with zeroes](Padding::Zero).</span>
-    @<span class="kw">pub</span> <span class="ident">Second</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::Zero</span> };
+    @<span class="kw">pub</span> <span class="ident">Second</span> =&gt; <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::Zero</span> };
     <span class="doccomment">/// Creates a modifier that indicates the stringified value contains [one or more</span>
     <span class="doccomment">/// digits](Self::OneOrMore).</span>
-    <span class="ident">SubsecondDigits</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::OneOrMore</span>;
+    <span class="ident">SubsecondDigits</span> =&gt; <span class="ident"><span class="self">Self</span>::OneOrMore</span>;
     <span class="doccomment">/// Creates a modifier that indicates the stringified value contains [one or more</span>
     <span class="doccomment">/// digits](SubsecondDigits::OneOrMore).</span>
-    @<span class="kw">pub</span> <span class="ident">Subsecond</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="ident">digits</span>: <span class="ident">SubsecondDigits::OneOrMore</span> };
+    @<span class="kw">pub</span> <span class="ident">Subsecond</span> =&gt; <span class="self">Self</span> { <span class="ident">digits</span>: <span class="ident">SubsecondDigits::OneOrMore</span> };
     <span class="doccomment">/// Creates a modifier that indicates the value uses the `+` sign for all positive values</span>
     <span class="doccomment">/// and is [padded with zeroes](Padding::Zero).</span>
-    @<span class="kw">pub</span> <span class="ident">OffsetHour</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    @<span class="kw">pub</span> <span class="ident">OffsetHour</span> =&gt; <span class="self">Self</span> {
         <span class="ident">sign_is_mandatory</span>: <span class="bool-val">true</span>,
         <span class="ident">padding</span>: <span class="ident">Padding::Zero</span>,
     };
     <span class="doccomment">/// Creates a modifier that indicates the value is [padded with zeroes](Padding::Zero).</span>
-    @<span class="kw">pub</span> <span class="ident">OffsetMinute</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::Zero</span> };
+    @<span class="kw">pub</span> <span class="ident">OffsetMinute</span> =&gt; <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::Zero</span> };
     <span class="doccomment">/// Creates a modifier that indicates the value is [padded with zeroes](Padding::Zero).</span>
-    @<span class="kw">pub</span> <span class="ident">OffsetSecond</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::Zero</span> };
+    @<span class="kw">pub</span> <span class="ident">OffsetSecond</span> =&gt; <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::Zero</span> };
     <span class="doccomment">/// Creates a modifier that indicates the value is [padded with zeroes](Self::Zero).</span>
-    <span class="ident">Padding</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Zero</span>;
+    <span class="ident">Padding</span> =&gt; <span class="ident"><span class="self">Self</span>::Zero</span>;
 }
 
 <span class="doccomment">/// The modifiers parsed for any given component. `None` indicates the modifier was not present.</span>
@@ -915,7 +915,7 @@
         <span class="ident">component_name</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="kw-2">mut</span> <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidFormatDescription</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidFormatDescription</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">modifiers</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
 
         <span class="kw">while</span> <span class="op">!</span><span class="ident">bytes</span>.<span class="ident">is_empty</span>() {
@@ -947,7 +947,7 @@
                 <span class="op">|</span> (<span class="string">b&quot;ordinal&quot;</span>, <span class="string">b&quot;padding:space&quot;</span>)
                 <span class="op">|</span> (<span class="string">b&quot;second&quot;</span>, <span class="string">b&quot;padding:space&quot;</span>)
                 <span class="op">|</span> (<span class="string">b&quot;week_number&quot;</span>, <span class="string">b&quot;padding:space&quot;</span>)
-                <span class="op">|</span> (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;padding:space&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Padding::Space</span>),
+                <span class="op">|</span> (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;padding:space&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Padding::Space</span>),
                 (<span class="string">b&quot;day&quot;</span>, <span class="string">b&quot;padding:zero&quot;</span>)
                 <span class="op">|</span> (<span class="string">b&quot;hour&quot;</span>, <span class="string">b&quot;padding:zero&quot;</span>)
                 <span class="op">|</span> (<span class="string">b&quot;minute&quot;</span>, <span class="string">b&quot;padding:zero&quot;</span>)
@@ -958,7 +958,7 @@
                 <span class="op">|</span> (<span class="string">b&quot;ordinal&quot;</span>, <span class="string">b&quot;padding:zero&quot;</span>)
                 <span class="op">|</span> (<span class="string">b&quot;second&quot;</span>, <span class="string">b&quot;padding:zero&quot;</span>)
                 <span class="op">|</span> (<span class="string">b&quot;week_number&quot;</span>, <span class="string">b&quot;padding:zero&quot;</span>)
-                <span class="op">|</span> (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;padding:zero&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Padding::Zero</span>),
+                <span class="op">|</span> (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;padding:zero&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Padding::Zero</span>),
                 (<span class="string">b&quot;day&quot;</span>, <span class="string">b&quot;padding:none&quot;</span>)
                 <span class="op">|</span> (<span class="string">b&quot;hour&quot;</span>, <span class="string">b&quot;padding:none&quot;</span>)
                 <span class="op">|</span> (<span class="string">b&quot;minute&quot;</span>, <span class="string">b&quot;padding:none&quot;</span>)
@@ -969,78 +969,78 @@
                 <span class="op">|</span> (<span class="string">b&quot;ordinal&quot;</span>, <span class="string">b&quot;padding:none&quot;</span>)
                 <span class="op">|</span> (<span class="string">b&quot;second&quot;</span>, <span class="string">b&quot;padding:none&quot;</span>)
                 <span class="op">|</span> (<span class="string">b&quot;week_number&quot;</span>, <span class="string">b&quot;padding:none&quot;</span>)
-                <span class="op">|</span> (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;padding:none&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Padding::None</span>),
-                (<span class="string">b&quot;hour&quot;</span>, <span class="string">b&quot;repr:24&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">hour_is_12_hour_clock</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
-                (<span class="string">b&quot;hour&quot;</span>, <span class="string">b&quot;repr:12&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">hour_is_12_hour_clock</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
+                <span class="op">|</span> (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;padding:none&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Padding::None</span>),
+                (<span class="string">b&quot;hour&quot;</span>, <span class="string">b&quot;repr:24&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">hour_is_12_hour_clock</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+                (<span class="string">b&quot;hour&quot;</span>, <span class="string">b&quot;repr:12&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">hour_is_12_hour_clock</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
                 (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;case_sensitive:true&quot;</span>)
                 <span class="op">|</span> (<span class="string">b&quot;period&quot;</span>, <span class="string">b&quot;case_sensitive:true&quot;</span>)
-                <span class="op">|</span> (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;case_sensitive:true&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">case_sensitive</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
+                <span class="op">|</span> (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;case_sensitive:true&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">case_sensitive</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
                 (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;case_sensitive:false&quot;</span>)
                 <span class="op">|</span> (<span class="string">b&quot;period&quot;</span>, <span class="string">b&quot;case_sensitive:false&quot;</span>)
-                <span class="op">|</span> (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;case_sensitive:false&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">case_sensitive</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
-                (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;repr:numerical&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">month_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">MonthRepr::Numerical</span>),
-                (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;repr:long&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">month_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">MonthRepr::Long</span>),
-                (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;repr:short&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">month_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">MonthRepr::Short</span>),
-                (<span class="string">b&quot;offset_hour&quot;</span>, <span class="string">b&quot;sign:automatic&quot;</span>) <span class="op">|</span> (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;sign:automatic&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="op">|</span> (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;case_sensitive:false&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">case_sensitive</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+                (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;repr:numerical&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">month_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">MonthRepr::Numerical</span>),
+                (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;repr:long&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">month_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">MonthRepr::Long</span>),
+                (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;repr:short&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">month_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">MonthRepr::Short</span>),
+                (<span class="string">b&quot;offset_hour&quot;</span>, <span class="string">b&quot;sign:automatic&quot;</span>) <span class="op">|</span> (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;sign:automatic&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">sign_is_mandatory</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
                 }
-                (<span class="string">b&quot;offset_hour&quot;</span>, <span class="string">b&quot;sign:mandatory&quot;</span>) <span class="op">|</span> (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;sign:mandatory&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;offset_hour&quot;</span>, <span class="string">b&quot;sign:mandatory&quot;</span>) <span class="op">|</span> (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;sign:mandatory&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">sign_is_mandatory</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
                 }
-                (<span class="string">b&quot;period&quot;</span>, <span class="string">b&quot;case:upper&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">period_is_uppercase</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
-                (<span class="string">b&quot;period&quot;</span>, <span class="string">b&quot;case:lower&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">period_is_uppercase</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
-                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:1&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;period&quot;</span>, <span class="string">b&quot;case:upper&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">period_is_uppercase</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
+                (<span class="string">b&quot;period&quot;</span>, <span class="string">b&quot;case:lower&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">period_is_uppercase</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:1&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::One</span>);
                 }
-                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:2&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:2&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Two</span>);
                 }
-                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:3&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:3&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Three</span>);
                 }
-                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:4&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:4&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Four</span>);
                 }
-                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:5&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:5&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Five</span>);
                 }
-                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:6&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:6&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Six</span>);
                 }
-                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:7&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:7&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Seven</span>);
                 }
-                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:8&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:8&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Eight</span>);
                 }
-                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:9&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:9&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Nine</span>);
                 }
-                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:1+&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:1+&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::OneOrMore</span>);
                 }
-                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:short&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">weekday_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekdayRepr::Short</span>),
-                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:long&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">weekday_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekdayRepr::Long</span>),
-                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:sunday&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">weekday_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekdayRepr::Sunday</span>),
-                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:monday&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">weekday_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekdayRepr::Monday</span>),
-                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;one_indexed:true&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">weekday_is_one_indexed</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
-                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;one_indexed:false&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:short&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">weekday_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekdayRepr::Short</span>),
+                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:long&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">weekday_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekdayRepr::Long</span>),
+                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:sunday&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">weekday_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekdayRepr::Sunday</span>),
+                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:monday&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">weekday_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekdayRepr::Monday</span>),
+                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;one_indexed:true&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">weekday_is_one_indexed</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
+                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;one_indexed:false&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">weekday_is_one_indexed</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
                 }
-                (<span class="string">b&quot;week_number&quot;</span>, <span class="string">b&quot;repr:iso&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;week_number&quot;</span>, <span class="string">b&quot;repr:iso&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">week_number_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekNumberRepr::Iso</span>);
                 }
-                (<span class="string">b&quot;week_number&quot;</span>, <span class="string">b&quot;repr:sunday&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;week_number&quot;</span>, <span class="string">b&quot;repr:sunday&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">week_number_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekNumberRepr::Sunday</span>);
                 }
-                (<span class="string">b&quot;week_number&quot;</span>, <span class="string">b&quot;repr:monday&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;week_number&quot;</span>, <span class="string">b&quot;repr:monday&quot;</span>) =&gt; {
                     <span class="ident">modifiers</span>.<span class="ident">week_number_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekNumberRepr::Monday</span>);
                 }
-                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;repr:full&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">year_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">YearRepr::Full</span>),
-                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;repr:last_two&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">year_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">YearRepr::LastTwo</span>),
-                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;base:calendar&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">year_is_iso_week_based</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
-                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;base:iso_week&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">modifiers</span>.<span class="ident">year_is_iso_week_based</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;repr:full&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">year_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">YearRepr::Full</span>),
+                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;repr:last_two&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">year_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">YearRepr::LastTwo</span>),
+                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;base:calendar&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">year_is_iso_week_based</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;base:iso_week&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">year_is_iso_week_based</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
+                <span class="kw">_</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidFormatDescription::InvalidModifier</span> {
                         <span class="ident">value</span>: <span class="ident">String::from_utf8_lossy</span>(<span class="ident">modifier</span>).<span class="ident">into_owned</span>(),
                         <span class="ident">index</span>: <span class="kw-2">*</span><span class="ident">index</span>,

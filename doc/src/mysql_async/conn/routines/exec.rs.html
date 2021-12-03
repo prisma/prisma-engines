@@ -98,17 +98,17 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExecRoutine</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Statement</span>, <span class="ident">params</span>: <span class="ident">Params</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Statement</span>, <span class="ident">params</span>: <span class="ident">Params</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">stmt</span>, <span class="ident">params</span> }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Routine</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExecRoutine</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">call</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Conn</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">call</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Conn</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">loop</span> {
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">params</span> {
-                    <span class="ident">Params::Positional</span>(<span class="kw-2">ref</span> <span class="ident">params</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">Params::Positional</span>(<span class="kw-2">ref</span> <span class="ident">params</span>) =&gt; {
                         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">num_params</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">!</span><span class="op">=</span> <span class="ident">params</span>.<span class="ident">len</span>() {
                             <span class="prelude-val">Err</span>(<span class="ident">DriverError::StmtParamsMismatch</span> {
                                 <span class="ident">required</span>: <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">num_params</span>(),
@@ -127,7 +127,7 @@
                         <span class="ident">conn</span>.<span class="ident">read_result_set</span>::<span class="op">&lt;</span><span class="ident">BinaryProtocol</span><span class="op">&gt;</span>(<span class="bool-val">true</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                         <span class="kw">break</span>;
                     }
-                    <span class="ident">Params::Named</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">Params::Named</span>(<span class="kw">_</span>) =&gt; {
                         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">named_params</span>.<span class="ident">is_none</span>() {
                             <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DriverError::NamedParamsForPositionalQuery</span>.<span class="ident">into</span>();
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>);
@@ -139,7 +139,7 @@
 
                         <span class="kw">continue</span>;
                     }
-                    <span class="ident">Params::Empty</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">Params::Empty</span> =&gt; {
                         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">num_params</span>() <span class="op">&gt;</span> <span class="number">0</span> {
                             <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DriverError::StmtParamsMismatch</span> {
                                 <span class="ident">required</span>: <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">num_params</span>(),

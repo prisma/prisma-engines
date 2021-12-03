@@ -57,7 +57,7 @@
 <span class="doccomment">/// This is needed to ensure when adjusting the exponent relative to</span>
 <span class="doccomment">/// the mantissa we do not overflow for comically-long exponents.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">into_i32</span>(<span class="ident">value</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+<span class="kw">fn</span> <span class="ident">into_i32</span>(<span class="ident">value</span>: <span class="ident">usize</span>) -&gt; <span class="ident">i32</span> {
     <span class="kw">if</span> <span class="ident">value</span> <span class="op">&gt;</span> <span class="ident">i32::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span> {
         <span class="ident">i32::max_value</span>()
     } <span class="kw">else</span> {
@@ -75,8 +75,8 @@
     <span class="ident">exponent</span>: <span class="ident">i32</span>,
     <span class="ident">integer_digits</span>: <span class="ident">usize</span>,
     <span class="ident">fraction_start</span>: <span class="ident">usize</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
-    <span class="kw">if</span> <span class="ident">integer_digits</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+) -&gt; <span class="ident">i32</span> {
+    <span class="kw">if</span> <span class="ident">integer_digits</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="kw">let</span> <span class="ident">fraction_start</span> <span class="op">=</span> <span class="ident">into_i32</span>(<span class="ident">fraction_start</span>);
         <span class="ident">exponent</span>.<span class="ident">saturating_sub</span>(<span class="ident">fraction_start</span>).<span class="ident">saturating_sub</span>(<span class="number">1</span>)
     } <span class="kw">else</span> {
@@ -91,7 +91,7 @@
 <span class="comment">// the dot, and add the number of truncated digits from the mantissa,</span>
 <span class="comment">// to calculate the scaling factor for the mantissa from a raw exponent.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mantissa_exponent</span>(<span class="ident">exponent</span>: <span class="ident">i32</span>, <span class="ident">fraction_digits</span>: <span class="ident">usize</span>, <span class="ident">truncated</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mantissa_exponent</span>(<span class="ident">exponent</span>: <span class="ident">i32</span>, <span class="ident">fraction_digits</span>: <span class="ident">usize</span>, <span class="ident">truncated</span>: <span class="ident">usize</span>) -&gt; <span class="ident">i32</span> {
     <span class="kw">if</span> <span class="ident">fraction_digits</span> <span class="op">&gt;</span> <span class="ident">truncated</span> {
         <span class="ident">exponent</span>.<span class="ident">saturating_sub</span>(<span class="ident">into_i32</span>(<span class="ident">fraction_digits</span> <span class="op">-</span> <span class="ident">truncated</span>))
     } <span class="kw">else</span> {

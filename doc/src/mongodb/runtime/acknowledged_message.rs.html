@@ -56,7 +56,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">AcknowledgedMessage</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new message and return it along with the AcknowledgmentReceiver that will</span>
     <span class="doccomment">/// be notified when the message is received or when it is dropped.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">package</span>(<span class="ident">message</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="ident">AcknowledgmentReceiver</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">package</span>(<span class="ident">message</span>: <span class="ident">M</span>) -&gt; (<span class="self">Self</span>, <span class="ident">AcknowledgmentReceiver</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">tokio::sync::oneshot::channel</span>();
         (
             <span class="self">Self</span> {
@@ -68,7 +68,7 @@
     }
 
     <span class="doccomment">/// Borrow the message.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">M</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">M</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>
     }
 
@@ -88,7 +88,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">AcknowledgmentReceiver</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Wait for the message to be acknowledged. If this returns None, that means the message</span>
     <span class="doccomment">/// was dropped without the receiving end explicitly sending anything back.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">wait_for_acknowledgment</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">wait_for_acknowledgment</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">receiver</span>.<span class="kw">await</span>.<span class="ident">ok</span>()
     }
 }

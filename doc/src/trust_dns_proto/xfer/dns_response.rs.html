@@ -902,37 +902,37 @@
 <span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">DnsResponseFuture</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">DnsResponseFutureInner</span>::<span class="kw-2">*</span>;
         <span class="ident">Poll::Ready</span>(<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">Timeout</span>(<span class="ident">fut</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">fut</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
+            <span class="ident">Timeout</span>(<span class="ident">fut</span>) =&gt; <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">fut</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>)) {
+                <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
             },
-            <span class="ident">Receiver</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fut</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">fut</span>).<span class="ident">poll</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoError::from</span>(<span class="string">&quot;the completion was canceled&quot;</span>)),
+            <span class="ident">Receiver</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fut</span>) =&gt; <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">fut</span>).<span class="ident">poll</span>(<span class="ident">cx</span>)) {
+                <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ProtoError::from</span>(<span class="string">&quot;the completion was canceled&quot;</span>)),
             },
-            <span class="ident">Error</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;cannot poll after complete&quot;</span>)),
-            <span class="ident">Boxed</span>(<span class="ident">fut</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">ready!</span>(<span class="ident">fut</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>)),
+            <span class="ident">Error</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;cannot poll after complete&quot;</span>)),
+            <span class="ident">Boxed</span>(<span class="ident">fut</span>) =&gt; <span class="macro">ready!</span>(<span class="ident">fut</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>)),
         })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TimeoutFuture</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DnsResponseFuture</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">TimeoutFuture</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">TimeoutFuture</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">DnsResponseFuture</span>(<span class="ident">DnsResponseFutureInner::Timeout</span>(<span class="ident">f</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">oneshot::Receiver</span><span class="op">&lt;</span><span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">DnsResponse</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DnsResponseFuture</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">receiver</span>: <span class="ident">oneshot::Receiver</span><span class="op">&lt;</span><span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">DnsResponse</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">receiver</span>: <span class="ident">oneshot::Receiver</span><span class="op">&lt;</span><span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">DnsResponse</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">DnsResponseFuture</span>(<span class="ident">DnsResponseFutureInner::Receiver</span>(<span class="ident">receiver</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DnsResponseFuture</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ProtoError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ProtoError</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">DnsResponseFuture</span>(<span class="ident">DnsResponseFutureInner::Error</span>(<span class="prelude-val">Some</span>(<span class="ident">e</span>)))
     }
 }
@@ -941,7 +941,7 @@
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">DnsResponseFuture</span>(<span class="ident">DnsResponseFutureInner::Boxed</span>(
             <span class="ident">f</span> <span class="kw">as</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         ))
@@ -970,27 +970,27 @@
 <span class="comment">// TODO: when `impl Trait` lands in stable, remove this, and expose FlatMap over answers, et al.</span>
 <span class="kw">impl</span> <span class="ident">DnsResponse</span> {
     <span class="doccomment">/// Get all the messages in the Response</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">messages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Message</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">messages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_slice</span>().<span class="ident">iter</span>()
     }
 
     <span class="doccomment">/// Get all the messages in the Response</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">messages_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Message</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">messages_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_mut_slice</span>().<span class="ident">iter_mut</span>()
     }
 
     <span class="doccomment">/// returns the number of messages in the response</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// returns the number of messages in the response</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_empty</span>()
     }
 
     <span class="doccomment">/// Retrieves the SOA from the response. This will only exist if it was an authoritative response.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">soa</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SOA</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">soa</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SOA</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">name_servers</span>()
             .<span class="ident">iter</span>()
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">record</span><span class="op">|</span> <span class="ident">record</span>.<span class="ident">rdata</span>().<span class="ident">as_soa</span>())
@@ -1053,7 +1053,7 @@
     <span class="doccomment">///   and would make sensible a default.  Values exceeding one day have</span>
     <span class="doccomment">///   been found to be problematic.</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negative_ttl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negative_ttl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="comment">// TODO: should this ensure that the SOA zone matches the Queried Zone?</span>
         <span class="self">self</span>.<span class="ident">name_servers</span>()
             .<span class="ident">iter</span>()
@@ -1063,23 +1063,23 @@
     }
 
     <span class="doccomment">/// Does the response contain any records matching the query name and type?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_answer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_answer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">for</span> <span class="ident">q</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">queries</span>() {
             <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">q</span>.<span class="ident">query_type</span>() {
-                <span class="ident">RecordType::ANY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">all_sections</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">q</span>.<span class="ident">name</span>()),
-                <span class="ident">RecordType::SOA</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">RecordType::ANY</span> =&gt; <span class="self">self</span>.<span class="ident">all_sections</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">q</span>.<span class="ident">name</span>()),
+                <span class="ident">RecordType::SOA</span> =&gt; {
                     <span class="comment">// for SOA name must be part of the SOA zone</span>
                     <span class="self">self</span>.<span class="ident">all_sections</span>()
                         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">record_type</span>().<span class="ident">is_soa</span>())
                         .<span class="ident">any</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">name</span>().<span class="ident">zone_of</span>(<span class="ident">q</span>.<span class="ident">name</span>()))
                 }
-                <span class="ident">q_type</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">q_type</span> =&gt; {
                     <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">answers</span>().<span class="ident">is_empty</span>() {
                         <span class="bool-val">true</span>
                     } <span class="kw">else</span> {
                         <span class="self">self</span>.<span class="ident">all_sections</span>()
-                            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">record_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">q_type</span>)
-                            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">q</span>.<span class="ident">name</span>())
+                            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">record_type</span>() <span class="op">==</span> <span class="ident">q_type</span>)
+                            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">q</span>.<span class="ident">name</span>())
                     }
                 }
             };
@@ -1096,7 +1096,7 @@
     <span class="doccomment">///   The Various types should be handled when caching or otherwise differently.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See [NegativeType]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negative_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NegativeType</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negative_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NegativeType</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">response_code</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">response_code</span>();
         <span class="kw">let</span> <span class="ident">ttl_from_soa</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">negative_ttl</span>();
         <span class="kw">let</span> <span class="ident">has_soa</span> <span class="op">=</span> <span class="ident">ttl_from_soa</span>.<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>);
@@ -1113,25 +1113,25 @@
             <span class="ident">has_non_cname</span>,
             <span class="ident">has_additionals</span>,
         ) {
-            (<span class="ident">ResponseCode::NXDomain</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">NegativeType::NameErrorType1</span>),
-            (<span class="ident">ResponseCode::NXDomain</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">ResponseCode::NXDomain</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">NegativeType::NameErrorType1</span>),
+            (<span class="ident">ResponseCode::NXDomain</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">NegativeType::NameErrorType2</span>)
             }
-            (<span class="ident">ResponseCode::NXDomain</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">ResponseCode::NXDomain</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">NegativeType::NameErrorType3</span>)
             }
-            (<span class="ident">ResponseCode::NXDomain</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">ResponseCode::NXDomain</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">NegativeType::NameErrorType4</span>)
             }
-            (<span class="ident">ResponseCode::NoError</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">NegativeType::NoDataType1</span>),
-            (<span class="ident">ResponseCode::NoError</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">ResponseCode::NoError</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">NegativeType::NoDataType1</span>),
+            (<span class="ident">ResponseCode::NoError</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">NegativeType::NoDataType2</span>)
             }
-            (<span class="ident">ResponseCode::NoError</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">ResponseCode::NoError</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident">NegativeType::NoDataType3</span>)
             }
-            (<span class="ident">ResponseCode::NoError</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">NegativeType::Referral</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            (<span class="ident">ResponseCode::NoError</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="kw">_</span>, <span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">NegativeType::Referral</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
@@ -1139,31 +1139,31 @@
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">DnsResponse</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Message</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="number">0</span>]
     }
 }
 
 <span class="kw">impl</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">DnsResponse</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>[<span class="number">0</span>]
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DnsResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Message</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw-2">mut</span> <span class="ident">response</span>: <span class="ident">DnsResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Message</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw-2">mut</span> <span class="ident">response</span>: <span class="ident">DnsResponse</span>) -&gt; <span class="ident">Message</span> {
         <span class="ident">response</span>.<span class="number">0</span>.<span class="ident">remove</span>(<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DnsResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">message</span>: <span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DnsResponse</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">message</span>: <span class="ident">Message</span>) -&gt; <span class="ident">DnsResponse</span> {
         <span class="ident">DnsResponse</span>(<span class="ident">SmallVec::from</span>([<span class="ident">message</span>]))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">Message</span>; <span class="number">1</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DnsResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">messages</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">Message</span>; <span class="number">1</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DnsResponse</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">messages</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">Message</span>; <span class="number">1</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">DnsResponse</span> {
         <span class="macro">debug_assert!</span>(
             <span class="op">!</span><span class="ident">messages</span>.<span class="ident">is_empty</span>(),
             <span class="string">&quot;There should be at least one message in any DnsResponse&quot;</span>
@@ -1473,7 +1473,7 @@
 
 <span class="kw">impl</span> <span class="ident">NegativeType</span> {
     <span class="doccomment">/// The response contains an SOA record</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_authoritative</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_authoritative</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
             <span class="ident">NegativeType::NameErrorType1</span>
@@ -1493,59 +1493,59 @@
 
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">fn</span> <span class="ident">xx</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">xx</span>() -&gt; <span class="ident">Name</span> {
         <span class="ident">Name::from_ascii</span>(<span class="string">&quot;XX.&quot;</span>).<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">ns1</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">ns1</span>() -&gt; <span class="ident">Name</span> {
         <span class="ident">Name::from_ascii</span>(<span class="string">&quot;NS1.XX.&quot;</span>).<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">ns2</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">ns2</span>() -&gt; <span class="ident">Name</span> {
         <span class="ident">Name::from_ascii</span>(<span class="string">&quot;NS1.XX.&quot;</span>).<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">hostmaster</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">hostmaster</span>() -&gt; <span class="ident">Name</span> {
         <span class="ident">Name::from_ascii</span>(<span class="string">&quot;HOSTMASTER.NS1.XX.&quot;</span>).<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">tripple_xx</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">tripple_xx</span>() -&gt; <span class="ident">Name</span> {
         <span class="ident">Name::from_ascii</span>(<span class="string">&quot;TRIPPLE.XX.&quot;</span>).<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">example</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">example</span>() -&gt; <span class="ident">Name</span> {
         <span class="ident">Name::from_ascii</span>(<span class="string">&quot;EXAMPLE.&quot;</span>).<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">an_example</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">an_example</span>() -&gt; <span class="ident">Name</span> {
         <span class="ident">Name::from_ascii</span>(<span class="string">&quot;AN.EXAMPLE.&quot;</span>).<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">another_example</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Name</span> {
+    <span class="kw">fn</span> <span class="ident">another_example</span>() -&gt; <span class="ident">Name</span> {
         <span class="ident">Name::from_ascii</span>(<span class="string">&quot;ANOTHER.EXAMPLE.&quot;</span>).<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">an_cname_record</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Record</span> {
+    <span class="kw">fn</span> <span class="ident">an_cname_record</span>() -&gt; <span class="ident">Record</span> {
         <span class="ident">Record::from_rdata</span>(<span class="ident">an_example</span>(), <span class="number">88640</span>, <span class="ident">RData::CNAME</span>(<span class="ident">tripple_xx</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">ns1_record</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Record</span> {
+    <span class="kw">fn</span> <span class="ident">ns1_record</span>() -&gt; <span class="ident">Record</span> {
         <span class="ident">Record::from_rdata</span>(<span class="ident">xx</span>(), <span class="number">88640</span>, <span class="ident">RData::NS</span>(<span class="ident">ns1</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">ns2_record</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Record</span> {
+    <span class="kw">fn</span> <span class="ident">ns2_record</span>() -&gt; <span class="ident">Record</span> {
         <span class="ident">Record::from_rdata</span>(<span class="ident">xx</span>(), <span class="number">88640</span>, <span class="ident">RData::NS</span>(<span class="ident">ns2</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">ns1_a</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Record</span> {
+    <span class="kw">fn</span> <span class="ident">ns1_a</span>() -&gt; <span class="ident">Record</span> {
         <span class="ident">Record::from_rdata</span>(<span class="ident">xx</span>(), <span class="number">88640</span>, <span class="ident">RData::A</span>([<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>].<span class="ident">into</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">ns2_a</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Record</span> {
+    <span class="kw">fn</span> <span class="ident">ns2_a</span>() -&gt; <span class="ident">Record</span> {
         <span class="ident">Record::from_rdata</span>(<span class="ident">xx</span>(), <span class="number">88640</span>, <span class="ident">RData::A</span>([<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>].<span class="ident">into</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">soa</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Record</span> {
+    <span class="kw">fn</span> <span class="ident">soa</span>() -&gt; <span class="ident">Record</span> {
         <span class="ident">Record::from_rdata</span>(
             <span class="ident">example</span>(),
             <span class="number">88640</span>,
@@ -1553,11 +1553,11 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">an_query</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Query</span> {
+    <span class="kw">fn</span> <span class="ident">an_query</span>() -&gt; <span class="ident">Query</span> {
         <span class="ident">Query::query</span>(<span class="ident">an_example</span>(), <span class="ident">RecordType::A</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">another_query</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Query</span> {
+    <span class="kw">fn</span> <span class="ident">another_query</span>() -&gt; <span class="ident">Query</span> {
         <span class="ident">Query::query</span>(<span class="ident">another_example</span>(), <span class="ident">RecordType::A</span>)
     }
 

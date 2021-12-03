@@ -96,9 +96,9 @@
     <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
     <span class="ident">keepalives</span>: <span class="ident">bool</span>,
     <span class="ident">keepalives_idle</span>: <span class="ident">Duration</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Socket</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Socket</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">host</span> {
-        <span class="ident">Host::Tcp</span>(<span class="ident">host</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Host::Tcp</span>(<span class="ident">host</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="ident">net::lookup_host</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">host</span>, <span class="ident">port</span>))
                 .<span class="kw">await</span>
                 .<span class="ident">map_err</span>(<span class="ident">Error::connect</span>)<span class="question-mark">?</span>;
@@ -108,8 +108,8 @@
             <span class="kw">for</span> <span class="ident">addr</span> <span class="kw">in</span> <span class="ident">addrs</span> {
                 <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span>
                     <span class="kw">match</span> <span class="ident">connect_with_timeout</span>(<span class="ident">TcpStream::connect</span>(<span class="ident">addr</span>), <span class="ident">connect_timeout</span>).<span class="kw">await</span> {
-                        <span class="prelude-val">Ok</span>(<span class="ident">stream</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>,
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="ident">stream</span>) =&gt; <span class="ident">stream</span>,
+                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                             <span class="ident">last_err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>);
                             <span class="kw">continue</span>;
                         }
@@ -133,7 +133,7 @@
             }))
         }
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-        <span class="ident">Host::Unix</span>(<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Host::Unix</span>(<span class="ident">path</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">join</span>(<span class="macro">format!</span>(<span class="string">&quot;.s.PGSQL.{}&quot;</span>, <span class="ident">port</span>));
             <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">connect_with_timeout</span>(<span class="ident">UnixStream::connect</span>(<span class="ident">path</span>), <span class="ident">connect_timeout</span>).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">Socket::new_unix</span>(<span class="ident">socket</span>))
@@ -141,22 +141,22 @@
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_with_timeout</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">connect</span>: <span class="ident">F</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_with_timeout</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">connect</span>: <span class="ident">F</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
     <span class="kw">match</span> <span class="ident">timeout</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">timeout</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">time::timeout</span>(<span class="ident">timeout</span>, <span class="ident">connect</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">socket</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">socket</span>),
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::connect</span>(<span class="ident">e</span>)),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::connect</span>(<span class="ident">io::Error::new</span>(
+        <span class="prelude-val">Some</span>(<span class="ident">timeout</span>) =&gt; <span class="kw">match</span> <span class="ident">time::timeout</span>(<span class="ident">timeout</span>, <span class="ident">connect</span>).<span class="kw">await</span> {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">socket</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">socket</span>),
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::connect</span>(<span class="ident">e</span>)),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::connect</span>(<span class="ident">io::Error::new</span>(
                 <span class="ident">io::ErrorKind::TimedOut</span>,
                 <span class="string">&quot;connection timed out&quot;</span>,
             ))),
         },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">connect</span>.<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">socket</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">socket</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::connect</span>(<span class="ident">e</span>)),
+        <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">connect</span>.<span class="kw">await</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">socket</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">socket</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::connect</span>(<span class="ident">e</span>)),
         },
     }
 }

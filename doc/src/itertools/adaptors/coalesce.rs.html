@@ -261,7 +261,7 @@
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CoalescePredicate</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">coalesce_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>, <span class="ident">item</span>: <span class="ident">Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, (<span class="ident">T</span>, <span class="ident">T</span>)<span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">coalesce_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>, <span class="ident">item</span>: <span class="ident">Item</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, (<span class="ident">T</span>, <span class="ident">T</span>)<span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">CoalesceBy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>
@@ -271,7 +271,7 @@
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="comment">// this fuses the iterator</span>
         <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">last</span>.<span class="ident">take</span>()<span class="question-mark">?</span>;
 
@@ -280,8 +280,8 @@
         <span class="prelude-val">Some</span>(
             <span class="self">self</span>.<span class="ident">iter</span>
                 .<span class="ident">try_fold</span>(<span class="ident">last</span>, <span class="op">|</span><span class="ident">last</span>, <span class="ident">next</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">self_f</span>.<span class="ident">coalesce_pair</span>(<span class="ident">last</span>, <span class="ident">next</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">joined</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">joined</span>),
-                    <span class="prelude-val">Err</span>((<span class="ident">last_</span>, <span class="ident">next_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">joined</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">joined</span>),
+                    <span class="prelude-val">Err</span>((<span class="ident">last_</span>, <span class="ident">next_</span>)) =&gt; {
                         <span class="kw-2">*</span><span class="ident">self_last</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">next_</span>);
                         <span class="prelude-val">Err</span>(<span class="ident">last_</span>)
                     }
@@ -290,21 +290,21 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">low</span>, <span class="ident">hi</span>) <span class="op">=</span> <span class="ident">size_hint::add_scalar</span>(<span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">size_hint</span>(), <span class="self">self</span>.<span class="ident">last</span>.<span class="ident">is_some</span>() <span class="kw">as</span> <span class="ident">usize</span>);
         ((<span class="ident">low</span> <span class="op">&gt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">hi</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">fold</span><span class="op">&lt;</span><span class="ident">Acc</span>, <span class="ident">FnAcc</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">acc</span>: <span class="ident">Acc</span>, <span class="kw-2">mut</span> <span class="ident">fn_acc</span>: <span class="ident">FnAcc</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Acc</span>
+    <span class="kw">fn</span> <span class="ident">fold</span><span class="op">&lt;</span><span class="ident">Acc</span>, <span class="ident">FnAcc</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">acc</span>: <span class="ident">Acc</span>, <span class="kw-2">mut</span> <span class="ident">fn_acc</span>: <span class="ident">FnAcc</span>) -&gt; <span class="ident">Acc</span>
     <span class="kw">where</span>
-        <span class="ident">FnAcc</span>: <span class="ident">FnMut</span>(<span class="ident">Acc</span>, <span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Acc</span>,
+        <span class="ident">FnAcc</span>: <span class="ident">FnMut</span>(<span class="ident">Acc</span>, <span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">Acc</span>,
     {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">last</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">last</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span>;
             <span class="kw">let</span> (<span class="ident">last</span>, <span class="ident">acc</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">fold</span>((<span class="ident">last</span>, <span class="ident">acc</span>), <span class="op">|</span>(<span class="ident">last</span>, <span class="ident">acc</span>), <span class="ident">elt</span><span class="op">|</span> {
                 <span class="kw">match</span> <span class="ident">f</span>.<span class="ident">coalesce_pair</span>(<span class="ident">last</span>, <span class="ident">elt</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">joined</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">joined</span>, <span class="ident">acc</span>),
-                    <span class="prelude-val">Err</span>((<span class="ident">last_</span>, <span class="ident">next_</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">next_</span>, <span class="ident">fn_acc</span>(<span class="ident">acc</span>, <span class="ident">last_</span>)),
+                    <span class="prelude-val">Ok</span>(<span class="ident">joined</span>) =&gt; (<span class="ident">joined</span>, <span class="ident">acc</span>),
+                    <span class="prelude-val">Err</span>((<span class="ident">last_</span>, <span class="ident">next_</span>)) =&gt; (<span class="ident">next_</span>, <span class="ident">fn_acc</span>(<span class="ident">acc</span>, <span class="ident">last_</span>)),
                 }
             });
             <span class="ident">fn_acc</span>(<span class="ident">acc</span>, <span class="ident">last</span>)
@@ -324,15 +324,15 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Item</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">CoalescePredicate</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>, <span class="ident">Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, (<span class="ident">T</span>, <span class="ident">T</span>)<span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>, <span class="ident">Item</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, (<span class="ident">T</span>, <span class="ident">T</span>)<span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">coalesce_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>, <span class="ident">item</span>: <span class="ident">Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, (<span class="ident">T</span>, <span class="ident">T</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">coalesce_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>, <span class="ident">item</span>: <span class="ident">Item</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, (<span class="ident">T</span>, <span class="ident">T</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>(<span class="ident">t</span>, <span class="ident">item</span>)
     }
 }
 
 <span class="doccomment">/// Create a new `Coalesce`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coalesce</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Coalesce</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coalesce</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Coalesce</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Iterator</span>,
 {
@@ -354,14 +354,14 @@
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DedupPredicate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="comment">// TODO replace by Fn(&amp;T, &amp;T)-&gt;bool once Rust supports it</span>
-    <span class="kw">fn</span> <span class="ident">dedup_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">dedup_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">DP</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">CoalescePredicate</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DedupPred2CoalescePred</span><span class="op">&lt;</span><span class="ident">DP</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">DP</span>: <span class="ident">DedupPredicate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">coalesce_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>, <span class="ident">item</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, (<span class="ident">T</span>, <span class="ident">T</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">coalesce_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, (<span class="ident">T</span>, <span class="ident">T</span>)<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">dedup_pair</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">t</span>)
         } <span class="kw">else</span> {
@@ -374,19 +374,19 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DedupEq</span>;
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">PartialEq</span><span class="op">&gt;</span> <span class="ident">DedupPredicate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DedupEq</span> {
-    <span class="kw">fn</span> <span class="ident">dedup_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="ident">b</span>
+    <span class="kw">fn</span> <span class="ident">dedup_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span> <span class="ident">DedupPredicate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span> {
-    <span class="kw">fn</span> <span class="ident">dedup_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span> <span class="ident">DedupPredicate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span> {
+    <span class="kw">fn</span> <span class="ident">dedup_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>(<span class="ident">a</span>, <span class="ident">b</span>)
     }
 }
 
 <span class="doccomment">/// Create a new `DedupBy`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dedup_by</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">Pred</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">dedup_pred</span>: <span class="ident">Pred</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DedupBy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">Pred</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dedup_by</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">Pred</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">dedup_pred</span>: <span class="ident">Pred</span>) -&gt; <span class="ident">DedupBy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">Pred</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Iterator</span>,
 {
@@ -403,7 +403,7 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Dedup</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">DedupBy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">DedupEq</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Create a new `Dedup`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dedup</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Dedup</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dedup</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="ident">Dedup</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Iterator</span>,
 {
@@ -430,7 +430,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         (<span class="ident">c</span>, <span class="ident">t</span>): (<span class="ident">usize</span>, <span class="ident">T</span>),
         <span class="ident">item</span>: <span class="ident">T</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">T</span>), ((<span class="ident">usize</span>, <span class="ident">T</span>), (<span class="ident">usize</span>, <span class="ident">T</span>))<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">T</span>), ((<span class="ident">usize</span>, <span class="ident">T</span>), (<span class="ident">usize</span>, <span class="ident">T</span>))<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">dedup_pair</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>, <span class="kw-2">&amp;</span><span class="ident">item</span>) {
             <span class="prelude-val">Ok</span>((<span class="ident">c</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">t</span>))
         } <span class="kw">else</span> {
@@ -446,7 +446,7 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DedupWithCount</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">DedupByWithCount</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">DedupEq</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Create a new `DedupByWithCount`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dedup_by_with_count</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">Pred</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">dedup_pred</span>: <span class="ident">Pred</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DedupByWithCount</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">Pred</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dedup_by_with_count</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">Pred</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">dedup_pred</span>: <span class="ident">Pred</span>) -&gt; <span class="ident">DedupByWithCount</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">Pred</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Iterator</span>,
 {
@@ -458,7 +458,7 @@
 }
 
 <span class="doccomment">/// Create a new `DedupWithCount`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dedup_with_count</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DedupWithCount</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dedup_with_count</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="ident">DedupWithCount</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Iterator</span>,
 {

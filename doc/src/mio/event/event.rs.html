@@ -241,17 +241,17 @@
 
 <span class="kw">impl</span> <span class="ident">Event</span> {
     <span class="doccomment">/// Returns the event&#39;s token.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Token</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Token</span> {
         <span class="ident">sys::event::token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
     }
 
     <span class="doccomment">/// Returns true if the event contains readable readiness.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_readable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_readable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">sys::event::is_readable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
     }
 
     <span class="doccomment">/// Returns true if the event contains writable readiness.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_writable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_writable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">sys::event::is_writable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
     }
 
@@ -276,7 +276,7 @@
     <span class="doccomment">/// [OS selector]: ../struct.Poll.html#implementation-notes</span>
     <span class="doccomment">/// [epoll]: http://man7.org/linux/man-pages/man7/epoll.7.html</span>
     <span class="doccomment">/// [kqueue]: https://www.freebsd.org/cgi/man.cgi?query=kqueue&amp;sektion=2</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">sys::event::is_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
     }
 
@@ -307,7 +307,7 @@
     <span class="doccomment">/// [OS selector]: ../struct.Poll.html#implementation-notes</span>
     <span class="doccomment">/// [epoll]: http://man7.org/linux/man-pages/man7/epoll.7.html</span>
     <span class="doccomment">/// [kqueue]: https://www.freebsd.org/cgi/man.cgi?query=kqueue&amp;sektion=2</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_read_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_read_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">sys::event::is_read_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
     }
 
@@ -337,7 +337,7 @@
     <span class="doccomment">/// [OS selector]: ../struct.Poll.html#implementation-notes</span>
     <span class="doccomment">/// [epoll]: http://man7.org/linux/man-pages/man7/epoll.7.html</span>
     <span class="doccomment">/// [kqueue]: https://www.freebsd.org/cgi/man.cgi?query=kqueue&amp;sektion=2</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_write_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_write_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">sys::event::is_write_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
     }
 
@@ -359,7 +359,7 @@
     <span class="doccomment">/// [epoll]: http://man7.org/linux/man-pages/man7/epoll.7.html</span>
     <span class="doccomment">/// [kqueue]: https://www.freebsd.org/cgi/man.cgi?query=kqueue&amp;sektion=2</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_priority</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_priority</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">sys::event::is_priority</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
     }
 
@@ -381,7 +381,7 @@
     <span class="doccomment">/// [OS selector]: ../struct.Poll.html#implementation-notes</span>
     <span class="doccomment">/// [epoll]: http://man7.org/linux/man-pages/man7/epoll.7.html</span>
     <span class="doccomment">/// [kqueue]: https://www.freebsd.org/cgi/man.cgi?query=kqueue&amp;sektion=2</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_aio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_aio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">sys::event::is_aio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
     }
 
@@ -391,12 +391,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Method is available on all platforms, but only FreeBSD supports LIO. On</span>
     <span class="doccomment">/// FreeBSD this method checks the `EVFILT_LIO` flag.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_lio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_lio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">sys::event::is_lio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
     }
 
     <span class="doccomment">/// Create a reference to an `Event` from a platform specific event.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_sys_event_ref</span>(<span class="ident">sys_event</span>: <span class="kw-2">&amp;</span><span class="ident">sys::Event</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Event</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_sys_event_ref</span>(<span class="ident">sys_event</span>: <span class="kw-2">&amp;</span><span class="ident">sys::Event</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Event</span> {
         <span class="kw">unsafe</span> {
             <span class="comment">// This is safe because the memory layout of `Event` is</span>
             <span class="comment">// the same as `sys::Event` due to the `repr(transparent)` attribute.</span>
@@ -412,7 +412,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [alternate]: fmt::Formatter::alternate</span>
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Event</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">alternate</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">alternate</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Event&quot;</span>);
         <span class="ident">d</span>.<span class="ident">field</span>(<span class="string">&quot;token&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>())
@@ -429,7 +429,7 @@
             <span class="kw">struct</span> <span class="ident">EventDetails</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">sys::Event</span>);
 
             <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">EventDetails</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-                <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+                <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
                     <span class="ident">sys::event::debug_details</span>(<span class="ident">f</span>, <span class="self">self</span>.<span class="number">0</span>)
                 }
             }

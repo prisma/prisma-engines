@@ -185,30 +185,30 @@
 <span class="kw">use</span> <span class="ident">std::ops::Sub</span>;
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">from_days</span>(<span class="ident">days</span>: <span class="ident">i64</span>, <span class="ident">start_year</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NaiveDate</span> {
+<span class="kw">fn</span> <span class="ident">from_days</span>(<span class="ident">days</span>: <span class="ident">i64</span>, <span class="ident">start_year</span>: <span class="ident">i32</span>) -&gt; <span class="ident">NaiveDate</span> {
     <span class="ident">NaiveDate::from_ymd</span>(<span class="ident">start_year</span>, <span class="number">1</span>, <span class="number">1</span>) <span class="op">+</span> <span class="ident">chrono::Duration::days</span>(<span class="ident">days</span> <span class="kw">as</span> <span class="ident">i64</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">from_sec_fragments</span>(<span class="ident">sec_fragments</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NaiveTime</span> {
+<span class="kw">fn</span> <span class="ident">from_sec_fragments</span>(<span class="ident">sec_fragments</span>: <span class="ident">i64</span>) -&gt; <span class="ident">NaiveTime</span> {
     <span class="ident">NaiveTime::from_hms</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>) <span class="op">+</span> <span class="ident">chrono::Duration::nanoseconds</span>(<span class="ident">sec_fragments</span> <span class="op">*</span> (<span class="number">1e9</span> <span class="kw">as</span> <span class="ident">i64</span>) <span class="op">/</span> <span class="number">300</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">from_mins</span>(<span class="ident">mins</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NaiveTime</span> {
+<span class="kw">fn</span> <span class="ident">from_mins</span>(<span class="ident">mins</span>: <span class="ident">u32</span>) -&gt; <span class="ident">NaiveTime</span> {
     <span class="ident">NaiveTime::from_num_seconds_from_midnight</span>(<span class="ident">mins</span>, <span class="number">0</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">to_days</span>(<span class="ident">date</span>: <span class="ident">NaiveDate</span>, <span class="ident">start_year</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
+<span class="kw">fn</span> <span class="ident">to_days</span>(<span class="ident">date</span>: <span class="ident">NaiveDate</span>, <span class="ident">start_year</span>: <span class="ident">i32</span>) -&gt; <span class="ident">i64</span> {
     <span class="ident">date</span>.<span class="ident">signed_duration_since</span>(<span class="ident">NaiveDate::from_ymd</span>(<span class="ident">start_year</span>, <span class="number">1</span>, <span class="number">1</span>))
         .<span class="ident">num_days</span>()
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">to_sec_fragments</span>(<span class="ident">time</span>: <span class="ident">NaiveTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
+<span class="kw">fn</span> <span class="ident">to_sec_fragments</span>(<span class="ident">time</span>: <span class="ident">NaiveTime</span>) -&gt; <span class="ident">i64</span> {
     <span class="ident">time</span>.<span class="ident">signed_duration_since</span>(<span class="ident">NaiveTime::from_hms</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))
         .<span class="ident">num_nanoseconds</span>()
         .<span class="ident">unwrap</span>()
@@ -219,27 +219,27 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
 <span class="macro">from_sql!</span>(
     <span class="ident">NaiveDateTime</span>:
-        <span class="ident">ColumnData::SmallDateTime</span>(<span class="kw-2">ref</span> <span class="ident">dt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> <span class="ident">NaiveDateTime::new</span>(
+        <span class="ident">ColumnData::SmallDateTime</span>(<span class="kw-2">ref</span> <span class="ident">dt</span>) =&gt; <span class="ident">dt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> <span class="ident">NaiveDateTime::new</span>(
             <span class="ident">from_days</span>(<span class="ident">dt</span>.<span class="ident">days</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1900</span>),
             <span class="ident">from_mins</span>(<span class="ident">dt</span>.<span class="ident">seconds_fragments</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">*</span> <span class="number">60</span>),
         )),
-        <span class="ident">ColumnData::DateTime2</span>(<span class="kw-2">ref</span> <span class="ident">dt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> <span class="ident">NaiveDateTime::new</span>(
+        <span class="ident">ColumnData::DateTime2</span>(<span class="kw-2">ref</span> <span class="ident">dt</span>) =&gt; <span class="ident">dt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> <span class="ident">NaiveDateTime::new</span>(
             <span class="ident">from_days</span>(<span class="ident">dt</span>.<span class="ident">date</span>.<span class="ident">days</span>() <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>),
             <span class="ident">NaiveTime::from_hms</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>) <span class="op">+</span> <span class="ident">chrono::Duration::nanoseconds</span>(<span class="ident">dt</span>.<span class="ident">time</span>.<span class="ident">increments</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">*</span> <span class="number">10i64</span>.<span class="ident">pow</span>(<span class="number">9</span> <span class="op">-</span> <span class="ident">dt</span>.<span class="ident">time</span>.<span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u32</span>))
         )),
-        <span class="ident">ColumnData::DateTime</span>(<span class="kw-2">ref</span> <span class="ident">dt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> <span class="ident">NaiveDateTime::new</span>(
+        <span class="ident">ColumnData::DateTime</span>(<span class="kw-2">ref</span> <span class="ident">dt</span>) =&gt; <span class="ident">dt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> <span class="ident">NaiveDateTime::new</span>(
             <span class="ident">from_days</span>(<span class="ident">dt</span>.<span class="ident">days</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1900</span>),
             <span class="ident">from_sec_fragments</span>(<span class="ident">dt</span>.<span class="ident">seconds_fragments</span> <span class="kw">as</span> <span class="ident">i64</span>)
         ));
     <span class="ident">NaiveTime</span>:
-        <span class="ident">ColumnData::Time</span>(<span class="kw-2">ref</span> <span class="ident">time</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> {
+        <span class="ident">ColumnData::Time</span>(<span class="kw-2">ref</span> <span class="ident">time</span>) =&gt; <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">ns</span> <span class="op">=</span> <span class="ident">time</span>.<span class="ident">increments</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">*</span> <span class="number">10i64</span>.<span class="ident">pow</span>(<span class="number">9</span> <span class="op">-</span> <span class="ident">time</span>.<span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u32</span>);
             <span class="ident">NaiveTime::from_hms</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>) <span class="op">+</span> <span class="ident">chrono::Duration::nanoseconds</span>(<span class="ident">ns</span>)
         });
     <span class="ident">NaiveDate</span>:
-        <span class="ident">ColumnData::Date</span>(<span class="kw-2">ref</span> <span class="ident">date</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="ident">from_days</span>(<span class="ident">date</span>.<span class="ident">days</span>() <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
+        <span class="ident">ColumnData::Date</span>(<span class="kw-2">ref</span> <span class="ident">date</span>) =&gt; <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="ident">from_days</span>(<span class="ident">date</span>.<span class="ident">days</span>() <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
     <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>:
-        <span class="ident">ColumnData::DateTimeOffset</span>(<span class="kw-2">ref</span> <span class="ident">dto</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dto</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dto</span><span class="op">|</span> {
+        <span class="ident">ColumnData::DateTimeOffset</span>(<span class="kw-2">ref</span> <span class="ident">dto</span>) =&gt; <span class="ident">dto</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dto</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">from_days</span>(<span class="ident">dto</span>.<span class="ident">datetime2</span>.<span class="ident">date</span>.<span class="ident">days</span>() <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>);
             <span class="kw">let</span> <span class="ident">ns</span> <span class="op">=</span> <span class="ident">dto</span>.<span class="ident">datetime2</span>.<span class="ident">time</span>.<span class="ident">increments</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">*</span> <span class="number">10i64</span>.<span class="ident">pow</span>(<span class="number">9</span> <span class="op">-</span> <span class="ident">dto</span>.<span class="ident">datetime2</span>.<span class="ident">time</span>.<span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u32</span>);
             <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">NaiveTime::from_hms</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>) <span class="op">+</span> <span class="ident">chrono::Duration::nanoseconds</span>(<span class="ident">ns</span>);
@@ -249,7 +249,7 @@
 
             <span class="ident">chrono::DateTime::from_utc</span>(<span class="ident">naive</span>, <span class="ident">Utc</span>)
         });
-    <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span>: <span class="ident">ColumnData::DateTimeOffset</span>(<span class="kw-2">ref</span> <span class="ident">dto</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dto</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dto</span><span class="op">|</span> {
+    <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span>: <span class="ident">ColumnData::DateTimeOffset</span>(<span class="kw-2">ref</span> <span class="ident">dto</span>) =&gt; <span class="ident">dto</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dto</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">from_days</span>(<span class="ident">dto</span>.<span class="ident">datetime2</span>.<span class="ident">date</span>.<span class="ident">days</span>() <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">ns</span> <span class="op">=</span> <span class="ident">dto</span>.<span class="ident">datetime2</span>.<span class="ident">time</span>.<span class="ident">increments</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">*</span> <span class="number">10i64</span>.<span class="ident">pow</span>(<span class="number">9</span> <span class="op">-</span> <span class="ident">dto</span>.<span class="ident">datetime2</span>.<span class="ident">time</span>.<span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u32</span>);
         <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">NaiveTime::from_hms</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>) <span class="op">+</span> <span class="ident">chrono::Duration::nanoseconds</span>(<span class="ident">ns</span>);
@@ -329,7 +329,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>))]</span>
 <span class="macro">from_sql!</span>(
     <span class="ident">NaiveDateTime</span>:
-        <span class="ident">ColumnData::DateTime</span>(<span class="kw-2">ref</span> <span class="ident">dt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">dt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> <span class="ident">NaiveDateTime::new</span>(
+        <span class="ident">ColumnData::DateTime</span>(<span class="kw-2">ref</span> <span class="ident">dt</span>) =&gt; <span class="ident">dt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> <span class="ident">NaiveDateTime::new</span>(
             <span class="ident">from_days</span>(<span class="ident">dt</span>.<span class="ident">days</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1900</span>),
             <span class="ident">from_sec_fragments</span>(<span class="ident">dt</span>.<span class="ident">seconds_fragments</span> <span class="kw">as</span> <span class="ident">i64</span>)
         ))

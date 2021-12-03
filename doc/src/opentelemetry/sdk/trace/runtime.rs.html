@@ -163,7 +163,7 @@
     <span class="kw">type</span> <span class="ident">Sender</span>: <span class="ident">TrySend</span> <span class="op">+</span> <span class="ident">Debug</span>;
 
     <span class="doccomment">/// Return the sender and receiver used to send batch message between tasks.</span>
-    <span class="kw">fn</span> <span class="ident">batch_message_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident"><span class="self">Self</span>::Sender</span>, <span class="ident"><span class="self">Self</span>::Receiver</span>);
+    <span class="kw">fn</span> <span class="ident">batch_message_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; (<span class="ident"><span class="self">Self</span>::Sender</span>, <span class="ident"><span class="self">Self</span>::Receiver</span>);
 }
 
 <span class="doccomment">/// TrySend is an abstraction of sender that is capable to send BatchMessage with reference.</span>
@@ -171,15 +171,15 @@
     <span class="doccomment">/// Try to send one batch message to worker thread.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// It can fail because either the receiver has closed or the buffer is full.</span>
-    <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">item</span>: <span class="ident">BatchMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TraceError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">item</span>: <span class="ident">BatchMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TraceError</span><span class="op">&gt;</span>;
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-tokio-current-thread&quot;</span>))]</span>
 <span class="kw">impl</span> <span class="ident">TrySend</span> <span class="kw">for</span> <span class="ident">tokio::sync::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">BatchMessage</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">item</span>: <span class="ident">BatchMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TraceError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">item</span>: <span class="ident">BatchMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TraceError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">try_send</span>(<span class="ident">item</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">tokio::sync::mpsc::error::TrySendError::Full</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraceError::from</span>(<span class="ident">CHANNEL_FULL_ERROR</span>),
-            <span class="ident">tokio::sync::mpsc::error::TrySendError::Closed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tokio::sync::mpsc::error::TrySendError::Full</span>(<span class="kw">_</span>) =&gt; <span class="ident">TraceError::from</span>(<span class="ident">CHANNEL_FULL_ERROR</span>),
+            <span class="ident">tokio::sync::mpsc::error::TrySendError::Closed</span>(<span class="kw">_</span>) =&gt; {
                 <span class="ident">TraceError::from</span>(<span class="ident">CHANNEL_CLOSED_ERROR</span>)
             }
         })
@@ -192,7 +192,7 @@
     <span class="kw">type</span> <span class="ident">Receiver</span> <span class="op">=</span> <span class="ident">tokio_stream::wrappers::ReceiverStream</span><span class="op">&lt;</span><span class="ident">BatchMessage</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Sender</span> <span class="op">=</span> <span class="ident">tokio::sync::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">BatchMessage</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">batch_message_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident"><span class="self">Self</span>::Sender</span>, <span class="ident"><span class="self">Self</span>::Receiver</span>) {
+    <span class="kw">fn</span> <span class="ident">batch_message_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; (<span class="ident"><span class="self">Self</span>::Sender</span>, <span class="ident"><span class="self">Self</span>::Receiver</span>) {
         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">tokio::sync::mpsc::channel</span>(<span class="ident">capacity</span>);
         (
             <span class="ident">sender</span>,
@@ -207,7 +207,7 @@
     <span class="kw">type</span> <span class="ident">Receiver</span> <span class="op">=</span> <span class="ident">tokio_stream::wrappers::ReceiverStream</span><span class="op">&lt;</span><span class="ident">BatchMessage</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Sender</span> <span class="op">=</span> <span class="ident">tokio::sync::mpsc::Sender</span><span class="op">&lt;</span><span class="ident">BatchMessage</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">batch_message_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident"><span class="self">Self</span>::Sender</span>, <span class="ident"><span class="self">Self</span>::Receiver</span>) {
+    <span class="kw">fn</span> <span class="ident">batch_message_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; (<span class="ident"><span class="self">Self</span>::Sender</span>, <span class="ident"><span class="self">Self</span>::Receiver</span>) {
         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">tokio::sync::mpsc::channel</span>(<span class="ident">capacity</span>);
         (
             <span class="ident">sender</span>,
@@ -218,10 +218,10 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-async-std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">TrySend</span> <span class="kw">for</span> <span class="ident">async_std::channel::Sender</span><span class="op">&lt;</span><span class="ident">BatchMessage</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">item</span>: <span class="ident">BatchMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TraceError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">item</span>: <span class="ident">BatchMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TraceError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">try_send</span>(<span class="ident">item</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">async_std::channel::TrySendError::Full</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraceError::from</span>(<span class="ident">CHANNEL_FULL_ERROR</span>),
-            <span class="ident">async_std::channel::TrySendError::Closed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraceError::from</span>(<span class="ident">CHANNEL_CLOSED_ERROR</span>),
+            <span class="ident">async_std::channel::TrySendError::Full</span>(<span class="kw">_</span>) =&gt; <span class="ident">TraceError::from</span>(<span class="ident">CHANNEL_FULL_ERROR</span>),
+            <span class="ident">async_std::channel::TrySendError::Closed</span>(<span class="kw">_</span>) =&gt; <span class="ident">TraceError::from</span>(<span class="ident">CHANNEL_CLOSED_ERROR</span>),
         })
     }
 }
@@ -232,7 +232,7 @@
     <span class="kw">type</span> <span class="ident">Receiver</span> <span class="op">=</span> <span class="ident">async_std::channel::Receiver</span><span class="op">&lt;</span><span class="ident">BatchMessage</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Sender</span> <span class="op">=</span> <span class="ident">async_std::channel::Sender</span><span class="op">&lt;</span><span class="ident">BatchMessage</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">batch_message_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident"><span class="self">Self</span>::Sender</span>, <span class="ident"><span class="self">Self</span>::Receiver</span>) {
+    <span class="kw">fn</span> <span class="ident">batch_message_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; (<span class="ident"><span class="self">Self</span>::Sender</span>, <span class="ident"><span class="self">Self</span>::Receiver</span>) {
         <span class="ident">async_std::channel::bounded</span>(<span class="ident">capacity</span>)
     }
 }

@@ -164,7 +164,7 @@
 <span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">GetThreadId</span> <span class="kw">for</span> <span class="ident">RawThreadId</span> {
     <span class="kw">const</span> <span class="ident">INIT</span>: <span class="ident">RawThreadId</span> <span class="op">=</span> <span class="ident">RawThreadId</span>;
 
-    <span class="kw">fn</span> <span class="ident">nonzero_thread_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NonZeroUsize</span> {
+    <span class="kw">fn</span> <span class="ident">nonzero_thread_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">NonZeroUsize</span> {
         <span class="comment">// The address of a thread-local variable is guaranteed to be unique to the</span>
         <span class="comment">// current thread, and is also guaranteed to be non-zero. The variable has to have a</span>
         <span class="comment">// non-zero size to guarantee it has a unique address for each thread.</span>
@@ -192,7 +192,7 @@
 <span class="doccomment">/// Creates a new reentrant mutex in an unlocked state ready for use.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This allows creating a reentrant mutex in a constant context on stable Rust.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">const_reentrant_mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReentrantMutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">const_reentrant_mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">ReentrantMutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">ReentrantMutex::const_new</span>(
         <span class="op">&lt;</span><span class="ident">RawMutex</span> <span class="kw">as</span> <span class="ident">lock_api::RawMutex</span><span class="op">&gt;</span><span class="ident">::INIT</span>,
         <span class="op">&lt;</span><span class="ident">RawThreadId</span> <span class="kw">as</span> <span class="ident">lock_api::GetThreadId</span><span class="op">&gt;</span><span class="ident">::INIT</span>,

@@ -194,13 +194,13 @@
 <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;string contains no or an invalid date&quot;</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">io::Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">Error</span>) -&gt; <span class="ident">io::Error</span> {
         <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="ident">e</span>)
     }
 }
@@ -210,14 +210,14 @@
 <span class="doccomment">/// Supports the preferred IMF-fixdate and the legacy RFC 805 and</span>
 <span class="doccomment">/// ascdate formats. Two digit years are mapped to dates between</span>
 <span class="doccomment">/// 1970 and 2069.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_http_date</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SystemTime</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_http_date</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SystemTime</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">HttpDate</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">into</span>())
 }
 
 <span class="doccomment">/// Format a date to be used in a HTTP header field.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Dates are formatted as IMF-fixdate: `Fri, 15 May 2015 15:34:21 GMT`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fmt_http_date</span>(<span class="ident">d</span>: <span class="ident">SystemTime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fmt_http_date</span>(<span class="ident">d</span>: <span class="ident">SystemTime</span>) -&gt; <span class="ident">String</span> {
     <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">HttpDate::from</span>(<span class="ident">d</span>))
 }
 

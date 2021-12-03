@@ -128,7 +128,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">PrismaContext</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;PrismaContext { .. }&quot;</span>)
     }
 }
@@ -141,24 +141,24 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ContextBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">legacy</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">legacy</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">legacy</span> <span class="op">=</span> <span class="ident">val</span>;
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_raw_queries</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_raw_queries</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">enable_raw_queries</span> <span class="op">=</span> <span class="ident">val</span>;
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">PrismaContext</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">PrismaContext</span><span class="op">&gt;</span> {
         <span class="ident">PrismaContext::new</span>(<span class="self">self</span>.<span class="ident">config</span>, <span class="self">self</span>.<span class="ident">datamodel</span>, <span class="self">self</span>.<span class="ident">legacy</span>, <span class="self">self</span>.<span class="ident">enable_raw_queries</span>).<span class="kw">await</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PrismaContext</span> {
     <span class="doccomment">/// Initializes a new Prisma context.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="ident">Configuration</span>, <span class="ident">dm</span>: <span class="ident">Datamodel</span>, <span class="ident">legacy</span>: <span class="ident">bool</span>, <span class="ident">enable_raw_queries</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="ident">Configuration</span>, <span class="ident">dm</span>: <span class="ident">Datamodel</span>, <span class="ident">legacy</span>: <span class="ident">bool</span>, <span class="ident">enable_raw_queries</span>: <span class="ident">bool</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="comment">// We only support one data source at the moment, so take the first one (default not exposed yet).</span>
         <span class="kw">let</span> <span class="ident">data_source</span> <span class="op">=</span> <span class="ident">config</span>
             .<span class="ident">datasources</span>
@@ -196,12 +196,12 @@
         <span class="prelude-val">Ok</span>(<span class="ident">context</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">verify_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">verify_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">primary_connector</span>().<span class="ident">get_connection</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>(<span class="ident">config</span>: <span class="ident">Configuration</span>, <span class="ident">datamodel</span>: <span class="ident">Datamodel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ContextBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>(<span class="ident">config</span>: <span class="ident">Configuration</span>, <span class="ident">datamodel</span>: <span class="ident">Datamodel</span>) -&gt; <span class="ident">ContextBuilder</span> {
         <span class="ident">ContextBuilder</span> {
             <span class="ident">legacy</span>: <span class="bool-val">false</span>,
             <span class="ident">enable_raw_queries</span>: <span class="bool-val">false</span>,
@@ -210,15 +210,15 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">QuerySchemaRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">QuerySchemaRef</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">query_schema</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datamodel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Datamodel</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datamodel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Datamodel</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dm</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">executor</span>.<span class="ident">primary_connector</span>().<span class="ident">name</span>()
     }
 }

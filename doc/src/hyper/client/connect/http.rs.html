@@ -1087,7 +1087,7 @@
 
 <span class="kw">impl</span> <span class="ident">HttpConnector</span> {
     <span class="doccomment">/// Construct a new HttpConnector.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpConnector</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">HttpConnector</span> {
         <span class="ident">HttpConnector::new_with_resolver</span>(<span class="ident">GaiResolver::new</span>())
     }
 }
@@ -1108,7 +1108,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="doccomment">/// Construct a new HttpConnector.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Takes a [`Resolver`](crate::client::connect::dns#resolvers-are-services) to handle DNS lookups.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_resolver</span>(<span class="ident">resolver</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpConnector</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_resolver</span>(<span class="ident">resolver</span>: <span class="ident">R</span>) -&gt; <span class="ident">HttpConnector</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
         <span class="ident">HttpConnector</span> {
             <span class="ident">config</span>: <span class="ident">Arc::new</span>(<span class="ident">Config</span> {
                 <span class="ident">connect_timeout</span>: <span class="prelude-val">None</span>,
@@ -1172,9 +1172,9 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_local_address</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">v4</span>, <span class="ident">v6</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">addr</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">IpAddr::V4</span>(<span class="ident">a</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="prelude-val">Some</span>(<span class="ident">a</span>), <span class="prelude-val">None</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">IpAddr::V6</span>(<span class="ident">a</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">a</span>)),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">IpAddr::V4</span>(<span class="ident">a</span>)) =&gt; (<span class="prelude-val">Some</span>(<span class="ident">a</span>), <span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">IpAddr::V6</span>(<span class="ident">a</span>)) =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">a</span>)),
+            <span class="kw">_</span> =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
         };
 
         <span class="kw">let</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config_mut</span>();
@@ -1225,14 +1225,14 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is `false`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reuse_address</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reuse_address</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reuse_address</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reuse_address</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">config_mut</span>().<span class="ident">reuse_address</span> <span class="op">=</span> <span class="ident">reuse_address</span>;
         <span class="self">self</span>
     }
 
     <span class="comment">// private</span>
 
-    <span class="kw">fn</span> <span class="ident">config_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Config</span> {
+    <span class="kw">fn</span> <span class="ident">config_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Config</span> {
         <span class="comment">// If the are HttpConnector clones, this will clone the inner</span>
         <span class="comment">// config. So mutating the config won&#39;t ever affect previous</span>
         <span class="comment">// clones.</span>
@@ -1246,7 +1246,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 
 <span class="comment">// R: Debug required for now to allow adding it to debug output later...</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">HttpConnector</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;HttpConnector&quot;</span>).<span class="ident">finish</span>()
     }
 }
@@ -1260,12 +1260,12 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ConnectError</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">HttpConnecting</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">resolver</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)).<span class="ident">map_err</span>(<span class="ident">ConnectError::dns</span>)<span class="question-mark">?</span>;
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">self_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="ident">HttpConnecting</span> {
             <span class="ident">fut</span>: <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">self_</span>.<span class="ident">call_async</span>(<span class="ident">dst</span>).<span class="kw">await</span> }),
@@ -1274,7 +1274,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_host_port</span><span class="op">&lt;</span><span class="lifetime">&#39;u</span><span class="op">&gt;</span>(<span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;u</span> <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;u</span> <span class="ident">str</span>, <span class="ident">u16</span>), <span class="ident">ConnectError</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">get_host_port</span><span class="op">&lt;</span><span class="lifetime">&#39;u</span><span class="op">&gt;</span>(<span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;u</span> <span class="ident">Uri</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;u</span> <span class="ident">str</span>, <span class="ident">u16</span>), <span class="ident">ConnectError</span><span class="op">&gt;</span> {
     <span class="macro">trace!</span>(
         <span class="string">&quot;Http::connect; scheme={:?}, host={:?}, port={:?}&quot;</span>,
         <span class="ident">dst</span>.<span class="ident">scheme</span>(),
@@ -1297,8 +1297,8 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     }
 
     <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">dst</span>.<span class="ident">host</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+        <span class="prelude-val">None</span> =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectError</span> {
                 <span class="ident">msg</span>: <span class="ident">INVALID_MISSING_HOST</span>.<span class="ident">into</span>(),
                 <span class="ident">cause</span>: <span class="prelude-val">None</span>,
@@ -1306,9 +1306,9 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
         }
     };
     <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">dst</span>.<span class="ident">port</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">port</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">port</span>.<span class="ident">as_u16</span>(),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="ident">dst</span>.<span class="ident">scheme</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Scheme::HTTPS</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">port</span>) =&gt; <span class="ident">port</span>.<span class="ident">as_u16</span>(),
+        <span class="prelude-val">None</span> =&gt; {
+            <span class="kw">if</span> <span class="ident">dst</span>.<span class="ident">scheme</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Scheme::HTTPS</span>) {
                 <span class="number">443</span>
             } <span class="kw">else</span> {
                 <span class="number">80</span>
@@ -1323,7 +1323,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="ident">Resolve</span>,
 {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">call_async</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">call_async</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>;
 
         <span class="kw">let</span> (<span class="ident">host</span>, <span class="ident">port</span>) <span class="op">=</span> <span class="ident">get_host_port</span>(<span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">dst</span>)<span class="question-mark">?</span>;
@@ -1359,7 +1359,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 }
 
 <span class="kw">impl</span> <span class="ident">Connection</span> <span class="kw">for</span> <span class="ident">TcpStream</span> {
-    <span class="kw">fn</span> <span class="ident">connected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connected</span> {
+    <span class="kw">fn</span> <span class="ident">connected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Connected</span> {
         <span class="kw">let</span> <span class="ident">connected</span> <span class="op">=</span> <span class="ident">Connected::new</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">remote_addr</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">peer_addr</span>() {
             <span class="ident">connected</span>.<span class="ident">extra</span>(<span class="ident">HttpInfo</span> { <span class="ident">remote_addr</span> })
@@ -1371,7 +1371,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 
 <span class="kw">impl</span> <span class="ident">HttpInfo</span> {
     <span class="doccomment">/// Get the remote address of the transport used.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remote_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SocketAddr</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remote_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SocketAddr</span> {
         <span class="self">self</span>.<span class="ident">remote_addr</span>
     }
 }
@@ -1397,7 +1397,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Resolve</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">HttpConnecting</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">ConnectResult</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">fut</span>.<span class="ident">poll</span>(<span class="ident">cx</span>)
     }
 }
@@ -1409,7 +1409,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectError</span> {
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">S</span>, <span class="ident">cause</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectError</span>
+    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">S</span>, <span class="ident">cause</span>: <span class="ident">E</span>) -&gt; <span class="ident">ConnectError</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -1420,14 +1420,14 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">dns</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">cause</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectError</span>
+    <span class="kw">fn</span> <span class="ident">dns</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">cause</span>: <span class="ident">E</span>) -&gt; <span class="ident">ConnectError</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
         <span class="ident">ConnectError::new</span>(<span class="string">&quot;dns error&quot;</span>, <span class="ident">cause</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">m</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectError</span>
+    <span class="kw">fn</span> <span class="ident">m</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">S</span>) -&gt; <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">E</span>) -&gt; <span class="ident">ConnectError</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -1437,7 +1437,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ConnectError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">cause</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">cause</span> {
             <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;ConnectError&quot;</span>)
                 .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">msg</span>)
@@ -1450,7 +1450,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ConnectError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">msg</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">cause</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">cause</span> {
@@ -1462,7 +1462,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 }
 
 <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">ConnectError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">cause</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">e</span> <span class="kw">as</span> <span class="kw">_</span>)
     }
 }
@@ -1474,7 +1474,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ConnectingTcp</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">remote_addrs</span>: <span class="ident">dns::SocketAddrs</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Config</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">remote_addrs</span>: <span class="ident">dns::SocketAddrs</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Config</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fallback_timeout</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">happy_eyeballs_timeout</span> {
             <span class="kw">let</span> (<span class="ident">preferred_addrs</span>, <span class="ident">fallback_addrs</span>) <span class="op">=</span> <span class="ident">remote_addrs</span>
                 .<span class="ident">split_by_preference</span>(<span class="ident">config</span>.<span class="ident">local_address_ipv4</span>, <span class="ident">config</span>.<span class="ident">local_address_ipv6</span>);
@@ -1515,7 +1515,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectingTcpRemote</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">addrs</span>: <span class="ident">dns::SocketAddrs</span>, <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">addrs</span>: <span class="ident">dns::SocketAddrs</span>, <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">connect_timeout</span> <span class="op">=</span> <span class="ident">connect_timeout</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">/</span> (<span class="ident">addrs</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>));
 
         <span class="self">Self</span> {
@@ -1526,16 +1526,16 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectingTcpRemote</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">err</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">for</span> <span class="ident">addr</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">addrs</span> {
             <span class="macro">debug!</span>(<span class="string">&quot;connecting to {}&quot;</span>, <span class="ident">addr</span>);
             <span class="kw">match</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>, <span class="ident">config</span>, <span class="self">self</span>.<span class="ident">connect_timeout</span>)<span class="question-mark">?</span>.<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">tcp</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">tcp</span>) =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;connected to {}&quot;</span>, <span class="ident">addr</span>);
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">tcp</span>);
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="macro">trace!</span>(<span class="string">&quot;connect error for {}: {:?}&quot;</span>, <span class="ident">addr</span>, <span class="ident">e</span>);
                     <span class="ident">err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>);
                 }
@@ -1543,8 +1543,8 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
         }
 
         <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectError::new</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ConnectError::new</span>(
                 <span class="string">&quot;tcp connect error&quot;</span>,
                 <span class="ident">std::io::Error::new</span>(<span class="ident">std::io::ErrorKind::NotConnected</span>, <span class="string">&quot;Network unreachable&quot;</span>),
             )),
@@ -1557,20 +1557,20 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="ident">dst_addr</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>,
     <span class="ident">local_addr_ipv4</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ipv4Addr</span><span class="op">&gt;</span>,
     <span class="ident">local_addr_ipv6</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ipv6Addr</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">match</span> (<span class="kw-2">*</span><span class="ident">dst_addr</span>, <span class="ident">local_addr_ipv4</span>, <span class="ident">local_addr_ipv6</span>) {
-        (<span class="ident">SocketAddr::V4</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="ident">addr</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="ident">SocketAddr::V4</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="ident">addr</span>), <span class="kw">_</span>) =&gt; {
             <span class="ident">socket</span>.<span class="ident">bind</span>(<span class="kw-2">&amp;</span><span class="ident">SocketAddr::new</span>(<span class="ident">addr</span>.<span class="ident">clone</span>().<span class="ident">into</span>(), <span class="number">0</span>).<span class="ident">into</span>())<span class="question-mark">?</span>;
         }
-        (<span class="ident">SocketAddr::V6</span>(<span class="kw">_</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">addr</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="ident">SocketAddr::V6</span>(<span class="kw">_</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">addr</span>)) =&gt; {
             <span class="ident">socket</span>.<span class="ident">bind</span>(<span class="kw-2">&amp;</span><span class="ident">SocketAddr::new</span>(<span class="ident">addr</span>.<span class="ident">clone</span>().<span class="ident">into</span>(), <span class="number">0</span>).<span class="ident">into</span>())<span class="question-mark">?</span>;
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">_</span> =&gt; {
             <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">windows</span>) {
                 <span class="comment">// Windows requires a socket be bound before calling connect</span>
                 <span class="kw">let</span> <span class="ident">any</span>: <span class="ident">SocketAddr</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">dst_addr</span> {
-                    <span class="ident">SocketAddr::V4</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> ([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>], <span class="number">0</span>).<span class="ident">into</span>(),
-                    <span class="ident">SocketAddr::V6</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> ([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>], <span class="number">0</span>).<span class="ident">into</span>(),
+                    <span class="ident">SocketAddr::V4</span>(<span class="kw">_</span>) =&gt; ([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>], <span class="number">0</span>).<span class="ident">into</span>(),
+                    <span class="ident">SocketAddr::V6</span>(<span class="kw">_</span>) =&gt; ([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>], <span class="number">0</span>).<span class="ident">into</span>(),
                 };
                 <span class="ident">socket</span>.<span class="ident">bind</span>(<span class="kw-2">&amp;</span><span class="ident">any</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
             }
@@ -1584,7 +1584,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>,
     <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>,
     <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span> {
     <span class="comment">// TODO(eliza): if Tokio&#39;s `TcpSocket` gains support for setting the</span>
     <span class="comment">// keepalive timeout, it would be nice to use that instead of socket2,</span>
     <span class="comment">// and avoid the unsafe `into_raw_fd`/`from_raw_fd` dance...</span>
@@ -1656,22 +1656,22 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="kw">let</span> <span class="ident">connect</span> <span class="op">=</span> <span class="ident">socket</span>.<span class="ident">connect</span>(<span class="kw-2">*</span><span class="ident">addr</span>);
     <span class="prelude-val">Ok</span>(<span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw">match</span> <span class="ident">connect_timeout</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">tokio::time::timeout</span>(<span class="ident">dur</span>, <span class="ident">connect</span>).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::TimedOut</span>, <span class="ident">e</span>)),
+            <span class="prelude-val">Some</span>(<span class="ident">dur</span>) =&gt; <span class="kw">match</span> <span class="ident">tokio::time::timeout</span>(<span class="ident">dur</span>, <span class="ident">connect</span>).<span class="kw">await</span> {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">s</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::TimedOut</span>, <span class="ident">e</span>)),
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">connect</span>.<span class="kw">await</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">connect</span>.<span class="kw">await</span>,
         }
         .<span class="ident">map_err</span>(<span class="ident">ConnectError::m</span>(<span class="string">&quot;tcp connect error&quot;</span>))
     })
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectingTcp</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">fallback</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">preferred</span>.<span class="ident">connect</span>(<span class="self">self</span>.<span class="ident">config</span>).<span class="kw">await</span>,
-            <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">fallback</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">preferred</span>.<span class="ident">connect</span>(<span class="self">self</span>.<span class="ident">config</span>).<span class="kw">await</span>,
+            <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">fallback</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">preferred_fut</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">preferred</span>.<span class="ident">connect</span>(<span class="self">self</span>.<span class="ident">config</span>);
                 <span class="macro">futures_util::pin_mut!</span>(<span class="ident">preferred_fut</span>);
 
@@ -1683,10 +1683,10 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 
                 <span class="kw">let</span> (<span class="ident">result</span>, <span class="ident">future</span>) <span class="op">=</span>
                     <span class="kw">match</span> <span class="ident">futures_util::future::select</span>(<span class="ident">preferred_fut</span>, <span class="ident">fallback_delay</span>).<span class="kw">await</span> {
-                        <span class="ident">Either::Left</span>((<span class="ident">result</span>, <span class="ident">_fallback_delay</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Either::Left</span>((<span class="ident">result</span>, <span class="ident">_fallback_delay</span>)) =&gt; {
                             (<span class="ident">result</span>, <span class="ident">Either::Right</span>(<span class="ident">fallback_fut</span>))
                         }
-                        <span class="ident">Either::Right</span>(((), <span class="ident">preferred_fut</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Either::Right</span>(((), <span class="ident">preferred_fut</span>)) =&gt; {
                             <span class="comment">// Delay is done, start polling both the preferred and the fallback</span>
                             <span class="ident">futures_util::future::select</span>(<span class="ident">preferred_fut</span>, <span class="ident">fallback_fut</span>)
                                 .<span class="kw">await</span>
@@ -1718,7 +1718,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(
         <span class="ident">connector</span>: <span class="ident">C</span>,
         <span class="ident">dst</span>: <span class="ident">Uri</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">C::_Svc</span> <span class="kw">as</span> <span class="ident">ConnectSvc</span><span class="op">&gt;</span><span class="ident">::Connection</span>, <span class="op">&lt;</span><span class="ident">C::_Svc</span> <span class="kw">as</span> <span class="ident">ConnectSvc</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">C::_Svc</span> <span class="kw">as</span> <span class="ident">ConnectSvc</span><span class="op">&gt;</span><span class="ident">::Connection</span>, <span class="op">&lt;</span><span class="ident">C::_Svc</span> <span class="kw">as</span> <span class="ident">ConnectSvc</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">C</span>: <span class="ident">Connect</span>,
     {
@@ -1735,7 +1735,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">get_local_ips</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::net::Ipv4Addr</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::net::Ipv6Addr</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">get_local_ips</span>() -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::net::Ipv4Addr</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::net::Ipv6Addr</span><span class="op">&gt;</span>) {
         <span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">IpAddr</span>, <span class="ident">TcpListener</span>};
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ip_v4</span> <span class="op">=</span> <span class="prelude-val">None</span>;
@@ -1747,9 +1747,9 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 
         <span class="kw">for</span> <span class="ident">ip</span> <span class="kw">in</span> <span class="ident">ips</span> {
             <span class="kw">match</span> <span class="ident">ip</span> {
-                <span class="ident">IpAddr::V4</span>(<span class="ident">ip</span>) <span class="kw">if</span> <span class="ident">TcpListener::bind</span>((<span class="ident">ip</span>, <span class="number">0</span>)).<span class="ident">is_ok</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ip_v4</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ip</span>),
-                <span class="ident">IpAddr::V6</span>(<span class="ident">ip</span>) <span class="kw">if</span> <span class="ident">TcpListener::bind</span>((<span class="ident">ip</span>, <span class="number">0</span>)).<span class="ident">is_ok</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ip_v6</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ip</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                <span class="ident">IpAddr::V4</span>(<span class="ident">ip</span>) <span class="kw">if</span> <span class="ident">TcpListener::bind</span>((<span class="ident">ip</span>, <span class="number">0</span>)).<span class="ident">is_ok</span>() =&gt; <span class="ident">ip_v4</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ip</span>),
+                <span class="ident">IpAddr::V6</span>(<span class="ident">ip</span>) <span class="kw">if</span> <span class="ident">TcpListener::bind</span>((<span class="ident">ip</span>, <span class="number">0</span>)).<span class="ident">is_ok</span>() =&gt; <span class="ident">ip_v6</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ip</span>),
+                <span class="kw">_</span> =&gt; (),
             }
 
             <span class="kw">if</span> <span class="ident">ip_v4</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">ip_v6</span>.<span class="ident">is_some</span>() {
@@ -1786,10 +1786,10 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">HttpConnector::new</span>();
 
             <span class="kw">match</span> (<span class="ident">bind_ip_v4</span>, <span class="ident">bind_ip_v6</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">v4</span>), <span class="prelude-val">Some</span>(<span class="ident">v6</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">connector</span>.<span class="ident">set_local_addresses</span>(<span class="ident">v4</span>, <span class="ident">v6</span>),
-                (<span class="prelude-val">Some</span>(<span class="ident">v4</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">connector</span>.<span class="ident">set_local_address</span>(<span class="prelude-val">Some</span>(<span class="ident">v4</span>.<span class="ident">into</span>())),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">v6</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">connector</span>.<span class="ident">set_local_address</span>(<span class="prelude-val">Some</span>(<span class="ident">v6</span>.<span class="ident">into</span>())),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                (<span class="prelude-val">Some</span>(<span class="ident">v4</span>), <span class="prelude-val">Some</span>(<span class="ident">v6</span>)) =&gt; <span class="ident">connector</span>.<span class="ident">set_local_addresses</span>(<span class="ident">v4</span>, <span class="ident">v6</span>),
+                (<span class="prelude-val">Some</span>(<span class="ident">v4</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">connector</span>.<span class="ident">set_local_address</span>(<span class="prelude-val">Some</span>(<span class="ident">v4</span>.<span class="ident">into</span>())),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">v6</span>)) =&gt; <span class="ident">connector</span>.<span class="ident">set_local_address</span>(<span class="prelude-val">Some</span>(<span class="ident">v6</span>.<span class="ident">into</span>())),
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
             }
 
             <span class="ident">connect</span>(<span class="ident">connector</span>, <span class="ident">dst</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -1963,38 +1963,38 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
             <span class="macro">assert!</span>(<span class="ident">duration</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max_duration</span>);
         }
 
-        <span class="kw">fn</span> <span class="ident">local_ipv4_addr</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IpAddr</span> {
+        <span class="kw">fn</span> <span class="ident">local_ipv4_addr</span>() -&gt; <span class="ident">IpAddr</span> {
             <span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>).<span class="ident">into</span>()
         }
 
-        <span class="kw">fn</span> <span class="ident">local_ipv6_addr</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IpAddr</span> {
+        <span class="kw">fn</span> <span class="ident">local_ipv6_addr</span>() -&gt; <span class="ident">IpAddr</span> {
             <span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>).<span class="ident">into</span>()
         }
 
-        <span class="kw">fn</span> <span class="ident">unreachable_ipv4_addr</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IpAddr</span> {
+        <span class="kw">fn</span> <span class="ident">unreachable_ipv4_addr</span>() -&gt; <span class="ident">IpAddr</span> {
             <span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>).<span class="ident">into</span>()
         }
 
-        <span class="kw">fn</span> <span class="ident">unreachable_ipv6_addr</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IpAddr</span> {
+        <span class="kw">fn</span> <span class="ident">unreachable_ipv6_addr</span>() -&gt; <span class="ident">IpAddr</span> {
             <span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>).<span class="ident">into</span>()
         }
 
-        <span class="kw">fn</span> <span class="ident">slow_ipv4_addr</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IpAddr</span> {
+        <span class="kw">fn</span> <span class="ident">slow_ipv4_addr</span>() -&gt; <span class="ident">IpAddr</span> {
             <span class="comment">// RFC 6890 reserved IPv4 address.</span>
             <span class="ident">Ipv4Addr::new</span>(<span class="number">198</span>, <span class="number">18</span>, <span class="number">0</span>, <span class="number">25</span>).<span class="ident">into</span>()
         }
 
-        <span class="kw">fn</span> <span class="ident">slow_ipv6_addr</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IpAddr</span> {
+        <span class="kw">fn</span> <span class="ident">slow_ipv6_addr</span>() -&gt; <span class="ident">IpAddr</span> {
             <span class="comment">// RFC 6890 reserved IPv6 address.</span>
             <span class="ident">Ipv6Addr::new</span>(<span class="number">2001</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">254</span>).<span class="ident">into</span>()
         }
 
-        <span class="kw">fn</span> <span class="ident">measure_connect</span>(<span class="ident">addr</span>: <span class="ident">IpAddr</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">bool</span>, <span class="ident">Duration</span>) {
+        <span class="kw">fn</span> <span class="ident">measure_connect</span>(<span class="ident">addr</span>: <span class="ident">IpAddr</span>) -&gt; (<span class="ident">bool</span>, <span class="ident">Duration</span>) {
             <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
             <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span>
                 <span class="ident">std::net::TcpStream::connect_timeout</span>(<span class="kw-2">&amp;</span>(<span class="ident">addr</span>, <span class="number">80</span>).<span class="ident">into</span>(), <span class="ident">Duration::from_secs</span>(<span class="number">1</span>));
 
-            <span class="kw">let</span> <span class="ident">reachable</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">result</span>.<span class="ident">unwrap_err</span>().<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">io::ErrorKind::TimedOut</span>;
+            <span class="kw">let</span> <span class="ident">reachable</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">result</span>.<span class="ident">unwrap_err</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io::ErrorKind::TimedOut</span>;
             <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">start</span>.<span class="ident">elapsed</span>();
             (<span class="ident">reachable</span>, <span class="ident">duration</span>)
         }

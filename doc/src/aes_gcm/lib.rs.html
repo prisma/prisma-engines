@@ -521,7 +521,7 @@
 {
     <span class="kw">type</span> <span class="ident">KeySize</span> <span class="op">=</span> <span class="ident">Aes::KeySize</span>;
 
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="ident">Aes</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="ident">Aes</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Aes::new</span>(<span class="ident">key</span>).<span class="ident">into</span>()
     }
 }
@@ -532,7 +532,7 @@
     <span class="ident">Aes::ParBlocks</span>: <span class="ident">ArrayLength</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">Aes</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">NonceSize</span>: <span class="ident">ArrayLength</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">cipher</span>: <span class="ident">Aes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">cipher</span>: <span class="ident">Aes</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ghash_key</span> <span class="op">=</span> <span class="ident">GenericArray::default</span>();
         <span class="ident">cipher</span>.<span class="ident">encrypt_block</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ghash_key</span>);
 
@@ -564,7 +564,7 @@
         <span class="ident">nonce</span>: <span class="kw-2">&amp;</span><span class="ident">GenericArray</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">NonceSize</span><span class="op">&gt;</span>,
         <span class="ident">associated_data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Tag</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Tag</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">buffer</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">&gt;</span> <span class="ident">P_MAX</span> <span class="op">|</span><span class="op">|</span> <span class="ident">associated_data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">&gt;</span> <span class="ident">A_MAX</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>);
         }
@@ -588,7 +588,7 @@
         <span class="ident">associated_data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="ident">Tag</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">buffer</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">&gt;</span> <span class="ident">C_MAX</span> <span class="op">|</span><span class="op">|</span> <span class="ident">associated_data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">&gt;</span> <span class="ident">A_MAX</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>);
         }
@@ -600,7 +600,7 @@
         <span class="ident">ctr</span>.<span class="ident">apply_keystream</span>(<span class="ident">expected_tag</span>.<span class="ident">as_mut_slice</span>());
 
         <span class="kw">use</span> <span class="ident">subtle::ConstantTimeEq</span>;
-        <span class="kw">if</span> <span class="ident">expected_tag</span>.<span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="ident">tag</span>).<span class="ident">unwrap_u8</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">expected_tag</span>.<span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="ident">tag</span>).<span class="ident">unwrap_u8</span>() <span class="op">==</span> <span class="number">1</span> {
             <span class="ident">ctr</span>.<span class="ident">apply_keystream</span>(<span class="ident">buffer</span>);
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else</span> {
@@ -624,8 +624,8 @@
     <span class="doccomment">/// &gt; If len(IV)=96, then J0 = IV || 0{31} || 1.</span>
     <span class="doccomment">/// &gt; If len(IV) ≠ 96, then let s = 128 ⎡len(IV)/128⎤-len(IV), and</span>
     <span class="doccomment">/// &gt;     J0=GHASH(IV||0s+64||[len(IV)]64).</span>
-    <span class="kw">fn</span> <span class="ident">init_ctr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nonce</span>: <span class="kw-2">&amp;</span><span class="ident">GenericArray</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">NonceSize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ctr32BE</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Aes</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">j0</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">NonceSize::to_usize</span>() <span class="op">=</span><span class="op">=</span> <span class="number">12</span> {
+    <span class="kw">fn</span> <span class="ident">init_ctr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nonce</span>: <span class="kw-2">&amp;</span><span class="ident">GenericArray</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">NonceSize</span><span class="op">&gt;</span>) -&gt; <span class="ident">Ctr32BE</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Aes</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">j0</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">NonceSize::to_usize</span>() <span class="op">==</span> <span class="number">12</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">GenericArray::default</span>();
             <span class="ident">block</span>[..<span class="number">12</span>].<span class="ident">copy_from_slice</span>(<span class="ident">nonce</span>);
             <span class="ident">block</span>[<span class="number">15</span>] <span class="op">=</span> <span class="number">1</span>;
@@ -646,7 +646,7 @@
     }
 
     <span class="doccomment">/// Authenticate the given plaintext and associated data using GHASH</span>
-    <span class="kw">fn</span> <span class="ident">compute_tag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">associated_data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buffer</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Tag</span> {
+    <span class="kw">fn</span> <span class="ident">compute_tag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">associated_data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buffer</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Tag</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ghash</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ghash</span>.<span class="ident">clone</span>();
         <span class="ident">ghash</span>.<span class="ident">update_padded</span>(<span class="ident">associated_data</span>);
         <span class="ident">ghash</span>.<span class="ident">update_padded</span>(<span class="ident">buffer</span>);

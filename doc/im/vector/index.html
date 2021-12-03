@@ -13,7 +13,7 @@ not high, performance, but they all have more or less the same
 O(log n) complexity, so you don’t need to keep their performance
 characteristics in mind - everything, even splitting and merging,
 is safe to use and never too slow.</p>
-<h2 id="performance-notes" class="section-header"><a href="#performance-notes">Performance Notes</a></h2>
+<h3 id="performance-notes" class="section-header"><a href="#performance-notes">Performance Notes</a></h3>
 <p>Because of the head/tail chunking technique, until you push a
 number of items above double the tree’s branching factor (that’s
 <code>self.len()</code> = 2 × <em>k</em> (where <em>k</em> = 64) = 128) on either side, the
@@ -28,15 +28,15 @@ allocate tree nodes of capacity <em>k</em> as needed.</p>
 full data structure once you go past the chunk size. This makes them
 perform identically to <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a> at small sizes.</p>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Chunks.html" title="im::vector::Chunks struct">Chunks</a></div><div class="item-right docblock-short"><p>An iterator over the leaf nodes of a vector.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ChunksMut.html" title="im::vector::ChunksMut struct">ChunksMut</a></div><div class="item-right docblock-short"><p>A mutable iterator over the leaf nodes of a vector.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Iter.html" title="im::vector::Iter struct">Iter</a></div><div class="item-right docblock-short"><p>An iterator over vectors with values of type <code>A</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.IterMut.html" title="im::vector::IterMut struct">IterMut</a></div><div class="item-right docblock-short"><p>A mutable iterator over vectors with values of type <code>A</code>.</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.ConsumingIter.html" title="im::vector::ConsumingIter enum">ConsumingIter</a></div><div class="item-right docblock-short"><p>A consuming iterator over vectors with values of type <code>A</code>.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.Focus.html" title="im::vector::Focus enum">Focus</a></div><div class="item-right docblock-short"><p>Focused indexing over a <a href="enum.Vector.html"><code>Vector</code></a>.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.FocusMut.html" title="im::vector::FocusMut enum">FocusMut</a></div><div class="item-right docblock-short"><p>A mutable version of <a href="enum.Focus.html"><code>Focus</code></a>.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.Vector.html" title="im::vector::Vector enum">Vector</a></div><div class="item-right docblock-short"><p>A persistent vector.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="im" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Chunks.html" title="im::vector::Chunks struct">Chunks</a></div><div class="item-right docblock-short"><p>An iterator over the leaf nodes of a vector.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ChunksMut.html" title="im::vector::ChunksMut struct">ChunksMut</a></div><div class="item-right docblock-short"><p>A mutable iterator over the leaf nodes of a vector.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Iter.html" title="im::vector::Iter struct">Iter</a></div><div class="item-right docblock-short"><p>An iterator over vectors with values of type <code>A</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.IterMut.html" title="im::vector::IterMut struct">IterMut</a></div><div class="item-right docblock-short"><p>A mutable iterator over vectors with values of type <code>A</code>.</p>
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ConsumingIter.html" title="im::vector::ConsumingIter enum">ConsumingIter</a></div><div class="item-right docblock-short"><p>A consuming iterator over vectors with values of type <code>A</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Focus.html" title="im::vector::Focus enum">Focus</a></div><div class="item-right docblock-short"><p>Focused indexing over a <a href="enum.Vector.html"><code>Vector</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.FocusMut.html" title="im::vector::FocusMut enum">FocusMut</a></div><div class="item-right docblock-short"><p>A mutable version of <a href="enum.Focus.html"><code>Focus</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Vector.html" title="im::vector::Vector enum">Vector</a></div><div class="item-right docblock-short"><p>A persistent vector.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="im" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

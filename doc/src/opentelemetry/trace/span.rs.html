@@ -362,7 +362,7 @@
 
     <span class="doccomment">/// Returns the `SpanContext` for the given `Span`. The returned value may be used even after</span>
     <span class="doccomment">/// the `Span is finished. The returned value MUST be the same for the entire `Span` lifetime.</span>
-    <span class="kw">fn</span> <span class="ident">span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">SpanContext</span>;
+    <span class="kw">fn</span> <span class="ident">span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">SpanContext</span>;
 
     <span class="doccomment">/// Returns true if this `Span` is recording information like events with the `add_event`</span>
     <span class="doccomment">/// operation, attributes using `set_attributes`, status with `set_status`, etc.</span>
@@ -380,7 +380,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Users of the API should only access the `is_recording` property when instrumenting code and</span>
     <span class="doccomment">/// never access `SampledFlag` unless used in context propagators.</span>
-    <span class="kw">fn</span> <span class="ident">is_recording</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">is_recording</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 
     <span class="doccomment">/// An API to set a single `Attribute` where the attribute properties are passed</span>
     <span class="doccomment">/// as arguments. To avoid extra allocations some implementations may offer a separate API for</span>
@@ -503,13 +503,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SpanKind</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SpanKind::Client</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;client&quot;</span>),
-            <span class="ident">SpanKind::Server</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;server&quot;</span>),
-            <span class="ident">SpanKind::Producer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;producer&quot;</span>),
-            <span class="ident">SpanKind::Consumer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;consumer&quot;</span>),
-            <span class="ident">SpanKind::Internal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;internal&quot;</span>),
+            <span class="ident">SpanKind::Client</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;client&quot;</span>),
+            <span class="ident">SpanKind::Server</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;server&quot;</span>),
+            <span class="ident">SpanKind::Producer</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;producer&quot;</span>),
+            <span class="ident">SpanKind::Consumer</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;consumer&quot;</span>),
+            <span class="ident">SpanKind::Internal</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;internal&quot;</span>),
         }
     }
 }
@@ -530,21 +530,21 @@
 
 <span class="kw">impl</span> <span class="ident">StatusCode</span> {
     <span class="doccomment">/// Return a static str that represent the status code</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">StatusCode::Unset</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;&quot;</span>,
-            <span class="ident">StatusCode::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;OK&quot;</span>,
-            <span class="ident">StatusCode::Error</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ERROR&quot;</span>,
+            <span class="ident">StatusCode::Unset</span> =&gt; <span class="string">&quot;&quot;</span>,
+            <span class="ident">StatusCode::Ok</span> =&gt; <span class="string">&quot;OK&quot;</span>,
+            <span class="ident">StatusCode::Error</span> =&gt; <span class="string">&quot;ERROR&quot;</span>,
         }
     }
 
     <span class="doccomment">/// Return the priority of the status code.</span>
     <span class="doccomment">/// Status code with higher priority can override the lower priority one.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">priority</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">priority</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">StatusCode::Unset</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">StatusCode::Error</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">StatusCode::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+            <span class="ident">StatusCode::Unset</span> =&gt; <span class="number">0</span>,
+            <span class="ident">StatusCode::Error</span> =&gt; <span class="number">1</span>,
+            <span class="ident">StatusCode::Ok</span> =&gt; <span class="number">2</span>,
         }
     }
 }

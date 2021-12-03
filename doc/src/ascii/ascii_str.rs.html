@@ -1139,31 +1139,31 @@
 
 <span class="kw">impl</span> <span class="ident">AsciiStr</span> {
     <span class="doccomment">/// Coerces into an `AsciiStr` slice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">AsciiStr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">AsciiStr</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
         <span class="ident">s</span>.<span class="ident">as_ref</span>()
     }
 
     <span class="doccomment">/// Converts `&amp;self` to a `&amp;str` slice.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">AsciiStr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">str</span>) }
     }
 
     <span class="doccomment">/// Converts `&amp;self` into a byte slice.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">AsciiStr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span>[<span class="ident">u8</span>]) }
     }
 
     <span class="doccomment">/// Returns the entire string as slice of `AsciiChar`s.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">AsciiChar</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">AsciiChar</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">slice</span>
     }
 
     <span class="doccomment">/// Returns the entire string as mutable slice of `AsciiChar`s.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">AsciiChar</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">AsciiChar</span>] {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">slice</span>
     }
 
@@ -1173,7 +1173,7 @@
     <span class="doccomment">/// will end up pointing to garbage. Modifying the `AsciiStr` may cause it&#39;s buffer to be</span>
     <span class="doccomment">/// reallocated, which would also make any pointers to it invalid.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">AsciiChar</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">AsciiChar</span> {
         <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">as_ptr</span>()
     }
 
@@ -1183,13 +1183,13 @@
     <span class="doccomment">/// will end up pointing to garbage. Modifying the `AsciiStr` may cause it&#39;s buffer to be</span>
     <span class="doccomment">/// reallocated, which would also make any pointers to it invalid.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_ptr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">AsciiChar</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_ptr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">AsciiChar</span> {
         <span class="self">self</span>.<span class="ident">as_mut_slice</span>().<span class="ident">as_mut_ptr</span>()
     }
 
     <span class="doccomment">/// Copies the content of this `AsciiStr` into an owned `AsciiString`.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ascii_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AsciiString</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ascii_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AsciiString</span> {
         <span class="ident">AsciiString::from</span>(<span class="self">self</span>.<span class="ident">slice</span>.<span class="ident">to_vec</span>())
     }
 
@@ -1204,7 +1204,7 @@
     <span class="doccomment">/// assert_eq!(err.unwrap_err().valid_up_to(), 0);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ascii</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ascii</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     {
@@ -1221,7 +1221,7 @@
     <span class="doccomment">/// assert_eq!(foo.as_str(), &quot;foo&quot;);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_ascii_unchecked</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_ascii_unchecked</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">B</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     {
@@ -1237,7 +1237,7 @@
     <span class="doccomment">/// assert_eq!(s.len(), 3);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">slice</span>.<span class="ident">len</span>()
     }
 
@@ -1252,20 +1252,20 @@
     <span class="doccomment">/// assert!(!full.is_empty());</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Returns an iterator over the characters of the `AsciiStr`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chars</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Chars</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chars</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Chars</span> {
         <span class="self">self</span>.<span class="ident">slice</span>.<span class="ident">iter</span>()
     }
 
     <span class="doccomment">/// Returns an iterator over the characters of the `AsciiStr` which allows you to modify the</span>
     <span class="doccomment">/// value of each `AsciiChar`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chars_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CharsMut</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chars_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">CharsMut</span> {
         <span class="self">self</span>.<span class="ident">slice</span>.<span class="ident">iter_mut</span>()
     }
 
@@ -1280,7 +1280,7 @@
     <span class="doccomment">///     .collect::&lt;Vec&lt;_&gt;&gt;();</span>
     <span class="doccomment">/// assert_eq!(words, [&quot;apple&quot;, &quot;banana&quot;, &quot;lemon&quot;]);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,  <span class="ident">on</span>: <span class="ident">AsciiChar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Split</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,  <span class="ident">on</span>: <span class="ident">AsciiChar</span>) -&gt; <span class="ident">Split</span> {
         <span class="ident">Split</span> {
             <span class="ident">on</span>: <span class="ident">on</span>,
             <span class="ident">ended</span>: <span class="bool-val">false</span>,
@@ -1294,7 +1294,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The final line ending is optional.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lines</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Lines</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lines</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Lines</span> {
         <span class="ident">Lines</span> {
             <span class="ident">string</span>: <span class="self">self</span>,
         }
@@ -1308,7 +1308,7 @@
     <span class="doccomment">/// let example = AsciiStr::from_ascii(&quot;  \twhite \tspace  \t&quot;).unwrap();</span>
     <span class="doccomment">/// assert_eq!(&quot;white \tspace&quot;, example.trim());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trim</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trim</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">trim_right</span>().<span class="ident">trim_left</span>()
     }
 
@@ -1320,7 +1320,7 @@
     <span class="doccomment">/// let example = AsciiStr::from_ascii(&quot;  \twhite \tspace  \t&quot;).unwrap();</span>
     <span class="doccomment">/// assert_eq!(&quot;white \tspace  \t&quot;, example.trim_left());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trim_left</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trim_left</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="self">self</span>.<span class="ident">chars</span>().<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">is_whitespace</span>()).<span class="ident">count</span>()..]
     }
 
@@ -1332,7 +1332,7 @@
     <span class="doccomment">/// let example = AsciiStr::from_ascii(&quot;  \twhite \tspace  \t&quot;).unwrap();</span>
     <span class="doccomment">/// assert_eq!(&quot;  \twhite \tspace&quot;, example.trim_right());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trim_right</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trim_right</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chars</span>()
             .<span class="ident">rev</span>()
             .<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">is_whitespace</span>())
@@ -1341,8 +1341,8 @@
     }
 
     <span class="doccomment">/// Compares two strings case-insensitively.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span>
             <span class="self">self</span>.<span class="ident">chars</span>().<span class="ident">zip</span>(<span class="ident">other</span>.<span class="ident">chars</span>()).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> {
                 <span class="ident">a</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">b</span>)
             })
@@ -1364,7 +1364,7 @@
 
     <span class="doccomment">/// Returns a copy of this string where letters &#39;a&#39; to &#39;z&#39; are mapped to &#39;A&#39; to &#39;Z&#39;.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ascii_uppercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AsciiString</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ascii_uppercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AsciiString</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ascii_string</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_ascii_string</span>();
         <span class="ident">ascii_string</span>.<span class="ident">make_ascii_uppercase</span>();
         <span class="ident">ascii_string</span>
@@ -1372,7 +1372,7 @@
 
     <span class="doccomment">/// Returns a copy of this string where letters &#39;A&#39; to &#39;Z&#39; are mapped to &#39;a&#39; to &#39;z&#39;.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ascii_lowercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AsciiString</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ascii_lowercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AsciiString</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ascii_string</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_ascii_string</span>();
         <span class="ident">ascii_string</span>.<span class="ident">make_ascii_lowercase</span>();
         <span class="ident">ascii_string</span>
@@ -1380,29 +1380,29 @@
 
     <span class="doccomment">/// Returns the first character if the string is not empty.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AsciiChar</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AsciiChar</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">slice</span>.<span class="ident">first</span>().<span class="ident">cloned</span>()
     }
 
     <span class="doccomment">/// Returns the last character if the string is not empty.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AsciiChar</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AsciiChar</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">slice</span>.<span class="ident">last</span>().<span class="ident">cloned</span>()
     }
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_partial_eq</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span>: <span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span>: <span class="ident">ty</span>) =&gt; {
         <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsciiStr</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-                <span class="op">&lt;</span><span class="ident">AsciiStr</span> <span class="kw">as</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::as_ref</span>(<span class="self">self</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>
+            <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span>) -&gt; <span class="ident">bool</span> {
+                <span class="op">&lt;</span><span class="ident">AsciiStr</span> <span class="kw">as</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::as_ref</span>(<span class="self">self</span>) <span class="op">==</span> <span class="ident">other</span>
             }
         }
         <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">AsciiStr</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-                <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="op">&lt;</span><span class="ident">AsciiStr</span> <span class="kw">as</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::as_ref</span>(<span class="ident">other</span>)
+            <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>) -&gt; <span class="ident">bool</span> {
+                <span class="self">self</span> <span class="op">==</span> <span class="op">&lt;</span><span class="ident">AsciiStr</span> <span class="kw">as</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::as_ref</span>(<span class="ident">other</span>)
             }
         }
     };
@@ -1417,52 +1417,52 @@
     <span class="kw">type</span> <span class="ident">Owned</span> <span class="op">=</span> <span class="ident">AsciiString</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_owned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AsciiString</span> {
+    <span class="kw">fn</span> <span class="ident">to_owned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AsciiString</span> {
         <span class="self">self</span>.<span class="ident">to_ascii_string</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="ident">as_bytes</span>()
     }
 }
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">as_str</span>()
     }
 }
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">AsciiChar</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">AsciiChar</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">AsciiChar</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">slice</span>
     }
 }
 <span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">AsciiChar</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">AsciiChar</span>] {
+    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">AsciiChar</span>] {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">slice</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">AsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">AsciiStr</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">AsciiStr</span> {
         <span class="ident">From::from</span>(<span class="kw-2">&amp;</span>[] <span class="kw">as</span> <span class="kw-2">&amp;</span>[<span class="ident">AsciiChar</span>])
     }
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">AsciiChar</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">AsciiChar</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">AsciiChar</span>]) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">slice</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> [<span class="ident">AsciiChar</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">AsciiStr</span>;
         <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ptr</span> }
     }
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">AsciiChar</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">AsciiChar</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">AsciiChar</span>]) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">slice</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> [<span class="ident">AsciiChar</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>;
         <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">ptr</span> }
     }
@@ -1470,7 +1470,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">AsciiChar</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">AsciiStr</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">owned</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">AsciiChar</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">AsciiStr</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">owned</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">AsciiChar</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">AsciiStr</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">Box::into_raw</span>(<span class="ident">owned</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>;
         <span class="kw">unsafe</span> { <span class="ident">Box::from_raw</span>(<span class="ident">ptr</span>) }
     }
@@ -1478,47 +1478,47 @@
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">AsciiStr</span><span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">AsciiChar</span>] {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
         <span class="self">self</span>.<span class="ident">into</span>()
     }
 }
 <span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">AsciiStr</span><span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">AsciiChar</span>] {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
+    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
         <span class="self">self</span>.<span class="ident">into</span>()
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">AsciiChar</span>] {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">astr</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">AsciiChar</span>] {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">astr</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">AsciiChar</span>] {
         <span class="kw-2">&amp;</span><span class="ident">astr</span>.<span class="ident">slice</span>
     }
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">AsciiStr</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">AsciiChar</span>] {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">astr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">AsciiChar</span>] {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">astr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">AsciiChar</span>] {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">astr</span>.<span class="ident">slice</span>
     }
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">astr</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">astr</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="ident">astr</span>.<span class="ident">as_bytes</span>()
     }
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">astr</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">astr</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="ident">astr</span>.<span class="ident">as_str</span>()
     }
 }
 <span class="macro">macro_rules!</span> <span class="ident">widen_box</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span>: <span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span>: <span class="ident">ty</span>) =&gt; {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
         <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">AsciiStr</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span><span class="op">&gt;</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">owned</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">AsciiStr</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">owned</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">AsciiStr</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">Box::into_raw</span>(<span class="ident">owned</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span>;
                 <span class="kw">unsafe</span> { <span class="ident">Box::from_raw</span>(<span class="ident">ptr</span>) }
             }
@@ -1531,32 +1531,32 @@
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">AsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt::Display::fmt</span>(<span class="self">self</span>.<span class="ident">as_str</span>(), <span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">AsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt::Debug::fmt</span>(<span class="self">self</span>.<span class="ident">as_str</span>(), <span class="ident">f</span>)
     }
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_index</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>:<span class="ident">ty</span>) =&gt; {
         <span class="kw">impl</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsciiStr</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">AsciiStr</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
+            <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
                 <span class="self">self</span>.<span class="ident">slice</span>[<span class="ident">index</span>].<span class="ident">as_ref</span>()
             }
         }
 
         <span class="kw">impl</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsciiStr</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
+            <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
                 <span class="self">self</span>.<span class="ident">slice</span>[<span class="ident">index</span>].<span class="ident">as_mut</span>()
             }
         }
@@ -1572,14 +1572,14 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">AsciiChar</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiChar</span> {
+    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiChar</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">slice</span>[<span class="ident">index</span>]
     }
 }
 
 <span class="kw">impl</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiChar</span> {
+    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiChar</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">slice</span>[<span class="ident">index</span>]
     }
 }
@@ -1589,24 +1589,24 @@
     <span class="kw">type</span> <span class="ident">Owned</span> <span class="op">=</span> <span class="ident">AsciiString</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_ascii</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_ascii</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">to_ascii_uppercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AsciiString</span> {
+    <span class="kw">fn</span> <span class="ident">to_ascii_uppercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AsciiString</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ascii_string</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_ascii_string</span>();
         <span class="ident">ascii_string</span>.<span class="ident">make_ascii_uppercase</span>();
         <span class="ident">ascii_string</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">to_ascii_lowercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AsciiString</span> {
+    <span class="kw">fn</span> <span class="ident">to_ascii_lowercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AsciiString</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ascii_string</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_ascii_string</span>();
         <span class="ident">ascii_string</span>.<span class="ident">make_ascii_lowercase</span>();
         <span class="ident">ascii_string</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span>
+    <span class="kw">fn</span> <span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span>
             <span class="self">self</span>.<span class="ident">chars</span>().<span class="ident">zip</span>(<span class="ident">other</span>.<span class="ident">chars</span>()).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> {
                 <span class="ident">a</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">b</span>)
             })
@@ -1629,7 +1629,7 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiChar</span>;
     <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Chars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="self">self</span>.<span class="ident">chars</span>()
     }
 }
@@ -1638,7 +1638,7 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">AsciiChar</span>;
     <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">CharsMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="self">self</span>.<span class="ident">chars_mut</span>()
     }
 }
@@ -1661,11 +1661,11 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Split</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">ended</span> {
             <span class="kw">let</span> <span class="ident">start</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chars</span>.<span class="ident">as_slice</span>().<span class="ident">into</span>();
             <span class="kw">let</span> <span class="ident">split_on</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">on</span>;
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">at</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">chars</span>.<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="ident">split_on</span>) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">at</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">chars</span>.<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="ident">split_on</span>) {
                 <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">start</span>[..<span class="ident">at</span>])
             } <span class="kw">else</span> {
                 <span class="self">self</span>.<span class="ident">ended</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -1677,11 +1677,11 @@
     }
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Split</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">ended</span> {
             <span class="kw">let</span> <span class="ident">start</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chars</span>.<span class="ident">as_slice</span>().<span class="ident">into</span>();
             <span class="kw">let</span> <span class="ident">split_on</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">on</span>;
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">at</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">chars</span>.<span class="ident">rposition</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="ident">split_on</span>) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">at</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">chars</span>.<span class="ident">rposition</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="ident">split_on</span>) {
                 <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">start</span>[<span class="ident">at</span><span class="op">+</span><span class="number">1</span>..])
             } <span class="kw">else</span> {
                 <span class="self">self</span>.<span class="ident">ended</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -1701,12 +1701,12 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Lines</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">idx</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">string</span>
             .<span class="ident">chars</span>()
-            .<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">chr</span><span class="op">|</span> <span class="ident">chr</span> <span class="op">=</span><span class="op">=</span> <span class="ident">AsciiChar::LineFeed</span>)
+            .<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">chr</span><span class="op">|</span> <span class="ident">chr</span> <span class="op">==</span> <span class="ident">AsciiChar::LineFeed</span>)
         {
-            <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">string</span>[<span class="ident">idx</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">AsciiChar::CarriageReturn</span> {
+            <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">string</span>[<span class="ident">idx</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">==</span> <span class="ident">AsciiChar::CarriageReturn</span> {
                 <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">string</span>[..<span class="ident">idx</span> <span class="op">-</span> <span class="number">1</span>]
             } <span class="kw">else</span> {
                 <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">string</span>[..<span class="ident">idx</span>]
@@ -1723,14 +1723,14 @@
     }
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Lines</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AsciiStr</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">string</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">string</span>.<span class="ident">len</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">string</span>[<span class="ident">i</span><span class="op">-</span><span class="number">1</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">AsciiChar::LineFeed</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">string</span>[<span class="ident">i</span><span class="op">-</span><span class="number">1</span>] <span class="op">==</span> <span class="ident">AsciiChar::LineFeed</span> {
             <span class="ident">i</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">string</span>[<span class="ident">i</span><span class="op">-</span><span class="number">1</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">AsciiChar::CarriageReturn</span> {
+            <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">string</span>[<span class="ident">i</span><span class="op">-</span><span class="number">1</span>] <span class="op">==</span> <span class="ident">AsciiChar::CarriageReturn</span> {
                 <span class="ident">i</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
             }
         }
@@ -1757,25 +1757,25 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// It is the maximum index such that `from_ascii(input[..index])` would return `Ok(_)`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_up_to</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_up_to</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
     <span class="doccomment">/// Returns a description for this error, like `std::error::Error::description`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="ident">ERRORMSG_STR</span>
     }
 }
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">AsAsciiStrError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmtr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmtr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">fmtr</span>, <span class="string">&quot;the byte at index {} is not ASCII&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">AsAsciiStrError</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="ident">ERRORMSG_STR</span>
     }
 }
@@ -1783,143 +1783,143 @@
 <span class="doccomment">/// Convert slices of bytes to `AsciiStr`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsAsciiStr</span> {
     <span class="doccomment">/// Convert to an ASCII slice without checking for non-ASCII characters.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>;
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>;
     <span class="doccomment">/// Convert to an ASCII slice.</span>
-    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Convert mutable slices of bytes to `AsciiStr`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsMutAsciiStr</span> {
     <span class="doccomment">/// Convert to a mutable ASCII slice without checking for non-ASCII characters.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>;
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>;
     <span class="doccomment">/// Convert to a mutable ASCII slice.</span>
-    <span class="kw">fn</span> <span class="ident">as_mut_ascii_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">as_mut_ascii_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span>;
 }
 
 <span class="comment">// These generic implementations mirror the generic implementations for AsRef&lt;T&gt; in core.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">AsAsciiStr</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">AsAsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
         <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">AsAsciiStr</span><span class="op">&gt;</span><span class="ident">::as_ascii_str</span>(<span class="kw-2">*</span><span class="self">self</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
         <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">AsAsciiStr</span><span class="op">&gt;</span><span class="ident">::as_ascii_str_unchecked</span>(<span class="kw-2">*</span><span class="self">self</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">AsAsciiStr</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">AsAsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
         <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">AsAsciiStr</span><span class="op">&gt;</span><span class="ident">::as_ascii_str</span>(<span class="kw-2">*</span><span class="self">self</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
         <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">AsAsciiStr</span><span class="op">&gt;</span><span class="ident">::as_ascii_str_unchecked</span>(<span class="kw-2">*</span><span class="self">self</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">AsMutAsciiStr</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">AsMutAsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_mut_ascii_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_mut_ascii_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
         <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">AsMutAsciiStr</span><span class="op">&gt;</span><span class="ident">::as_mut_ascii_str</span>(<span class="kw-2">*</span><span class="self">self</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
         <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">AsMutAsciiStr</span><span class="op">&gt;</span><span class="ident">::as_mut_ascii_str_unchecked</span>(<span class="kw-2">*</span><span class="self">self</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">AsAsciiStr</span> <span class="kw">for</span> <span class="ident">AsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
         <span class="self">self</span>
     }
 }
 <span class="kw">impl</span> <span class="ident">AsMutAsciiStr</span> <span class="kw">for</span> <span class="ident">AsciiStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_mut_ascii_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_mut_ascii_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
         <span class="self">self</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">AsAsciiStr</span> <span class="kw">for</span> [<span class="ident">AsciiChar</span>] {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">into</span>())
     }
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
         <span class="self">self</span>.<span class="ident">into</span>()
     }
 }
 <span class="kw">impl</span> <span class="ident">AsMutAsciiStr</span> <span class="kw">for</span> [<span class="ident">AsciiChar</span>] {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_mut_ascii_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_mut_ascii_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">into</span>())
     }
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
         <span class="self">self</span>.<span class="ident">into</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">AsAsciiStr</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">&gt;</span> <span class="number">127</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">AsAsciiStrError</span>(<span class="ident">index</span>)),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> { <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">as_ascii_str_unchecked</span>()) },
+            <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">AsAsciiStrError</span>(<span class="ident">index</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="kw">unsafe</span> { <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">as_ascii_str_unchecked</span>()) },
         }
     }
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> [<span class="ident">u8</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">AsciiStr</span>;
         <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ptr</span>
     }
 }
 <span class="kw">impl</span> <span class="ident">AsMutAsciiStr</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">as_mut_ascii_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_mut_ascii_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">&gt;</span> <span class="number">127</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">AsAsciiStrError</span>(<span class="ident">index</span>)),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> { <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">as_mut_ascii_str_unchecked</span>()) },
+            <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">AsAsciiStrError</span>(<span class="ident">index</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="kw">unsafe</span> { <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">as_mut_ascii_str_unchecked</span>()) },
         }
     }
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> [<span class="ident">u8</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>;
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">ptr</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">AsAsciiStr</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">as_ascii_str</span>()
     }
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
         <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">as_ascii_str_unchecked</span>()
     }
 }
 <span class="kw">impl</span> <span class="ident">AsMutAsciiStr</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">as_mut_ascii_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_mut_ascii_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">bytes</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">&gt;</span> <span class="number">127</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">AsAsciiStrError</span>(<span class="ident">index</span>)),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> { <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">as_mut_ascii_str_unchecked</span>()) },
+            <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">AsAsciiStrError</span>(<span class="ident">index</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="kw">unsafe</span> { <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">as_mut_ascii_str_unchecked</span>()) },
         }
     }
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_mut_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">str</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>;
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">ptr</span>
     }
@@ -1929,11 +1929,11 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">AsAsciiStr</span> <span class="kw">for</span> <span class="ident">CStr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_ascii_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">to_bytes</span>().<span class="ident">as_ascii_str</span>()
     }
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">as_ascii_str_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AsciiStr</span> {
         <span class="self">self</span>.<span class="ident">to_bytes</span>().<span class="ident">as_ascii_str_unchecked</span>()
     }
 }
@@ -1945,7 +1945,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">generic_as_ascii_str</span>() {
-        <span class="kw">fn</span> <span class="ident">generic</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">AsAsciiStr</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">generic</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">AsAsciiStr</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
             <span class="ident">c</span>.<span class="ident">as_ascii_str</span>()
         }
         <span class="kw">let</span> <span class="ident">arr</span> <span class="op">=</span> [<span class="ident">AsciiChar::A</span>];
@@ -1962,7 +1962,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">cstring_as_ascii_str</span>() {
         <span class="kw">use</span> <span class="ident">std::ffi::CString</span>;
-        <span class="kw">fn</span> <span class="ident">generic</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">AsAsciiStr</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">generic</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">AsAsciiStr</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
             <span class="ident">c</span>.<span class="ident">as_ascii_str</span>()
         }
         <span class="kw">let</span> <span class="ident">arr</span> <span class="op">=</span> [<span class="ident">AsciiChar::A</span>];
@@ -1975,7 +1975,7 @@
     <span class="kw">fn</span> <span class="ident">generic_as_mut_ascii_str</span>() {
         <span class="kw">fn</span> <span class="ident">generic_mut</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">AsMutAsciiStr</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
             <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">C</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AsciiStr</span>, <span class="ident">AsAsciiStrError</span><span class="op">&gt;</span> {
             <span class="ident">c</span>.<span class="ident">as_mut_ascii_str</span>()
         }
 
@@ -1991,7 +1991,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">as_ascii_str</span>() {
-        <span class="macro">macro_rules!</span> <span class="ident">err</span> {{<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>} <span class="op">=</span><span class="op">&gt;</span> {<span class="prelude-val">Err</span>(<span class="ident">AsAsciiStrError</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>))}}
+        <span class="macro">macro_rules!</span> <span class="ident">err</span> {{<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>} =&gt; {<span class="prelude-val">Err</span>(<span class="ident">AsAsciiStrError</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>))}}
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span>: <span class="ident">String</span> <span class="op">=</span> <span class="string">&quot;abčd&quot;</span>.<span class="ident">to_string</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">as_str</span>().<span class="ident">as_ascii_str</span>(), <span class="macro">err!</span>(<span class="number">2</span>));
@@ -2161,12 +2161,12 @@
                 <span class="macro">assert_eq!</span>(<span class="ident">asciis</span>.<span class="ident">size_hint</span>(), <span class="ident">strs</span>.<span class="ident">size_hint</span>());
                 <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">s</span>) <span class="op">=</span> (<span class="ident">asciis</span>.<span class="ident">next</span>(), <span class="ident">strs</span>.<span class="ident">next</span>());
                 <span class="macro">assert_eq!</span>(<span class="ident">a</span>, <span class="ident">s</span>);
-                <span class="kw">if</span> <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="prelude-val">None</span> {
+                <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="prelude-val">None</span> {
                     <span class="kw">break</span>;
                 }
             }
             <span class="comment">// test fusedness if str&#39;s version is fused</span>
-            <span class="kw">if</span> <span class="ident">strs</span>.<span class="ident">next</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">None</span> {
+            <span class="kw">if</span> <span class="ident">strs</span>.<span class="ident">next</span>() <span class="op">==</span> <span class="prelude-val">None</span> {
                 <span class="macro">assert_eq!</span>(<span class="ident">asciis</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
             }
         }

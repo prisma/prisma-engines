@@ -1707,12 +1707,12 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::std_support::xxh3</span>::{<span class="ident">RandomHashBuilder128</span>, <span class="ident">RandomHashBuilder64</span>};
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash64</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash64</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u64</span> {
     <span class="ident">hash64_with_seed</span>(<span class="ident">data</span>, <span class="number">0</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash64_with_seed</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash64_with_seed</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
 
     <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">16</span> {
@@ -1727,7 +1727,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash64_with_secret</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash64_with_secret</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u64</span> {
     <span class="macro">debug_assert!</span>(<span class="ident">secret</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">SECRET_SIZE_MIN</span>);
 
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
@@ -1744,12 +1744,12 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash128</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash128</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u128</span> {
     <span class="ident">hash128_with_seed</span>(<span class="ident">data</span>, <span class="number">0</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash128_with_seed</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash128_with_seed</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u128</span> {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
 
     <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">16</span> {
@@ -1764,7 +1764,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash128_with_secret</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash128_with_secret</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u128</span> {
     <span class="macro">debug_assert!</span>(<span class="ident">secret</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">SECRET_SIZE_MIN</span>);
 
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
@@ -1786,18 +1786,18 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Hash64</span>(<span class="ident">State</span>);
 
 <span class="kw">impl</span> <span class="ident">Hash64</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_seed</span>(<span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_seed</span>(<span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">State::with_seed</span>(<span class="ident">seed</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_secret</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">secret</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_secret</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">secret</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">State::with_secret</span>(<span class="ident">secret</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Hasher</span> <span class="kw">for</span> <span class="ident">Hash64</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">digest64</span>()
     }
 
@@ -1813,18 +1813,18 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Hash128</span>(<span class="ident">State</span>);
 
 <span class="kw">impl</span> <span class="ident">Hash128</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_seed</span>(<span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_seed</span>(<span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">State::with_seed</span>(<span class="ident">seed</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_secret</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">secret</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_secret</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">secret</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">State::with_secret</span>(<span class="ident">secret</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Hasher</span> <span class="kw">for</span> <span class="ident">Hash128</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">digest128</span>() <span class="kw">as</span> <span class="ident">u64</span>
     }
 
@@ -1835,12 +1835,12 @@
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">HasherExt</span>: <span class="ident">Hasher</span> {
-    <span class="kw">fn</span> <span class="ident">finish_ext</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span>;
+    <span class="kw">fn</span> <span class="ident">finish_ext</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u128</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">HasherExt</span> <span class="kw">for</span> <span class="ident">Hash128</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">finish_ext</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+    <span class="kw">fn</span> <span class="ident">finish_ext</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u128</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">digest128</span>()
     }
 }
@@ -1875,7 +1875,7 @@
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Secret</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">SECRET</span>
     }
 }
@@ -1884,7 +1884,7 @@
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> [<span class="ident">u8</span>];
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[..]
     }
 }
@@ -1892,7 +1892,7 @@
 <span class="macro">cfg_if!</span> {
     <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span> {
         <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Secret</span> {
-            <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
             {
@@ -1901,7 +1901,7 @@
         }
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Secret</span> {
-            <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Secret</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Secret</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
             {
@@ -1914,15 +1914,15 @@
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SecretVisitor</span> {
             <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">Secret</span>;
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">core::fmt::Result</span> {
+            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
                 <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;secret with a bytes array&quot;</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_bytes</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">visit_bytes</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
             {
-                <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">SECRET_DEFAULT_SIZE</span> {
+                <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">SECRET_DEFAULT_SIZE</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">secret</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">SECRET_DEFAULT_SIZE</span>];
 
                     <span class="ident">secret</span>.<span class="ident">copy_from_slice</span>(<span class="ident">v</span>);
@@ -1938,7 +1938,7 @@
 
 <span class="kw">impl</span> <span class="ident">Secret</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_seed</span>(<span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_seed</span>(<span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">secret</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">SECRET_DEFAULT_SIZE</span>];
 
         <span class="kw">for</span> <span class="ident">off</span> <span class="kw">in</span> (<span class="number">0</span>..<span class="ident">SECRET_DEFAULT_SIZE</span>).<span class="ident">step_by</span>(<span class="number">16</span>) {
@@ -1975,7 +1975,7 @@
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Acc</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Acc</span>([
             <span class="ident">u64::from</span>(<span class="ident">PRIME32_3</span>),
             <span class="ident">PRIME64_1</span>,
@@ -1993,22 +1993,22 @@
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> [<span class="ident">u64</span>];
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">Acc</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">trait</span> <span class="ident">Buf</span> {
-    <span class="kw">fn</span> <span class="ident">read_u32_le</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span>;
+    <span class="kw">fn</span> <span class="ident">read_u32_le</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
 
-    <span class="kw">fn</span> <span class="ident">read_u64_le</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>;
+    <span class="kw">fn</span> <span class="ident">read_u64_le</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span>;
 }
 
 <span class="kw">trait</span> <span class="ident">BufMut</span> {
@@ -2019,13 +2019,13 @@
 
 <span class="kw">impl</span> <span class="ident">Buf</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">read_u32_le</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">read_u32_le</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>[..<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>()];
         <span class="ident">u32::from_le_bytes</span>(<span class="ident">buf</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>())
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">read_u64_le</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">read_u64_le</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>[..<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>()];
         <span class="ident">u64::from_le_bytes</span>(<span class="ident">buf</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>())
     }
@@ -2048,7 +2048,7 @@
  * ========================================== */</span>
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_len_0to16_64bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">hash_len_0to16_64bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="macro">debug_assert!</span>(<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">16</span>);
 
     <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">8</span> {
@@ -2063,7 +2063,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_len_9to16_64bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">hash_len_9to16_64bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="macro">debug_assert!</span>((<span class="number">9</span>..<span class="op">=</span><span class="number">16</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>));
 
     <span class="kw">let</span> <span class="ident">ll1</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">read_u64_le</span>() <span class="op">^</span> <span class="ident">key</span>.<span class="ident">read_u64_le</span>().<span class="ident">wrapping_add</span>(<span class="ident">seed</span>);
@@ -2077,7 +2077,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_len_4to8_64bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">hash_len_4to8_64bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="macro">debug_assert!</span>((<span class="number">4</span>..<span class="op">=</span><span class="number">8</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>));
 
     <span class="kw">let</span> <span class="ident">in1</span> <span class="op">=</span> <span class="ident">u64::from</span>(<span class="ident">data</span>.<span class="ident">read_u32_le</span>());
@@ -2091,7 +2091,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_len_1to3_64bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">hash_len_1to3_64bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="macro">debug_assert!</span>((<span class="number">1</span>..<span class="op">=</span><span class="number">3</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>));
 
     <span class="kw">let</span> <span class="ident">c1</span> <span class="op">=</span> <span class="ident">u32::from</span>(<span class="ident">data</span>[<span class="number">0</span>]);
@@ -2105,7 +2105,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_len_17to128_64bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">hash_len_17to128_64bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="macro">debug_assert!</span>((<span class="number">17</span>..<span class="op">=</span><span class="number">128</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>));
     <span class="macro">debug_assert!</span>(<span class="ident">secret</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">SECRET_SIZE_MIN</span>);
 
@@ -2140,7 +2140,7 @@
 <span class="kw">const</span> <span class="ident">MIDSIZE_LASTOFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">17</span>;
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_len_129to240_64bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">hash_len_129to240_64bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="macro">debug_assert!</span>((<span class="number">129</span>..<span class="op">=</span><span class="ident">MIDSIZE_MAX</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>));
     <span class="macro">debug_assert!</span>(<span class="ident">secret</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">SECRET_SIZE_MIN</span>);
 
@@ -2185,12 +2185,12 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_long_64bits_with_default_secret</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">hash_long_64bits_with_default_secret</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
     <span class="ident">hash_long_internal</span>(<span class="ident">data</span>, <span class="ident">len</span>, <span class="kw-2">&amp;</span><span class="ident">SECRET</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_long_64bits_with_secret</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">hash_long_64bits_with_secret</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u64</span> {
     <span class="ident">hash_long_internal</span>(<span class="ident">data</span>, <span class="ident">len</span>, <span class="ident">secret</span>)
 }
 
@@ -2200,8 +2200,8 @@
 <span class="doccomment">/// This operation is decently fast but nonetheless costs a little bit of time.</span>
 <span class="doccomment">/// Try to avoid it whenever possible (typically when `seed.is_none()`).</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_long_64bits_with_seed</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-    <span class="kw">if</span> <span class="ident">seed</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+<span class="kw">fn</span> <span class="ident">hash_long_64bits_with_seed</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
+    <span class="kw">if</span> <span class="ident">seed</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="ident">hash_long_64bits_with_default_secret</span>(<span class="ident">data</span>, <span class="ident">len</span>)
     } <span class="kw">else</span> {
         <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident">Secret::with_seed</span>(<span class="ident">seed</span>);
@@ -2211,7 +2211,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_long_internal</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">hash_long_internal</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">acc</span> <span class="op">=</span> <span class="ident">Acc::default</span>();
 
     <span class="ident">hash_long_internal_loop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">data</span>, <span class="ident">len</span>, <span class="ident">secret</span>, <span class="ident">AccWidth::Acc64Bits</span>);
@@ -2283,7 +2283,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">_mm_shuffle</span>(<span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">w</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">_mm_shuffle</span>(<span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">w</span>: <span class="ident">u32</span>) -&gt; <span class="ident">i32</span> {
     ((<span class="ident">z</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>) <span class="op">|</span> (<span class="ident">y</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>) <span class="op">|</span> (<span class="ident">x</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>) <span class="op">|</span> <span class="ident">w</span>) <span class="kw">as</span> <span class="ident">i32</span>
 }
 
@@ -2308,7 +2308,7 @@
             <span class="kw">let</span> <span class="ident">dk</span> <span class="op">=</span> <span class="ident">_mm256_xor_si256</span>(<span class="ident">d</span>, <span class="ident">k</span>); <span class="comment">// uint32 dk[8]  = {d0+k0, d1+k1, d2+k2, d3+k3, ...}</span>
             <span class="kw">let</span> <span class="ident">mul</span> <span class="op">=</span> <span class="ident">_mm256_mul_epu32</span>(<span class="ident">dk</span>, <span class="ident">_mm256_shuffle_epi32</span>(<span class="ident">dk</span>, <span class="number">0x31</span>)); <span class="comment">// uint64 res[4] = {dk0*dk1, dk2*dk3, ...}</span>
 
-            <span class="ident">xacc</span>.<span class="ident">add</span>(<span class="ident">i</span>).<span class="ident">write</span>(<span class="kw">if</span> <span class="ident">acc_width</span> <span class="op">=</span><span class="op">=</span> <span class="ident">AccWidth::Acc128Bits</span> {
+            <span class="ident">xacc</span>.<span class="ident">add</span>(<span class="ident">i</span>).<span class="ident">write</span>(<span class="kw">if</span> <span class="ident">acc_width</span> <span class="op">==</span> <span class="ident">AccWidth::Acc128Bits</span> {
                 <span class="kw">let</span> <span class="ident">dswap</span> <span class="op">=</span> <span class="ident">_mm256_shuffle_epi32</span>(<span class="ident">d</span>, <span class="ident">_mm_shuffle</span>(<span class="number">1</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">2</span>));
                 <span class="kw">let</span> <span class="ident">add</span> <span class="op">=</span> <span class="ident">_mm256_add_epi64</span>(<span class="ident">xacc</span>.<span class="ident">add</span>(<span class="ident">i</span>).<span class="ident">read</span>(), <span class="ident">dswap</span>);
                 <span class="ident">_mm256_add_epi64</span>(<span class="ident">mul</span>, <span class="ident">add</span>)
@@ -2364,7 +2364,7 @@
             <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">_mm_loadu_si128</span>(<span class="ident">xkey</span>.<span class="ident">add</span>(<span class="ident">i</span>));
             <span class="kw">let</span> <span class="ident">dk</span> <span class="op">=</span> <span class="ident">_mm_xor_si128</span>(<span class="ident">d</span>, <span class="ident">k</span>); <span class="comment">// uint32 dk[4]  = {d0+k0, d1+k1, d2+k2, d3+k3} */</span>
             <span class="kw">let</span> <span class="ident">mul</span> <span class="op">=</span> <span class="ident">_mm_mul_epu32</span>(<span class="ident">dk</span>, <span class="ident">_mm_shuffle_epi32</span>(<span class="ident">dk</span>, <span class="number">0x31</span>)); <span class="comment">// uint64 res[4] = {dk0*dk1, dk2*dk3, ...} */</span>
-            <span class="ident">xacc</span>.<span class="ident">add</span>(<span class="ident">i</span>).<span class="ident">write</span>(<span class="kw">if</span> <span class="ident">acc_width</span> <span class="op">=</span><span class="op">=</span> <span class="ident">AccWidth::Acc128Bits</span> {
+            <span class="ident">xacc</span>.<span class="ident">add</span>(<span class="ident">i</span>).<span class="ident">write</span>(<span class="kw">if</span> <span class="ident">acc_width</span> <span class="op">==</span> <span class="ident">AccWidth::Acc128Bits</span> {
                 <span class="kw">let</span> <span class="ident">dswap</span> <span class="op">=</span> <span class="ident">_mm_shuffle_epi32</span>(<span class="ident">d</span>, <span class="ident">_mm_shuffle</span>(<span class="number">1</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">2</span>));
                 <span class="kw">let</span> <span class="ident">add</span> <span class="op">=</span> <span class="ident">_mm_add_epi64</span>(<span class="ident">xacc</span>.<span class="ident">add</span>(<span class="ident">i</span>).<span class="ident">read</span>(), <span class="ident">dswap</span>);
                 <span class="ident">_mm_add_epi64</span>(<span class="ident">mul</span>, <span class="ident">add</span>)
@@ -2422,7 +2422,7 @@
             <span class="ident">acc</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">acc</span>[<span class="ident">i</span>].<span class="ident">wrapping_add</span>(<span class="ident">mul32_to64</span>(<span class="ident">data_key1</span>, <span class="ident">data_key1</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>));
             <span class="ident">acc</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">acc</span>[<span class="ident">i</span>].<span class="ident">wrapping_add</span>(<span class="ident">mul32_to64</span>(<span class="ident">data_key2</span>, <span class="ident">data_key2</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>));
 
-            <span class="kw">if</span> <span class="ident">acc_width</span> <span class="op">=</span><span class="op">=</span> <span class="ident">AccWidth::Acc128Bits</span> {
+            <span class="kw">if</span> <span class="ident">acc_width</span> <span class="op">==</span> <span class="ident">AccWidth::Acc128Bits</span> {
                 <span class="ident">acc</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">acc</span>[<span class="ident">i</span>].<span class="ident">wrapping_add</span>(<span class="ident">in2</span>);
                 <span class="ident">acc</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">acc</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>].<span class="ident">wrapping_add</span>(<span class="ident">in1</span>);
             } <span class="kw">else</span> {
@@ -2433,7 +2433,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">mul32_to64</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">mul32_to64</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
         (<span class="ident">a</span> <span class="op">&amp;</span> <span class="number">0xFFFFFFFF</span>).<span class="ident">wrapping_mul</span>(<span class="ident">b</span> <span class="op">&amp;</span> <span class="number">0xFFFFFFFF</span>)
     }
 
@@ -2461,7 +2461,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">merge_accs</span>(<span class="ident">acc</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>], <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">start</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">merge_accs</span>(<span class="ident">acc</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>], <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">start</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="ident">avalanche</span>(
         <span class="ident">start</span>
             .<span class="ident">wrapping_add</span>(<span class="ident">mix2accs</span>(<span class="ident">acc</span>, <span class="ident">secret</span>))
@@ -2472,7 +2472,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">mix2accs</span>(<span class="ident">acc</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>], <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">mix2accs</span>(<span class="ident">acc</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>], <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u64</span> {
     <span class="ident">mul128_fold64</span>(
         <span class="ident">acc</span>[<span class="number">0</span>] <span class="op">^</span> <span class="ident">secret</span>.<span class="ident">read_u64_le</span>(),
         <span class="ident">acc</span>[<span class="number">1</span>] <span class="op">^</span> <span class="ident">secret</span>[<span class="number">8</span>..].<span class="ident">read_u64_le</span>(),
@@ -2480,7 +2480,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">mix_16bytes</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">mix_16bytes</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">ll1</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">read_u64_le</span>();
     <span class="kw">let</span> <span class="ident">ll2</span> <span class="op">=</span> <span class="ident">data</span>[<span class="number">8</span>..].<span class="ident">read_u64_le</span>();
 
@@ -2491,14 +2491,14 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">mul128_fold64</span>(<span class="ident">ll1</span>: <span class="ident">u64</span>, <span class="ident">ll2</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">mul128_fold64</span>(<span class="ident">ll1</span>: <span class="ident">u64</span>, <span class="ident">ll2</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="ident">lll</span> <span class="op">=</span> <span class="ident">u128::from</span>(<span class="ident">ll1</span>).<span class="ident">wrapping_mul</span>(<span class="ident">u128::from</span>(<span class="ident">ll2</span>));
 
     (<span class="ident">lll</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">^</span> ((<span class="ident">lll</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u64</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">avalanche</span>(<span class="kw-2">mut</span> <span class="ident">h64</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">avalanche</span>(<span class="kw-2">mut</span> <span class="ident">h64</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     <span class="ident">h64</span> <span class="op">^</span><span class="op">=</span> <span class="ident">h64</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">37</span>;
     <span class="ident">h64</span> <span class="op">=</span> <span class="ident">h64</span>.<span class="ident">wrapping_mul</span>(<span class="ident">PRIME64_3</span>);
     <span class="ident">h64</span> <span class="op">^</span> (<span class="ident">h64</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>)
@@ -2535,22 +2535,22 @@
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">With</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> [<span class="ident">u8</span>];
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">With::Default</span>(<span class="ident">secret</span>) <span class="op">|</span> <span class="ident">With::Custom</span>(<span class="ident">secret</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">secret</span>.<span class="number">0</span>[..],
-            <span class="ident">With::Ref</span>(<span class="ident">secret</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">secret</span>,
+            <span class="ident">With::Default</span>(<span class="ident">secret</span>) <span class="op">|</span> <span class="ident">With::Custom</span>(<span class="ident">secret</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">secret</span>.<span class="number">0</span>[..],
+            <span class="ident">With::Ref</span>(<span class="ident">secret</span>) =&gt; <span class="ident">secret</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="number">0</span>, <span class="ident">With::Default</span>(<span class="ident">Secret::default</span>()))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">seed</span>: <span class="ident">u64</span>, <span class="ident">secret</span>: <span class="ident">With</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">seed</span>: <span class="ident">u64</span>, <span class="ident">secret</span>: <span class="ident">With</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">State</span> {
             <span class="ident">acc</span>: <span class="ident">Acc::default</span>(),
             <span class="ident">secret</span>,
@@ -2561,11 +2561,11 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">with_seed</span>(<span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">with_seed</span>(<span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">seed</span>, <span class="ident">With::Custom</span>(<span class="ident">Secret::with_seed</span>(<span class="ident">seed</span>)))
     }
 
-    <span class="kw">fn</span> <span class="ident">with_secret</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">secret</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">with_secret</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">secret</span>: <span class="ident">S</span>) -&gt; <span class="ident">State</span> {
         <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident">secret</span>.<span class="ident">into</span>();
 
         <span class="macro">debug_assert!</span>(<span class="ident">secret</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">SECRET_SIZE_MIN</span>);
@@ -2574,12 +2574,12 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">secret_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">secret_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">secret</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">STRIPE_LEN</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">nb_stripes_per_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">nb_stripes_per_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">secret_limit</span>() <span class="op">/</span> <span class="ident">SECRET_CONSUME_RATE</span>
     }
 
@@ -2587,7 +2587,7 @@
     <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">acc_width</span>: <span class="ident">AccWidth</span>) {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>();
 
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span>;
         }
 
@@ -2640,7 +2640,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">digest_long</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">acc_width</span>: <span class="ident">AccWidth</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Acc</span> {
+    <span class="kw">fn</span> <span class="ident">digest_long</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">acc_width</span>: <span class="ident">AccWidth</span>) -&gt; <span class="ident">Acc</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">acc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">acc</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">secret_limit</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">secret_limit</span>();
 
@@ -2694,7 +2694,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">digest64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">digest64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">total_len</span> <span class="op">&gt;</span> <span class="ident">MIDSIZE_MAX</span> {
             <span class="kw">let</span> <span class="ident">acc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">digest_long</span>(<span class="ident">AccWidth::Acc64Bits</span>);
 
@@ -2711,7 +2711,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">digest128</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+    <span class="kw">fn</span> <span class="ident">digest128</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u128</span> {
         <span class="kw">let</span> <span class="ident">secret_limit</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">secret_limit</span>();
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">total_len</span> <span class="op">&gt;</span> <span class="ident">MIDSIZE_MAX</span> {
@@ -2752,7 +2752,7 @@
     <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     <span class="ident">secret_limit</span>: <span class="ident">usize</span>,
     <span class="ident">acc_width</span>: <span class="ident">AccWidth</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+) -&gt; <span class="ident">usize</span> {
     <span class="macro">debug_assert!</span>(<span class="ident">nb_stripes_so_far</span> <span class="op">&lt;</span> <span class="ident">nb_stripes_per_block</span>);
 
     <span class="kw">if</span> <span class="ident">nb_stripes_per_block</span> <span class="op">-</span> <span class="ident">nb_stripes_so_far</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">total_stripes</span> {
@@ -2795,7 +2795,7 @@
  * ========================================== */</span>
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_len_0to16_128bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">fn</span> <span class="ident">hash_len_0to16_128bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u128</span> {
     <span class="macro">debug_assert!</span>(<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">16</span>);
 
     <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">8</span> {
@@ -2810,7 +2810,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_len_1to3_128bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">fn</span> <span class="ident">hash_len_1to3_128bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u128</span> {
     <span class="macro">debug_assert!</span>((<span class="number">1</span>..<span class="op">=</span><span class="number">3</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>));
 
     <span class="kw">let</span> <span class="ident">c1</span> <span class="op">=</span> <span class="ident">u32::from</span>(<span class="ident">data</span>[<span class="number">0</span>]);
@@ -2827,7 +2827,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_len_4to8_128bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">fn</span> <span class="ident">hash_len_4to8_128bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u128</span> {
     <span class="macro">debug_assert!</span>((<span class="number">4</span>..<span class="op">=</span><span class="number">8</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>));
 
     <span class="kw">let</span> <span class="ident">in1</span> <span class="op">=</span> <span class="ident">u64::from</span>(<span class="ident">data</span>.<span class="ident">read_u32_le</span>());
@@ -2848,7 +2848,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_len_9to16_128bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">fn</span> <span class="ident">hash_len_9to16_128bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u128</span> {
     <span class="macro">debug_assert!</span>((<span class="number">9</span>..<span class="op">=</span><span class="number">16</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>));
 
     <span class="kw">let</span> <span class="ident">ll1</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">read_u64_le</span>() <span class="op">^</span> <span class="ident">key</span>.<span class="ident">read_u64_le</span>().<span class="ident">wrapping_add</span>(<span class="ident">seed</span>);
@@ -2867,7 +2867,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_len_17to128_128bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">fn</span> <span class="ident">hash_len_17to128_128bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u128</span> {
     <span class="macro">debug_assert!</span>((<span class="number">17</span>..<span class="op">=</span><span class="number">128</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>));
     <span class="macro">debug_assert!</span>(<span class="ident">secret</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">SECRET_SIZE_MIN</span>);
 
@@ -2901,7 +2901,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_len_129to240_128bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">fn</span> <span class="ident">hash_len_129to240_128bits</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u128</span> {
     <span class="macro">debug_assert!</span>((<span class="number">129</span>..<span class="op">=</span><span class="ident">MIDSIZE_MAX</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>));
     <span class="macro">debug_assert!</span>(<span class="ident">secret</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">SECRET_SIZE_MIN</span>);
 
@@ -2961,18 +2961,18 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">hash_long_128bits_with_default_secret</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">fn</span> <span class="ident">hash_long_128bits_with_default_secret</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u128</span> {
     <span class="ident">hash_long_128bits_internal</span>(<span class="ident">data</span>, <span class="ident">len</span>, <span class="kw-2">&amp;</span><span class="ident">SECRET</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">hash_long_128bits_with_secret</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">fn</span> <span class="ident">hash_long_128bits_with_secret</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u128</span> {
     <span class="ident">hash_long_128bits_internal</span>(<span class="ident">data</span>, <span class="ident">len</span>, <span class="ident">secret</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">hash_long_128bits_with_seed</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
-    <span class="kw">if</span> <span class="ident">seed</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+<span class="kw">fn</span> <span class="ident">hash_long_128bits_with_seed</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u128</span> {
+    <span class="kw">if</span> <span class="ident">seed</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="ident">hash_long_128bits_with_default_secret</span>(<span class="ident">data</span>, <span class="ident">len</span>)
     } <span class="kw">else</span> {
         <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident">Secret::with_seed</span>(<span class="ident">seed</span>);
@@ -2982,7 +2982,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">hash_long_128bits_internal</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">fn</span> <span class="ident">hash_long_128bits_internal</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u128</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">acc</span> <span class="op">=</span> <span class="ident">Acc::default</span>();
 
     <span class="ident">hash_long_internal_loop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">data</span>, <span class="ident">len</span>, <span class="ident">secret</span>, <span class="ident">AccWidth::Acc128Bits</span>);
@@ -3019,7 +3019,7 @@ and near the end of the digest function */</span>
     <span class="kw">const</span> <span class="ident">PRIME64</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">11400714785074694797</span>;
     <span class="kw">const</span> <span class="ident">SANITY_BUFFER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2243</span>;
 
-    <span class="kw">fn</span> <span class="ident">sanity_buffer</span>() <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="ident">SANITY_BUFFER_SIZE</span>] {
+    <span class="kw">fn</span> <span class="ident">sanity_buffer</span>() -&gt; [<span class="ident">u8</span>; <span class="ident">SANITY_BUFFER_SIZE</span>] {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">SANITY_BUFFER_SIZE</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte_gen</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">PRIME</span>;
 

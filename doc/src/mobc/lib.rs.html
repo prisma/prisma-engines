@@ -928,7 +928,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">E</span>) -&gt; <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
         <span class="ident">Error::Inner</span>(<span class="ident">e</span>)
     }
 }
@@ -937,11 +937,11 @@
 <span class="kw">where</span>
     <span class="ident">E</span>: <span class="ident">fmt::Display</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::Inner</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>),
-            <span class="ident">Error::Timeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Timed out in mobc&quot;</span>),
-            <span class="ident">Error::BadConn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Bad connection in mobc&quot;</span>),
+            <span class="ident">Error::Inner</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>),
+            <span class="ident">Error::Timeout</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Timed out in mobc&quot;</span>),
+            <span class="ident">Error::BadConn</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Bad connection in mobc&quot;</span>),
         }
     }
 }
@@ -950,11 +950,11 @@
 <span class="kw">where</span>
     <span class="ident">E</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::Inner</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>),
-            <span class="ident">Error::Timeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Timed out in mobc&quot;</span>),
-            <span class="ident">Error::BadConn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Bad connection in mobc&quot;</span>),
+            <span class="ident">Error::Inner</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>),
+            <span class="ident">Error::Timeout</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Timed out in mobc&quot;</span>),
+            <span class="ident">Error::BadConn</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Bad connection in mobc&quot;</span>),
         }
     }
 }
@@ -963,11 +963,11 @@
 <span class="kw">where</span>
     <span class="ident">E</span>: <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::Inner</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error::Timeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">Error::BadConn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Error::Inner</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">Error::Timeout</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">Error::BadConn</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
@@ -990,17 +990,17 @@
     }
 
     <span class="doccomment">/// Attempts to create a new connection.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Connection</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Connection</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Determines if the connection is still connected to the database when check-out.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A standard implementation would check if a simple query like `SELECT 1`</span>
     <span class="doccomment">/// succeeds.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">conn</span>: <span class="ident"><span class="self">Self</span>::Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Connection</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">conn</span>: <span class="ident"><span class="self">Self</span>::Connection</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Connection</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// *Quickly* determines a connection is still valid when check-in.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_conn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_conn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Connection</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 }
@@ -1026,7 +1026,7 @@
         <span class="ident">internals</span>.<span class="ident">num_open</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">expired</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">expired</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">timeout</span>
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">check_interval</span><span class="op">|</span> {
                 <span class="ident">Instant::now</span>()
@@ -1036,7 +1036,7 @@
             .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">idle_expired</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">idle_expired</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">timeout</span>
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">check_interval</span><span class="op">|</span> {
                 <span class="ident">Instant::now</span>()
@@ -1046,7 +1046,7 @@
             .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">needs_health_check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">needs_health_check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">timeout</span>
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">check_interval</span><span class="op">|</span> {
                 <span class="ident">Instant::now</span>()
@@ -1081,7 +1081,7 @@
 
 <span class="doccomment">/// Returns a new `Pool` referencing the same state as `self`.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Pool</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>())
     }
 }
@@ -1111,7 +1111,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Stats&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;max_open&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max_open</span>)
             .<span class="ident">field</span>(<span class="string">&quot;connections&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connections</span>)
@@ -1139,12 +1139,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new connection pool with a default configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">manager</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">manager</span>: <span class="ident">M</span>) -&gt; <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="ident">Pool::builder</span>().<span class="ident">build</span>(<span class="ident">manager</span>)
     }
 
     <span class="doccomment">/// Returns a builder type to configure a new pool.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() -&gt; <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="ident">Builder::new</span>()
     }
 
@@ -1205,11 +1205,11 @@
         <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_lifetime</span> <span class="op">=</span> <span class="ident">max_lifetime</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">lifetime</span>) <span class="op">=</span> <span class="ident">max_lifetime</span> {
             <span class="kw">match</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_lifetime</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">prev</span>) <span class="kw">if</span> <span class="ident">lifetime</span> <span class="op">&lt;</span> <span class="ident">prev</span> <span class="op">&amp;&amp;</span> <span class="ident">internals</span>.<span class="ident">cleaner_ch</span>.<span class="ident">is_some</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">prev</span>) <span class="kw">if</span> <span class="ident">lifetime</span> <span class="op">&lt;</span> <span class="ident">prev</span> <span class="op">&amp;&amp;</span> <span class="ident">internals</span>.<span class="ident">cleaner_ch</span>.<span class="ident">is_some</span>() =&gt; {
                     <span class="comment">// FIXME</span>
                     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">cleaner_ch</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">send</span>(()).<span class="kw">await</span>;
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                <span class="kw">_</span> =&gt; (),
             }
         }
 
@@ -1225,8 +1225,8 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_inner</span>(<span class="ident">manager</span>: <span class="ident">M</span>, <span class="ident">config</span>: <span class="ident">Config</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">max_open</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">max_open</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_inner</span>(<span class="ident">manager</span>: <span class="ident">M</span>, <span class="ident">config</span>: <span class="ident">Config</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">max_open</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">max_open</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="ident">CONNECTION_REQUEST_QUEUE_SIZE</span>
         } <span class="kw">else</span> {
             <span class="ident">config</span>.<span class="ident">max_open</span> <span class="kw">as</span> <span class="ident">usize</span>
@@ -1264,10 +1264,10 @@
     <span class="doccomment">/// Returns a single connection by either opening a new connection</span>
     <span class="doccomment">/// or returning an existing connection from the connection pool. Conn will</span>
     <span class="doccomment">/// block until either a connection is returned or timeout.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">config</span>.<span class="ident">get_timeout</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">get_timeout</span>(<span class="ident">duration</span>).<span class="kw">await</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">inner_get_with_retries</span>().<span class="kw">await</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">duration</span>) =&gt; <span class="self">self</span>.<span class="ident">get_timeout</span>(<span class="ident">duration</span>).<span class="kw">await</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">inner_get_with_retries</span>().<span class="kw">await</span>,
         }
     }
 
@@ -1275,29 +1275,29 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The given timeout will be used instead of the configured connection</span>
     <span class="doccomment">/// timeout.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">time::timeout</span>(<span class="ident">duration</span>, <span class="self">self</span>.<span class="ident">inner_get_with_retries</span>()).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">inner_get_with_retries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">inner_get_with_retries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">try_times</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">config</span>;
         <span class="kw">loop</span> {
             <span class="ident">try_times</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">strategy_get</span>(<span class="ident">GetStrategy::CachedOrNewConn</span>).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">conn</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">conn</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">Error::BadConn</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">try_times</span> <span class="op">=</span><span class="op">=</span> <span class="ident">config</span>.<span class="ident">max_bad_conn_retries</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">conn</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">conn</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">Error::BadConn</span>) =&gt; {
+                    <span class="kw">if</span> <span class="ident">try_times</span> <span class="op">==</span> <span class="ident">config</span>.<span class="ident">max_bad_conn_retries</span> {
                         <span class="kw">return</span> <span class="self">self</span>.<span class="ident">strategy_get</span>(<span class="ident">GetStrategy::AlwaysNewConn</span>).<span class="kw">await</span>;
                     }
                     <span class="kw">continue</span>;
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
             }
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">strategy_get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">strategy</span>: <span class="ident">GetStrategy</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">strategy_get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">strategy</span>: <span class="ident">GetStrategy</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner_strategy_ctx</span>(<span class="ident">strategy</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">c</span>.<span class="ident">brand_new</span> {
@@ -1318,11 +1318,11 @@
             <span class="kw">if</span> <span class="ident">needs_health_check</span> {
                 <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">raw</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
                 <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">manager</span>.<span class="ident">check</span>(<span class="ident">raw</span>).<span class="kw">await</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">raw</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">raw</span>) =&gt; {
                         <span class="ident">c</span>.<span class="ident">last_checked_at</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
                         <span class="ident">c</span>.<span class="ident">raw</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">raw</span>)
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">_e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">_e</span>) =&gt; {
                         <span class="ident">internals</span>.<span class="ident">num_open</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::BadConn</span>);
                     }
@@ -1343,10 +1343,10 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">inner_strategy_ctx</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">strategy</span>: <span class="ident">GetStrategy</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">M::Connection</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">M::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">num_free</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">len</span>();
-        <span class="kw">if</span> <span class="ident">strategy</span> <span class="op">=</span><span class="op">=</span> <span class="ident">GetStrategy::CachedOrNewConn</span> <span class="op">&amp;&amp;</span> <span class="ident">num_free</span> <span class="op">&gt;</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">strategy</span> <span class="op">==</span> <span class="ident">GetStrategy::CachedOrNewConn</span> <span class="op">&amp;&amp;</span> <span class="ident">num_free</span> <span class="op">&gt;</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">internals</span>.<span class="ident">free_conns</span>.<span class="ident">swap_remove</span>(<span class="number">0</span>);
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">c</span>);
         }
@@ -1370,7 +1370,7 @@
 
         <span class="macro">log::debug!</span>(<span class="string">&quot;get conn with manager create&quot;</span>);
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">manager</span>.<span class="ident">connect</span>().<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; {
                 <span class="ident">internals</span>.<span class="ident">num_open</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">drop</span>(<span class="ident">internals</span>);
 
@@ -1385,7 +1385,7 @@
 
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">conn</span>);
             }
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                 <span class="ident">maybe_open_new_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">internals</span>).<span class="kw">await</span>;
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Inner</span>(<span class="ident">e</span>));
             }
@@ -1393,7 +1393,7 @@
     }
 
     <span class="doccomment">/// Returns information about the current state of the pool.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">State</span> {
         <span class="kw">let</span> <span class="ident">internals</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="ident">State</span> {
             <span class="ident">max_open</span>: <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_open</span>,
@@ -1420,15 +1420,15 @@
 
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">open_new_connection</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span>(<span class="ident">shared</span>: <span class="kw-2">&amp;</span><span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">shared</span>.<span class="ident">upgrade</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">shared</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">shared</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">shared</span>) =&gt; <span class="ident">shared</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
     };
 
     <span class="kw">let</span> <span class="ident">create_r</span> <span class="op">=</span> <span class="ident">shared</span>.<span class="ident">manager</span>.<span class="ident">connect</span>().<span class="kw">await</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="ident">shared</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
     <span class="kw">match</span> <span class="ident">create_r</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Conn</span> {
                 <span class="ident">raw</span>: <span class="prelude-val">Some</span>(<span class="ident">c</span>),
                 <span class="ident">last_err</span>: <span class="ident">Mutex::new</span>(<span class="prelude-val">None</span>),
@@ -1439,7 +1439,7 @@
             };
             <span class="kw">return</span> <span class="ident">put_conn</span>(<span class="kw-2">&amp;</span><span class="ident">shared</span>, <span class="ident">internals</span>, <span class="ident">conn</span>).<span class="kw">await</span>;
         }
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
             <span class="ident">internals</span>.<span class="ident">num_open</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
             <span class="kw">return</span> <span class="ident">maybe_open_new_connection</span>(<span class="kw-2">&amp;</span><span class="ident">shared</span>, <span class="ident">internals</span>).<span class="kw">await</span>;
         }
@@ -1530,10 +1530,10 @@
 
     <span class="kw">loop</span> {
         <span class="macro">select!</span> {
-            <span class="kw">_</span> <span class="op">=</span> <span class="ident">interval</span>.<span class="ident">tick</span>().<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">r</span> <span class="op">=</span> <span class="ident">cleaner_ch</span>.<span class="ident">next</span>().<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">r</span>{
-                <span class="prelude-val">Some</span>(()) <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="prelude-val">None</span><span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>
+            <span class="kw">_</span> <span class="op">=</span> <span class="ident">interval</span>.<span class="ident">tick</span>().<span class="ident">fuse</span>() =&gt; (),
+            <span class="ident">r</span> <span class="op">=</span> <span class="ident">cleaner_ch</span>.<span class="ident">next</span>().<span class="ident">fuse</span>() =&gt; <span class="kw">match</span> <span class="ident">r</span>{
+                <span class="prelude-val">Some</span>(()) =&gt; (),
+                <span class="prelude-val">None</span>=&gt; <span class="kw">return</span>
             },
         }
 
@@ -1543,10 +1543,10 @@
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">clean_connection</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span>(<span class="ident">shared</span>: <span class="kw-2">&amp;</span><span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">clean_connection</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span>(<span class="ident">shared</span>: <span class="kw-2">&amp;</span><span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">SharedPool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">shared</span>.<span class="ident">upgrade</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">shared</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">shared</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">shared</span>) =&gt; <span class="ident">shared</span>,
+        <span class="prelude-val">None</span> =&gt; {
             <span class="macro">log::debug!</span>(<span class="string">&quot;Failed to clean connections&quot;</span>);
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
@@ -1555,7 +1555,7 @@
     <span class="macro">log::debug!</span>(<span class="string">&quot;Clean connections&quot;</span>);
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internals</span> <span class="op">=</span> <span class="ident">shared</span>.<span class="ident">internals</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-    <span class="kw">if</span> <span class="ident">internals</span>.<span class="ident">num_open</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_lifetime</span>.<span class="ident">is_none</span>() {
+    <span class="kw">if</span> <span class="ident">internals</span>.<span class="ident">num_open</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">internals</span>.<span class="ident">config</span>.<span class="ident">max_lifetime</span>.<span class="ident">is_none</span>() {
         <span class="ident">internals</span>.<span class="ident">cleaner_ch</span>.<span class="ident">take</span>();
         <span class="kw">return</span> <span class="bool-val">false</span>;
     }
@@ -1597,12 +1597,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Returns true is the connection is newly established.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_brand_new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_brand_new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">brand_new</span>
     }
 
     <span class="doccomment">/// Unwraps the raw database connection.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">M::Connection</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">M::Connection</span> {
         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">raw</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>()
     }
 }
@@ -1620,13 +1620,13 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">M::Connection</span>;
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">raw</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M::Connection</span> {
+    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M::Connection</span> {
         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">raw</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()
     }
 }

@@ -168,7 +168,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DestructiveCheckPlan</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">DestructiveCheckPlan</span> {
             <span class="ident">warnings</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">unexecutable_migrations</span>: <span class="ident">Vec::new</span>(),
@@ -192,7 +192,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">flavour</span>: <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">SqlFlavour</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>),
         <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DestructiveChangeDiagnostics</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DestructiveChangeDiagnostics</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span> <span class="op">=</span> <span class="ident">DatabaseInspectionResults::default</span>();
 
         <span class="kw">let</span> <span class="ident">inspection</span> <span class="op">=</span> <span class="kw">async</span> {
@@ -210,8 +210,8 @@
 
         <span class="comment">// Ignore the timeout error, we will still return useful warnings.</span>
         <span class="kw">match</span> <span class="ident">timeout</span>(<span class="ident">DESTRUCTIVE_TIMEOUT_DURATION</span>, <span class="ident">inspection</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(())) <span class="op">|</span> <span class="prelude-val">Err</span>(<span class="ident">Elapsed</span> { .. }) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(())) <span class="op">|</span> <span class="prelude-val">Err</span>(<span class="ident">Elapsed</span> { .. }) =&gt; (),
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">DestructiveChangeDiagnostics::new</span>();
@@ -244,7 +244,7 @@
         <span class="ident">flavour</span>: <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">SqlFlavour</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>),
         <span class="ident">results</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DatabaseInspectionResults</span>,
         <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">table</span>) <span class="op">=</span> <span class="ident">check</span>.<span class="ident">needed_table_row_count</span>() {
             <span class="kw">if</span> <span class="ident">results</span>.<span class="ident">get_row_count</span>(<span class="ident">table</span>).<span class="ident">is_none</span>() {
                 <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">flavour</span>.<span class="ident">count_rows_in_table</span>(<span class="ident">table</span>, <span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -267,7 +267,7 @@
     <span class="doccomment">/// database we cannot check directly. For example when we want to emit</span>
     <span class="doccomment">/// warnings about the production database, when creating a migration in</span>
     <span class="doccomment">/// development.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">pure_check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DestructiveChangeDiagnostics</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">pure_check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DestructiveChangeDiagnostics</span> {
         <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> <span class="ident">DatabaseInspectionResults::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">DestructiveChangeDiagnostics::new</span>();
 

@@ -170,21 +170,21 @@
 
 <span class="kw">impl</span> <span class="ident">Month</span> {
     <span class="doccomment">/// Create a `Month` from its numerical value.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_number</span>(<span class="ident">n</span>: <span class="ident">NonZeroU8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_number</span>(<span class="ident">n</span>: <span class="ident">NonZeroU8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">n</span>.<span class="ident">get</span>() {
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">January</span>),
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">February</span>),
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">March</span>),
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">April</span>),
-            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">May</span>),
-            <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">June</span>),
-            <span class="number">7</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">July</span>),
-            <span class="number">8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">August</span>),
-            <span class="number">9</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">September</span>),
-            <span class="number">10</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">October</span>),
-            <span class="number">11</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">November</span>),
-            <span class="number">12</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">December</span>),
-            <span class="ident">n</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">error::ComponentRange</span> {
+            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">January</span>),
+            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">February</span>),
+            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">March</span>),
+            <span class="number">4</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">April</span>),
+            <span class="number">5</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">May</span>),
+            <span class="number">6</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">June</span>),
+            <span class="number">7</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">July</span>),
+            <span class="number">8</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">August</span>),
+            <span class="number">9</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">September</span>),
+            <span class="number">10</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">October</span>),
+            <span class="number">11</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">November</span>),
+            <span class="number">12</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">December</span>),
+            <span class="ident">n</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">error::ComponentRange</span> {
                 <span class="ident">name</span>: <span class="string">&quot;month&quot;</span>,
                 <span class="ident">minimum</span>: <span class="number">1</span>,
                 <span class="ident">maximum</span>: <span class="number">12</span>,
@@ -200,20 +200,20 @@
     <span class="doccomment">/// # use time::Month;</span>
     <span class="doccomment">/// assert_eq!(Month::January.previous(), Month::December);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">previous</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">previous</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">January</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">December</span>,
-            <span class="ident">February</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">January</span>,
-            <span class="ident">March</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">February</span>,
-            <span class="ident">April</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">March</span>,
-            <span class="ident">May</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">April</span>,
-            <span class="ident">June</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">May</span>,
-            <span class="ident">July</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">June</span>,
-            <span class="ident">August</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">July</span>,
-            <span class="ident">September</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">August</span>,
-            <span class="ident">October</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">September</span>,
-            <span class="ident">November</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">October</span>,
-            <span class="ident">December</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">November</span>,
+            <span class="ident">January</span> =&gt; <span class="ident">December</span>,
+            <span class="ident">February</span> =&gt; <span class="ident">January</span>,
+            <span class="ident">March</span> =&gt; <span class="ident">February</span>,
+            <span class="ident">April</span> =&gt; <span class="ident">March</span>,
+            <span class="ident">May</span> =&gt; <span class="ident">April</span>,
+            <span class="ident">June</span> =&gt; <span class="ident">May</span>,
+            <span class="ident">July</span> =&gt; <span class="ident">June</span>,
+            <span class="ident">August</span> =&gt; <span class="ident">July</span>,
+            <span class="ident">September</span> =&gt; <span class="ident">August</span>,
+            <span class="ident">October</span> =&gt; <span class="ident">September</span>,
+            <span class="ident">November</span> =&gt; <span class="ident">October</span>,
+            <span class="ident">December</span> =&gt; <span class="ident">November</span>,
         }
     }
 
@@ -223,45 +223,45 @@
     <span class="doccomment">/// # use time::Month;</span>
     <span class="doccomment">/// assert_eq!(Month::January.next(), Month::February);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">January</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">February</span>,
-            <span class="ident">February</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">March</span>,
-            <span class="ident">March</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">April</span>,
-            <span class="ident">April</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">May</span>,
-            <span class="ident">May</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">June</span>,
-            <span class="ident">June</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">July</span>,
-            <span class="ident">July</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">August</span>,
-            <span class="ident">August</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">September</span>,
-            <span class="ident">September</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">October</span>,
-            <span class="ident">October</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">November</span>,
-            <span class="ident">November</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">December</span>,
-            <span class="ident">December</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">January</span>,
+            <span class="ident">January</span> =&gt; <span class="ident">February</span>,
+            <span class="ident">February</span> =&gt; <span class="ident">March</span>,
+            <span class="ident">March</span> =&gt; <span class="ident">April</span>,
+            <span class="ident">April</span> =&gt; <span class="ident">May</span>,
+            <span class="ident">May</span> =&gt; <span class="ident">June</span>,
+            <span class="ident">June</span> =&gt; <span class="ident">July</span>,
+            <span class="ident">July</span> =&gt; <span class="ident">August</span>,
+            <span class="ident">August</span> =&gt; <span class="ident">September</span>,
+            <span class="ident">September</span> =&gt; <span class="ident">October</span>,
+            <span class="ident">October</span> =&gt; <span class="ident">November</span>,
+            <span class="ident">November</span> =&gt; <span class="ident">December</span>,
+            <span class="ident">December</span> =&gt; <span class="ident">January</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Month</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">January</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;January&quot;</span>,
-            <span class="ident">February</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;February&quot;</span>,
-            <span class="ident">March</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;March&quot;</span>,
-            <span class="ident">April</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;April&quot;</span>,
-            <span class="ident">May</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;May&quot;</span>,
-            <span class="ident">June</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;June&quot;</span>,
-            <span class="ident">July</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;July&quot;</span>,
-            <span class="ident">August</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;August&quot;</span>,
-            <span class="ident">September</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;September&quot;</span>,
-            <span class="ident">October</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;October&quot;</span>,
-            <span class="ident">November</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;November&quot;</span>,
-            <span class="ident">December</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;December&quot;</span>,
+            <span class="ident">January</span> =&gt; <span class="string">&quot;January&quot;</span>,
+            <span class="ident">February</span> =&gt; <span class="string">&quot;February&quot;</span>,
+            <span class="ident">March</span> =&gt; <span class="string">&quot;March&quot;</span>,
+            <span class="ident">April</span> =&gt; <span class="string">&quot;April&quot;</span>,
+            <span class="ident">May</span> =&gt; <span class="string">&quot;May&quot;</span>,
+            <span class="ident">June</span> =&gt; <span class="string">&quot;June&quot;</span>,
+            <span class="ident">July</span> =&gt; <span class="string">&quot;July&quot;</span>,
+            <span class="ident">August</span> =&gt; <span class="string">&quot;August&quot;</span>,
+            <span class="ident">September</span> =&gt; <span class="string">&quot;September&quot;</span>,
+            <span class="ident">October</span> =&gt; <span class="string">&quot;October&quot;</span>,
+            <span class="ident">November</span> =&gt; <span class="string">&quot;November&quot;</span>,
+            <span class="ident">December</span> =&gt; <span class="string">&quot;December&quot;</span>,
         })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Month</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">month</span>: <span class="ident">Month</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">month</span>: <span class="ident">Month</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">month</span> <span class="kw">as</span> <span class="kw">_</span>
     }
 }
@@ -269,10 +269,10 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Month</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">error::ComponentRange</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">NonZeroU8::new</span>(<span class="ident">value</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::from_number</span>(<span class="ident">value</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">error::ComponentRange</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="ident"><span class="self">Self</span>::from_number</span>(<span class="ident">value</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">error::ComponentRange</span> {
                 <span class="ident">name</span>: <span class="string">&quot;month&quot;</span>,
                 <span class="ident">minimum</span>: <span class="number">1</span>,
                 <span class="ident">maximum</span>: <span class="number">12</span>,

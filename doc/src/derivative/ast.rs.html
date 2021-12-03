@@ -205,18 +205,18 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ast</span>(
         <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">syn::DeriveInput</span>,
         <span class="ident">errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">proc_macro2::TokenStream</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">attr::Input::from_ast</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">attrs</span>, <span class="ident">errors</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">item</span>.<span class="ident">data</span> {
-            <span class="ident">syn::Data::Enum</span>(<span class="ident">syn::DataEnum</span> { <span class="kw-2">ref</span> <span class="ident">variants</span>, .. }) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">syn::Data::Enum</span>(<span class="ident">syn::DataEnum</span> { <span class="kw-2">ref</span> <span class="ident">variants</span>, .. }) =&gt; {
                 <span class="ident">Body::Enum</span>(<span class="ident">enum_from_ast</span>(<span class="ident">variants</span>, <span class="ident">errors</span>)<span class="question-mark">?</span>)
             }
-            <span class="ident">syn::Data::Struct</span>(<span class="ident">syn::DataStruct</span> { <span class="kw-2">ref</span> <span class="ident">fields</span>, .. }) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">syn::Data::Struct</span>(<span class="ident">syn::DataStruct</span> { <span class="kw-2">ref</span> <span class="ident">fields</span>, .. }) =&gt; {
                 <span class="kw">let</span> (<span class="ident">style</span>, <span class="ident">fields</span>) <span class="op">=</span> <span class="ident">struct_from_ast</span>(<span class="ident">fields</span>, <span class="ident">errors</span>)<span class="question-mark">?</span>;
                 <span class="ident">Body::Struct</span>(<span class="ident">style</span>, <span class="ident">fields</span>)
             }
-            <span class="ident">syn::Data::Union</span>(..) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">syn::Data::Union</span>(..) =&gt; {
                 <span class="ident">errors</span>.<span class="ident">extend</span>(
                     <span class="ident">syn::Error::new_spanned</span>(<span class="ident">item</span>, <span class="string">&quot;derivative does not support unions&quot;</span>)
                         .<span class="ident">to_compile_error</span>(),
@@ -235,36 +235,36 @@
     }
 
     <span class="doccomment">/// Checks whether this type is an enum with only unit variants.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_trivial_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_trivial_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">body</span> {
-            <span class="ident">Body::Enum</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">is_unit</span>()),
-            <span class="ident">Body::Struct</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Body::Enum</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">is_unit</span>()),
+            <span class="ident">Body::Struct</span>(..) =&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Body</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Field</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Field</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Body::Enum</span>(<span class="kw-2">ref</span> <span class="ident">variants</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">variants</span>
+            <span class="ident">Body::Enum</span>(<span class="kw-2">ref</span> <span class="ident">variants</span>) =&gt; <span class="ident">variants</span>
                 .<span class="ident">iter</span>()
                 .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> <span class="ident">variant</span>.<span class="ident">fields</span>.<span class="ident">iter</span>())
                 .<span class="ident">collect</span>(),
-            <span class="ident">Body::Struct</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">collect</span>(),
+            <span class="ident">Body::Struct</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">collect</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Body::Enum</span>(<span class="kw-2">ref</span> <span class="ident">variants</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">variants</span>.<span class="ident">is_empty</span>(),
-            <span class="ident">Body::Struct</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fields</span>.<span class="ident">is_empty</span>(),
+            <span class="ident">Body::Enum</span>(<span class="kw-2">ref</span> <span class="ident">variants</span>) =&gt; <span class="ident">variants</span>.<span class="ident">is_empty</span>(),
+            <span class="ident">Body::Struct</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">is_empty</span>(),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Variant</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Checks whether this variant is a unit variant.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>()
     }
 }
@@ -272,7 +272,7 @@
 <span class="kw">fn</span> <span class="ident">enum_from_ast</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">variants</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">syn::punctuated::Punctuated</span><span class="op">&lt;</span><span class="ident">syn::Variant</span>, <span class="ident">syn::token::Comma</span><span class="op">&gt;</span>,
     <span class="ident">errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">proc_macro2::TokenStream</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Variant</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Variant</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
     <span class="ident">variants</span>
         .<span class="ident">iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> {
@@ -290,22 +290,22 @@
 <span class="kw">fn</span> <span class="ident">struct_from_ast</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">syn::Fields</span>,
     <span class="ident">errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">proc_macro2::TokenStream</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Style</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>), ()<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Style</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>), ()<span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">fields</span> {
-        <span class="ident">syn::Fields::Named</span>(<span class="kw-2">ref</span> <span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">syn::Fields::Named</span>(<span class="kw-2">ref</span> <span class="ident">fields</span>) =&gt; {
             <span class="prelude-val">Ok</span>((<span class="ident">Style::Struct</span>, <span class="ident">fields_from_ast</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>.<span class="ident">named</span>, <span class="ident">errors</span>)<span class="question-mark">?</span>))
         }
-        <span class="ident">syn::Fields::Unnamed</span>(<span class="kw-2">ref</span> <span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">syn::Fields::Unnamed</span>(<span class="kw-2">ref</span> <span class="ident">fields</span>) =&gt; {
             <span class="prelude-val">Ok</span>((<span class="ident">Style::Tuple</span>, <span class="ident">fields_from_ast</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>.<span class="ident">unnamed</span>, <span class="ident">errors</span>)<span class="question-mark">?</span>))
         }
-        <span class="ident">syn::Fields::Unit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="ident">Style::Unit</span>, <span class="ident">Vec::new</span>())),
+        <span class="ident">syn::Fields::Unit</span> =&gt; <span class="prelude-val">Ok</span>((<span class="ident">Style::Unit</span>, <span class="ident">Vec::new</span>())),
     }
 }
 
 <span class="kw">fn</span> <span class="ident">fields_from_ast</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">syn::punctuated::Punctuated</span><span class="op">&lt;</span><span class="ident">syn::Field</span>, <span class="ident">syn::token::Comma</span><span class="op">&gt;</span>,
     <span class="ident">errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">proc_macro2::TokenStream</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
     <span class="ident">fields</span>
         .<span class="ident">iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {

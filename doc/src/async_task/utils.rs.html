@@ -68,7 +68,7 @@
 <span class="doccomment">/// Aborts the process.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// To abort, this function simply panics while panicking.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">abort</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="op">!</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">abort</span>() -&gt; <span class="op">!</span> {
     <span class="kw">struct</span> <span class="ident">Panic</span>;
 
     <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Panic</span> {
@@ -85,7 +85,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is useful in unsafe code where we can&#39;t recover from panics.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">abort_on_panic</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">abort_on_panic</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span>) -&gt; <span class="ident">T</span> {
     <span class="kw">struct</span> <span class="ident">Bomb</span>;
 
     <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Bomb</span> {
@@ -105,7 +105,7 @@
 <span class="doccomment">/// This function was adapted from the currently unstable `Layout::extend()`:</span>
 <span class="doccomment">/// https://doc.rust-lang.org/nightly/std/alloc/struct.Layout.html#method.extend</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">extend</span>(<span class="ident">a</span>: <span class="ident">Layout</span>, <span class="ident">b</span>: <span class="ident">Layout</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Layout</span>, <span class="ident">usize</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">extend</span>(<span class="ident">a</span>: <span class="ident">Layout</span>, <span class="ident">b</span>: <span class="ident">Layout</span>) -&gt; (<span class="ident">Layout</span>, <span class="ident">usize</span>) {
     <span class="kw">let</span> <span class="ident">new_align</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">align</span>().<span class="ident">max</span>(<span class="ident">b</span>.<span class="ident">align</span>());
     <span class="kw">let</span> <span class="ident">pad</span> <span class="op">=</span> <span class="ident">padding_needed_for</span>(<span class="ident">a</span>, <span class="ident">b</span>.<span class="ident">align</span>());
 
@@ -121,7 +121,7 @@
 <span class="doccomment">/// This function was adapted from the currently unstable `Layout::padding_needed_for()`:</span>
 <span class="doccomment">/// https://doc.rust-lang.org/nightly/std/alloc/struct.Layout.html#method.padding_needed_for</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">padding_needed_for</span>(<span class="ident">layout</span>: <span class="ident">Layout</span>, <span class="ident">align</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">padding_needed_for</span>(<span class="ident">layout</span>: <span class="ident">Layout</span>, <span class="ident">align</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">layout</span>.<span class="ident">size</span>();
     <span class="kw">let</span> <span class="ident">len_rounded_up</span> <span class="op">=</span> <span class="ident">len</span>.<span class="ident">wrapping_add</span>(<span class="ident">align</span>).<span class="ident">wrapping_sub</span>(<span class="number">1</span>) <span class="op">&amp;</span> <span class="op">!</span><span class="ident">align</span>.<span class="ident">wrapping_sub</span>(<span class="number">1</span>);
     <span class="ident">len_rounded_up</span>.<span class="ident">wrapping_sub</span>(<span class="ident">len</span>)

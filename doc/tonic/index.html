@@ -4,11 +4,11 @@ RPC framework that puts mobile and HTTP/2 first.</p>
 performance</strong>, <strong>interoperability</strong>, and <strong>flexibility</strong>. This library was
 created to have first class support of async/await and to act as a core building
 block for production systems written in Rust.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>Examples can be found in the <a href="https://github.com/hyperium/tonic/tree/master/examples"><code>tonic-examples</code></a> crate.</p>
-<h1 id="getting-started" class="section-header"><a href="#getting-started">Getting Started</a></h1>
+<h2 id="getting-started" class="section-header"><a href="#getting-started">Getting Started</a></h2>
 <p>Follow the instructions in the <a href="https://docs.rs/tonic-build"><code>tonic-build</code></a> crate documentation.</p>
-<h1 id="feature-flags" class="section-header"><a href="#feature-flags">Feature Flags</a></h1>
+<h2 id="feature-flags" class="section-header"><a href="#feature-flags">Feature Flags</a></h2>
 <ul>
 <li><code>transport</code>: Enables the fully featured, batteries included client and server
 implementation based on <a href="https://docs.rs/hyper"><code>hyper</code></a>, <a href="https://docs.rs/tower"><code>tower</code></a> and <a href="https://docs.rs/tokio"><code>tokio</code></a>. Enabled by default.</li>
@@ -26,13 +26,13 @@ enabled by default.</li>
 that you must enable the <code>compression</code> feature on both <code>tonic</code> and
 <code>tonic-build</code> to use it. Depends on <a href="https://crates.io/crates/flate2">flate2</a>. Not enabled by default.</li>
 </ul>
-<h1 id="structure" class="section-header"><a href="#structure">Structure</a></h1><h2 id="generic-implementation" class="section-header"><a href="#generic-implementation">Generic implementation</a></h2>
+<h2 id="structure" class="section-header"><a href="#structure">Structure</a></h2><h3 id="generic-implementation" class="section-header"><a href="#generic-implementation">Generic implementation</a></h3>
 <p>The main goal of <a href="https://github.com/hyperium/tonic"><code>tonic</code></a> is to provide a generic gRPC implementation over HTTP/2
 framing. This means at the lowest level this library provides the ability to use
 a generic HTTP/2 implementation with different types of gRPC encodings formats. Generally,
 some form of codegen should be used instead of interacting directly with the items in
 <a href="client/index.html"><code>client</code></a> and <a href="transport/struct.Server.html"><code>server</code></a>.</p>
-<h2 id="transport" class="section-header"><a href="#transport">Transport</a></h2>
+<h3 id="transport" class="section-header"><a href="#transport">Transport</a></h3>
 <p>The <a href="transport/index.html"><code>transport</code></a> module contains a fully featured HTTP/2.0 <a href="transport/struct.Channel.html"><code>Channel</code></a> (gRPC terminology)
 and <a href="transport/struct.Server.html"><code>Server</code></a>. These implementations are built on top of <a href="https://docs.rs/tokio"><code>tokio</code></a>, <a href="https://docs.rs/hyper"><code>hyper</code></a> and <a href="https://docs.rs/tower"><code>tower</code></a>.
 It also provides many of the features that the core gRPC libraries provide such as load balancing,
@@ -40,31 +40,31 @@ tls, timeouts, and many more. This implementation can also be used as a referenc
 to build even more feature rich clients and servers. This module also provides the ability to
 enable TLS using <a href="https://docs.rs/rustls"><code>rustls</code></a>, via the <code>tls</code> feature flag.</p>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="body/index.html" title="tonic::body mod">body</a></div><div class="item-right docblock-short"><p>HTTP specific body utilities.</p>
-</div><div class="item-left module-item"><a class="mod" href="client/index.html" title="tonic::client mod">client</a></div><div class="item-right docblock-short"><p>Generic client implementation.</p>
-</div><div class="item-left module-item"><a class="mod" href="codec/index.html" title="tonic::codec mod">codec</a></div><div class="item-right docblock-short"><p>Generic encoding and decoding.</p>
-</div><div class="item-left module-item"><a class="mod" href="metadata/index.html" title="tonic::metadata mod">metadata</a></div><div class="item-right docblock-short"><p>Contains data structures and utilities for handling gRPC custom metadata.</p>
-</div><div class="item-left module-item"><a class="mod" href="server/index.html" title="tonic::server mod">server</a></div><div class="item-right docblock-short"><p>Generic server implementation.</p>
-</div><div class="item-left module-item"><a class="mod" href="service/index.html" title="tonic::service mod">service</a></div><div class="item-right docblock-short"><p>Utilities for using Tower services with Tonic.</p>
-</div><div class="item-left module-item"><a class="mod" href="transport/index.html" title="tonic::transport mod">transport</a></div><div class="item-right docblock-short"><p>Batteries included server and client.</p>
-</div></div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="macro" href="macro.include_file_descriptor_set.html" title="tonic::include_file_descriptor_set macro">include_file_descriptor_set</a></div><div class="item-right docblock-short"><p>Include an encoded <code>prost_types::FileDescriptorSet</code> as a <code>&amp;'static [u8]</code>. The parameter must be
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="body/index.html" title="tonic::body mod">body</a></div><div class="item-right docblock-short"><p>HTTP specific body utilities.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="client/index.html" title="tonic::client mod">client</a></div><div class="item-right docblock-short"><p>Generic client implementation.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="codec/index.html" title="tonic::codec mod">codec</a></div><div class="item-right docblock-short"><p>Generic encoding and decoding.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="metadata/index.html" title="tonic::metadata mod">metadata</a></div><div class="item-right docblock-short"><p>Contains data structures and utilities for handling gRPC custom metadata.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="server/index.html" title="tonic::server mod">server</a></div><div class="item-right docblock-short"><p>Generic server implementation.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="service/index.html" title="tonic::service mod">service</a></div><div class="item-right docblock-short"><p>Utilities for using Tower services with Tonic.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="transport/index.html" title="tonic::transport mod">transport</a></div><div class="item-right docblock-short"><p>Batteries included server and client.</p>
+</div></div></div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.include_file_descriptor_set.html" title="tonic::include_file_descriptor_set macro">include_file_descriptor_set</a></div><div class="item-right docblock-short"><p>Include an encoded <code>prost_types::FileDescriptorSet</code> as a <code>&amp;'static [u8]</code>. The parameter must be
 the stem of the filename passed to <code>file_descriptor_set_path</code> for the <code>tonic-build::Builder</code>,
 excluding the <code>.bin</code> extension.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.include_proto.html" title="tonic::include_proto macro">include_proto</a></div><div class="item-right docblock-short"><p>Include generated proto server and client items.</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Extensions.html" title="tonic::Extensions struct">Extensions</a></div><div class="item-right docblock-short"><p>A type map of protocol extensions.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Request.html" title="tonic::Request struct">Request</a></div><div class="item-right docblock-short"><p>A gRPC request and metadata from an RPC call.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Response.html" title="tonic::Response struct">Response</a></div><div class="item-right docblock-short"><p>A gRPC response and metadata from an RPC call.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Status.html" title="tonic::Status struct">Status</a></div><div class="item-right docblock-short"><p>A gRPC status describing the result of an RPC call.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Streaming.html" title="tonic::Streaming struct">Streaming</a></div><div class="item-right docblock-short"><p>Streaming requests and responses.</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.Code.html" title="tonic::Code enum">Code</a></div><div class="item-right docblock-short"><p>gRPC status codes used by <a href="struct.Status.html" title="Status"><code>Status</code></a>.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.IntoRequest.html" title="tonic::IntoRequest trait">IntoRequest</a></div><div class="item-right docblock-short"><p>Trait implemented by RPC request types.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.IntoStreamingRequest.html" title="tonic::IntoStreamingRequest trait">IntoStreamingRequest</a></div><div class="item-right docblock-short"><p>Trait implemented by RPC streaming request types.</p>
-</div></div><h2 id="attributes" class="section-header"><a href="#attributes">Attribute Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="attr" href="attr.async_trait.html" title="tonic::async_trait attr">async_trait</a></div><div class="item-right docblock-short"><p>A re-export of <a href="https://docs.rs/async-trait"><code>async-trait</code></a> for use with codegen.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="tonic" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.include_proto.html" title="tonic::include_proto macro">include_proto</a></div><div class="item-right docblock-short"><p>Include generated proto server and client items.</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Extensions.html" title="tonic::Extensions struct">Extensions</a></div><div class="item-right docblock-short"><p>A type map of protocol extensions.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Request.html" title="tonic::Request struct">Request</a></div><div class="item-right docblock-short"><p>A gRPC request and metadata from an RPC call.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Response.html" title="tonic::Response struct">Response</a></div><div class="item-right docblock-short"><p>A gRPC response and metadata from an RPC call.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Status.html" title="tonic::Status struct">Status</a></div><div class="item-right docblock-short"><p>A gRPC status describing the result of an RPC call.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Streaming.html" title="tonic::Streaming struct">Streaming</a></div><div class="item-right docblock-short"><p>Streaming requests and responses.</p>
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Code.html" title="tonic::Code enum">Code</a></div><div class="item-right docblock-short"><p>gRPC status codes used by <a href="struct.Status.html" title="Status"><code>Status</code></a>.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IntoRequest.html" title="tonic::IntoRequest trait">IntoRequest</a></div><div class="item-right docblock-short"><p>Trait implemented by RPC request types.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IntoStreamingRequest.html" title="tonic::IntoStreamingRequest trait">IntoStreamingRequest</a></div><div class="item-right docblock-short"><p>Trait implemented by RPC streaming request types.</p>
+</div></div></div><h2 id="attributes" class="section-header"><a href="#attributes">Attribute Macros</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.async_trait.html" title="tonic::async_trait attr">async_trait</a></div><div class="item-right docblock-short"><p>A re-export of <a href="https://docs.rs/async-trait"><code>async-trait</code></a> for use with codegen.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="tonic" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

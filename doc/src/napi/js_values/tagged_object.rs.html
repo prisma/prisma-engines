@@ -23,7 +23,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">TaggedObject</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">object</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">object</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">TaggedObject</span> {
       <span class="ident">type_id</span>: <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(),
       <span class="ident">object</span>: <span class="prelude-val">Some</span>(<span class="ident">object</span>),

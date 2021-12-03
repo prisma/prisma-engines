@@ -329,10 +329,10 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">graph_impl::stable_graph</span>;
 
 <span class="macro">macro_rules!</span> <span class="ident">copyclone</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>) =&gt; {
         <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="kw-2">*</span><span class="self">self</span> }
+            <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> { <span class="kw-2">*</span><span class="self">self</span> }
         }
     }
 }
@@ -353,16 +353,16 @@
 <span class="kw">impl</span> <span class="ident">Direction</span> {
     <span class="doccomment">/// Return the opposite `Direction`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opposite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Direction</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opposite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Direction</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Outgoing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Incoming</span>,
-            <span class="ident">Incoming</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Outgoing</span>,
+            <span class="ident">Outgoing</span> =&gt; <span class="ident">Incoming</span>,
+            <span class="ident">Incoming</span> =&gt; <span class="ident">Outgoing</span>,
         }
     }
 
     <span class="doccomment">/// Return `0` for `Outgoing` and `1` for `Incoming`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         (<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&amp;</span> <span class="number">0x1</span>
     }
 }
@@ -382,17 +382,17 @@
 
 <span class="doccomment">/// A graph&#39;s edge type determines whether is has directed edges or not.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">EdgeType</span> {
-    <span class="kw">fn</span> <span class="ident">is_directed</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">is_directed</span>() -&gt; <span class="ident">bool</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">EdgeType</span> <span class="kw">for</span> <span class="ident">Directed</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_directed</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">true</span> }
+    <span class="kw">fn</span> <span class="ident">is_directed</span>() -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
 }
 
 <span class="kw">impl</span> <span class="ident">EdgeType</span> <span class="kw">for</span> <span class="ident">Undirected</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_directed</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">false</span> }
+    <span class="kw">fn</span> <span class="ident">is_directed</span>() -&gt; <span class="ident">bool</span> { <span class="bool-val">false</span> }
 }
 
 
@@ -402,7 +402,7 @@
 <span class="doccomment">/// For `Graph::from_edges` and `GraphMap::from_edges`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">NodeId</span>;
-    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident"><span class="self">Self</span>::NodeId</span>, <span class="ident"><span class="self">Self</span>::NodeId</span>, <span class="ident">E</span>);
+    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) -&gt; (<span class="ident"><span class="self">Self</span>::NodeId</span>, <span class="ident"><span class="self">Self</span>::NodeId</span>, <span class="ident">E</span>);
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">Ix</span>, <span class="ident">Ix</span>)
@@ -410,7 +410,7 @@
 {
     <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">Ix</span>;
 
-    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
+    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) -&gt; (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
         <span class="kw">let</span> (<span class="ident">s</span>, <span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>;
         (<span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">E::default</span>())
     }
@@ -419,7 +419,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>)
 {
     <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">Ix</span>;
-    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
+    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) -&gt; (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
         <span class="self">self</span>
     }
 }
@@ -428,7 +428,7 @@
     <span class="kw">where</span> <span class="ident">E</span>: <span class="ident">Clone</span>
 {
     <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">Ix</span>;
-    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
+    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) -&gt; (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
         <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>) <span class="op">=</span> <span class="self">self</span>;
         (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>.<span class="ident">clone</span>())
     }
@@ -438,7 +438,7 @@
     <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">Copy</span>, <span class="ident">E</span>: <span class="ident">Default</span>
 {
     <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">Ix</span>;
-    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
+    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) -&gt; (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
         <span class="kw">let</span> (<span class="ident">s</span>, <span class="ident">t</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
         (<span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">E::default</span>())
     }
@@ -448,7 +448,7 @@
     <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">Copy</span>, <span class="ident">E</span>: <span class="ident">Clone</span>
 {
     <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">Ix</span>;
-    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
+    <span class="kw">fn</span> <span class="ident">into_weighted_edge</span>(<span class="self">self</span>) -&gt; (<span class="ident">Ix</span>, <span class="ident">Ix</span>, <span class="ident">E</span>) {
         <span class="self">self</span>.<span class="ident">clone</span>()
     }
 }

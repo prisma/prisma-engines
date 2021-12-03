@@ -772,36 +772,36 @@
 
 <span class="kw">impl</span> <span class="ident">LookupIp</span> {
     <span class="doccomment">/// Returns a borrowed iterator of the returned IPs</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LookupIpIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LookupIpIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">LookupIpIter</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>())
     }
 
     <span class="doccomment">/// Returns a reference to the `Query` that was used to produce this result.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Query</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Query</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">query</span>()
     }
 
     <span class="doccomment">/// Returns the `Instant` at which this lookup is no longer valid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Instant</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Instant</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">valid_until</span>()
     }
 
     <span class="doccomment">/// Return a reference to the inner lookup</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This can be useful for getting all records from the request</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_lookup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Lookup</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_lookup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Lookup</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Lookup</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LookupIp</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lookup</span>: <span class="ident">Lookup</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lookup</span>: <span class="ident">Lookup</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">LookupIp</span>(<span class="ident">lookup</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">LookupIp</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Lookup</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lookup</span>: <span class="ident">LookupIp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lookup</span>: <span class="ident">LookupIp</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">lookup</span>.<span class="number">0</span>
     }
 }
@@ -812,12 +812,12 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">LookupIpIter</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">IpAddr</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>;
         <span class="ident">iter</span>.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">rdata</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">rdata</span> {
-            <span class="ident">RData::A</span>(<span class="ident">ip</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">ip</span>)),
-            <span class="ident">RData::AAAA</span>(<span class="ident">ip</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">ip</span>)),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RData::A</span>(<span class="ident">ip</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">ip</span>)),
+            <span class="ident">RData::AAAA</span>(<span class="ident">ip</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">ip</span>)),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         })
         .<span class="ident">next</span>()
     }
@@ -829,7 +829,7 @@
 
     <span class="doccomment">/// This is most likely not a free conversion, the RDatas will be cloned if data is</span>
     <span class="doccomment">///  held behind an Arc with more than one reference (which is most likely the case coming from cache)</span>
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="ident">LookupIpIntoIter</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">into_iter</span>())
     }
 }
@@ -840,12 +840,12 @@
 <span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">LookupIpIntoIter</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">IpAddr</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>;
         <span class="ident">iter</span>.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">rdata</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">rdata</span> {
-            <span class="ident">RData::A</span>(<span class="ident">ip</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">ip</span>)),
-            <span class="ident">RData::AAAA</span>(<span class="ident">ip</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">ip</span>)),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RData::A</span>(<span class="ident">ip</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">ip</span>)),
+            <span class="ident">RData::AAAA</span>(<span class="ident">ip</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">ip</span>)),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         })
         .<span class="ident">next</span>()
     }
@@ -875,7 +875,7 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LookupIp</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="comment">// Try polling the underlying DNS query.</span>
             <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>);
@@ -883,13 +883,13 @@
             <span class="comment">// Determine whether or not we will attempt to retry the query.</span>
             <span class="kw">let</span> <span class="ident">should_retry</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">query</span> {
                 <span class="comment">// If the query is NotReady, yield immediately.</span>
-                <span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
+                <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
                 <span class="comment">// If the query returned a successful lookup, we will attempt</span>
                 <span class="comment">// to retry if the lookup is empty. Otherwise, we will return</span>
                 <span class="comment">// that lookup.</span>
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="ident">lookup</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">lookup</span>.<span class="ident">is_empty</span>(),
+                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="ident">lookup</span>)) =&gt; <span class="ident">lookup</span>.<span class="ident">is_empty</span>(),
                 <span class="comment">// If the query failed, we will attempt to retry.</span>
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
             };
 
             <span class="kw">if</span> <span class="ident">should_retry</span> {
@@ -947,7 +947,7 @@
         <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
         <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">finally_ip_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">empty</span> <span class="op">=</span>
             <span class="ident">ResolveError::from</span>(<span class="ident">ResolveErrorKind::Message</span>(<span class="string">&quot;can not lookup IPs for no names&quot;</span>));
         <span class="ident">LookupIpFuture</span> {
@@ -971,17 +971,17 @@
     <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
     <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
     <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
     <span class="kw">match</span> <span class="ident">strategy</span> {
-        <span class="ident">LookupIpStrategy::Ipv4Only</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ipv4_only</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
-        <span class="ident">LookupIpStrategy::Ipv6Only</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ipv6_only</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
-        <span class="ident">LookupIpStrategy::Ipv4AndIpv6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ipv4_and_ipv6</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
-        <span class="ident">LookupIpStrategy::Ipv6thenIpv4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ipv6_then_ipv4</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
-        <span class="ident">LookupIpStrategy::Ipv4thenIpv6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ipv4_then_ipv6</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
+        <span class="ident">LookupIpStrategy::Ipv4Only</span> =&gt; <span class="ident">ipv4_only</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
+        <span class="ident">LookupIpStrategy::Ipv6Only</span> =&gt; <span class="ident">ipv6_only</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
+        <span class="ident">LookupIpStrategy::Ipv4AndIpv6</span> =&gt; <span class="ident">ipv4_and_ipv6</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
+        <span class="ident">LookupIpStrategy::Ipv6thenIpv4</span> =&gt; <span class="ident">ipv6_then_ipv4</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
+        <span class="ident">LookupIpStrategy::Ipv4thenIpv6</span> =&gt; <span class="ident">ipv4_then_ipv6</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
     }
 }
 
@@ -991,7 +991,7 @@
     <span class="kw-2">mut</span> <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
     <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
     <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -1011,7 +1011,7 @@
     <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
     <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
     <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -1025,7 +1025,7 @@
     <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
     <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
     <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -1040,7 +1040,7 @@
     <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
     <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
     <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -1058,26 +1058,26 @@
     .<span class="kw">await</span>;
 
     <span class="kw">let</span> (<span class="ident">ips</span>, <span class="ident">remaining_query</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">sel_res</span> {
-        <span class="ident">Either::Left</span>(<span class="ident">ips_and_remaining</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ips_and_remaining</span>,
-        <span class="ident">Either::Right</span>(<span class="ident">ips_and_remaining</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ips_and_remaining</span>,
+        <span class="ident">Either::Left</span>(<span class="ident">ips_and_remaining</span>) =&gt; <span class="ident">ips_and_remaining</span>,
+        <span class="ident">Either::Right</span>(<span class="ident">ips_and_remaining</span>) =&gt; <span class="ident">ips_and_remaining</span>,
     };
 
     <span class="kw">let</span> <span class="ident">next_ips</span> <span class="op">=</span> <span class="ident">remaining_query</span>.<span class="kw">await</span>;
 
     <span class="kw">match</span> (<span class="ident">ips</span>, <span class="ident">next_ips</span>) {
-        (<span class="prelude-val">Ok</span>(<span class="ident">ips</span>), <span class="prelude-val">Ok</span>(<span class="ident">next_ips</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">Ok</span>(<span class="ident">ips</span>), <span class="prelude-val">Ok</span>(<span class="ident">next_ips</span>)) =&gt; {
             <span class="comment">// TODO: create a LookupIp enum with the ability to chain these together</span>
             <span class="kw">let</span> <span class="ident">ips</span> <span class="op">=</span> <span class="ident">ips</span>.<span class="ident">append</span>(<span class="ident">next_ips</span>);
             <span class="prelude-val">Ok</span>(<span class="ident">ips</span>)
         }
-        (<span class="prelude-val">Ok</span>(<span class="ident">ips</span>), <span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">|</span> (<span class="prelude-val">Err</span>(<span class="ident">e</span>), <span class="prelude-val">Ok</span>(<span class="ident">ips</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">Ok</span>(<span class="ident">ips</span>), <span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">|</span> (<span class="prelude-val">Err</span>(<span class="ident">e</span>), <span class="prelude-val">Ok</span>(<span class="ident">ips</span>)) =&gt; {
             <span class="macro">debug!</span>(
                 <span class="string">&quot;one of ipv4 or ipv6 lookup failed in ipv4_and_ipv6 strategy: {}&quot;</span>,
                 <span class="ident">e</span>
             );
             <span class="prelude-val">Ok</span>(<span class="ident">ips</span>)
         }
-        (<span class="prelude-val">Err</span>(<span class="ident">e1</span>), <span class="prelude-val">Err</span>(<span class="ident">e2</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">Err</span>(<span class="ident">e1</span>), <span class="prelude-val">Err</span>(<span class="ident">e2</span>)) =&gt; {
             <span class="macro">debug!</span>(
                 <span class="string">&quot;both of ipv4 or ipv6 lookup failed in ipv4_and_ipv6 strategy e1: {}, e2: {}&quot;</span>,
                 <span class="ident">e1</span>, <span class="ident">e2</span>
@@ -1093,7 +1093,7 @@
     <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
     <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
     <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -1115,7 +1115,7 @@
     <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
     <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
     <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -1139,7 +1139,7 @@
     <span class="ident">second_type</span>: <span class="ident">RecordType</span>,
     <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
     <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -1154,7 +1154,7 @@
     .<span class="kw">await</span>;
 
     <span class="kw">match</span> <span class="ident">res</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">ips</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">ips</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">ips</span>.<span class="ident">is_empty</span>() {
                 <span class="comment">// no ips returns, NXDomain or Otherwise, doesn&#39;t matter</span>
                 <span class="ident">hosts_lookup</span>(
@@ -1168,7 +1168,7 @@
                 <span class="prelude-val">Ok</span>(<span class="ident">ips</span>)
             }
         }
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
             <span class="ident">hosts_lookup</span>(
                 <span class="ident">Query::query</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">second_type</span>),
                 <span class="ident">or_client</span>,
@@ -1205,14 +1205,14 @@
             <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span><span class="op">&gt;</span>;
         <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ResolveError</span>;
 
-        <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Response</span> {
+        <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
             <span class="ident">Box::pin</span>(<span class="ident">future::ready</span>(
                 <span class="self">self</span>.<span class="ident">messages</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">pop</span>().<span class="ident">unwrap_or_else</span>(<span class="ident">empty</span>),
             ))
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">v4_message</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">v4_message</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::new</span>();
         <span class="ident">message</span>.<span class="ident">add_query</span>(<span class="ident">Query::query</span>(<span class="ident">Name::root</span>(), <span class="ident">RecordType::A</span>));
         <span class="ident">message</span>.<span class="ident">insert_answers</span>(<span class="macro">vec!</span>[<span class="ident">Record::from_rdata</span>(
@@ -1226,7 +1226,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">resp</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">v6_message</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">v6_message</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::new</span>();
         <span class="ident">message</span>.<span class="ident">add_query</span>(<span class="ident">Query::query</span>(<span class="ident">Name::root</span>(), <span class="ident">RecordType::AAAA</span>));
         <span class="ident">message</span>.<span class="ident">insert_answers</span>(<span class="macro">vec!</span>[<span class="ident">Record::from_rdata</span>(
@@ -1240,15 +1240,15 @@
         <span class="prelude-val">Ok</span>(<span class="ident">resp</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">Message::new</span>().<span class="ident">into</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Err</span>(<span class="ident">ResolveError::from</span>(<span class="string">&quot;forced test failure&quot;</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mock</span>(<span class="ident">messages</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MockDnsHandle</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mock</span>(<span class="ident">messages</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">MockDnsHandle</span> {
         <span class="ident">MockDnsHandle</span> {
             <span class="ident">messages</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">messages</span>)),
         }

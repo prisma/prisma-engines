@@ -16,7 +16,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">SystemDatabase</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">String</span>);
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SystemDatabase</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">SystemDatabase</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">SystemDatabase</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::user_facing</span>(<span class="ident">MigrateSystemDatabase</span> { <span class="ident">database_name</span>: <span class="ident">err</span>.<span class="number">0</span> })
     }
 }

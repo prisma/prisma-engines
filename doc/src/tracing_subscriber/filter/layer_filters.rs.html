@@ -992,11 +992,11 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LevelFilter</span> {
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">meta</span>.<span class="ident">level</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
+    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
         <span class="kw">if</span> <span class="ident">meta</span>.<span class="ident">level</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span> {
             <span class="ident">Interest::always</span>()
         } <span class="kw">else</span> {
@@ -1004,41 +1004,41 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="self">self</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">enabled</span>(<span class="ident">meta</span>, <span class="ident">cx</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
+    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
         (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">callsite_enabled</span>(<span class="ident">meta</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
         (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">max_level_hint</span>()
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">layer::Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">enabled</span>(<span class="ident">meta</span>, <span class="ident">cx</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
+    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
         (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">callsite_enabled</span>(<span class="ident">meta</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
         (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">max_level_hint</span>()
     }
 }
@@ -1055,7 +1055,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
     <span class="doccomment">/// [plf]: crate::layer#per-layer-filtering</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">layer</span>: <span class="ident">L</span>, <span class="ident">filter</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">layer</span>: <span class="ident">L</span>, <span class="ident">filter</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">layer</span>,
             <span class="ident">filter</span>,
@@ -1065,7 +1065,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FilterId</span> {
+    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FilterId</span> {
         <span class="macro">debug_assert!</span>(
             <span class="op">!</span><span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>.<span class="ident">is_disabled</span>(),
             <span class="string">&quot;a `Filtered` layer was used, but it had no `FilterId`; \
@@ -1098,7 +1098,7 @@
     <span class="comment">// if a trait impl has the default impl of a trait method or not, but that&#39;s</span>
     <span class="comment">// almsot certainly impossible...right?</span>
 
-    <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
+    <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
         <span class="kw">let</span> <span class="ident">interest</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">callsite_enabled</span>(<span class="ident">metadata</span>);
 
         <span class="comment">// If the filter didn&#39;t disable the callsite, allow the inner layer to</span>
@@ -1123,7 +1123,7 @@
         <span class="ident">Interest::always</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">with_filter</span>(<span class="self">self</span>.<span class="ident">id</span>());
         <span class="kw">let</span> <span class="ident">enabled</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="kw-2">&amp;</span><span class="ident">cx</span>);
         <span class="ident">FILTERING</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">filtering</span><span class="op">|</span> <span class="ident">filtering</span>.<span class="ident">set</span>(<span class="self">self</span>.<span class="ident">id</span>(), <span class="ident">enabled</span>));
@@ -1157,7 +1157,7 @@
     }
 
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">max_level_hint</span>()
     }
 
@@ -1208,15 +1208,15 @@
 
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downcast_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> ()<span class="op">&gt;</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downcast_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> ()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">id</span> {
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> ()),
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">layer</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> ()),
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> ()),
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">MagicPlfDowncastMarker</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> ()),
+            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>() =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">layer</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> ()),
+            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>() =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> ()),
+            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">MagicPlfDowncastMarker</span><span class="op">&gt;</span>() =&gt; {
                 <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> ())
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">downcast_raw</span>(<span class="ident">id</span>),
+            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">downcast_raw</span>(<span class="ident">id</span>),
         }
     }
 }
@@ -1226,7 +1226,7 @@
     <span class="ident">F</span>: <span class="ident">fmt::Debug</span>,
     <span class="ident">L</span>: <span class="ident">fmt::Debug</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Filtered&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span>)
             .<span class="ident">field</span>(<span class="string">&quot;layer&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">layer</span>)
@@ -1238,16 +1238,16 @@
 <span class="comment">// === impl FilterId ===</span>
 
 <span class="kw">impl</span> <span class="ident">FilterId</span> {
-    <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">disabled</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">disabled</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">std::u64::MAX</span>)
     }
 
     <span class="doccomment">/// Returns a `FilterId` that will consider _all_ spans enabled.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">none</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="number">0</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(<span class="ident">id</span> <span class="op">&lt;</span> <span class="number">64</span>, <span class="string">&quot;filter IDs may not be greater than 64&quot;</span>);
         <span class="self">Self</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">id</span> <span class="kw">as</span> <span class="ident">usize</span>)
     }
@@ -1330,25 +1330,25 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Context`]: crate::layer::Context</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">and</span>(<span class="self">self</span>, <span class="ident">FilterId</span>(<span class="ident">other</span>): <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">and</span>(<span class="self">self</span>, <span class="ident">FilterId</span>(<span class="ident">other</span>): <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="comment">// If this mask is disabled, just return the other --- otherwise, we</span>
         <span class="comment">// would always see that every span is disabled.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::disabled</span>().<span class="number">0</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::disabled</span>().<span class="number">0</span> {
             <span class="kw">return</span> <span class="self">Self</span>(<span class="ident">other</span>);
         }
 
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">other</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_disabled</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::disabled</span>().<span class="number">0</span>
+    <span class="kw">fn</span> <span class="ident">is_disabled</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::disabled</span>().<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FilterId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="comment">// don&#39;t print a giant set of the numbers 0..63 if the filter ID is disabled.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::disabled</span>().<span class="number">0</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::disabled</span>().<span class="number">0</span> {
             <span class="kw">return</span> <span class="ident">f</span>
                 .<span class="ident">debug_tuple</span>(<span class="string">&quot;FilterId&quot;</span>)
                 .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;DISABLED&quot;</span>))
@@ -1367,7 +1367,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Binary</span> <span class="kw">for</span> <span class="ident">FilterId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;FilterId&quot;</span>)
             .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
             .<span class="ident">finish</span>()
@@ -1377,8 +1377,8 @@
 <span class="comment">// === impl FilterMap ===</span>
 
 <span class="kw">impl</span> <span class="ident">FilterMap</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set</span>(<span class="self">self</span>, <span class="ident">FilterId</span>(<span class="ident">mask</span>): <span class="ident">FilterId</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">mask</span> <span class="op">=</span><span class="op">=</span> <span class="ident">std::u64::MAX</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set</span>(<span class="self">self</span>, <span class="ident">FilterId</span>(<span class="ident">mask</span>): <span class="ident">FilterId</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">if</span> <span class="ident">mask</span> <span class="op">==</span> <span class="ident">std::u64::MAX</span> {
             <span class="kw">return</span> <span class="self">self</span>;
         }
 
@@ -1394,18 +1394,18 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_enabled</span>(<span class="self">self</span>, <span class="ident">FilterId</span>(<span class="ident">mask</span>): <span class="ident">FilterId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">bits</span> <span class="op">&amp;</span> <span class="ident">mask</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_enabled</span>(<span class="self">self</span>, <span class="ident">FilterId</span>(<span class="ident">mask</span>): <span class="ident">FilterId</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">bits</span> <span class="op">&amp;</span> <span class="ident">mask</span> <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">any_enabled</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">any_enabled</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">bits</span> <span class="op">!</span><span class="op">=</span> <span class="ident">std::u64::MAX</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FilterMap</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">alt</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">alternate</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;FilterMap&quot;</span>);
         <span class="ident">s</span>.<span class="ident">field</span>(<span class="string">&quot;disabled_by&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">FmtBitset</span>(<span class="self">self</span>.<span class="ident">bits</span>)));
@@ -1419,7 +1419,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Binary</span> <span class="kw">for</span> <span class="ident">FilterMap</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;FilterMap&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;bits&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, <span class="self">self</span>.<span class="ident">bits</span>))
             .<span class="ident">finish</span>()
@@ -1429,7 +1429,7 @@
 <span class="comment">// === impl FilterState ===</span>
 
 <span class="kw">impl</span> <span class="ident">FilterState</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">enabled</span>: <span class="ident">Cell::new</span>(<span class="ident">FilterMap::default</span>()),
             <span class="ident">interest</span>: <span class="ident">RefCell::new</span>(<span class="prelude-val">None</span>),
@@ -1443,7 +1443,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
         {
             <span class="kw">let</span> <span class="ident">in_current_pass</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">get</span>();
-            <span class="kw">if</span> <span class="ident">in_current_pass</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">in_current_pass</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">enabled</span>.<span class="ident">get</span>(), <span class="ident">FilterMap::default</span>());
             }
             <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">set</span>(<span class="ident">in_current_pass</span> <span class="op">+</span> <span class="number">1</span>);
@@ -1463,7 +1463,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
         {
             <span class="kw">let</span> <span class="ident">in_current_pass</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_interest_pass</span>.<span class="ident">get</span>();
-            <span class="kw">if</span> <span class="ident">in_current_pass</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">in_current_pass</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="macro">debug_assert!</span>(<span class="ident">curr_interest</span>.<span class="ident">is_none</span>());
             }
             <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_interest_pass</span>.<span class="ident">set</span>(<span class="ident">in_current_pass</span> <span class="op">+</span> <span class="number">1</span>);
@@ -1482,13 +1482,13 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">event_enabled</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">event_enabled</span>() -&gt; <span class="ident">bool</span> {
         <span class="ident">FILTERING</span>
             .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">this</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">enabled</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">enabled</span>.<span class="ident">get</span>().<span class="ident">any_enabled</span>();
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
                 {
-                    <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">get</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="number">0</span> {
                         <span class="macro">debug_assert_eq!</span>(<span class="ident">this</span>.<span class="ident">enabled</span>.<span class="ident">get</span>(), <span class="ident">FilterMap::default</span>());
                     }
 
@@ -1555,12 +1555,12 @@
         });
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_interest</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Interest</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_interest</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Interest</span><span class="op">&gt;</span> {
         <span class="ident">FILTERING</span>
             .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">filtering</span><span class="op">|</span> {
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
                 {
-                    <span class="kw">if</span> <span class="ident">filtering</span>.<span class="ident">counters</span>.<span class="ident">in_interest_pass</span>.<span class="ident">get</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">filtering</span>.<span class="ident">counters</span>.<span class="ident">in_interest_pass</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="number">0</span> {
                         <span class="macro">debug_assert!</span>(<span class="ident">filtering</span>.<span class="ident">interest</span>.<span class="ident">try_borrow</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">is_none</span>());
                     }
                     <span class="ident">filtering</span>.<span class="ident">counters</span>.<span class="ident">in_interest_pass</span>.<span class="ident">set</span>(<span class="number">0</span>);
@@ -1570,11 +1570,11 @@
             .<span class="ident">ok</span>()<span class="question-mark">?</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">filter_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FilterMap</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">filter_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FilterMap</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">enabled</span>.<span class="ident">get</span>();
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
         {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">get</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">counters</span>.<span class="ident">in_filter_pass</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="number">0</span> {
                 <span class="macro">debug_assert_eq!</span>(<span class="ident">map</span>, <span class="ident">FilterMap::default</span>());
             }
         }
@@ -1608,7 +1608,7 @@
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">struct</span> <span class="ident">MagicPlfDowncastMarker</span>(<span class="ident">FilterId</span>);
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">MagicPlfDowncastMarker</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="comment">// Just pretend that `MagicPlfDowncastMarker` doesn&#39;t exist for</span>
         <span class="comment">// `fmt::Debug` purposes...if no one *sees* it in their `Debug` output,</span>
         <span class="comment">// they don&#39;t have to know I thought this code would be a good idea.</span>
@@ -1616,12 +1616,12 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_plf_downcast_marker</span>(<span class="ident">type_id</span>: <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">type_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">MagicPlfDowncastMarker</span><span class="op">&gt;</span>()
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_plf_downcast_marker</span>(<span class="ident">type_id</span>: <span class="ident">TypeId</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">type_id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">MagicPlfDowncastMarker</span><span class="op">&gt;</span>()
 }
 
 <span class="doccomment">/// Does a type implementing `Subscriber` contain any per-layer filters?</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">subscriber_has_plf</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">subscriber</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">subscriber_has_plf</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">subscriber</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) -&gt; <span class="ident">bool</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">Subscriber</span>,
 {
@@ -1629,7 +1629,7 @@
 }
 
 <span class="doccomment">/// Does a type implementing `Layer` contain any per-layer filters?</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">layer_has_plf</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">layer</span>: <span class="kw-2">&amp;</span><span class="ident">L</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">layer_has_plf</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">layer</span>: <span class="kw-2">&amp;</span><span class="ident">L</span>) -&gt; <span class="ident">bool</span>
 <span class="kw">where</span>
     <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
     <span class="ident">S</span>: <span class="ident">Subscriber</span>,
@@ -1647,7 +1647,7 @@
 <span class="kw">struct</span> <span class="ident">FmtBitset</span>(<span class="ident">u64</span>);
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FmtBitset</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_set</span>();
         <span class="kw">for</span> <span class="ident">bit</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">64</span> {
             <span class="comment">// if the `bit`-th bit is set, add it to the debug set</span>

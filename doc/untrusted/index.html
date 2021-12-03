@@ -56,7 +56,7 @@ a slice to use a function that isn’t written using untrusted.rs,
 <code>untrusted::Reader</code>, etc., instead of using <code>use untrusted::*</code>. Qualifying
 the names with <code>untrusted</code> helps remind the reader of the code that it is
 dealing with <em>untrusted</em> input.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p><a href="https://github.com/briansmith/ring"><em>ring</em></a>’s parser for the subset of
 ASN.1 DER it needs to understand,
 <a href="https://github.com/briansmith/ring/blob/master/src/der.rs"><code>ring::der</code></a>,
@@ -65,15 +65,15 @@ public keys, RSA PKCS#1 1.5 padding, and for all other parsing it does.</p>
 <p>All of <a href="https://github.com/briansmith/webpki">webpki</a>’s parsing of X.509
 certificates (also ASN.1 DER) is done using untrusted.rs.</p>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.EndOfInput.html" title="untrusted::EndOfInput struct">EndOfInput</a></div><div class="item-right docblock-short"><p>The error type used to indicate the end of the input was reached before the
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.EndOfInput.html" title="untrusted::EndOfInput struct">EndOfInput</a></div><div class="item-right docblock-short"><p>The error type used to indicate the end of the input was reached before the
 operation could be completed.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Input.html" title="untrusted::Input struct">Input</a></div><div class="item-right docblock-short"><p>A wrapper around <code>&amp;'a [u8]</code> that helps in writing panic-free code.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Mark.html" title="untrusted::Mark struct">Mark</a></div><div class="item-right docblock-short"><p>An index into the already-parsed input of a <code>Reader</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Reader.html" title="untrusted::Reader struct">Reader</a></div><div class="item-right docblock-short"><p>A read-only, forward-only* cursor into the data in an <code>Input</code>.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.read_all_optional.html" title="untrusted::read_all_optional fn">read_all_optional</a></div><div class="item-right docblock-short"><p>Calls <code>read</code> with the given input as a <code>Reader</code>, ensuring that <code>read</code>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Input.html" title="untrusted::Input struct">Input</a></div><div class="item-right docblock-short"><p>A wrapper around <code>&amp;'a [u8]</code> that helps in writing panic-free code.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Mark.html" title="untrusted::Mark struct">Mark</a></div><div class="item-right docblock-short"><p>An index into the already-parsed input of a <code>Reader</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Reader.html" title="untrusted::Reader struct">Reader</a></div><div class="item-right docblock-short"><p>A read-only, forward-only* cursor into the data in an <code>Input</code>.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.read_all_optional.html" title="untrusted::read_all_optional fn">read_all_optional</a></div><div class="item-right docblock-short"><p>Calls <code>read</code> with the given input as a <code>Reader</code>, ensuring that <code>read</code>
 consumed the entire input. When <code>input</code> is <code>None</code>, <code>read</code> will be
 called with <code>None</code>.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="untrusted" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="untrusted" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

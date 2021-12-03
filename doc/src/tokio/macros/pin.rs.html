@@ -267,7 +267,7 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">pin</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ident</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> { $(
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ident</span>),<span class="kw-2">*</span>) =&gt; { $(
         <span class="comment">// Move the value to ensure that it is owned</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>;
         <span class="comment">// Shadow the original binding so that it can&#39;t be directly accessed</span>
@@ -279,7 +279,7 @@
     )<span class="op">*</span> };
     ($(
             <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ident</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">init</span>:<span class="ident">expr</span>;
-    )<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    )<span class="kw-2">*</span>) =&gt; {
         $(
             <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">init</span>;
             <span class="macro-nonterminal">$</span><span class="macro">crate::pin!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>);

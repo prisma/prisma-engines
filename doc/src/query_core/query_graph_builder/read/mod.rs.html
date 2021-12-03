@@ -42,7 +42,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Query</span>, <span class="ident">QueryGraph</span>, <span class="ident">ReadQuery</span>};
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">QueryGraph</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReadQuery</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraph</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryGraph</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">graph</span> <span class="op">=</span> <span class="ident">QueryGraph::new</span>();
         <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Read</span>(<span class="self">self</span>));
         <span class="ident">graph</span>

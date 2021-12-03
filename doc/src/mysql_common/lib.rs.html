@@ -337,8 +337,8 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">params</span> {
-    () <span class="op">=</span><span class="op">&gt;</span> {};
-    (@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (
+    () =&gt; {};
+    (@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>) =&gt; (
         <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>.<span class="ident">entry</span>(<span class="ident">std::string::String::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>));
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">std::collections::hash_map::Entry::Occupied</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">entry</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;Redefinition of named parameter `{}&#39;&quot;</span>, <span class="ident">entry</span>.<span class="ident">key</span>());
@@ -346,7 +346,7 @@
             <span class="ident">entry</span>.<span class="ident">or_insert</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::value::Value::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>));
         }
     );
-    (@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> (
+    (@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>) =&gt; (
         <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>.<span class="ident">entry</span>(<span class="ident">std::string::String::from</span>(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>)));
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">std::collections::hash_map::Entry::Occupied</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">entry</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;Redefinition of named parameter `{}&#39;&quot;</span>, <span class="ident">entry</span>.<span class="ident">key</span>());
@@ -354,38 +354,38 @@
             <span class="ident">entry</span>.<span class="ident">or_insert</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::value::Value::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>));
         }
     );
-    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>;) <span class="op">=</span><span class="op">&gt;</span> {};
-    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">params!</span>(@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
+    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>;) =&gt; {};
+    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">params!</span>(@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
         <span class="macro">params!</span>(@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
     };
-    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">params!</span>(@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
+    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">params!</span>(@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
         <span class="macro">params!</span>(@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
     };
-    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">params!</span>(@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>);
         <span class="macro">params!</span>(@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
     };
-    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">params!</span>(@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>);
         <span class="macro">params!</span>(@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">std::string::String</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::value::Value</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::default::Default::default</span>();
             <span class="macro">params!</span>(@<span class="ident">expand</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">map</span>); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::params::Params::Named</span>(<span class="ident">map</span>)
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">std::string::String</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::value::Value</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::default::Default::default</span>();
-            <span class="macro">params!</span>(@<span class="ident">expand</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">map</span>); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">=</span><span class="op">&gt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
+            <span class="macro">params!</span>(@<span class="ident">expand</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">map</span>); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::params::Params::Named</span>(<span class="ident">map</span>)
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>) =&gt; {
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">std::string::String</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::value::Value</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::default::Default::default</span>();
             <span class="macro">params!</span>(@<span class="ident">expand</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">map</span>); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>);
@@ -396,7 +396,7 @@
 
 <span class="doccomment">/// Non panicking Slice::split_at</span>
 <span class="macro">macro_rules!</span> <span class="ident">split_at_or_err</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">reader</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">at</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">reader</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">at</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>) =&gt; {
         <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">reader</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">at</span> {
             <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">reader</span>.<span class="ident">split_at</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">at</span>))
         } <span class="kw">else</span> {
@@ -408,7 +408,7 @@
 <span class="doccomment">/// Reads MySql&#39;s length-encoded string</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">read_lenenc_str</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">reader</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">reader</span>:<span class="ident">expr</span>) =&gt; {{
         <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">reader</span>;
         <span class="ident">reader</span>.<span class="ident">read_lenenc_int</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> {
             <span class="kw">let</span> (<span class="ident">value</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="macro">split_at_or_err!</span>(
@@ -470,49 +470,49 @@
             (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
             (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
         ]),
-        <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">foo</span>, <span class="string">&quot;bar&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bar</span> }
+        <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> =&gt; <span class="ident">foo</span>, <span class="string">&quot;bar&quot;</span> =&gt; <span class="ident">bar</span> }
     );
     <span class="macro">assert_eq!</span>(
         <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
             (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
             (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
         ]),
-        <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">foo</span>, <span class="string">&quot;bar&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bar</span>, }
+        <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> =&gt; <span class="ident">foo</span>, <span class="string">&quot;bar&quot;</span> =&gt; <span class="ident">bar</span>, }
     );
     <span class="macro">assert_eq!</span>(
         <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
             (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
             (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
         ]),
-        <span class="macro">params!</span> { <span class="ident">foo</span>, <span class="string">&quot;bar&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bar</span> }
+        <span class="macro">params!</span> { <span class="ident">foo</span>, <span class="string">&quot;bar&quot;</span> =&gt; <span class="ident">bar</span> }
     );
     <span class="macro">assert_eq!</span>(
         <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
             (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
             (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
         ]),
-        <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">foo</span>, <span class="ident">bar</span> }
+        <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> =&gt; <span class="ident">foo</span>, <span class="ident">bar</span> }
     );
     <span class="macro">assert_eq!</span>(
         <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
             (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
             (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
         ]),
-        <span class="macro">params!</span> { <span class="ident">foo</span>, <span class="string">&quot;bar&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bar</span>, }
+        <span class="macro">params!</span> { <span class="ident">foo</span>, <span class="string">&quot;bar&quot;</span> =&gt; <span class="ident">bar</span>, }
     );
     <span class="macro">assert_eq!</span>(
         <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
             (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
             (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
         ]),
-        <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">foo</span>, <span class="ident">bar</span>, }
+        <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> =&gt; <span class="ident">foo</span>, <span class="ident">bar</span>, }
     );
 }
 
 <span class="attribute">#[<span class="ident">test</span>]</span>
 <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;Redefinition of named parameter `a&#39;&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">params_macro_should_panic_on_named_param_redefinition</span>() {
-    <span class="macro">params!</span> {<span class="string">&quot;a&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>, <span class="string">&quot;b&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>, <span class="string">&quot;a&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>};
+    <span class="macro">params!</span> {<span class="string">&quot;a&quot;</span> =&gt; <span class="number">1</span>, <span class="string">&quot;b&quot;</span> =&gt; <span class="number">2</span>, <span class="string">&quot;a&quot;</span> =&gt; <span class="number">3</span>};
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mysql_common" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

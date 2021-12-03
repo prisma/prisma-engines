@@ -267,10 +267,10 @@
         <span class="kw">let</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">projection</span>.<span class="ident">values</span>().<span class="ident">collect</span>();
 
         <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::CreateRecord</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">x</span>.<span class="ident">args</span>,
-            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">x</span>.<span class="ident">args</span>,
-            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">x</span>.<span class="ident">args</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
+            <span class="ident"><span class="self">Self</span>::CreateRecord</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">x</span>) =&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">x</span>.<span class="ident">args</span>,
+            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="ident">x</span>) =&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">x</span>.<span class="ident">args</span>,
+            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="ident">x</span>) =&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">x</span>.<span class="ident">args</span>,
+            <span class="kw">_</span> =&gt; <span class="kw">return</span>,
         };
 
         <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">projection</span>.<span class="ident">model</span>().<span class="ident">expect</span>(<span class="string">&quot;Model was not found&quot;</span>);
@@ -283,82 +283,82 @@
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">projection</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">returns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">projection</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">returns_id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">projection</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">returns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">projection</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">let</span> <span class="ident">returns_id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>() <span class="op">==</span> <span class="ident">projection</span>;
 
         <span class="comment">// Write operations only return IDs at the moment, so anything different</span>
         <span class="comment">// from the primary ID is automatically not returned.</span>
         <span class="comment">// DeleteMany, Connect and Disconnect do not return anything.</span>
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::CreateRecord</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">returns_id</span>,
-            <span class="ident"><span class="self">Self</span>::CreateManyRecords</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">returns_id</span>,
-            <span class="ident"><span class="self">Self</span>::DeleteRecord</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">returns_id</span>,
-            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">returns_id</span>,
-            <span class="ident"><span class="self">Self</span>::DeleteManyRecords</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident"><span class="self">Self</span>::ConnectRecords</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident"><span class="self">Self</span>::DisconnectRecords</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident"><span class="self">Self</span>::ExecuteRaw</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident"><span class="self">Self</span>::QueryRaw</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident"><span class="self">Self</span>::CreateRecord</span>(<span class="kw">_</span>) =&gt; <span class="ident">returns_id</span>,
+            <span class="ident"><span class="self">Self</span>::CreateManyRecords</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="kw">_</span>) =&gt; <span class="ident">returns_id</span>,
+            <span class="ident"><span class="self">Self</span>::DeleteRecord</span>(<span class="kw">_</span>) =&gt; <span class="ident">returns_id</span>,
+            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="kw">_</span>) =&gt; <span class="ident">returns_id</span>,
+            <span class="ident"><span class="self">Self</span>::DeleteManyRecords</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="ident"><span class="self">Self</span>::ConnectRecords</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="ident"><span class="self">Self</span>::DisconnectRecords</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="ident"><span class="self">Self</span>::ExecuteRaw</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="ident"><span class="self">Self</span>::QueryRaw</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelRef</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::CreateRecord</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
-            <span class="ident"><span class="self">Self</span>::CreateManyRecords</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
-            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
-            <span class="ident"><span class="self">Self</span>::DeleteRecord</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
-            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
-            <span class="ident"><span class="self">Self</span>::DeleteManyRecords</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
-            <span class="ident"><span class="self">Self</span>::ConnectRecords</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">relation_field</span>.<span class="ident">model</span>(),
-            <span class="ident"><span class="self">Self</span>::DisconnectRecords</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">relation_field</span>.<span class="ident">model</span>(),
-            <span class="ident"><span class="self">Self</span>::ExecuteRaw</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(),
-            <span class="ident"><span class="self">Self</span>::QueryRaw</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(),
+            <span class="ident"><span class="self">Self</span>::CreateRecord</span>(<span class="ident">q</span>) =&gt; <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
+            <span class="ident"><span class="self">Self</span>::CreateManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
+            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="ident">q</span>) =&gt; <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
+            <span class="ident"><span class="self">Self</span>::DeleteRecord</span>(<span class="ident">q</span>) =&gt; <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
+            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
+            <span class="ident"><span class="self">Self</span>::DeleteManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>.<span class="ident">model</span>),
+            <span class="ident"><span class="self">Self</span>::ConnectRecords</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">relation_field</span>.<span class="ident">model</span>(),
+            <span class="ident"><span class="self">Self</span>::DisconnectRecords</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">relation_field</span>.<span class="ident">model</span>(),
+            <span class="ident"><span class="self">Self</span>::ExecuteRaw</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
+            <span class="ident"><span class="self">Self</span>::QueryRaw</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FilteredQuery</span> <span class="kw">for</span> <span class="ident">WriteQuery</span> {
-    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">get_filter</span>(),
-            <span class="ident"><span class="self">Self</span>::DeleteManyRecords</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">get_filter</span>(),
-            <span class="ident"><span class="self">Self</span>::DeleteRecord</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">get_filter</span>(),
-            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">get_filter</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(),
+            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">get_filter</span>(),
+            <span class="ident"><span class="self">Self</span>::DeleteManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">get_filter</span>(),
+            <span class="ident"><span class="self">Self</span>::DeleteRecord</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">get_filter</span>(),
+            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">get_filter</span>(),
+            <span class="kw">_</span> =&gt; <span class="macro">unimplemented!</span>(),
         }
     }
 
     <span class="kw">fn</span> <span class="ident">set_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">Filter</span>) {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
-            <span class="ident"><span class="self">Self</span>::DeleteManyRecords</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
-            <span class="ident"><span class="self">Self</span>::DeleteRecord</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
-            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(),
+            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
+            <span class="ident"><span class="self">Self</span>::DeleteManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
+            <span class="ident"><span class="self">Self</span>::DeleteRecord</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
+            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
+            <span class="kw">_</span> =&gt; <span class="macro">unimplemented!</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">WriteQuery</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::CreateRecord</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CreateRecord(model: {}, args: {:?})&quot;</span>, <span class="ident">q</span>.<span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">q</span>.<span class="ident">args</span>),
-            <span class="ident"><span class="self">Self</span>::CreateManyRecords</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CreateManyRecord(model: {})&quot;</span>, <span class="ident">q</span>.<span class="ident">model</span>.<span class="ident">name</span>),
-            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+            <span class="ident"><span class="self">Self</span>::CreateRecord</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CreateRecord(model: {}, args: {:?})&quot;</span>, <span class="ident">q</span>.<span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">q</span>.<span class="ident">args</span>),
+            <span class="ident"><span class="self">Self</span>::CreateManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CreateManyRecord(model: {})&quot;</span>, <span class="ident">q</span>.<span class="ident">model</span>.<span class="ident">name</span>),
+            <span class="ident"><span class="self">Self</span>::UpdateRecord</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;UpdateRecord(model: {}, filter: {:?}, args: {:?})&quot;</span>,
                 <span class="ident">q</span>.<span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">q</span>.<span class="ident">record_filter</span>, <span class="ident">q</span>.<span class="ident">args</span>,
             ),
-            <span class="ident"><span class="self">Self</span>::DeleteRecord</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DeleteRecord: {}, {:?}&quot;</span>, <span class="ident">q</span>.<span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">q</span>.<span class="ident">record_filter</span>),
-            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;UpdateManyRecords(model: {}, args: {:?})&quot;</span>, <span class="ident">q</span>.<span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">q</span>.<span class="ident">args</span>),
-            <span class="ident"><span class="self">Self</span>::DeleteManyRecords</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DeleteManyRecords: {}&quot;</span>, <span class="ident">q</span>.<span class="ident">model</span>.<span class="ident">name</span>),
-            <span class="ident"><span class="self">Self</span>::ConnectRecords</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ConnectRecords&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::DisconnectRecords</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DisconnectRecords&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ExecuteRaw</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ExecuteRaw: {} ({:?})&quot;</span>, <span class="ident">r</span>.<span class="ident">query</span>, <span class="ident">r</span>.<span class="ident">parameters</span>),
-            <span class="ident"><span class="self">Self</span>::QueryRaw</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;QueryRaw: {} ({:?})&quot;</span>, <span class="ident">r</span>.<span class="ident">query</span>, <span class="ident">r</span>.<span class="ident">parameters</span>),
+            <span class="ident"><span class="self">Self</span>::DeleteRecord</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DeleteRecord: {}, {:?}&quot;</span>, <span class="ident">q</span>.<span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">q</span>.<span class="ident">record_filter</span>),
+            <span class="ident"><span class="self">Self</span>::UpdateManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;UpdateManyRecords(model: {}, args: {:?})&quot;</span>, <span class="ident">q</span>.<span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">q</span>.<span class="ident">args</span>),
+            <span class="ident"><span class="self">Self</span>::DeleteManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DeleteManyRecords: {}&quot;</span>, <span class="ident">q</span>.<span class="ident">model</span>.<span class="ident">name</span>),
+            <span class="ident"><span class="self">Self</span>::ConnectRecords</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ConnectRecords&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::DisconnectRecords</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DisconnectRecords&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::ExecuteRaw</span>(<span class="ident">r</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ExecuteRaw: {} ({:?})&quot;</span>, <span class="ident">r</span>.<span class="ident">query</span>, <span class="ident">r</span>.<span class="ident">parameters</span>),
+            <span class="ident"><span class="self">Self</span>::QueryRaw</span>(<span class="ident">r</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;QueryRaw: {} ({:?})&quot;</span>, <span class="ident">r</span>.<span class="ident">query</span>, <span class="ident">r</span>.<span class="ident">parameters</span>),
         }
     }
 }
@@ -439,7 +439,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FilteredQuery</span> <span class="kw">for</span> <span class="ident">UpdateRecord</span> {
-    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">record_filter</span>.<span class="ident">filter</span>)
     }
 
@@ -449,7 +449,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FilteredQuery</span> <span class="kw">for</span> <span class="ident">UpdateManyRecords</span> {
-    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">record_filter</span>.<span class="ident">filter</span>)
     }
 
@@ -459,7 +459,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FilteredQuery</span> <span class="kw">for</span> <span class="ident">DeleteManyRecords</span> {
-    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">record_filter</span>.<span class="ident">filter</span>)
     }
 
@@ -469,14 +469,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FilteredQuery</span> <span class="kw">for</span> <span class="ident">DeleteRecord</span> {
-    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">record_filter</span>.<span class="ident">as_mut</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f</span>.<span class="ident">filter</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">set_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">Filter</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">record_filter</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rf</span>.<span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">record_filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>.<span class="ident">into</span>()),
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">record_filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>.<span class="ident">into</span>()),
         }
 
         <span class="comment">//.filter = Some(filter)</span>

@@ -156,7 +156,7 @@
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # Ok(()) }) }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_dir</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ReadDir</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_dir</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ReadDir</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>();
     <span class="ident">spawn_blocking</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
         <span class="ident">std::fs::read_dir</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)
@@ -192,7 +192,7 @@
 
 <span class="kw">impl</span> <span class="ident">ReadDir</span> {
     <span class="doccomment">/// Creates an asynchronous `ReadDir` from a synchronous handle.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">std::fs::ReadDir</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReadDir</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">std::fs::ReadDir</span>) -&gt; <span class="ident">ReadDir</span> {
         <span class="ident">ReadDir</span>(<span class="ident">State::Idle</span>(<span class="prelude-val">Some</span>(<span class="ident">inner</span>)))
     }
 }
@@ -200,10 +200,10 @@
 <span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">ReadDir</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">DirEntry</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span> {
-                <span class="ident">State::Idle</span>(<span class="ident">opt</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">State::Idle</span>(<span class="ident">opt</span>) =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">opt</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
 
                     <span class="comment">// Start the operation asynchronously.</span>
@@ -213,7 +213,7 @@
                     }));
                 }
                 <span class="comment">// Poll the asynchronous operation the file is currently blocked on.</span>
-                <span class="ident">State::Busy</span>(<span class="ident">task</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">State::Busy</span>(<span class="ident">task</span>) =&gt; {
                     <span class="kw">let</span> (<span class="ident">inner</span>, <span class="ident">opt</span>) <span class="op">=</span> <span class="macro">futures_core::ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">task</span>).<span class="ident">poll</span>(<span class="ident">cx</span>));
                     <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">State::Idle</span>(<span class="prelude-val">Some</span>(<span class="ident">inner</span>));
                     <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="ident">opt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">res</span>.<span class="ident">map</span>(<span class="ident">DirEntry::new</span>)));

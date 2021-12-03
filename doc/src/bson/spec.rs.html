@@ -306,31 +306,31 @@
 <span class="kw">impl</span> <span class="ident">ElementType</span> {
     <span class="doccomment">/// Attempt to convert from a `u8`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tag</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ElementType</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tag</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ElementType</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ElementType</span>::<span class="kw-2">*</span>;
         <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">tag</span> {
-            <span class="ident">ELEMENT_TYPE_FLOATING_POINT</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Double</span>,
-            <span class="ident">ELEMENT_TYPE_UTF8_STRING</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::String</span>,
-            <span class="ident">ELEMENT_TYPE_EMBEDDED_DOCUMENT</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EmbeddedDocument</span>,
-            <span class="ident">ELEMENT_TYPE_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Array</span>,
-            <span class="ident">ELEMENT_TYPE_BINARY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Binary</span>,
-            <span class="ident">ELEMENT_TYPE_UNDEFINED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Undefined</span>,
-            <span class="ident">ELEMENT_TYPE_OBJECT_ID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ObjectId</span>,
-            <span class="ident">ELEMENT_TYPE_BOOLEAN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Boolean</span>,
-            <span class="ident">ELEMENT_TYPE_UTC_DATETIME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::DateTime</span>,
-            <span class="ident">ELEMENT_TYPE_NULL_VALUE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Null</span>,
-            <span class="ident">ELEMENT_TYPE_REGULAR_EXPRESSION</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RegularExpression</span>,
-            <span class="ident">ELEMENT_TYPE_DBPOINTER</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DbPointer</span>,
-            <span class="ident">ELEMENT_TYPE_JAVASCRIPT_CODE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">JavaScriptCode</span>,
-            <span class="ident">ELEMENT_TYPE_SYMBOL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Symbol</span>,
-            <span class="ident">ELEMENT_TYPE_JAVASCRIPT_CODE_WITH_SCOPE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">JavaScriptCodeWithScope</span>,
-            <span class="ident">ELEMENT_TYPE_32BIT_INTEGER</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Int32</span>,
-            <span class="ident">ELEMENT_TYPE_TIMESTAMP</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Timestamp</span>,
-            <span class="ident">ELEMENT_TYPE_64BIT_INTEGER</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Int64</span>,
-            <span class="ident">ELEMENT_TYPE_128BIT_DECIMAL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Decimal128</span>,
-            <span class="ident">ELEMENT_TYPE_MAXKEY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MaxKey</span>,
-            <span class="ident">ELEMENT_TYPE_MINKEY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MinKey</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
+            <span class="ident">ELEMENT_TYPE_FLOATING_POINT</span> =&gt; <span class="ident"><span class="self">Self</span>::Double</span>,
+            <span class="ident">ELEMENT_TYPE_UTF8_STRING</span> =&gt; <span class="ident"><span class="self">Self</span>::String</span>,
+            <span class="ident">ELEMENT_TYPE_EMBEDDED_DOCUMENT</span> =&gt; <span class="ident">EmbeddedDocument</span>,
+            <span class="ident">ELEMENT_TYPE_ARRAY</span> =&gt; <span class="ident">Array</span>,
+            <span class="ident">ELEMENT_TYPE_BINARY</span> =&gt; <span class="ident">Binary</span>,
+            <span class="ident">ELEMENT_TYPE_UNDEFINED</span> =&gt; <span class="ident">Undefined</span>,
+            <span class="ident">ELEMENT_TYPE_OBJECT_ID</span> =&gt; <span class="ident">ObjectId</span>,
+            <span class="ident">ELEMENT_TYPE_BOOLEAN</span> =&gt; <span class="ident">Boolean</span>,
+            <span class="ident">ELEMENT_TYPE_UTC_DATETIME</span> =&gt; <span class="ident"><span class="self">Self</span>::DateTime</span>,
+            <span class="ident">ELEMENT_TYPE_NULL_VALUE</span> =&gt; <span class="ident"><span class="self">Self</span>::Null</span>,
+            <span class="ident">ELEMENT_TYPE_REGULAR_EXPRESSION</span> =&gt; <span class="ident">RegularExpression</span>,
+            <span class="ident">ELEMENT_TYPE_DBPOINTER</span> =&gt; <span class="ident">DbPointer</span>,
+            <span class="ident">ELEMENT_TYPE_JAVASCRIPT_CODE</span> =&gt; <span class="ident">JavaScriptCode</span>,
+            <span class="ident">ELEMENT_TYPE_SYMBOL</span> =&gt; <span class="ident">Symbol</span>,
+            <span class="ident">ELEMENT_TYPE_JAVASCRIPT_CODE_WITH_SCOPE</span> =&gt; <span class="ident">JavaScriptCodeWithScope</span>,
+            <span class="ident">ELEMENT_TYPE_32BIT_INTEGER</span> =&gt; <span class="ident">Int32</span>,
+            <span class="ident">ELEMENT_TYPE_TIMESTAMP</span> =&gt; <span class="ident">Timestamp</span>,
+            <span class="ident">ELEMENT_TYPE_64BIT_INTEGER</span> =&gt; <span class="ident">Int64</span>,
+            <span class="ident">ELEMENT_TYPE_128BIT_DECIMAL</span> =&gt; <span class="ident">Decimal128</span>,
+            <span class="ident">ELEMENT_TYPE_MAXKEY</span> =&gt; <span class="ident">MaxKey</span>,
+            <span class="ident">ELEMENT_TYPE_MINKEY</span> =&gt; <span class="ident">MinKey</span>,
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
         })
     }
 }
@@ -353,36 +353,36 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">BinarySubtype</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="ident">BinarySubtype</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="ident">BinarySubtype</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="ident">t</span> {
-            <span class="ident">BinarySubtype::Generic</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BINARY_SUBTYPE_GENERIC</span>,
-            <span class="ident">BinarySubtype::Function</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BINARY_SUBTYPE_FUNCTION</span>,
-            <span class="ident">BinarySubtype::BinaryOld</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BINARY_SUBTYPE_BINARY_OLD</span>,
-            <span class="ident">BinarySubtype::UuidOld</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BINARY_SUBTYPE_UUID_OLD</span>,
-            <span class="ident">BinarySubtype::Uuid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BINARY_SUBTYPE_UUID</span>,
-            <span class="ident">BinarySubtype::Md5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BINARY_SUBTYPE_MD5</span>,
-            <span class="ident">BinarySubtype::Encrypted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BINARY_SUBTYPE_ENCRYPTED</span>,
-            <span class="ident">BinarySubtype::Column</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BINARY_SUBTYPE_COLUMN</span>,
-            <span class="ident">BinarySubtype::UserDefined</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
-            <span class="ident">BinarySubtype::Reserved</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
+            <span class="ident">BinarySubtype::Generic</span> =&gt; <span class="ident">BINARY_SUBTYPE_GENERIC</span>,
+            <span class="ident">BinarySubtype::Function</span> =&gt; <span class="ident">BINARY_SUBTYPE_FUNCTION</span>,
+            <span class="ident">BinarySubtype::BinaryOld</span> =&gt; <span class="ident">BINARY_SUBTYPE_BINARY_OLD</span>,
+            <span class="ident">BinarySubtype::UuidOld</span> =&gt; <span class="ident">BINARY_SUBTYPE_UUID_OLD</span>,
+            <span class="ident">BinarySubtype::Uuid</span> =&gt; <span class="ident">BINARY_SUBTYPE_UUID</span>,
+            <span class="ident">BinarySubtype::Md5</span> =&gt; <span class="ident">BINARY_SUBTYPE_MD5</span>,
+            <span class="ident">BinarySubtype::Encrypted</span> =&gt; <span class="ident">BINARY_SUBTYPE_ENCRYPTED</span>,
+            <span class="ident">BinarySubtype::Column</span> =&gt; <span class="ident">BINARY_SUBTYPE_COLUMN</span>,
+            <span class="ident">BinarySubtype::UserDefined</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+            <span class="ident">BinarySubtype::Reserved</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BinarySubtype</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BinarySubtype</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="ident">u8</span>) -&gt; <span class="ident">BinarySubtype</span> {
         <span class="kw">match</span> <span class="ident">t</span> {
-            <span class="ident">BINARY_SUBTYPE_GENERIC</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BinarySubtype::Generic</span>,
-            <span class="ident">BINARY_SUBTYPE_FUNCTION</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BinarySubtype::Function</span>,
-            <span class="ident">BINARY_SUBTYPE_BINARY_OLD</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BinarySubtype::BinaryOld</span>,
-            <span class="ident">BINARY_SUBTYPE_UUID_OLD</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BinarySubtype::UuidOld</span>,
-            <span class="ident">BINARY_SUBTYPE_UUID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BinarySubtype::Uuid</span>,
-            <span class="ident">BINARY_SUBTYPE_MD5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BinarySubtype::Md5</span>,
-            <span class="ident">BINARY_SUBTYPE_ENCRYPTED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BinarySubtype::Encrypted</span>,
-            <span class="ident">BINARY_SUBTYPE_COLUMN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BinarySubtype::Column</span>,
-            <span class="kw">_</span> <span class="kw">if</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="ident">BINARY_SUBTYPE_USER_DEFINED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BinarySubtype::Reserved</span>(<span class="ident">t</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BinarySubtype::UserDefined</span>(<span class="ident">t</span>),
+            <span class="ident">BINARY_SUBTYPE_GENERIC</span> =&gt; <span class="ident">BinarySubtype::Generic</span>,
+            <span class="ident">BINARY_SUBTYPE_FUNCTION</span> =&gt; <span class="ident">BinarySubtype::Function</span>,
+            <span class="ident">BINARY_SUBTYPE_BINARY_OLD</span> =&gt; <span class="ident">BinarySubtype::BinaryOld</span>,
+            <span class="ident">BINARY_SUBTYPE_UUID_OLD</span> =&gt; <span class="ident">BinarySubtype::UuidOld</span>,
+            <span class="ident">BINARY_SUBTYPE_UUID</span> =&gt; <span class="ident">BinarySubtype::Uuid</span>,
+            <span class="ident">BINARY_SUBTYPE_MD5</span> =&gt; <span class="ident">BinarySubtype::Md5</span>,
+            <span class="ident">BINARY_SUBTYPE_ENCRYPTED</span> =&gt; <span class="ident">BinarySubtype::Encrypted</span>,
+            <span class="ident">BINARY_SUBTYPE_COLUMN</span> =&gt; <span class="ident">BinarySubtype::Column</span>,
+            <span class="kw">_</span> <span class="kw">if</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="ident">BINARY_SUBTYPE_USER_DEFINED</span> =&gt; <span class="ident">BinarySubtype::Reserved</span>(<span class="ident">t</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">BinarySubtype::UserDefined</span>(<span class="ident">t</span>),
         }
     }
 }

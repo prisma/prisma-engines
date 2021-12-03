@@ -132,7 +132,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">ChunkedEncoder</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new instance.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">reader</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">reader</span>,
             <span class="ident">done</span>: <span class="bool-val">false</span>,
@@ -145,7 +145,7 @@
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">done</span> {
             <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>));
         }
@@ -154,7 +154,7 @@
         <span class="kw">let</span> <span class="ident">max_bytes_to_read</span> <span class="op">=</span> <span class="ident">max_bytes_to_read</span>(<span class="ident">buf</span>.<span class="ident">len</span>());
 
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">reader</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[..<span class="ident">max_bytes_to_read</span>]))<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">bytes</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">bytes</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="self">self</span>.<span class="ident">done</span> <span class="op">=</span> <span class="bool-val">true</span>;
         }
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:X}\r\n&quot;</span>, <span class="ident">bytes</span>);
@@ -167,7 +167,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">max_bytes_to_read</span>(<span class="ident">buf_len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">max_bytes_to_read</span>(<span class="ident">buf_len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">if</span> <span class="ident">buf_len</span> <span class="op">&lt;</span> <span class="number">6</span> {
         <span class="comment">// the minimum read size is of 6 represents one byte of</span>
         <span class="comment">// content from the body. the other five bytes are 1\r\n_\r\n</span>
@@ -224,7 +224,7 @@
             <span class="comment">// testing the test:</span>
             <span class="kw">let</span> <span class="ident">used_bytes</span> <span class="op">=</span> <span class="ident">expected</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="macro">format!</span>(<span class="string">&quot;{:X}&quot;</span>, <span class="ident">expected</span>).<span class="ident">len</span>();
             <span class="macro">assert!</span>(
-                <span class="ident">used_bytes</span> <span class="op">=</span><span class="op">=</span> <span class="ident">input</span> <span class="op">|</span><span class="op">|</span> <span class="ident">used_bytes</span> <span class="op">=</span><span class="op">=</span> <span class="ident">input</span> <span class="op">-</span> <span class="number">1</span>,
+                <span class="ident">used_bytes</span> <span class="op">==</span> <span class="ident">input</span> <span class="op">|</span><span class="op">|</span> <span class="ident">used_bytes</span> <span class="op">==</span> <span class="ident">input</span> <span class="op">-</span> <span class="number">1</span>,
                 <span class="string">&quot;\n\nfor an input of {}, expected used bytes to be {} or {}, but was {}&quot;</span>,
                 <span class="ident">input</span>,
                 <span class="ident">input</span>,

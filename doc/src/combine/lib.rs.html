@@ -1418,16 +1418,16 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser::item::tokens2</span>;
 
 <span class="macro">macro_rules!</span> <span class="ident">static_fn</span> {
-    (($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">pat</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_ty</span>: <span class="ident">ty</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span> }) <span class="op">=</span><span class="op">&gt;</span> { {
-        <span class="kw">fn</span> <span class="ident">temp</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_ty</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span> }
-        <span class="ident">temp</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw">_</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">_</span>
+    (($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">pat</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_ty</span>: <span class="ident">ty</span>),<span class="kw-2">*</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span> }) =&gt; { {
+        <span class="kw">fn</span> <span class="ident">temp</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_ty</span>),<span class="kw-2">*</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span> }
+        <span class="ident">temp</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw">_</span>) -&gt; <span class="kw">_</span>
     } }
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_token_parser</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty_var</span>: <span class="ident">ident</span>),<span class="kw-2">*</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>: <span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner_type</span>: <span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty_var</span>: <span class="ident">ident</span>),<span class="kw-2">*</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>: <span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner_type</span>: <span class="ident">ty</span>) =&gt; {
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">I</span> $(,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty_var</span>)<span class="kw-2">*</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner_type</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span> (<span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">I</span><span class="op">&gt;</span>)
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="ident">I</span> $(,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty_var</span>)<span class="kw-2">*</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner_type</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span> (<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>)
         <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>,
               <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>
               $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty_var</span> : <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">=</span><span class="ident">I</span><span class="op">&gt;</span>)<span class="kw-2">*</span>;
@@ -1536,12 +1536,12 @@
     (
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="op">*</span> )
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro">parser!</span>{
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="op">*</span> )(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="op">*</span> )(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
                 <span class="kw">where</span> []
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>
         }
@@ -1549,12 +1549,12 @@
     (
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="op">*</span> )
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro">parser!</span>{
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="op">*</span> )(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="op">*</span> )(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
                 <span class="kw">where</span> []
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>
         }
@@ -1562,16 +1562,16 @@
     (
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="op">*</span> )
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
             <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro">combine_parser_impl!</span>{
             (<span class="kw">pub</span>)
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
             <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> (());
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
                 <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>)<span class="kw-2">*</span>]
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>
         }
@@ -1579,16 +1579,16 @@
     (
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="kw-2">*</span>)
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
             <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro">combine_parser_impl!</span>{
             ()
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
             <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> (());
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
                 <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>)<span class="kw-2">*</span>]
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>
         }
@@ -1598,17 +1598,17 @@
         <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span>: <span class="ident">ident</span>;
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="op">*</span> )
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
             <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro">combine_parser_impl!</span>{
             (<span class="kw">pub</span>)
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">derive</span>]</span>)<span class="op">*</span>
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span>;
             <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> (());
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
                 <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>)<span class="kw-2">*</span>]
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>
         }
@@ -1618,17 +1618,17 @@
         <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span>: <span class="ident">ident</span>;
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="kw-2">*</span>)
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
             <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro">combine_parser_impl!</span>{
             ()
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">derive</span>]</span>)<span class="op">*</span>
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span>;
             <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> (());
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
                 <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>)<span class="kw-2">*</span>]
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>
         }
@@ -1637,13 +1637,13 @@
         <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>: <span class="ident">ty</span>;
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="op">*</span> )
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro">parser!</span>{
             <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="op">*</span> )(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="op">*</span> )(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
                 <span class="kw">where</span> []
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>
         }
@@ -1652,13 +1652,13 @@
         <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>: <span class="ident">ty</span>;
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="op">*</span> )
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro">parser!</span>{
             <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>;
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="op">*</span> )(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="op">*</span> )(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
                 <span class="kw">where</span> []
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>
         }
@@ -1667,16 +1667,16 @@
         <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>: <span class="ident">ty</span>;
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="op">*</span> )
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
             <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro">combine_parser_impl!</span>{
             (<span class="kw">pub</span>)
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
             <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>);
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
                 <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>)<span class="kw-2">*</span>]
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>
         }
@@ -1685,16 +1685,16 @@
         <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>: <span class="ident">ty</span>;
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="kw-2">*</span>)
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
             <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro">combine_parser_impl!</span>{
             ()
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
             <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>);
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
                 <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>)<span class="kw-2">*</span>]
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>
         }
@@ -1705,17 +1705,17 @@
         <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>: <span class="ident">ty</span>;
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="op">*</span> )
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
             <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro">combine_parser_impl!</span>{
             (<span class="kw">pub</span>)
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">derive</span>]</span>)<span class="op">*</span>
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span>;
             <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>);
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
                 <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>)<span class="kw-2">*</span>]
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>
         }
@@ -1726,17 +1726,17 @@
         <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>: <span class="ident">ty</span>;
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="kw-2">*</span>)
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
             <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro">combine_parser_impl!</span>{
             ()
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">derive</span>]</span>)<span class="op">*</span>
             <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span>;
             <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>);
             $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="kw-2">*</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>
                 <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>)<span class="kw-2">*</span>]
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>
         }
@@ -1746,13 +1746,13 @@
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">combine_parse_partial</span> {
-    ((()) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">mode</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>:<span class="ident">block</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    ((()) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">mode</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>:<span class="ident">block</span>) =&gt; {{
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default::default</span>();
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>;
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>.<span class="ident">parse_mode</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">mode</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>, <span class="ident">state</span>)
     }};
-    ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ignored</span>:<span class="ident">ty</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">mode</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>:<span class="ident">block</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ignored</span>:<span class="ident">ty</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">mode</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>:<span class="ident">block</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>.<span class="ident">parse_mode</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">mode</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>)
     };
 }
@@ -1767,10 +1767,10 @@
         <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>);
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
         <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> :  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>: <span class="ident">ty</span>),<span class="kw-2">*</span>)
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>: <span class="ident">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>: <span class="ident">ty</span>
             <span class="kw">where</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>]
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">block</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
 
         $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">derive</span>]</span>)<span class="op">*</span>
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
@@ -1784,7 +1784,7 @@
                 $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">where_clause</span>)<span class="op">*</span>
         {
             $(<span class="kw">pub</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>,)<span class="op">*</span>
-            <span class="ident">__marker</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::lib::marker::PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span><span class="op">&gt;</span>
+            <span class="ident">__marker</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::lib::marker::PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span><span class="op">&gt;</span>
         }
 
         <span class="comment">// We want this to work on older compilers, at least for a while</span>
@@ -1809,7 +1809,7 @@
                 <span class="ident">mode</span>: <span class="ident">M</span>,
                 <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
                 <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-                ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::ConsumedResult</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span><span class="op">&gt;</span>
+                ) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::ConsumedResult</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">output_type</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span><span class="op">&gt;</span>
             <span class="kw">where</span> <span class="ident">M</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::parser::ParseMode</span>
             {
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span> { $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,)<span class="op">*</span> .. } <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
@@ -1850,7 +1850,7 @@
         <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pub_</span>)<span class="op">*</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="op">*</span> <span class="op">&gt;</span>(
                 $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_type</span>),<span class="op">*</span>
-            ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span><span class="op">&gt;</span>
+            ) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_params</span>)<span class="kw-2">*</span><span class="op">&gt;</span>
             <span class="kw">where</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::stream::StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span>:
                     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::error::ParseError</span><span class="op">&lt;</span>
                         <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">input_type</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::stream::StreamOnce</span><span class="op">&gt;</span><span class="ident">::Item</span>,
@@ -1877,69 +1877,69 @@
 
 <span class="doccomment">/// Internal API. May break without a semver bump</span>
 <span class="macro">macro_rules!</span> <span class="ident">forward_parser</span> {
-    (, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) =&gt; {
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>: <span class="ident">ident</span> $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">methods</span>: <span class="ident">ident</span>)<span class="kw-2">*</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>: <span class="ident">ident</span> $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">methods</span>: <span class="ident">ident</span>)<span class="kw-2">*</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">forward_parser!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)<span class="op">+</span>);
         <span class="macro">forward_parser!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">methods</span>)<span class="kw-2">*</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)<span class="op">+</span>);
     };
-    (<span class="ident">parse_mode</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">parse_mode</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) =&gt; {
         <span class="attribute">#[<span class="ident">inline</span>]</span>
         <span class="kw">fn</span> <span class="ident">parse_mode_impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
             <span class="ident">mode</span>: <span class="ident">M</span>,
             <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
             <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+        ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
         <span class="kw">where</span>
             <span class="ident">M</span>: <span class="ident">ParseMode</span>,
         {
             <span class="self">self</span>.$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)<span class="op">+</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">state</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">a</span>)
         }
     };
-    (<span class="ident">parse_lazy</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">parse_lazy</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) =&gt; {
         <span class="kw">fn</span> <span class="ident">parse_lazy</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
             <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
             <span class="self">self</span>.$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)<span class="op">+</span>.<span class="ident">parse_lazy</span>(<span class="ident">input</span>)
         }
     };
-    (<span class="ident">parse_first</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">parse_first</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) =&gt; {
         <span class="kw">fn</span> <span class="ident">parse_first</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
             <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
             <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
             <span class="self">self</span>.$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)<span class="op">+</span>.<span class="ident">parse_first</span>(<span class="ident">input</span>, <span class="ident">state</span>)
         }
     };
-    (<span class="ident">parse_partial</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">parse_partial</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) =&gt; {
         <span class="kw">fn</span> <span class="ident">parse_partial</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
             <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
             <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
             <span class="self">self</span>.$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)<span class="op">+</span>.<span class="ident">parse_partial</span>(<span class="ident">input</span>, <span class="ident">state</span>)
         }
     };
-    (<span class="ident">add_error</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">add_error</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) =&gt; {
 
         <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">error</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
             <span class="self">self</span>.$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)<span class="op">+</span>.<span class="ident">add_error</span>(<span class="ident">error</span>)
         }
     };
-    (<span class="ident">add_consumed_expected_error</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">add_consumed_expected_error</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) =&gt; {
         <span class="kw">fn</span> <span class="ident">add_consumed_expected_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">error</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
             <span class="self">self</span>.$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)<span class="op">+</span>.<span class="ident">add_consumed_expected_error</span>(<span class="ident">error</span>)
         }
     };
-    (<span class="ident">parser_count</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">parser_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::ErrorOffset</span> {
+    (<span class="ident">parser_count</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>)<span class="op">+</span>) =&gt; {
+        <span class="kw">fn</span> <span class="ident">parser_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::ErrorOffset</span> {
             <span class="self">self</span>.$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)<span class="op">+</span>.<span class="ident">parser_count</span>()
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">tt</span>) =&gt; {
         <span class="macro">forward_parser!</span>(<span class="ident">parse_lazy</span> <span class="ident">parse_first</span> <span class="ident">parse_partial</span> <span class="ident">add_error</span> <span class="ident">add_consumed_expected_error</span> <span class="ident">parser_count</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>);
     }
 }
@@ -2023,7 +2023,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">chainl1_error_consume</span>() {
-        <span class="kw">fn</span> <span class="ident">first</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">t</span>: <span class="ident">T</span>, <span class="kw">_</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+        <span class="kw">fn</span> <span class="ident">first</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">t</span>: <span class="ident">T</span>, <span class="kw">_</span>: <span class="ident">U</span>) -&gt; <span class="ident">T</span> {
             <span class="ident">t</span>
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">chainl1</span>(<span class="ident">string</span>(<span class="string">&quot;abc&quot;</span>), <span class="ident">char</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">first</span>));
@@ -2080,14 +2080,14 @@
         <span class="macro">assert_eq!</span>(<span class="ident">err</span>.<span class="ident">position</span>, <span class="ident">SourcePosition</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">1</span> });
     }
 
-    <span class="kw">fn</span> <span class="ident">follow</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span>(), <span class="ident">I</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">follow</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(), <span class="ident">I</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">easy::ParseError</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">I::Position</span>: <span class="ident">Default</span>,
     {
         <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
         <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">uncons</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_alphanumeric</span>() {
                     <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
                     <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">Error::Unexpected</span>(<span class="ident">c</span>.<span class="ident">into</span>());
@@ -2098,11 +2098,11 @@
                     <span class="prelude-val">Ok</span>(((), <span class="ident">Consumed::Empty</span>(())))
                 }
             }
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(((), <span class="ident">Consumed::Empty</span>(()))),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(((), <span class="ident">Consumed::Empty</span>(()))),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">integer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">i64</span>, <span class="ident">I</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">integer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">i64</span>, <span class="ident">I</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
         <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
@@ -2176,7 +2176,7 @@
     }
 
     <span class="macro">parser!</span> {
-        <span class="kw">fn</span> <span class="ident">expr</span>[<span class="ident">I</span>]()(<span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expr</span>
+        <span class="kw">fn</span> <span class="ident">expr</span>[<span class="ident">I</span>]()(<span class="ident">I</span>) -&gt; <span class="ident">Expr</span>
         <span class="kw">where</span>
             [<span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,]
         {
@@ -2226,15 +2226,15 @@
         <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="prelude-val">Err</span>(<span class="ident">err</span>));
     }
 
-    <span class="kw">fn</span> <span class="ident">term</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Expr</span>, <span class="ident">I</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">term</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">Expr</span>, <span class="ident">I</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
         <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
     {
-        <span class="kw">fn</span> <span class="ident">times</span>(<span class="ident">l</span>: <span class="ident">Expr</span>, <span class="ident">r</span>: <span class="ident">Expr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expr</span> {
+        <span class="kw">fn</span> <span class="ident">times</span>(<span class="ident">l</span>: <span class="ident">Expr</span>, <span class="ident">r</span>: <span class="ident">Expr</span>) -&gt; <span class="ident">Expr</span> {
             <span class="ident">Expr::Times</span>(<span class="ident">Box::new</span>(<span class="ident">l</span>), <span class="ident">Box::new</span>(<span class="ident">r</span>))
         }
-        <span class="kw">fn</span> <span class="ident">plus</span>(<span class="ident">l</span>: <span class="ident">Expr</span>, <span class="ident">r</span>: <span class="ident">Expr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expr</span> {
+        <span class="kw">fn</span> <span class="ident">plus</span>(<span class="ident">l</span>: <span class="ident">Expr</span>, <span class="ident">r</span>: <span class="ident">Expr</span>) -&gt; <span class="ident">Expr</span> {
             <span class="ident">Expr::Plus</span>(<span class="ident">Box::new</span>(<span class="ident">l</span>), <span class="ident">Box::new</span>(<span class="ident">r</span>))
         }
         <span class="kw">let</span> <span class="ident">mul</span> <span class="op">=</span> <span class="ident">char</span>(<span class="string">&#39;*&#39;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">times</span>);
@@ -2265,12 +2265,12 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_string</span>())
             .<span class="ident">or</span>(<span class="ident">many1</span>(<span class="ident">digit</span>()));
         <span class="kw">match</span> <span class="ident">p</span>.<span class="ident">easy_parse</span>(<span class="ident">State::new</span>(<span class="string">&quot;le123&quot;</span>)) {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">false</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert_eq!</span>(<span class="ident">err</span>.<span class="ident">position</span>, <span class="ident">SourcePosition</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">1</span> }),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="macro">assert!</span>(<span class="bool-val">false</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">err</span>.<span class="ident">position</span>, <span class="ident">SourcePosition</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">1</span> }),
         }
         <span class="kw">match</span> <span class="ident">p</span>.<span class="ident">easy_parse</span>(<span class="ident">State::new</span>(<span class="string">&quot;let1&quot;</span>)) {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">false</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert_eq!</span>(<span class="ident">err</span>.<span class="ident">position</span>, <span class="ident">SourcePosition</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">4</span> }),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="macro">assert!</span>(<span class="bool-val">false</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">err</span>.<span class="ident">position</span>, <span class="ident">SourcePosition</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">4</span> }),
         }
     }
 
@@ -2309,12 +2309,12 @@
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
         <span class="kw">struct</span> <span class="ident">Error</span>;
         <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;error&quot;</span>)
             }
         }
         <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">Error</span> {
-            <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+            <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
                 <span class="string">&quot;error&quot;</span>
             }
         }
@@ -2350,25 +2350,25 @@
         <span class="kw">struct</span> <span class="ident">ExtractedError</span>(<span class="ident">usize</span>, <span class="ident">DisplayVec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">CloneOnly</span>, <span class="ident">DisplayVec</span><span class="op">&lt;</span><span class="ident">CloneOnly</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>);
 
         <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">ExtractedError</span> {
-            <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+            <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
                 <span class="string">&quot;extracted error&quot;</span>
             }
         }
 
         <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">CloneOnly</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
             }
         }
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DisplayVec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[{:?}]&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
             }
         }
 
         <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ExtractedError</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
                 <span class="macro">try!</span>(<span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;Parse error at {}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>));
                 <span class="ident">Error::fmt_errors</span>(<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="number">1</span>).<span class="number">0</span>, <span class="ident">f</span>)
             }

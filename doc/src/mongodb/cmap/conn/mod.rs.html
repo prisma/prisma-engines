@@ -625,7 +625,7 @@
         <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
         <span class="ident">generation</span>: <span class="ident">u32</span>,
         <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionOptions</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">stream_options</span> <span class="op">=</span> <span class="ident">StreamOptions</span> {
             <span class="ident">address</span>: <span class="ident">address</span>.<span class="ident">clone</span>(),
             <span class="ident">connect_timeout</span>: <span class="ident">options</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">connect_timeout</span>),
@@ -651,10 +651,10 @@
     }
 
     <span class="doccomment">/// Constructs and connects a new connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">pending_connection</span>: <span class="ident">PendingConnection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">pending_connection</span>: <span class="ident">PendingConnection</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">generation</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pending_connection</span>.<span class="ident">generation</span> {
-            <span class="ident">PoolGeneration::Normal</span>(<span class="ident">gen</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">gen</span>,
-            <span class="ident">PoolGeneration::LoadBalanced</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>, <span class="comment">/* Placeholder; will be overwritten in
+            <span class="ident">PoolGeneration::Normal</span>(<span class="ident">gen</span>) =&gt; <span class="ident">gen</span>,
+            <span class="ident">PoolGeneration::LoadBalanced</span>(<span class="kw">_</span>) =&gt; <span class="number">0</span>, <span class="comment">/* Placeholder; will be overwritten in
                                                    * `ConnectionEstablisher::
                                                    * establish_connection`. */</span>
         };
@@ -672,7 +672,7 @@
         <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
         <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
         <span class="ident">tls_options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TlsOptions</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(
             <span class="number">0</span>,
             <span class="ident">address</span>,
@@ -692,22 +692,22 @@
         <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
         <span class="ident">generation</span>: <span class="ident">u32</span>,
         <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionOptions</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">id</span>, <span class="ident">address</span>, <span class="ident">generation</span>, <span class="ident">options</span>).<span class="kw">await</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectionInfo</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionInfo</span> {
         <span class="ident">ConnectionInfo</span> {
             <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
             <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">service_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">service_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">generation</span>.<span class="ident">service_id</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">address</span>
     }
 
@@ -727,7 +727,7 @@
     }
 
     <span class="doccomment">/// Checks if the connection is idle.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_idle_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_idle_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ready_and_available_time</span>
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">ready_and_available_time</span><span class="op">|</span> {
                 <span class="ident">max_idle_time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">max_idle_time</span><span class="op">|</span> {
@@ -738,17 +738,17 @@
     }
 
     <span class="doccomment">/// Checks if the connection is currently executing an operation.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_executing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_executing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">command_executing</span>
     }
 
     <span class="doccomment">/// Checks if the connection experienced a network error and should be closed.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_errored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_errored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">error</span>
     }
 
     <span class="doccomment">/// Helper to create a `ConnectionCheckedOutEvent` for the connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">checked_out_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectionCheckedOutEvent</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">checked_out_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionCheckedOutEvent</span> {
         <span class="ident">ConnectionCheckedOutEvent</span> {
             <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
             <span class="ident">connection_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
@@ -756,7 +756,7 @@
     }
 
     <span class="doccomment">/// Helper to create a `ConnectionCheckedInEvent` for the connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">checked_in_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectionCheckedInEvent</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">checked_in_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionCheckedInEvent</span> {
         <span class="ident">ConnectionCheckedInEvent</span> {
             <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
             <span class="ident">connection_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
@@ -764,7 +764,7 @@
     }
 
     <span class="doccomment">/// Helper to create a `ConnectionReadyEvent` for the connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ready_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectionReadyEvent</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ready_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionReadyEvent</span> {
         <span class="ident">ConnectionReadyEvent</span> {
             <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
             <span class="ident">connection_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
@@ -772,7 +772,7 @@
     }
 
     <span class="doccomment">/// Helper to create a `ConnectionClosedEvent` for the connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">closed_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">ConnectionClosedReason</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectionClosedEvent</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">closed_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">ConnectionClosedReason</span>) -&gt; <span class="ident">ConnectionClosedEvent</span> {
         <span class="ident">ConnectionClosedEvent</span> {
             <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
             <span class="ident">connection_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
@@ -784,18 +784,18 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">message</span>: <span class="ident">Message</span>,
         <span class="ident">to_compress</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawCommandResponse</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawCommandResponse</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">command_executing</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
         <span class="comment">// If the client has agreed on a compressor with the server, and the command</span>
         <span class="comment">// is the right type of command, then compress the message.</span>
         <span class="kw">let</span> <span class="ident">write_result</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">compressor</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">compressor</span>) <span class="kw">if</span> <span class="ident">to_compress</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">compressor</span>) <span class="kw">if</span> <span class="ident">to_compress</span> =&gt; {
                 <span class="ident">message</span>
                     .<span class="ident">write_compressed_to</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">stream</span>, <span class="ident">compressor</span>)
                     .<span class="kw">await</span>
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">message</span>.<span class="ident">write_to</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">stream</span>).<span class="kw">await</span>,
+            <span class="kw">_</span> =&gt; <span class="ident">message</span>.<span class="ident">write_to</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">stream</span>).<span class="kw">await</span>,
         };
 
         <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="ident">write_result</span>.<span class="ident">is_err</span>();
@@ -817,7 +817,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">command</span>: <span class="ident">Command</span>,
         <span class="ident">request_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawCommandResponse</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawCommandResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">to_compress</span> <span class="op">=</span> <span class="ident">command</span>.<span class="ident">should_compress</span>();
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::with_command</span>(<span class="ident">command</span>, <span class="ident">request_id</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">send_message</span>(<span class="ident">message</span>, <span class="ident">to_compress</span>).<span class="kw">await</span>
@@ -833,14 +833,14 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">command</span>: <span class="ident">RawCommand</span>,
         <span class="ident">request_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawCommandResponse</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawCommandResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">to_compress</span> <span class="op">=</span> <span class="ident">command</span>.<span class="ident">should_compress</span>();
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::with_raw_command</span>(<span class="ident">command</span>, <span class="ident">request_id</span>.<span class="ident">into</span>());
         <span class="self">self</span>.<span class="ident">send_message</span>(<span class="ident">message</span>, <span class="ident">to_compress</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets the connection&#39;s StreamDescription.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">stream_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">StreamDescription</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">stream_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">StreamDescription</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">stream_description</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="ident">ErrorKind::Internal</span> {
                 <span class="ident">message</span>: <span class="string">&quot;Stream checked out but not handshaked&quot;</span>.<span class="ident">to_string</span>(),
@@ -850,7 +850,7 @@
     }
 
     <span class="doccomment">/// Pin the connection, removing it from the normal connection pool.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pinned_sender</span>.<span class="ident">is_some</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::internal</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;cannot pin an already-pinned connection (id = {})&quot;</span>,
@@ -886,7 +886,7 @@
 
     <span class="doccomment">/// Nullify the inner state and return it in a new `Connection` for checking back in to</span>
     <span class="doccomment">/// the pool.</span>
-    <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connection</span> {
+    <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Connection</span> {
         <span class="ident">Connection</span> {
             <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
             <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
@@ -923,9 +923,9 @@
                 <span class="ident">dropped_connection</span>.<span class="ident">pool_manager</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">pool_manager</span>.<span class="ident">clone</span>());
                 <span class="ident">dropped_connection</span>.<span class="ident">ready_and_available_time</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ready_and_available_time</span>;
                 <span class="kw">match</span> <span class="ident">sender</span>.<span class="ident">try_send</span>(<span class="ident">dropped_connection</span>) {
-                    <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+                    <span class="prelude-val">Ok</span>(()) =&gt; <span class="prelude-val">Ok</span>(()),
                     <span class="comment">// The connection has been unpinned and should be checked back in.</span>
-                    <span class="prelude-val">Err</span>(<span class="ident">mpsc::error::TrySendError::Closed</span>(<span class="kw-2">mut</span> <span class="ident">conn</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">mpsc::error::TrySendError::Closed</span>(<span class="kw-2">mut</span> <span class="ident">conn</span>)) =&gt; {
                         <span class="ident">conn</span>.<span class="ident">pinned_sender</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                         <span class="ident">conn</span>.<span class="ident">ready_and_available_time</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                         <span class="ident">pool_manager</span>.<span class="ident">check_in</span>(<span class="ident">conn</span>)
@@ -933,7 +933,7 @@
                     <span class="comment">// The connection is being returned to the pin holder while another connection</span>
                     <span class="comment">// is in the pin buffer; this should never happen.  Only possible action is to</span>
                     <span class="comment">// check the connection back in.</span>
-                    <span class="prelude-val">Err</span>(<span class="ident">mpsc::error::TrySendError::Full</span>(<span class="kw-2">mut</span> <span class="ident">conn</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">mpsc::error::TrySendError::Full</span>(<span class="kw-2">mut</span> <span class="ident">conn</span>)) =&gt; {
                         <span class="comment">// Panic in debug mode</span>
                         <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
                             <span class="macro">panic!</span>(
@@ -972,7 +972,7 @@
     <span class="doccomment">/// Make a new `PinnedConnectionHandle` that refers to the same connection as this one.</span>
     <span class="doccomment">/// Use with care and only when &quot;lending&quot; a handle in a way that can&#39;t be expressed as a</span>
     <span class="doccomment">/// normal borrow.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">replicate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">replicate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
             <span class="ident">receiver</span>: <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">clone</span>(),
@@ -981,7 +981,7 @@
 
     <span class="doccomment">/// Retrieve the pinned connection, blocking until it&#39;s available for use.  Will fail if the</span>
     <span class="doccomment">/// connection has been unpinned.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">take_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">take_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="ident">receiver</span>.<span class="ident">recv</span>().<span class="kw">await</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="ident">Error::internal</span>(<span class="macro">format!</span>(
@@ -991,7 +991,7 @@
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">id</span>
     }
 }
@@ -1006,24 +1006,24 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectionGeneration</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">service_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">service_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConnectionGeneration::Normal</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">ConnectionGeneration::LoadBalanced</span> { <span class="ident">service_id</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">service_id</span>),
+            <span class="ident">ConnectionGeneration::Normal</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">ConnectionGeneration::LoadBalanced</span> { <span class="ident">service_id</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">service_id</span>),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_stale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current_generation</span>: <span class="kw-2">&amp;</span><span class="ident">PoolGeneration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_stale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current_generation</span>: <span class="kw-2">&amp;</span><span class="ident">PoolGeneration</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">current_generation</span>) {
-            (<span class="ident">ConnectionGeneration::Normal</span>(<span class="ident">cgen</span>), <span class="ident">PoolGeneration::Normal</span>(<span class="ident">pgen</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cgen</span> <span class="op">!</span><span class="op">=</span> <span class="ident">pgen</span>,
+            (<span class="ident">ConnectionGeneration::Normal</span>(<span class="ident">cgen</span>), <span class="ident">PoolGeneration::Normal</span>(<span class="ident">pgen</span>)) =&gt; <span class="ident">cgen</span> <span class="op">!</span><span class="op">=</span> <span class="ident">pgen</span>,
             (
                 <span class="ident">ConnectionGeneration::LoadBalanced</span> {
                     <span class="ident">generation</span>: <span class="ident">cgen</span>,
                     <span class="ident">service_id</span>,
                 },
                 <span class="ident">PoolGeneration::LoadBalanced</span>(<span class="ident">gen_map</span>),
-            ) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cgen</span> <span class="op">!</span><span class="op">=</span> <span class="ident">gen_map</span>.<span class="ident">get</span>(<span class="ident">service_id</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="number">0</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">load_balanced_mode_mismatch!</span>(<span class="bool-val">false</span>),
+            ) =&gt; <span class="ident">cgen</span> <span class="op">!</span><span class="op">=</span> <span class="ident">gen_map</span>.<span class="ident">get</span>(<span class="ident">service_id</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="number">0</span>),
+            <span class="kw">_</span> =&gt; <span class="macro">load_balanced_mode_mismatch!</span>(<span class="bool-val">false</span>),
         }
     }
 }
@@ -1043,7 +1043,7 @@
 
 <span class="kw">impl</span> <span class="ident">PendingConnection</span> {
     <span class="doccomment">/// Helper to create a `ConnectionCreatedEvent` for the connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">created_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectionCreatedEvent</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">created_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionCreatedEvent</span> {
         <span class="ident">ConnectionCreatedEvent</span> {
             <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
             <span class="ident">connection_id</span>: <span class="self">self</span>.<span class="ident">id</span>,

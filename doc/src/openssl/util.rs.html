@@ -113,7 +113,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">CallbackState</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">callback</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">CallbackState</span> {
             <span class="ident">cb</span>: <span class="prelude-val">Some</span>(<span class="ident">callback</span>),
             <span class="ident">panic</span>: <span class="prelude-val">None</span>,
@@ -137,9 +137,9 @@
     <span class="ident">size</span>: <span class="ident">c_int</span>,
     <span class="ident">_rwflag</span>: <span class="ident">c_int</span>,
     <span class="ident">cb_state</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>
+) -&gt; <span class="ident">c_int</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="ident">callback</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">cb_state</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">CallbackState</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>);
 
@@ -149,12 +149,12 @@
     }));
 
     <span class="kw">match</span> <span class="ident">result</span> {
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">len</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">c_int</span>,
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">len</span>)) =&gt; <span class="ident">len</span> <span class="kw">as</span> <span class="ident">c_int</span>,
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; {
             <span class="comment">// FIXME restore error stack</span>
             <span class="number">0</span>
         }
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
             <span class="ident">callback</span>.<span class="ident">panic</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
             <span class="number">0</span>
         }
@@ -162,7 +162,7 @@
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ForeignTypeExt</span>: <span class="ident">ForeignType</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_ptr_opt</span>(<span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::CType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_ptr_opt</span>(<span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::CType</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -173,11 +173,11 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">FT</span>: <span class="ident">ForeignType</span><span class="op">&gt;</span> <span class="ident">ForeignTypeExt</span> <span class="kw">for</span> <span class="ident">FT</span> {}
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ForeignTypeRefExt</span>: <span class="ident">ForeignTypeRef</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_const_ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident"><span class="self">Self</span>::CType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_const_ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident"><span class="self">Self</span>::CType</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ptr</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::CType</span>)
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_const_ptr_opt</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident"><span class="self">Self</span>::CType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_const_ptr_opt</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident"><span class="self">Self</span>::CType</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {

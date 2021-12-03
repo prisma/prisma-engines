@@ -252,7 +252,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
         <span class="ident">f</span>.<span class="ident">write_char</span>(<span class="string">&#39;\n&#39;</span>)<span class="question-mark">?</span>;
         <span class="ident">Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>)
@@ -260,7 +260,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">message</span> {
             <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">message</span>)<span class="question-mark">?</span>;
             <span class="ident">f</span>.<span class="ident">write_char</span>(<span class="string">&#39;\n&#39;</span>)<span class="question-mark">?</span>;
@@ -276,27 +276,27 @@
 }
 
 <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>
             .<span class="ident">source</span>
             .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) { <span class="ident">err</span>.<span class="ident">as_ref</span>() })
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) { <span class="ident">err</span>.<span class="ident">as_ref</span>() })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectorError</span> {
     <span class="doccomment">/// A reference to the tracing-error context.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">SpanTrace</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">SpanTrace</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">context</span>
     }
 
     <span class="doccomment">/// The user-facing error code for this error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_facing_error</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">error_code</span>)
     }
 
     <span class="doccomment">/// Build a generic unknown error from just an error message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_msg</span>(<span class="ident">msg</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_msg</span>(<span class="ident">msg</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ConnectorError</span>(<span class="ident">Box::new</span>(<span class="ident">ConnectorErrorImpl</span> {
             <span class="ident">user_facing_error</span>: <span class="prelude-val">None</span>,
             <span class="ident">context</span>: <span class="ident">SpanTrace::capture</span>(),
@@ -306,7 +306,7 @@
     }
 
     <span class="doccomment">/// Build a generic unknown error from a source error, with some additional context.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_source</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="ident">E</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_source</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="ident">E</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ConnectorError</span>(<span class="ident">Box::new</span>(<span class="ident">ConnectorErrorImpl</span> {
             <span class="ident">user_facing_error</span>: <span class="prelude-val">None</span>,
             <span class="ident">message</span>: <span class="prelude-val">Some</span>(<span class="ident">context</span>.<span class="ident">into</span>()),
@@ -316,7 +316,7 @@
     }
 
     <span class="doccomment">/// Turn the error into a nested, user-facing MigrationDoesNotApplyCleanly error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_migration_does_not_apply_cleanly</span>(<span class="self">self</span>, <span class="ident">migration_name</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_migration_does_not_apply_cleanly</span>(<span class="self">self</span>, <span class="ident">migration_name</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">context</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">user_facing_error</span> <span class="op">=</span> <span class="ident">user_facing_errors::migration_engine::MigrationDoesNotApplyCleanly</span> {
             <span class="ident">migration_name</span>,
@@ -332,7 +332,7 @@
     }
 
     <span class="doccomment">/// Turn the error into a nested, user-facing ShadowDbCreationError.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_shadow_db_creation_error</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_shadow_db_creation_error</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">context</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">user_facing_error</span> <span class="op">=</span> <span class="ident">user_facing_errors::migration_engine::ShadowDbCreationError</span> {
             <span class="ident">inner_error</span>: <span class="self">self</span>.<span class="ident">to_user_facing</span>(),
@@ -347,7 +347,7 @@
     }
 
     <span class="doccomment">/// Turn the error into a nested, user-facing SoftResetFailed error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_soft_reset_failed_error</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_soft_reset_failed_error</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">context</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">user_facing_error</span> <span class="op">=</span> <span class="ident">user_facing_errors::migration_engine::SoftResetFailed</span> {
             <span class="ident">inner_error</span>: <span class="self">self</span>.<span class="ident">to_user_facing</span>(),
@@ -362,25 +362,25 @@
     }
 
     <span class="doccomment">/// Access the inner `user_facing_error::KnownError`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">known_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">KnownError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">known_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">KnownError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_facing_error</span>.<span class="ident">as_ref</span>()
     }
 
     <span class="doccomment">/// Create a new P1012 user facing error from the rendered datamodel parser error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_schema_parser_error</span>(<span class="ident">full_error</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_schema_parser_error</span>(<span class="ident">full_error</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ConnectorError::user_facing</span>(<span class="ident">SchemaParserError</span> { <span class="ident">full_error</span> })
     }
 
     <span class="doccomment">/// Render to a user_facing_error::Error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_user_facing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">user_facing_errors::Error</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_user_facing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">user_facing_errors::Error</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_facing_error</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">known_error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">known_error</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">user_facing_errors::Error::from_dyn_error</span>(<span class="self">self</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">known_error</span>) =&gt; <span class="ident">known_error</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">user_facing_errors::Error::from_dyn_error</span>(<span class="self">self</span>),
         }
     }
 
     <span class="doccomment">/// Construct a GenericError with an associated user facing error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_facing</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">UserFacingError</span><span class="op">&gt;</span>(<span class="ident">err</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_facing</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">UserFacingError</span><span class="op">&gt;</span>(<span class="ident">err</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ConnectorError</span>(<span class="ident">Box::new</span>(<span class="ident">ConnectorErrorImpl</span> {
             <span class="ident">message</span>: <span class="prelude-val">Some</span>(<span class="ident">err</span>.<span class="ident">message</span>().<span class="ident">into_boxed_str</span>()),
             <span class="ident">user_facing_error</span>: <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">err</span>)),
@@ -390,7 +390,7 @@
     }
 
     <span class="doccomment">/// Construct an UrlParseError.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url_parse_error</span>(<span class="ident">err</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url_parse_error</span>(<span class="ident">err</span>: <span class="kw">impl</span> <span class="ident">Display</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::user_facing</span>(<span class="ident">user_facing_errors::common::InvalidConnectionString</span> {
             <span class="ident">details</span>: <span class="ident">err</span>.<span class="ident">to_string</span>(),
         })
@@ -398,7 +398,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KnownError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">KnownError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">KnownError</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ConnectorError</span>(<span class="ident">Box::new</span>(<span class="ident">ConnectorErrorImpl</span> {
             <span class="ident">message</span>: <span class="prelude-val">Some</span>(<span class="ident">err</span>.<span class="ident">message</span>.<span class="ident">clone</span>().<span class="ident">into_boxed_str</span>()),
             <span class="ident">user_facing_error</span>: <span class="prelude-val">Some</span>(<span class="ident">err</span>),
@@ -409,7 +409,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ReadMigrationScriptError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">ReadMigrationScriptError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">ReadMigrationScriptError</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">err</span>.<span class="number">1</span>.<span class="ident">clone</span>();
 
         <span class="ident">ConnectorError</span>(<span class="ident">Box::new</span>(<span class="ident">ConnectorErrorImpl</span> {
@@ -424,7 +424,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ListMigrationsError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">ListMigrationsError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">ListMigrationsError</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ConnectorError::from_msg</span>(<span class="ident">err</span>.<span class="ident">to_string</span>())
     }
 }

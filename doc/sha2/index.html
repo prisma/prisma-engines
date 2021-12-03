@@ -15,7 +15,7 @@ truncated to 256 bits.</li>
 <p>Algorithmically, there are only 2 core algorithms: <code>Sha256</code> and <code>Sha512</code>.
 All other algorithms are just applications of these with different initial
 hash values, and truncated to different digest bit lengths.</p>
-<h1 id="usage" class="section-header"><a href="#usage">Usage</a></h1>
+<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">hex_literal::hex</span>;
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Sha256</span>, <span class="ident">Sha512</span>, <span class="ident">Digest</span>};
 
@@ -43,19 +43,19 @@ hash values, and truncated to different digest bit lengths.</p>
 &quot;</span>)[..]);</code></pre></div>
 <p>Also see <a href="https://github.com/RustCrypto/hashes">RustCrypto/hashes</a> readme.</p>
 </div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
-<div class="item-table"><div class="item-left import-item"><code>pub use <a class="mod" href="../digest/index.html" title="mod digest">digest</a>;</code></div><div class="item-right docblock-short"></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Sha224.html" title="sha2::Sha224 struct">Sha224</a></div><div class="item-right docblock-short"><p>The SHA-256 hash algorithm with the SHA-224 initial hash value. The result
+<div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use <a class="mod" href="../digest/index.html" title="mod digest">digest</a>;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Sha224.html" title="sha2::Sha224 struct">Sha224</a></div><div class="item-right docblock-short"><p>The SHA-256 hash algorithm with the SHA-224 initial hash value. The result
 is truncated to 224 bits.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Sha256.html" title="sha2::Sha256 struct">Sha256</a></div><div class="item-right docblock-short"><p>The SHA-256 hash algorithm with the SHA-256 initial hash value.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Sha384.html" title="sha2::Sha384 struct">Sha384</a></div><div class="item-right docblock-short"><p>The SHA-512 hash algorithm with the SHA-384 initial hash value. The result
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Sha256.html" title="sha2::Sha256 struct">Sha256</a></div><div class="item-right docblock-short"><p>The SHA-256 hash algorithm with the SHA-256 initial hash value.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Sha384.html" title="sha2::Sha384 struct">Sha384</a></div><div class="item-right docblock-short"><p>The SHA-512 hash algorithm with the SHA-384 initial hash value. The result
 is truncated to 384 bits.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Sha512.html" title="sha2::Sha512 struct">Sha512</a></div><div class="item-right docblock-short"><p>The SHA-512 hash algorithm with the SHA-512 initial hash value.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Sha512Trunc224.html" title="sha2::Sha512Trunc224 struct">Sha512Trunc224</a></div><div class="item-right docblock-short"><p>The SHA-512 hash algorithm with the SHA-512/224 initial hash value.
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Sha512.html" title="sha2::Sha512 struct">Sha512</a></div><div class="item-right docblock-short"><p>The SHA-512 hash algorithm with the SHA-512 initial hash value.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Sha512Trunc224.html" title="sha2::Sha512Trunc224 struct">Sha512Trunc224</a></div><div class="item-right docblock-short"><p>The SHA-512 hash algorithm with the SHA-512/224 initial hash value.
 The result is truncated to 224 bits.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Sha512Trunc256.html" title="sha2::Sha512Trunc256 struct">Sha512Trunc256</a></div><div class="item-right docblock-short"><p>The SHA-512 hash algorithm with the SHA-512/256 initial hash value. The
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Sha512Trunc256.html" title="sha2::Sha512Trunc256 struct">Sha512Trunc256</a></div><div class="item-right docblock-short"><p>The SHA-512 hash algorithm with the SHA-512/256 initial hash value. The
 result is truncated to 256 bits.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Digest.html" title="sha2::Digest trait">Digest</a></div><div class="item-right docblock-short"><p>The <code>Digest</code> trait specifies an interface common for digest functions.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="sha2" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Digest.html" title="sha2::Digest trait">Digest</a></div><div class="item-right docblock-short"><p>The <code>Digest</code> trait specifies an interface common for digest functions.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="sha2" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

@@ -1030,12 +1030,12 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReturnDocument</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
         <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
-            <span class="string">&quot;after&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ReturnDocument::After</span>),
-            <span class="string">&quot;before&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ReturnDocument::Before</span>),
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">D::Error::custom</span>(<span class="macro">format!</span>(
+            <span class="string">&quot;after&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ReturnDocument::After</span>),
+            <span class="string">&quot;before&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ReturnDocument::Before</span>),
+            <span class="ident">other</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">D::Error::custom</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;Unknown return document value: {}&quot;</span>,
                 <span class="ident">other</span>
             ))),
@@ -1055,10 +1055,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Hint</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bson</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bson</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bson</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Bson</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Hint::Keys</span>(<span class="kw-2">ref</span> <span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Document</span>(<span class="ident">d</span>.<span class="ident">clone</span>()),
-            <span class="ident">Hint::Name</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::String</span>(<span class="ident">s</span>.<span class="ident">clone</span>()),
+            <span class="ident">Hint::Keys</span>(<span class="kw-2">ref</span> <span class="ident">d</span>) =&gt; <span class="ident">Bson::Document</span>(<span class="ident">d</span>.<span class="ident">clone</span>()),
+            <span class="ident">Hint::Name</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>.<span class="ident">clone</span>()),
         }
     }
 }
@@ -1116,7 +1116,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">InsertManyOptions</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_insert_one_options</span>(<span class="ident">options</span>: <span class="ident">InsertOneOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_insert_one_options</span>(<span class="ident">options</span>: <span class="ident">InsertOneOptions</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">bypass_document_validation</span>: <span class="ident">options</span>.<span class="ident">bypass_document_validation</span>,
             <span class="ident">ordered</span>: <span class="prelude-val">None</span>,
@@ -1141,10 +1141,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">UpdateModifications</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bson</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bson</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bson</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Bson</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">UpdateModifications::Document</span>(<span class="kw-2">ref</span> <span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Document</span>(<span class="ident">d</span>.<span class="ident">clone</span>()),
-            <span class="ident">UpdateModifications::Pipeline</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">UpdateModifications::Document</span>(<span class="kw-2">ref</span> <span class="ident">d</span>) =&gt; <span class="ident">Bson::Document</span>(<span class="ident">d</span>.<span class="ident">clone</span>()),
+            <span class="ident">UpdateModifications::Pipeline</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) =&gt; {
                 <span class="ident">Bson::Array</span>(<span class="ident">p</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">Bson::Document</span>(<span class="ident">d</span>.<span class="ident">clone</span>())).<span class="ident">collect</span>())
             }
         }
@@ -1152,13 +1152,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UpdateModifications</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">item</span>: <span class="ident">Document</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">item</span>: <span class="ident">Document</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">UpdateModifications::Document</span>(<span class="ident">item</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UpdateModifications</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">item</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">item</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">UpdateModifications::Pipeline</span>(<span class="ident">item</span>)
     }
 }
@@ -1200,7 +1200,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">UpdateOptions</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_replace_options</span>(<span class="ident">options</span>: <span class="ident">ReplaceOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_replace_options</span>(<span class="ident">options</span>: <span class="ident">ReplaceOptions</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">bypass_document_validation</span>: <span class="ident">options</span>.<span class="ident">bypass_document_validation</span>,
             <span class="ident">upsert</span>: <span class="ident">options</span>.<span class="ident">upsert</span>,
@@ -1706,7 +1706,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FindOneOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FindOptions</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">options</span>: <span class="ident">FindOneOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">options</span>: <span class="ident">FindOneOptions</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FindOptions</span> {
             <span class="ident">allow_disk_use</span>: <span class="prelude-val">None</span>,
             <span class="ident">allow_partial_results</span>: <span class="ident">options</span>.<span class="ident">allow_partial_results</span>,
@@ -1737,13 +1737,13 @@
 <span class="kw">fn</span> <span class="ident">serialize_absolute_value</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
     <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
     <span class="ident">serializer</span>: <span class="ident">S</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">Serializer</span>,
 {
     <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_i64</span>(<span class="ident">v</span>.<span class="ident">abs</span>()),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+        <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i64</span>(<span class="ident">v</span>.<span class="ident">abs</span>()),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
     }
 }
 
@@ -1932,21 +1932,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">CommitQuorum</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Serializer</span>,
     {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CommitQuorum::Nodes</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_helpers::serialize_u32_as_i32</span>(<span class="ident">n</span>, <span class="ident">serializer</span>),
-            <span class="ident">CommitQuorum::VotingMembers</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="string">&quot;votingMembers&quot;</span>),
-            <span class="ident">CommitQuorum::Majority</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="string">&quot;majority&quot;</span>),
-            <span class="ident">CommitQuorum::Custom</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="ident">s</span>),
+            <span class="ident">CommitQuorum::Nodes</span>(<span class="ident">n</span>) =&gt; <span class="ident">serde_helpers::serialize_u32_as_i32</span>(<span class="ident">n</span>, <span class="ident">serializer</span>),
+            <span class="ident">CommitQuorum::VotingMembers</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="string">&quot;votingMembers&quot;</span>),
+            <span class="ident">CommitQuorum::Majority</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="string">&quot;majority&quot;</span>),
+            <span class="ident">CommitQuorum::Custom</span>(<span class="ident">s</span>) =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="ident">s</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CommitQuorum</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1957,16 +1957,16 @@
             <span class="ident">String</span>(<span class="ident">String</span>),
         }
         <span class="kw">match</span> <span class="ident">IntOrString::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span> {
-            <span class="ident">IntOrString::String</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="ident">s</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;votingMembers&quot;</span> {
+            <span class="ident">IntOrString::String</span>(<span class="ident">s</span>) =&gt; {
+                <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="string">&quot;votingMembers&quot;</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">CommitQuorum::VotingMembers</span>)
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">s</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;majority&quot;</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="string">&quot;majority&quot;</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">CommitQuorum::Majority</span>)
                 } <span class="kw">else</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">CommitQuorum::Custom</span>(<span class="ident">s</span>))
                 }
             }
-            <span class="ident">IntOrString::Int</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CommitQuorum::Nodes</span>(<span class="ident">i</span>)),
+            <span class="ident">IntOrString::Int</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CommitQuorum::Nodes</span>(<span class="ident">i</span>)),
         }
     }
 }

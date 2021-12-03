@@ -313,7 +313,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PrismaOpt</span> {
-    <span class="kw">fn</span> <span class="ident">datamodel_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">datamodel_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">datamodel</span>
             .<span class="ident">as_deref</span>()
@@ -327,18 +327,18 @@
         <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datamodel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">Datamodel</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datamodel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">Datamodel</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">datamodel_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">datamodel_str</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">datamodel::parse_datamodel</span>(<span class="ident">datamodel_str</span>);
 
         <span class="kw">match</span> <span class="ident">datamodel</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">errors</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">PrismaError::ConversionError</span>(<span class="ident">errors</span>, <span class="ident">datamodel_str</span>.<span class="ident">to_string</span>())),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">datamodel</span>.<span class="ident">unwrap</span>().<span class="ident">subject</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">errors</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">PrismaError::ConversionError</span>(<span class="ident">errors</span>, <span class="ident">datamodel_str</span>.<span class="ident">to_string</span>())),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">datamodel</span>.<span class="ident">unwrap</span>().<span class="ident">subject</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configuration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ignore_env_errors</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">ValidatedConfiguration</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configuration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ignore_env_errors</span>: <span class="ident">bool</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">ValidatedConfiguration</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">datamodel_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">datamodel_str</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">datasource_url_overrides</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">json</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">overwrite_datasources</span> {
@@ -363,39 +363,39 @@
     }
 
     <span class="doccomment">/// Extract the log format from on the RUST_LOG_FORMAT env var.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">log_format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::LogFormat</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">log_format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::LogFormat</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">log_format</span>.<span class="ident">as_deref</span>() {
-            <span class="prelude-val">Some</span>(<span class="string">&quot;devel&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::LogFormat::Text</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::LogFormat::Json</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;devel&quot;</span>) =&gt; <span class="ident"><span class="kw">crate</span>::LogFormat::Text</span>,
+            <span class="kw">_</span> =&gt; <span class="ident"><span class="kw">crate</span>::LogFormat::Json</span>,
         }
     }
 
     <span class="doccomment">/// The unix path to listen on.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unix_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unix_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">unix_path</span>.<span class="ident">as_ref</span>()
     }
 
     <span class="doccomment">/// Enable query logging</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">log_queries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">log_queries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">std::env::var</span>(<span class="string">&quot;LOG_QUERIES&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>).<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">log_queries</span>)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_base64_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_base64_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">base64::decode</span>(<span class="ident">s</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from_utf8</span>(<span class="ident">bytes</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>) =&gt; <span class="ident">String::from_utf8</span>(<span class="ident">bytes</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
             <span class="macro">trace!</span>(<span class="string">&quot;Error decoding {} from Base64 (invalid UTF-8): {:?}&quot;</span>, <span class="ident">s</span>, <span class="ident">e</span>);
 
             <span class="ident">PrismaError::ConfigurationError</span>(<span class="string">&quot;Invalid Base64&quot;</span>.<span class="ident">into</span>())
         }),
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
             <span class="macro">trace!</span>(<span class="string">&quot;Decoding Base64 failed (might not be encoded): {:?}&quot;</span>, <span class="ident">e</span>);
             <span class="prelude-val">Ok</span>(<span class="ident">String::from</span>(<span class="ident">s</span>))
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">load_datamodel_file</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">OsStr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">load_datamodel_file</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">OsStr</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Could not open datamodel file {:?}&quot;</span>, <span class="ident">path</span>));
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">String::new</span>();
 

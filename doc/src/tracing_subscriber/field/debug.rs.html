@@ -128,7 +128,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Alt</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Wraps the provided visitor so that any `fmt::Debug` fields are formatted</span>
     <span class="doccomment">/// using the alternative (`:#`) formatter.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Alt</span>(<span class="ident">inner</span>)
     }
 }
@@ -140,7 +140,7 @@
     <span class="kw">type</span> <span class="ident">Visitor</span> <span class="op">=</span> <span class="ident">Alt</span><span class="op">&lt;</span><span class="ident">V::Visitor</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">make_visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Visitor</span> {
+    <span class="kw">fn</span> <span class="ident">make_visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="ident">T</span>) -&gt; <span class="ident"><span class="self">Self</span>::Visitor</span> {
         <span class="ident">Alt</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">make_visitor</span>(<span class="ident">target</span>))
     }
 }
@@ -190,7 +190,7 @@
     <span class="ident">V</span>: <span class="ident">VisitOutput</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">O</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) -&gt; <span class="ident">O</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">finish</span>()
     }
 }
@@ -205,7 +205,7 @@
         <span class="ident">V</span>: <span class="ident">VisitWrite</span>,
     {
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">io::Write</span> {
+        <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">io::Write</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">writer</span>()
         }
     }
@@ -216,7 +216,7 @@
     <span class="ident">V</span>: <span class="ident">VisitFmt</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span> {
+    <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">writer</span>()
     }
 }

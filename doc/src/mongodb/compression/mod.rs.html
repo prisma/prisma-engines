@@ -362,16 +362,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CompressorId</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">id</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">id</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">id</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CompressorId::Noop</span>),
+            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CompressorId::Noop</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CompressorId::Snappy</span>),
+            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CompressorId::Snappy</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CompressorId::Zlib</span>),
+            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CompressorId::Zlib</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CompressorId::Zstd</span>),
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
+            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">CompressorId::Zstd</span>),
+            <span class="ident">other</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
                 <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Invalid compressor id: {}&quot;</span>, <span class="ident">other</span>),
             }
             .<span class="ident">into</span>()),
@@ -420,71 +420,71 @@
             <span class="ident">level</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">zlib_level</span>,
         } <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>
         {
-            <span class="kw-2">*</span><span class="ident">zlib_level</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">level</span> <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span> { <span class="prelude-val">None</span> } <span class="kw">else</span> { <span class="prelude-val">Some</span>(<span class="ident">level</span>) }
+            <span class="kw-2">*</span><span class="ident">zlib_level</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">level</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> { <span class="prelude-val">None</span> } <span class="kw">else</span> { <span class="prelude-val">Some</span>(<span class="ident">level</span>) }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="string">&quot;zlib&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Compressor::Zlib</span> { <span class="ident">level</span>: <span class="prelude-val">None</span> }),
+            <span class="string">&quot;zlib&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Compressor::Zlib</span> { <span class="ident">level</span>: <span class="prelude-val">None</span> }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="string">&quot;zstd&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Compressor::Zstd</span> { <span class="ident">level</span>: <span class="prelude-val">None</span> }),
+            <span class="string">&quot;zstd&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Compressor::Zstd</span> { <span class="ident">level</span>: <span class="prelude-val">None</span> }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="string">&quot;snappy&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Compressor::Snappy</span>),
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
+            <span class="string">&quot;snappy&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Compressor::Snappy</span>),
+            <span class="ident">other</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                 <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Invalid compressor: {} was supplied but is invalid&quot;</span>, <span class="ident">other</span>),
             })),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zstd</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;zstd&quot;</span>,
+            <span class="ident">Compressor::Zstd</span> { .. } =&gt; <span class="string">&quot;zstd&quot;</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zlib</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;zlib&quot;</span>,
+            <span class="ident">Compressor::Zlib</span> { .. } =&gt; <span class="string">&quot;zlib&quot;</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Snappy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;snappy&quot;</span>,
+            <span class="ident">Compressor::Snappy</span> =&gt; <span class="string">&quot;snappy&quot;</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CompressorId</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CompressorId</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zstd</span> { <span class="ident">level</span>: <span class="kw">_</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CompressorId::Zstd</span>,
+            <span class="ident">Compressor::Zstd</span> { <span class="ident">level</span>: <span class="kw">_</span> } =&gt; <span class="ident">CompressorId::Zstd</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zlib</span> { <span class="ident">level</span>: <span class="kw">_</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CompressorId::Zlib</span>,
+            <span class="ident">Compressor::Zlib</span> { <span class="ident">level</span>: <span class="kw">_</span> } =&gt; <span class="ident">CompressorId::Zlib</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Snappy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CompressorId::Snappy</span>,
+            <span class="ident">Compressor::Snappy</span> =&gt; <span class="ident">CompressorId::Snappy</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_patterns</span>)]</span>
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
             <span class="ident">Compressor::Zstd</span> { <span class="ident">level</span>: <span class="prelude-val">Some</span>(<span class="ident">level</span>) }
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">zstd::compression_level_range</span>().<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">level</span>) <span class="op">=</span><span class="op">&gt;</span>
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">zstd::compression_level_range</span>().<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">level</span>) =&gt;
             {
                 <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid zstd level: {}&quot;</span>, <span class="ident">level</span>),
                 }))
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zlib</span> { <span class="ident">level</span>: <span class="prelude-val">Some</span>(<span class="ident">level</span>) } <span class="kw">if</span> <span class="op">!</span>(<span class="op">-</span><span class="number">1</span>..<span class="number">10</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">level</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Compressor::Zlib</span> { <span class="ident">level</span>: <span class="prelude-val">Some</span>(<span class="ident">level</span>) } <span class="kw">if</span> <span class="op">!</span>(<span class="op">-</span><span class="number">1</span>..<span class="number">10</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">level</span>) =&gt; {
                 <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid zlib level: {}&quot;</span>, <span class="ident">level</span>),
                 }))
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Encoder</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Encoder</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zstd</span> { <span class="ident">level</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Compressor::Zstd</span> { <span class="ident">level</span> } =&gt; {
                 <span class="kw">let</span> <span class="ident">encoder</span> <span class="op">=</span>
                     <span class="ident">zstd::Encoder::new</span>(<span class="macro">vec!</span>[], <span class="ident">level</span>.<span class="ident">unwrap_or</span>(<span class="ident">zstd::DEFAULT_COMPRESSION_LEVEL</span>))
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
@@ -499,20 +499,20 @@
                 <span class="prelude-val">Ok</span>(<span class="ident">Encoder::Zstd</span> { <span class="ident">encoder</span> })
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Zlib</span> { <span class="ident">level</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Compressor::Zlib</span> { <span class="ident">level</span> } =&gt; {
                 <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">level</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">level</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Compression::new</span>(<span class="ident">level</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">level</span>) =&gt; <span class="ident">Compression::new</span>(<span class="ident">level</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
                         <span class="ident">Error::from</span>(<span class="ident">ErrorKind::Internal</span> {
                             <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an invalid zlib compression level was given: {}&quot;</span>, <span class="ident">e</span>),
                         })
                     })<span class="question-mark">?</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Compression::default</span>(),
+                    <span class="kw">_</span> =&gt; <span class="ident">Compression::default</span>(),
                 };
                 <span class="kw">let</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">ZlibEncoder::new</span>(<span class="macro">vec!</span>[], <span class="ident">level</span>);
                 <span class="prelude-val">Ok</span>(<span class="ident">Encoder::Zlib</span> { <span class="ident">encoder</span> })
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">Compressor::Snappy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Encoder::Snappy</span> { <span class="ident">bytes</span>: <span class="macro">vec!</span>[] }),
+            <span class="ident">Compressor::Snappy</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Encoder::Snappy</span> { <span class="ident">bytes</span>: <span class="macro">vec!</span>[] }),
         }
     }
 }
@@ -530,24 +530,24 @@
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Encoder</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Encoder::Zstd</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">encoder</span>.<span class="ident">write_all</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+            <span class="ident">Encoder::Zstd</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> } =&gt; <span class="ident">encoder</span>.<span class="ident">write_all</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
                 <span class="ident">ErrorKind::Internal</span> {
                     <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an error occurred writing to the zstd encoder: {}&quot;</span>, <span class="ident">e</span>),
                 }
                 .<span class="ident">into</span>()
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Encoder::Zlib</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">encoder</span>.<span class="ident">write_all</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+            <span class="ident">Encoder::Zlib</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> } =&gt; <span class="ident">encoder</span>.<span class="ident">write_all</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
                 <span class="ident">ErrorKind::Internal</span> {
                     <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an error occurred writing to the zlib encoder: {}&quot;</span>, <span class="ident">e</span>),
                 }
                 .<span class="ident">into</span>()
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">Encoder::Snappy</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bytes</span>.<span class="ident">write_all</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+            <span class="ident">Encoder::Snappy</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> } =&gt; <span class="ident">bytes</span>.<span class="ident">write_all</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
                 <span class="ident">ErrorKind::Internal</span> {
                     <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an error occurred writing to the snappy encoder: {}&quot;</span>, <span class="ident">e</span>),
                 }
@@ -556,24 +556,24 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Encoder::Zstd</span> { <span class="ident">encoder</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">encoder</span>.<span class="ident">finish</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+            <span class="ident">Encoder::Zstd</span> { <span class="ident">encoder</span> } =&gt; <span class="ident">encoder</span>.<span class="ident">finish</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
                 <span class="ident">ErrorKind::Internal</span> {
                     <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an error occurred finishing zstd encoder: {}&quot;</span>, <span class="ident">e</span>),
                 }
                 .<span class="ident">into</span>()
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Encoder::Zlib</span> { <span class="ident">encoder</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">encoder</span>.<span class="ident">finish</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+            <span class="ident">Encoder::Zlib</span> { <span class="ident">encoder</span> } =&gt; <span class="ident">encoder</span>.<span class="ident">finish</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
                 <span class="ident">ErrorKind::Internal</span> {
                     <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;an error occurred finishing zlib encoder: {}&quot;</span>, <span class="ident">e</span>),
                 }
                 .<span class="ident">into</span>()
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">Encoder::Snappy</span> { <span class="ident">bytes</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Encoder::Snappy</span> { <span class="ident">bytes</span> } =&gt; {
                 <span class="comment">// The server doesn&#39;t use snappy frame format, so we need to use snap::raw::Encoder</span>
                 <span class="comment">// rather than snap::write::FrameEncoder.  Likewise for decoding.</span>
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">compressor</span> <span class="op">=</span> <span class="ident">snap::raw::Encoder::new</span>();
@@ -600,10 +600,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Decoder</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">decode</span>(<span class="self">self</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">decode</span>(<span class="self">self</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">Decoder::Zstd</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Decoder::Zstd</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                 <span class="ident">zstd::stream::copy_decode</span>(<span class="ident">source</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
                     <span class="ident">Error::from</span>(<span class="ident">ErrorKind::Internal</span> {
@@ -613,7 +613,7 @@
                 <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">Decoder::Zlib</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Decoder::Zlib</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">ZlibDecoder::new</span>(<span class="macro">vec!</span>[]);
                 <span class="ident">decoder</span>.<span class="ident">write_all</span>(<span class="ident">source</span>)<span class="question-mark">?</span>;
                 <span class="ident">decoder</span>.<span class="ident">finish</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
@@ -624,7 +624,7 @@
                 })
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">Decoder::Snappy</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Decoder::Snappy</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decompressor</span> <span class="op">=</span> <span class="ident">snap::raw::Decoder::new</span>();
                 <span class="ident">decompressor</span>.<span class="ident">decompress_vec</span>(<span class="ident">source</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
                     <span class="ident">ErrorKind::Internal</span> {
@@ -633,20 +633,20 @@
                     .<span class="ident">into</span>()
                 })
             }
-            <span class="ident">Decoder::Noop</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">source</span>.<span class="ident">to_vec</span>()),
+            <span class="ident">Decoder::Noop</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">source</span>.<span class="ident">to_vec</span>()),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">id</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">id</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">compressor_id</span> <span class="op">=</span> <span class="ident">CompressorId::from_u8</span>(<span class="ident">id</span>)<span class="question-mark">?</span>;
         <span class="kw">match</span> <span class="ident">compressor_id</span> {
-            <span class="ident">CompressorId::Noop</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Decoder::Noop</span>),
+            <span class="ident">CompressorId::Noop</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Decoder::Noop</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;snappy-compression&quot;</span>)]</span>
-            <span class="ident">CompressorId::Snappy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Decoder::Snappy</span>),
+            <span class="ident">CompressorId::Snappy</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Decoder::Snappy</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zlib-compression&quot;</span>)]</span>
-            <span class="ident">CompressorId::Zlib</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Decoder::Zlib</span>),
+            <span class="ident">CompressorId::Zlib</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Decoder::Zlib</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;zstd-compression&quot;</span>)]</span>
-            <span class="ident">CompressorId::Zstd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Decoder::Zstd</span>),
+            <span class="ident">CompressorId::Zstd</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Decoder::Zstd</span>),
         }
     }
 }

@@ -433,19 +433,19 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Expresses the choice by returning something that implements `Signer`,</span>
     <span class="doccomment">/// using the chosen scheme.</span>
-    <span class="kw">fn</span> <span class="ident">choose_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">choose_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// What kind of key we have.</span>
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SignatureAlgorithm</span>;
+    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureAlgorithm</span>;
 }
 
 <span class="doccomment">/// A thing that can sign a message.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Signer</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
     <span class="doccomment">/// Signs `message` using the selected scheme.</span>
-    <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">TLSError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">TLSError</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Reveals which scheme will be used when you call `sign()`.</span>
-    <span class="kw">fn</span> <span class="ident">get_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SignatureScheme</span>;
+    <span class="kw">fn</span> <span class="ident">get_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureScheme</span>;
 }
 
 <span class="doccomment">/// A packaged-together certificate chain, matching `SigningKey` and</span>
@@ -473,7 +473,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The cert chain must not be empty. The first certificate in the chain</span>
     <span class="doccomment">/// must be the end-entity certificate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cert</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>, <span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CertifiedKey</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cert</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>, <span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">CertifiedKey</span> {
         <span class="ident">CertifiedKey</span> {
             <span class="ident">cert</span>,
             <span class="ident">key</span>,
@@ -483,32 +483,32 @@
     }
 
     <span class="doccomment">/// The end-entity certificate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_entity_cert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">key::Certificate</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_entity_cert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">key::Certificate</span>, ()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">cert</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">ok_or</span>(())
     }
 
     <span class="doccomment">/// Steal ownership of the certificate chain.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_cert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_cert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span> {
         <span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">cert</span>, <span class="ident">Vec::new</span>())
     }
 
     <span class="doccomment">/// Return true if there&#39;s an OCSP response.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_ocsp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_ocsp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ocsp</span>.<span class="ident">is_some</span>()
     }
 
     <span class="doccomment">/// Steal ownership of the OCSP response.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_ocsp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_ocsp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ocsp</span>, <span class="prelude-val">None</span>)
     }
 
     <span class="doccomment">/// Return true if there&#39;s an SCT list.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sct_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_sct_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">sct_list</span>.<span class="ident">is_some</span>()
     }
 
     <span class="doccomment">/// Steal ownership of the SCT list.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_sct_list</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_sct_list</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">sct_list</span>, <span class="prelude-val">None</span>)
     }
 
@@ -523,7 +523,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cross_check_end_entity_cert</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">webpki::DNSNameRef</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="comment">// Always reject an empty certificate chain.</span>
         <span class="kw">let</span> <span class="ident">end_entity_cert</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">end_entity_cert</span>().<span class="ident">map_err</span>(<span class="op">|</span>()<span class="op">|</span> {
             <span class="ident">TLSError::General</span>(<span class="string">&quot;No end-entity certificate in certificate chain&quot;</span>.<span class="ident">to_string</span>())
@@ -563,7 +563,7 @@
 
 <span class="doccomment">/// Parse `der` as any supported key encoding/type, returning</span>
 <span class="doccomment">/// the first which works.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any_supported_type</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any_supported_type</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">rsa</span>) <span class="op">=</span> <span class="ident">RSASigningKey::new</span>(<span class="ident">der</span>) {
         <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">rsa</span>))
     } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ecdsa</span>) <span class="op">=</span> <span class="ident">any_ecdsa_type</span>(<span class="ident">der</span>) {
@@ -574,7 +574,7 @@
 }
 
 <span class="doccomment">/// Parse `der` as any ECDSA key type, returning the first which works.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any_ecdsa_type</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any_ecdsa_type</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ecdsa_p256</span>) <span class="op">=</span> <span class="ident">ECDSASigningKey::new</span>(
         <span class="ident">der</span>,
         <span class="ident">SignatureScheme::ECDSA_NISTP256_SHA256</span>,
@@ -595,7 +595,7 @@
 }
 
 <span class="doccomment">/// Parse `der` as any EdDSA key type, returning the first which works.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any_eddsa_type</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any_eddsa_type</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SigningKey</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ed25519</span>) <span class="op">=</span> <span class="ident">Ed25519SigningKey::new</span>(<span class="ident">der</span>, <span class="ident">SignatureScheme::ED25519</span>) {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">ed25519</span>));
     }
@@ -622,7 +622,7 @@
 <span class="kw">impl</span> <span class="ident">RSASigningKey</span> {
     <span class="doccomment">/// Make a new `RSASigningKey` from a DER encoding, in either</span>
     <span class="doccomment">/// PKCS#1 or PKCS#8 format.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RSASigningKey</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RSASigningKey</span>, ()<span class="op">&gt;</span> {
         <span class="ident">RsaKeyPair::from_der</span>(<span class="kw-2">&amp;</span><span class="ident">der</span>.<span class="number">0</span>)
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RsaKeyPair::from_pkcs8</span>(<span class="kw-2">&amp;</span><span class="ident">der</span>.<span class="number">0</span>))
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">RSASigningKey</span> { <span class="ident">key</span>: <span class="ident">Arc::new</span>(<span class="ident">s</span>) })
@@ -631,7 +631,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SigningKey</span> <span class="kw">for</span> <span class="ident">RSASigningKey</span> {
-    <span class="kw">fn</span> <span class="ident">choose_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">choose_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">ALL_RSA_SCHEMES</span>
             .<span class="ident">iter</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">scheme</span><span class="op">|</span> <span class="ident">offered</span>.<span class="ident">contains</span>(<span class="ident">scheme</span>))
@@ -639,7 +639,7 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">scheme</span><span class="op">|</span> <span class="ident">RSASigner::new</span>(<span class="self">self</span>.<span class="ident">key</span>.<span class="ident">clone</span>(), <span class="kw-2">*</span><span class="ident">scheme</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SignatureAlgorithm</span> {
+    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureAlgorithm</span> {
         <span class="ident">SignatureAlgorithm::RSA</span>
     }
 }
@@ -651,15 +651,15 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RSASigner</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RsaKeyPair</span><span class="op">&gt;</span>, <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RsaKeyPair</span><span class="op">&gt;</span>, <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">encoding</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">signature::RsaEncoding</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">scheme</span> {
-            <span class="ident">SignatureScheme::RSA_PKCS1_SHA256</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PKCS1_SHA256</span>,
-            <span class="ident">SignatureScheme::RSA_PKCS1_SHA384</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PKCS1_SHA384</span>,
-            <span class="ident">SignatureScheme::RSA_PKCS1_SHA512</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PKCS1_SHA512</span>,
-            <span class="ident">SignatureScheme::RSA_PSS_SHA256</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PSS_SHA256</span>,
-            <span class="ident">SignatureScheme::RSA_PSS_SHA384</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PSS_SHA384</span>,
-            <span class="ident">SignatureScheme::RSA_PSS_SHA512</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PSS_SHA512</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident">SignatureScheme::RSA_PKCS1_SHA256</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PKCS1_SHA256</span>,
+            <span class="ident">SignatureScheme::RSA_PKCS1_SHA384</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PKCS1_SHA384</span>,
+            <span class="ident">SignatureScheme::RSA_PKCS1_SHA512</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PKCS1_SHA512</span>,
+            <span class="ident">SignatureScheme::RSA_PSS_SHA256</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PSS_SHA256</span>,
+            <span class="ident">SignatureScheme::RSA_PSS_SHA384</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PSS_SHA384</span>,
+            <span class="ident">SignatureScheme::RSA_PSS_SHA512</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::RSA_PSS_SHA512</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
 
         <span class="ident">Box::new</span>(<span class="ident">RSASigner</span> {
@@ -671,7 +671,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Signer</span> <span class="kw">for</span> <span class="ident">RSASigner</span> {
-    <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sig</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">public_modulus_len</span>()];
 
         <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">ring::rand::SystemRandom::new</span>();
@@ -681,7 +681,7 @@
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">TLSError::General</span>(<span class="string">&quot;signing failed&quot;</span>.<span class="ident">to_string</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">get_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SignatureScheme</span> {
+    <span class="kw">fn</span> <span class="ident">get_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureScheme</span> {
         <span class="self">self</span>.<span class="ident">scheme</span>
     }
 }
@@ -709,7 +709,7 @@
         <span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>,
         <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>,
         <span class="ident">sigalg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">signature::EcdsaSigningAlgorithm</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ECDSASigningKey</span>, ()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ECDSASigningKey</span>, ()<span class="op">&gt;</span> {
         <span class="ident">EcdsaKeyPair::from_pkcs8</span>(<span class="ident">sigalg</span>, <span class="kw-2">&amp;</span><span class="ident">der</span>.<span class="number">0</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">kp</span><span class="op">|</span> <span class="ident">ECDSASigningKey</span> {
                 <span class="ident">key</span>: <span class="ident">Arc::new</span>(<span class="ident">kp</span>),
@@ -720,7 +720,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SigningKey</span> <span class="kw">for</span> <span class="ident">ECDSASigningKey</span> {
-    <span class="kw">fn</span> <span class="ident">choose_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">choose_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">offered</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">scheme</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">ECDSASigner</span> {
                 <span class="ident">key</span>: <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">clone</span>(),
@@ -731,7 +731,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SignatureAlgorithm</span> {
+    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureAlgorithm</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::DecomposedSignatureScheme</span>;
         <span class="self">self</span>.<span class="ident">scheme</span>.<span class="ident">sign</span>()
     }
@@ -743,7 +743,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Signer</span> <span class="kw">for</span> <span class="ident">ECDSASigner</span> {
-    <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">ring::rand::SystemRandom::new</span>();
         <span class="self">self</span>.<span class="ident">key</span>
             .<span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="ident">rng</span>, <span class="ident">message</span>)
@@ -751,7 +751,7 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sig</span><span class="op">|</span> <span class="ident">sig</span>.<span class="ident">as_ref</span>().<span class="ident">into</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">get_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SignatureScheme</span> {
+    <span class="kw">fn</span> <span class="ident">get_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureScheme</span> {
         <span class="self">self</span>.<span class="ident">scheme</span>
     }
 }
@@ -775,7 +775,7 @@
 <span class="kw">impl</span> <span class="ident">Ed25519SigningKey</span> {
     <span class="doccomment">/// Make a new `Ed25519SigningKey` from a DER encoding in PKCS#8 format,</span>
     <span class="doccomment">/// expecting a key usable with precisely the given signature scheme.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>, <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ed25519SigningKey</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>, <span class="ident">scheme</span>: <span class="ident">SignatureScheme</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ed25519SigningKey</span>, ()<span class="op">&gt;</span> {
         <span class="ident">Ed25519KeyPair::from_pkcs8_maybe_unchecked</span>(<span class="kw-2">&amp;</span><span class="ident">der</span>.<span class="number">0</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">kp</span><span class="op">|</span> <span class="ident">Ed25519SigningKey</span> {
                 <span class="ident">key</span>: <span class="ident">Arc::new</span>(<span class="ident">kp</span>),
@@ -786,7 +786,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SigningKey</span> <span class="kw">for</span> <span class="ident">Ed25519SigningKey</span> {
-    <span class="kw">fn</span> <span class="ident">choose_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">choose_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Signer</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">offered</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">scheme</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">Ed25519Signer</span> {
                 <span class="ident">key</span>: <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">clone</span>(),
@@ -797,7 +797,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SignatureAlgorithm</span> {
+    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureAlgorithm</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::DecomposedSignatureScheme</span>;
         <span class="self">self</span>.<span class="ident">scheme</span>.<span class="ident">sign</span>()
     }
@@ -809,18 +809,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Signer</span> <span class="kw">for</span> <span class="ident">Ed25519Signer</span> {
-    <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">key</span>.<span class="ident">sign</span>(<span class="ident">message</span>).<span class="ident">as_ref</span>().<span class="ident">into</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">get_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SignatureScheme</span> {
+    <span class="kw">fn</span> <span class="ident">get_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SignatureScheme</span> {
         <span class="self">self</span>.<span class="ident">scheme</span>
     }
 }
 
 <span class="doccomment">/// The set of schemes we support for signatures and</span>
 <span class="doccomment">/// that are allowed for TLS1.3.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supported_sign_tls13</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">SignatureScheme</span>] {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supported_sign_tls13</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">SignatureScheme</span>] {
     <span class="kw-2">&amp;</span>[
         <span class="ident">SignatureScheme::ECDSA_NISTP384_SHA384</span>,
         <span class="ident">SignatureScheme::ECDSA_NISTP256_SHA256</span>,

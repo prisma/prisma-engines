@@ -315,6 +315,8 @@
 <span id="315">315</span>
 <span id="316">316</span>
 <span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::SqlError</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_builder::write</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">QueryExt</span>};
 <span class="kw">use</span> <span class="ident">connector_interface</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
@@ -328,66 +330,66 @@
 <span class="doccomment">/// Create a single record to the database defined in `conn`, resulting into a</span>
 <span class="doccomment">/// `RecordProjection` as an identifier pointing to the just-created record.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">args</span>))]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_record</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">args</span>: <span class="ident">WriteArgs</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_record</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">args</span>: <span class="ident">WriteArgs</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">insert</span>, <span class="ident">returned_id</span>) <span class="op">=</span> <span class="ident">write::create_record</span>(<span class="ident">model</span>, <span class="ident">args</span>);
 
     <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">insert</span>(<span class="ident">insert</span>).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">id</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
-            <span class="ident">ErrorKind::UniqueConstraintViolation</span> { <span class="ident">constraint</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">constraint</span> {
-                <span class="ident">quaint::error::DatabaseConstraint::Index</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
+            <span class="ident">ErrorKind::UniqueConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; <span class="kw">match</span> <span class="ident">constraint</span> {
+                <span class="ident">quaint::error::DatabaseConstraint::Index</span>(<span class="ident">name</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::Index</span>(<span class="ident">name</span>.<span class="ident">clone</span>());
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::UniqueConstraintViolation</span> { <span class="ident">constraint</span> });
                 }
-                <span class="ident">quaint::error::DatabaseConstraint::Fields</span>(<span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">quaint::error::DatabaseConstraint::Fields</span>(<span class="ident">fields</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::Fields</span>(<span class="ident">fields</span>.<span class="ident">clone</span>());
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::UniqueConstraintViolation</span> { <span class="ident">constraint</span> });
                 }
-                <span class="ident">quaint::error::DatabaseConstraint::ForeignKey</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">quaint::error::DatabaseConstraint::ForeignKey</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::ForeignKey</span>;
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::UniqueConstraintViolation</span> { <span class="ident">constraint</span> });
                 }
-                <span class="ident">quaint::error::DatabaseConstraint::CannotParse</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">quaint::error::DatabaseConstraint::CannotParse</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::CannotParse</span>;
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::UniqueConstraintViolation</span> { <span class="ident">constraint</span> });
                 }
             },
-            <span class="ident">ErrorKind::NullConstraintViolation</span> { <span class="ident">constraint</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">constraint</span> {
-                <span class="ident">quaint::error::DatabaseConstraint::Index</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ErrorKind::NullConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; <span class="kw">match</span> <span class="ident">constraint</span> {
+                <span class="ident">quaint::error::DatabaseConstraint::Index</span>(<span class="ident">name</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::Index</span>(<span class="ident">name</span>.<span class="ident">clone</span>());
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::NullConstraintViolation</span> { <span class="ident">constraint</span> });
                 }
-                <span class="ident">quaint::error::DatabaseConstraint::Fields</span>(<span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">quaint::error::DatabaseConstraint::Fields</span>(<span class="ident">fields</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::Fields</span>(<span class="ident">fields</span>.<span class="ident">clone</span>());
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::NullConstraintViolation</span> { <span class="ident">constraint</span> });
                 }
-                <span class="ident">quaint::error::DatabaseConstraint::ForeignKey</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">quaint::error::DatabaseConstraint::ForeignKey</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::ForeignKey</span>;
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::NullConstraintViolation</span> { <span class="ident">constraint</span> });
                 }
-                <span class="ident">quaint::error::DatabaseConstraint::CannotParse</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">quaint::error::DatabaseConstraint::CannotParse</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::CannotParse</span>;
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::NullConstraintViolation</span> { <span class="ident">constraint</span> });
                 }
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::from</span>(<span class="ident">e</span>)),
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::from</span>(<span class="ident">e</span>)),
         },
     };
 
     <span class="kw">match</span> (<span class="ident">returned_id</span>, <span class="ident">result_set</span>.<span class="ident">len</span>(), <span class="ident">result_set</span>.<span class="ident">last_insert_id</span>()) {
         <span class="comment">// All values provided in the write arrghs</span>
-        (<span class="prelude-val">Some</span>(<span class="ident">identifier</span>), <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">identifier</span>.<span class="ident">misses_autogen_value</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">identifier</span>),
+        (<span class="prelude-val">Some</span>(<span class="ident">identifier</span>), <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">identifier</span>.<span class="ident">misses_autogen_value</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="ident">identifier</span>),
 
         <span class="comment">// PostgreSQL with a working RETURNING statement</span>
-        (<span class="kw">_</span>, <span class="ident">n</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">try_convert</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">primary_identifier</span>(), <span class="ident">result_set</span>)<span class="question-mark">?</span>),
+        (<span class="kw">_</span>, <span class="ident">n</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">try_convert</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">primary_identifier</span>(), <span class="ident">result_set</span>)<span class="question-mark">?</span>),
 
         <span class="comment">// We have an auto-incremented id that we got from MySQL or SQLite</span>
-        (<span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">identifier</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">num</span>)) <span class="kw">if</span> <span class="ident">identifier</span>.<span class="ident">misses_autogen_value</span>() <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">identifier</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">num</span>)) <span class="kw">if</span> <span class="ident">identifier</span>.<span class="ident">misses_autogen_value</span>() =&gt; {
             <span class="ident">identifier</span>.<span class="ident">add_autogen_value</span>(<span class="ident">num</span> <span class="kw">as</span> <span class="ident">i64</span>);
             <span class="prelude-val">Ok</span>(<span class="ident">identifier</span>)
         }
 
-        (<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Could not figure out an ID in create&quot;</span>),
+        (<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Could not figure out an ID in create&quot;</span>),
     }
 }
 
@@ -398,7 +400,7 @@
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">WriteArgs</span><span class="op">&gt;</span>,
     <span class="ident">skip_duplicates</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>);
     }
@@ -407,6 +409,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
     <span class="ident">args</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">fields</span>.<span class="ident">extend</span>(<span class="ident">arg</span>.<span class="ident">keys</span>().<span class="ident">into_iter</span>()));
 
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::mutable_key_type</span>)]</span>
     <span class="kw">let</span> <span class="ident">affected_fields</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>
         .<span class="ident">into_iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">dsfn</span><span class="op">|</span> {
@@ -414,7 +417,7 @@
                 .<span class="ident">fields</span>()
                 .<span class="ident">scalar</span>()
                 .<span class="ident">into_iter</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">db_name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">dsfn</span>.<span class="ident">deref</span>())
+                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">db_name</span>() <span class="op">==</span> <span class="ident">dsfn</span>.<span class="ident">deref</span>())
                 .<span class="ident">unwrap</span>()
         })
         .<span class="ident">collect</span>();
@@ -428,6 +431,7 @@
 }
 
 <span class="doccomment">/// Standard create many records, requires `affected_fields` to be non-empty.</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::mutable_key_type</span>)]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_many_nonempty</span>(
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
     <span class="ident">sql_info</span>: <span class="ident">SqlInfo</span>,
@@ -435,7 +439,7 @@
     <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">WriteArgs</span><span class="op">&gt;</span>,
     <span class="ident">skip_duplicates</span>: <span class="ident">bool</span>,
     <span class="ident">affected_fields</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">batches</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_params</span>) <span class="op">=</span> <span class="ident">sql_info</span>.<span class="ident">max_bind_values</span> {
         <span class="comment">// We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.</span>
         <span class="comment">// -&gt; Horizontal partitioning by row number, vertical by number of args.</span>
@@ -449,17 +453,17 @@
                     <span class="comment">// If the param count _including_ the next item doens&#39;t exceed the limit,</span>
                     <span class="comment">// we continue filling up the current batch.</span>
                     <span class="kw">let</span> <span class="ident">proceed</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">peek</span>() {
-                        <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">param_count</span> <span class="op">+</span> <span class="ident">next</span>.<span class="ident">len</span>()) <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max_params</span>,
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                        <span class="prelude-val">Some</span>(<span class="ident">next</span>) =&gt; (<span class="ident">param_count</span> <span class="op">+</span> <span class="ident">next</span>.<span class="ident">len</span>()) <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max_params</span>,
+                        <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
                     };
 
                     <span class="kw">if</span> <span class="ident">proceed</span> {
                         <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">next</span>) =&gt; {
                                 <span class="ident">param_count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">len</span>();
                                 <span class="ident">batch</span>.<span class="ident">push</span>(<span class="ident">next</span>)
                             }
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                            <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
                         }
                     } <span class="kw">else</span> {
                         <span class="kw">break</span>;
@@ -521,7 +525,7 @@
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">num_records</span>: <span class="ident">usize</span>,
     <span class="ident">skip_duplicates</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">write::create_records_empty</span>(<span class="ident">model</span>, <span class="ident">skip_duplicates</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -541,7 +545,7 @@
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
     <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">filter_selectors</span>(<span class="ident">model</span>, <span class="ident">record_filter</span>).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">id_args</span> <span class="op">=</span> <span class="ident">pick_args</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">primary_identifier</span>(), <span class="kw-2">&amp;</span><span class="ident">args</span>);
 
@@ -567,12 +571,12 @@
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">filter_selectors</span>(<span class="ident">model</span>, <span class="ident">record_filter</span>).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ids</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">id</span>).<span class="ident">collect</span>();
     <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">ids</span>.<span class="ident">len</span>();
 
-    <span class="kw">if</span> <span class="ident">count</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">count</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">count</span>);
     }
 
@@ -591,7 +595,7 @@
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
     <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">RecordProjection</span>,
     <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">RecordProjection</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">write::create_relation_table_records</span>(<span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>);
     <span class="ident">conn</span>.<span class="ident">query</span>(<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -606,7 +610,7 @@
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
     <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">RecordProjection</span>,
     <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">RecordProjection</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">write::delete_relation_table_records</span>(<span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>);
     <span class="ident">conn</span>.<span class="ident">delete</span>(<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -616,7 +620,7 @@
 <span class="doccomment">/// Execute a plain SQL query with the given parameters, returning the number of</span>
 <span class="doccomment">/// affected rows.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">query</span>, <span class="ident">parameters</span>))]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>, <span class="ident">query</span>: <span class="ident">String</span>, <span class="ident">parameters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>, <span class="ident">query</span>: <span class="ident">String</span>, <span class="ident">parameters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">raw_count</span>(<span class="ident">query</span>, <span class="ident">parameters</span>).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
 }
@@ -628,7 +632,7 @@
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
     <span class="ident">query</span>: <span class="ident">String</span>,
     <span class="ident">parameters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">raw_json</span>(<span class="ident">query</span>, <span class="ident">parameters</span>).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
 }

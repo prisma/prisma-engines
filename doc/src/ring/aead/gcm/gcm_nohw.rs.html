@@ -269,19 +269,19 @@
 <span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">gcm_mul64_nohw</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u64</span>, <span class="ident">u64</span>) {
+<span class="kw">fn</span> <span class="ident">gcm_mul64_nohw</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">lo</span>(<span class="ident">a</span>: <span class="ident">u128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">lo</span>(<span class="ident">a</span>: <span class="ident">u128</span>) -&gt; <span class="ident">u64</span> {
         <span class="ident">a</span> <span class="kw">as</span> <span class="ident">u64</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">hi</span>(<span class="ident">a</span>: <span class="ident">u128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">hi</span>(<span class="ident">a</span>: <span class="ident">u128</span>) -&gt; <span class="ident">u64</span> {
         <span class="ident">lo</span>(<span class="ident">a</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u128</span> {
         <span class="ident">u128::from</span>(<span class="ident">a</span>) <span class="op">*</span> <span class="ident">u128::from</span>(<span class="ident">b</span>)
     }
 
@@ -329,9 +329,9 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">gcm_mul32_nohw</span>(<span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">gcm_mul32_nohw</span>(<span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u64</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u64</span> {
         <span class="ident">u64::from</span>(<span class="ident">a</span>) <span class="op">*</span> <span class="ident">u64::from</span>(<span class="ident">b</span>)
     }
 
@@ -359,13 +359,13 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">gcm_mul64_nohw</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u64</span>, <span class="ident">u64</span>) {
+<span class="kw">fn</span> <span class="ident">gcm_mul64_nohw</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">lo</span>(<span class="ident">a</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">lo</span>(<span class="ident">a</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u32</span> {
         <span class="ident">a</span> <span class="kw">as</span> <span class="ident">u32</span>
     }
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">hi</span>(<span class="ident">a</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">hi</span>(<span class="ident">a</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u32</span> {
         <span class="ident">lo</span>(<span class="ident">a</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>)
     }
 
@@ -380,7 +380,7 @@
     (<span class="ident">lo</span> <span class="op">^</span> (<span class="ident">mid</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>), <span class="ident">hi</span> <span class="op">^</span> (<span class="ident">mid</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>))
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">init</span>(<span class="ident">xi</span>: [<span class="ident">u64</span>; <span class="number">2</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::u128</span> {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">init</span>(<span class="ident">xi</span>: [<span class="ident">u64</span>; <span class="number">2</span>]) -&gt; <span class="ident"><span class="kw">super</span>::u128</span> {
     <span class="comment">// We implement GHASH in terms of POLYVAL, as described in RFC8452. This</span>
     <span class="comment">// avoids a shift by 1 in the multiplication, needed to account for bit</span>
     <span class="comment">// reversal losing a bit after multiplication, that is,</span>

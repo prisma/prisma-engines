@@ -757,19 +757,19 @@
 <span class="kw">use</span> <span class="ident">uuid::Uuid</span>;
 
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">params</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">conv_params</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="kw">dyn</span> <span class="ident">types::ToSql</span> <span class="op">+</span> <span class="ident">Sync</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">conv_params</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="kw">dyn</span> <span class="ident">types::ToSql</span> <span class="op">+</span> <span class="ident">Sync</span>)<span class="op">&gt;</span> {
     <span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">ToSql</span> <span class="op">+</span> <span class="ident">Sync</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
 }
 
 <span class="kw">struct</span> <span class="ident">XmlString</span>(<span class="kw">pub</span> <span class="ident">String</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">XmlString</span> {
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">_ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">XmlString</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">_ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">XmlString</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">XmlString</span>(<span class="ident">String::from_utf8</span>(<span class="ident">raw</span>.<span class="ident">to_owned</span>()).<span class="ident">unwrap</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">ty</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">PostgresType::XML</span>
+    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">ty</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">PostgresType::XML</span>
     }
 }
 
@@ -778,13 +778,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EnumString</span> {
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">_ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EnumString</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">_ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EnumString</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">EnumString</span> {
             <span class="ident">value</span>: <span class="ident">String::from_utf8</span>(<span class="ident">raw</span>.<span class="ident">to_owned</span>()).<span class="ident">unwrap</span>(),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">_ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">_ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 }
@@ -794,14 +794,14 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TimeTz</span> {
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">_ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TimeTz</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">_ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TimeTz</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// We assume UTC.</span>
         <span class="kw">let</span> <span class="ident">time</span>: <span class="ident">chrono::NaiveTime</span> <span class="op">=</span> <span class="ident">chrono::NaiveTime::from_sql</span>(<span class="kw-2">&amp;</span><span class="ident">PostgresType::TIMETZ</span>, <span class="kw-2">&amp;</span><span class="ident">raw</span>[..<span class="number">8</span>])<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">TimeTz</span>(<span class="ident">time</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">ty</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">PostgresType::TIMETZ</span>
+    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">ty</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">PostgresType::TIMETZ</span>
     }
 }
 
@@ -814,191 +814,191 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NaiveMoney</span> {
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">_ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NaiveMoney</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">_ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NaiveMoney</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cents</span> <span class="op">=</span> <span class="ident">i64::from_sql</span>(<span class="kw-2">&amp;</span><span class="ident">PostgresType::INT8</span>, <span class="ident">raw</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">NaiveMoney</span>(<span class="ident">BigDecimal::new</span>(<span class="ident">BigInt::from_i64</span>(<span class="ident">cents</span>).<span class="ident">unwrap</span>(), <span class="number">2</span>)))
     }
 
-    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">ty</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">PostgresType::MONEY</span>
+    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">ty</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">PostgresType::MONEY</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">GetRow</span> <span class="kw">for</span> <span class="ident">PostgresRow</span> {
-    <span class="kw">fn</span> <span class="ident">get_result_row</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">convert</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresRow</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_result_row</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">convert</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresRow</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">row</span>.<span class="ident">columns</span>()[<span class="ident">i</span>].<span class="ident">type_</span>() {
-                <span class="ident">PostgresType::BOOL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Boolean</span>(<span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span>),
-                <span class="ident">PostgresType::INT2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::BOOL</span> =&gt; <span class="ident">Value::Boolean</span>(<span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span>),
+                <span class="ident">PostgresType::INT2</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">i16</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::integer</span>(<span class="ident">val</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::INT4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::INT4</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::integer</span>(<span class="ident">val</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::INT8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::INT8</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::integer</span>(<span class="ident">val</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::FLOAT4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::FLOAT4</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::float</span>(<span class="ident">val</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Float</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Float</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::FLOAT8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::FLOAT8</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::double</span>(<span class="ident">val</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Double</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Double</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::BYTEA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::BYTEA</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::bytes</span>(<span class="ident">val</span>.<span class="ident">to_owned</span>())
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Bytes</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Bytes</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::BYTEA_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::BYTEA_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">byteas</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::bytes</span>);
                         <span class="ident">Value::array</span>(<span class="ident">byteas</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-                <span class="ident">PostgresType::NUMERIC</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::NUMERIC</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">dw</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DecimalWrapper</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
 
                     <span class="ident">Value::Numeric</span>(<span class="ident">dw</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">dw</span><span class="op">|</span> <span class="ident">dw</span>.<span class="number">0</span>))
                 }
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-                <span class="ident">PostgresType::MONEY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::MONEY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">NaiveMoney</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::numeric</span>(<span class="ident">val</span>.<span class="number">0</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Numeric</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Numeric</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                <span class="ident">PostgresType::TIMESTAMP</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::TIMESTAMP</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">ts</span>: <span class="ident">NaiveDateTime</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">DateTime</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::from_utc</span>(<span class="ident">ts</span>, <span class="ident">Utc</span>);
                         <span class="ident">Value::datetime</span>(<span class="ident">dt</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::DateTime</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::DateTime</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                <span class="ident">PostgresType::TIMESTAMPTZ</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::TIMESTAMPTZ</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">ts</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::datetime</span>(<span class="ident">ts</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::DateTime</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::DateTime</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                <span class="ident">PostgresType::DATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::date</span>(<span class="ident">val</span>),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Date</span>(<span class="prelude-val">None</span>),
+                <span class="ident">PostgresType::DATE</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; <span class="ident">Value::date</span>(<span class="ident">val</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Date</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                <span class="ident">PostgresType::TIME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::time</span>(<span class="ident">val</span>),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Time</span>(<span class="prelude-val">None</span>),
+                <span class="ident">PostgresType::TIME</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; <span class="ident">Value::time</span>(<span class="ident">val</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Time</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                <span class="ident">PostgresType::TIMETZ</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::TIMETZ</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">time</span>: <span class="ident">TimeTz</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::time</span>(<span class="ident">time</span>.<span class="number">0</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Time</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Time</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-                <span class="ident">PostgresType::UUID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::UUID</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Uuid</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::uuid</span>(<span class="ident">val</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Uuid</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Uuid</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-                <span class="ident">PostgresType::UUID_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::UUID_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::uuid</span>);
                         <span class="ident">Value::array</span>(<span class="ident">val</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
-                <span class="ident">PostgresType::JSON</span> <span class="op">|</span> <span class="ident">PostgresType::JSONB</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Json</span>(<span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span>),
-                <span class="ident">PostgresType::INT2_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::JSON</span> <span class="op">|</span> <span class="ident">PostgresType::JSONB</span> =&gt; <span class="ident">Value::Json</span>(<span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span>),
+                <span class="ident">PostgresType::INT2_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">ints</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::integer</span>);
                         <span class="ident">Value::array</span>(<span class="ident">ints</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::INT4_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::INT4_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">ints</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::integer</span>);
                         <span class="ident">Value::array</span>(<span class="ident">ints</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::INT8_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::INT8_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">ints</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::integer</span>);
                         <span class="ident">Value::array</span>(<span class="ident">ints</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::FLOAT4_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::FLOAT4_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">floats</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::float</span>);
                         <span class="ident">Value::array</span>(<span class="ident">floats</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::FLOAT8_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::FLOAT8_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">floats</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::double</span>);
                         <span class="ident">Value::array</span>(<span class="ident">floats</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::BOOL_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::BOOL_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">bools</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::from</span>);
                         <span class="ident">Value::array</span>(<span class="ident">bools</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                <span class="ident">PostgresType::TIMESTAMP_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::TIMESTAMP_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NaiveDateTime</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
 
                         <span class="kw">let</span> <span class="ident">dates</span> <span class="op">=</span> <span class="ident">val</span>
@@ -1007,11 +1007,11 @@
 
                         <span class="ident">Value::array</span>(<span class="ident">dates</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-                <span class="ident">PostgresType::NUMERIC_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::NUMERIC_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DecimalWrapper</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
 
                         <span class="kw">let</span> <span class="ident">decimals</span> <span class="op">=</span> <span class="ident">val</span>
@@ -1020,126 +1020,126 @@
 
                         <span class="ident">Value::array</span>(<span class="ident">decimals</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::TEXT_ARRAY</span> <span class="op">|</span> <span class="ident">PostgresType::NAME_ARRAY</span> <span class="op">|</span> <span class="ident">PostgresType::VARCHAR_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::TEXT_ARRAY</span> <span class="op">|</span> <span class="ident">PostgresType::NAME_ARRAY</span> <span class="op">|</span> <span class="ident">PostgresType::VARCHAR_ARRAY</span> =&gt; {
                     <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                             <span class="kw">let</span> <span class="ident">strings</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                             <span class="ident">Value::array</span>(<span class="ident">strings</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_string</span>()))
                         }
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                     }
                 }
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-                <span class="ident">PostgresType::MONEY_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::MONEY_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NaiveMoney</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">nums</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::numeric</span>(<span class="ident">x</span>.<span class="number">0</span>));
                         <span class="ident">Value::array</span>(<span class="ident">nums</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::OID_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::OID_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">nums</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::integer</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">i64</span>));
                         <span class="ident">Value::array</span>(<span class="ident">nums</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                <span class="ident">PostgresType::TIMESTAMPTZ_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::TIMESTAMPTZ_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">dates</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::datetime</span>);
                         <span class="ident">Value::array</span>(<span class="ident">dates</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                <span class="ident">PostgresType::DATE_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::DATE_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">chrono::NaiveDate</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::array</span>(<span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::date</span>))
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                <span class="ident">PostgresType::TIME_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::TIME_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">chrono::NaiveTime</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::array</span>(<span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::time</span>))
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-                <span class="ident">PostgresType::TIMETZ_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::TIMETZ_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TimeTz</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
 
                         <span class="kw">let</span> <span class="ident">dates</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> <span class="ident">Value::time</span>(<span class="ident">time</span>.<span class="number">0</span>));
 
                         <span class="ident">Value::array</span>(<span class="ident">dates</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
-                <span class="ident">PostgresType::JSON_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::JSON_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">jsons</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::json</span>);
                         <span class="ident">Value::array</span>(<span class="ident">jsons</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
-                <span class="ident">PostgresType::JSONB_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::JSONB_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">jsons</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::json</span>);
                         <span class="ident">Value::array</span>(<span class="ident">jsons</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::OID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::OID</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::integer</span>(<span class="ident">val</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Integer</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::CHAR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::CHAR</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">i8</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::character</span>((<span class="ident">val</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="kw">as</span> <span class="ident">char</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Char</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Char</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::INET</span> <span class="op">|</span> <span class="ident">PostgresType::CIDR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::INET</span> <span class="op">|</span> <span class="ident">PostgresType::CIDR</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">std::net::IpAddr</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::text</span>(<span class="ident">val</span>.<span class="ident">to_string</span>())
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Text</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Text</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::INET_ARRAY</span> <span class="op">|</span> <span class="ident">PostgresType::CIDR_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::INET_ARRAY</span> <span class="op">|</span> <span class="ident">PostgresType::CIDR_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">std::net::IpAddr</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">Value::text</span>(<span class="ident">v</span>.<span class="ident">to_string</span>()));
                         <span class="ident">Value::array</span>(<span class="ident">addrs</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::BIT</span> <span class="op">|</span> <span class="ident">PostgresType::VARBIT</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::BIT</span> <span class="op">|</span> <span class="ident">PostgresType::VARBIT</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">BitVec</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::text</span>(<span class="ident">bits_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>)<span class="question-mark">?</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Text</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Text</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::BIT_ARRAY</span> <span class="op">|</span> <span class="ident">PostgresType::VARBIT_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::BIT_ARRAY</span> <span class="op">|</span> <span class="ident">PostgresType::VARBIT_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BitVec</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
 
                         <span class="kw">let</span> <span class="ident">stringified</span> <span class="op">=</span> <span class="ident">val</span>
@@ -1149,54 +1149,54 @@
 
                         <span class="ident">Value::array</span>(<span class="ident">stringified</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::XML</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::XML</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">XmlString</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::xml</span>(<span class="ident">val</span>.<span class="number">0</span>)
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Xml</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Xml</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="ident">PostgresType::XML_ARRAY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PostgresType::XML_ARRAY</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">XmlString</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                         <span class="ident">Value::array</span>(<span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="number">0</span>))
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                 },
-                <span class="kw-2">ref</span> <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">x</span>.<span class="ident">kind</span>() {
-                    <span class="ident">Kind::Enum</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw-2">ref</span> <span class="ident">x</span> =&gt; <span class="kw">match</span> <span class="ident">x</span>.<span class="ident">kind</span>() {
+                    <span class="ident">Kind::Enum</span>(<span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                             <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">EnumString</span> <span class="op">=</span> <span class="ident">val</span>;
                             <span class="ident">Value::enum_variant</span>(<span class="ident">val</span>.<span class="ident">value</span>)
                         }
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Enum</span>(<span class="prelude-val">None</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Enum</span>(<span class="prelude-val">None</span>),
                     },
-                    <span class="ident">Kind::Array</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">inner</span>.<span class="ident">kind</span>() {
-                        <span class="ident">Kind::Enum</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">Kind::Array</span>(<span class="ident">inner</span>) =&gt; <span class="kw">match</span> <span class="ident">inner</span>.<span class="ident">kind</span>() {
+                        <span class="ident">Kind::Enum</span>(<span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                                 <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EnumString</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                                 <span class="kw">let</span> <span class="ident">variants</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::enum_variant</span>(<span class="ident">x</span>.<span class="ident">value</span>));
                                 <span class="ident">Value::array</span>(<span class="ident">variants</span>)
                             }
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                            <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                         },
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">_</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                                 <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>;
                                 <span class="kw">let</span> <span class="ident">strings</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Value::text</span>);
                                 <span class="ident">Value::array</span>(<span class="ident">strings</span>)
                             }
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
+                            <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>),
                         },
                     },
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">try_get</span>(<span class="ident">i</span>)<span class="question-mark">?</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                             <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">val</span>;
                             <span class="ident">Value::text</span>(<span class="ident">val</span>)
                         }
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Text</span>(<span class="prelude-val">None</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Text</span>(<span class="prelude-val">None</span>),
                     },
                 },
             };
@@ -1216,7 +1216,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ToColumnNames</span> <span class="kw">for</span> <span class="ident">PostgresStatement</span> {
-    <span class="kw">fn</span> <span class="ident">to_column_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_column_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">columns</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>().<span class="ident">into</span>()).<span class="ident">collect</span>()
     }
 }
@@ -1226,54 +1226,54 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>,
         <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">ty</span>) {
-            (<span class="ident">Value::Integer</span>(<span class="ident">integer</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::INT2</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">integer</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">integer</span><span class="op">|</span> (<span class="ident">integer</span> <span class="kw">as</span> <span class="ident">i16</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Integer</span>(<span class="ident">integer</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::INT4</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">integer</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">integer</span><span class="op">|</span> (<span class="ident">integer</span> <span class="kw">as</span> <span class="ident">i32</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Integer</span>(<span class="ident">integer</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::INT2</span>) =&gt; <span class="ident">integer</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">integer</span><span class="op">|</span> (<span class="ident">integer</span> <span class="kw">as</span> <span class="ident">i16</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Integer</span>(<span class="ident">integer</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::INT4</span>) =&gt; <span class="ident">integer</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">integer</span><span class="op">|</span> (<span class="ident">integer</span> <span class="kw">as</span> <span class="ident">i32</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            (<span class="ident">Value::Integer</span>(<span class="ident">integer</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::NUMERIC</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">integer</span>
+            (<span class="ident">Value::Integer</span>(<span class="ident">integer</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::NUMERIC</span>) =&gt; <span class="ident">integer</span>
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">integer</span><span class="op">|</span> <span class="ident">BigDecimal::from_i64</span>(<span class="ident">integer</span>).<span class="ident">unwrap</span>())
                 .<span class="ident">map</span>(<span class="ident">DecimalWrapper</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">dw</span><span class="op">|</span> <span class="ident">dw</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Integer</span>(<span class="ident">integer</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::TEXT</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">Value::Integer</span>(<span class="ident">integer</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::TEXT</span>) =&gt; {
                 <span class="ident">integer</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">integer</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">integer</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>))
             }
-            (<span class="ident">Value::Integer</span>(<span class="ident">integer</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::OID</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">integer</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">integer</span><span class="op">|</span> (<span class="ident">integer</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Integer</span>(<span class="ident">integer</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">integer</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">integer</span><span class="op">|</span> (<span class="ident">integer</span> <span class="kw">as</span> <span class="ident">i64</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Float</span>(<span class="ident">float</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::FLOAT8</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">float</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">float</span><span class="op">|</span> (<span class="ident">float</span> <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Integer</span>(<span class="ident">integer</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::OID</span>) =&gt; <span class="ident">integer</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">integer</span><span class="op">|</span> (<span class="ident">integer</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Integer</span>(<span class="ident">integer</span>), <span class="kw">_</span>) =&gt; <span class="ident">integer</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">integer</span><span class="op">|</span> (<span class="ident">integer</span> <span class="kw">as</span> <span class="ident">i64</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Float</span>(<span class="ident">float</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::FLOAT8</span>) =&gt; <span class="ident">float</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">float</span><span class="op">|</span> (<span class="ident">float</span> <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            (<span class="ident">Value::Float</span>(<span class="ident">float</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::NUMERIC</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">float</span>
+            (<span class="ident">Value::Float</span>(<span class="ident">float</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::NUMERIC</span>) =&gt; <span class="ident">float</span>
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">float</span><span class="op">|</span> <span class="ident">BigDecimal::from_f32</span>(<span class="ident">float</span>).<span class="ident">unwrap</span>())
                 .<span class="ident">map</span>(<span class="ident">DecimalWrapper</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">dw</span><span class="op">|</span> <span class="ident">dw</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Float</span>(<span class="ident">float</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">float</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">float</span><span class="op">|</span> <span class="ident">float</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Double</span>(<span class="ident">double</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::FLOAT4</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">double</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">double</span><span class="op">|</span> (<span class="ident">double</span> <span class="kw">as</span> <span class="ident">f32</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Float</span>(<span class="ident">float</span>), <span class="kw">_</span>) =&gt; <span class="ident">float</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">float</span><span class="op">|</span> <span class="ident">float</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Double</span>(<span class="ident">double</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::FLOAT4</span>) =&gt; <span class="ident">double</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">double</span><span class="op">|</span> (<span class="ident">double</span> <span class="kw">as</span> <span class="ident">f32</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            (<span class="ident">Value::Double</span>(<span class="ident">double</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::NUMERIC</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">double</span>
+            (<span class="ident">Value::Double</span>(<span class="ident">double</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::NUMERIC</span>) =&gt; <span class="ident">double</span>
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">double</span><span class="op">|</span> <span class="ident">BigDecimal::from_f64</span>(<span class="ident">double</span>).<span class="ident">unwrap</span>())
                 .<span class="ident">map</span>(<span class="ident">DecimalWrapper</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">dw</span><span class="op">|</span> <span class="ident">dw</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Double</span>(<span class="ident">double</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">double</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">double</span><span class="op">|</span> <span class="ident">double</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Double</span>(<span class="ident">double</span>), <span class="kw">_</span>) =&gt; <span class="ident">double</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">double</span><span class="op">|</span> <span class="ident">double</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            (<span class="ident">Value::Numeric</span>(<span class="ident">decimal</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::FLOAT4</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">decimal</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">decimal</span><span class="op">|</span> {
+            (<span class="ident">Value::Numeric</span>(<span class="ident">decimal</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::FLOAT4</span>) =&gt; <span class="ident">decimal</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">decimal</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">decimal</span>.<span class="ident">to_string</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>().<span class="ident">expect</span>(<span class="string">&quot;decimal to f32 conversion&quot;</span>);
                 <span class="ident">f</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            (<span class="ident">Value::Numeric</span>(<span class="ident">decimal</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::FLOAT8</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">decimal</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">decimal</span><span class="op">|</span> {
+            (<span class="ident">Value::Numeric</span>(<span class="ident">decimal</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::FLOAT8</span>) =&gt; <span class="ident">decimal</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">decimal</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">decimal</span>.<span class="ident">to_string</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>().<span class="ident">expect</span>(<span class="string">&quot;decimal to f64 conversion&quot;</span>);
                 <span class="ident">f</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::FLOAT4_ARRAY</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">values</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">values</span><span class="op">|</span> {
+            (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::FLOAT4_ARRAY</span>) =&gt; <span class="ident">values</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">values</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">floats</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">values</span>.<span class="ident">len</span>());
 
                 <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">iter</span>() {
                     <span class="kw">let</span> <span class="ident">float</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-                        <span class="ident">Value::Numeric</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">to_string</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>().<span class="ident">ok</span>()),
-                        <span class="ident">Value::Float</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">f</span>,
-                        <span class="ident">Value::Double</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span> <span class="kw">as</span> <span class="ident">f32</span>),
-                        <span class="ident">v</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Value::Numeric</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">to_string</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>().<span class="ident">ok</span>()),
+                        <span class="ident">Value::Float</span>(<span class="ident">f</span>) =&gt; <span class="kw-2">*</span><span class="ident">f</span>,
+                        <span class="ident">Value::Double</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span> <span class="kw">as</span> <span class="ident">f32</span>),
+                        <span class="ident">v</span> =&gt; {
                             <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::conversion</span>(<span class="macro">format!</span>(
                                 <span class="string">&quot;Couldn&#39;t add value of type `{:?}` into a float array.&quot;</span>,
                                 <span class="ident">v</span>
@@ -1289,15 +1289,15 @@
                 <span class="ident">floats</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::FLOAT8_ARRAY</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">values</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">values</span><span class="op">|</span> {
+            (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::FLOAT8_ARRAY</span>) =&gt; <span class="ident">values</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">values</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">floats</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">values</span>.<span class="ident">len</span>());
 
                 <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">iter</span>() {
                     <span class="kw">let</span> <span class="ident">float</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-                        <span class="ident">Value::Numeric</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">to_string</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>().<span class="ident">ok</span>()),
-                        <span class="ident">Value::Float</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span> <span class="kw">as</span> <span class="ident">f64</span>),
-                        <span class="ident">Value::Double</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">d</span>,
-                        <span class="ident">v</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Value::Numeric</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">to_string</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>().<span class="ident">ok</span>()),
+                        <span class="ident">Value::Float</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span> <span class="kw">as</span> <span class="ident">f64</span>),
+                        <span class="ident">Value::Double</span>(<span class="ident">d</span>) =&gt; <span class="kw-2">*</span><span class="ident">d</span>,
+                        <span class="ident">v</span> =&gt; {
                             <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::conversion</span>(<span class="macro">format!</span>(
                                 <span class="string">&quot;Couldn&#39;t add value of type `{:?}` into a double array.&quot;</span>,
                                 <span class="ident">v</span>
@@ -1313,7 +1313,7 @@
                 <span class="ident">floats</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            (<span class="ident">Value::Numeric</span>(<span class="ident">decimal</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::MONEY</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">decimal</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">decimal</span><span class="op">|</span> {
+            (<span class="ident">Value::Numeric</span>(<span class="ident">decimal</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::MONEY</span>) =&gt; <span class="ident">decimal</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">decimal</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">decimal</span> <span class="op">=</span> (<span class="ident">decimal</span> <span class="op">*</span> <span class="ident">BigInt::from_i32</span>(<span class="number">100</span>).<span class="ident">unwrap</span>()).<span class="ident">round</span>(<span class="number">0</span>);
 
                 <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">decimal</span>.<span class="ident">to_i64</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
@@ -1324,33 +1324,33 @@
                 <span class="ident">i</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            (<span class="ident">Value::Numeric</span>(<span class="ident">decimal</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::NUMERIC</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">decimal</span>
+            (<span class="ident">Value::Numeric</span>(<span class="ident">decimal</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::NUMERIC</span>) =&gt; <span class="ident">decimal</span>
                 .<span class="ident">as_ref</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">decimal</span><span class="op">|</span> <span class="ident">DecimalWrapper</span>(<span class="ident">decimal</span>.<span class="ident">clone</span>()).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-            (<span class="ident">Value::Numeric</span>(<span class="ident">float</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">float</span>
+            (<span class="ident">Value::Numeric</span>(<span class="ident">float</span>), <span class="kw">_</span>) =&gt; <span class="ident">float</span>
                 .<span class="ident">as_ref</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">float</span><span class="op">|</span> <span class="ident">DecimalWrapper</span>(<span class="ident">float</span>.<span class="ident">clone</span>()).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-            (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::UUID</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">string</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">string</span><span class="op">|</span> {
+            (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::UUID</span>) =&gt; <span class="ident">string</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">string</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">parsed_uuid</span>: <span class="ident">Uuid</span> <span class="op">=</span> <span class="ident">string</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
                 <span class="ident">parsed_uuid</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-            (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::UUID_ARRAY</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">values</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">values</span><span class="op">|</span> {
+            (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::UUID_ARRAY</span>) =&gt; <span class="ident">values</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">values</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">parsed_uuid</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">values</span>
                     .<span class="ident">iter</span>()
                     .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()))
                     .<span class="ident">collect</span>();
                 <span class="ident">parsed_uuid</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)
             }),
-            (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::INET</span>) <span class="op">|</span> (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::CIDR</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::INET</span>) <span class="op">|</span> (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::CIDR</span>) =&gt; {
                 <span class="ident">string</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">string</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">parsed_ip_addr</span>: <span class="ident">std::net::IpAddr</span> <span class="op">=</span> <span class="ident">string</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
                     <span class="ident">parsed_ip_addr</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)
                 })
             }
-            (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::INET_ARRAY</span>) <span class="op">|</span> (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::CIDR_ARRAY</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::INET_ARRAY</span>) <span class="op">|</span> (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::CIDR_ARRAY</span>) =&gt; {
                 <span class="ident">values</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">values</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">parsed_ip_addr</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">std::net::IpAddr</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">values</span>
                         .<span class="ident">iter</span>()
@@ -1360,18 +1360,18 @@
                 })
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
-            (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::JSON</span>) <span class="op">|</span> (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::JSONB</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">string</span>
+            (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::JSON</span>) <span class="op">|</span> (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::JSONB</span>) =&gt; <span class="ident">string</span>
                 .<span class="ident">as_ref</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">string</span><span class="op">|</span> <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span>(<span class="ident">string</span>)<span class="question-mark">?</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::BIT</span>) <span class="op">|</span> (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::VARBIT</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::BIT</span>) <span class="op">|</span> (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::VARBIT</span>) =&gt; {
                 <span class="ident">string</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">string</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">BitVec</span> <span class="op">=</span> <span class="ident">string_to_bits</span>(<span class="ident">string</span>)<span class="question-mark">?</span>;
 
                     <span class="ident">bits</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)
                 })
             }
-            (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">string</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">ref</span> <span class="ident">string</span><span class="op">|</span> <span class="ident">string</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::BIT_ARRAY</span>) <span class="op">|</span> (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::VARBIT_ARRAY</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">Value::Text</span>(<span class="ident">string</span>), <span class="kw">_</span>) =&gt; <span class="ident">string</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">ref</span> <span class="ident">string</span><span class="op">|</span> <span class="ident">string</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::BIT_ARRAY</span>) <span class="op">|</span> (<span class="ident">Value::Array</span>(<span class="ident">values</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::VARBIT_ARRAY</span>) =&gt; {
                 <span class="ident">values</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">values</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">bitvecs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BitVec</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">values</span>
                         .<span class="ident">iter</span>()
@@ -1381,63 +1381,63 @@
                     <span class="ident">bitvecs</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)
                 })
             }
-            (<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bytes</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">bytes</span><span class="op">|</span> <span class="ident">bytes</span>.<span class="ident">as_ref</span>().<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Enum</span>(<span class="ident">string</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">string</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">string</span><span class="op">|</span> {
+            (<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>), <span class="kw">_</span>) =&gt; <span class="ident">bytes</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">bytes</span><span class="op">|</span> <span class="ident">bytes</span>.<span class="ident">as_ref</span>().<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Enum</span>(<span class="ident">string</span>), <span class="kw">_</span>) =&gt; <span class="ident">string</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">string</span><span class="op">|</span> {
                 <span class="ident">out</span>.<span class="ident">extend_from_slice</span>(<span class="ident">string</span>.<span class="ident">as_bytes</span>());
                 <span class="prelude-val">Ok</span>(<span class="ident">IsNull::No</span>)
             }),
-            (<span class="ident">Value::Boolean</span>(<span class="ident">boo</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">boo</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">boo</span><span class="op">|</span> <span class="ident">boo</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Char</span>(<span class="ident">c</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> (<span class="ident">c</span> <span class="kw">as</span> <span class="ident">i8</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Array</span>(<span class="ident">vec</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">vec</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">vec</span><span class="op">|</span> <span class="ident">vec</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Boolean</span>(<span class="ident">boo</span>), <span class="kw">_</span>) =&gt; <span class="ident">boo</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">boo</span><span class="op">|</span> <span class="ident">boo</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Char</span>(<span class="ident">c</span>), <span class="kw">_</span>) =&gt; <span class="ident">c</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> (<span class="ident">c</span> <span class="kw">as</span> <span class="ident">i8</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Array</span>(<span class="ident">vec</span>), <span class="kw">_</span>) =&gt; <span class="ident">vec</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">vec</span><span class="op">|</span> <span class="ident">vec</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
-            (<span class="ident">Value::Json</span>(<span class="ident">value</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
-            (<span class="ident">Value::Xml</span>(<span class="ident">value</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Json</span>(<span class="ident">value</span>), <span class="kw">_</span>) =&gt; <span class="ident">value</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Xml</span>(<span class="ident">value</span>), <span class="kw">_</span>) =&gt; <span class="ident">value</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-            (<span class="ident">Value::Uuid</span>(<span class="ident">value</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Uuid</span>(<span class="ident">value</span>), <span class="kw">_</span>) =&gt; <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            (<span class="ident">Value::DateTime</span>(<span class="ident">value</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::DATE</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">Value::DateTime</span>(<span class="ident">value</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::DATE</span>) =&gt; {
                 <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">date</span>().<span class="ident">naive_utc</span>().<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>))
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            (<span class="ident">Value::Date</span>(<span class="ident">value</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Date</span>(<span class="ident">value</span>), <span class="kw">_</span>) =&gt; <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            (<span class="ident">Value::Time</span>(<span class="ident">value</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::Time</span>(<span class="ident">value</span>), <span class="kw">_</span>) =&gt; <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            (<span class="ident">Value::DateTime</span>(<span class="ident">value</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::TIME</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">time</span>().<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::DateTime</span>(<span class="ident">value</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::TIME</span>) =&gt; <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">time</span>().<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            (<span class="ident">Value::DateTime</span>(<span class="ident">value</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::TIMETZ</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
+            (<span class="ident">Value::DateTime</span>(<span class="ident">value</span>), <span class="kw-2">&amp;</span><span class="ident">PostgresType::TIMETZ</span>) =&gt; <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">time</span>().<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)<span class="question-mark">?</span>;
                 <span class="comment">// We assume UTC. see https://www.postgresql.org/docs/9.5/datatype-datetime.html</span>
                 <span class="ident">out</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">4</span>]);
                 <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
             }),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-            (<span class="ident">Value::DateTime</span>(<span class="ident">value</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">naive_utc</span>().<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
+            (<span class="ident">Value::DateTime</span>(<span class="ident">value</span>), <span class="kw">_</span>) =&gt; <span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">naive_utc</span>().<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)),
         };
 
         <span class="kw">match</span> <span class="ident">res</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">res</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">IsNull::Yes</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">res</span>) =&gt; <span class="ident">res</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">IsNull::Yes</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span> <span class="comment">// Please check later should we make this to be more restricted</span>
     }
 
     <span class="macro">tokio_postgres::types::to_sql_checked!</span>();
 }
 
-<span class="kw">fn</span> <span class="ident">string_to_bits</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">BitVec</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">string_to_bits</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">BitVec</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">bit_vec</span>::<span class="kw-2">*</span>;
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">BitVec::with_capacity</span>(<span class="ident">s</span>.<span class="ident">len</span>());
 
     <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">chars</span>() {
         <span class="kw">match</span> <span class="ident">c</span> {
-            <span class="string">&#39;0&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bits</span>.<span class="ident">push</span>(<span class="bool-val">false</span>),
-            <span class="string">&#39;1&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bits</span>.<span class="ident">push</span>(<span class="bool-val">true</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&#39;0&#39;</span> =&gt; <span class="ident">bits</span>.<span class="ident">push</span>(<span class="bool-val">false</span>),
+            <span class="string">&#39;1&#39;</span> =&gt; <span class="ident">bits</span>.<span class="ident">push</span>(<span class="bool-val">true</span>),
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Unexpected character for bits input. Expected only 1 and 0.&quot;</span>;
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::conversion</span>(<span class="ident">msg</span>);
 
@@ -1449,7 +1449,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">bits</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">bits_to_string</span>(<span class="ident">bits</span>: <span class="kw-2">&amp;</span><span class="ident">BitVec</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">bits_to_string</span>(<span class="ident">bits</span>: <span class="kw-2">&amp;</span><span class="ident">BitVec</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">bits</span>.<span class="ident">len</span>());
 
     <span class="kw">for</span> <span class="ident">bit</span> <span class="kw">in</span> <span class="ident">bits</span> {

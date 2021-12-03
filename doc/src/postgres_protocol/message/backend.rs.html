@@ -927,7 +927,7 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::len_without_is_empty</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Header</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">5</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
@@ -946,12 +946,12 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">tag</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="self">self</span>) -&gt; <span class="ident">i32</span> {
         <span class="self">self</span>.<span class="ident">len</span>
     }
 }
@@ -994,7 +994,7 @@
 
 <span class="kw">impl</span> <span class="ident">Message</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">5</span> {
             <span class="kw">let</span> <span class="ident">to_read</span> <span class="op">=</span> <span class="number">5</span> <span class="op">-</span> <span class="ident">buf</span>.<span class="ident">len</span>();
             <span class="ident">buf</span>.<span class="ident">reserve</span>(<span class="ident">to_read</span>);
@@ -1024,10 +1024,10 @@
         };
 
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tag</span> {
-            <span class="ident">PARSE_COMPLETE_TAG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::ParseComplete</span>,
-            <span class="ident">BIND_COMPLETE_TAG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::BindComplete</span>,
-            <span class="ident">CLOSE_COMPLETE_TAG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::CloseComplete</span>,
-            <span class="ident">NOTIFICATION_RESPONSE_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PARSE_COMPLETE_TAG</span> =&gt; <span class="ident">Message::ParseComplete</span>,
+            <span class="ident">BIND_COMPLETE_TAG</span> =&gt; <span class="ident">Message::BindComplete</span>,
+            <span class="ident">CLOSE_COMPLETE_TAG</span> =&gt; <span class="ident">Message::CloseComplete</span>,
+            <span class="ident">NOTIFICATION_RESPONSE_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">process_id</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_cstr</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_cstr</span>()<span class="question-mark">?</span>;
@@ -1037,25 +1037,25 @@
                     <span class="ident">message</span>,
                 })
             }
-            <span class="ident">COPY_DONE_TAG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::CopyDone</span>,
-            <span class="ident">COMMAND_COMPLETE_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">COPY_DONE_TAG</span> =&gt; <span class="ident">Message::CopyDone</span>,
+            <span class="ident">COMMAND_COMPLETE_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_cstr</span>()<span class="question-mark">?</span>;
                 <span class="ident">Message::CommandComplete</span>(<span class="ident">CommandCompleteBody</span> { <span class="ident">tag</span> })
             }
-            <span class="ident">COPY_DATA_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">COPY_DATA_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
                 <span class="ident">Message::CopyData</span>(<span class="ident">CopyDataBody</span> { <span class="ident">storage</span> })
             }
-            <span class="ident">DATA_ROW_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">DATA_ROW_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
                 <span class="ident">Message::DataRow</span>(<span class="ident">DataRowBody</span> { <span class="ident">storage</span>, <span class="ident">len</span> })
             }
-            <span class="ident">ERROR_RESPONSE_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ERROR_RESPONSE_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
                 <span class="ident">Message::ErrorResponse</span>(<span class="ident">ErrorResponseBody</span> { <span class="ident">storage</span> })
             }
-            <span class="ident">COPY_IN_RESPONSE_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">COPY_IN_RESPONSE_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
@@ -1065,7 +1065,7 @@
                     <span class="ident">storage</span>,
                 })
             }
-            <span class="ident">COPY_OUT_RESPONSE_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">COPY_OUT_RESPONSE_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
@@ -1075,8 +1075,8 @@
                     <span class="ident">storage</span>,
                 })
             }
-            <span class="ident">EMPTY_QUERY_RESPONSE_TAG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::EmptyQueryResponse</span>,
-            <span class="ident">BACKEND_KEY_DATA_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">EMPTY_QUERY_RESPONSE_TAG</span> =&gt; <span class="ident">Message::EmptyQueryResponse</span>,
+            <span class="ident">BACKEND_KEY_DATA_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">process_id</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">secret_key</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="ident">Message::BackendKeyData</span>(<span class="ident">BackendKeyDataBody</span> {
@@ -1084,67 +1084,67 @@
                     <span class="ident">secret_key</span>,
                 })
             }
-            <span class="ident">NO_DATA_TAG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::NoData</span>,
-            <span class="ident">NOTICE_RESPONSE_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">NO_DATA_TAG</span> =&gt; <span class="ident">Message::NoData</span>,
+            <span class="ident">NOTICE_RESPONSE_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
                 <span class="ident">Message::NoticeResponse</span>(<span class="ident">NoticeResponseBody</span> { <span class="ident">storage</span> })
             }
-            <span class="ident">AUTHENTICATION_TAG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">buf</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
-                <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::AuthenticationOk</span>,
-                <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::AuthenticationKerberosV5</span>,
-                <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::AuthenticationCleartextPassword</span>,
-                <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AUTHENTICATION_TAG</span> =&gt; <span class="kw">match</span> <span class="ident">buf</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
+                <span class="number">0</span> =&gt; <span class="ident">Message::AuthenticationOk</span>,
+                <span class="number">2</span> =&gt; <span class="ident">Message::AuthenticationKerberosV5</span>,
+                <span class="number">3</span> =&gt; <span class="ident">Message::AuthenticationCleartextPassword</span>,
+                <span class="number">5</span> =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">salt</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
                     <span class="ident">buf</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">salt</span>)<span class="question-mark">?</span>;
                     <span class="ident">Message::AuthenticationMd5Password</span>(<span class="ident">AuthenticationMd5PasswordBody</span> { <span class="ident">salt</span> })
                 }
-                <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::AuthenticationScmCredential</span>,
-                <span class="number">7</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::AuthenticationGss</span>,
-                <span class="number">8</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="number">6</span> =&gt; <span class="ident">Message::AuthenticationScmCredential</span>,
+                <span class="number">7</span> =&gt; <span class="ident">Message::AuthenticationGss</span>,
+                <span class="number">8</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
                     <span class="ident">Message::AuthenticationGssContinue</span>(<span class="ident">AuthenticationGssContinueBody</span>(<span class="ident">storage</span>))
                 }
-                <span class="number">9</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::AuthenticationSspi</span>,
-                <span class="number">10</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="number">9</span> =&gt; <span class="ident">Message::AuthenticationSspi</span>,
+                <span class="number">10</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
                     <span class="ident">Message::AuthenticationSasl</span>(<span class="ident">AuthenticationSaslBody</span>(<span class="ident">storage</span>))
                 }
-                <span class="number">11</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="number">11</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
                     <span class="ident">Message::AuthenticationSaslContinue</span>(<span class="ident">AuthenticationSaslContinueBody</span>(<span class="ident">storage</span>))
                 }
-                <span class="number">12</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="number">12</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
                     <span class="ident">Message::AuthenticationSaslFinal</span>(<span class="ident">AuthenticationSaslFinalBody</span>(<span class="ident">storage</span>))
                 }
-                <span class="ident">tag</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">tag</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                         <span class="ident">io::ErrorKind::InvalidInput</span>,
                         <span class="macro">format!</span>(<span class="string">&quot;unknown authentication tag `{}`&quot;</span>, <span class="ident">tag</span>),
                     ));
                 }
             },
-            <span class="ident">PORTAL_SUSPENDED_TAG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::PortalSuspended</span>,
-            <span class="ident">PARAMETER_STATUS_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PORTAL_SUSPENDED_TAG</span> =&gt; <span class="ident">Message::PortalSuspended</span>,
+            <span class="ident">PARAMETER_STATUS_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_cstr</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_cstr</span>()<span class="question-mark">?</span>;
                 <span class="ident">Message::ParameterStatus</span>(<span class="ident">ParameterStatusBody</span> { <span class="ident">name</span>, <span class="ident">value</span> })
             }
-            <span class="ident">PARAMETER_DESCRIPTION_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PARAMETER_DESCRIPTION_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
                 <span class="ident">Message::ParameterDescription</span>(<span class="ident">ParameterDescriptionBody</span> { <span class="ident">storage</span>, <span class="ident">len</span> })
             }
-            <span class="ident">ROW_DESCRIPTION_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ROW_DESCRIPTION_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
                 <span class="ident">Message::RowDescription</span>(<span class="ident">RowDescriptionBody</span> { <span class="ident">storage</span>, <span class="ident">len</span> })
             }
-            <span class="ident">READY_FOR_QUERY_TAG</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">READY_FOR_QUERY_TAG</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
                 <span class="ident">Message::ReadyForQuery</span>(<span class="ident">ReadyForQueryBody</span> { <span class="ident">status</span> })
             }
-            <span class="ident">tag</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tag</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                     <span class="ident">io::ErrorKind::InvalidInput</span>,
                     <span class="macro">format!</span>(<span class="string">&quot;unknown message tag `{}`&quot;</span>, <span class="ident">tag</span>),
@@ -1170,26 +1170,26 @@
 
 <span class="kw">impl</span> <span class="ident">Buffer</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="self">self</span>.<span class="ident">idx</span>..]
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">slice</span>().<span class="ident">is_empty</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_cstr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read_cstr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">memchr</span>(<span class="number">0</span>, <span class="self">self</span>.<span class="ident">slice</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">pos</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">idx</span>;
                 <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">start</span> <span class="op">+</span> <span class="ident">pos</span>;
                 <span class="kw">let</span> <span class="ident">cstr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">slice</span>(<span class="ident">start</span>..<span class="ident">end</span>);
                 <span class="self">self</span>.<span class="ident">idx</span> <span class="op">=</span> <span class="ident">end</span> <span class="op">+</span> <span class="number">1</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">cstr</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                 <span class="ident">io::ErrorKind::UnexpectedEof</span>,
                 <span class="string">&quot;unexpected EOF&quot;</span>,
             )),
@@ -1197,7 +1197,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bytes</span> {
+    <span class="kw">fn</span> <span class="ident">read_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Bytes</span> {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">slice</span>(<span class="self">self</span>.<span class="ident">idx</span>..);
         <span class="self">self</span>.<span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">len</span>();
         <span class="ident">buf</span>
@@ -1206,7 +1206,7 @@
 
 <span class="kw">impl</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="ident">Buffer</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">slice</span>();
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">slice</span>.<span class="ident">len</span>(), <span class="ident">buf</span>.<span class="ident">len</span>());
@@ -1224,7 +1224,7 @@
 
 <span class="kw">impl</span> <span class="ident">AuthenticationMd5PasswordBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">salt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">4</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">salt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">4</span>] {
         <span class="self">self</span>.<span class="ident">salt</span>
     }
 }
@@ -1233,7 +1233,7 @@
 
 <span class="kw">impl</span> <span class="ident">AuthenticationGssContinueBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -1242,7 +1242,7 @@
 
 <span class="kw">impl</span> <span class="ident">AuthenticationSaslBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mechanisms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SaslMechanisms</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mechanisms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SaslMechanisms</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">SaslMechanisms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -1254,9 +1254,9 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">value_end</span> <span class="op">=</span> <span class="ident">find_null</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">value_end</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">value_end</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                     <span class="ident">io::ErrorKind::InvalidData</span>,
@@ -1276,7 +1276,7 @@
 
 <span class="kw">impl</span> <span class="ident">AuthenticationSaslContinueBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -1285,7 +1285,7 @@
 
 <span class="kw">impl</span> <span class="ident">AuthenticationSaslFinalBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -1297,12 +1297,12 @@
 
 <span class="kw">impl</span> <span class="ident">BackendKeyDataBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
         <span class="self">self</span>.<span class="ident">process_id</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secret_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secret_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
         <span class="self">self</span>.<span class="ident">secret_key</span>
     }
 }
@@ -1313,7 +1313,7 @@
 
 <span class="kw">impl</span> <span class="ident">CommandCompleteBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tag</span>)
     }
 }
@@ -1324,12 +1324,12 @@
 
 <span class="kw">impl</span> <span class="ident">CopyDataBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bytes</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bytes</span>(<span class="self">self</span>) -&gt; <span class="ident">Bytes</span> {
         <span class="self">self</span>.<span class="ident">storage</span>
     }
 }
@@ -1342,12 +1342,12 @@
 
 <span class="kw">impl</span> <span class="ident">CopyInResponseBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">format</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_formats</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnFormats</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_formats</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnFormats</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">ColumnFormats</span> {
             <span class="ident">remaining</span>: <span class="self">self</span>.<span class="ident">len</span>,
             <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>,
@@ -1365,8 +1365,8 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             } <span class="kw">else</span> {
@@ -1382,7 +1382,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="kw">as</span> <span class="ident">usize</span>;
         (<span class="ident">len</span>, <span class="prelude-val">Some</span>(<span class="ident">len</span>))
     }
@@ -1396,12 +1396,12 @@
 
 <span class="kw">impl</span> <span class="ident">CopyOutResponseBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">format</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_formats</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnFormats</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_formats</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnFormats</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">ColumnFormats</span> {
             <span class="ident">remaining</span>: <span class="self">self</span>.<span class="ident">len</span>,
             <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>,
@@ -1416,7 +1416,7 @@
 
 <span class="kw">impl</span> <span class="ident">DataRowBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ranges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DataRowRanges</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ranges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DataRowRanges</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">DataRowRanges</span> {
             <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>,
             <span class="ident">len</span>: <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">len</span>(),
@@ -1425,7 +1425,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>
     }
 }
@@ -1441,8 +1441,8 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             } <span class="kw">else</span> {
@@ -1472,7 +1472,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="kw">as</span> <span class="ident">usize</span>;
         (<span class="ident">len</span>, <span class="prelude-val">Some</span>(<span class="ident">len</span>))
     }
@@ -1484,7 +1484,7 @@
 
 <span class="kw">impl</span> <span class="ident">ErrorResponseBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ErrorFields</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ErrorFields</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">ErrorFields</span> { <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span> }
     }
 }
@@ -1498,9 +1498,9 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ErrorField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ErrorField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">type_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">type_</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">type_</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             } <span class="kw">else</span> {
@@ -1526,12 +1526,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ErrorField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">type_</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">value</span>
     }
 }
@@ -1542,7 +1542,7 @@
 
 <span class="kw">impl</span> <span class="ident">NoticeResponseBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ErrorFields</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ErrorFields</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">ErrorFields</span> { <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span> }
     }
 }
@@ -1555,17 +1555,17 @@
 
 <span class="kw">impl</span> <span class="ident">NotificationResponseBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
         <span class="self">self</span>.<span class="ident">process_id</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>)
     }
 }
@@ -1577,7 +1577,7 @@
 
 <span class="kw">impl</span> <span class="ident">ParameterDescriptionBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parameters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Parameters</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parameters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Parameters</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">Parameters</span> {
             <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>,
             <span class="ident">remaining</span>: <span class="self">self</span>.<span class="ident">len</span>,
@@ -1595,8 +1595,8 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Oid</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Oid</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             } <span class="kw">else</span> {
@@ -1612,7 +1612,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="kw">as</span> <span class="ident">usize</span>;
         (<span class="ident">len</span>, <span class="prelude-val">Some</span>(<span class="ident">len</span>))
     }
@@ -1625,12 +1625,12 @@
 
 <span class="kw">impl</span> <span class="ident">ParameterStatusBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>)
     }
 }
@@ -1641,7 +1641,7 @@
 
 <span class="kw">impl</span> <span class="ident">ReadyForQueryBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">status</span>
     }
 }
@@ -1653,7 +1653,7 @@
 
 <span class="kw">impl</span> <span class="ident">RowDescriptionBody</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">Fields</span> {
             <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>,
             <span class="ident">remaining</span>: <span class="self">self</span>.<span class="ident">len</span>,
@@ -1671,8 +1671,8 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             } <span class="kw">else</span> {
@@ -1718,46 +1718,46 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">name</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_oid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Oid</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_oid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Oid</span> {
         <span class="self">self</span>.<span class="ident">table_oid</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i16</span> {
         <span class="self">self</span>.<span class="ident">column_id</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_oid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Oid</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_oid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Oid</span> {
         <span class="self">self</span>.<span class="ident">type_oid</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i16</span> {
         <span class="self">self</span>.<span class="ident">type_size</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_modifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_modifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
         <span class="self">self</span>.<span class="ident">type_modifier</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i16</span> {
         <span class="self">self</span>.<span class="ident">format</span>
     }
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">find_null</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">start</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">find_null</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">start</span>: <span class="ident">usize</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">memchr</span>(<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="ident">start</span>..]) {
-        <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">pos</span> <span class="op">+</span> <span class="ident">start</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
+        <span class="prelude-val">Some</span>(<span class="ident">pos</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pos</span> <span class="op">+</span> <span class="ident">start</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
             <span class="ident">io::ErrorKind::UnexpectedEof</span>,
             <span class="string">&quot;unexpected EOF&quot;</span>,
         )),
@@ -1765,7 +1765,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">get_str</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">get_str</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
     <span class="ident">str::from_utf8</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="ident">e</span>))
 }
 </code></pre></div>

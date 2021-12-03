@@ -141,7 +141,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TransactionBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Client</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TransactionBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Client</span>) -&gt; <span class="ident">TransactionBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">TransactionBuilder</span> {
             <span class="ident">client</span>,
             <span class="ident">isolation_level</span>: <span class="prelude-val">None</span>,
@@ -151,13 +151,13 @@
     }
 
     <span class="doccomment">/// Sets the isolation level of the transaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isolation_level</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">isolation_level</span>: <span class="ident">IsolationLevel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isolation_level</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">isolation_level</span>: <span class="ident">IsolationLevel</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">isolation_level</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">isolation_level</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the access mode of the transaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_only</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">read_only</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_only</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">read_only</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">read_only</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">read_only</span>);
         <span class="self">self</span>
     }
@@ -167,7 +167,7 @@
     <span class="doccomment">/// If the transaction is also serializable and read only, creation of the transaction may block, but when it</span>
     <span class="doccomment">/// completes the transaction is able to run with less overhead and a guarantee that it will not be aborted due to</span>
     <span class="doccomment">/// serialization failure.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deferrable</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">deferrable</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deferrable</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">deferrable</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">deferrable</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">deferrable</span>);
         <span class="self">self</span>
     }
@@ -175,7 +175,7 @@
     <span class="doccomment">/// Begins the transaction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The transaction will roll back by default - use the `commit` method to commit it.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">query</span> <span class="op">=</span> <span class="string">&quot;START TRANSACTION&quot;</span>.<span class="ident">to_string</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
@@ -184,10 +184,10 @@
 
             <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="string">&quot; ISOLATION LEVEL &quot;</span>);
             <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">level</span> {
-                <span class="ident">IsolationLevel::ReadUncommitted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;READ UNCOMMITTED&quot;</span>,
-                <span class="ident">IsolationLevel::ReadCommitted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;READ COMMITTED&quot;</span>,
-                <span class="ident">IsolationLevel::RepeatableRead</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;REPEATABLE READ&quot;</span>,
-                <span class="ident">IsolationLevel::Serializable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SERIALIZABLE&quot;</span>,
+                <span class="ident">IsolationLevel::ReadUncommitted</span> =&gt; <span class="string">&quot;READ UNCOMMITTED&quot;</span>,
+                <span class="ident">IsolationLevel::ReadCommitted</span> =&gt; <span class="string">&quot;READ COMMITTED&quot;</span>,
+                <span class="ident">IsolationLevel::RepeatableRead</span> =&gt; <span class="string">&quot;REPEATABLE READ&quot;</span>,
+                <span class="ident">IsolationLevel::Serializable</span> =&gt; <span class="string">&quot;SERIALIZABLE&quot;</span>,
             };
             <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="ident">level</span>);
         }

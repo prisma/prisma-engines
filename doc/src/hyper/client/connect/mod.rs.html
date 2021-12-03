@@ -513,7 +513,7 @@
 <span class="doccomment">/// Describes a type returned by a connector.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Connection</span> {
     <span class="doccomment">/// Return metadata describing the connection.</span>
-    <span class="kw">fn</span> <span class="ident">connected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connected</span>;
+    <span class="kw">fn</span> <span class="ident">connected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Connected</span>;
 }
 
 <span class="doccomment">/// Extra information about the connected transport.</span>
@@ -537,7 +537,7 @@
 
 <span class="kw">impl</span> <span class="ident">Connected</span> {
     <span class="doccomment">/// Create new `Connected` type with empty metadata.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connected</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Connected</span> {
         <span class="ident">Connected</span> {
             <span class="ident">alpn</span>: <span class="ident">Alpn::None</span>,
             <span class="ident">is_proxied</span>: <span class="bool-val">false</span>,
@@ -563,18 +563,18 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is `false`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">proxy</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">is_proxied</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connected</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">proxy</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">is_proxied</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Connected</span> {
         <span class="self">self</span>.<span class="ident">is_proxied</span> <span class="op">=</span> <span class="ident">is_proxied</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Determines if the connected transport is to an HTTP proxy.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_proxied</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_proxied</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">is_proxied</span>
     }
 
     <span class="doccomment">/// Set extra connection information to be set in the extensions of every `Response`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extra</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">extra</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connected</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extra</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">extra</span>: <span class="ident">T</span>) -&gt; <span class="ident">Connected</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">prev</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">extra</span> {
             <span class="self">self</span>.<span class="ident">extra</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Extra</span>(<span class="ident">Box::new</span>(<span class="ident">ExtraChain</span>(<span class="ident">prev</span>.<span class="number">0</span>, <span class="ident">extra</span>))));
         } <span class="kw">else</span> {
@@ -591,20 +591,20 @@
     }
 
     <span class="doccomment">/// Set that the connected transport negotiated HTTP/2 as its next protocol.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negotiated_h2</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connected</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negotiated_h2</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Connected</span> {
         <span class="self">self</span>.<span class="ident">alpn</span> <span class="op">=</span> <span class="ident">Alpn::H2</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Determines if the connected transport negotiated HTTP/2 as its next protocol.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_negotiated_h2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">alpn</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Alpn::H2</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_negotiated_h2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">alpn</span> <span class="op">==</span> <span class="ident">Alpn::H2</span>
     }
 
     <span class="comment">// Don&#39;t public expose that `Connected` is `Clone`, unsure if we want to</span>
     <span class="comment">// keep that contract...</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connected</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Connected</span> {
         <span class="ident">Connected</span> {
             <span class="ident">alpn</span>: <span class="self">self</span>.<span class="ident">alpn</span>.<span class="ident">clone</span>(),
             <span class="ident">is_proxied</span>: <span class="self">self</span>.<span class="ident">is_proxied</span>,
@@ -622,19 +622,19 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Extra</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Extra</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Extra</span> {
         <span class="ident">Extra</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone_box</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Extra</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Extra&quot;</span>).<span class="ident">finish</span>()
     }
 }
 
 <span class="kw">trait</span> <span class="ident">ExtraInner</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="kw">fn</span> <span class="ident">clone_box</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ExtraInner</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">clone_box</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ExtraInner</span><span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">res</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Extensions</span>);
 }
 
@@ -648,7 +648,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">clone_box</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ExtraInner</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">clone_box</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ExtraInner</span><span class="op">&gt;</span> {
         <span class="ident">Box::new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
@@ -660,7 +660,7 @@
 <span class="kw">struct</span> <span class="ident">ExtraChain</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ExtraInner</span><span class="op">&gt;</span>, <span class="ident">T</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">ExtraChain</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ExtraChain</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone_box</span>(), <span class="self">self</span>.<span class="number">1</span>.<span class="ident">clone</span>())
     }
 }
@@ -669,7 +669,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">clone_box</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ExtraInner</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">clone_box</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ExtraInner</span><span class="op">&gt;</span> {
         <span class="ident">Box::new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
@@ -705,7 +705,7 @@
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
         <span class="kw">type</span> <span class="ident">_Svc</span>: <span class="ident">ConnectSvc</span>;
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="ident">internal_only</span>: <span class="ident">Internal</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::_Svc</span> <span class="kw">as</span> <span class="ident">ConnectSvc</span><span class="op">&gt;</span><span class="ident">::Future</span>;
+        <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="ident">internal_only</span>: <span class="ident">Internal</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) -&gt; <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::_Svc</span> <span class="kw">as</span> <span class="ident">ConnectSvc</span><span class="op">&gt;</span><span class="ident">::Future</span>;
     }
 
     <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConnectSvc</span> {
@@ -713,7 +713,7 @@
         <span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>;
         <span class="kw">type</span> <span class="ident">Future</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Connection</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
 
-        <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="ident">internal_only</span>: <span class="ident">Internal</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span>;
+        <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="ident">internal_only</span>: <span class="ident">Internal</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span>;
     }
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Connect</span> <span class="kw">for</span> <span class="ident">S</span>
@@ -725,7 +725,7 @@
     {
         <span class="kw">type</span> <span class="ident">_Svc</span> <span class="op">=</span> <span class="ident">S</span>;
 
-        <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Internal</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::service::Oneshot</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Uri</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Internal</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) -&gt; <span class="ident"><span class="kw">crate</span>::service::Oneshot</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Uri</span><span class="op">&gt;</span> {
             <span class="ident"><span class="kw">crate</span>::service::oneshot</span>(<span class="self">self</span>, <span class="ident">dst</span>)
         }
     }
@@ -741,7 +741,7 @@
         <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
         <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::service::Oneshot</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Uri</span><span class="op">&gt;</span>;
 
-        <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Internal</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+        <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Internal</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
             <span class="ident"><span class="kw">crate</span>::service::oneshot</span>(<span class="self">self</span>, <span class="ident">dst</span>)
         }
     }

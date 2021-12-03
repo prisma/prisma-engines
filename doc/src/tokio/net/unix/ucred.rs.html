@@ -265,12 +265,12 @@
 
 <span class="kw">impl</span> <span class="ident">UCred</span> {
     <span class="doccomment">/// Gets UID (user ID) of the process.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">uid_t</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">uid_t</span> {
         <span class="self">self</span>.<span class="ident">uid</span>
     }
 
     <span class="doccomment">/// Gets GID (group ID) of the process.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">gid_t</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">gid_t</span> {
         <span class="self">self</span>.<span class="ident">gid</span>
     }
 
@@ -278,7 +278,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is only implemented under Linux, Android, iOS, macOS, Solaris and</span>
     <span class="doccomment">/// Illumos. On other platforms this will always return `None`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">pid_t</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">pid_t</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">pid</span>
     }
 }
@@ -310,7 +310,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>))]</span>
     <span class="kw">use</span> <span class="ident">libc::ucred</span>;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_peer_cred</span>(<span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="ident">UnixStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::UCred</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_peer_cred</span>(<span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="ident">UnixStream</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::UCred</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">std::os::unix::io::AsRawFd</span>;
 
         <span class="kw">unsafe</span> {
@@ -337,7 +337,7 @@
                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ucred</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ucred</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ucred_size</span>,
             );
-            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">ucred_size</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">=</span><span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">ucred</span><span class="op">&gt;</span>() {
+            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">ucred_size</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">==</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">ucred</span><span class="op">&gt;</span>() {
                 <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">super</span>::UCred</span> {
                     <span class="ident">uid</span>: <span class="ident">ucred</span>.<span class="ident">uid</span>,
                     <span class="ident">gid</span>: <span class="ident">ucred</span>.<span class="ident">gid</span>,
@@ -359,7 +359,7 @@
     <span class="kw">use</span> <span class="ident">std::mem::size_of</span>;
     <span class="kw">use</span> <span class="ident">std::os::unix::io::AsRawFd</span>;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_peer_cred</span>(<span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="ident">UnixStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::UCred</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_peer_cred</span>(<span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="ident">UnixStream</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::UCred</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">raw_fd</span> <span class="op">=</span> <span class="ident">sock</span>.<span class="ident">as_raw_fd</span>();
 
@@ -379,7 +379,7 @@
                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unpcbid</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">unpcbid</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
                 <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unpcbid_size</span>,
             );
-            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">unpcbid_size</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">=</span><span class="op">=</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">unpcbid</span><span class="op">&gt;</span>() {
+            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">unpcbid_size</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">==</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">unpcbid</span><span class="op">&gt;</span>() {
                 <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">super</span>::UCred</span> {
                     <span class="ident">uid</span>: <span class="ident">unpcbid</span>.<span class="ident">unp_euid</span>,
                     <span class="ident">gid</span>: <span class="ident">unpcbid</span>.<span class="ident">unp_egid</span>,
@@ -401,7 +401,7 @@
     <span class="kw">use</span> <span class="ident">std::mem::MaybeUninit</span>;
     <span class="kw">use</span> <span class="ident">std::os::unix::io::AsRawFd</span>;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_peer_cred</span>(<span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="ident">UnixStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::UCred</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_peer_cred</span>(<span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="ident">UnixStream</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::UCred</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">raw_fd</span> <span class="op">=</span> <span class="ident">sock</span>.<span class="ident">as_raw_fd</span>();
 
@@ -410,7 +410,7 @@
 
             <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">getpeereid</span>(<span class="ident">raw_fd</span>, <span class="ident">uid</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">gid</span>.<span class="ident">as_mut_ptr</span>());
 
-            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">super</span>::UCred</span> {
                     <span class="ident">uid</span>: <span class="ident">uid</span>.<span class="ident">assume_init</span>(),
                     <span class="ident">gid</span>: <span class="ident">gid</span>.<span class="ident">assume_init</span>(),
@@ -433,7 +433,7 @@
     <span class="kw">use</span> <span class="ident">std::mem::MaybeUninit</span>;
     <span class="kw">use</span> <span class="ident">std::os::unix::io::AsRawFd</span>;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_peer_cred</span>(<span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="ident">UnixStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::UCred</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_peer_cred</span>(<span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="ident">UnixStream</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::UCred</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">raw_fd</span> <span class="op">=</span> <span class="ident">sock</span>.<span class="ident">as_raw_fd</span>();
 
@@ -453,11 +453,11 @@
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::last_os_error</span>());
             }
 
-            <span class="macro">assert!</span>(<span class="ident">pid_size</span>.<span class="ident">assume_init</span>() <span class="op">=</span><span class="op">=</span> (<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">pid_t</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u32</span>));
+            <span class="macro">assert!</span>(<span class="ident">pid_size</span>.<span class="ident">assume_init</span>() <span class="op">==</span> (<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">pid_t</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u32</span>));
 
             <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">getpeereid</span>(<span class="ident">raw_fd</span>, <span class="ident">uid</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">gid</span>.<span class="ident">as_mut_ptr</span>());
 
-            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">super</span>::UCred</span> {
                     <span class="ident">uid</span>: <span class="ident">uid</span>.<span class="ident">assume_init</span>(),
                     <span class="ident">gid</span>: <span class="ident">gid</span>.<span class="ident">assume_init</span>(),
@@ -477,14 +477,14 @@
     <span class="kw">use</span> <span class="ident">std::os::unix::io::AsRawFd</span>;
     <span class="kw">use</span> <span class="ident">std::ptr</span>;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_peer_cred</span>(<span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="ident">UnixStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::UCred</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_peer_cred</span>(<span class="ident">sock</span>: <span class="kw-2">&amp;</span><span class="ident">UnixStream</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::UCred</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">raw_fd</span> <span class="op">=</span> <span class="ident">sock</span>.<span class="ident">as_raw_fd</span>();
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cred</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
             <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">libc::getpeerucred</span>(<span class="ident">raw_fd</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cred</span>);
 
-            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">ret</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="kw">let</span> <span class="ident">uid</span> <span class="op">=</span> <span class="ident">libc::ucred_geteuid</span>(<span class="ident">cred</span>);
                 <span class="kw">let</span> <span class="ident">gid</span> <span class="op">=</span> <span class="ident">libc::ucred_getegid</span>(<span class="ident">cred</span>);
                 <span class="kw">let</span> <span class="ident">pid</span> <span class="op">=</span> <span class="ident">libc::ucred_getpid</span>(<span class="ident">cred</span>);

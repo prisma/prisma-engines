@@ -181,7 +181,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// async_global_executor::spawn_more_threads(2);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">spawn_more_threads</span>(<span class="ident">count</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">spawn_more_threads</span>(<span class="ident">count</span>: <span class="ident">usize</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="comment">// Get the current configuration, or initialize the thread pool.</span>
     <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::config::GLOBAL_EXECUTOR_CONFIG</span>
         .<span class="ident">get</span>()
@@ -214,7 +214,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// async_global_executor::stop_thread();</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stop_thread</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stop_thread</span>() -&gt; <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="ident"><span class="kw">crate</span>::spawn</span>(<span class="ident">stop_current_executor_thread</span>())
 }
 
@@ -227,7 +227,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// async_global_executor::stop_current_thread();</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stop_current_thread</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stop_current_thread</span>() -&gt; <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="ident"><span class="kw">crate</span>::spawn_local</span>(<span class="ident">stop_current_executor_thread</span>())
 }
 
@@ -285,7 +285,7 @@
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">stop_current_executor_thread</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">stop_current_executor_thread</span>() -&gt; <span class="ident">bool</span> {
     <span class="comment">// How many threads are we supposed to have (when all shutdowns are complete)</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expected_threads_number</span> <span class="op">=</span> <span class="ident">GLOBAL_EXECUTOR_EXPECTED_THREADS_NUMBER</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
     <span class="comment">// Ensure we don&#39;t go below the configured min_threads (ignoring shutting down)</span>

@@ -240,7 +240,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `handle` - handle to the dns connection</span>
     <span class="doccomment">/// * `attempts` - number of attempts before failing</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">handle</span>: <span class="ident">H</span>, <span class="ident">attempts</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">handle</span>: <span class="ident">H</span>, <span class="ident">attempts</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">RetryDnsHandle</span> { <span class="ident">handle</span>, <span class="ident">attempts</span> }
     }
 }
@@ -253,7 +253,7 @@
     <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">H</span> <span class="kw">as</span> <span class="ident">DnsHandle</span><span class="op">&gt;</span><span class="ident">::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Response</span> {
+    <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">into</span>();
 
         <span class="comment">// need to clone here so that the retry can resend if necessary...</span>
@@ -286,13 +286,13 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="op">&lt;</span><span class="ident">H</span> <span class="kw">as</span> <span class="ident">DnsHandle</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="comment">// loop over the future, on errors, spawn a new future</span>
         <span class="comment">//  on ready and not ready return.</span>
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">future</span>.<span class="ident">poll_unpin</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining_attempts</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">e</span>.<span class="ident">should_retry</span>() {
+                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; {
+                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining_attempts</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">e</span>.<span class="ident">should_retry</span>() {
                         <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>));
                     }
 
@@ -305,7 +305,7 @@
                     <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">request</span>.<span class="ident">clone</span>();
                     <span class="self">self</span>.<span class="ident">future</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">send</span>(<span class="ident">request</span>);
                 }
-                <span class="ident">poll</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">poll</span>,
+                <span class="ident">poll</span> =&gt; <span class="kw">return</span> <span class="ident">poll</span>,
             }
         }
     }
@@ -314,17 +314,17 @@
 <span class="doccomment">/// What errors should be retried</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RetryableError</span> {
     <span class="doccomment">/// Whether the query should be retried after this error</span>
-    <span class="kw">fn</span> <span class="ident">should_retry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">should_retry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
     <span class="doccomment">/// Whether this error should count as an attempt</span>
-    <span class="kw">fn</span> <span class="ident">attempted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">attempted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">RetryableError</span> <span class="kw">for</span> <span class="ident">ProtoError</span> {
-    <span class="kw">fn</span> <span class="ident">should_retry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">should_retry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">attempted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">attempted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>(), <span class="ident">ProtoErrorKind::Busy</span>)
     }
 }
@@ -353,10 +353,10 @@
         <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span>;
         <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ProtoError</span>;
 
-        <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Response</span> {
+        <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
             <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">attempts</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
 
-            <span class="kw">if</span> (<span class="ident">i</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">retries</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">retries</span> <span class="op">-</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>) <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">last_succeed</span> {
+            <span class="kw">if</span> (<span class="ident">i</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">retries</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">retries</span> <span class="op">-</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span>) <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">last_succeed</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::new</span>();
                 <span class="ident">message</span>.<span class="ident">set_id</span>(<span class="ident">i</span>);
                 <span class="kw">return</span> <span class="ident">Box::new</span>(<span class="ident">ok</span>(<span class="ident">message</span>.<span class="ident">into</span>()));

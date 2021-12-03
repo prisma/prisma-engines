@@ -3066,7 +3066,7 @@
     <span class="doccomment">/// # let read_debug_line_section_somehow = || &amp;buf;</span>
     <span class="doccomment">/// let debug_line = DebugLine::new(read_debug_line_section_somehow(), LittleEndian);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">debug_line_section</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> [<span class="ident">u8</span>], <span class="ident">endian</span>: <span class="ident">Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">debug_line_section</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;input</span> [<span class="ident">u8</span>], <span class="ident">endian</span>: <span class="ident">Endian</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">EndianSlice::new</span>(<span class="ident">debug_line_section</span>, <span class="ident">endian</span>))
     }
 }
@@ -3102,7 +3102,7 @@
         <span class="ident">address_size</span>: <span class="ident">u8</span>,
         <span class="ident">comp_dir</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
         <span class="ident">comp_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IncompleteLineProgram</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IncompleteLineProgram</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">debug_line_section</span>.<span class="ident">clone</span>();
         <span class="ident">input</span>.<span class="ident">skip</span>(<span class="ident">offset</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">LineProgramHeader::parse</span>(<span class="ident">input</span>, <span class="ident">offset</span>, <span class="ident">address_size</span>, <span class="ident">comp_dir</span>, <span class="ident">comp_name</span>)<span class="question-mark">?</span>;
@@ -3127,26 +3127,26 @@
     <span class="doccomment">///     gimli::EndianSlice::new(&amp;section, gimli::LittleEndian)</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">borrow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">borrow</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DebugLine</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">borrow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">borrow</span>: <span class="ident">F</span>) -&gt; <span class="ident">DebugLine</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
     {
         <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">debug_line_section</span>).<span class="ident">into</span>()
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Section</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DebugLine</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SectionId</span> {
+    <span class="kw">fn</span> <span class="ident">id</span>() -&gt; <span class="ident">SectionId</span> {
         <span class="ident">SectionId::DebugLine</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">reader</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">R</span> {
+    <span class="kw">fn</span> <span class="ident">reader</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">R</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">debug_line_section</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DebugLine</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">debug_line_section</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">debug_line_section</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">DebugLine</span> { <span class="ident">debug_line_section</span> }
     }
 }
@@ -3164,7 +3164,7 @@
     <span class="ident">Offset</span>: <span class="ident">ReaderOffset</span>,
 {
     <span class="doccomment">/// Get a reference to the held `LineProgramHeader`.</span>
-    <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>;
     <span class="doccomment">/// Add a file to the file table if necessary.</span>
     <span class="kw">fn</span> <span class="ident">add_file</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">file</span>: <span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>);
 }
@@ -3174,7 +3174,7 @@
     <span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">Offset</span> <span class="op">=</span> <span class="ident">Offset</span><span class="op">&gt;</span>,
     <span class="ident">Offset</span>: <span class="ident">ReaderOffset</span>,
 {
-    <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">header</span>
     }
     <span class="kw">fn</span> <span class="ident">add_file</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">file</span>: <span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>) {
@@ -3187,7 +3187,7 @@
     <span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">Offset</span> <span class="op">=</span> <span class="ident">Offset</span><span class="op">&gt;</span>,
     <span class="ident">Offset</span>: <span class="ident">ReaderOffset</span>,
 {
-    <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">header</span>
     }
     <span class="kw">fn</span> <span class="ident">add_file</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>) {
@@ -3229,7 +3229,7 @@
     <span class="ident">Offset</span>: <span class="ident">ReaderOffset</span>,
 {
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::new_ret_no_self</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">program</span>: <span class="ident">IncompleteLineProgram</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OneShotLineRows</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">program</span>: <span class="ident">IncompleteLineProgram</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>) -&gt; <span class="ident">OneShotLineRows</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">LineRow::new</span>(<span class="ident">program</span>.<span class="ident">header</span>());
         <span class="kw">let</span> <span class="ident">instructions</span> <span class="op">=</span> <span class="ident">LineInstructions</span> {
             <span class="ident">input</span>: <span class="ident">program</span>.<span class="ident">header</span>().<span class="ident">program_buf</span>.<span class="ident">clone</span>(),
@@ -3244,7 +3244,7 @@
     <span class="kw">fn</span> <span class="ident">resume</span><span class="op">&lt;</span><span class="lifetime">&#39;program</span><span class="op">&gt;</span>(
         <span class="ident">program</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;program</span> <span class="ident">CompleteLineProgram</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>,
         <span class="ident">sequence</span>: <span class="kw-2">&amp;</span><span class="ident">LineSequence</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResumedLineRows</span><span class="op">&lt;</span><span class="lifetime">&#39;program</span>, <span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ResumedLineRows</span><span class="op">&lt;</span><span class="lifetime">&#39;program</span>, <span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">LineRow::new</span>(<span class="ident">program</span>.<span class="ident">header</span>());
         <span class="kw">let</span> <span class="ident">instructions</span> <span class="op">=</span> <span class="ident">sequence</span>.<span class="ident">instructions</span>.<span class="ident">clone</span>();
         <span class="ident">LineRows</span> {
@@ -3257,7 +3257,7 @@
     <span class="doccomment">/// Get a reference to the header for this state machine&#39;s line number</span>
     <span class="doccomment">/// program.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">program</span>.<span class="ident">header</span>()
     }
 
@@ -3271,16 +3271,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Unfortunately, the references mean that this cannot be a</span>
     <span class="doccomment">/// `FallibleIterator`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_row</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">LineRow</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_row</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">LineRow</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Perform any reset that was required after copying the previous row.</span>
         <span class="self">self</span>.<span class="ident">row</span>.<span class="ident">reset</span>(<span class="self">self</span>.<span class="ident">program</span>.<span class="ident">header</span>());
 
         <span class="kw">loop</span> {
             <span class="comment">// Split the borrow here, rather than calling `self.header()`.</span>
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">instructions</span>.<span class="ident">next_instruction</span>(<span class="self">self</span>.<span class="ident">program</span>.<span class="ident">header</span>()) {
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">instruction</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">instruction</span>)) =&gt; {
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">row</span>.<span class="ident">execute</span>(<span class="ident">instruction</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">program</span>) {
                         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="self">self</span>.<span class="ident">header</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">row</span>)));
                     }
@@ -3440,25 +3440,25 @@
     <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="lifetime">&#39;header</span><span class="op">&gt;</span>(
         <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;header</span> <span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LineInstruction</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LineInstruction</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="lifetime">&#39;header</span>,
     {
         <span class="kw">let</span> <span class="ident">opcode</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">opcode</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">opcode</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>().<span class="ident">and_then</span>(<span class="ident">R::Offset::from_u64</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">instr_rest</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">split</span>(<span class="ident">length</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">opcode</span> <span class="op">=</span> <span class="ident">instr_rest</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
 
             <span class="kw">match</span> <span class="ident">constants::DwLne</span>(<span class="ident">opcode</span>) {
-                <span class="ident">constants::DW_LNE_end_sequence</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::EndSequence</span>),
+                <span class="ident">constants::DW_LNE_end_sequence</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::EndSequence</span>),
 
-                <span class="ident">constants::DW_LNE_set_address</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">constants::DW_LNE_set_address</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">instr_rest</span>.<span class="ident">read_address</span>(<span class="ident">header</span>.<span class="ident">address_size</span>())<span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::SetAddress</span>(<span class="ident">address</span>))
                 }
 
-                <span class="ident">constants::DW_LNE_define_file</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">constants::DW_LNE_define_file</span> =&gt; {
                     <span class="kw">if</span> <span class="ident">header</span>.<span class="ident">version</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">4</span> {
                         <span class="kw">let</span> <span class="ident">path_name</span> <span class="op">=</span> <span class="ident">instr_rest</span>.<span class="ident">read_null_terminated_slice</span>()<span class="question-mark">?</span>;
                         <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">FileEntry::parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">instr_rest</span>, <span class="ident">path_name</span>)<span class="question-mark">?</span>;
@@ -3471,70 +3471,70 @@
                     }
                 }
 
-                <span class="ident">constants::DW_LNE_set_discriminator</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">constants::DW_LNE_set_discriminator</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">discriminator</span> <span class="op">=</span> <span class="ident">instr_rest</span>.<span class="ident">read_uleb128</span>()<span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::SetDiscriminator</span>(<span class="ident">discriminator</span>))
                 }
 
-                <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::UnknownExtended</span>(<span class="ident">otherwise</span>, <span class="ident">instr_rest</span>)),
+                <span class="ident">otherwise</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::UnknownExtended</span>(<span class="ident">otherwise</span>, <span class="ident">instr_rest</span>)),
             }
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">opcode</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">header</span>.<span class="ident">opcode_base</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::Special</span>(<span class="ident">opcode</span>))
         } <span class="kw">else</span> {
             <span class="kw">match</span> <span class="ident">constants::DwLns</span>(<span class="ident">opcode</span>) {
-                <span class="ident">constants::DW_LNS_copy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::Copy</span>),
+                <span class="ident">constants::DW_LNS_copy</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::Copy</span>),
 
-                <span class="ident">constants::DW_LNS_advance_pc</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">constants::DW_LNS_advance_pc</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">advance</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>()<span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::AdvancePc</span>(<span class="ident">advance</span>))
                 }
 
-                <span class="ident">constants::DW_LNS_advance_line</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">constants::DW_LNS_advance_line</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">increment</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_sleb128</span>()<span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::AdvanceLine</span>(<span class="ident">increment</span>))
                 }
 
-                <span class="ident">constants::DW_LNS_set_file</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">constants::DW_LNS_set_file</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>()<span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::SetFile</span>(<span class="ident">file</span>))
                 }
 
-                <span class="ident">constants::DW_LNS_set_column</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">constants::DW_LNS_set_column</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>()<span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::SetColumn</span>(<span class="ident">column</span>))
                 }
 
-                <span class="ident">constants::DW_LNS_negate_stmt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::NegateStatement</span>),
+                <span class="ident">constants::DW_LNS_negate_stmt</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::NegateStatement</span>),
 
-                <span class="ident">constants::DW_LNS_set_basic_block</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::SetBasicBlock</span>),
+                <span class="ident">constants::DW_LNS_set_basic_block</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::SetBasicBlock</span>),
 
-                <span class="ident">constants::DW_LNS_const_add_pc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::ConstAddPc</span>),
+                <span class="ident">constants::DW_LNS_const_add_pc</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::ConstAddPc</span>),
 
-                <span class="ident">constants::DW_LNS_fixed_advance_pc</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">constants::DW_LNS_fixed_advance_pc</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">advance</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::FixedAddPc</span>(<span class="ident">advance</span>))
                 }
 
-                <span class="ident">constants::DW_LNS_set_prologue_end</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::SetPrologueEnd</span>),
+                <span class="ident">constants::DW_LNS_set_prologue_end</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::SetPrologueEnd</span>),
 
-                <span class="ident">constants::DW_LNS_set_epilogue_begin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::SetEpilogueBegin</span>),
+                <span class="ident">constants::DW_LNS_set_epilogue_begin</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::SetEpilogueBegin</span>),
 
-                <span class="ident">constants::DW_LNS_set_isa</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">constants::DW_LNS_set_isa</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">isa</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>()<span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::SetIsa</span>(<span class="ident">isa</span>))
                 }
 
-                <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">otherwise</span> =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opcode_lengths</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">standard_opcode_lengths</span>().<span class="ident">clone</span>();
                     <span class="ident">opcode_lengths</span>.<span class="ident">skip</span>(<span class="ident">R::Offset::from_u8</span>(<span class="ident">opcode</span> <span class="op">-</span> <span class="number">1</span>))<span class="question-mark">?</span>;
                     <span class="kw">let</span> <span class="ident">num_args</span> <span class="op">=</span> <span class="ident">opcode_lengths</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
                     <span class="kw">match</span> <span class="ident">num_args</span> {
-                        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::UnknownStandard0</span>(<span class="ident">otherwise</span>)),
-                        <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::UnknownStandard0</span>(<span class="ident">otherwise</span>)),
+                        <span class="number">1</span> =&gt; {
                             <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>()<span class="question-mark">?</span>;
                             <span class="prelude-val">Ok</span>(<span class="ident">LineInstruction::UnknownStandard1</span>(<span class="ident">otherwise</span>, <span class="ident">arg</span>))
                         }
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">_</span> =&gt; {
                             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">clone</span>();
                             <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">num_args</span> {
                                 <span class="ident">input</span>.<span class="ident">read_uleb128</span>()<span class="question-mark">?</span>;
@@ -3555,49 +3555,49 @@
     <span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&lt;</span><span class="ident">Offset</span> <span class="op">=</span> <span class="ident">Offset</span><span class="op">&gt;</span>,
     <span class="ident">Offset</span>: <span class="ident">ReaderOffset</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result::Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">result::Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">LineInstruction::Special</span>(<span class="ident">opcode</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Special opcode {}&quot;</span>, <span class="ident">opcode</span>),
-            <span class="ident">LineInstruction::Copy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNS_copy</span>),
-            <span class="ident">LineInstruction::AdvancePc</span>(<span class="ident">advance</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::Special</span>(<span class="ident">opcode</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Special opcode {}&quot;</span>, <span class="ident">opcode</span>),
+            <span class="ident">LineInstruction::Copy</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNS_copy</span>),
+            <span class="ident">LineInstruction::AdvancePc</span>(<span class="ident">advance</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} by {}&quot;</span>, <span class="ident">constants::DW_LNS_advance_pc</span>, <span class="ident">advance</span>)
             }
-            <span class="ident">LineInstruction::AdvanceLine</span>(<span class="ident">increment</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::AdvanceLine</span>(<span class="ident">increment</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} by {}&quot;</span>, <span class="ident">constants::DW_LNS_advance_line</span>, <span class="ident">increment</span>)
             }
-            <span class="ident">LineInstruction::SetFile</span>(<span class="ident">file</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::SetFile</span>(<span class="ident">file</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} to {}&quot;</span>, <span class="ident">constants::DW_LNS_set_file</span>, <span class="ident">file</span>)
             }
-            <span class="ident">LineInstruction::SetColumn</span>(<span class="ident">column</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::SetColumn</span>(<span class="ident">column</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} to {}&quot;</span>, <span class="ident">constants::DW_LNS_set_column</span>, <span class="ident">column</span>)
             }
-            <span class="ident">LineInstruction::NegateStatement</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNS_negate_stmt</span>),
-            <span class="ident">LineInstruction::SetBasicBlock</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNS_set_basic_block</span>),
-            <span class="ident">LineInstruction::ConstAddPc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNS_const_add_pc</span>),
-            <span class="ident">LineInstruction::FixedAddPc</span>(<span class="ident">advance</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::NegateStatement</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNS_negate_stmt</span>),
+            <span class="ident">LineInstruction::SetBasicBlock</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNS_set_basic_block</span>),
+            <span class="ident">LineInstruction::ConstAddPc</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNS_const_add_pc</span>),
+            <span class="ident">LineInstruction::FixedAddPc</span>(<span class="ident">advance</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} by {}&quot;</span>, <span class="ident">constants::DW_LNS_fixed_advance_pc</span>, <span class="ident">advance</span>)
             }
-            <span class="ident">LineInstruction::SetPrologueEnd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNS_set_prologue_end</span>),
-            <span class="ident">LineInstruction::SetEpilogueBegin</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::SetPrologueEnd</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNS_set_prologue_end</span>),
+            <span class="ident">LineInstruction::SetEpilogueBegin</span> =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNS_set_epilogue_begin</span>)
             }
-            <span class="ident">LineInstruction::SetIsa</span>(<span class="ident">isa</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} to {}&quot;</span>, <span class="ident">constants::DW_LNS_set_isa</span>, <span class="ident">isa</span>),
-            <span class="ident">LineInstruction::UnknownStandard0</span>(<span class="ident">opcode</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Unknown {}&quot;</span>, <span class="ident">opcode</span>),
-            <span class="ident">LineInstruction::UnknownStandard1</span>(<span class="ident">opcode</span>, <span class="ident">arg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::SetIsa</span>(<span class="ident">isa</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} to {}&quot;</span>, <span class="ident">constants::DW_LNS_set_isa</span>, <span class="ident">isa</span>),
+            <span class="ident">LineInstruction::UnknownStandard0</span>(<span class="ident">opcode</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Unknown {}&quot;</span>, <span class="ident">opcode</span>),
+            <span class="ident">LineInstruction::UnknownStandard1</span>(<span class="ident">opcode</span>, <span class="ident">arg</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Unknown {} with operand {}&quot;</span>, <span class="ident">opcode</span>, <span class="ident">arg</span>)
             }
-            <span class="ident">LineInstruction::UnknownStandardN</span>(<span class="ident">opcode</span>, <span class="kw-2">ref</span> <span class="ident">args</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::UnknownStandardN</span>(<span class="ident">opcode</span>, <span class="kw-2">ref</span> <span class="ident">args</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Unknown {} with operands {:?}&quot;</span>, <span class="ident">opcode</span>, <span class="ident">args</span>)
             }
-            <span class="ident">LineInstruction::EndSequence</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNE_end_sequence</span>),
-            <span class="ident">LineInstruction::SetAddress</span>(<span class="ident">address</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::EndSequence</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNE_end_sequence</span>),
+            <span class="ident">LineInstruction::SetAddress</span>(<span class="ident">address</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} to {}&quot;</span>, <span class="ident">constants::DW_LNE_set_address</span>, <span class="ident">address</span>)
             }
-            <span class="ident">LineInstruction::DefineFile</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNE_define_file</span>),
-            <span class="ident">LineInstruction::SetDiscriminator</span>(<span class="ident">discr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::DefineFile</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">constants::DW_LNE_define_file</span>),
+            <span class="ident">LineInstruction::SetDiscriminator</span>(<span class="ident">discr</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} to {}&quot;</span>, <span class="ident">constants::DW_LNE_set_discriminator</span>, <span class="ident">discr</span>)
             }
-            <span class="ident">LineInstruction::UnknownExtended</span>(<span class="ident">opcode</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Unknown {}&quot;</span>, <span class="ident">opcode</span>),
+            <span class="ident">LineInstruction::UnknownExtended</span>(<span class="ident">opcode</span>, <span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Unknown {}&quot;</span>, <span class="ident">opcode</span>),
         }
     }
 }
@@ -3617,7 +3617,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">LineInstructions</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">remove_trailing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">LineInstructions</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LineInstructions</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">remove_trailing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">LineInstructions</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LineInstructions</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">input</span>.<span class="ident">offset_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">clone</span>();
         <span class="ident">input</span>.<span class="ident">truncate</span>(<span class="ident">offset</span>)<span class="question-mark">?</span>;
@@ -3641,14 +3641,14 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_instruction</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LineInstruction</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LineInstruction</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
         <span class="kw">match</span> <span class="ident">LineInstruction::parse</span>(<span class="ident">header</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">input</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">instruction</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">instruction</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">instruction</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">instruction</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">empty</span>();
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>)
             }
@@ -3681,7 +3681,7 @@
 
 <span class="kw">impl</span> <span class="ident">LineRow</span> {
     <span class="doccomment">/// Create a line number row in the initial state for the given program.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">LineRow</span> {
             <span class="comment">// &quot;At the beginning of each sequence within a line number program, the</span>
             <span class="comment">// state of the registers is:&quot; -- Section 6.2.2</span>
@@ -3708,7 +3708,7 @@
     <span class="doccomment">/// &quot;The program-counter value corresponding to a machine instruction</span>
     <span class="doccomment">/// generated by the compiler.&quot;</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">address</span>.<span class="number">0</span>
     }
 
@@ -3720,14 +3720,14 @@
     <span class="doccomment">/// &gt; pointer that can reference any individual operation with the</span>
     <span class="doccomment">/// &gt; instruction stream.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">op_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">op_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">op_index</span>.<span class="number">0</span>
     }
 
     <span class="doccomment">/// &quot;An unsigned integer indicating the identity of the source file</span>
     <span class="doccomment">/// corresponding to a machine instruction.&quot;</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">file</span>
     }
 
@@ -3736,7 +3736,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span><span class="op">&lt;</span><span class="lifetime">&#39;header</span>, <span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;header</span> <span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;header</span> <span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;header</span> <span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">header</span>.<span class="ident">file</span>(<span class="self">self</span>.<span class="ident">file</span>)
     }
 
@@ -3745,7 +3745,7 @@
     <span class="doccomment">/// instruction cannot be attributed to any source line.&quot;</span>
     <span class="doccomment">/// Line number values of 0 are represented as `None`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span> {
         <span class="ident">NonZeroU64::new</span>(<span class="self">self</span>.<span class="ident">line</span>.<span class="number">0</span>)
     }
 
@@ -3753,7 +3753,7 @@
     <span class="doccomment">/// line. Columns are numbered beginning at 1. The value 0 is reserved to</span>
     <span class="doccomment">/// indicate that a statement begins at the “left edge” of the line.&quot;</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnType</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnType</span> {
         <span class="ident">NonZeroU64::new</span>(<span class="self">self</span>.<span class="ident">column</span>)
             .<span class="ident">map</span>(<span class="ident">ColumnType::Column</span>)
             .<span class="ident">unwrap_or</span>(<span class="ident">ColumnType::LeftEdge</span>)
@@ -3764,14 +3764,14 @@
     <span class="doccomment">/// “represent” a line, a statement and/or a semantically distinct subpart</span>
     <span class="doccomment">/// of a statement.&quot;</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_stmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_stmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">is_stmt</span>
     }
 
     <span class="doccomment">/// &quot;A boolean indicating that the current instruction is the beginning of a</span>
     <span class="doccomment">/// basic block.&quot;</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">basic_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">basic_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">basic_block</span>
     }
 
@@ -3780,7 +3780,7 @@
     <span class="doccomment">/// terminates a sequence of lines; therefore other information in the same</span>
     <span class="doccomment">/// row is not meaningful.&quot;</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_sequence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_sequence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">end_sequence</span>
     }
 
@@ -3788,7 +3788,7 @@
     <span class="doccomment">/// where execution should be suspended for an entry breakpoint of a</span>
     <span class="doccomment">/// function.&quot;</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prologue_end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prologue_end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">prologue_end</span>
     }
 
@@ -3796,7 +3796,7 @@
     <span class="doccomment">/// where execution should be suspended for an exit breakpoint of a</span>
     <span class="doccomment">/// function.&quot;</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">epilogue_begin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">epilogue_begin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">epilogue_begin</span>
     }
 
@@ -3809,7 +3809,7 @@
     <span class="doccomment">/// &gt; given architecture. It is recommended that this encoding be defined by</span>
     <span class="doccomment">/// &gt; the ABI authoring committee for each architecture.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isa</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isa</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">isa</span>
     }
 
@@ -3820,7 +3820,7 @@
     <span class="doccomment">/// only one block exists for a given source position, the discriminator</span>
     <span class="doccomment">/// value should be zero.&quot;</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">discriminator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">discriminator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">discriminator</span>
     }
 
@@ -3833,94 +3833,94 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">instruction</span>: <span class="ident">LineInstruction</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
         <span class="ident">program</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Program</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+    ) -&gt; <span class="ident">bool</span>
     <span class="kw">where</span>
         <span class="ident">Program</span>: <span class="ident">LineProgram</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
         <span class="ident">R</span>: <span class="ident">Reader</span>,
     {
         <span class="kw">match</span> <span class="ident">instruction</span> {
-            <span class="ident">LineInstruction::Special</span>(<span class="ident">opcode</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::Special</span>(<span class="ident">opcode</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">exec_special_opcode</span>(<span class="ident">opcode</span>, <span class="ident">program</span>.<span class="ident">header</span>());
                 <span class="bool-val">true</span>
             }
 
-            <span class="ident">LineInstruction::Copy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">LineInstruction::Copy</span> =&gt; <span class="bool-val">true</span>,
 
-            <span class="ident">LineInstruction::AdvancePc</span>(<span class="ident">operation_advance</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::AdvancePc</span>(<span class="ident">operation_advance</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">apply_operation_advance</span>(<span class="ident">operation_advance</span>, <span class="ident">program</span>.<span class="ident">header</span>());
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::AdvanceLine</span>(<span class="ident">line_increment</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::AdvanceLine</span>(<span class="ident">line_increment</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">apply_line_advance</span>(<span class="ident">line_increment</span>);
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::SetFile</span>(<span class="ident">file</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::SetFile</span>(<span class="ident">file</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">file</span> <span class="op">=</span> <span class="ident">file</span>;
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::SetColumn</span>(<span class="ident">column</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::SetColumn</span>(<span class="ident">column</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">column</span> <span class="op">=</span> <span class="ident">column</span>;
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::NegateStatement</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::NegateStatement</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">is_stmt</span> <span class="op">=</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_stmt</span>;
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::SetBasicBlock</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::SetBasicBlock</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">basic_block</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::ConstAddPc</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::ConstAddPc</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">adjusted</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">adjust_opcode</span>(<span class="number">255</span>, <span class="ident">program</span>.<span class="ident">header</span>());
                 <span class="kw">let</span> <span class="ident">operation_advance</span> <span class="op">=</span> <span class="ident">adjusted</span> <span class="op">/</span> <span class="ident">program</span>.<span class="ident">header</span>().<span class="ident">line_encoding</span>.<span class="ident">line_range</span>;
                 <span class="self">self</span>.<span class="ident">apply_operation_advance</span>(<span class="ident">u64::from</span>(<span class="ident">operation_advance</span>), <span class="ident">program</span>.<span class="ident">header</span>());
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::FixedAddPc</span>(<span class="ident">operand</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::FixedAddPc</span>(<span class="ident">operand</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">address</span> <span class="op">+</span><span class="op">=</span> <span class="ident">Wrapping</span>(<span class="ident">u64::from</span>(<span class="ident">operand</span>));
                 <span class="self">self</span>.<span class="ident">op_index</span>.<span class="number">0</span> <span class="op">=</span> <span class="number">0</span>;
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::SetPrologueEnd</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::SetPrologueEnd</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">prologue_end</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::SetEpilogueBegin</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::SetEpilogueBegin</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">epilogue_begin</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::SetIsa</span>(<span class="ident">isa</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::SetIsa</span>(<span class="ident">isa</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">isa</span> <span class="op">=</span> <span class="ident">isa</span>;
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::EndSequence</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::EndSequence</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">end_sequence</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="bool-val">true</span>
             }
 
-            <span class="ident">LineInstruction::SetAddress</span>(<span class="ident">address</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::SetAddress</span>(<span class="ident">address</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">address</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">address</span>;
                 <span class="self">self</span>.<span class="ident">op_index</span>.<span class="number">0</span> <span class="op">=</span> <span class="number">0</span>;
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::DefineFile</span>(<span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::DefineFile</span>(<span class="ident">entry</span>) =&gt; {
                 <span class="ident">program</span>.<span class="ident">add_file</span>(<span class="ident">entry</span>);
                 <span class="bool-val">false</span>
             }
 
-            <span class="ident">LineInstruction::SetDiscriminator</span>(<span class="ident">discriminator</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">LineInstruction::SetDiscriminator</span>(<span class="ident">discriminator</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">discriminator</span> <span class="op">=</span> <span class="ident">discriminator</span>;
                 <span class="bool-val">false</span>
             }
@@ -3929,7 +3929,7 @@
             <span class="ident">LineInstruction::UnknownStandard0</span>(<span class="kw">_</span>)
             <span class="op">|</span> <span class="ident">LineInstruction::UnknownStandard1</span>(<span class="kw">_</span>, <span class="kw">_</span>)
             <span class="op">|</span> <span class="ident">LineInstruction::UnknownStandardN</span>(<span class="kw">_</span>, <span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">LineInstruction::UnknownExtended</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="op">|</span> <span class="ident">LineInstruction::UnknownExtended</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 
@@ -3981,7 +3981,7 @@
             <span class="ident">u64::from</span>(<span class="ident">header</span>.<span class="ident">line_encoding</span>.<span class="ident">maximum_operations_per_instruction</span>);
         <span class="kw">let</span> <span class="ident">maximum_operations_per_instruction</span> <span class="op">=</span> <span class="ident">Wrapping</span>(<span class="ident">maximum_operations_per_instruction</span>);
 
-        <span class="kw">if</span> <span class="ident">maximum_operations_per_instruction</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">maximum_operations_per_instruction</span>.<span class="number">0</span> <span class="op">==</span> <span class="number">1</span> {
             <span class="self">self</span>.<span class="ident">address</span> <span class="op">+</span><span class="op">=</span> <span class="ident">minimum_instruction_length</span> <span class="op">*</span> <span class="ident">operation_advance</span>;
             <span class="self">self</span>.<span class="ident">op_index</span>.<span class="number">0</span> <span class="op">=</span> <span class="number">0</span>;
         } <span class="kw">else</span> {
@@ -3993,7 +3993,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">adjust_opcode</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">opcode</span>: <span class="ident">u8</span>, <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">adjust_opcode</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">opcode</span>: <span class="ident">u8</span>, <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">u8</span> {
         <span class="ident">opcode</span> <span class="op">-</span> <span class="ident">header</span>.<span class="ident">opcode_base</span>
     }
 
@@ -4110,88 +4110,88 @@
     <span class="ident">Offset</span>: <span class="ident">ReaderOffset</span>,
 {
     <span class="doccomment">/// Return the offset of the line number program header in the `.debug_line` section.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DebugLineOffset</span><span class="op">&lt;</span><span class="ident">R::Offset</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DebugLineOffset</span><span class="op">&lt;</span><span class="ident">R::Offset</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">offset</span>
     }
 
     <span class="doccomment">/// Return the length of the line number program and header, not including</span>
     <span class="doccomment">/// the length of the encoded length itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unit_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R::Offset</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unit_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">R::Offset</span> {
         <span class="self">self</span>.<span class="ident">unit_length</span>
     }
 
     <span class="doccomment">/// Return the encoding parameters for this header&#39;s line program.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Encoding</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Encoding</span> {
         <span class="self">self</span>.<span class="ident">encoding</span>
     }
 
     <span class="doccomment">/// Get the version of this header&#39;s line program.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
         <span class="self">self</span>.<span class="ident">encoding</span>.<span class="ident">version</span>
     }
 
     <span class="doccomment">/// Get the length of the encoded line number program header, not including</span>
     <span class="doccomment">/// the length of the encoded length itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R::Offset</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">R::Offset</span> {
         <span class="self">self</span>.<span class="ident">header_length</span>
     }
 
     <span class="doccomment">/// Get the size in bytes of a target machine address.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">address_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">address_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">encoding</span>.<span class="ident">address_size</span>
     }
 
     <span class="doccomment">/// Whether this line program is encoded in 64- or 32-bit DWARF.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Format</span> {
         <span class="self">self</span>.<span class="ident">encoding</span>.<span class="ident">format</span>
     }
 
     <span class="doccomment">/// Get the line encoding parameters for this header&#39;s line program.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line_encoding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LineEncoding</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line_encoding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LineEncoding</span> {
         <span class="self">self</span>.<span class="ident">line_encoding</span>
     }
 
     <span class="doccomment">/// Get the minimum instruction length any instruction in this header&#39;s line</span>
     <span class="doccomment">/// program may have.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">minimum_instruction_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">minimum_instruction_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">line_encoding</span>.<span class="ident">minimum_instruction_length</span>
     }
 
     <span class="doccomment">/// Get the maximum number of operations each instruction in this header&#39;s</span>
     <span class="doccomment">/// line program may have.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">maximum_operations_per_instruction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">maximum_operations_per_instruction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">line_encoding</span>.<span class="ident">maximum_operations_per_instruction</span>
     }
 
     <span class="doccomment">/// Get the default value of the `is_stmt` register for this header&#39;s line</span>
     <span class="doccomment">/// program.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_is_stmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_is_stmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">line_encoding</span>.<span class="ident">default_is_stmt</span>
     }
 
     <span class="doccomment">/// Get the line base for this header&#39;s line program.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line_base</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line_base</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i8</span> {
         <span class="self">self</span>.<span class="ident">line_encoding</span>.<span class="ident">line_base</span>
     }
 
     <span class="doccomment">/// Get the line range for this header&#39;s line program.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">line_encoding</span>.<span class="ident">line_range</span>
     }
 
     <span class="doccomment">/// Get opcode base for this header&#39;s line program.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opcode_base</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opcode_base</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">opcode_base</span>
     }
 
     <span class="doccomment">/// An array of `u8` that specifies the number of LEB128 operands for</span>
     <span class="doccomment">/// each of the standard opcodes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">standard_opcode_lengths</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">R</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">standard_opcode_lengths</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">R</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">standard_opcode_lengths</span>
     }
 
     <span class="doccomment">/// Get the format of a directory entry.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">directory_entry_format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">FileEntryFormat</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">directory_entry_format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">FileEntryFormat</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">directory_entry_format</span>[..]
     }
 
@@ -4199,16 +4199,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// For DWARF version &lt;= 4, the compilation&#39;s current directory is not included</span>
     <span class="doccomment">/// in the return value, but is implicitly considered to be in the set per spec.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">include_directories</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">AttributeValue</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">include_directories</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">AttributeValue</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">include_directories</span>[..]
     }
 
     <span class="doccomment">/// The include directory with the given directory index.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A directory index of 0 corresponds to the compilation unit directory.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">directory</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">directory</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AttributeValue</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">directory</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">directory</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AttributeValue</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">encoding</span>.<span class="ident">version</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">4</span> {
-            <span class="kw">if</span> <span class="ident">directory</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">directory</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="self">self</span>.<span class="ident">comp_dir</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="ident">AttributeValue::String</span>)
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">directory</span> <span class="op">=</span> <span class="ident">directory</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>;
@@ -4220,7 +4220,7 @@
     }
 
     <span class="doccomment">/// Get the format of a file name entry.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_name_entry_format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">FileEntryFormat</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_name_entry_format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">FileEntryFormat</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">file_name_entry_format</span>[..]
     }
 
@@ -4228,35 +4228,35 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Only returns false if we definitely know that all timestamp fields</span>
     <span class="doccomment">/// are invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_has_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_has_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">encoding</span>.<span class="ident">version</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">4</span>
             <span class="op">|</span><span class="op">|</span> <span class="self">self</span>
                 .<span class="ident">file_name_entry_format</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">content_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">constants::DW_LNCT_timestamp</span>)
+                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">content_type</span> <span class="op">==</span> <span class="ident">constants::DW_LNCT_timestamp</span>)
     }
 
     <span class="doccomment">/// Return true if the file entries may have valid sizes.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Only returns false if we definitely know that all size fields</span>
     <span class="doccomment">/// are invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_has_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_has_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">encoding</span>.<span class="ident">version</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">4</span>
             <span class="op">|</span><span class="op">|</span> <span class="self">self</span>
                 .<span class="ident">file_name_entry_format</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">content_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">constants::DW_LNCT_size</span>)
+                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">content_type</span> <span class="op">==</span> <span class="ident">constants::DW_LNCT_size</span>)
     }
 
     <span class="doccomment">/// Return true if the file name entry format contains an MD5 field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_has_md5</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_has_md5</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">file_name_entry_format</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">content_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">constants::DW_LNCT_MD5</span>)
+            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">content_type</span> <span class="op">==</span> <span class="ident">constants::DW_LNCT_MD5</span>)
     }
 
     <span class="doccomment">/// Get the list of source files that appear in this header&#39;s line program.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">file_names</span>[..]
     }
 
@@ -4265,9 +4265,9 @@
     <span class="doccomment">/// A file index of 0 corresponds to the compilation unit file.</span>
     <span class="doccomment">/// Note that a file index of 0 is invalid for DWARF version &lt;= 4,</span>
     <span class="doccomment">/// but we support it anyway.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">encoding</span>.<span class="ident">version</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">4</span> {
-            <span class="kw">if</span> <span class="ident">file</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">file</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="self">self</span>.<span class="ident">comp_file</span>.<span class="ident">as_ref</span>()
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">file</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>;
@@ -4296,13 +4296,13 @@
     <span class="doccomment">/// println!(&quot;The length of the raw program in bytes is {}&quot;, raw_program.len());</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_program_buf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_program_buf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">R</span> {
         <span class="self">self</span>.<span class="ident">program_buf</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Iterate over the instructions in this header&#39;s line number program, parsing</span>
     <span class="doccomment">/// them as we go.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instructions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LineInstructions</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instructions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LineInstructions</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
         <span class="ident">LineInstructions</span> {
             <span class="ident">input</span>: <span class="self">self</span>.<span class="ident">program_buf</span>.<span class="ident">clone</span>(),
         }
@@ -4314,7 +4314,7 @@
         <span class="kw-2">mut</span> <span class="ident">address_size</span>: <span class="ident">u8</span>,
         <span class="kw-2">mut</span> <span class="ident">comp_dir</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
         <span class="ident">comp_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">unit_length</span>, <span class="ident">format</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_initial_length</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>.<span class="ident">split</span>(<span class="ident">unit_length</span>)<span class="question-mark">?</span>;
 
@@ -4344,21 +4344,21 @@
         <span class="ident">rest</span>.<span class="ident">truncate</span>(<span class="ident">header_length</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">minimum_instruction_length</span> <span class="op">=</span> <span class="ident">rest</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">minimum_instruction_length</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">minimum_instruction_length</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::MinimumInstructionLengthZero</span>);
         }
 
         <span class="comment">// This field did not exist before DWARF 4, but is specified to be 1 for</span>
         <span class="comment">// non-VLIW architectures, which makes it a no-op.</span>
         <span class="kw">let</span> <span class="ident">maximum_operations_per_instruction</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">version</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> { <span class="ident">rest</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> } <span class="kw">else</span> { <span class="number">1</span> };
-        <span class="kw">if</span> <span class="ident">maximum_operations_per_instruction</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">maximum_operations_per_instruction</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::MaximumOperationsPerInstructionZero</span>);
         }
 
         <span class="kw">let</span> <span class="ident">default_is_stmt</span> <span class="op">=</span> <span class="ident">rest</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">line_base</span> <span class="op">=</span> <span class="ident">rest</span>.<span class="ident">read_i8</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">line_range</span> <span class="op">=</span> <span class="ident">rest</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">line_range</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">line_range</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::LineRangeZero</span>);
         }
         <span class="kw">let</span> <span class="ident">line_encoding</span> <span class="op">=</span> <span class="ident">LineEncoding</span> {
@@ -4370,7 +4370,7 @@
         };
 
         <span class="kw">let</span> <span class="ident">opcode_base</span> <span class="op">=</span> <span class="ident">rest</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">opcode_base</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">opcode_base</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::OpcodeBaseZero</span>);
         }
 
@@ -4472,13 +4472,13 @@
     <span class="ident">Offset</span>: <span class="ident">ReaderOffset</span>,
 {
     <span class="doccomment">/// Retrieve the `LineProgramHeader` for this program.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">header</span>
     }
 
     <span class="doccomment">/// Construct a new `LineRows` for executing this program to iterate</span>
     <span class="doccomment">/// over rows in the line information matrix.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rows</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OneShotLineRows</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rows</span>(<span class="self">self</span>) -&gt; <span class="ident">OneShotLineRows</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
         <span class="ident">OneShotLineRows::new</span>(<span class="self">self</span>)
     }
 
@@ -4503,7 +4503,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sequences</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">CompleteLineProgram</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LineSequence</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sequences</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">CompleteLineProgram</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LineSequence</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sequences</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rows</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">instructions</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">instructions</span>.<span class="ident">clone</span>();
@@ -4565,7 +4565,7 @@
     <span class="ident">Offset</span>: <span class="ident">ReaderOffset</span>,
 {
     <span class="doccomment">/// Retrieve the `LineProgramHeader` for this program.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">header</span>
     }
 
@@ -4593,7 +4593,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resume_from</span><span class="op">&lt;</span><span class="lifetime">&#39;program</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;program</span> <span class="self">self</span>,
         <span class="ident">sequence</span>: <span class="kw-2">&amp;</span><span class="ident">LineSequence</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResumedLineRows</span><span class="op">&lt;</span><span class="lifetime">&#39;program</span>, <span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ResumedLineRows</span><span class="op">&lt;</span><span class="lifetime">&#39;program</span>, <span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
         <span class="ident">ResumedLineRows::resume</span>(<span class="self">self</span>, <span class="ident">sequence</span>)
     }
 }
@@ -4618,7 +4618,7 @@
     <span class="ident">Offset</span>: <span class="ident">ReaderOffset</span>,
 {
     <span class="comment">// version 2-4</span>
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">path_name</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">path_name</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">directory_index</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>()<span class="question-mark">?</span>;
@@ -4639,7 +4639,7 @@
     <span class="doccomment">/// &gt; name, the file is located relative to either the compilation directory</span>
     <span class="doccomment">/// &gt; (as specified by the DW_AT_comp_dir attribute given in the compilation</span>
     <span class="doccomment">/// &gt; unit) or one of the directories in the include_directories section.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttributeValue</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AttributeValue</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">path_name</span>.<span class="ident">clone</span>()
     }
 
@@ -4654,20 +4654,20 @@
     <span class="doccomment">/// &gt; in the first directory in the include_directories section, and so</span>
     <span class="doccomment">/// &gt; on. The directory index is ignored for file names that represent full</span>
     <span class="doccomment">/// &gt; path names.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">directory_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">directory_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">directory_index</span>
     }
 
     <span class="doccomment">/// Get this file&#39;s directory.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A directory index of 0 corresponds to the compilation unit directory.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">directory</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AttributeValue</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">directory</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AttributeValue</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">header</span>.<span class="ident">directory</span>(<span class="self">self</span>.<span class="ident">directory_index</span>)
     }
 
     <span class="doccomment">/// The implementation-defined time of last modification of the file,</span>
     <span class="doccomment">/// or 0 if not available.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">timestamp</span>
     }
 
@@ -4675,12 +4675,12 @@
     <span class="doccomment">/// the file, or 0 if not available.&quot;</span>
     <span class="comment">// Terminology changed in DWARF version 5.</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_modification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_modification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">timestamp</span>
     }
 
     <span class="doccomment">/// The size of the file in bytes, or 0 if not available.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">size</span>
     }
 
@@ -4688,14 +4688,14 @@
     <span class="doccomment">/// or 0 if not available.&quot;</span>
     <span class="comment">// Terminology changed in DWARF version 5.</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">size</span>
     }
 
     <span class="doccomment">/// A 16-byte MD5 digest of the file contents.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Only valid if `LineProgramHeader::file_has_md5` returns `true`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">md5</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">16</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">md5</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">16</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">md5</span>
     }
 }
@@ -4711,7 +4711,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FileEntryFormat</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FileEntryFormat</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FileEntryFormat</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">format_count</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">format_count</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path_count</span> <span class="op">=</span> <span class="number">0</span>;
@@ -4722,7 +4722,7 @@
             } <span class="kw">else</span> {
                 <span class="ident">constants::DwLnct</span>(<span class="ident">content_type</span> <span class="kw">as</span> <span class="ident">u16</span>)
             };
-            <span class="kw">if</span> <span class="ident">content_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">constants::DW_LNCT_path</span> {
+            <span class="kw">if</span> <span class="ident">content_type</span> <span class="op">==</span> <span class="ident">constants::DW_LNCT_path</span> {
                 <span class="ident">path_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             }
 
@@ -4741,12 +4741,12 @@
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>,
     <span class="ident">encoding</span>: <span class="ident">Encoding</span>,
     <span class="ident">formats</span>: <span class="kw-2">&amp;</span>[<span class="ident">FileEntryFormat</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AttributeValue</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AttributeValue</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path_name</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
     <span class="kw">for</span> <span class="ident">format</span> <span class="kw">in</span> <span class="ident">formats</span> {
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">parse_attribute</span>(<span class="ident">input</span>, <span class="ident">encoding</span>, <span class="ident">format</span>.<span class="ident">form</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">content_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">constants::DW_LNCT_path</span> {
+        <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">content_type</span> <span class="op">==</span> <span class="ident">constants::DW_LNCT_path</span> {
             <span class="ident">path_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
         }
     }
@@ -4758,7 +4758,7 @@
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>,
     <span class="ident">encoding</span>: <span class="ident">Encoding</span>,
     <span class="ident">formats</span>: <span class="kw-2">&amp;</span>[<span class="ident">FileEntryFormat</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FileEntry</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path_name</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">directory_index</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="number">0</span>;
@@ -4768,31 +4768,31 @@
     <span class="kw">for</span> <span class="ident">format</span> <span class="kw">in</span> <span class="ident">formats</span> {
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">parse_attribute</span>(<span class="ident">input</span>, <span class="ident">encoding</span>, <span class="ident">format</span>.<span class="ident">form</span>)<span class="question-mark">?</span>;
         <span class="kw">match</span> <span class="ident">format</span>.<span class="ident">content_type</span> {
-            <span class="ident">constants::DW_LNCT_path</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">path_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>),
-            <span class="ident">constants::DW_LNCT_directory_index</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">constants::DW_LNCT_path</span> =&gt; <span class="ident">path_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>),
+            <span class="ident">constants::DW_LNCT_directory_index</span> =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">udata_value</span>() {
                     <span class="ident">directory_index</span> <span class="op">=</span> <span class="ident">value</span>;
                 }
             }
-            <span class="ident">constants::DW_LNCT_timestamp</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">constants::DW_LNCT_timestamp</span> =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">udata_value</span>() {
                     <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">value</span>;
                 }
             }
-            <span class="ident">constants::DW_LNCT_size</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">constants::DW_LNCT_size</span> =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">udata_value</span>() {
                     <span class="ident">size</span> <span class="op">=</span> <span class="ident">value</span>;
                 }
             }
-            <span class="ident">constants::DW_LNCT_MD5</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">constants::DW_LNCT_MD5</span> =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AttributeValue::Block</span>(<span class="kw-2">mut</span> <span class="ident">value</span>) <span class="op">=</span> <span class="ident">value</span> {
-                    <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">len</span>().<span class="ident">into_u64</span>() <span class="op">=</span><span class="op">=</span> <span class="number">16</span> {
+                    <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">len</span>().<span class="ident">into_u64</span>() <span class="op">==</span> <span class="number">16</span> {
                         <span class="ident">md5</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">read_u8_array</span>()<span class="question-mark">?</span>;
                     }
                 }
             }
             <span class="comment">// Ignore unknown content types.</span>
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">_</span> =&gt; {}
         }
     }
 
@@ -4810,101 +4810,101 @@
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>,
     <span class="ident">encoding</span>: <span class="ident">Encoding</span>,
     <span class="ident">form</span>: <span class="ident">constants::DwForm</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AttributeValue</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AttributeValue</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">form</span> {
-        <span class="ident">constants::DW_FORM_block1</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_block1</span> =&gt; {
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u8</span>().<span class="ident">map</span>(<span class="ident">R::Offset::from_u8</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">split</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::Block</span>(<span class="ident">block</span>)
         }
-        <span class="ident">constants::DW_FORM_block2</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_block2</span> =&gt; {
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u16</span>().<span class="ident">map</span>(<span class="ident">R::Offset::from_u16</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">split</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::Block</span>(<span class="ident">block</span>)
         }
-        <span class="ident">constants::DW_FORM_block4</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_block4</span> =&gt; {
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u32</span>().<span class="ident">map</span>(<span class="ident">R::Offset::from_u32</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">split</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::Block</span>(<span class="ident">block</span>)
         }
-        <span class="ident">constants::DW_FORM_block</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_block</span> =&gt; {
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>().<span class="ident">and_then</span>(<span class="ident">R::Offset::from_u64</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">split</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::Block</span>(<span class="ident">block</span>)
         }
-        <span class="ident">constants::DW_FORM_data1</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_data1</span> =&gt; {
             <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::Data1</span>(<span class="ident">data</span>)
         }
-        <span class="ident">constants::DW_FORM_data2</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_data2</span> =&gt; {
             <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::Data2</span>(<span class="ident">data</span>)
         }
-        <span class="ident">constants::DW_FORM_data4</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_data4</span> =&gt; {
             <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u32</span>()<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::Data4</span>(<span class="ident">data</span>)
         }
-        <span class="ident">constants::DW_FORM_data8</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_data8</span> =&gt; {
             <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u64</span>()<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::Data8</span>(<span class="ident">data</span>)
         }
-        <span class="ident">constants::DW_FORM_data16</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_data16</span> =&gt; {
             <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">split</span>(<span class="ident">R::Offset::from_u8</span>(<span class="number">16</span>))<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::Block</span>(<span class="ident">block</span>)
         }
-        <span class="ident">constants::DW_FORM_udata</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_udata</span> =&gt; {
             <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>()<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::Udata</span>(<span class="ident">data</span>)
         }
-        <span class="ident">constants::DW_FORM_sdata</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_sdata</span> =&gt; {
             <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_sleb128</span>()<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::Sdata</span>(<span class="ident">data</span>)
         }
-        <span class="ident">constants::DW_FORM_flag</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_flag</span> =&gt; {
             <span class="kw">let</span> <span class="ident">present</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::Flag</span>(<span class="ident">present</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
         }
-        <span class="ident">constants::DW_FORM_sec_offset</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_sec_offset</span> =&gt; {
             <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_offset</span>(<span class="ident">encoding</span>.<span class="ident">format</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::SecOffset</span>(<span class="ident">offset</span>)
         }
-        <span class="ident">constants::DW_FORM_string</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_string</span> =&gt; {
             <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_null_terminated_slice</span>()<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::String</span>(<span class="ident">string</span>)
         }
-        <span class="ident">constants::DW_FORM_strp</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_strp</span> =&gt; {
             <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_offset</span>(<span class="ident">encoding</span>.<span class="ident">format</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::DebugStrRef</span>(<span class="ident">DebugStrOffset</span>(<span class="ident">offset</span>))
         }
-        <span class="ident">constants::DW_FORM_strp_sup</span> <span class="op">|</span> <span class="ident">constants::DW_FORM_GNU_strp_alt</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_strp_sup</span> <span class="op">|</span> <span class="ident">constants::DW_FORM_GNU_strp_alt</span> =&gt; {
             <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_offset</span>(<span class="ident">encoding</span>.<span class="ident">format</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::DebugStrRefSup</span>(<span class="ident">DebugStrOffset</span>(<span class="ident">offset</span>))
         }
-        <span class="ident">constants::DW_FORM_line_strp</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_line_strp</span> =&gt; {
             <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_offset</span>(<span class="ident">encoding</span>.<span class="ident">format</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::DebugLineStrRef</span>(<span class="ident">DebugLineStrOffset</span>(<span class="ident">offset</span>))
         }
-        <span class="ident">constants::DW_FORM_strx</span> <span class="op">|</span> <span class="ident">constants::DW_FORM_GNU_str_index</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_strx</span> <span class="op">|</span> <span class="ident">constants::DW_FORM_GNU_str_index</span> =&gt; {
             <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>().<span class="ident">and_then</span>(<span class="ident">R::Offset::from_u64</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::DebugStrOffsetsIndex</span>(<span class="ident">DebugStrOffsetsIndex</span>(<span class="ident">index</span>))
         }
-        <span class="ident">constants::DW_FORM_strx1</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_strx1</span> =&gt; {
             <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u8</span>().<span class="ident">map</span>(<span class="ident">R::Offset::from_u8</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::DebugStrOffsetsIndex</span>(<span class="ident">DebugStrOffsetsIndex</span>(<span class="ident">index</span>))
         }
-        <span class="ident">constants::DW_FORM_strx2</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_strx2</span> =&gt; {
             <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u16</span>().<span class="ident">map</span>(<span class="ident">R::Offset::from_u16</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::DebugStrOffsetsIndex</span>(<span class="ident">DebugStrOffsetsIndex</span>(<span class="ident">index</span>))
         }
-        <span class="ident">constants::DW_FORM_strx3</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_strx3</span> =&gt; {
             <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uint</span>(<span class="number">3</span>).<span class="ident">and_then</span>(<span class="ident">R::Offset::from_u64</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::DebugStrOffsetsIndex</span>(<span class="ident">DebugStrOffsetsIndex</span>(<span class="ident">index</span>))
         }
-        <span class="ident">constants::DW_FORM_strx4</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">constants::DW_FORM_strx4</span> =&gt; {
             <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u32</span>().<span class="ident">map</span>(<span class="ident">R::Offset::from_u32</span>)<span class="question-mark">?</span>;
             <span class="ident">AttributeValue::DebugStrOffsetsIndex</span>(<span class="ident">DebugStrOffsetsIndex</span>(<span class="ident">index</span>))
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">_</span> =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownForm</span>);
         }
     })
@@ -5085,8 +5085,8 @@
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">LineProgramHeader::parse</span>(<span class="ident">input</span>, <span class="ident">DebugLineOffset</span>(<span class="number">0</span>), <span class="number">4</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>) {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
-            <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) =&gt; <span class="kw">return</span>,
+            <span class="ident">otherwise</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
         }
     }
 
@@ -5146,8 +5146,8 @@
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">LineProgramHeader::parse</span>(<span class="ident">input</span>, <span class="ident">DebugLineOffset</span>(<span class="number">0</span>), <span class="number">4</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>) {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
-            <span class="ident">otherwise</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) =&gt; <span class="kw">return</span>,
+            <span class="ident">otherwise</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result: {:?}&quot;</span>, <span class="ident">otherwise</span>),
         }
     }
 
@@ -5156,7 +5156,7 @@
 
     <span class="kw">fn</span> <span class="ident">make_test_header</span>(
         <span class="ident">buf</span>: <span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">LineProgramHeader</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">encoding</span> <span class="op">=</span> <span class="ident">Encoding</span> {
             <span class="ident">format</span>: <span class="ident">Format::Dwarf32</span>,
             <span class="ident">version</span>: <span class="number">4</span>,
@@ -5202,7 +5202,7 @@
 
     <span class="kw">fn</span> <span class="ident">make_test_program</span>(
         <span class="ident">buf</span>: <span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IncompleteLineProgram</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">IncompleteLineProgram</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">IncompleteLineProgram</span> {
             <span class="ident">header</span>: <span class="ident">make_test_header</span>(<span class="ident">buf</span>),
         }

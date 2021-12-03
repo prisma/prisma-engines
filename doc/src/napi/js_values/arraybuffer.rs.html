@@ -351,28 +351,28 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">sys::napi_typedarray_type</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TypedArrayType</span> {
-  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">sys::napi_typedarray_type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">sys::napi_typedarray_type</span>) -&gt; <span class="self">Self</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
-      <span class="ident">sys::TypedarrayType::napi_int8_array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Int8</span>,
-      <span class="ident">sys::TypedarrayType::napi_uint8_array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Uint8</span>,
-      <span class="ident">sys::TypedarrayType::napi_uint8_clamped_array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Uint8Clamped</span>,
-      <span class="ident">sys::TypedarrayType::napi_int16_array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Int16</span>,
-      <span class="ident">sys::TypedarrayType::napi_uint16_array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Uint16</span>,
-      <span class="ident">sys::TypedarrayType::napi_int32_array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Int32</span>,
-      <span class="ident">sys::TypedarrayType::napi_uint32_array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Uint32</span>,
-      <span class="ident">sys::TypedarrayType::napi_float32_array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Float32</span>,
-      <span class="ident">sys::TypedarrayType::napi_float64_array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Float64</span>,
+      <span class="ident">sys::TypedarrayType::napi_int8_array</span> =&gt; <span class="ident"><span class="self">Self</span>::Int8</span>,
+      <span class="ident">sys::TypedarrayType::napi_uint8_array</span> =&gt; <span class="ident"><span class="self">Self</span>::Uint8</span>,
+      <span class="ident">sys::TypedarrayType::napi_uint8_clamped_array</span> =&gt; <span class="ident"><span class="self">Self</span>::Uint8Clamped</span>,
+      <span class="ident">sys::TypedarrayType::napi_int16_array</span> =&gt; <span class="ident"><span class="self">Self</span>::Int16</span>,
+      <span class="ident">sys::TypedarrayType::napi_uint16_array</span> =&gt; <span class="ident"><span class="self">Self</span>::Uint16</span>,
+      <span class="ident">sys::TypedarrayType::napi_int32_array</span> =&gt; <span class="ident"><span class="self">Self</span>::Int32</span>,
+      <span class="ident">sys::TypedarrayType::napi_uint32_array</span> =&gt; <span class="ident"><span class="self">Self</span>::Uint32</span>,
+      <span class="ident">sys::TypedarrayType::napi_float32_array</span> =&gt; <span class="ident"><span class="self">Self</span>::Float32</span>,
+      <span class="ident">sys::TypedarrayType::napi_float64_array</span> =&gt; <span class="ident"><span class="self">Self</span>::Float64</span>,
       <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi6&quot;</span>)]</span>
-      <span class="ident">sys::TypedarrayType::napi_bigint64_array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::BigInt64</span>,
+      <span class="ident">sys::TypedarrayType::napi_bigint64_array</span> =&gt; <span class="ident"><span class="self">Self</span>::BigInt64</span>,
       <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi6&quot;</span>)]</span>
-      <span class="ident">sys::TypedarrayType::napi_biguint64_array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::BigUint64</span>,
-      <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Unknown</span>,
+      <span class="ident">sys::TypedarrayType::napi_biguint64_array</span> =&gt; <span class="ident"><span class="self">Self</span>::BigUint64</span>,
+      <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>,
     }
   }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TypedArrayType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">sys::napi_typedarray_type</span> {
-  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">TypedArrayType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::napi_typedarray_type</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">TypedArrayType</span>) -&gt; <span class="ident">sys::napi_typedarray_type</span> {
     <span class="ident">value</span> <span class="kw">as</span> <span class="ident">i32</span>
   }
 }
@@ -380,13 +380,13 @@
 <span class="kw">impl</span> <span class="ident">JsArrayBuffer</span> {
   <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi7&quot;</span>)]</span>
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">detach</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">detach</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="macro">check_status!</span>(<span class="kw">unsafe</span> { <span class="ident">sys::napi_detach_arraybuffer</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>) })
   }
 
   <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi7&quot;</span>)]</span>
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_detached</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_detached</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_detached</span> <span class="op">=</span> <span class="bool-val">false</span>;
     <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
       <span class="ident">sys::napi_is_detached_arraybuffer</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">is_detached</span>)
@@ -395,7 +395,7 @@
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_value</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsArrayBufferValue</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_value</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsArrayBufferValue</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
@@ -414,7 +414,7 @@
     <span class="ident">typedarray_type</span>: <span class="ident">TypedArrayType</span>,
     <span class="ident">length</span>: <span class="ident">usize</span>,
     <span class="ident">byte_offset</span>: <span class="ident">usize</span>,
-  ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsTypedArray</span><span class="op">&gt;</span> {
+  ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsTypedArray</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">typedarray_value</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
     <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
       <span class="ident">sys::napi_create_typedarray</span>(
@@ -434,7 +434,7 @@
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_dataview</span>(<span class="self">self</span>, <span class="ident">length</span>: <span class="ident">usize</span>, <span class="ident">byte_offset</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsDataView</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_dataview</span>(<span class="self">self</span>, <span class="ident">length</span>: <span class="ident">usize</span>, <span class="ident">byte_offset</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsDataView</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dataview_value</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
     <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
       <span class="ident">sys::napi_create_dataview</span>(
@@ -453,36 +453,36 @@
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_ref</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">JsArrayBufferValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_ref</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">JsArrayBufferValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">Ref::new</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="number">1</span>, <span class="self">self</span>.<span class="ident">into_value</span>()<span class="question-mark">?</span>)
   }
 }
 
 <span class="kw">impl</span> <span class="ident">JsArrayBufferValue</span> {
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">JsArrayBuffer</span>, <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">JsArrayBuffer</span>, <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">JsArrayBufferValue</span> { <span class="ident">value</span>, <span class="ident">len</span>, <span class="ident">data</span> }
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_raw</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">JsArrayBuffer</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_raw</span>(<span class="self">self</span>) -&gt; <span class="ident">JsArrayBuffer</span> {
     <span class="self">self</span>.<span class="ident">value</span>
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_unknown</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">JsUnknown</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_unknown</span>(<span class="self">self</span>) -&gt; <span class="ident">JsUnknown</span> {
     <span class="kw">unsafe</span> { <span class="ident">JsUnknown::from_raw_unchecked</span>(<span class="self">self</span>.<span class="ident">value</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="ident">value</span>.<span class="number">0</span>.<span class="ident">value</span>) }
   }
 }
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsArrayBufferValue</span> {
-  <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+  <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
     <span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts</span>(<span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>, <span class="self">self</span>.<span class="ident">len</span>) }
   }
 }
 
 <span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsArrayBufferValue</span> {
-  <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>] {
+  <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>] {
     <span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts_mut</span>(<span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="self">self</span>.<span class="ident">len</span>) }
   }
 }
@@ -490,13 +490,13 @@
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">JsArrayBufferValue</span> {
   <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> [<span class="ident">u8</span>];
 
-  <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+  <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
     <span class="self">self</span>.<span class="ident">as_ref</span>()
   }
 }
 
 <span class="kw">impl</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">JsArrayBufferValue</span> {
-  <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
+  <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
     <span class="self">self</span>.<span class="ident">as_mut</span>()
   }
 }
@@ -507,7 +507,7 @@
   <span class="doccomment">///</span>
   <span class="doccomment">/// ***Warning***: Use caution while using this API since the underlying data buffer is managed by the VM.</span>
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_value</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsTypedArrayValue</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_value</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsTypedArrayValue</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">typedarray_type</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">0u64</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
@@ -536,15 +536,15 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_as_ref</span> {
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ref_type</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ref_type</span>:<span class="ident">ident</span>) =&gt; {
     <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ref_type</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsTypedArrayValue</span> {
-      <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ref_type</span>] {
+      <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ref_type</span>] {
         <span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts</span>(<span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ref_type</span>, <span class="self">self</span>.<span class="ident">length</span> <span class="kw">as</span> <span class="ident">usize</span>) }
       }
     }
 
     <span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ref_type</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsTypedArrayValue</span> {
-      <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ref_type</span>] {
+      <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ref_type</span>] {
         <span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts_mut</span>(<span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ref_type</span>, <span class="self">self</span>.<span class="ident">length</span> <span class="kw">as</span> <span class="ident">usize</span>) }
       }
     }
@@ -566,7 +566,7 @@
 
 <span class="kw">impl</span> <span class="ident">JsDataView</span> {
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_value</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsDataViewValue</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_value</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsDataViewValue</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length</span> <span class="op">=</span> <span class="number">0u64</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte_offset</span> <span class="op">=</span> <span class="number">0u64</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arraybuffer_value</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();

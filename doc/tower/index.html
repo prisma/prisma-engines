@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="`async fn(Request) -&gt; Result&lt;Response, Error&gt;`"><meta name="keywords" content="rust, rustlang, rust-lang, tower"><title>tower - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../tower/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate tower</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.4.11</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all tower's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div><div id="sidebar-vars" data-name="tower" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">tower</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/tower/lib.rs.html#1-235" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p><code>async fn(Request) -&gt; Result&lt;Response, Error&gt;</code></p>
-<h1 id="overview" class="section-header"><a href="#overview">Overview</a></h1>
+<h2 id="overview" class="section-header"><a href="#overview">Overview</a></h2>
 <p>Tower is a library of modular and reusable components for building
 robust networking clients and servers.</p>
 <p>Tower provides a simple core abstraction, the <a href="trait.Service.html"><code>Service</code></a> trait, which
@@ -17,7 +17,7 @@ asynchronous function from a request type to a response type, a <a href="trait.L
 a function taking a <a href="trait.Service.html"><code>Service</code></a> of one type and returning a <a href="trait.Service.html"><code>Service</code></a> of a
 different type. The <a href="struct.ServiceBuilder.html"><code>ServiceBuilder</code></a> type is used to add middleware to a
 service by composing it with multiple <a href="trait.Layer.html"><code>Layer</code></a>s.</p>
-<h2 id="the-tower-ecosystem" class="section-header"><a href="#the-tower-ecosystem">The Tower Ecosystem</a></h2>
+<h3 id="the-tower-ecosystem" class="section-header"><a href="#the-tower-ecosystem">The Tower Ecosystem</a></h3>
 <p>Tower is made up of the following crates:</p>
 <ul>
 <li><a href="https://crates.io/crates/tower"><code>tower</code></a> (this crate)</li>
@@ -33,7 +33,7 @@ re-exports of those core traits, implementations of commonly-used
 middleware, and <a href="trait.ServiceExt.html">utilities</a> for working with <a href="trait.Service.html"><code>Service</code></a>s and <a href="trait.Layer.html"><code>Layer</code></a>s.
 Finally, the <a href="https://crates.io/crates/tower-test"><code>tower-test</code></a> crate provides tools for testing programs using
 Tower.</p>
-<h1 id="usage" class="section-header"><a href="#usage">Usage</a></h1>
+<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
 <p>Tower provides an abstraction layer, and generic implementations of various
 middleware. This means that the <code>tower</code> crate on its own does <em>not</em> provide
 a working implementation of a network client or server. Instead, Tower’s
@@ -69,7 +69,7 @@ provided by existing Tower middleware, a protocol implementation might use
 Tower middleware internally, as well as as an integration point.</p>
 </li>
 </ul>
-<h2 id="library-support" class="section-header"><a href="#library-support">Library Support</a></h2>
+<h3 id="library-support" class="section-header"><a href="#library-support">Library Support</a></h3>
 <p>A number of third-party libraries support Tower and the <a href="trait.Service.html"><code>Service</code></a> trait.
 The following is an incomplete list of such libraries:</p>
 <ul>
@@ -85,7 +85,7 @@ Server Protocol</a> based on Tower.</li>
 <p>If you’re the maintainer of a crate that supports Tower, we’d love to add
 your crate to this list! Please <a href="https://github.com/tower-rs/tower/compare">open a PR</a> adding a brief description of
 your library!</p>
-<h2 id="getting-started" class="section-header"><a href="#getting-started">Getting Started</a></h2>
+<h3 id="getting-started" class="section-header"><a href="#getting-started">Getting Started</a></h3>
 <p>If you’re brand new to Tower and want to start with the basics, we recommend you
 check out some of our <a href="https://github.com/tower-rs/tower/tree/master/guides">guides</a>.</p>
 <p>The various middleware implementations provided by this crate are feature
@@ -100,29 +100,29 @@ only the <a href="crate::retry"><code>retry</code></a> and <a href="timeout/inde
 <p>See <a href="#modules">here</a> for a complete list of all middleware provided by
 Tower.</p>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="balance/index.html" title="tower::balance mod">balance</a></div><div class="item-right docblock-short"><p>Middleware that allows balancing load among multiple services.</p>
-</div><div class="item-left module-item"><a class="mod" href="buffer/index.html" title="tower::buffer mod">buffer</a></div><div class="item-right docblock-short"><p>Middleware that provides a buffered mpsc channel to a service.</p>
-</div><div class="item-left module-item"><a class="mod" href="builder/index.html" title="tower::builder mod">builder</a></div><div class="item-right docblock-short"><p>Builder types to compose layers and services</p>
-</div><div class="item-left module-item"><a class="mod" href="discover/index.html" title="tower::discover mod">discover</a></div><div class="item-right docblock-short"><p>Service discovery</p>
-</div><div class="item-left module-item"><a class="mod" href="layer/index.html" title="tower::layer mod">layer</a></div><div class="item-right docblock-short"><p>A collection of <a href="trait.Layer.html"><code>Layer</code></a> based tower services</p>
-</div><div class="item-left module-item"><a class="mod" href="limit/index.html" title="tower::limit mod">limit</a></div><div class="item-right docblock-short"><p>Tower middleware for limiting requests.</p>
-</div><div class="item-left module-item"><a class="mod" href="load/index.html" title="tower::load mod">load</a></div><div class="item-right docblock-short"><p>Service load measurement</p>
-</div><div class="item-left module-item"><a class="mod" href="make/index.html" title="tower::make mod">make</a></div><div class="item-right docblock-short"><p>Trait aliases for Services that produce specific types of Responses.</p>
-</div><div class="item-left module-item"><a class="mod" href="ready_cache/index.html" title="tower::ready_cache mod">ready_cache</a></div><div class="item-right docblock-short"><p>A cache of services</p>
-</div><div class="item-left module-item"><a class="mod" href="timeout/index.html" title="tower::timeout mod">timeout</a></div><div class="item-right docblock-short"><p>Middleware that applies a timeout to requests.</p>
-</div><div class="item-left module-item"><a class="mod" href="util/index.html" title="tower::util mod">util</a></div><div class="item-right docblock-short"><p>Various utility types and functions that are generally used with Tower.</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.ServiceBuilder.html" title="tower::ServiceBuilder struct">ServiceBuilder</a></div><div class="item-right docblock-short"><p>Declaratively construct <a href="trait.Service.html"><code>Service</code></a> values.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Layer.html" title="tower::Layer trait">Layer</a></div><div class="item-right docblock-short"><p>Decorates a <a href="../tower/trait.Service.html"><code>Service</code></a>, transforming either the request or the response.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.MakeService.html" title="tower::MakeService trait">MakeService</a></div><div class="item-right docblock-short"><p>Creates new <a href="trait.Service.html" title="Service"><code>Service</code></a> values.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Service.html" title="tower::Service trait">Service</a></div><div class="item-right docblock-short"><p>An asynchronous function from a <code>Request</code> to a <code>Response</code>.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.ServiceExt.html" title="tower::ServiceExt trait">ServiceExt</a></div><div class="item-right docblock-short"><p>An extension trait for <code>Service</code>s that provides a variety of convenient
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="balance/index.html" title="tower::balance mod">balance</a></div><div class="item-right docblock-short"><p>Middleware that allows balancing load among multiple services.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="buffer/index.html" title="tower::buffer mod">buffer</a></div><div class="item-right docblock-short"><p>Middleware that provides a buffered mpsc channel to a service.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="builder/index.html" title="tower::builder mod">builder</a></div><div class="item-right docblock-short"><p>Builder types to compose layers and services</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="discover/index.html" title="tower::discover mod">discover</a></div><div class="item-right docblock-short"><p>Service discovery</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="layer/index.html" title="tower::layer mod">layer</a></div><div class="item-right docblock-short"><p>A collection of <a href="trait.Layer.html"><code>Layer</code></a> based tower services</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="limit/index.html" title="tower::limit mod">limit</a></div><div class="item-right docblock-short"><p>Tower middleware for limiting requests.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="load/index.html" title="tower::load mod">load</a></div><div class="item-right docblock-short"><p>Service load measurement</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="make/index.html" title="tower::make mod">make</a></div><div class="item-right docblock-short"><p>Trait aliases for Services that produce specific types of Responses.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="ready_cache/index.html" title="tower::ready_cache mod">ready_cache</a></div><div class="item-right docblock-short"><p>A cache of services</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="timeout/index.html" title="tower::timeout mod">timeout</a></div><div class="item-right docblock-short"><p>Middleware that applies a timeout to requests.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="util/index.html" title="tower::util mod">util</a></div><div class="item-right docblock-short"><p>Various utility types and functions that are generally used with Tower.</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ServiceBuilder.html" title="tower::ServiceBuilder struct">ServiceBuilder</a></div><div class="item-right docblock-short"><p>Declaratively construct <a href="trait.Service.html"><code>Service</code></a> values.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Layer.html" title="tower::Layer trait">Layer</a></div><div class="item-right docblock-short"><p>Decorates a <a href="../tower/trait.Service.html"><code>Service</code></a>, transforming either the request or the response.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.MakeService.html" title="tower::MakeService trait">MakeService</a></div><div class="item-right docblock-short"><p>Creates new <a href="trait.Service.html" title="Service"><code>Service</code></a> values.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Service.html" title="tower::Service trait">Service</a></div><div class="item-right docblock-short"><p>An asynchronous function from a <code>Request</code> to a <code>Response</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ServiceExt.html" title="tower::ServiceExt trait">ServiceExt</a></div><div class="item-right docblock-short"><p>An extension trait for <code>Service</code>s that provides a variety of convenient
 adapters</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.service_fn.html" title="tower::service_fn fn">service_fn</a></div><div class="item-right docblock-short"><p>Returns a new <a href="util/struct.ServiceFn.html" title="ServiceFn"><code>ServiceFn</code></a> with the given closure.</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.BoxError.html" title="tower::BoxError type">BoxError</a></div><div class="item-right docblock-short"><p>Alias for a type-erased error type.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="tower" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.service_fn.html" title="tower::service_fn fn">service_fn</a></div><div class="item-right docblock-short"><p>Returns a new <a href="util/struct.ServiceFn.html" title="ServiceFn"><code>ServiceFn</code></a> with the given closure.</p>
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.BoxError.html" title="tower::BoxError type">BoxError</a></div><div class="item-right docblock-short"><p>Alias for a type-erased error type.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="tower" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

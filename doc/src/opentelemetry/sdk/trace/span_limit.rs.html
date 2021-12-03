@@ -82,7 +82,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SpanLimits</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">SpanLimits</span> {
             <span class="ident">max_events_per_span</span>: <span class="ident">DEFAULT_MAX_EVENT_PER_SPAN</span>,
             <span class="ident">max_attributes_per_span</span>: <span class="ident">DEFAULT_MAX_ATTRIBUTES_PER_SPAN</span>,

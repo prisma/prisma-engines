@@ -217,7 +217,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EnterContext</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_entered</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_entered</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">EnterContext::Entered</span> { .. })
     }
 }
@@ -236,7 +236,7 @@
 
     <span class="doccomment">/// Marks the current thread as being within the dynamic extent of an</span>
     <span class="doccomment">/// executor.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">enter</span>(<span class="ident">allow_blocking</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Enter</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">enter</span>(<span class="ident">allow_blocking</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Enter</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">enter</span>) <span class="op">=</span> <span class="ident">try_enter</span>(<span class="ident">allow_blocking</span>) {
             <span class="kw">return</span> <span class="ident">enter</span>;
         }
@@ -251,7 +251,7 @@
 
     <span class="doccomment">/// Tries to enter a runtime context, returns `None` if already in a runtime</span>
     <span class="doccomment">/// context.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_enter</span>(<span class="ident">allow_blocking</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Enter</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_enter</span>(<span class="ident">allow_blocking</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Enter</span><span class="op">&gt;</span> {
         <span class="ident">ENTERED</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
             <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">get</span>().<span class="ident">is_entered</span>() {
                 <span class="prelude-val">None</span>
@@ -271,7 +271,7 @@
 <span class="comment">// This is hidden for a reason. Do not use without fully understanding</span>
 <span class="comment">// executors. Misusing can easily cause your program to deadlock.</span>
 <span class="macro">cfg_rt_multi_thread!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">exit</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">exit</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">R</span> {
         <span class="comment">// Reset in case the closure panics</span>
         <span class="kw">struct</span> <span class="ident">Reset</span>(<span class="ident">EnterContext</span>);
         <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Reset</span> {
@@ -298,7 +298,7 @@
 
 <span class="macro">cfg_rt!</span> {
     <span class="doccomment">/// Disallow blocking in the current runtime context until the guard is dropped.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">disallow_blocking</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DisallowBlockingGuard</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">disallow_blocking</span>() -&gt; <span class="ident">DisallowBlockingGuard</span> {
         <span class="kw">let</span> <span class="ident">reset</span> <span class="op">=</span> <span class="ident">ENTERED</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">EnterContext::Entered</span> {
                 <span class="ident">allow_blocking</span>: <span class="bool-val">true</span>,
@@ -337,7 +337,7 @@
 
 <span class="macro">cfg_rt_multi_thread!</span> {
     <span class="doccomment">/// Returns true if in a runtime context.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">context</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EnterContext</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">context</span>() -&gt; <span class="ident">EnterContext</span> {
         <span class="ident">ENTERED</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">get</span>())
     }
 }
@@ -346,7 +346,7 @@
     <span class="kw">impl</span> <span class="ident">Enter</span> {
         <span class="doccomment">/// Blocks the thread on the specified future, returning the value with</span>
         <span class="doccomment">/// which that future completes.</span>
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F::Output</span>, <span class="ident">ParkError</span><span class="op">&gt;</span>
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F::Output</span>, <span class="ident">ParkError</span><span class="op">&gt;</span>
         <span class="kw">where</span>
             <span class="ident">F</span>: <span class="ident">std::future::Future</span>,
         {
@@ -360,7 +360,7 @@
         <span class="doccomment">///</span>
         <span class="doccomment">/// If the future completes before `timeout`, the result is returned. If</span>
         <span class="doccomment">/// `timeout` elapses, then `Err` is returned.</span>
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">block_on_timeout</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F::Output</span>, <span class="ident">ParkError</span><span class="op">&gt;</span>
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">block_on_timeout</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F::Output</span>, <span class="ident">ParkError</span><span class="op">&gt;</span>
         <span class="kw">where</span>
             <span class="ident">F</span>: <span class="ident">std::future::Future</span>,
         {
@@ -395,7 +395,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Enter</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Enter&quot;</span>).<span class="ident">finish</span>()
     }
 }

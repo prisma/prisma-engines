@@ -10,7 +10,7 @@ doesn’t mean the work would be used by the receiver.</p>
 <p>This is where something like <code>want</code> comes in. Added to a channel, you can
 make sure that the <code>tx</code> only creates the message and sends it when the <code>rx</code>
 has <code>poll()</code> for it, and the buffer was empty.</p>
-<h1 id="example" class="section-header"><a href="#example">Example</a></h1><div class="example-wrap"><pre class="language-nightly"><code>extern crate want;
+<h2 id="example" class="section-header"><a href="#example">Example</a></h2><div class="example-wrap"><pre class="language-nightly"><code>extern crate want;
 
 
 // Some message that is expensive to produce.
@@ -57,12 +57,12 @@ spawn(async move {
     tx.send(Expensive);
 });
 </code></pre></div></div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Closed.html" title="want::Closed struct">Closed</a></div><div class="item-right docblock-short"><p>The <code>Taker</code> has canceled its interest in a value.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Giver.html" title="want::Giver struct">Giver</a></div><div class="item-right docblock-short"><p>An entity that gives a value when wanted.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SharedGiver.html" title="want::SharedGiver struct">SharedGiver</a></div><div class="item-right docblock-short"><p>A cloneable <code>Giver</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Taker.html" title="want::Taker struct">Taker</a></div><div class="item-right docblock-short"><p>An entity that wants a value.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.new.html" title="want::new fn">new</a></div><div class="item-right docblock-short"><p>Create a new <code>want</code> channel.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="want" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Closed.html" title="want::Closed struct">Closed</a></div><div class="item-right docblock-short"><p>The <code>Taker</code> has canceled its interest in a value.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Giver.html" title="want::Giver struct">Giver</a></div><div class="item-right docblock-short"><p>An entity that gives a value when wanted.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SharedGiver.html" title="want::SharedGiver struct">SharedGiver</a></div><div class="item-right docblock-short"><p>A cloneable <code>Giver</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Taker.html" title="want::Taker struct">Taker</a></div><div class="item-right docblock-short"><p>An entity that wants a value.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.new.html" title="want::new fn">new</a></div><div class="item-right docblock-short"><p>Create a new <code>want</code> channel.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="want" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

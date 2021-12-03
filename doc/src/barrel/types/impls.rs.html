@@ -262,11 +262,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Constraint</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Unique</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;UNIQUE&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::PrimaryKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;PRIMARY KEY&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ForeignKey</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;FOREIGN KEY&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Unique</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;UNIQUE&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::PrimaryKey</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;PRIMARY KEY&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::ForeignKey</span> { .. } =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;FOREIGN KEY&quot;</span>),
         }
     }
 }
@@ -302,13 +302,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ReferentialAction</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ReferentialAction::Cascade</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CASCADE&quot;</span>),
-            <span class="ident">ReferentialAction::NoAction</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;NO ACTION&quot;</span>),
-            <span class="ident">ReferentialAction::Restrict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;RESTRICT&quot;</span>),
-            <span class="ident">ReferentialAction::SetNull</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SET NULL&quot;</span>),
-            <span class="ident">ReferentialAction::SetDefault</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SET DEFAULT&quot;</span>),
+            <span class="ident">ReferentialAction::Cascade</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CASCADE&quot;</span>),
+            <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;NO ACTION&quot;</span>),
+            <span class="ident">ReferentialAction::Restrict</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;RESTRICT&quot;</span>),
+            <span class="ident">ReferentialAction::SetNull</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SET NULL&quot;</span>),
+            <span class="ident">ReferentialAction::SetDefault</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SET DEFAULT&quot;</span>),
         }
     }
 }
@@ -406,7 +406,7 @@
 <span class="doccomment">/// This is a public API, be considered about breaking thigns</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">rustfmt</span>, <span class="ident">rustfmt_skip</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Type</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">BaseType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">BaseType</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">nullable</span>: <span class="bool-val">false</span>,
             <span class="ident">unique</span>: <span class="bool-val">false</span>,
@@ -420,54 +420,54 @@
     }
 
     <span class="doccomment">/// Function used to hide the inner type to outside users (sneaky, I know)</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BaseType</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BaseType</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Set the nullability of this type</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nullable</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nullable</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">nullable</span>: <span class="ident">arg</span>, ..<span class="self">self</span> }
     }
 
     <span class="doccomment">/// Set the uniqueness of this type</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">unique</span>: <span class="ident">arg</span>, ..<span class="self">self</span> }
     }
 
     <span class="doccomment">/// Specify if this type should auto-increment</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increments</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increments</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">increments</span>: <span class="ident">arg</span>, ..<span class="self">self</span> }
     }
 
     <span class="doccomment">/// Specify if this type should be indexed by your SQL implementation</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indexed</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indexed</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">indexed</span>: <span class="ident">arg</span>, ..<span class="self">self</span> }
     }
 
     <span class="doccomment">/// Specify if this type should be a primary key</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">primary</span>: <span class="ident">arg</span>, ..<span class="self">self</span> }
     }
 
     <span class="doccomment">/// Provide a default value for a type column</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">default</span>: <span class="prelude-val">Some</span>(<span class="ident">arg</span>.<span class="ident">into</span>()), ..<span class="self">self</span> }
     }
 
     <span class="doccomment">/// Specify a size limit (important or varchar &amp; similar)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">size</span>(<span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">size</span>: <span class="prelude-val">Some</span>(<span class="ident">arg</span>), ..<span class="self">self</span> }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WrapVec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">WrapVec</span>(<span class="macro">vec!</span>[<span class="ident">s</span>.<span class="ident">into</span>()])
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WrapVec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">WrapVec</span>(<span class="macro">vec!</span>[<span class="ident">s</span>])
     }
 }
@@ -476,7 +476,7 @@
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">WrapVec</span>(<span class="ident">v</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">into</span>()).<span class="ident">collect</span>())
     }
 }

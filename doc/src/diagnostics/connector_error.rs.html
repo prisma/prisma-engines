@@ -278,13 +278,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">source</span>()
     }
 }
@@ -295,46 +295,46 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectorErrorFactory</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">native_type</span>: <span class="ident">String</span>, <span class="ident">connector</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">native_type</span>: <span class="ident">String</span>, <span class="ident">connector</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ConnectorErrorFactory</span> { <span class="ident">native_type</span>, <span class="ident">connector</span> }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_scale_larger_than_precision_error</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_scale_larger_than_precision_error</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ScaleLargerThanPrecisionError</span> {
             <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
             <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_index</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_index</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::IncompatibleNativeTypeWithIndexAttribute</span> {
             <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
             <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_unique</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_unique</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::IncompatibleNativeTypeWithUniqueAttribute</span> {
             <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
             <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_id</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_id</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::IncompatibleNativeTypeWithIdAttribute</span> {
             <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
             <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_sequential_type_with_static_default_value_error</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_sequential_type_with_static_default_value_error</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::IncompatibleSequentialTypeWithStaticDefaultValue</span> {
             <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
             <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_argument_m_out_of_range_error</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_argument_m_out_of_range_error</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ArgumentOutOfRangeError</span> {
             <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
             <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
@@ -342,14 +342,14 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_type_name_unknown</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_type_name_unknown</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::NativeTypeNameUnknown</span> {
             <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
             <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_type_invalid_param</span>(<span class="self">self</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">got</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_type_invalid_param</span>(<span class="self">self</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">got</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::InvalidArgumentError</span> {
             <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
             <span class="ident">expected</span>: <span class="ident">expected</span>.<span class="ident">into</span>(),
@@ -359,7 +359,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_kind</span>(<span class="ident">kind</span>: <span class="ident">ErrorKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_kind</span>(<span class="ident">kind</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ConnectorError</span> { <span class="ident">kind</span> }
     }
 
@@ -367,7 +367,7 @@
         <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">required_count</span>: <span class="ident">usize</span>,
         <span class="ident">given_count</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    ) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ArgumentCountMisMatchError</span> {
             <span class="ident">native_type</span>: <span class="ident">String::from</span>(<span class="ident">native_type</span>),
             <span class="ident">required_count</span>,
@@ -375,7 +375,7 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_value_parser_error</span>(<span class="ident">expected_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">parser_error</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_value_parser_error</span>(<span class="ident">expected_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">parser_error</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ValueParserError</span> {
             <span class="ident">expected_type</span>: <span class="ident">String::from</span>(<span class="ident">expected_type</span>),
             <span class="ident">parser_error</span>: <span class="ident">String::from</span>(<span class="ident">parser_error</span>),
@@ -383,7 +383,7 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_native_type_parser_error</span>(<span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_native_type_parser_error</span>(<span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::InvalidNativeType</span> {
             <span class="ident">native_type</span>: <span class="ident">String::from</span>(<span class="ident">native_type</span>),
         })

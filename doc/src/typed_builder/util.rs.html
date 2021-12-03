@@ -91,7 +91,7 @@
 <span id="91">91</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">quote::ToTokens</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path_to_single_string</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path_to_single_string</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Path</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">leading_colon</span>.<span class="ident">is_some</span>() {
         <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
@@ -107,7 +107,7 @@
     <span class="prelude-val">Some</span>(<span class="ident">segment</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>())
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_to_single_string</span>(<span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Expr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expr_to_single_string</span>(<span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Expr</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Expr::Path</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">expr</span> {
         <span class="ident">path_to_single_string</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">path</span>)
     } <span class="kw">else</span> {
@@ -115,7 +115,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ident_to_type</span>(<span class="ident">ident</span>: <span class="ident">syn::Ident</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ident_to_type</span>(<span class="ident">ident</span>: <span class="ident">syn::Ident</span>) -&gt; <span class="ident">syn::Type</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">syn::Path</span> {
         <span class="ident">leading_colon</span>: <span class="prelude-val">None</span>,
         <span class="ident">segments</span>: <span class="ident">Default::default</span>(),
@@ -127,7 +127,7 @@
     <span class="ident">syn::Type::Path</span>(<span class="ident">syn::TypePath</span> { <span class="ident">qself</span>: <span class="prelude-val">None</span>, <span class="ident">path</span> })
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_type</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::Type</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_type</span>() -&gt; <span class="ident">syn::Type</span> {
     <span class="ident">syn::TypeTuple</span> {
         <span class="ident">paren_token</span>: <span class="ident">Default::default</span>(),
         <span class="ident">elems</span>: <span class="ident">Default::default</span>(),
@@ -135,7 +135,7 @@
     .<span class="ident">into</span>()
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_tuple</span>(<span class="ident">elems</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">syn::Type</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::TypeTuple</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_tuple</span>(<span class="ident">elems</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">syn::Type</span><span class="op">&gt;</span>) -&gt; <span class="ident">syn::TypeTuple</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">syn::TypeTuple</span> {
         <span class="ident">paren_token</span>: <span class="ident">Default::default</span>(),
         <span class="ident">elems</span>: <span class="ident">elems</span>.<span class="ident">collect</span>(),
@@ -146,20 +146,20 @@
     <span class="ident">result</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_type_tuple</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::TypeTuple</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_type_tuple</span>() -&gt; <span class="ident">syn::TypeTuple</span> {
     <span class="ident">syn::TypeTuple</span> {
         <span class="ident">paren_token</span>: <span class="ident">Default::default</span>(),
         <span class="ident">elems</span>: <span class="ident">Default::default</span>(),
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_punctuated_single</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">P</span>: <span class="ident">Default</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::punctuated::Punctuated</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_punctuated_single</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">P</span>: <span class="ident">Default</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="ident">syn::punctuated::Punctuated</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">punctuated</span> <span class="op">=</span> <span class="ident">syn::punctuated::Punctuated::new</span>();
     <span class="ident">punctuated</span>.<span class="ident">push</span>(<span class="ident">value</span>);
     <span class="ident">punctuated</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modify_types_generics_hack</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">ty_generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn::TypeGenerics</span>, <span class="kw-2">mut</span> <span class="ident">mutator</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::AngleBracketedGenericArguments</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modify_types_generics_hack</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">ty_generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn::TypeGenerics</span>, <span class="kw-2">mut</span> <span class="ident">mutator</span>: <span class="ident">F</span>) -&gt; <span class="ident">syn::AngleBracketedGenericArguments</span>
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">syn::punctuated::Punctuated</span><span class="op">&lt;</span><span class="ident">syn::GenericArgument</span>, <span class="ident">syn::token::Comma</span><span class="op">&gt;</span>),
 {
@@ -174,7 +174,7 @@
     <span class="ident">abga</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strip_raw_ident_prefix</span>(<span class="kw-2">mut</span> <span class="ident">name</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strip_raw_ident_prefix</span>(<span class="kw-2">mut</span> <span class="ident">name</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;r#&quot;</span>) {
         <span class="ident">name</span>.<span class="ident">replace_range</span>(<span class="number">0</span>..<span class="number">2</span>, <span class="string">&quot;&quot;</span>);
     }

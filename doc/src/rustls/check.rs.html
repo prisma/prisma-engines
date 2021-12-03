@@ -88,15 +88,15 @@
 <span class="doccomment">/// has the given $payload_type.  If not, return Err(TLSError) quoting</span>
 <span class="doccomment">/// $handshake_type as the expected handshake type.</span>
 <span class="macro">macro_rules!</span> <span class="ident">require_handshake_msg</span>(
-  ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">handshake_type</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">payload_type</span>:<span class="ident">path</span> ) <span class="op">=</span><span class="op">&gt;</span> (
+  ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">handshake_type</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">payload_type</span>:<span class="ident">path</span> ) =&gt; (
     <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>.<span class="ident">payload</span> {
-        <span class="ident">MessagePayload::Handshake</span>(<span class="kw-2">ref</span> <span class="ident">hsp</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">hsp</span>.<span class="ident">payload</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">payload_type</span>(<span class="kw-2">ref</span> <span class="ident">hm</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">hm</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">TLSError::InappropriateHandshakeMessage</span> {
+        <span class="ident">MessagePayload::Handshake</span>(<span class="kw-2">ref</span> <span class="ident">hsp</span>) =&gt; <span class="kw">match</span> <span class="ident">hsp</span>.<span class="ident">payload</span> {
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">payload_type</span>(<span class="kw-2">ref</span> <span class="ident">hm</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">hm</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">TLSError::InappropriateHandshakeMessage</span> {
                      <span class="ident">expect_types</span>: <span class="macro">vec!</span>[ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">handshake_type</span> ],
                      <span class="ident">got_type</span>: <span class="ident">hsp</span>.<span class="ident">typ</span>})
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">TLSError::InappropriateMessage</span> {
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">TLSError::InappropriateMessage</span> {
                  <span class="ident">expect_types</span>: <span class="macro">vec!</span>[ <span class="ident">ContentType::Handshake</span> ],
                  <span class="ident">got_type</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>.<span class="ident">typ</span>})
     }
@@ -105,15 +105,15 @@
 
 <span class="doccomment">/// Like require_handshake_msg, but moves the payload out of $m.</span>
 <span class="macro">macro_rules!</span> <span class="ident">require_handshake_msg_mut</span>(
-  ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">handshake_type</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">payload_type</span>:<span class="ident">path</span> ) <span class="op">=</span><span class="op">&gt;</span> (
+  ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">handshake_type</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">payload_type</span>:<span class="ident">path</span> ) =&gt; (
     <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>.<span class="ident">payload</span> {
-        <span class="ident">MessagePayload::Handshake</span>(<span class="ident">hsp</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">hsp</span>.<span class="ident">payload</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">payload_type</span>(<span class="ident">hm</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">hm</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">TLSError::InappropriateHandshakeMessage</span> {
+        <span class="ident">MessagePayload::Handshake</span>(<span class="ident">hsp</span>) =&gt; <span class="kw">match</span> <span class="ident">hsp</span>.<span class="ident">payload</span> {
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">payload_type</span>(<span class="ident">hm</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">hm</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">TLSError::InappropriateHandshakeMessage</span> {
                      <span class="ident">expect_types</span>: <span class="macro">vec!</span>[ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">handshake_type</span> ],
                      <span class="ident">got_type</span>: <span class="ident">hsp</span>.<span class="ident">typ</span>})
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">TLSError::InappropriateMessage</span> {
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">TLSError::InappropriateMessage</span> {
                  <span class="ident">expect_types</span>: <span class="macro">vec!</span>[ <span class="ident">ContentType::Handshake</span> ],
                  <span class="ident">got_type</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>.<span class="ident">typ</span>})
     }
@@ -129,7 +129,7 @@
     <span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
     <span class="ident">content_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">ContentType</span>],
     <span class="ident">handshake_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">HandshakeType</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">content_types</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">typ</span>) {
         <span class="macro">warn!</span>(
             <span class="string">&quot;Received a {:?} message while expecting {:?}&quot;</span>,

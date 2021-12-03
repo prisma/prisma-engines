@@ -86,13 +86,13 @@
 
 <span class="kw">impl</span> <span class="ident">OpCode</span> {
     <span class="doccomment">/// Attempt to infer the op code based on the numeric value.</span>
-    <span class="kw">fn</span> <span class="ident">from_i32</span>(<span class="ident">i</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_i32</span>(<span class="ident">i</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">i</span> {
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Reply</span>),
-            <span class="number">2004</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Query</span>),
-            <span class="number">2013</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Message</span>),
-            <span class="number">2012</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Compressed</span>),
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
+            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Reply</span>),
+            <span class="number">2004</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Query</span>),
+            <span class="number">2013</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Message</span>),
+            <span class="number">2012</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Compressed</span>),
+            <span class="ident">other</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
                 <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Invalid wire protocol opcode: {}&quot;</span>, <span class="ident">other</span>),
             }
             .<span class="ident">into</span>()),
@@ -113,7 +113,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span> <span class="op">*</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>();
 
     <span class="doccomment">/// Serializes the Header and writes the bytes to `w`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_to</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_to</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">stream</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">length</span>.<span class="ident">to_le_bytes</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="ident">stream</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">request_id</span>.<span class="ident">to_le_bytes</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="ident">stream</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">response_to</span>.<span class="ident">to_le_bytes</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -123,7 +123,7 @@
     }
 
     <span class="doccomment">/// Reads bytes from `r` and deserializes them into a header.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_from</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_from</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">request_id</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">response_to</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32</span>().<span class="kw">await</span><span class="question-mark">?</span>;

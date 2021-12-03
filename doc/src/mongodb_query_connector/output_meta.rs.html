@@ -106,7 +106,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">OutputMeta</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strip_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutputMeta</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strip_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OutputMeta</span> {
         <span class="ident">OutputMeta</span> {
             <span class="ident">ident</span>: <span class="self">self</span>.<span class="ident">ident</span>.<span class="ident">clone</span>(),
             <span class="ident">default</span>: <span class="self">self</span>.<span class="ident">default</span>.<span class="ident">clone</span>(),
@@ -118,7 +118,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_selected_fields</span>(
     <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>,
     <span class="ident">aggregation_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutputMetaMapping</span> {
+) -&gt; <span class="ident">OutputMetaMapping</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">OutputMetaMapping::new</span>();
 
     <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">selected_fields</span>.<span class="ident">scalar_fields</span>() {
@@ -132,13 +132,13 @@
     <span class="ident">map</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_field</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutputMeta</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_field</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="ident">OutputMeta</span> {
     <span class="kw">let</span> (<span class="ident">ident</span>, <span class="ident">field_arity</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">type_identifier_with_arity</span>();
 
     <span class="comment">// Only add a possible default return if the field is required.</span>
     <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_value</span>.<span class="ident">clone</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">dv</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">dv</span>.<span class="ident">into_kind</span>() {
-        <span class="ident">datamodel::DefaultKind::Single</span>(<span class="ident">pv</span>) <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_required</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">pv</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="ident">datamodel::DefaultKind::Single</span>(<span class="ident">pv</span>) <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_required</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">pv</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     });
 
     <span class="ident">OutputMeta</span> {
@@ -150,7 +150,7 @@
 
 <span class="doccomment">/// Mapping valid for one specific selection.</span>
 <span class="doccomment">/// Field name -&gt; OutputMeta</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_aggregation_selection</span>(<span class="ident">selection</span>: <span class="kw-2">&amp;</span><span class="ident">AggregationSelection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutputMetaMapping</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_aggregation_selection</span>(<span class="ident">selection</span>: <span class="kw-2">&amp;</span><span class="ident">AggregationSelection</span>) -&gt; <span class="ident">OutputMetaMapping</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">OutputMetaMapping::new</span>();
 
     <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">ident</span>, <span class="ident">field_arity</span>) <span class="kw">in</span> <span class="ident">selection</span>.<span class="ident">identifiers</span>() {
@@ -169,7 +169,7 @@
 
 <span class="doccomment">/// Mapping for one specific relation aggregation selection.</span>
 <span class="doccomment">/// DB alias -&gt; OutputMeta</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_rel_aggregation_selection</span>(<span class="ident">aggr_selection</span>: <span class="kw-2">&amp;</span><span class="ident">RelAggregationSelection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutputMeta</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_rel_aggregation_selection</span>(<span class="ident">aggr_selection</span>: <span class="kw-2">&amp;</span><span class="ident">RelAggregationSelection</span>) -&gt; <span class="ident">OutputMeta</span> {
     <span class="kw">let</span> (<span class="ident">ident</span>, <span class="ident">arity</span>) <span class="op">=</span> <span class="ident">aggr_selection</span>.<span class="ident">type_identifier_with_arity</span>();
 
     <span class="ident">OutputMeta</span> {

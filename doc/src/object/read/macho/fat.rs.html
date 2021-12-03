@@ -127,13 +127,13 @@
     <span class="doccomment">/// Attempt to parse a fat header.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Does not validate the magic value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">file</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">FatHeader</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">file</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">FatHeader</span><span class="op">&gt;</span> {
         <span class="ident">file</span>.<span class="ident">read_at</span>::<span class="op">&lt;</span><span class="ident">FatHeader</span><span class="op">&gt;</span>(<span class="number">0</span>)
             .<span class="ident">read_error</span>(<span class="string">&quot;Invalid fat header size or alignment&quot;</span>)
     }
 
     <span class="doccomment">/// Attempt to parse a fat header and 32-bit fat arches.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_arch32</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">file</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">FatArch32</span>]<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_arch32</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">file</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">FatArch32</span>]<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">file</span>
             .<span class="ident">read</span>::<span class="op">&lt;</span><span class="ident">FatHeader</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">offset</span>)
@@ -146,7 +146,7 @@
     }
 
     <span class="doccomment">/// Attempt to parse a fat header and 64-bit fat arches.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_arch64</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">file</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">FatArch64</span>]<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_arch64</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">file</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">FatArch64</span>]<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">file</span>
             .<span class="ident">read</span>::<span class="op">&lt;</span><span class="ident">FatHeader</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">offset</span>)
@@ -164,28 +164,28 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FatArch</span>: <span class="ident">Pod</span> {
     <span class="kw">type</span> <span class="ident">Word</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">cputype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span>;
-    <span class="kw">fn</span> <span class="ident">cpusubtype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span>;
-    <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Word</span>;
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Word</span>;
-    <span class="kw">fn</span> <span class="ident">align</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span>;
+    <span class="kw">fn</span> <span class="ident">cputype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+    <span class="kw">fn</span> <span class="ident">cpusubtype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+    <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span>;
+    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span>;
+    <span class="kw">fn</span> <span class="ident">align</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
 
-    <span class="kw">fn</span> <span class="ident">architecture</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Architecture</span> {
+    <span class="kw">fn</span> <span class="ident">architecture</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Architecture</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">cputype</span>() {
-            <span class="ident">macho::CPU_TYPE_ARM</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Architecture::Arm</span>,
-            <span class="ident">macho::CPU_TYPE_ARM64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Architecture::Aarch64</span>,
-            <span class="ident">macho::CPU_TYPE_X86</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Architecture::I386</span>,
-            <span class="ident">macho::CPU_TYPE_X86_64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Architecture::X86_64</span>,
-            <span class="ident">macho::CPU_TYPE_MIPS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Architecture::Mips</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Architecture::Unknown</span>,
+            <span class="ident">macho::CPU_TYPE_ARM</span> =&gt; <span class="ident">Architecture::Arm</span>,
+            <span class="ident">macho::CPU_TYPE_ARM64</span> =&gt; <span class="ident">Architecture::Aarch64</span>,
+            <span class="ident">macho::CPU_TYPE_X86</span> =&gt; <span class="ident">Architecture::I386</span>,
+            <span class="ident">macho::CPU_TYPE_X86_64</span> =&gt; <span class="ident">Architecture::X86_64</span>,
+            <span class="ident">macho::CPU_TYPE_MIPS</span> =&gt; <span class="ident">Architecture::Mips</span>,
+            <span class="kw">_</span> =&gt; <span class="ident">Architecture::Unknown</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">file_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u64</span>, <span class="ident">u64</span>) {
+    <span class="kw">fn</span> <span class="ident">file_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
         (<span class="self">self</span>.<span class="ident">offset</span>().<span class="ident">into</span>(), <span class="self">self</span>.<span class="ident">size</span>().<span class="ident">into</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">data</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">data</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
         <span class="ident">file</span>.<span class="ident">read_bytes_at</span>(<span class="self">self</span>.<span class="ident">offset</span>().<span class="ident">into</span>(), <span class="self">self</span>.<span class="ident">size</span>().<span class="ident">into</span>())
             .<span class="ident">read_error</span>(<span class="string">&quot;Invalid fat arch offset or size&quot;</span>)
     }
@@ -194,23 +194,23 @@
 <span class="kw">impl</span> <span class="ident">FatArch</span> <span class="kw">for</span> <span class="ident">FatArch32</span> {
     <span class="kw">type</span> <span class="ident">Word</span> <span class="op">=</span> <span class="ident">u32</span>;
 
-    <span class="kw">fn</span> <span class="ident">cputype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">cputype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">cputype</span>.<span class="ident">get</span>(<span class="ident">BigEndian</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">cpusubtype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">cpusubtype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">cpusubtype</span>.<span class="ident">get</span>(<span class="ident">BigEndian</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Word</span> {
+    <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
         <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">get</span>(<span class="ident">BigEndian</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Word</span> {
+    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
         <span class="self">self</span>.<span class="ident">size</span>.<span class="ident">get</span>(<span class="ident">BigEndian</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">align</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">align</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">align</span>.<span class="ident">get</span>(<span class="ident">BigEndian</span>)
     }
 }
@@ -218,23 +218,23 @@
 <span class="kw">impl</span> <span class="ident">FatArch</span> <span class="kw">for</span> <span class="ident">FatArch64</span> {
     <span class="kw">type</span> <span class="ident">Word</span> <span class="op">=</span> <span class="ident">u64</span>;
 
-    <span class="kw">fn</span> <span class="ident">cputype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">cputype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">cputype</span>.<span class="ident">get</span>(<span class="ident">BigEndian</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">cpusubtype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">cpusubtype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">cpusubtype</span>.<span class="ident">get</span>(<span class="ident">BigEndian</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Word</span> {
+    <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
         <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">get</span>(<span class="ident">BigEndian</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Word</span> {
+    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
         <span class="self">self</span>.<span class="ident">size</span>.<span class="ident">get</span>(<span class="ident">BigEndian</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">align</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">align</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">align</span>.<span class="ident">get</span>(<span class="ident">BigEndian</span>)
     }
 }

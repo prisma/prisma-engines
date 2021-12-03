@@ -779,7 +779,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">AliasMode</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">AliasMode::Table</span>
     }
 }
@@ -797,7 +797,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Use when nesting one level down to a new subquery. `AliasMode` is</span>
     <span class="doccomment">/// required due to the fact the current mode can be in `AliasMode::Join`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">AliasMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">AliasMode</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">counter</span>: <span class="self">self</span>.<span class="ident">counter</span> <span class="op">+</span> <span class="number">1</span>,
             <span class="ident">mode</span>,
@@ -805,7 +805,7 @@
     }
 
     <span class="doccomment">/// Flip the alias to a different mode keeping the same nesting count.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">AliasMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">AliasMode</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">counter</span>: <span class="self">self</span>.<span class="ident">counter</span>,
             <span class="ident">mode</span>,
@@ -814,10 +814,10 @@
 
     <span class="doccomment">/// A string representation of the current alias. The current mode can be</span>
     <span class="doccomment">/// overridden by defining the `mode_override`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode_override</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AliasMode</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mode_override</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AliasMode</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="ident">mode_override</span>.<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">mode</span>) {
-            <span class="ident">AliasMode::Table</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;t{}&quot;</span>, <span class="self">self</span>.<span class="ident">counter</span>),
-            <span class="ident">AliasMode::Join</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;j{}&quot;</span>, <span class="self">self</span>.<span class="ident">counter</span>),
+            <span class="ident">AliasMode::Table</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;t{}&quot;</span>, <span class="self">self</span>.<span class="ident">counter</span>),
+            <span class="ident">AliasMode::Join</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;j{}&quot;</span>, <span class="self">self</span>.<span class="ident">counter</span>),
         }
     }
 }
@@ -828,7 +828,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Alias should be used only when nesting, making the top level queries</span>
     <span class="doccomment">/// more explicit.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">trait</span> <span class="ident">AliasedSelect</span> {
@@ -837,18 +837,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Alias should be used only when nesting, making the top level queries</span>
     <span class="doccomment">/// more explicit.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_sel</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">aliased_sel</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">Filter</span> {
     <span class="doccomment">/// Conversion from a `Filter` to a query condition tree. Aliased when in a nested `SELECT`.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">alias</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Filter::And</span>(<span class="kw-2">mut</span> <span class="ident">filters</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConditionTree::NoCondition</span>,
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">filters</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Filter::And</span>(<span class="kw-2">mut</span> <span class="ident">filters</span>) =&gt; <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">ConditionTree::NoCondition</span>,
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">filters</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
+                <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">exprs</span> <span class="op">=</span> <span class="ident">filters</span>
                         .<span class="ident">into_iter</span>()
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>))
@@ -858,10 +858,10 @@
                     <span class="ident">ConditionTree::And</span>(<span class="ident">exprs</span>)
                 }
             },
-            <span class="ident">Filter::Or</span>(<span class="kw-2">mut</span> <span class="ident">filters</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConditionTree::NegativeCondition</span>,
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">filters</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Filter::Or</span>(<span class="kw-2">mut</span> <span class="ident">filters</span>) =&gt; <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">ConditionTree::NegativeCondition</span>,
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">filters</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
+                <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">exprs</span> <span class="op">=</span> <span class="ident">filters</span>
                         .<span class="ident">into_iter</span>()
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>))
@@ -871,10 +871,10 @@
                     <span class="ident">ConditionTree::Or</span>(<span class="ident">exprs</span>)
                 }
             },
-            <span class="ident">Filter::Not</span>(<span class="kw-2">mut</span> <span class="ident">filters</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConditionTree::NoCondition</span>,
-                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">filters</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="ident">aliased_cond</span>(<span class="ident">alias</span>).<span class="ident">not</span>(),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Filter::Not</span>(<span class="kw-2">mut</span> <span class="ident">filters</span>) =&gt; <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">ConditionTree::NoCondition</span>,
+                <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">filters</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="ident">aliased_cond</span>(<span class="ident">alias</span>).<span class="ident">not</span>(),
+                <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">exprs</span> <span class="op">=</span> <span class="ident">filters</span>
                         .<span class="ident">into_iter</span>()
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>).<span class="ident">not</span>())
@@ -884,40 +884,40 @@
                     <span class="ident">ConditionTree::And</span>(<span class="ident">exprs</span>)
                 }
             },
-            <span class="ident">Filter::Scalar</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
-            <span class="ident">Filter::OneRelationIsNull</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
-            <span class="ident">Filter::Relation</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
-            <span class="ident">Filter::BoolFilter</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Filter::Scalar</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
+            <span class="ident">Filter::OneRelationIsNull</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
+            <span class="ident">Filter::Relation</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
+            <span class="ident">Filter::BoolFilter</span>(<span class="ident">b</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">b</span> {
                     <span class="ident">ConditionTree::NoCondition</span>
                 } <span class="kw">else</span> {
                     <span class="ident">ConditionTree::NegativeCondition</span>
                 }
             }
-            <span class="ident">Filter::Aggregation</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
-            <span class="ident">Filter::ScalarList</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
-            <span class="ident">Filter::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConditionTree::NoCondition</span>,
+            <span class="ident">Filter::Aggregation</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
+            <span class="ident">Filter::ScalarList</span>(<span class="ident">filter</span>) =&gt; <span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="ident">alias</span>),
+            <span class="ident">Filter::Empty</span> =&gt; <span class="ident">ConditionTree::NoCondition</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">ScalarFilter</span> {
     <span class="doccomment">/// Conversion from a `ScalarFilter` to a query condition tree. Aliased when in a nested `SELECT`.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">condition</span> {
-            <span class="ident">ScalarCondition::Search</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">ScalarCondition::NotSearch</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ScalarCondition::Search</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">ScalarCondition::NotSearch</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
                 <span class="ident">scalar_filter_aliased_cond_search</span>(<span class="self">self</span>, <span class="ident">alias</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">scalar_filter_aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">scalar_filter_aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">scalar_filter_aliased_cond_search</span>(<span class="ident">sf</span>: <span class="ident">ScalarFilter</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">scalar_filter_aliased_cond_search</span>(<span class="ident">sf</span>: <span class="ident">ScalarFilter</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">projections</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">sf</span>.<span class="ident">condition</span>.<span class="ident">clone</span>() {
-        <span class="ident">ScalarCondition::Search</span>(<span class="kw">_</span>, <span class="ident">proj</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proj</span>,
-        <span class="ident">ScalarCondition::NotSearch</span>(<span class="kw">_</span>, <span class="ident">proj</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proj</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="ident">ScalarCondition::Search</span>(<span class="kw">_</span>, <span class="ident">proj</span>) =&gt; <span class="ident">proj</span>,
+        <span class="ident">ScalarCondition::NotSearch</span>(<span class="kw">_</span>, <span class="ident">proj</span>) =&gt; <span class="ident">proj</span>,
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
     };
 
     <span class="ident">projections</span>.<span class="ident">push</span>(<span class="ident">sf</span>.<span class="ident">projection</span>);
@@ -925,9 +925,9 @@
     <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">projections</span>
         .<span class="ident">into_iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> (<span class="ident">p</span>, <span class="ident">alias</span>) {
-            (<span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">field</span>.<span class="ident">as_column</span>(),
-            (<span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>), <span class="prelude-val">Some</span>(<span class="ident">alias</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">field</span>.<span class="ident">as_column</span>().<span class="ident">table</span>(<span class="ident">alias</span>.<span class="ident">to_string</span>(<span class="prelude-val">None</span>)),
-            (<span class="ident">ScalarProjection::Compound</span>(<span class="kw">_</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;Full-text search does not support compound fields&quot;</span>),
+            (<span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">field</span>.<span class="ident">as_column</span>(),
+            (<span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>), <span class="prelude-val">Some</span>(<span class="ident">alias</span>)) =&gt; <span class="ident">field</span>.<span class="ident">as_column</span>().<span class="ident">table</span>(<span class="ident">alias</span>.<span class="ident">to_string</span>(<span class="prelude-val">None</span>)),
+            (<span class="ident">ScalarProjection::Compound</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Full-text search does not support compound fields&quot;</span>),
         })
         .<span class="ident">collect</span>();
 
@@ -936,14 +936,14 @@
     <span class="ident">convert_scalar_filter</span>(<span class="ident">comparable</span>, <span class="ident">sf</span>.<span class="ident">condition</span>, <span class="ident">sf</span>.<span class="ident">mode</span>, <span class="kw-2">&amp;</span>[], <span class="bool-val">false</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">scalar_filter_aliased_cond</span>(<span class="ident">sf</span>: <span class="ident">ScalarFilter</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">scalar_filter_aliased_cond</span>(<span class="ident">sf</span>: <span class="ident">ScalarFilter</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="kw">match</span> (<span class="ident">alias</span>, <span class="ident">sf</span>.<span class="ident">projection</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">alias</span>), <span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">Some</span>(<span class="ident">alias</span>), <span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>)) =&gt; {
             <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_column</span>().<span class="ident">table</span>(<span class="ident">alias</span>.<span class="ident">to_string</span>(<span class="prelude-val">None</span>)).<span class="ident">into</span>();
 
             <span class="ident">convert_scalar_filter</span>(<span class="ident">comparable</span>, <span class="ident">sf</span>.<span class="ident">condition</span>, <span class="ident">sf</span>.<span class="ident">mode</span>, <span class="kw-2">&amp;</span>[<span class="ident">field</span>], <span class="bool-val">false</span>)
         }
-        (<span class="prelude-val">Some</span>(<span class="ident">alias</span>), <span class="ident">ScalarProjection::Compound</span>(<span class="ident">fields</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">Some</span>(<span class="ident">alias</span>), <span class="ident">ScalarProjection::Compound</span>(<span class="ident">fields</span>)) =&gt; {
             <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>
                 .<span class="ident">clone</span>()
                 .<span class="ident">into_iter</span>()
@@ -952,12 +952,12 @@
 
             <span class="ident">convert_scalar_filter</span>(<span class="ident">Row::from</span>(<span class="ident">columns</span>).<span class="ident">into</span>(), <span class="ident">sf</span>.<span class="ident">condition</span>, <span class="ident">sf</span>.<span class="ident">mode</span>, <span class="kw-2">&amp;</span><span class="ident">fields</span>, <span class="bool-val">false</span>)
         }
-        (<span class="prelude-val">None</span>, <span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">None</span>, <span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>)) =&gt; {
             <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_column</span>().<span class="ident">into</span>();
 
             <span class="ident">convert_scalar_filter</span>(<span class="ident">comparable</span>, <span class="ident">sf</span>.<span class="ident">condition</span>, <span class="ident">sf</span>.<span class="ident">mode</span>, <span class="kw-2">&amp;</span>[<span class="ident">field</span>], <span class="bool-val">false</span>)
         }
-        (<span class="prelude-val">None</span>, <span class="ident">ScalarProjection::Compound</span>(<span class="ident">fields</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">None</span>, <span class="ident">ScalarProjection::Compound</span>(<span class="ident">fields</span>)) =&gt; {
             <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">as_column</span>()).<span class="ident">collect</span>();
 
             <span class="ident">convert_scalar_filter</span>(<span class="ident">Row::from</span>(<span class="ident">columns</span>).<span class="ident">into</span>(), <span class="ident">sf</span>.<span class="ident">condition</span>, <span class="ident">sf</span>.<span class="ident">mode</span>, <span class="kw-2">&amp;</span><span class="ident">fields</span>, <span class="bool-val">false</span>)
@@ -966,13 +966,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">ScalarListFilter</span> {
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">alias</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">alias</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">alias</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">as_column</span>().<span class="ident">table</span>(<span class="ident">alias</span>.<span class="ident">to_string</span>(<span class="prelude-val">None</span>)).<span class="ident">into</span>();
                 <span class="ident">convert_scalar_list_filter</span>(<span class="ident">comparable</span>, <span class="self">self</span>.<span class="ident">condition</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">as_column</span>().<span class="ident">into</span>();
                 <span class="ident">convert_scalar_list_filter</span>(<span class="ident">comparable</span>, <span class="self">self</span>.<span class="ident">condition</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field</span>)
             }
@@ -984,15 +984,15 @@
     <span class="ident">comparable</span>: <span class="kw">impl</span> <span class="ident">Comparable</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
     <span class="ident">cond</span>: <span class="ident">ScalarListCondition</span>,
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">condition</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cond</span> {
-        <span class="ident">ScalarListCondition::Contains</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarListCondition::Contains</span>(<span class="ident">val</span>) =&gt; {
             <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;@&gt;&quot;</span>, <span class="ident">Value::Array</span>(<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="ident">convert_value</span>(<span class="ident">field</span>, <span class="ident">val</span>)])))
         }
-        <span class="ident">ScalarListCondition::ContainsEvery</span>(<span class="ident">vals</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;@&gt;&quot;</span>, <span class="ident">convert_list_value</span>(<span class="ident">field</span>, <span class="ident">vals</span>)),
-        <span class="ident">ScalarListCondition::ContainsSome</span>(<span class="ident">vals</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;&amp;&amp;&quot;</span>, <span class="ident">convert_list_value</span>(<span class="ident">field</span>, <span class="ident">vals</span>)),
-        <span class="ident">ScalarListCondition::IsEmpty</span>(<span class="ident">cond</span>) <span class="kw">if</span> <span class="ident">cond</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;=&quot;</span>, <span class="ident">Value::Array</span>(<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[])).<span class="ident">raw</span>()),
-        <span class="ident">ScalarListCondition::IsEmpty</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;&lt;&gt;&quot;</span>, <span class="ident">Value::Array</span>(<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[])).<span class="ident">raw</span>()),
+        <span class="ident">ScalarListCondition::ContainsEvery</span>(<span class="ident">vals</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;@&gt;&quot;</span>, <span class="ident">convert_list_value</span>(<span class="ident">field</span>, <span class="ident">vals</span>)),
+        <span class="ident">ScalarListCondition::ContainsSome</span>(<span class="ident">vals</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;&amp;&amp;&quot;</span>, <span class="ident">convert_list_value</span>(<span class="ident">field</span>, <span class="ident">vals</span>)),
+        <span class="ident">ScalarListCondition::IsEmpty</span>(<span class="ident">cond</span>) <span class="kw">if</span> <span class="ident">cond</span> =&gt; <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;=&quot;</span>, <span class="ident">Value::Array</span>(<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[])).<span class="ident">raw</span>()),
+        <span class="ident">ScalarListCondition::IsEmpty</span>(<span class="kw">_</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;&lt;&gt;&quot;</span>, <span class="ident">Value::Array</span>(<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[])).<span class="ident">raw</span>()),
     };
 
     <span class="ident">ConditionTree::single</span>(<span class="ident">condition</span>)
@@ -1000,21 +1000,21 @@
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">RelationFilter</span> {
     <span class="doccomment">/// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>().<span class="ident">as_columns</span>();
         <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">alias</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">alias</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ids</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">table</span>(<span class="ident">alias</span>.<span class="ident">to_string</span>(<span class="prelude-val">None</span>))).<span class="ident">collect</span>(),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ids</span>.<span class="ident">collect</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">alias</span>) =&gt; <span class="ident">ids</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">table</span>(<span class="ident">alias</span>.<span class="ident">to_string</span>(<span class="prelude-val">None</span>))).<span class="ident">collect</span>(),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">ids</span>.<span class="ident">collect</span>(),
         };
 
         <span class="kw">let</span> <span class="ident">condition</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">condition</span>;
         <span class="kw">let</span> <span class="ident">sub_select</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">aliased_sel</span>(<span class="ident">alias</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">inc</span>(<span class="ident">AliasMode::Table</span>)));
 
         <span class="kw">let</span> <span class="ident">comparison</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">condition</span> {
-            <span class="ident">RelationCondition::AtLeastOneRelatedRecord</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Row::from</span>(<span class="ident">columns</span>).<span class="ident">in_selection</span>(<span class="ident">sub_select</span>),
-            <span class="ident">RelationCondition::EveryRelatedRecord</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Row::from</span>(<span class="ident">columns</span>).<span class="ident">not_in_selection</span>(<span class="ident">sub_select</span>),
-            <span class="ident">RelationCondition::NoRelatedRecord</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Row::from</span>(<span class="ident">columns</span>).<span class="ident">not_in_selection</span>(<span class="ident">sub_select</span>),
-            <span class="ident">RelationCondition::ToOneRelatedRecord</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Row::from</span>(<span class="ident">columns</span>).<span class="ident">in_selection</span>(<span class="ident">sub_select</span>),
+            <span class="ident">RelationCondition::AtLeastOneRelatedRecord</span> =&gt; <span class="ident">Row::from</span>(<span class="ident">columns</span>).<span class="ident">in_selection</span>(<span class="ident">sub_select</span>),
+            <span class="ident">RelationCondition::EveryRelatedRecord</span> =&gt; <span class="ident">Row::from</span>(<span class="ident">columns</span>).<span class="ident">not_in_selection</span>(<span class="ident">sub_select</span>),
+            <span class="ident">RelationCondition::NoRelatedRecord</span> =&gt; <span class="ident">Row::from</span>(<span class="ident">columns</span>).<span class="ident">not_in_selection</span>(<span class="ident">sub_select</span>),
+            <span class="ident">RelationCondition::ToOneRelatedRecord</span> =&gt; <span class="ident">Row::from</span>(<span class="ident">columns</span>).<span class="ident">in_selection</span>(<span class="ident">sub_select</span>),
         };
 
         <span class="ident">comparison</span>.<span class="ident">into</span>()
@@ -1023,7 +1023,7 @@
 
 <span class="kw">impl</span> <span class="ident">AliasedSelect</span> <span class="kw">for</span> <span class="ident">RelationFilter</span> {
     <span class="doccomment">/// The subselect part of the `RelationFilter` `ConditionTree`.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_sel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">aliased_sel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="ident">alias</span>.<span class="ident">unwrap_or_default</span>();
         <span class="kw">let</span> <span class="ident">condition</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">condition</span>;
 
@@ -1072,7 +1072,7 @@
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">OneRelationIsNullFilter</span> {
     <span class="doccomment">/// Conversion from a `OneRelationIsNullFilter` to a query condition tree. Aliased when in a nested `SELECT`.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="ident">alias</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">to_string</span>(<span class="prelude-val">None</span>));
 
         <span class="kw">let</span> <span class="ident">condition</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">relation_is_inlined_in_parent</span>() {
@@ -1080,16 +1080,16 @@
                 <span class="kw">let</span> <span class="ident">column_is_null</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">opt_table</span>(<span class="ident">alias</span>.<span class="ident">clone</span>()).<span class="ident">is_null</span>();
 
                 <span class="kw">match</span> <span class="ident">acc</span> {
-                    <span class="ident">ConditionTree::NoCondition</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">column_is_null</span>.<span class="ident">into</span>(),
-                    <span class="ident">cond</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cond</span>.<span class="ident">and</span>(<span class="ident">column_is_null</span>),
+                    <span class="ident">ConditionTree::NoCondition</span> =&gt; <span class="ident">column_is_null</span>.<span class="ident">into</span>(),
+                    <span class="ident">cond</span> =&gt; <span class="ident">cond</span>.<span class="ident">and</span>(<span class="ident">column_is_null</span>),
                 }
             })
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">relation</span>();
             <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">as_table</span>();
             <span class="kw">let</span> <span class="ident">relation_table</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">alias</span> {
-                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">alias</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">table</span>.<span class="ident">alias</span>(<span class="ident">alias</span>.<span class="ident">to_string</span>()),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">table</span>,
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">alias</span>) =&gt; <span class="ident">table</span>.<span class="ident">alias</span>(<span class="ident">alias</span>.<span class="ident">to_string</span>()),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">table</span>,
             };
 
             <span class="kw">let</span> <span class="ident">columns_not_null</span> <span class="op">=</span>
@@ -1100,8 +1100,8 @@
                         <span class="kw">let</span> <span class="ident">column_is_not_null</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">opt_table</span>(<span class="ident">alias</span>.<span class="ident">clone</span>()).<span class="ident">is_not_null</span>();
 
                         <span class="kw">match</span> <span class="ident">acc</span> {
-                            <span class="ident">ConditionTree::NoCondition</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">column_is_not_null</span>.<span class="ident">into</span>(),
-                            <span class="ident">cond</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cond</span>.<span class="ident">and</span>(<span class="ident">column_is_not_null</span>),
+                            <span class="ident">ConditionTree::NoCondition</span> =&gt; <span class="ident">column_is_not_null</span>.<span class="ident">into</span>(),
+                            <span class="ident">cond</span> =&gt; <span class="ident">cond</span>.<span class="ident">and</span>(<span class="ident">column_is_not_null</span>),
                         }
                     });
 
@@ -1113,8 +1113,8 @@
                 .<span class="ident">scalar_fields</span>()
                 .<span class="ident">iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">alias</span>.<span class="ident">as_ref</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Column::from</span>((<span class="ident">a</span>.<span class="ident">clone</span>(), <span class="ident">f</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">as_column</span>(),
+                    <span class="prelude-val">Some</span>(<span class="ident">a</span>) =&gt; <span class="ident">Column::from</span>((<span class="ident">a</span>.<span class="ident">clone</span>(), <span class="ident">f</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">f</span>.<span class="ident">as_column</span>(),
                 })
                 .<span class="ident">collect</span>();
 
@@ -1138,35 +1138,35 @@
 
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">AggregationFilter</span> {
     <span class="doccomment">/// Conversion from an `AggregationFilter` to a query condition tree. Aliased when in a nested `SELECT`.</span>
-    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AggregationFilter::Count</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aggregate_conditions</span>(<span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">alias</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">count</span>(<span class="ident">x</span>).<span class="ident">into</span>()),
-            <span class="ident">AggregationFilter::Average</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aggregate_conditions</span>(<span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">alias</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">avg</span>(<span class="ident">x</span>).<span class="ident">into</span>()),
-            <span class="ident">AggregationFilter::Sum</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aggregate_conditions</span>(<span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">alias</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">sum</span>(<span class="ident">x</span>).<span class="ident">into</span>()),
-            <span class="ident">AggregationFilter::Min</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aggregate_conditions</span>(<span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">alias</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">min</span>(<span class="ident">x</span>).<span class="ident">into</span>()),
-            <span class="ident">AggregationFilter::Max</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aggregate_conditions</span>(<span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">alias</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">max</span>(<span class="ident">x</span>).<span class="ident">into</span>()),
+            <span class="ident">AggregationFilter::Count</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">alias</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">count</span>(<span class="ident">x</span>).<span class="ident">into</span>()),
+            <span class="ident">AggregationFilter::Average</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">alias</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">avg</span>(<span class="ident">x</span>).<span class="ident">into</span>()),
+            <span class="ident">AggregationFilter::Sum</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">alias</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">sum</span>(<span class="ident">x</span>).<span class="ident">into</span>()),
+            <span class="ident">AggregationFilter::Min</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">alias</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">min</span>(<span class="ident">x</span>).<span class="ident">into</span>()),
+            <span class="ident">AggregationFilter::Max</span>(<span class="ident">filter</span>) =&gt; <span class="ident">aggregate_conditions</span>(<span class="kw-2">*</span><span class="ident">filter</span>, <span class="ident">alias</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">max</span>(<span class="ident">x</span>).<span class="ident">into</span>()),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">aggregate_conditions</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">filter</span>: <span class="ident">Filter</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>, <span class="ident">field_transformer</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">aggregate_conditions</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">filter</span>: <span class="ident">Filter</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>, <span class="ident">field_transformer</span>: <span class="ident">T</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Fn</span>(<span class="ident">Column</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span>,
+    <span class="ident">T</span>: <span class="ident">Fn</span>(<span class="ident">Column</span>) -&gt; <span class="ident">Expression</span>,
 {
     <span class="kw">let</span> <span class="ident">sf</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">filter</span> {
-        <span class="ident">Filter::Scalar</span>(<span class="ident">sf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sf</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(),
+        <span class="ident">Filter::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>,
+        <span class="kw">_</span> =&gt; <span class="macro">unimplemented!</span>(),
     };
 
     <span class="kw">match</span> (<span class="ident">alias</span>, <span class="ident">sf</span>.<span class="ident">projection</span>) {
-        (<span class="kw">_</span>, <span class="ident">ScalarProjection::Compound</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="kw">_</span>, <span class="ident">ScalarProjection::Compound</span>(<span class="kw">_</span>)) =&gt; {
             <span class="macro">unimplemented!</span>(<span class="string">&quot;Compound aggregate projections are unsupported.&quot;</span>)
         }
-        (<span class="prelude-val">Some</span>(<span class="ident">alias</span>), <span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">Some</span>(<span class="ident">alias</span>), <span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>)) =&gt; {
             <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">field_transformer</span>(<span class="ident">field</span>.<span class="ident">as_column</span>().<span class="ident">table</span>(<span class="ident">alias</span>.<span class="ident">to_string</span>(<span class="prelude-val">None</span>)));
             <span class="ident">convert_scalar_filter</span>(<span class="ident">comparable</span>, <span class="ident">sf</span>.<span class="ident">condition</span>, <span class="ident">sf</span>.<span class="ident">mode</span>, <span class="kw-2">&amp;</span>[<span class="ident">field</span>], <span class="bool-val">true</span>)
         }
-        (<span class="prelude-val">None</span>, <span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">None</span>, <span class="ident">ScalarProjection::Single</span>(<span class="ident">field</span>)) =&gt; {
             <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">field_transformer</span>(<span class="ident">field</span>.<span class="ident">as_column</span>());
             <span class="ident">convert_scalar_filter</span>(<span class="ident">comparable</span>, <span class="ident">sf</span>.<span class="ident">condition</span>, <span class="ident">sf</span>.<span class="ident">mode</span>, <span class="kw-2">&amp;</span>[<span class="ident">field</span>], <span class="bool-val">true</span>)
         }
@@ -1179,14 +1179,14 @@
     <span class="ident">mode</span>: <span class="ident">QueryMode</span>,
     <span class="ident">fields</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarFieldRef</span>],
     <span class="ident">is_parent_aggregation</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">cond</span> {
-        <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">json_compare</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::JsonCompare</span>(<span class="ident">json_compare</span>) =&gt; {
             <span class="ident">convert_json_filter</span>(<span class="ident">comparable</span>, <span class="ident">json_compare</span>, <span class="ident">mode</span>, <span class="ident">fields</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">to_owned</span>())
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">mode</span> {
-            <span class="ident">QueryMode::Default</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">default_scalar_filter</span>(<span class="ident">comparable</span>, <span class="ident">cond</span>, <span class="ident">fields</span>),
-            <span class="ident">QueryMode::Insensitive</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">insensitive_scalar_filter</span>(<span class="ident">comparable</span>, <span class="ident">cond</span>, <span class="ident">fields</span>, <span class="ident">is_parent_aggregation</span>),
+        <span class="kw">_</span> =&gt; <span class="kw">match</span> <span class="ident">mode</span> {
+            <span class="ident">QueryMode::Default</span> =&gt; <span class="ident">default_scalar_filter</span>(<span class="ident">comparable</span>, <span class="ident">cond</span>, <span class="ident">fields</span>),
+            <span class="ident">QueryMode::Insensitive</span> =&gt; <span class="ident">insensitive_scalar_filter</span>(<span class="ident">comparable</span>, <span class="ident">cond</span>, <span class="ident">fields</span>, <span class="ident">is_parent_aggregation</span>),
         },
     }
 }
@@ -1196,17 +1196,17 @@
     <span class="ident">json_condition</span>: <span class="ident">JsonCondition</span>,
     <span class="ident">query_mode</span>: <span class="ident">QueryMode</span>,
     <span class="ident">field</span>: <span class="ident">ScalarFieldRef</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">json_filter_path</span> <span class="op">=</span> <span class="ident">json_condition</span>.<span class="ident">path</span>;
     <span class="kw">let</span> <span class="ident">cond</span> <span class="op">=</span> <span class="ident">json_condition</span>.<span class="ident">condition</span>;
     <span class="kw">let</span> <span class="ident">target_type</span> <span class="op">=</span> <span class="ident">json_condition</span>.<span class="ident">target_type</span>;
     <span class="kw">let</span> (<span class="ident">expr_json</span>, <span class="ident">expr_string</span>): (<span class="ident">Expression</span>, <span class="ident">Expression</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">json_filter_path</span> {
         <span class="kw">match</span> <span class="ident">path</span> {
-            <span class="ident">JsonFilterPath::String</span>(<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> (
+            <span class="ident">JsonFilterPath::String</span>(<span class="ident">path</span>) =&gt; (
                 <span class="ident">json_extract</span>(<span class="ident">comparable</span>.<span class="ident">clone</span>(), <span class="ident">JsonPath::string</span>(<span class="ident">path</span>.<span class="ident">clone</span>()), <span class="bool-val">false</span>).<span class="ident">into</span>(),
                 <span class="ident">json_extract</span>(<span class="ident">comparable</span>, <span class="ident">JsonPath::string</span>(<span class="ident">path</span>), <span class="bool-val">true</span>).<span class="ident">into</span>(),
             ),
-            <span class="ident">JsonFilterPath::Array</span>(<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> (
+            <span class="ident">JsonFilterPath::Array</span>(<span class="ident">path</span>) =&gt; (
                 <span class="ident">json_extract</span>(<span class="ident">comparable</span>.<span class="ident">clone</span>(), <span class="ident">JsonPath::array</span>(<span class="ident">path</span>.<span class="ident">clone</span>()), <span class="bool-val">false</span>).<span class="ident">into</span>(),
                 <span class="ident">json_extract</span>(<span class="ident">comparable</span>, <span class="ident">JsonPath::array</span>(<span class="ident">path</span>), <span class="bool-val">true</span>).<span class="ident">into</span>(),
             ),
@@ -1216,85 +1216,85 @@
     };
 
     <span class="kw">let</span> <span class="ident">condition</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">cond</span> {
-        <span class="ident">ScalarCondition::Contains</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">target_type</span>.<span class="ident">unwrap</span>() {
-            <span class="ident">JsonTargetType::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_string</span>
+        <span class="ident">ScalarCondition::Contains</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">target_type</span>.<span class="ident">unwrap</span>() {
+            <span class="ident">JsonTargetType::String</span> =&gt; <span class="ident">expr_string</span>
                 .<span class="ident">like</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>))
                 .<span class="ident">and</span>(<span class="ident">expr_json</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::String</span>))
                 .<span class="ident">into</span>(),
-            <span class="ident">JsonTargetType::Array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_json</span>.<span class="ident">json_array_contains</span>(<span class="ident">convert_value</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>)).<span class="ident">into</span>(),
+            <span class="ident">JsonTargetType::Array</span> =&gt; <span class="ident">expr_json</span>.<span class="ident">json_array_contains</span>(<span class="ident">convert_value</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>)).<span class="ident">into</span>(),
         },
-        <span class="ident">ScalarCondition::NotContains</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">target_type</span>.<span class="ident">unwrap</span>() {
-            <span class="ident">JsonTargetType::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_string</span>
+        <span class="ident">ScalarCondition::NotContains</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">target_type</span>.<span class="ident">unwrap</span>() {
+            <span class="ident">JsonTargetType::String</span> =&gt; <span class="ident">expr_string</span>
                 .<span class="ident">not_like</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>))
                 .<span class="ident">and</span>(<span class="ident">expr_json</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::String</span>))
                 .<span class="ident">into</span>(),
-            <span class="ident">JsonTargetType::Array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_json</span>.<span class="ident">json_array_not_contains</span>(<span class="ident">convert_value</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>)).<span class="ident">into</span>(),
+            <span class="ident">JsonTargetType::Array</span> =&gt; <span class="ident">expr_json</span>.<span class="ident">json_array_not_contains</span>(<span class="ident">convert_value</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>)).<span class="ident">into</span>(),
         },
-        <span class="ident">ScalarCondition::StartsWith</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">target_type</span>.<span class="ident">unwrap</span>() {
-            <span class="ident">JsonTargetType::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_string</span>
+        <span class="ident">ScalarCondition::StartsWith</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">target_type</span>.<span class="ident">unwrap</span>() {
+            <span class="ident">JsonTargetType::String</span> =&gt; <span class="ident">expr_string</span>
                 .<span class="ident">begins_with</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>))
                 .<span class="ident">and</span>(<span class="ident">expr_json</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::String</span>))
                 .<span class="ident">into</span>(),
-            <span class="ident">JsonTargetType::Array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_json</span>
+            <span class="ident">JsonTargetType::Array</span> =&gt; <span class="ident">expr_json</span>
                 .<span class="ident">clone</span>()
                 .<span class="ident">json_array_begins_with</span>(<span class="ident">convert_value</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>))
                 .<span class="ident">and</span>(<span class="ident">expr_json</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::Array</span>))
                 .<span class="ident">into</span>(),
         },
-        <span class="ident">ScalarCondition::NotStartsWith</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">target_type</span>.<span class="ident">unwrap</span>() {
-            <span class="ident">JsonTargetType::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_string</span>
+        <span class="ident">ScalarCondition::NotStartsWith</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">target_type</span>.<span class="ident">unwrap</span>() {
+            <span class="ident">JsonTargetType::String</span> =&gt; <span class="ident">expr_string</span>
                 .<span class="ident">not_begins_with</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>))
                 .<span class="ident">and</span>(<span class="ident">expr_json</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::String</span>))
                 .<span class="ident">into</span>(),
-            <span class="ident">JsonTargetType::Array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_json</span>
+            <span class="ident">JsonTargetType::Array</span> =&gt; <span class="ident">expr_json</span>
                 .<span class="ident">clone</span>()
                 .<span class="ident">json_array_not_begins_with</span>(<span class="ident">convert_value</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>))
                 .<span class="ident">and</span>(<span class="ident">expr_json</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::Array</span>))
                 .<span class="ident">into</span>(),
         },
-        <span class="ident">ScalarCondition::EndsWith</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">target_type</span>.<span class="ident">unwrap</span>() {
-            <span class="ident">JsonTargetType::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_string</span>
+        <span class="ident">ScalarCondition::EndsWith</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">target_type</span>.<span class="ident">unwrap</span>() {
+            <span class="ident">JsonTargetType::String</span> =&gt; <span class="ident">expr_string</span>
                 .<span class="ident">ends_into</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>))
                 .<span class="ident">and</span>(<span class="ident">expr_json</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::String</span>))
                 .<span class="ident">into</span>(),
-            <span class="ident">JsonTargetType::Array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_json</span>
+            <span class="ident">JsonTargetType::Array</span> =&gt; <span class="ident">expr_json</span>
                 .<span class="ident">clone</span>()
                 .<span class="ident">json_array_ends_into</span>(<span class="ident">convert_value</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>))
                 .<span class="ident">and</span>(<span class="ident">expr_json</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::Array</span>))
                 .<span class="ident">into</span>(),
         },
-        <span class="ident">ScalarCondition::NotEndsWith</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">target_type</span>.<span class="ident">unwrap</span>() {
-            <span class="ident">JsonTargetType::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_string</span>
+        <span class="ident">ScalarCondition::NotEndsWith</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">target_type</span>.<span class="ident">unwrap</span>() {
+            <span class="ident">JsonTargetType::String</span> =&gt; <span class="ident">expr_string</span>
                 .<span class="ident">not_ends_into</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>))
                 .<span class="ident">and</span>(<span class="ident">expr_json</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::String</span>))
                 .<span class="ident">into</span>(),
-            <span class="ident">JsonTargetType::Array</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_json</span>
+            <span class="ident">JsonTargetType::Array</span> =&gt; <span class="ident">expr_json</span>
                 .<span class="ident">clone</span>()
                 .<span class="ident">json_array_not_ends_into</span>(<span class="ident">convert_value</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>))
                 .<span class="ident">and</span>(<span class="ident">expr_json</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::Array</span>))
                 .<span class="ident">into</span>(),
         },
-        <span class="ident">ScalarCondition::GreaterThan</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_json</span>
+        <span class="ident">ScalarCondition::GreaterThan</span>(<span class="ident">value</span>) =&gt; <span class="ident">expr_json</span>
             .<span class="ident">clone</span>()
             .<span class="ident">greater_than</span>(<span class="ident">convert_value</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>.<span class="ident">clone</span>()))
             .<span class="ident">and</span>(<span class="ident">filter_json_type</span>(<span class="ident">expr_json</span>, <span class="ident">value</span>))
             .<span class="ident">into</span>(),
-        <span class="ident">ScalarCondition::GreaterThanOrEquals</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_json</span>
+        <span class="ident">ScalarCondition::GreaterThanOrEquals</span>(<span class="ident">value</span>) =&gt; <span class="ident">expr_json</span>
             .<span class="ident">clone</span>()
             .<span class="ident">greater_than_or_equals</span>(<span class="ident">convert_value</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>.<span class="ident">clone</span>()))
             .<span class="ident">and</span>(<span class="ident">filter_json_type</span>(<span class="ident">expr_json</span>, <span class="ident">value</span>))
             .<span class="ident">into</span>(),
-        <span class="ident">ScalarCondition::LessThan</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_json</span>
+        <span class="ident">ScalarCondition::LessThan</span>(<span class="ident">value</span>) =&gt; <span class="ident">expr_json</span>
             .<span class="ident">clone</span>()
             .<span class="ident">less_than</span>(<span class="ident">convert_value</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>.<span class="ident">clone</span>()))
             .<span class="ident">and</span>(<span class="ident">filter_json_type</span>(<span class="ident">expr_json</span>, <span class="ident">value</span>))
             .<span class="ident">into</span>(),
-        <span class="ident">ScalarCondition::LessThanOrEquals</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr_json</span>
+        <span class="ident">ScalarCondition::LessThanOrEquals</span>(<span class="ident">value</span>) =&gt; <span class="ident">expr_json</span>
             .<span class="ident">clone</span>()
             .<span class="ident">less_than_or_equals</span>(<span class="ident">convert_value</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>.<span class="ident">clone</span>()))
             .<span class="ident">and</span>(<span class="ident">filter_json_type</span>(<span class="ident">expr_json</span>, <span class="ident">value</span>))
             .<span class="ident">into</span>(),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">_</span> =&gt; {
             <span class="kw">return</span> <span class="ident">convert_scalar_filter</span>(<span class="ident">expr_json</span>, <span class="kw-2">*</span><span class="ident">cond</span>, <span class="ident">query_mode</span>, <span class="kw-2">&amp;</span>[<span class="ident">field</span>], <span class="bool-val">false</span>);
         }
     };
@@ -1302,18 +1302,18 @@
     <span class="ident">ConditionTree::single</span>(<span class="ident">condition</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">filter_json_type</span>(<span class="ident">comparable</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">PrismaValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Compare</span> {
+<span class="kw">fn</span> <span class="ident">filter_json_type</span>(<span class="ident">comparable</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="ident">Compare</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">PrismaValue::Json</span>(<span class="ident">json</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">PrismaValue::Json</span>(<span class="ident">json</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">json</span>: <span class="ident">serde_json::Value</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">json</span>.<span class="ident">as_str</span>()).<span class="ident">unwrap</span>();
 
             <span class="kw">match</span> <span class="ident">json</span> {
-                <span class="ident">serde_json::Value::String</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::String</span>),
-                <span class="ident">serde_json::Value::Number</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::Number</span>),
-                <span class="ident">v</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;JSON target types only accept strings or numbers, found: {}&quot;</span>, <span class="ident">v</span>),
+                <span class="ident">serde_json::Value::String</span>(<span class="kw">_</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::String</span>),
+                <span class="ident">serde_json::Value::Number</span>(<span class="kw">_</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">json_type_equals</span>(<span class="ident">JsonType::Number</span>),
+                <span class="ident">v</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;JSON target types only accept strings or numbers, found: {}&quot;</span>, <span class="ident">v</span>),
             }
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
@@ -1321,26 +1321,26 @@
     <span class="ident">comparable</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
     <span class="ident">cond</span>: <span class="ident">ScalarCondition</span>,
     <span class="ident">fields</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarFieldRef</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">condition</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cond</span> {
-        <span class="ident">ScalarCondition::Equals</span>(<span class="ident">PrismaValue::Null</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">is_null</span>(),
-        <span class="ident">ScalarCondition::NotEquals</span>(<span class="ident">PrismaValue::Null</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">is_not_null</span>(),
-        <span class="ident">ScalarCondition::Equals</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">equals</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::NotEquals</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">not_equals</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::Contains</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">like</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::NotContains</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">not_like</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::StartsWith</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">begins_with</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::NotStartsWith</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">not_begins_with</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::EndsWith</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">ends_into</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::NotEndsWith</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">not_ends_into</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::LessThan</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">less_than</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::LessThanOrEquals</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">less_than_or_equals</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::GreaterThan</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">greater_than</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::GreaterThanOrEquals</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::Equals</span>(<span class="ident">PrismaValue::Null</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">is_null</span>(),
+        <span class="ident">ScalarCondition::NotEquals</span>(<span class="ident">PrismaValue::Null</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">is_not_null</span>(),
+        <span class="ident">ScalarCondition::Equals</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">equals</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::NotEquals</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">not_equals</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::Contains</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">like</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::NotContains</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">not_like</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::StartsWith</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">begins_with</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::NotStartsWith</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">not_begins_with</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::EndsWith</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">ends_into</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::NotEndsWith</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">not_ends_into</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::LessThan</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">less_than</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::LessThanOrEquals</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">less_than_or_equals</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::GreaterThan</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">greater_than</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::GreaterThanOrEquals</span>(<span class="ident">value</span>) =&gt; {
             <span class="ident">comparable</span>.<span class="ident">greater_than_or_equals</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>))
         }
-        <span class="ident">ScalarCondition::In</span>(<span class="ident">values</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">values</span>.<span class="ident">split_first</span>() {
-            <span class="prelude-val">Some</span>((<span class="ident">PrismaValue::List</span>(<span class="kw">_</span>), <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::In</span>(<span class="ident">values</span>) =&gt; <span class="kw">match</span> <span class="ident">values</span>.<span class="ident">split_first</span>() {
+            <span class="prelude-val">Some</span>((<span class="ident">PrismaValue::List</span>(<span class="kw">_</span>), <span class="kw">_</span>)) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql_values</span> <span class="op">=</span> <span class="ident">Values::with_capacity</span>(<span class="ident">values</span>.<span class="ident">len</span>());
 
                 <span class="kw">for</span> <span class="ident">pv</span> <span class="kw">in</span> <span class="ident">values</span> {
@@ -1350,10 +1350,10 @@
 
                 <span class="ident">comparable</span>.<span class="ident">in_selection</span>(<span class="ident">sql_values</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">in_selection</span>(<span class="ident">convert_values</span>(<span class="ident">fields</span>, <span class="ident">values</span>)),
+            <span class="kw">_</span> =&gt; <span class="ident">comparable</span>.<span class="ident">in_selection</span>(<span class="ident">convert_values</span>(<span class="ident">fields</span>, <span class="ident">values</span>)),
         },
-        <span class="ident">ScalarCondition::NotIn</span>(<span class="ident">values</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">values</span>.<span class="ident">split_first</span>() {
-            <span class="prelude-val">Some</span>((<span class="ident">PrismaValue::List</span>(<span class="kw">_</span>), <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::NotIn</span>(<span class="ident">values</span>) =&gt; <span class="kw">match</span> <span class="ident">values</span>.<span class="ident">split_first</span>() {
+            <span class="prelude-val">Some</span>((<span class="ident">PrismaValue::List</span>(<span class="kw">_</span>), <span class="kw">_</span>)) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql_values</span> <span class="op">=</span> <span class="ident">Values::with_capacity</span>(<span class="ident">values</span>.<span class="ident">len</span>());
 
                 <span class="kw">for</span> <span class="ident">pv</span> <span class="kw">in</span> <span class="ident">values</span> {
@@ -1363,23 +1363,23 @@
 
                 <span class="ident">comparable</span>.<span class="ident">not_in_selection</span>(<span class="ident">sql_values</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">not_in_selection</span>(<span class="ident">convert_values</span>(<span class="ident">fields</span>, <span class="ident">values</span>)),
+            <span class="kw">_</span> =&gt; <span class="ident">comparable</span>.<span class="ident">not_in_selection</span>(<span class="ident">convert_values</span>(<span class="ident">fields</span>, <span class="ident">values</span>)),
         },
-        <span class="ident">ScalarCondition::Search</span>(<span class="ident">value</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::Search</span>(<span class="ident">value</span>, <span class="kw">_</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">query</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">value</span>
                 .<span class="ident">try_into</span>()
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span>: <span class="ident">ConversionFailure</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>));
 
             <span class="ident">comparable</span>.<span class="ident">matches</span>(<span class="ident">query</span>)
         }
-        <span class="ident">ScalarCondition::NotSearch</span>(<span class="ident">value</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::NotSearch</span>(<span class="ident">value</span>, <span class="kw">_</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">query</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">value</span>
                 .<span class="ident">try_into</span>()
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span>: <span class="ident">ConversionFailure</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>));
 
             <span class="ident">comparable</span>.<span class="ident">not_matches</span>(<span class="ident">query</span>)
         }
-        <span class="ident">ScalarCondition::JsonCompare</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="ident">ScalarCondition::JsonCompare</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
     };
 
     <span class="ident">ConditionTree::single</span>(<span class="ident">condition</span>)
@@ -1390,42 +1390,42 @@
     <span class="ident">cond</span>: <span class="ident">ScalarCondition</span>,
     <span class="ident">fields</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarFieldRef</span>],
     <span class="ident">is_parent_aggregation</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="comment">// Current workaround: We assume we can use ILIKE when we see `mode: insensitive`, because postgres is the only DB that has</span>
     <span class="comment">// insensitive. We need a connector context for filter building that is unexpectedly complicated to integrate.</span>
     <span class="kw">let</span> <span class="ident">condition</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cond</span> {
-        <span class="ident">ScalarCondition::Equals</span>(<span class="ident">PrismaValue::Null</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">is_null</span>(),
-        <span class="ident">ScalarCondition::NotEquals</span>(<span class="ident">PrismaValue::Null</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">is_not_null</span>(),
-        <span class="ident">ScalarCondition::Equals</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::NotEquals</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;NOT ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::Contains</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;%{}%&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::NotContains</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;NOT ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;%{}%&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::StartsWith</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{}%&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::NotStartsWith</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;NOT ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{}%&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::EndsWith</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;%{}&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::NotEndsWith</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;NOT ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;%{}&quot;</span>, <span class="ident">value</span>)),
-        <span class="ident">ScalarCondition::LessThan</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::Equals</span>(<span class="ident">PrismaValue::Null</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">is_null</span>(),
+        <span class="ident">ScalarCondition::NotEquals</span>(<span class="ident">PrismaValue::Null</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">is_not_null</span>(),
+        <span class="ident">ScalarCondition::Equals</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::NotEquals</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;NOT ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::Contains</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;%{}%&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::NotContains</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;NOT ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;%{}%&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::StartsWith</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{}%&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::NotStartsWith</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;NOT ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{}%&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::EndsWith</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;%{}&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::NotEndsWith</span>(<span class="ident">value</span>) =&gt; <span class="ident">comparable</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;NOT ILIKE&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;%{}&quot;</span>, <span class="ident">value</span>)),
+        <span class="ident">ScalarCondition::LessThan</span>(<span class="ident">value</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">lower_if</span>(<span class="ident">comparable</span>, <span class="op">!</span><span class="ident">is_parent_aggregation</span>);
 
             <span class="ident">comparable</span>.<span class="ident">less_than</span>(<span class="ident">lower</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)))
         }
-        <span class="ident">ScalarCondition::LessThanOrEquals</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::LessThanOrEquals</span>(<span class="ident">value</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">lower_if</span>(<span class="ident">comparable</span>, <span class="op">!</span><span class="ident">is_parent_aggregation</span>);
 
             <span class="ident">comparable</span>.<span class="ident">less_than_or_equals</span>(<span class="ident">lower</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)))
         }
-        <span class="ident">ScalarCondition::GreaterThan</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::GreaterThan</span>(<span class="ident">value</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">lower_if</span>(<span class="ident">comparable</span>, <span class="op">!</span><span class="ident">is_parent_aggregation</span>);
 
             <span class="ident">comparable</span>.<span class="ident">greater_than</span>(<span class="ident">lower</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)))
         }
-        <span class="ident">ScalarCondition::GreaterThanOrEquals</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::GreaterThanOrEquals</span>(<span class="ident">value</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">lower_if</span>(<span class="ident">comparable</span>, <span class="op">!</span><span class="ident">is_parent_aggregation</span>);
 
             <span class="ident">comparable</span>.<span class="ident">greater_than_or_equals</span>(<span class="ident">lower</span>(<span class="ident">convert_first_value</span>(<span class="ident">fields</span>, <span class="ident">value</span>)))
         }
-        <span class="ident">ScalarCondition::In</span>(<span class="ident">values</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">values</span>.<span class="ident">split_first</span>() {
-            <span class="prelude-val">Some</span>((<span class="ident">PrismaValue::List</span>(<span class="kw">_</span>), <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::In</span>(<span class="ident">values</span>) =&gt; <span class="kw">match</span> <span class="ident">values</span>.<span class="ident">split_first</span>() {
+            <span class="prelude-val">Some</span>((<span class="ident">PrismaValue::List</span>(<span class="kw">_</span>), <span class="kw">_</span>)) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql_values</span> <span class="op">=</span> <span class="ident">Values::with_capacity</span>(<span class="ident">values</span>.<span class="ident">len</span>());
 
                 <span class="kw">for</span> <span class="ident">pv</span> <span class="kw">in</span> <span class="ident">values</span> {
@@ -1437,7 +1437,7 @@
 
                 <span class="ident">comparable</span>.<span class="ident">in_selection</span>(<span class="ident">sql_values</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">lower_if</span>(<span class="ident">comparable</span>, <span class="op">!</span><span class="ident">is_parent_aggregation</span>);
 
                 <span class="ident">comparable</span>.<span class="ident">in_selection</span>(
@@ -1451,8 +1451,8 @@
                 )
             }
         },
-        <span class="ident">ScalarCondition::NotIn</span>(<span class="ident">values</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">values</span>.<span class="ident">split_first</span>() {
-            <span class="prelude-val">Some</span>((<span class="ident">PrismaValue::List</span>(<span class="kw">_</span>), <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::NotIn</span>(<span class="ident">values</span>) =&gt; <span class="kw">match</span> <span class="ident">values</span>.<span class="ident">split_first</span>() {
+            <span class="prelude-val">Some</span>((<span class="ident">PrismaValue::List</span>(<span class="kw">_</span>), <span class="kw">_</span>)) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql_values</span> <span class="op">=</span> <span class="ident">Values::with_capacity</span>(<span class="ident">values</span>.<span class="ident">len</span>());
 
                 <span class="kw">for</span> <span class="ident">pv</span> <span class="kw">in</span> <span class="ident">values</span> {
@@ -1464,7 +1464,7 @@
 
                 <span class="ident">comparable</span>.<span class="ident">not_in_selection</span>(<span class="ident">sql_values</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">comparable</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">lower</span>(<span class="ident">comparable</span>).<span class="ident">into</span>();
 
                 <span class="ident">comparable</span>.<span class="ident">not_in_selection</span>(
@@ -1478,27 +1478,27 @@
                 )
             }
         },
-        <span class="ident">ScalarCondition::Search</span>(<span class="ident">value</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::Search</span>(<span class="ident">value</span>, <span class="kw">_</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">query</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">value</span>
                 .<span class="ident">try_into</span>()
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span>: <span class="ident">ConversionFailure</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>));
 
             <span class="ident">comparable</span>.<span class="ident">matches</span>(<span class="ident">query</span>)
         }
-        <span class="ident">ScalarCondition::NotSearch</span>(<span class="ident">value</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ScalarCondition::NotSearch</span>(<span class="ident">value</span>, <span class="kw">_</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">query</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">value</span>
                 .<span class="ident">try_into</span>()
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span>: <span class="ident">ConversionFailure</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>));
 
             <span class="ident">comparable</span>.<span class="ident">not_matches</span>(<span class="ident">query</span>)
         }
-        <span class="ident">ScalarCondition::JsonCompare</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="ident">ScalarCondition::JsonCompare</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
     };
 
     <span class="ident">ConditionTree::single</span>(<span class="ident">condition</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">lower_if</span>(<span class="ident">expr</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="ident">cond</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">lower_if</span>(<span class="ident">expr</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="ident">cond</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">cond</span> {
         <span class="ident">lower</span>(<span class="ident">expr</span>).<span class="ident">into</span>()
     } <span class="kw">else</span> {
@@ -1506,20 +1506,20 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">convert_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">value</span>: <span class="ident">PrismaValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">convert_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">value</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">field</span>.<span class="ident">value</span>(<span class="ident">value</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">convert_first_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarFieldRef</span>], <span class="ident">value</span>: <span class="ident">PrismaValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">convert_first_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarFieldRef</span>], <span class="ident">value</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">convert_value</span>(<span class="ident">fields</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>(), <span class="ident">value</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">convert_list_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">convert_list_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">Value::Array</span>(<span class="prelude-val">Some</span>(<span class="ident">values</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">convert_value</span>(<span class="ident">field</span>, <span class="ident">val</span>)).<span class="ident">collect</span>()))
 }
 
-<span class="kw">fn</span> <span class="ident">convert_values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarFieldRef</span>], <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">values</span>.<span class="ident">len</span>() {
+<span class="kw">fn</span> <span class="ident">convert_values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarFieldRef</span>], <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">values</span>.<span class="ident">len</span>() {
         <span class="ident">fields</span>
             .<span class="ident">iter</span>()
             .<span class="ident">zip</span>(<span class="ident">values</span>)

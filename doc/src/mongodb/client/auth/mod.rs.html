@@ -615,18 +615,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AuthMechanism</span> {
-    <span class="kw">fn</span> <span class="ident">from_scram_version</span>(<span class="ident">scram</span>: <span class="kw-2">&amp;</span><span class="ident">ScramVersion</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from_scram_version</span>(<span class="ident">scram</span>: <span class="kw-2">&amp;</span><span class="ident">ScramVersion</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">scram</span> {
-            <span class="ident">ScramVersion::Sha1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::ScramSha1</span>,
-            <span class="ident">ScramVersion::Sha256</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::ScramSha256</span>,
+            <span class="ident">ScramVersion::Sha1</span> =&gt; <span class="ident"><span class="self">Self</span>::ScramSha1</span>,
+            <span class="ident">ScramVersion::Sha256</span> =&gt; <span class="ident"><span class="self">Self</span>::ScramSha256</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_stream_description</span>(<span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AuthMechanism</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_stream_description</span>(<span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>) -&gt; <span class="ident">AuthMechanism</span> {
         <span class="kw">let</span> <span class="ident">scram_sha_256_found</span> <span class="op">=</span> <span class="ident">description</span>
             .<span class="ident">sasl_supported_mechs</span>
             .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ms</span><span class="op">|</span> <span class="ident">ms</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span> <span class="op">=</span><span class="op">=</span> <span class="ident">AuthMechanism::ScramSha256</span>.<span class="ident">as_str</span>()))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ms</span><span class="op">|</span> <span class="ident">ms</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span> <span class="op">==</span> <span class="ident">AuthMechanism::ScramSha256</span>.<span class="ident">as_str</span>()))
             .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
 
         <span class="kw">if</span> <span class="ident">scram_sha_256_found</span> {
@@ -638,9 +638,9 @@
 
     <span class="doccomment">/// Determines if the provided credentials have the required information to perform</span>
     <span class="doccomment">/// authentication.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_credential</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">credential</span>: <span class="kw-2">&amp;</span><span class="ident">Credential</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_credential</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">credential</span>: <span class="kw-2">&amp;</span><span class="ident">Credential</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AuthMechanism::ScramSha1</span> <span class="op">|</span> <span class="ident">AuthMechanism::ScramSha256</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMechanism::ScramSha1</span> <span class="op">|</span> <span class="ident">AuthMechanism::ScramSha256</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">credential</span>.<span class="ident">username</span>.<span class="ident">is_none</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="string">&quot;No username provided for SCRAM authentication&quot;</span>.<span class="ident">to_string</span>(),
@@ -649,7 +649,7 @@
                 };
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="ident">AuthMechanism::MongoDbX509</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMechanism::MongoDbX509</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">credential</span>.<span class="ident">password</span>.<span class="ident">is_some</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="string">&quot;A password cannot be specified with MONGODB-X509&quot;</span>.<span class="ident">to_string</span>(),
@@ -668,7 +668,7 @@
 
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="ident">AuthMechanism::Plain</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMechanism::Plain</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">credential</span>.<span class="ident">username</span>.<span class="ident">is_none</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="string">&quot;No username provided for PLAIN authentication&quot;</span>.<span class="ident">to_string</span>(),
@@ -676,7 +676,7 @@
                     .<span class="ident">into</span>());
                 }
 
-                <span class="kw">if</span> <span class="ident">credential</span>.<span class="ident">username</span>.<span class="ident">as_deref</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) {
+                <span class="kw">if</span> <span class="ident">credential</span>.<span class="ident">username</span>.<span class="ident">as_deref</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="string">&quot;Username for PLAIN authentication must be non-empty&quot;</span>.<span class="ident">to_string</span>(),
                     }
@@ -693,7 +693,7 @@
                 <span class="prelude-val">Ok</span>(())
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;aws-auth&quot;</span>)]</span>
-            <span class="ident">AuthMechanism::MongoDbAws</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMechanism::MongoDbAws</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">credential</span>.<span class="ident">username</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">credential</span>.<span class="ident">password</span>.<span class="ident">is_none</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="string">&quot;Username cannot be provided without password for MONGODB-AWS \
@@ -705,37 +705,37 @@
 
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 
     <span class="doccomment">/// Returns this `AuthMechanism` as a string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AuthMechanism::ScramSha1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SCRAM_SHA_1_STR</span>,
-            <span class="ident">AuthMechanism::ScramSha256</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SCRAM_SHA_256_STR</span>,
-            <span class="ident">AuthMechanism::MongoDbCr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MONGODB_CR_STR</span>,
-            <span class="ident">AuthMechanism::MongoDbX509</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MONGODB_X509_STR</span>,
-            <span class="ident">AuthMechanism::Gssapi</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">GSSAPI_STR</span>,
-            <span class="ident">AuthMechanism::Plain</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PLAIN_STR</span>,
+            <span class="ident">AuthMechanism::ScramSha1</span> =&gt; <span class="ident">SCRAM_SHA_1_STR</span>,
+            <span class="ident">AuthMechanism::ScramSha256</span> =&gt; <span class="ident">SCRAM_SHA_256_STR</span>,
+            <span class="ident">AuthMechanism::MongoDbCr</span> =&gt; <span class="ident">MONGODB_CR_STR</span>,
+            <span class="ident">AuthMechanism::MongoDbX509</span> =&gt; <span class="ident">MONGODB_X509_STR</span>,
+            <span class="ident">AuthMechanism::Gssapi</span> =&gt; <span class="ident">GSSAPI_STR</span>,
+            <span class="ident">AuthMechanism::Plain</span> =&gt; <span class="ident">PLAIN_STR</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;aws-auth&quot;</span>)]</span>
-            <span class="ident">AuthMechanism::MongoDbAws</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MONGODB_AWS_STR</span>,
+            <span class="ident">AuthMechanism::MongoDbAws</span> =&gt; <span class="ident">MONGODB_AWS_STR</span>,
         }
     }
 
     <span class="doccomment">/// Get the default authSource for a given mechanism depending on the database provided in the</span>
     <span class="doccomment">/// connection string.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">default_source</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">uri_db</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">default_source</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">uri_db</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="comment">// TODO: fill in others as they&#39;re implemented</span>
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AuthMechanism::ScramSha1</span> <span class="op">|</span> <span class="ident">AuthMechanism::ScramSha256</span> <span class="op">|</span> <span class="ident">AuthMechanism::MongoDbCr</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMechanism::ScramSha1</span> <span class="op">|</span> <span class="ident">AuthMechanism::ScramSha256</span> <span class="op">|</span> <span class="ident">AuthMechanism::MongoDbCr</span> =&gt; {
                 <span class="ident">uri_db</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;admin&quot;</span>)
             }
-            <span class="ident">AuthMechanism::MongoDbX509</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;$external&quot;</span>,
-            <span class="ident">AuthMechanism::Plain</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">uri_db</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;$external&quot;</span>),
+            <span class="ident">AuthMechanism::MongoDbX509</span> =&gt; <span class="string">&quot;$external&quot;</span>,
+            <span class="ident">AuthMechanism::Plain</span> =&gt; <span class="ident">uri_db</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;$external&quot;</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;aws-auth&quot;</span>)]</span>
-            <span class="ident">AuthMechanism::MongoDbAws</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;$external&quot;</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;&quot;</span>,
+            <span class="ident">AuthMechanism::MongoDbAws</span> =&gt; <span class="string">&quot;$external&quot;</span>,
+            <span class="kw">_</span> =&gt; <span class="string">&quot;&quot;</span>,
         }
     }
 
@@ -744,32 +744,32 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build_speculative_client_first</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">credential</span>: <span class="kw-2">&amp;</span><span class="ident">Credential</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientFirst</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientFirst</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ScramSha1</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ScramSha1</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">client_first</span> <span class="op">=</span> <span class="ident">ScramVersion::Sha1</span>.<span class="ident">build_speculative_client_first</span>(<span class="ident">credential</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ClientFirst::Scram</span>(<span class="ident">ScramVersion::Sha1</span>, <span class="ident">client_first</span>)))
             }
-            <span class="ident"><span class="self">Self</span>::ScramSha256</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ScramSha256</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">client_first</span> <span class="op">=</span>
                     <span class="ident">ScramVersion::Sha256</span>.<span class="ident">build_speculative_client_first</span>(<span class="ident">credential</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ClientFirst::Scram</span>(<span class="ident">ScramVersion::Sha256</span>, <span class="ident">client_first</span>)))
             }
-            <span class="ident"><span class="self">Self</span>::MongoDbX509</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ClientFirst::X509</span>(<span class="ident">Box::new</span>(
+            <span class="ident"><span class="self">Self</span>::MongoDbX509</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ClientFirst::X509</span>(<span class="ident">Box::new</span>(
                 <span class="ident">x509::build_speculative_client_first</span>(<span class="ident">credential</span>),
             )))),
-            <span class="ident"><span class="self">Self</span>::Plain</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="ident"><span class="self">Self</span>::Plain</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;aws-auth&quot;</span>)]</span>
-            <span class="ident">AuthMechanism::MongoDbAws</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            <span class="ident">AuthMechanism::MongoDbCr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Authentication</span> {
+            <span class="ident">AuthMechanism::MongoDbAws</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="ident">AuthMechanism::MongoDbCr</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Authentication</span> {
                 <span class="ident">message</span>: <span class="string">&quot;MONGODB-CR is deprecated and not supported by this driver. Use SCRAM \
                           for password-based authentication instead&quot;</span>
                     .<span class="ident">into</span>(),
             }
             .<span class="ident">into</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Authentication</span> {
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Authentication</span> {
                 <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Authentication mechanism {:?} not yet implemented.&quot;</span>, <span class="self">self</span>),
             }
             .<span class="ident">into</span>()),
@@ -782,37 +782,37 @@
         <span class="ident">credential</span>: <span class="kw-2">&amp;</span><span class="ident">Credential</span>,
         <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
         <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;aws-auth&quot;</span>), <span class="ident">allow</span>(<span class="ident">unused</span>))]</span> <span class="ident">http_client</span>: <span class="kw-2">&amp;</span><span class="ident">HttpClient</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">validate_credential</span>(<span class="ident">credential</span>)<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AuthMechanism::ScramSha1</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMechanism::ScramSha1</span> =&gt; {
                 <span class="ident">ScramVersion::Sha1</span>
                     .<span class="ident">authenticate_stream</span>(<span class="ident">stream</span>, <span class="ident">credential</span>, <span class="ident">server_api</span>, <span class="prelude-val">None</span>)
                     .<span class="kw">await</span>
             }
-            <span class="ident">AuthMechanism::ScramSha256</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMechanism::ScramSha256</span> =&gt; {
                 <span class="ident">ScramVersion::Sha256</span>
                     .<span class="ident">authenticate_stream</span>(<span class="ident">stream</span>, <span class="ident">credential</span>, <span class="ident">server_api</span>, <span class="prelude-val">None</span>)
                     .<span class="kw">await</span>
             }
-            <span class="ident">AuthMechanism::MongoDbX509</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMechanism::MongoDbX509</span> =&gt; {
                 <span class="ident">x509::authenticate_stream</span>(<span class="ident">stream</span>, <span class="ident">credential</span>, <span class="ident">server_api</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
             }
-            <span class="ident">AuthMechanism::Plain</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMechanism::Plain</span> =&gt; {
                 <span class="ident">plain::authenticate_stream</span>(<span class="ident">stream</span>, <span class="ident">credential</span>, <span class="ident">server_api</span>).<span class="kw">await</span>
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;aws-auth&quot;</span>)]</span>
-            <span class="ident">AuthMechanism::MongoDbAws</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AuthMechanism::MongoDbAws</span> =&gt; {
                 <span class="ident">aws::authenticate_stream</span>(<span class="ident">stream</span>, <span class="ident">credential</span>, <span class="ident">server_api</span>, <span class="ident">http_client</span>).<span class="kw">await</span>
             }
-            <span class="ident">AuthMechanism::MongoDbCr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Authentication</span> {
+            <span class="ident">AuthMechanism::MongoDbCr</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Authentication</span> {
                 <span class="ident">message</span>: <span class="string">&quot;MONGODB-CR is deprecated and not supported by this driver. Use SCRAM \
                           for password-based authentication instead&quot;</span>
                     .<span class="ident">into</span>(),
             }
             .<span class="ident">into</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Authentication</span> {
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Authentication</span> {
                 <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Authentication mechanism {:?} not yet implemented.&quot;</span>, <span class="self">self</span>),
             }
             .<span class="ident">into</span>()),
@@ -823,26 +823,26 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">AuthMechanism</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">str</span> {
-            <span class="ident">SCRAM_SHA_1_STR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::ScramSha1</span>),
-            <span class="ident">SCRAM_SHA_256_STR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::ScramSha256</span>),
-            <span class="ident">MONGODB_CR_STR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::MongoDbCr</span>),
-            <span class="ident">MONGODB_X509_STR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::MongoDbX509</span>),
-            <span class="ident">GSSAPI_STR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::Gssapi</span>),
-            <span class="ident">PLAIN_STR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::Plain</span>),
+            <span class="ident">SCRAM_SHA_1_STR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::ScramSha1</span>),
+            <span class="ident">SCRAM_SHA_256_STR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::ScramSha256</span>),
+            <span class="ident">MONGODB_CR_STR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::MongoDbCr</span>),
+            <span class="ident">MONGODB_X509_STR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::MongoDbX509</span>),
+            <span class="ident">GSSAPI_STR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::Gssapi</span>),
+            <span class="ident">PLAIN_STR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::Plain</span>),
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;aws-auth&quot;</span>)]</span>
-            <span class="ident">MONGODB_AWS_STR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::MongoDbAws</span>),
+            <span class="ident">MONGODB_AWS_STR</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMechanism::MongoDbAws</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;aws-auth&quot;</span>))]</span>
-            <span class="ident">MONGODB_AWS_STR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
+            <span class="ident">MONGODB_AWS_STR</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                 <span class="ident">message</span>: <span class="string">&quot;MONGODB-AWS auth is only supported with the aws-auth feature flag and \
                           the tokio runtime&quot;</span>
                     .<span class="ident">into</span>(),
             }
             .<span class="ident">into</span>()),
 
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                 <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid mechanism string: {}&quot;</span>, <span class="ident">str</span>),
             }
             .<span class="ident">into</span>()),
@@ -880,7 +880,7 @@
 
 <span class="kw">impl</span> <span class="ident">Credential</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_document</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Document</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_document</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Document</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::bson::Bson</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Document::new</span>();
@@ -902,7 +902,7 @@
         <span class="ident">doc</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">resolved_source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">resolved_source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">mechanism</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">default_source</span>(<span class="prelude-val">None</span>))
@@ -929,7 +929,7 @@
         <span class="ident">http_client</span>: <span class="kw-2">&amp;</span><span class="ident">HttpClient</span>,
         <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
         <span class="ident">first_round</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FirstRound</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">stream_description</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">stream_description</span>()<span class="question-mark">?</span>;
 
         <span class="comment">// Verify server can authenticate.</span>
@@ -941,20 +941,20 @@
         <span class="comment">// logic and use the first round from the handshake.</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">first_round</span>) <span class="op">=</span> <span class="ident">first_round</span> {
             <span class="kw">return</span> <span class="kw">match</span> <span class="ident">first_round</span> {
-                <span class="ident">FirstRound::Scram</span>(<span class="ident">version</span>, <span class="ident">first_round</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">FirstRound::Scram</span>(<span class="ident">version</span>, <span class="ident">first_round</span>) =&gt; {
                     <span class="ident">version</span>
                         .<span class="ident">authenticate_stream</span>(<span class="ident">conn</span>, <span class="self">self</span>, <span class="ident">server_api</span>, <span class="ident">first_round</span>)
                         .<span class="kw">await</span>
                 }
-                <span class="ident">FirstRound::X509</span>(<span class="ident">server_first</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">FirstRound::X509</span>(<span class="ident">server_first</span>) =&gt; {
                     <span class="ident">x509::authenticate_stream</span>(<span class="ident">conn</span>, <span class="self">self</span>, <span class="ident">server_api</span>, <span class="ident">server_first</span>).<span class="kw">await</span>
                 }
             };
         }
 
         <span class="kw">let</span> <span class="ident">mechanism</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">mechanism</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::Owned</span>(<span class="ident">AuthMechanism::from_stream_description</span>(<span class="ident">stream_description</span>)),
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::Borrowed</span>(<span class="ident">m</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">Cow::Owned</span>(<span class="ident">AuthMechanism::from_stream_description</span>(<span class="ident">stream_description</span>)),
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) =&gt; <span class="ident">Cow::Borrowed</span>(<span class="ident">m</span>),
         };
 
         <span class="comment">// Authenticate according to the chosen mechanism.</span>
@@ -967,7 +967,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_for_client_options</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
         <span class="ident">credential</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credential</span><span class="op">&gt;</span>,
         <span class="ident">serializer</span>: <span class="ident">S</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
     {
@@ -990,7 +990,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Credential</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Credential&quot;</span>)
             .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="string">&quot;REDACTED&quot;</span>.<span class="ident">to_string</span>())
             .<span class="ident">finish</span>()
@@ -1004,23 +1004,23 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ClientFirst</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Document</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Document</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Scram</span>(<span class="ident">version</span>, <span class="ident">client_first</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">client_first</span>.<span class="ident">to_command</span>(<span class="ident">version</span>).<span class="ident">body</span>,
-            <span class="ident"><span class="self">Self</span>::X509</span>(<span class="ident">command</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">command</span>.<span class="ident">body</span>.<span class="ident">clone</span>(),
+            <span class="ident"><span class="self">Self</span>::Scram</span>(<span class="ident">version</span>, <span class="ident">client_first</span>) =&gt; <span class="ident">client_first</span>.<span class="ident">to_command</span>(<span class="ident">version</span>).<span class="ident">body</span>,
+            <span class="ident"><span class="self">Self</span>::X509</span>(<span class="ident">command</span>) =&gt; <span class="ident">command</span>.<span class="ident">body</span>.<span class="ident">clone</span>(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_first_round</span>(<span class="self">self</span>, <span class="ident">server_first</span>: <span class="ident">Document</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FirstRound</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_first_round</span>(<span class="self">self</span>, <span class="ident">server_first</span>: <span class="ident">Document</span>) -&gt; <span class="ident">FirstRound</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Scram</span>(<span class="ident">version</span>, <span class="ident">client_first</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FirstRound::Scram</span>(
+            <span class="ident"><span class="self">Self</span>::Scram</span>(<span class="ident">version</span>, <span class="ident">client_first</span>) =&gt; <span class="ident">FirstRound::Scram</span>(
                 <span class="ident">version</span>,
                 <span class="ident">scram::FirstRound</span> {
                     <span class="ident">client_first</span>,
                     <span class="ident">server_first</span>,
                 },
             ),
-            <span class="ident"><span class="self">Self</span>::X509</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FirstRound::X509</span>(<span class="ident">server_first</span>),
+            <span class="ident"><span class="self">Self</span>::X509</span>(..) =&gt; <span class="ident">FirstRound::X509</span>(<span class="ident">server_first</span>),
         }
     }
 }
@@ -1033,11 +1033,11 @@
     <span class="ident">X509</span>(<span class="ident">Document</span>),
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">generate_nonce_bytes</span>() <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">generate_nonce_bytes</span>() -&gt; [<span class="ident">u8</span>; <span class="number">32</span>] {
     <span class="ident">rand::thread_rng</span>().<span class="ident">gen</span>()
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">generate_nonce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">generate_nonce</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">generate_nonce_bytes</span>();
     <span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>)
 }
@@ -1046,7 +1046,7 @@
     <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     <span class="ident">auth_mechanism</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mac</span> <span class="op">=</span>
         <span class="ident">M::new_from_slice</span>(<span class="ident">key</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::unknown_authentication_error</span>(<span class="ident">auth_mechanism</span>))<span class="question-mark">?</span>;
     <span class="ident">mac</span>.<span class="ident">update</span>(<span class="ident">input</span>);

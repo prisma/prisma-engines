@@ -250,7 +250,7 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">lookup_fn</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">ty</span>) =&gt; {
         <span class="doccomment">/// Performs a lookup for the associated type.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// *hint* queries that end with a &#39;.&#39; are fully qualified names and are cheaper lookups</span>
@@ -258,18 +258,18 @@
         <span class="doccomment">/// # Arguments</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// * `query` - a `&amp;str` which parses to a domain name, failure to parse will return an error</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">N</span>) -&gt; <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">async_resolver</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>(<span class="ident">query</span>);
             <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">lock</span>()<span class="question-mark">?</span>.<span class="ident">block_on</span>(<span class="ident">lookup</span>)
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) =&gt; {
         <span class="doccomment">/// Performs a lookup for the associated type.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Arguments</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// * `query` - a type which can be converted to `Name` via `From`.</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) -&gt; <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">async_resolver</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>(<span class="ident">query</span>);
             <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">lock</span>()<span class="question-mark">?</span>.<span class="ident">block_on</span>(<span class="ident">lookup</span>)
         }
@@ -286,7 +286,7 @@
     <span class="doccomment">/// # Returns</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A new `Resolver` or an error if there was an error with the configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="ident">ResolverConfig</span>, <span class="ident">options</span>: <span class="ident">ResolverOpts</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="ident">ResolverConfig</span>, <span class="ident">options</span>: <span class="ident">ResolverOpts</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">runtime::Builder::new_current_thread</span>();
         <span class="ident">builder</span>.<span class="ident">enable_all</span>();
 
@@ -307,7 +307,7 @@
     <span class="doccomment">/// # Returns</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A new `Resolver` or an error if there was an error with the configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">ResolverConfig::default</span>(), <span class="ident">ResolverOpts::default</span>())
     }
 
@@ -316,7 +316,7 @@
     <span class="doccomment">/// This will use `/etc/resolv.conf` on Unix OSes and the registry on Windows.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_system_conf</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_system_conf</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">config</span>, <span class="ident">options</span>) <span class="op">=</span> <span class="ident"><span class="kw">super</span>::system_conf::read_system_conf</span>()<span class="question-mark">?</span>;
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">config</span>, <span class="ident">options</span>)
     }
@@ -329,7 +329,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `name` - name of the record to lookup, if name is not a valid domain name, an error will be returned</span>
     <span class="doccomment">/// * `record_type` - type of record to lookup</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">N</span>, <span class="ident">record_type</span>: <span class="ident">RecordType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="ident">Lookup</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">N</span>, <span class="ident">record_type</span>: <span class="ident">RecordType</span>) -&gt; <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="ident">Lookup</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">async_resolver</span>
             .<span class="ident">lookup</span>(<span class="ident">name</span>, <span class="ident">record_type</span>, <span class="ident">Default::default</span>());
@@ -343,7 +343,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `host` - string hostname, if this is an invalid hostname, an error will be returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup_ip</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span> <span class="op">+</span> <span class="ident">TryParseIp</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">host</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="ident">LookupIp</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup_ip</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span> <span class="op">+</span> <span class="ident">TryParseIp</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">host</span>: <span class="ident">N</span>) -&gt; <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="ident">LookupIp</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">async_resolver</span>.<span class="ident">lookup_ip</span>(<span class="ident">host</span>);
         <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">lock</span>()<span class="question-mark">?</span>.<span class="ident">block_on</span>(<span class="ident">lookup</span>)
     }

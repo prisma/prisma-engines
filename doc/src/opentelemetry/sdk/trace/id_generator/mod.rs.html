@@ -44,12 +44,12 @@
 
 <span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::trace::IdGenerator</span> <span class="kw">for</span> <span class="ident">IdGenerator</span> {
     <span class="doccomment">/// Generate new `TraceId` using thread local rng</span>
-    <span class="kw">fn</span> <span class="ident">new_trace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TraceId</span> {
+    <span class="kw">fn</span> <span class="ident">new_trace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TraceId</span> {
         <span class="ident">CURRENT_RNG</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">rng</span><span class="op">|</span> <span class="ident">TraceId::from_u128</span>(<span class="ident">rng</span>.<span class="ident">borrow_mut</span>().<span class="ident">gen</span>()))
     }
 
     <span class="doccomment">/// Generate new `SpanId` using thread local rng</span>
-    <span class="kw">fn</span> <span class="ident">new_span_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SpanId</span> {
+    <span class="kw">fn</span> <span class="ident">new_span_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SpanId</span> {
         <span class="ident">CURRENT_RNG</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">rng</span><span class="op">|</span> <span class="ident">SpanId::from_u64</span>(<span class="ident">rng</span>.<span class="ident">borrow_mut</span>().<span class="ident">gen</span>()))
     }
 }

@@ -76,22 +76,22 @@
 
 <span class="kw">use</span> <span class="ident">ast</span>::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unroll</span>(<span class="ident">rule</span>: <span class="ident">Rule</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Rule</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unroll</span>(<span class="ident">rule</span>: <span class="ident">Rule</span>) -&gt; <span class="ident">Rule</span> {
     <span class="kw">match</span> <span class="ident">rule</span> {
-        <span class="ident">Rule</span> { <span class="ident">name</span>, <span class="ident">ty</span>, <span class="ident">expr</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Rule</span> {
+        <span class="ident">Rule</span> { <span class="ident">name</span>, <span class="ident">ty</span>, <span class="ident">expr</span> } =&gt; <span class="ident">Rule</span> {
             <span class="ident">name</span>,
             <span class="ident">ty</span>,
             <span class="ident">expr</span>: <span class="ident">expr</span>.<span class="ident">map_bottom_up</span>(<span class="op">|</span><span class="ident">expr</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">expr</span> {
-                <span class="ident">Expr::RepOnce</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Expr::Seq</span>(<span class="ident">expr</span>.<span class="ident">clone</span>(), <span class="ident">Box::new</span>(<span class="ident">Expr::Rep</span>(<span class="ident">expr</span>))),
-                <span class="ident">Expr::RepExact</span>(<span class="ident">expr</span>, <span class="ident">num</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="number">1</span>..<span class="ident">num</span> <span class="op">+</span> <span class="number">1</span>)
+                <span class="ident">Expr::RepOnce</span>(<span class="ident">expr</span>) =&gt; <span class="ident">Expr::Seq</span>(<span class="ident">expr</span>.<span class="ident">clone</span>(), <span class="ident">Box::new</span>(<span class="ident">Expr::Rep</span>(<span class="ident">expr</span>))),
+                <span class="ident">Expr::RepExact</span>(<span class="ident">expr</span>, <span class="ident">num</span>) =&gt; (<span class="number">1</span>..<span class="ident">num</span> <span class="op">+</span> <span class="number">1</span>)
                     .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">expr</span>.<span class="ident">clone</span>())
                     .<span class="ident">rev</span>()
                     .<span class="ident">fold</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="ident">rep</span>, <span class="ident">expr</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">rep</span> {
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">expr</span>),
-                        <span class="prelude-val">Some</span>(<span class="ident">rep</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Expr::Seq</span>(<span class="ident">Box::new</span>(<span class="ident">expr</span>), <span class="ident">Box::new</span>(<span class="ident">rep</span>))),
+                        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">expr</span>),
+                        <span class="prelude-val">Some</span>(<span class="ident">rep</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Expr::Seq</span>(<span class="ident">Box::new</span>(<span class="ident">expr</span>), <span class="ident">Box::new</span>(<span class="ident">rep</span>))),
                     })
                     .<span class="ident">unwrap</span>(),
-                <span class="ident">Expr::RepMin</span>(<span class="ident">expr</span>, <span class="ident">min</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="number">1</span>..<span class="ident">min</span> <span class="op">+</span> <span class="number">2</span>)
+                <span class="ident">Expr::RepMin</span>(<span class="ident">expr</span>, <span class="ident">min</span>) =&gt; (<span class="number">1</span>..<span class="ident">min</span> <span class="op">+</span> <span class="number">2</span>)
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
                         <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">min</span> {
                             <span class="kw-2">*</span><span class="ident">expr</span>.<span class="ident">clone</span>()
@@ -101,19 +101,19 @@
                     })
                     .<span class="ident">rev</span>()
                     .<span class="ident">fold</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="ident">rep</span>, <span class="ident">expr</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">rep</span> {
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">expr</span>),
-                        <span class="prelude-val">Some</span>(<span class="ident">rep</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Expr::Seq</span>(<span class="ident">Box::new</span>(<span class="ident">expr</span>), <span class="ident">Box::new</span>(<span class="ident">rep</span>))),
+                        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">expr</span>),
+                        <span class="prelude-val">Some</span>(<span class="ident">rep</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Expr::Seq</span>(<span class="ident">Box::new</span>(<span class="ident">expr</span>), <span class="ident">Box::new</span>(<span class="ident">rep</span>))),
                     })
                     .<span class="ident">unwrap</span>(),
-                <span class="ident">Expr::RepMax</span>(<span class="ident">expr</span>, <span class="ident">max</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="number">1</span>..<span class="ident">max</span> <span class="op">+</span> <span class="number">1</span>)
+                <span class="ident">Expr::RepMax</span>(<span class="ident">expr</span>, <span class="ident">max</span>) =&gt; (<span class="number">1</span>..<span class="ident">max</span> <span class="op">+</span> <span class="number">1</span>)
                     .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Expr::Opt</span>(<span class="ident">expr</span>.<span class="ident">clone</span>()))
                     .<span class="ident">rev</span>()
                     .<span class="ident">fold</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="ident">rep</span>, <span class="ident">expr</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">rep</span> {
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">expr</span>),
-                        <span class="prelude-val">Some</span>(<span class="ident">rep</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Expr::Seq</span>(<span class="ident">Box::new</span>(<span class="ident">expr</span>), <span class="ident">Box::new</span>(<span class="ident">rep</span>))),
+                        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">expr</span>),
+                        <span class="prelude-val">Some</span>(<span class="ident">rep</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Expr::Seq</span>(<span class="ident">Box::new</span>(<span class="ident">expr</span>), <span class="ident">Box::new</span>(<span class="ident">rep</span>))),
                     })
                     .<span class="ident">unwrap</span>(),
-                <span class="ident">Expr::RepMinMax</span>(<span class="ident">expr</span>, <span class="ident">min</span>, <span class="ident">max</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="number">1</span>..<span class="ident">max</span> <span class="op">+</span> <span class="number">1</span>)
+                <span class="ident">Expr::RepMinMax</span>(<span class="ident">expr</span>, <span class="ident">min</span>, <span class="ident">max</span>) =&gt; (<span class="number">1</span>..<span class="ident">max</span> <span class="op">+</span> <span class="number">1</span>)
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
                         <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">min</span> {
                             <span class="kw-2">*</span><span class="ident">expr</span>.<span class="ident">clone</span>()
@@ -123,11 +123,11 @@
                     })
                     .<span class="ident">rev</span>()
                     .<span class="ident">fold</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="ident">rep</span>, <span class="ident">expr</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">rep</span> {
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">expr</span>),
-                        <span class="prelude-val">Some</span>(<span class="ident">rep</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Expr::Seq</span>(<span class="ident">Box::new</span>(<span class="ident">expr</span>), <span class="ident">Box::new</span>(<span class="ident">rep</span>))),
+                        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">expr</span>),
+                        <span class="prelude-val">Some</span>(<span class="ident">rep</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Expr::Seq</span>(<span class="ident">Box::new</span>(<span class="ident">expr</span>), <span class="ident">Box::new</span>(<span class="ident">rep</span>))),
                     })
                     .<span class="ident">unwrap</span>(),
-                <span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr</span>,
+                <span class="ident">expr</span> =&gt; <span class="ident">expr</span>,
             }),
         },
     }

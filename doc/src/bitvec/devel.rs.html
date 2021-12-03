@@ -226,7 +226,7 @@ that wish to safely perform generic programming with `bitvec` region types.
 <span class="doccomment">/// Views a `BitStore` reference as its accessor.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accessor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">T::Access</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accessor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T::Access</span>
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span> {
 	<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T::Access</span>) }
 }
@@ -236,7 +236,7 @@ that wish to safely perform generic programming with `bitvec` region types.
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alias_mask</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
 	<span class="ident">x</span>: <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitMask</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T::Alias</span> <span class="kw">as</span> <span class="ident">BitStore</span><span class="op">&gt;</span><span class="ident">::Mem</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">BitMask</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T::Alias</span> <span class="kw">as</span> <span class="ident">BitStore</span><span class="op">&gt;</span><span class="ident">::Mem</span><span class="op">&gt;</span>
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span> {
 	<span class="kw">unsafe</span> { <span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="ident">x</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>) }
 }
@@ -244,7 +244,7 @@ that wish to safely perform generic programming with `bitvec` region types.
 <span class="doccomment">/// Inserts an `::Alias` marker into a `T::Mem` value’s type.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alias_mem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="ident">T::Mem</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">&lt;</span><span class="ident">T::Alias</span> <span class="kw">as</span> <span class="ident">BitStore</span><span class="op">&gt;</span><span class="ident">::Mem</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alias_mem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="ident">T::Mem</span>) -&gt; <span class="op">&lt;</span><span class="ident">T::Alias</span> <span class="kw">as</span> <span class="ident">BitStore</span><span class="op">&gt;</span><span class="ident">::Mem</span>
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span> {
 	<span class="kw">unsafe</span> { <span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="ident">x</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>) }
 }
@@ -252,7 +252,7 @@ that wish to safely perform generic programming with `bitvec` region types.
 <span class="doccomment">/// Loads through an aliased reference into an unmarked local.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_aliased_local</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">T::Alias</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T::Mem</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_aliased_local</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">T::Alias</span>) -&gt; <span class="ident">T::Mem</span>
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span> {
 	<span class="ident">x</span>.<span class="ident">load_value</span>().<span class="ident">pipe</span>(<span class="ident">remove_alias</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>)
 }
@@ -260,7 +260,7 @@ that wish to safely perform generic programming with `bitvec` region types.
 <span class="doccomment">/// Converts a mutable reference into its memory register type.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mem_mut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T::Mem</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mem_mut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T::Mem</span>
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span> {
 	<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>) }
 }
@@ -268,7 +268,7 @@ that wish to safely perform generic programming with `bitvec` region types.
 <span class="doccomment">/// Removes the `::Alias` marker from a register value’s type.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_alias</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">BitStore</span><span class="op">&gt;</span><span class="ident">::Alias</span> <span class="kw">as</span> <span class="ident">BitStore</span><span class="op">&gt;</span><span class="ident">::Mem</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T::Mem</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_alias</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">BitStore</span><span class="op">&gt;</span><span class="ident">::Alias</span> <span class="kw">as</span> <span class="ident">BitStore</span><span class="op">&gt;</span><span class="ident">::Mem</span>) -&gt; <span class="ident">T::Mem</span>
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span> {
 	<span class="kw">unsafe</span> { <span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="ident">x</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>) }
 }
@@ -276,7 +276,7 @@ that wish to safely perform generic programming with `bitvec` region types.
 <span class="doccomment">/// Removes the `::Alias` marker from a `BitPtr`’s referent type.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_bitptr_alias</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">T::Alias</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_bitptr_alias</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">T::Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span> {
 	<span class="kw">unsafe</span> { <span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="ident">x</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>) }
 }
@@ -284,7 +284,7 @@ that wish to safely perform generic programming with `bitvec` region types.
 <span class="doccomment">/// Removes the `::Mem` marker from a memory value.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_mem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="ident">T::Mem</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_mem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="ident">T::Mem</span>) -&gt; <span class="ident">T</span>
 <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span> {
 	<span class="kw">unsafe</span> { <span class="ident">ptr::read</span>(<span class="kw-2">&amp;</span><span class="ident">x</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T::Mem</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>) }
 }
@@ -292,7 +292,7 @@ that wish to safely perform generic programming with `bitvec` region types.
 <span class="doccomment">/// Gets a `NonNull&lt;T&gt;` base pointer from a `NonNull&lt;[T]&gt;` slice pointer.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nonnull_slice_to_base</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">nn_slice</span>: <span class="ident">NonNull</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nonnull_slice_to_base</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">nn_slice</span>: <span class="ident">NonNull</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 	<span class="kw">unsafe</span> { <span class="ident">nn_slice</span>.<span class="ident">as_mut</span>() }
 		.<span class="ident">pipe</span>(<span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span><span class="ident">::as_mut_ptr</span>)
 		.<span class="ident">pipe</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">NonNull::new_unchecked</span>(<span class="ident">p</span>) })
@@ -322,17 +322,17 @@ the function, and must be inspected by the caller.
 `bounds` normalized to an ordinary `Range`, optionally clamped to `end`.
 **/</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalize_range</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">bounds</span>: <span class="ident">R</span>, <span class="ident">end</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalize_range</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">bounds</span>: <span class="ident">R</span>, <span class="ident">end</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
 <span class="kw">where</span> <span class="ident">R</span>: <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bounds</span>.<span class="ident">start_bound</span>() {
-		<span class="ident">Bound::Included</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>,
-		<span class="ident">Bound::Excluded</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>,
-		<span class="ident">Bound::Unbounded</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
+		<span class="ident">Bound::Included</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) =&gt; <span class="ident">n</span>,
+		<span class="ident">Bound::Excluded</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) =&gt; <span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>,
+		<span class="ident">Bound::Unbounded</span> =&gt; <span class="number">0</span>,
 	};
 	<span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bounds</span>.<span class="ident">end_bound</span>() {
-		<span class="ident">Bound::Included</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>,
-		<span class="ident">Bound::Excluded</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>,
-		<span class="ident">Bound::Unbounded</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">end</span>,
+		<span class="ident">Bound::Included</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) =&gt; <span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>,
+		<span class="ident">Bound::Excluded</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) =&gt; <span class="ident">n</span>,
+		<span class="ident">Bound::Unbounded</span> =&gt; <span class="ident">end</span>,
 	};
 	<span class="ident">min</span> .. <span class="ident">max</span>
 }

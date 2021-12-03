@@ -4,7 +4,7 @@
 compiler version, analogous to <a href="https://doc.rust-lang.org/reference/conditional-compilation.html#the-cfg-attribute"><code>#[cfg(...)]</code></a> and
 <a href="https://doc.rust-lang.org/reference/conditional-compilation.html#the-cfg_attr-attribute"><code>#[cfg_attr(...)]</code></a>.</p>
 <br>
-<h1 id="selectors" class="section-header"><a href="#selectors">Selectors</a></h1>
+<h2 id="selectors" class="section-header"><a href="#selectors">Selectors</a></h2>
 <ul>
 <li><p style="margin-left:50px;text-indent:-50px">
 <b><code>#[rustversion::stable]</code></b>
@@ -84,7 +84,7 @@ For conditional inclusion of attributes; analogous to
 </li>
 </ul>
 <br>
-<h1 id="use-cases" class="section-header"><a href="#use-cases">Use cases</a></h1>
+<h2 id="use-cases" class="section-header"><a href="#use-cases">Use cases</a></h2>
 <p>Providing additional trait impls as types are stabilized in the standard library
 without breaking compatibility with older compilers; in this case Pin&lt;P&gt;
 stabilized in <a href="https://blog.rust-lang.org/2019/02/28/Rust-1.33.0.html#pinning">Rust 1.33</a>:</p>
@@ -113,10 +113,10 @@ by the rustversion::attr macro.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
 <span class="attribute">#[<span class="ident">rustversion::attr</span>(<span class="ident">since</span>(<span class="number">1.32</span>), <span class="kw">const</span>)]</span>
-<span class="kw">fn</span> <span class="ident">duration_as_days</span>(<span class="ident">dur</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">duration_as_days</span>(<span class="ident">dur</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">u64</span> {
     <span class="ident">dur</span>.<span class="ident">as_secs</span>() <span class="op">/</span> <span class="number">60</span> <span class="op">/</span> <span class="number">60</span> <span class="op">/</span> <span class="number">24</span>
 }</code></pre></div>
 <br></div></details><h2 id="attributes" class="section-header"><a href="#attributes">Attribute Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="attr" href="attr.all.html" title="rustversion::all attr">all</a></div><div class="item-right docblock-short"></div><div class="item-left module-item"><a class="attr" href="attr.any.html" title="rustversion::any attr">any</a></div><div class="item-right docblock-short"></div><div class="item-left module-item"><a class="attr" href="attr.attr.html" title="rustversion::attr attr">attr</a></div><div class="item-right docblock-short"></div><div class="item-left module-item"><a class="attr" href="attr.before.html" title="rustversion::before attr">before</a></div><div class="item-right docblock-short"></div><div class="item-left module-item"><a class="attr" href="attr.beta.html" title="rustversion::beta attr">beta</a></div><div class="item-right docblock-short"></div><div class="item-left module-item"><a class="attr" href="attr.nightly.html" title="rustversion::nightly attr">nightly</a></div><div class="item-right docblock-short"></div><div class="item-left module-item"><a class="attr" href="attr.not.html" title="rustversion::not attr">not</a></div><div class="item-right docblock-short"></div><div class="item-left module-item"><a class="attr" href="attr.since.html" title="rustversion::since attr">since</a></div><div class="item-right docblock-short"></div><div class="item-left module-item"><a class="attr" href="attr.stable.html" title="rustversion::stable attr">stable</a></div><div class="item-right docblock-short"></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="rustversion" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.all.html" title="rustversion::all attr">all</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.any.html" title="rustversion::any attr">any</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.attr.html" title="rustversion::attr attr">attr</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.before.html" title="rustversion::before attr">before</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.beta.html" title="rustversion::beta attr">beta</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.nightly.html" title="rustversion::nightly attr">nightly</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.not.html" title="rustversion::not attr">not</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.since.html" title="rustversion::since attr">since</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.stable.html" title="rustversion::stable attr">stable</a></div><div class="item-right docblock-short"></div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="rustversion" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

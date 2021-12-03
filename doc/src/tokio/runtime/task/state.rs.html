@@ -692,7 +692,7 @@
 <span class="doccomment">/// unambiguous modification order.</span>
 <span class="kw">impl</span> <span class="ident">State</span> {
     <span class="doccomment">/// Return a task&#39;s initial state</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">State</span> {
         <span class="comment">// The raw task returned by this method has a ref-count of three. See</span>
         <span class="comment">// the comment on INITIAL_STATE for more.</span>
         <span class="ident">State</span> {
@@ -701,13 +701,13 @@
     }
 
     <span class="doccomment">/// Loads the current state, establishes `Acquire` ordering.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Snapshot</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Snapshot</span> {
         <span class="ident">Snapshot</span>(<span class="self">self</span>.<span class="ident">val</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>))
     }
 
     <span class="doccomment">/// Attempt to transition the lifecycle to `Running`. This sets the</span>
     <span class="doccomment">/// notified bit to false so notifications during the poll can be detected.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_running</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TransitionToRunning</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_running</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TransitionToRunning</span> {
         <span class="self">self</span>.<span class="ident">fetch_update_action</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">next</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">action</span>;
             <span class="macro">assert!</span>(<span class="ident">next</span>.<span class="ident">is_notified</span>());
@@ -717,7 +717,7 @@
                 <span class="comment">// has already completed, e.g. if it was cancelled during</span>
                 <span class="comment">// shutdown. Consume the ref-count and return.</span>
                 <span class="ident">next</span>.<span class="ident">ref_dec</span>();
-                <span class="kw">if</span> <span class="ident">next</span>.<span class="ident">ref_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">next</span>.<span class="ident">ref_count</span>() <span class="op">==</span> <span class="number">0</span> {
                     <span class="ident">action</span> <span class="op">=</span> <span class="ident">TransitionToRunning::Dealloc</span>;
                 } <span class="kw">else</span> {
                     <span class="ident">action</span> <span class="op">=</span> <span class="ident">TransitionToRunning::Failed</span>;
@@ -742,7 +742,7 @@
     <span class="doccomment">/// Returns `true` if the transition to `Idle` is successful, `false` otherwise.</span>
     <span class="doccomment">/// The transition to `Idle` fails if the task has been flagged to be</span>
     <span class="doccomment">/// cancelled.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TransitionToIdle</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TransitionToIdle</span> {
         <span class="self">self</span>.<span class="ident">fetch_update_action</span>(<span class="op">|</span><span class="ident">curr</span><span class="op">|</span> {
             <span class="macro">assert!</span>(<span class="ident">curr</span>.<span class="ident">is_running</span>());
 
@@ -757,7 +757,7 @@
             <span class="kw">if</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_notified</span>() {
                 <span class="comment">// Polling the future consumes the ref-count of the Notified.</span>
                 <span class="ident">next</span>.<span class="ident">ref_dec</span>();
-                <span class="kw">if</span> <span class="ident">next</span>.<span class="ident">ref_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">next</span>.<span class="ident">ref_count</span>() <span class="op">==</span> <span class="number">0</span> {
                     <span class="ident">action</span> <span class="op">=</span> <span class="ident">TransitionToIdle::OkDealloc</span>;
                 } <span class="kw">else</span> {
                     <span class="ident">action</span> <span class="op">=</span> <span class="ident">TransitionToIdle::Ok</span>;
@@ -775,7 +775,7 @@
     }
 
     <span class="doccomment">/// Transitions the task from `Running` -&gt; `Complete`.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_complete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Snapshot</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_complete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Snapshot</span> {
         <span class="kw">const</span> <span class="ident">DELTA</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">RUNNING</span> <span class="op">|</span> <span class="ident">COMPLETE</span>;
 
         <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">Snapshot</span>(<span class="self">self</span>.<span class="ident">val</span>.<span class="ident">fetch_xor</span>(<span class="ident">DELTA</span>, <span class="ident">AcqRel</span>));
@@ -789,7 +789,7 @@
     <span class="doccomment">/// count the specified number of times.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns true if the task should be deallocated.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_terminal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_terminal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">Snapshot</span>(<span class="self">self</span>.<span class="ident">val</span>.<span class="ident">fetch_sub</span>(<span class="ident">count</span> <span class="op">*</span> <span class="ident">REF_ONE</span>, <span class="ident">AcqRel</span>));
         <span class="macro">assert!</span>(
             <span class="ident">prev</span>.<span class="ident">ref_count</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">count</span>,
@@ -797,7 +797,7 @@
             <span class="ident">prev</span>.<span class="ident">ref_count</span>(),
             <span class="ident">count</span>
         );
-        <span class="ident">prev</span>.<span class="ident">ref_count</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">count</span>
+        <span class="ident">prev</span>.<span class="ident">ref_count</span>() <span class="op">==</span> <span class="ident">count</span>
     }
 
     <span class="doccomment">/// Transitions the state to `NOTIFIED`.</span>
@@ -806,7 +806,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If a task needs to be submitted, the ref-count is incremented for the</span>
     <span class="doccomment">/// new Notified.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_notified_by_val</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TransitionToNotifiedByVal</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_notified_by_val</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TransitionToNotifiedByVal</span> {
         <span class="self">self</span>.<span class="ident">fetch_update_action</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">snapshot</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">action</span>;
 
@@ -826,7 +826,7 @@
                 <span class="comment">// decrement the ref-count.</span>
                 <span class="ident">snapshot</span>.<span class="ident">ref_dec</span>();
 
-                <span class="kw">if</span> <span class="ident">snapshot</span>.<span class="ident">ref_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">snapshot</span>.<span class="ident">ref_count</span>() <span class="op">==</span> <span class="number">0</span> {
                     <span class="ident">action</span> <span class="op">=</span> <span class="ident">TransitionToNotifiedByVal::Dealloc</span>;
                 } <span class="kw">else</span> {
                     <span class="ident">action</span> <span class="op">=</span> <span class="ident">TransitionToNotifiedByVal::DoNothing</span>;
@@ -844,7 +844,7 @@
     }
 
     <span class="doccomment">/// Transitions the state to `NOTIFIED`.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_notified_by_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TransitionToNotifiedByRef</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_notified_by_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TransitionToNotifiedByRef</span> {
         <span class="self">self</span>.<span class="ident">fetch_update_action</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">snapshot</span><span class="op">|</span> {
             <span class="kw">if</span> <span class="ident">snapshot</span>.<span class="ident">is_complete</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">snapshot</span>.<span class="ident">is_notified</span>() {
                 <span class="comment">// There is nothing to do in this case.</span>
@@ -869,7 +869,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `true` if the task needs to be submitted to the pool for</span>
     <span class="doccomment">/// execution</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_notified_and_cancel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_notified_and_cancel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">fetch_update_action</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">snapshot</span><span class="op">|</span> {
             <span class="kw">if</span> <span class="ident">snapshot</span>.<span class="ident">is_cancelled</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">snapshot</span>.<span class="ident">is_complete</span>() {
                 <span class="comment">// Aborts to completed or cancelled tasks are no-ops.</span>
@@ -904,7 +904,7 @@
     <span class="doccomment">/// Set the `CANCELLED` bit and attempt to transition to `Running`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `true` if the transition to `Running` succeeded.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_shutdown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_to_shutdown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">Snapshot</span>(<span class="number">0</span>);
 
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fetch_update</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">snapshot</span><span class="op">|</span> {
@@ -926,7 +926,7 @@
 
     <span class="doccomment">/// Optimistically tries to swap the state assuming the join handle is</span>
     <span class="doccomment">/// __immediately__ dropped on spawn</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">drop_join_handle_fast</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">drop_join_handle_fast</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">std::sync::atomic::Ordering::Relaxed</span>;
 
         <span class="comment">// Relaxed is acceptable as if this function is called and succeeds,</span>
@@ -951,7 +951,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `Ok` if the operation happens before the task transitions to a</span>
     <span class="doccomment">/// completed state, `Err` otherwise.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">unset_join_interested</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UpdateResult</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">unset_join_interested</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">UpdateResult</span> {
         <span class="self">self</span>.<span class="ident">fetch_update</span>(<span class="op">|</span><span class="ident">curr</span><span class="op">|</span> {
             <span class="macro">assert!</span>(<span class="ident">curr</span>.<span class="ident">is_join_interested</span>());
 
@@ -970,7 +970,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `Ok` if the bit is set, `Err` otherwise. This operation fails if</span>
     <span class="doccomment">/// the task has completed.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">set_join_waker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UpdateResult</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">set_join_waker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">UpdateResult</span> {
         <span class="self">self</span>.<span class="ident">fetch_update</span>(<span class="op">|</span><span class="ident">curr</span><span class="op">|</span> {
             <span class="macro">assert!</span>(<span class="ident">curr</span>.<span class="ident">is_join_interested</span>());
             <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">curr</span>.<span class="ident">has_join_waker</span>());
@@ -990,7 +990,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `Ok` has been unset, `Err` otherwise. This operation fails if</span>
     <span class="doccomment">/// the task has completed.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">unset_waker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UpdateResult</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">unset_waker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">UpdateResult</span> {
         <span class="self">self</span>.<span class="ident">fetch_update</span>(<span class="op">|</span><span class="ident">curr</span><span class="op">|</span> {
             <span class="macro">assert!</span>(<span class="ident">curr</span>.<span class="ident">is_join_interested</span>());
             <span class="macro">assert!</span>(<span class="ident">curr</span>.<span class="ident">has_join_waker</span>());
@@ -1030,58 +1030,58 @@
     }
 
     <span class="doccomment">/// Returns `true` if the task should be released.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ref_dec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ref_dec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">Snapshot</span>(<span class="self">self</span>.<span class="ident">val</span>.<span class="ident">fetch_sub</span>(<span class="ident">REF_ONE</span>, <span class="ident">AcqRel</span>));
         <span class="macro">assert!</span>(<span class="ident">prev</span>.<span class="ident">ref_count</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>);
-        <span class="ident">prev</span>.<span class="ident">ref_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>
+        <span class="ident">prev</span>.<span class="ident">ref_count</span>() <span class="op">==</span> <span class="number">1</span>
     }
 
     <span class="doccomment">/// Returns `true` if the task should be released.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ref_dec_twice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ref_dec_twice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">Snapshot</span>(<span class="self">self</span>.<span class="ident">val</span>.<span class="ident">fetch_sub</span>(<span class="number">2</span> <span class="op">*</span> <span class="ident">REF_ONE</span>, <span class="ident">AcqRel</span>));
         <span class="macro">assert!</span>(<span class="ident">prev</span>.<span class="ident">ref_count</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span>);
-        <span class="ident">prev</span>.<span class="ident">ref_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2</span>
+        <span class="ident">prev</span>.<span class="ident">ref_count</span>() <span class="op">==</span> <span class="number">2</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">fetch_update_action</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+    <span class="kw">fn</span> <span class="ident">fetch_update_action</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Snapshot</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">T</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Snapshot</span><span class="op">&gt;</span>),
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Snapshot</span>) -&gt; (<span class="ident">T</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Snapshot</span><span class="op">&gt;</span>),
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">curr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">load</span>();
 
         <span class="kw">loop</span> {
             <span class="kw">let</span> (<span class="ident">output</span>, <span class="ident">next</span>) <span class="op">=</span> <span class="ident">f</span>(<span class="ident">curr</span>);
             <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">next</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">output</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">next</span>) =&gt; <span class="ident">next</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">output</span>,
             };
 
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">val</span>.<span class="ident">compare_exchange</span>(<span class="ident">curr</span>.<span class="number">0</span>, <span class="ident">next</span>.<span class="number">0</span>, <span class="ident">AcqRel</span>, <span class="ident">Acquire</span>);
 
             <span class="kw">match</span> <span class="ident">res</span> {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">output</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">actual</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">curr</span> <span class="op">=</span> <span class="ident">Snapshot</span>(<span class="ident">actual</span>),
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">output</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; <span class="ident">curr</span> <span class="op">=</span> <span class="ident">Snapshot</span>(<span class="ident">actual</span>),
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">fetch_update</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Snapshot</span>, <span class="ident">Snapshot</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">fetch_update</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Snapshot</span>, <span class="ident">Snapshot</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Snapshot</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Snapshot</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Snapshot</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Snapshot</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">curr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">load</span>();
 
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">f</span>(<span class="ident">curr</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">next</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">curr</span>),
+                <span class="prelude-val">Some</span>(<span class="ident">next</span>) =&gt; <span class="ident">next</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">curr</span>),
             };
 
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">val</span>.<span class="ident">compare_exchange</span>(<span class="ident">curr</span>.<span class="number">0</span>, <span class="ident">next</span>.<span class="number">0</span>, <span class="ident">AcqRel</span>, <span class="ident">Acquire</span>);
 
             <span class="kw">match</span> <span class="ident">res</span> {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">next</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">actual</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">curr</span> <span class="op">=</span> <span class="ident">Snapshot</span>(<span class="ident">actual</span>),
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">next</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; <span class="ident">curr</span> <span class="op">=</span> <span class="ident">Snapshot</span>(<span class="ident">actual</span>),
             }
         }
     }
@@ -1091,13 +1091,13 @@
 
 <span class="kw">impl</span> <span class="ident">Snapshot</span> {
     <span class="doccomment">/// Returns `true` if the task is in an idle state.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_idle</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> (<span class="ident">RUNNING</span> <span class="op">|</span> <span class="ident">COMPLETE</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_idle</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> (<span class="ident">RUNNING</span> <span class="op">|</span> <span class="ident">COMPLETE</span>) <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Returns `true` if the task has been flagged as notified.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_notified</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">NOTIFIED</span> <span class="op">=</span><span class="op">=</span> <span class="ident">NOTIFIED</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_notified</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">NOTIFIED</span> <span class="op">==</span> <span class="ident">NOTIFIED</span>
     }
 
     <span class="kw">fn</span> <span class="ident">unset_notified</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
@@ -1108,8 +1108,8 @@
         <span class="self">self</span>.<span class="number">0</span> <span class="op">|</span><span class="op">=</span> <span class="ident">NOTIFIED</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_running</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">RUNNING</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RUNNING</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_running</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">RUNNING</span> <span class="op">==</span> <span class="ident">RUNNING</span>
     }
 
     <span class="kw">fn</span> <span class="ident">set_running</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
@@ -1120,8 +1120,8 @@
         <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">RUNNING</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_cancelled</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">CANCELLED</span> <span class="op">=</span><span class="op">=</span> <span class="ident">CANCELLED</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_cancelled</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">CANCELLED</span> <span class="op">==</span> <span class="ident">CANCELLED</span>
     }
 
     <span class="kw">fn</span> <span class="ident">set_cancelled</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
@@ -1129,20 +1129,20 @@
     }
 
     <span class="doccomment">/// Returns `true` if the task&#39;s future has completed execution.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_complete</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">COMPLETE</span> <span class="op">=</span><span class="op">=</span> <span class="ident">COMPLETE</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_complete</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">COMPLETE</span> <span class="op">==</span> <span class="ident">COMPLETE</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_join_interested</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">JOIN_INTEREST</span> <span class="op">=</span><span class="op">=</span> <span class="ident">JOIN_INTEREST</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_join_interested</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">JOIN_INTEREST</span> <span class="op">==</span> <span class="ident">JOIN_INTEREST</span>
     }
 
     <span class="kw">fn</span> <span class="ident">unset_join_interested</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">JOIN_INTEREST</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_join_waker</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">JOIN_WAKER</span> <span class="op">=</span><span class="op">=</span> <span class="ident">JOIN_WAKER</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_join_waker</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">JOIN_WAKER</span> <span class="op">==</span> <span class="ident">JOIN_WAKER</span>
     }
 
     <span class="kw">fn</span> <span class="ident">set_join_waker</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
@@ -1153,7 +1153,7 @@
         <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">JOIN_WAKER</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ref_count</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ref_count</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         (<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">REF_COUNT_MASK</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">REF_COUNT_SHIFT</span>
     }
 
@@ -1169,14 +1169,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">load</span>();
         <span class="ident">snapshot</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Snapshot</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Snapshot&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;is_running&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_running</span>())
             .<span class="ident">field</span>(<span class="string">&quot;is_complete&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_complete</span>())

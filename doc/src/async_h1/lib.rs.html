@@ -265,10 +265,10 @@
 <span class="doccomment">/// like ready! but early-returns the Poll&lt;Result&lt;usize&gt;&gt; early in all situations other than Ready(Ok(0))</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">read_to_end</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">expr</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">expr</span>:<span class="ident">expr</span>) =&gt; {
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expr</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>)) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">other</span>,
+            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>)) =&gt; (),
+            <span class="ident">other</span> =&gt; <span class="kw">return</span> <span class="ident">other</span>,
         }
     };
 }

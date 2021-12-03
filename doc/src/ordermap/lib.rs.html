@@ -1911,7 +1911,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mutable_keys::MutableKeys</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">set::OrderSet</span>;
 
-<span class="kw">fn</span> <span class="ident">hash_elem_using</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">BuildHasher</span>, <span class="ident">K</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Hash</span><span class="op">&gt;</span>(<span class="ident">build</span>: <span class="kw-2">&amp;</span><span class="ident">B</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashValue</span> {
+<span class="kw">fn</span> <span class="ident">hash_elem_using</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">BuildHasher</span>, <span class="ident">K</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Hash</span><span class="op">&gt;</span>(<span class="ident">build</span>: <span class="kw-2">&amp;</span><span class="ident">B</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>) -&gt; <span class="ident">HashValue</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">build</span>.<span class="ident">build_hasher</span>();
     <span class="ident">k</span>.<span class="ident">hash</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">h</span>);
     <span class="ident">HashValue</span>(<span class="ident">h</span>.<span class="ident">finish</span>() <span class="kw">as</span> <span class="ident">usize</span>)
@@ -1924,17 +1924,17 @@
 
 <span class="kw">impl</span> <span class="ident">HashValue</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> { <span class="self">self</span>.<span class="number">0</span> }
+    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> { <span class="self">self</span>.<span class="number">0</span> }
 }
 
 <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">HashValue</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> { <span class="kw-2">*</span><span class="self">self</span> }
 }
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">HashValue</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">rhs</span>.<span class="number">0</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">rhs</span>.<span class="number">0</span>
     }
 }
 
@@ -1949,7 +1949,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// - Sz = u32: 32-bit hash is enough to select bucket index</span>
     <span class="doccomment">/// - Sz = u64: hash is not truncated</span>
-    <span class="kw">fn</span> <span class="ident">into_hash</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashValue</span> {
+    <span class="kw">fn</span> <span class="ident">into_hash</span>(<span class="self">self</span>) -&gt; <span class="ident">HashValue</span> {
         <span class="ident">HashValue</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -1957,13 +1957,13 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">ShortHash</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span> { }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">ShortHash</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> { <span class="kw-2">*</span><span class="self">self</span> }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">ShortHash</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">rhs</span>.<span class="number">0</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">rhs</span>.<span class="number">0</span>
     }
 }
 
@@ -1971,16 +1971,16 @@
 <span class="comment">// if applicable before the comparison</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">HashValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ShortHash</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">Sz</span>: <span class="ident">Size</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">HashValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">HashValue</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="ident">Sz::is_64_bit</span>() {
-            <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">rhs</span>.<span class="number">0</span>
+            <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">rhs</span>.<span class="number">0</span>
         } <span class="kw">else</span> {
-            <span class="ident">lo32</span>(<span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">lo32</span>(<span class="ident">rhs</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u64</span>)
+            <span class="ident">lo32</span>(<span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">==</span> <span class="ident">lo32</span>(<span class="ident">rhs</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u64</span>)
         }
     }
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ShortHash</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">ShortHash</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="ident">HashValue</span>(<span class="ident">x</span>.<span class="number">0</span>) }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">ShortHash</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> { <span class="ident">HashValue</span>(<span class="ident">x</span>.<span class="number">0</span>) }
 }
 
 <span class="doccomment">/// `Pos` is stored in the `indices` array and it points to the index of a</span>
@@ -2006,30 +2006,30 @@
 
 <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Pos</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> { <span class="kw-2">*</span><span class="self">self</span> }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Pos</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">pos</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Pos({} / {:x})&quot;</span>, <span class="ident">i</span>, <span class="self">self</span>.<span class="ident">index</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Pos(None)&quot;</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Pos({} / {:x})&quot;</span>, <span class="ident">i</span>, <span class="self">self</span>.<span class="ident">index</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Pos(None)&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Pos</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">none</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="ident">Pos</span> { <span class="ident">index</span>: <span class="op">!</span><span class="number">0</span> } }
+    <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="self">Self</span> { <span class="ident">Pos</span> { <span class="ident">index</span>: <span class="op">!</span><span class="number">0</span> } }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_none</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="self">self</span>.<span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="op">!</span><span class="number">0</span> }
+    <span class="kw">fn</span> <span class="ident">is_none</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="self">self</span>.<span class="ident">index</span> <span class="op">==</span> <span class="op">!</span><span class="number">0</span> }
 
     <span class="doccomment">/// Return the index part of the Pos value inside `Some(_)` if the position</span>
     <span class="doccomment">/// is not none, otherwise return `None`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="op">!</span><span class="number">0</span> { <span class="prelude-val">None</span> } <span class="kw">else</span> { <span class="prelude-val">Some</span>(<span class="ident">lo32</span>(<span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="ident">u64</span>)) }
+    <span class="kw">fn</span> <span class="ident">pos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">index</span> <span class="op">==</span> <span class="op">!</span><span class="number">0</span> { <span class="prelude-val">None</span> } <span class="kw">else</span> { <span class="prelude-val">Some</span>(<span class="ident">lo32</span>(<span class="self">self</span>.<span class="ident">index</span> <span class="kw">as</span> <span class="ident">u64</span>)) }
     }
 
     <span class="doccomment">/// Set the index part of the Pos value to `i`</span>
@@ -2046,7 +2046,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">with_hash</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">hash</span>: <span class="ident">HashValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">fn</span> <span class="ident">with_hash</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">hash</span>: <span class="ident">HashValue</span>) -&gt; <span class="self">Self</span>
         <span class="kw">where</span> <span class="ident">Sz</span>: <span class="ident">Size</span>
     {
         <span class="kw">if</span> <span class="ident">Sz::is_64_bit</span>() {
@@ -2064,7 +2064,7 @@
     <span class="doccomment">/// a proxy value to the hash (whether it contains the hash or not</span>
     <span class="doccomment">/// depends on the size class of the hash map).</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">resolve</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">ShortHashProxy</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>)<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">resolve</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">ShortHashProxy</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>)<span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">Sz</span>: <span class="ident">Size</span>
     {
         <span class="kw">if</span> <span class="ident">Sz::is_64_bit</span>() {
@@ -2085,7 +2085,7 @@
 
     <span class="doccomment">/// Like resolve, but the Pos **must** be non-none. Return its index.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">resolve_existing_index</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> 
+    <span class="kw">fn</span> <span class="ident">resolve_existing_index</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> 
         <span class="kw">where</span> <span class="ident">Sz</span>: <span class="ident">Size</span>
     {
         <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">is_none</span>(), <span class="string">&quot;datastructure inconsistent: none where valid Pos expected&quot;</span>);
@@ -2100,11 +2100,11 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">lo32</span>(<span class="ident">x</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> { (<span class="ident">x</span> <span class="op">&amp;</span> <span class="number">0xFFFF_FFFF</span>) <span class="kw">as</span> <span class="ident">usize</span> }
+<span class="kw">fn</span> <span class="ident">lo32</span>(<span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="ident">usize</span> { (<span class="ident">x</span> <span class="op">&amp;</span> <span class="number">0xFFFF_FFFF</span>) <span class="kw">as</span> <span class="ident">usize</span> }
 
 <span class="comment">// split into low, hi parts</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">split_lo_hi</span>(<span class="ident">x</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u32</span>, <span class="ident">u32</span>) { (<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u32</span>, (<span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>) }
+<span class="kw">fn</span> <span class="ident">split_lo_hi</span>(<span class="ident">x</span>: <span class="ident">u64</span>) -&gt; (<span class="ident">u32</span>, <span class="ident">u32</span>) { (<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u32</span>, (<span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>) }
 
 <span class="comment">// Possibly contains the truncated hash value for an entry, depending on</span>
 <span class="comment">// the size class.</span>
@@ -2113,13 +2113,13 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span> <span class="ident">ShortHashProxy</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">Sz</span>: <span class="ident">Size</span>
 {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ShortHashProxy</span>(<span class="ident">x</span>, <span class="ident">PhantomData</span>)
     }
 
     <span class="doccomment">/// Get the hash from either `self` or from a lookup into `entries`,</span>
     <span class="doccomment">/// depending on `Sz`.</span>
-    <span class="kw">fn</span> <span class="ident">get_short_hash</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">entries</span>: <span class="kw-2">&amp;</span>[<span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>], <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ShortHash</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_short_hash</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">entries</span>: <span class="kw-2">&amp;</span>[<span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>], <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ShortHash</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">Sz::is_64_bit</span>() {
             <span class="ident">ShortHash</span>(<span class="ident">entries</span>[<span class="ident">index</span>].<span class="ident">hash</span>.<span class="number">0</span>, <span class="ident">PhantomData</span>)
         } <span class="kw">else</span> {
@@ -2183,13 +2183,13 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">desired_pos</span>(<span class="ident">mask</span>: <span class="ident">usize</span>, <span class="ident">hash</span>: <span class="ident">HashValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">desired_pos</span>(<span class="ident">mask</span>: <span class="ident">usize</span>, <span class="ident">hash</span>: <span class="ident">HashValue</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">hash</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">mask</span>
 }
 
 <span class="doccomment">/// The number of steps that `current` is forward of the desired position for hash</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">probe_distance</span>(<span class="ident">mask</span>: <span class="ident">usize</span>, <span class="ident">hash</span>: <span class="ident">HashValue</span>, <span class="ident">current</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">probe_distance</span>(<span class="ident">mask</span>: <span class="ident">usize</span>, <span class="ident">hash</span>: <span class="ident">HashValue</span>, <span class="ident">current</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">current</span>.<span class="ident">wrapping_sub</span>(<span class="ident">desired_pos</span>(<span class="ident">mask</span>, <span class="ident">hash</span>)) <span class="op">&amp;</span> <span class="ident">mask</span>
 }
 
@@ -2207,7 +2207,7 @@
           <span class="ident">V</span>: <span class="ident">fmt::Debug</span>,
           <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">try!</span>(<span class="ident">f</span>.<span class="ident">debug_map</span>().<span class="ident">entries</span>(<span class="self">self</span>.<span class="ident">iter</span>()).<span class="ident">finish</span>());
         <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;test_debug&quot;</span>)) {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
@@ -2235,18 +2235,18 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">usable_capacity</span>(<span class="ident">cap</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">usable_capacity</span>(<span class="ident">cap</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">cap</span> <span class="op">-</span> <span class="ident">cap</span> <span class="op">/</span> <span class="number">4</span>
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">to_raw_capacity</span>(<span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">to_raw_capacity</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">n</span> <span class="op">+</span> <span class="ident">n</span> <span class="op">/</span> <span class="number">3</span>
 }
 
 <span class="comment">// this could not be captured in an efficient iterator</span>
 <span class="macro">macro_rules!</span> <span class="ident">probe_loop</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">probe_var</span>: <span class="ident">ident</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">probe_var</span>: <span class="ident">ident</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span>) =&gt; {
         <span class="kw">loop</span> {
             <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">probe_var</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span> {
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>
@@ -2260,7 +2260,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">OrderMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new map. (Does not allocate.)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="number">0</span>)
     }
 
@@ -2268,7 +2268,7 @@
     <span class="doccomment">/// allocate if `n` is zero.)</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(n)** time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::with_capacity_and_hasher</span>(<span class="ident">n</span>, <span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="ident">::default</span>())
     }
 }
@@ -2279,10 +2279,10 @@
     <span class="doccomment">/// allocate if `n` is zero.)</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(n)** time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity_and_hasher</span>(<span class="ident">n</span>: <span class="ident">usize</span>, <span class="ident">hash_builder</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity_and_hasher</span>(<span class="ident">n</span>: <span class="ident">usize</span>, <span class="ident">hash_builder</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span>
         <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">BuildHasher</span>
     {
-        <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="ident">OrderMap</span> {
                 <span class="ident">mask</span>: <span class="number">0</span>,
                 <span class="ident">indices</span>: <span class="ident">Box::new</span>([]),
@@ -2304,22 +2304,22 @@
     <span class="doccomment">/// Return the number of key-value pairs in the map.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(1)** time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">len</span>() }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">len</span>() }
 
     <span class="doccomment">/// Returns true if the map contains no elements.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(1)** time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> }
 
     <span class="doccomment">/// Create a new map with `hash_builder`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_hasher</span>(<span class="ident">hash_builder</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_hasher</span>(<span class="ident">hash_builder</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span>
         <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">BuildHasher</span>
     {
         <span class="ident"><span class="self">Self</span>::with_capacity_and_hasher</span>(<span class="number">0</span>, <span class="ident">hash_builder</span>)
     }
 
     <span class="doccomment">/// Return a reference to the map&#39;s `BuildHasher`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hasher</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">S</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hasher</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">S</span>
         <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">BuildHasher</span>
     {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hash_builder</span>
@@ -2327,24 +2327,24 @@
 
     <span class="comment">// Return whether we need 32 or 64 bits to specify a bucket or entry index</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;test_low_transition_point&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">size_class_is_64bit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">size_class_is_64bit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">usize::max_value</span>() <span class="op">&gt;</span> <span class="ident">u32::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;&amp;</span>
             <span class="self">self</span>.<span class="ident">raw_capacity</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">u32::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>
     }
 
     <span class="comment">// for testing</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;test_low_transition_point&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">size_class_is_64bit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">size_class_is_64bit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">raw_capacity</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">64</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">raw_capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">raw_capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// Computes in **O(1)** time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident">usable_capacity</span>(<span class="self">self</span>.<span class="ident">raw_capacity</span>())
     }
 }
@@ -2352,20 +2352,20 @@
 <span class="doccomment">/// Trait for the &quot;size class&quot;. Either u32 or u64 depending on the index</span>
 <span class="doccomment">/// size needed to address an entry&#39;s indes in self.entries.</span>
 <span class="kw">trait</span> <span class="ident">Size</span> {
-    <span class="kw">fn</span> <span class="ident">is_64_bit</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">is_same_size</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Size</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident"><span class="self">Self</span>::is_64_bit</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">T::is_64_bit</span>()
+    <span class="kw">fn</span> <span class="ident">is_64_bit</span>() -&gt; <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">is_same_size</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Size</span><span class="op">&gt;</span>() -&gt; <span class="ident">bool</span> {
+        <span class="ident"><span class="self">Self</span>::is_64_bit</span>() <span class="op">==</span> <span class="ident">T::is_64_bit</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Size</span> <span class="kw">for</span> <span class="ident">u32</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_64_bit</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">false</span> }
+    <span class="kw">fn</span> <span class="ident">is_64_bit</span>() -&gt; <span class="ident">bool</span> { <span class="bool-val">false</span> }
 }
 
 <span class="kw">impl</span> <span class="ident">Size</span> <span class="kw">for</span> <span class="ident">u64</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_64_bit</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">true</span> }
+    <span class="kw">fn</span> <span class="ident">is_64_bit</span>() -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
 }
 
 <span class="doccomment">/// Call self.method(args) with `::&lt;u32&gt;` or `::&lt;u64&gt;` depending on `self`</span>
@@ -2373,14 +2373,14 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The u32 or u64 is *prepended* to the type parameter list!</span>
 <span class="macro">macro_rules!</span> <span class="ident">dispatch_32_vs_64</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_</span>:<span class="ident">ident</span> . <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span>::<span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="kw-2">*</span><span class="op">&gt;</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_</span>:<span class="ident">ident</span> . <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span>::<span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="kw-2">*</span><span class="op">&gt;</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>)) =&gt; {
         <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_</span>.<span class="ident">size_class_is_64bit</span>() {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>::<span class="op">&lt;</span><span class="ident">u64</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="kw-2">*</span><span class="op">&gt;</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>),<span class="kw-2">*</span>)
         } <span class="kw">else</span> {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>::<span class="op">&lt;</span><span class="ident">u32</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="kw-2">*</span><span class="op">&gt;</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>),<span class="kw-2">*</span>)
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_</span>:<span class="ident">ident</span> . <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_</span>:<span class="ident">ident</span> . <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>)) =&gt; {
         <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_</span>.<span class="ident">size_class_is_64bit</span>() {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>),<span class="kw-2">*</span>)
         } <span class="kw">else</span> {
@@ -2403,35 +2403,35 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Computes in **O(1)** time (amortized average).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or_insert</span>(<span class="self">self</span>, <span class="ident">default</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or_insert</span>(<span class="self">self</span>, <span class="ident">default</span>: <span class="ident">V</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Entry::Occupied</span>(<span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">entry</span>.<span class="ident">into_mut</span>(),
-            <span class="ident">Entry::Vacant</span>(<span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">entry</span>.<span class="ident">insert</span>(<span class="ident">default</span>),
+            <span class="ident">Entry::Occupied</span>(<span class="ident">entry</span>) =&gt; <span class="ident">entry</span>.<span class="ident">into_mut</span>(),
+            <span class="ident">Entry::Vacant</span>(<span class="ident">entry</span>) =&gt; <span class="ident">entry</span>.<span class="ident">insert</span>(<span class="ident">default</span>),
         }
     }
 
     <span class="doccomment">/// Computes in **O(1)** time (amortized average).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or_insert_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">call</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">V</span>,
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or_insert_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">call</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span>
+        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">V</span>,
     {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Entry::Occupied</span>(<span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">entry</span>.<span class="ident">into_mut</span>(),
-            <span class="ident">Entry::Vacant</span>(<span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">entry</span>.<span class="ident">insert</span>(<span class="ident">call</span>()),
+            <span class="ident">Entry::Occupied</span>(<span class="ident">entry</span>) =&gt; <span class="ident">entry</span>.<span class="ident">into_mut</span>(),
+            <span class="ident">Entry::Vacant</span>(<span class="ident">entry</span>) =&gt; <span class="ident">entry</span>.<span class="ident">insert</span>(<span class="ident">call</span>()),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">K</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">K</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Entry::Occupied</span>(<span class="kw-2">ref</span> <span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">entry</span>.<span class="ident">key</span>(),
-            <span class="ident">Entry::Vacant</span>(<span class="kw-2">ref</span> <span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">entry</span>.<span class="ident">key</span>(),
+            <span class="ident">Entry::Occupied</span>(<span class="kw-2">ref</span> <span class="ident">entry</span>) =&gt; <span class="ident">entry</span>.<span class="ident">key</span>(),
+            <span class="ident">Entry::Vacant</span>(<span class="kw-2">ref</span> <span class="ident">entry</span>) =&gt; <span class="ident">entry</span>.<span class="ident">key</span>(),
         }
     }
 
     <span class="doccomment">/// Return the index where the key-value pair exists or will be inserted.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Entry::Occupied</span>(<span class="kw-2">ref</span> <span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">entry</span>.<span class="ident">index</span>(),
-            <span class="ident">Entry::Vacant</span>(<span class="kw-2">ref</span> <span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">entry</span>.<span class="ident">index</span>(),
+            <span class="ident">Entry::Occupied</span>(<span class="kw-2">ref</span> <span class="ident">entry</span>) =&gt; <span class="ident">entry</span>.<span class="ident">index</span>(),
+            <span class="ident">Entry::Vacant</span>(<span class="kw-2">ref</span> <span class="ident">entry</span>) =&gt; <span class="ident">entry</span>.<span class="ident">index</span>(),
         }
     }
 }
@@ -2444,32 +2444,32 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">OccupiedEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">K</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span> }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">V</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">K</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">V</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">map</span>.<span class="ident">entries</span>[<span class="self">self</span>.<span class="ident">index</span>].<span class="ident">value</span>
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">entries</span>[<span class="self">self</span>.<span class="ident">index</span>].<span class="ident">value</span>
     }
 
     <span class="doccomment">/// Return the index of the key-value pair</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">index</span>
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_mut</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_mut</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">entries</span>[<span class="self">self</span>.<span class="ident">index</span>].<span class="ident">value</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">V</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="ident">V</span> {
         <span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">into_mut</span>(), <span class="ident">value</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">V</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="self">self</span>) -&gt; <span class="ident">V</span> {
         <span class="self">self</span>.<span class="ident">remove_entry</span>().<span class="number">1</span>
     }
 
     <span class="doccomment">/// Remove and return the key, value pair stored in the map for this entry</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_entry</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">K</span>, <span class="ident">V</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_entry</span>(<span class="self">self</span>) -&gt; (<span class="ident">K</span>, <span class="ident">V</span>) {
         <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">remove_found</span>(<span class="self">self</span>.<span class="ident">probe</span>, <span class="self">self</span>.<span class="ident">index</span>)
     }
 }
@@ -2483,11 +2483,11 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">VacantEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">K</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span> }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_key</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">K</span> { <span class="self">self</span>.<span class="ident">key</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">K</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_key</span>(<span class="self">self</span>) -&gt; <span class="ident">K</span> { <span class="self">self</span>.<span class="ident">key</span> }
     <span class="doccomment">/// Return the index where the key-value pair will be inserted.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">len</span>() }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">len</span>() }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">size_class_is_64bit</span>() {
             <span class="self">self</span>.<span class="ident">insert_impl</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>(<span class="ident">value</span>)
         } <span class="kw">else</span> {
@@ -2495,7 +2495,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">insert_impl</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span>
+    <span class="kw">fn</span> <span class="ident">insert_impl</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span>
         <span class="kw">where</span> <span class="ident">Sz</span>: <span class="ident">Size</span>
     {
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">entries</span>.<span class="ident">len</span>();
@@ -2511,7 +2511,7 @@
           <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
 {
     <span class="comment">// Warning, this is a code duplication zone Entry is not yet finished</span>
-    <span class="kw">fn</span> <span class="ident">entry_phase_1</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">entry_phase_1</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) -&gt; <span class="ident">Entry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">Sz</span>: <span class="ident">Size</span>
     {
         <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash_elem_using</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hash_builder</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>);
@@ -2531,7 +2531,7 @@
                         <span class="ident">key</span>: <span class="ident">key</span>,
                         <span class="ident">probe</span>: <span class="ident">probe</span>,
                     });
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">entry_hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">hash</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">entries</span>[<span class="ident">i</span>].<span class="ident">key</span> <span class="op">=</span><span class="op">=</span> <span class="ident">key</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">entry_hash</span> <span class="op">==</span> <span class="ident">hash</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">entries</span>[<span class="ident">i</span>].<span class="ident">key</span> <span class="op">==</span> <span class="ident">key</span> {
                     <span class="kw">return</span> <span class="ident">Entry::Occupied</span>(<span class="ident">OccupiedEntry</span> {
                         <span class="ident">map</span>: <span class="self">self</span>,
                         <span class="ident">key</span>: <span class="ident">key</span>,
@@ -2581,7 +2581,7 @@
     <span class="comment">// We will know if `key` is already in the map, before we need to insert it.</span>
     <span class="comment">// When we insert they key, it might be that we need to continue displacing</span>
     <span class="comment">// entries (robin hood hashing), in which case Inserted::RobinHood is returned</span>
-    <span class="kw">fn</span> <span class="ident">insert_phase_1</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Inserted</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">insert_phase_1</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="ident">Inserted</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">Sz</span>: <span class="ident">Size</span>
     {
         <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash_elem_using</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hash_builder</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>);
@@ -2603,7 +2603,7 @@
                         <span class="ident">old_pos</span>: <span class="ident">Pos::with_hash</span>::<span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="ident">index</span>, <span class="ident">hash</span>),
                     };
                     <span class="kw">break</span>;
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">entry_hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">hash</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">entries</span>[<span class="ident">i</span>].<span class="ident">key</span> <span class="op">=</span><span class="op">=</span> <span class="ident">key</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">entry_hash</span> <span class="op">==</span> <span class="ident">hash</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">entries</span>[<span class="ident">i</span>].<span class="ident">key</span> <span class="op">==</span> <span class="ident">key</span> {
                     <span class="kw">return</span> <span class="ident">Inserted::Swapped</span> {
                         <span class="ident">prev_value</span>: <span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">entries</span>[<span class="ident">i</span>].<span class="ident">value</span>, <span class="ident">value</span>),
                     };
@@ -2634,8 +2634,8 @@
     <span class="kw">fn</span> <span class="ident">double_capacity</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>)
         <span class="kw">where</span> <span class="ident">Sz</span>: <span class="ident">Size</span>
     {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">raw_capacity</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>);
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw_capacity</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">raw_capacity</span>() <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>);
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw_capacity</span>() <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="self">self</span>.<span class="ident">first_allocation</span>();
         }
 
@@ -2643,7 +2643,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first_ideal</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">index</span>) <span class="kw">in</span> <span class="ident">enumerate</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">indices</span>) {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span> <span class="ident">index</span>.<span class="ident">pos</span>() {
-                <span class="kw">if</span> <span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">probe_distance</span>(<span class="self">self</span>.<span class="ident">mask</span>, <span class="self">self</span>.<span class="ident">entries</span>[<span class="ident">pos</span>].<span class="ident">hash</span>, <span class="ident">i</span>) {
+                <span class="kw">if</span> <span class="number">0</span> <span class="op">==</span> <span class="ident">probe_distance</span>(<span class="self">self</span>.<span class="ident">mask</span>, <span class="self">self</span>.<span class="ident">entries</span>[<span class="ident">pos</span>].<span class="ident">hash</span>, <span class="ident">i</span>) {
                     <span class="ident">first_ideal</span> <span class="op">=</span> <span class="ident">i</span>;
                     <span class="kw">break</span>;
                 }
@@ -2699,7 +2699,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">reserve_one</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">capacity</span>() {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">capacity</span>() {
             <span class="macro">dispatch_32_vs_64!</span>(<span class="self">self</span>.<span class="ident">double_capacity</span>());
         }
     }
@@ -2717,22 +2717,22 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// See also [`entry`](#method.entry) if you you want to insert *or* modify</span>
     <span class="doccomment">/// or if you need to get the `index` of the corresponding key-value pair.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">reserve_one</span>();
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">size_class_is_64bit</span>() {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">insert_phase_1</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>(<span class="ident">key</span>, <span class="ident">value</span>) {
-                <span class="ident">Inserted::Swapped</span> { <span class="ident">prev_value</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">prev_value</span>),
-                <span class="ident">Inserted::Done</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                <span class="ident">Inserted::RobinHood</span> { <span class="ident">probe</span>, <span class="ident">old_pos</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Inserted::Swapped</span> { <span class="ident">prev_value</span> } =&gt; <span class="prelude-val">Some</span>(<span class="ident">prev_value</span>),
+                <span class="ident">Inserted::Done</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="ident">Inserted::RobinHood</span> { <span class="ident">probe</span>, <span class="ident">old_pos</span> } =&gt; {
                     <span class="self">self</span>.<span class="ident">insert_phase_2</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>(<span class="ident">probe</span>, <span class="ident">old_pos</span>);
                     <span class="prelude-val">None</span>
                 }
             }
         } <span class="kw">else</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">insert_phase_1</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>(<span class="ident">key</span>, <span class="ident">value</span>) {
-                <span class="ident">Inserted::Swapped</span> { <span class="ident">prev_value</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">prev_value</span>),
-                <span class="ident">Inserted::Done</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                <span class="ident">Inserted::RobinHood</span> { <span class="ident">probe</span>, <span class="ident">old_pos</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Inserted::Swapped</span> { <span class="ident">prev_value</span> } =&gt; <span class="prelude-val">Some</span>(<span class="ident">prev_value</span>),
+                <span class="ident">Inserted::Done</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="ident">Inserted::RobinHood</span> { <span class="ident">probe</span>, <span class="ident">old_pos</span> } =&gt; {
                     <span class="self">self</span>.<span class="ident">insert_phase_2</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>(<span class="ident">probe</span>, <span class="ident">old_pos</span>);
                     <span class="prelude-val">None</span>
                 }
@@ -2744,35 +2744,35 @@
     <span class="doccomment">/// in-place manipulation.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(1)** time (amortized average).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) -&gt; <span class="ident">Entry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">reserve_one</span>();
         <span class="macro">dispatch_32_vs_64!</span>(<span class="self">self</span>.<span class="ident">entry_phase_1</span>(<span class="ident">key</span>))
     }
 
 
     <span class="doccomment">/// Return an iterator over the key-value pairs of the map, in their order</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="ident">Iter</span> {
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">iter</span>()
         }
     }
 
     <span class="doccomment">/// Return an iterator over the key-value pairs of the map, in their order</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="ident">IterMut</span> {
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">iter_mut</span>()
         }
     }
 
     <span class="doccomment">/// Return an iterator over the keys of the map, in their order</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Keys</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Keys</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="ident">Keys</span> {
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">iter</span>()
         }
     }
 
     <span class="doccomment">/// Return an iterator over the values of the map, in their order</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Values</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="ident">Values</span> {
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">iter</span>()
         }
@@ -2780,7 +2780,7 @@
 
     <span class="doccomment">/// Return an iterator over mutable references to the the values of the map,</span>
     <span class="doccomment">/// in their order</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValuesMut</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">ValuesMut</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="ident">ValuesMut</span> {
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">iter_mut</span>()
         }
@@ -2789,7 +2789,7 @@
     <span class="doccomment">/// Return `true` if and equivalent to `key` exists in the map.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(1)** time (average).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_key</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_key</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="ident">bool</span>
         <span class="kw">where</span> <span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">find</span>(<span class="ident">key</span>).<span class="ident">is_some</span>()
@@ -2799,14 +2799,14 @@
     <span class="doccomment">/// else `None`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(1)** time (average).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">V</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">V</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">get_full</span>(<span class="ident">key</span>).<span class="ident">map</span>(<span class="ident">third</span>)
     }
 
     <span class="doccomment">/// Return item index, key and value</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_full</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_full</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
     {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">found</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">find</span>(<span class="ident">key</span>) {
@@ -2817,24 +2817,24 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">get_full_mut</span>(<span class="ident">key</span>).<span class="ident">map</span>(<span class="ident">third</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_full_mut</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>)<span class="op">&gt;</span>
+        -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>)<span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">get_full_mut2</span>(<span class="ident">key</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">k</span>, <span class="ident">v</span>))
     }
 
     <span class="doccomment">/// Return probe (indices) and position (entries)</span>
-    <span class="kw">fn</span> <span class="ident">find</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">find</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
     {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> { <span class="kw">return</span> <span class="prelude-val">None</span>; }
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> { <span class="kw">return</span> <span class="prelude-val">None</span>; }
         <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">hash_elem_using</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hash_builder</span>, <span class="ident">key</span>);
         <span class="self">self</span>.<span class="ident">find_using</span>(<span class="ident">h</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">entry</span><span class="op">|</span> { <span class="ident">Q::equivalent</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">entry</span>.<span class="ident">key</span>) })
     }
@@ -2842,7 +2842,7 @@
     <span class="doccomment">/// NOTE: Same as .swap_remove</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(1)** time (average).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">swap_remove</span>(<span class="ident">key</span>)
@@ -2858,7 +2858,7 @@
     <span class="doccomment">/// Return `None` if `key` is not in map.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(1)** time (average).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap_remove</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap_remove</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">swap_remove_full</span>(<span class="ident">key</span>).<span class="ident">map</span>(<span class="ident">third</span>)
@@ -2872,12 +2872,12 @@
     <span class="doccomment">/// the postion of what used to be the last element!**</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Return `None` if `key` is not in map.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap_remove_full</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap_remove_full</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Equivalent</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> (<span class="ident">probe</span>, <span class="ident">found</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">find</span>(<span class="ident">key</span>) {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
         };
         <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">remove_found</span>(<span class="ident">probe</span>, <span class="ident">found</span>);
         <span class="prelude-val">Some</span>((<span class="ident">found</span>, <span class="ident">k</span>, <span class="ident">v</span>))
@@ -2886,7 +2886,7 @@
     <span class="doccomment">/// Remove the last key-value pair</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(1)** time (average).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">pop_impl</span>()
     }
 
@@ -2898,19 +2898,19 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(n)** time (average).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retain</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">keep</span>: <span class="ident">F</span>)
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="self">self</span>.<span class="ident">retain_mut</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">k</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">keep</span>(<span class="ident">k</span>, <span class="ident">v</span>));
     }
 
     <span class="kw">fn</span> <span class="ident">retain_mut</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">keep</span>: <span class="ident">F</span>)
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="macro">dispatch_32_vs_64!</span>(<span class="self">self</span>.<span class="ident">retain_in_order_impl</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">keep</span>));
     }
 
     <span class="kw">fn</span> <span class="ident">retain_in_order_impl</span><span class="op">&lt;</span><span class="ident">Sz</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">keep</span>: <span class="ident">F</span>)
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>) -&gt; <span class="ident">bool</span>,
               <span class="ident">Sz</span>: <span class="ident">Size</span>,
     {
         <span class="comment">// Like Vec::retain in self.entries; for each removed key-value pair,</span>
@@ -2957,7 +2957,7 @@
     <span class="doccomment">/// Computes in **O(n log n + c)** time and **O(n)** space where *n* is</span>
     <span class="doccomment">/// the length of the map and *c* the capacity. The sort is stable.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort_by</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">compare</span>: <span class="ident">F</span>)
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span>,
+        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>) -&gt; <span class="ident">Ordering</span>,
     {
         <span class="comment">// here we temporarily use the hash field in a bucket to store the old</span>
         <span class="comment">// index instead.</span>
@@ -2995,8 +2995,8 @@
     <span class="doccomment">/// the key-value pairs with the result.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The sort is stable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sorted_by</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">cmp</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sorted_by</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">cmp</span>: <span class="ident">F</span>) -&gt; <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>
+        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>) -&gt; <span class="ident">Ordering</span>
     {
         <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">sort_by</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">value</span>));
         <span class="self">self</span>.<span class="ident">into_iter</span>()
@@ -3004,7 +3004,7 @@
 
     <span class="doccomment">/// Clears the `OrderMap`, returning all key-value pairs as a drain iterator.</span>
     <span class="doccomment">/// Keeps the allocated memory for reuse.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">drain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">range</span>: <span class="ident">RangeFull</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Drain</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">drain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">range</span>: <span class="ident">RangeFull</span>) -&gt; <span class="ident">Drain</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">clear_indices</span>();
 
         <span class="ident">Drain</span> {
@@ -3019,7 +3019,7 @@
     <span class="doccomment">/// Valid indices are *0 &lt;= index &lt; self.len()*</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(1)** time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">get</span>(<span class="ident">index</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">ent</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">ent</span>.<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">ent</span>.<span class="ident">value</span>))
     }
 
@@ -3028,7 +3028,7 @@
     <span class="doccomment">/// Valid indices are *0 &lt;= index &lt; self.len()*</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(1)** time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">ent</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ent</span>.<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ent</span>.<span class="ident">value</span>))
     }
 
@@ -3037,12 +3037,12 @@
     <span class="doccomment">/// Valid indices are *0 &lt;= index &lt; self.len()*</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(1)** time (average).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap_remove_index</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap_remove_index</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">probe</span>, <span class="ident">found</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">get</span>(<span class="ident">index</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">find_existing_entry</span>(<span class="ident">e</span>))
         {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
         };
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">remove_found</span>(<span class="ident">probe</span>, <span class="ident">found</span>))
     }
@@ -3055,12 +3055,12 @@
 <span class="comment">//</span>
 <span class="comment">// However, we should probably not let this show in the public API or docs.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">OrderMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">pop_impl</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">pop_impl</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">probe</span>, <span class="ident">found</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">last</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">find_existing_entry</span>(<span class="ident">e</span>))
         {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
         };
         <span class="macro">debug_assert_eq!</span>(<span class="ident">found</span>, <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>);
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">remove_found</span>(<span class="ident">probe</span>, <span class="ident">found</span>))
@@ -3083,14 +3083,14 @@
 
 
     <span class="doccomment">/// Return probe (indices) and position (entries)</span>
-    <span class="kw">fn</span> <span class="ident">find_using</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hash</span>: <span class="ident">HashValue</span>, <span class="ident">key_eq</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="kw">fn</span> <span class="ident">find_using</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hash</span>: <span class="ident">HashValue</span>, <span class="ident">key_eq</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
+        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="macro">dispatch_32_vs_64!</span>(<span class="self">self</span>.<span class="ident">find_using_impl</span>::<span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">hash</span>, <span class="ident">key_eq</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">find_using_impl</span><span class="op">&lt;</span><span class="ident">Sz</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hash</span>: <span class="ident">HashValue</span>, <span class="ident">key_eq</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="kw">fn</span> <span class="ident">find_using_impl</span><span class="op">&lt;</span><span class="ident">Sz</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hash</span>: <span class="ident">HashValue</span>, <span class="ident">key_eq</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
+        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>,
               <span class="ident">Sz</span>: <span class="ident">Size</span>,
     {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>);
@@ -3102,7 +3102,7 @@
                 <span class="kw">if</span> <span class="ident">dist</span> <span class="op">&gt;</span> <span class="ident">probe_distance</span>(<span class="self">self</span>.<span class="ident">mask</span>, <span class="ident">entry_hash</span>.<span class="ident">into_hash</span>(), <span class="ident">probe</span>) {
                     <span class="comment">// give up when probe distance is too long</span>
                     <span class="kw">return</span> <span class="prelude-val">None</span>;
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">entry_hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">hash</span> <span class="op">&amp;&amp;</span> <span class="ident">key_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">entries</span>[<span class="ident">i</span>]) {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">entry_hash</span> <span class="op">==</span> <span class="ident">hash</span> <span class="op">&amp;&amp;</span> <span class="ident">key_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">entries</span>[<span class="ident">i</span>]) {
                     <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">probe</span>, <span class="ident">i</span>));
                 }
             } <span class="kw">else</span> {
@@ -3114,13 +3114,13 @@
 
     <span class="doccomment">/// Find `entry` which is already placed inside self.entries;</span>
     <span class="doccomment">/// return its probe and entry index.</span>
-    <span class="kw">fn</span> <span class="ident">find_existing_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">entry</span>: <span class="kw-2">&amp;</span><span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="ident">usize</span>)
+    <span class="kw">fn</span> <span class="ident">find_existing_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">entry</span>: <span class="kw-2">&amp;</span><span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>)
     {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>);
         <span class="macro">dispatch_32_vs_64!</span>(<span class="self">self</span>.<span class="ident">find_existing_entry_impl</span>(<span class="ident">entry</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">find_existing_entry_impl</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">entry</span>: <span class="kw-2">&amp;</span><span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="ident">usize</span>)
+    <span class="kw">fn</span> <span class="ident">find_existing_entry_impl</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">entry</span>: <span class="kw-2">&amp;</span><span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>)
         <span class="kw">where</span> <span class="ident">Sz</span>: <span class="ident">Size</span>,
     {
         <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">hash</span>;
@@ -3129,11 +3129,11 @@
         (<span class="ident">probe</span>, <span class="ident">actual_pos</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">remove_found</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">probe</span>: <span class="ident">usize</span>, <span class="ident">found</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">K</span>, <span class="ident">V</span>) {
+    <span class="kw">fn</span> <span class="ident">remove_found</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">probe</span>: <span class="ident">usize</span>, <span class="ident">found</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">K</span>, <span class="ident">V</span>) {
         <span class="macro">dispatch_32_vs_64!</span>(<span class="self">self</span>.<span class="ident">remove_found_impl</span>(<span class="ident">probe</span>, <span class="ident">found</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">remove_found_impl</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">probe</span>: <span class="ident">usize</span>, <span class="ident">found</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">K</span>, <span class="ident">V</span>)
+    <span class="kw">fn</span> <span class="ident">remove_found_impl</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">probe</span>: <span class="ident">usize</span>, <span class="ident">found</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">K</span>, <span class="ident">V</span>)
         <span class="kw">where</span> <span class="ident">Sz</span>: <span class="ident">Size</span>
     {
         <span class="comment">// index `probe` and entry `found` is to be removed</span>
@@ -3200,7 +3200,7 @@
 <span class="doccomment">/// + mask: self.mask.</span>
 <span class="doccomment">/// + entry_index: The index of the entry in self.entries</span>
 <span class="kw">fn</span> <span class="ident">find_existing_entry_at</span><span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>(<span class="ident">indices</span>: <span class="kw-2">&amp;</span>[<span class="ident">Pos</span>], <span class="ident">hash</span>: <span class="ident">HashValue</span>,
-                              <span class="ident">mask</span>: <span class="ident">usize</span>, <span class="ident">entry_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>
+                              <span class="ident">mask</span>: <span class="ident">usize</span>, <span class="ident">entry_index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span>
     <span class="kw">where</span> <span class="ident">Sz</span>: <span class="ident">Size</span>,
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">probe</span> <span class="op">=</span> <span class="ident">desired_pos</span>(<span class="ident">mask</span>, <span class="ident">hash</span>);
@@ -3208,7 +3208,7 @@
         <span class="comment">// the entry *must* be present; if we hit a Pos::none this was not true</span>
         <span class="comment">// and there is a debug assertion in resolve_existing_index for that.</span>
         <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">indices</span>[<span class="ident">probe</span>].<span class="ident">resolve_existing_index</span>::<span class="op">&lt;</span><span class="ident">Sz</span><span class="op">&gt;</span>();
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="ident">entry_index</span> { <span class="kw">return</span> <span class="ident">probe</span>; }
+        <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">entry_index</span> { <span class="kw">return</span> <span class="ident">probe</span>; }
     });
 }
 
@@ -3227,13 +3227,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Keys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ent</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">ent</span>.<span class="ident">key</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">Keys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">len</span>()
     }
 }
@@ -3249,13 +3249,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ent</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">ent</span>.<span class="ident">value</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">len</span>()
     }
 }
@@ -3271,13 +3271,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">ValuesMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ent</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ent</span>.<span class="ident">value</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">ValuesMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">len</span>()
     }
 }
@@ -3293,13 +3293,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">value</span>))
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">len</span>()
     }
 }
@@ -3315,13 +3315,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>.<span class="ident">value</span>))
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">len</span>()
     }
 }
@@ -3337,13 +3337,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">entry</span><span class="op">|</span> (<span class="ident">entry</span>.<span class="ident">key</span>, <span class="ident">entry</span>.<span class="ident">value</span>))
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">len</span>()
     }
 }
@@ -3369,7 +3369,7 @@
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">V</span>);
     <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="self">self</span>.<span class="ident">iter</span>()
     }
 }
@@ -3380,7 +3380,7 @@
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span>);
     <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="self">self</span>.<span class="ident">iter_mut</span>()
     }
 }
@@ -3391,7 +3391,7 @@
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">K</span>, <span class="ident">V</span>);
     <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="ident">IntoIter</span> {
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">into_iter</span>(),
         }
@@ -3408,7 +3408,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">V</span>;
 
     <span class="doccomment">/// ***Panics*** if `key` is not present in the map.</span>
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">V</span> {
+    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Q</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">V</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">key</span>) {
             <span class="ident">v</span>
         } <span class="kw">else</span> {
@@ -3427,7 +3427,7 @@
           <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
 {
     <span class="doccomment">/// ***Panics*** if `key` is not present in the map.</span>
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span> {
+    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Q</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">key</span>) {
             <span class="ident">v</span>
         } <span class="kw">else</span> {
@@ -3445,7 +3445,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// `from_iter` uses the same logic as `extend`. See</span>
     <span class="doccomment">/// [`extend`](#method.extend) for more details.</span>
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">iterable</span>.<span class="ident">into_iter</span>();
         <span class="kw">let</span> (<span class="ident">low</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">size_hint</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::with_capacity_and_hasher</span>(<span class="ident">low</span>, <span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="ident">::default</span>());
@@ -3489,7 +3489,7 @@
     <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
 {
     <span class="doccomment">/// Return an empty `OrderMap`</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::with_capacity_and_hasher</span>(<span class="number">0</span>, <span class="ident">S::default</span>())
     }
 }
@@ -3500,12 +3500,12 @@
           <span class="ident">S1</span>: <span class="ident">BuildHasher</span>,
           <span class="ident">S2</span>: <span class="ident">BuildHasher</span>
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">OrderMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V2</span>, <span class="ident">S2</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">OrderMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V2</span>, <span class="ident">S2</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">value</span>)<span class="op">|</span> <span class="ident">other</span>.<span class="ident">get</span>(<span class="ident">key</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">value</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">v</span>))
+        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">value</span>)<span class="op">|</span> <span class="ident">other</span>.<span class="ident">get</span>(<span class="ident">key</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">value</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">v</span>))
     }
 }
 
@@ -3674,7 +3674,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">remove_to_empty</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">ordermap!</span> { <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>, <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>, <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span> };
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">ordermap!</span> { <span class="number">0</span> =&gt; <span class="number">0</span>, <span class="number">4</span> =&gt; <span class="number">4</span>, <span class="number">5</span> =&gt; <span class="number">5</span> };
         <span class="ident">map</span>.<span class="ident">swap_remove</span>(<span class="kw-2">&amp;</span><span class="number">5</span>).<span class="ident">unwrap</span>();
         <span class="ident">map</span>.<span class="ident">swap_remove</span>(<span class="kw-2">&amp;</span><span class="number">4</span>).<span class="ident">unwrap</span>();
         <span class="ident">map</span>.<span class="ident">swap_remove</span>(<span class="kw-2">&amp;</span><span class="number">0</span>).<span class="ident">unwrap</span>();
@@ -3746,8 +3746,8 @@
         <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">index</span>(), <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">key</span>(), <span class="kw-2">&amp;</span><span class="number">2</span>);
         <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">Entry::Occupied</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="string">&quot;2&quot;</span>),
-            <span class="ident">Entry::Vacant</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>()
+            <span class="ident">Entry::Occupied</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="string">&quot;2&quot;</span>),
+            <span class="ident">Entry::Vacant</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>()
         }
         <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">or_insert</span>(<span class="string">&quot;4&quot;</span>), <span class="kw-2">&amp;</span><span class="string">&quot;2&quot;</span>);
     }

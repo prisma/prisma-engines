@@ -250,7 +250,7 @@
 <span class="kw">struct</span> <span class="ident">State</span>(<span class="ident">usize</span>);
 
 <span class="kw">impl</span> <span class="ident">Idle</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">num_workers</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Idle</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">num_workers</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Idle</span> {
         <span class="kw">let</span> <span class="ident">init</span> <span class="op">=</span> <span class="ident">State::new</span>(<span class="ident">num_workers</span>);
 
         <span class="ident">Idle</span> {
@@ -262,7 +262,7 @@
 
     <span class="doccomment">/// If there are no workers actively searching, returns the index of a</span>
     <span class="doccomment">/// worker currently sleeping.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">worker_to_notify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">worker_to_notify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="comment">// If at least one worker is spinning, work being notified will</span>
         <span class="comment">// eventually be found. A searching thread will find **some** work and</span>
         <span class="comment">// notify another worker, eventually leading to our work being found.</span>
@@ -297,7 +297,7 @@
 
     <span class="doccomment">/// Returns `true` if the worker needs to do a final check for submitted</span>
     <span class="doccomment">/// work.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_worker_to_parked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">worker</span>: <span class="ident">usize</span>, <span class="ident">is_searching</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_worker_to_parked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">worker</span>: <span class="ident">usize</span>, <span class="ident">is_searching</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
         <span class="comment">// Acquire the lock</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sleepers</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sleepers</span>.<span class="ident">lock</span>();
 
@@ -310,7 +310,7 @@
         <span class="ident">ret</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_worker_to_searching</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_worker_to_searching</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>, <span class="ident">SeqCst</span>);
         <span class="kw">if</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">state</span>.<span class="ident">num_searching</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">num_workers</span> {
             <span class="kw">return</span> <span class="bool-val">false</span>;
@@ -327,7 +327,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `true` if this is the final searching worker. The caller</span>
     <span class="doccomment">/// **must** notify a new worker.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_worker_from_searching</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">transition_worker_from_searching</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">State::dec_num_searching</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>)
     }
 
@@ -337,7 +337,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sleepers</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sleepers</span>.<span class="ident">lock</span>();
 
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">sleepers</span>.<span class="ident">len</span>() {
-            <span class="kw">if</span> <span class="ident">sleepers</span>[<span class="ident">index</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">worker_id</span> {
+            <span class="kw">if</span> <span class="ident">sleepers</span>[<span class="ident">index</span>] <span class="op">==</span> <span class="ident">worker_id</span> {
                 <span class="ident">sleepers</span>.<span class="ident">swap_remove</span>(<span class="ident">index</span>);
 
                 <span class="comment">// Update the state accordingly while the lock is held.</span>
@@ -349,19 +349,19 @@
     }
 
     <span class="doccomment">/// Returns `true` if `worker_id` is contained in the sleep set</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_parked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">worker_id</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_parked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">worker_id</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">sleepers</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sleepers</span>.<span class="ident">lock</span>();
         <span class="ident">sleepers</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">worker_id</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">notify_should_wakeup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">notify_should_wakeup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">fetch_add</span>(<span class="number">0</span>, <span class="ident">SeqCst</span>));
-        <span class="ident">state</span>.<span class="ident">num_searching</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">state</span>.<span class="ident">num_unparked</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">num_workers</span>
+        <span class="ident">state</span>.<span class="ident">num_searching</span>() <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">state</span>.<span class="ident">num_unparked</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">num_workers</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">num_workers</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">num_workers</span>: <span class="ident">usize</span>) -&gt; <span class="ident">State</span> {
         <span class="comment">// All workers start in the unparked state</span>
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">State</span>(<span class="ident">num_workers</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">UNPARK_SHIFT</span>);
         <span class="macro">debug_assert_eq!</span>(<span class="ident">num_workers</span>, <span class="ident">ret</span>.<span class="ident">num_unparked</span>());
@@ -369,7 +369,7 @@
         <span class="ident">ret</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>, <span class="ident">ordering</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>, <span class="ident">ordering</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">State</span> {
         <span class="ident">State</span>(<span class="ident">cell</span>.<span class="ident">load</span>(<span class="ident">ordering</span>))
     }
 
@@ -382,15 +382,15 @@
     }
 
     <span class="doccomment">/// Returns `true` if this is the final searching worker</span>
-    <span class="kw">fn</span> <span class="ident">dec_num_searching</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">dec_num_searching</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>(<span class="ident">cell</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>));
-        <span class="ident">state</span>.<span class="ident">num_searching</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>
+        <span class="ident">state</span>.<span class="ident">num_searching</span>() <span class="op">==</span> <span class="number">1</span>
     }
 
     <span class="doccomment">/// Track a sleeping worker</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `true` if this is the final searching worker.</span>
-    <span class="kw">fn</span> <span class="ident">dec_num_unparked</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>, <span class="ident">is_searching</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">dec_num_unparked</span>(<span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicUsize</span>, <span class="ident">is_searching</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dec</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">UNPARK_SHIFT</span>;
 
         <span class="kw">if</span> <span class="ident">is_searching</span> {
@@ -398,34 +398,34 @@
         }
 
         <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">State</span>(<span class="ident">cell</span>.<span class="ident">fetch_sub</span>(<span class="ident">dec</span>, <span class="ident">SeqCst</span>));
-        <span class="ident">is_searching</span> <span class="op">&amp;&amp;</span> <span class="ident">prev</span>.<span class="ident">num_searching</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>
+        <span class="ident">is_searching</span> <span class="op">&amp;&amp;</span> <span class="ident">prev</span>.<span class="ident">num_searching</span>() <span class="op">==</span> <span class="number">1</span>
     }
 
     <span class="doccomment">/// Number of workers currently searching</span>
-    <span class="kw">fn</span> <span class="ident">num_searching</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">num_searching</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">SEARCH_MASK</span>
     }
 
     <span class="doccomment">/// Number of workers currently unparked</span>
-    <span class="kw">fn</span> <span class="ident">num_unparked</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">num_unparked</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         (<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">UNPARK_MASK</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">UNPARK_SHIFT</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">usize</span>) -&gt; <span class="ident">State</span> {
         <span class="ident">State</span>(<span class="ident">src</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">usize</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">State</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">State</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident">src</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;worker::State&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;num_unparked&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">num_unparked</span>())
             .<span class="ident">field</span>(<span class="string">&quot;num_searching&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">num_searching</span>())

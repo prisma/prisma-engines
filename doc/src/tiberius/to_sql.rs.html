@@ -157,13 +157,13 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ToSql</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
     <span class="doccomment">/// Convert to a value understood by the SQL Server. Conversion</span>
     <span class="doccomment">/// by-reference.</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// A by-value conversion trait to a TDS type.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoSql</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
     <span class="doccomment">/// Convert to a value understood by the SQL Server. Conversion by-value.</span>
-    <span class="kw">fn</span> <span class="ident">into_sql</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">into_sql</span>(<span class="self">self</span>) -&gt; <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
 }
 
 <span class="macro">into_sql!</span>(<span class="ident">self_</span>,

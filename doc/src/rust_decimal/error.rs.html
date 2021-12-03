@@ -62,7 +62,7 @@
     <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::ErrorString</span>(<span class="ident">from</span>.<span class="ident">into</span>())
     }
 }
@@ -71,16 +71,16 @@
 <span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ErrorString</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">err</span>),
-            <span class="ident"><span class="self">Self</span>::ExceedsMaximumPossibleValue</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ErrorString</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">err</span>),
+            <span class="ident"><span class="self">Self</span>::ExceedsMaximumPossibleValue</span> =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Number exceeds maximum value that can be represented.&quot;</span>)
             }
-            <span class="ident"><span class="self">Self</span>::LessThanMinimumPossibleValue</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::LessThanMinimumPossibleValue</span> =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Number less than minimum value that can be represented.&quot;</span>)
             }
-            <span class="ident"><span class="self">Self</span>::ScaleExceedsMaximumPrecision</span>(<span class="kw-2">ref</span> <span class="ident">scale</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ScaleExceedsMaximumPrecision</span>(<span class="kw-2">ref</span> <span class="ident">scale</span>) =&gt; {
                 <span class="macro">write!</span>(
                     <span class="ident">f</span>,
                     <span class="string">&quot;Scale exceeds the maximum precision allowed: {} &gt; {}&quot;</span>,

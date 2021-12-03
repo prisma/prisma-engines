@@ -781,7 +781,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [RFC 5958]:</span>
     <span class="doccomment">///     https://tools.ietf.org/html/rfc5958</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pkcs8</span>(<span class="ident">pkcs8</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">KeyRejected</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pkcs8</span>(<span class="ident">pkcs8</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">KeyRejected</span><span class="op">&gt;</span> {
         <span class="kw">const</span> <span class="ident">RSA_ENCRYPTION</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../data/alg-rsa-encryption.der&quot;</span>);
         <span class="kw">let</span> (<span class="ident">der</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">pkcs8::unwrap_key_</span>(
             <span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span><span class="ident">RSA_ENCRYPTION</span>),
@@ -806,7 +806,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [NIST SP-800-56B rev. 1]:</span>
     <span class="doccomment">///     http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Br1.pdf</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_der</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">KeyRejected</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_der</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">KeyRejected</span><span class="op">&gt;</span> {
         <span class="ident">untrusted::Input::from</span>(<span class="ident">input</span>).<span class="ident">read_all</span>(<span class="ident">KeyRejected::invalid_encoding</span>(), <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
             <span class="ident">der::nested</span>(
                 <span class="ident">input</span>,
@@ -817,7 +817,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">from_der_reader</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">KeyRejected</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_der_reader</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">KeyRejected</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">der::small_nonnegative_integer</span>(<span class="ident">input</span>)
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
@@ -826,7 +826,7 @@
 
         <span class="kw">fn</span> <span class="ident">positive_integer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
             <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">io::Positive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">KeyRejected</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">io::Positive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">KeyRejected</span><span class="op">&gt;</span> {
             <span class="ident">der::positive_integer</span>(<span class="ident">input</span>)
                 .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">KeyRejected::invalid_encoding</span>())
         }
@@ -850,8 +850,8 @@
         <span class="comment">// recalculated below. `p != q` is verified implicitly below, e.g. when</span>
         <span class="comment">// `q_mod_p` is constructed.</span>
         <span class="kw">let</span> ((<span class="ident">p</span>, <span class="ident">p_bits</span>, <span class="ident">dP</span>), (<span class="ident">q</span>, <span class="ident">q_bits</span>, <span class="ident">dQ</span>, <span class="ident">qInv</span>)) <span class="op">=</span> <span class="kw">match</span> <span class="ident">q</span>.<span class="ident">verify_less_than</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>) {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> ((<span class="ident">p</span>, <span class="ident">p_bits</span>, <span class="ident">dP</span>), (<span class="ident">q</span>, <span class="ident">q_bits</span>, <span class="ident">dQ</span>, <span class="prelude-val">Some</span>(<span class="ident">qInv</span>))),
-            <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ((<span class="ident">p</span>, <span class="ident">p_bits</span>, <span class="ident">dP</span>), (<span class="ident">q</span>, <span class="ident">q_bits</span>, <span class="ident">dQ</span>, <span class="prelude-val">Some</span>(<span class="ident">qInv</span>))),
+            <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>) =&gt; {
                 <span class="comment">// TODO: verify `q` and `qInv` are inverses (mod p).</span>
                 ((<span class="ident">q</span>, <span class="ident">q_bits</span>, <span class="ident">dQ</span>), (<span class="ident">p</span>, <span class="ident">p_bits</span>, <span class="ident">dP</span>, <span class="prelude-val">None</span>))
             }
@@ -1021,7 +1021,7 @@
     <span class="doccomment">/// Returns the length in bytes of the key pair&#39;s public modulus.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A signature has the same length as the public modulus.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_modulus_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_modulus_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">public_key</span>
             .<span class="ident">modulus</span>()
             .<span class="ident">big_endian_without_leading_zero_as_input</span>()
@@ -1033,7 +1033,7 @@
 <span class="kw">impl</span> <span class="ident">signature::KeyPair</span> <span class="kw">for</span> <span class="ident">RsaKeyPair</span> {
     <span class="kw">type</span> <span class="ident">PublicKey</span> <span class="op">=</span> <span class="ident">RsaSubjectPublicKey</span>;
 
-    <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::PublicKey</span> {
+    <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::PublicKey</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">public_key</span>
     }
 }
@@ -1043,7 +1043,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RsaSubjectPublicKey</span>(<span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RsaSubjectPublicKey</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
     }
 }
@@ -1051,7 +1051,7 @@
 <span class="macro">derive_debug_self_as_ref_hex_bytes!</span>(<span class="ident">RsaSubjectPublicKey</span>);
 
 <span class="kw">impl</span> <span class="ident">RsaSubjectPublicKey</span> {
-    <span class="kw">fn</span> <span class="ident">from_n_and_e</span>(<span class="ident">n</span>: <span class="ident">io::Positive</span>, <span class="ident">e</span>: <span class="ident">io::Positive</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from_n_and_e</span>(<span class="ident">n</span>: <span class="ident">io::Positive</span>, <span class="ident">e</span>: <span class="ident">io::Positive</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">der_writer::write_all</span>(<span class="ident">der::Tag::Sequence</span>, <span class="kw-2">&amp;</span><span class="op">|</span><span class="ident">output</span><span class="op">|</span> {
             <span class="ident">der_writer::write_positive_integer</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span><span class="ident">n</span>);
             <span class="ident">der_writer::write_positive_integer</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span><span class="ident">e</span>);
@@ -1060,7 +1060,7 @@
     }
 
     <span class="doccomment">/// The public modulus (n).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modulus</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Positive</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modulus</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Positive</span> {
         <span class="comment">// Parsing won&#39;t fail because we serialized it ourselves.</span>
         <span class="kw">let</span> (<span class="ident">public_key</span>, <span class="ident">_exponent</span>) <span class="op">=</span>
             <span class="ident"><span class="kw">super</span>::parse_public_key</span>(<span class="ident">untrusted::Input::from</span>(<span class="self">self</span>.<span class="ident">as_ref</span>())).<span class="ident">unwrap</span>();
@@ -1068,7 +1068,7 @@
     }
 
     <span class="doccomment">/// The public exponent (e).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exponent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Positive</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exponent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Positive</span> {
         <span class="comment">// Parsing won&#39;t fail because we serialized it ourselves.</span>
         <span class="kw">let</span> (<span class="ident">_public_key</span>, <span class="ident">exponent</span>) <span class="op">=</span>
             <span class="ident"><span class="kw">super</span>::parse_public_key</span>(<span class="ident">untrusted::Input::from</span>(<span class="self">self</span>.<span class="ident">as_ref</span>())).<span class="ident">unwrap</span>();
@@ -1084,7 +1084,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Prime</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">PrivatePrime</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Constructs a `PrivatePrime` from the private prime `p` and `dP` where</span>
     <span class="doccomment">/// dP == d % (p - 1).</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">p</span>: <span class="ident">bigint::Nonnegative</span>, <span class="ident">dP</span>: <span class="ident">untrusted::Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">KeyRejected</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">p</span>: <span class="ident">bigint::Nonnegative</span>, <span class="ident">dP</span>: <span class="ident">untrusted::Input</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">KeyRejected</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">p</span>, <span class="ident">p_bits</span>) <span class="op">=</span> <span class="ident">bigint::Modulus::from_nonnegative_with_bit_length</span>(<span class="ident">p</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">p_bits</span>.<span class="ident">as_usize_bits</span>() <span class="op">%</span> <span class="number">512</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::KeyRejected::private_modulus_len_not_multiple_of_512_bits</span>());
@@ -1113,7 +1113,7 @@
 <span class="kw">fn</span> <span class="ident">elem_exp_consttime</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">MM</span><span class="op">&gt;</span>(
     <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">bigint::Elem</span><span class="op">&lt;</span><span class="ident">MM</span><span class="op">&gt;</span>,
     <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">PrivatePrime</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bigint::Elem</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bigint::Elem</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">M</span>: <span class="ident">bigint::NotMuchSmallerModulus</span><span class="op">&lt;</span><span class="ident">MM</span><span class="op">&gt;</span>,
     <span class="ident">M</span>: <span class="ident">Prime</span>,
@@ -1182,7 +1182,7 @@
         <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
         <span class="ident">msg</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">signature</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">mod_bits</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">public</span>.<span class="ident">n_bits</span>;
         <span class="kw">if</span> <span class="ident">signature</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">mod_bits</span>.<span class="ident">as_usize_bytes_rounded_up</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);

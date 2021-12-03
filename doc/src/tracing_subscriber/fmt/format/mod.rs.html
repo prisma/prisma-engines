@@ -1879,11 +1879,11 @@
         <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">FmtContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span>,
         <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span>;
+    ) -&gt; <span class="ident">fmt::Result</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">FormatEvent</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span>
-    <span class="kw">for</span> <span class="kw">fn</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">FmtContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span>, <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span>
+    <span class="kw">for</span> <span class="kw">fn</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">FmtContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span>, <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     <span class="ident">N</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -1893,7 +1893,7 @@
         <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">FmtContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span>,
         <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    ) -&gt; <span class="ident">fmt::Result</span> {
         (<span class="kw-2">*</span><span class="self">self</span>)(<span class="ident">ctx</span>, <span class="ident">writer</span>, <span class="ident">event</span>)
     }
 }
@@ -1907,7 +1907,7 @@
 <span class="doccomment">/// [`FmtSubscriber`]: ../fmt/struct.Subscriber.html</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Format the provided `fields` to the provided [`Writer`], returning a result.</span>
-    <span class="kw">fn</span> <span class="ident">format_fields</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RecordFields</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span>, <span class="ident">fields</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span>;
+    <span class="kw">fn</span> <span class="ident">format_fields</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RecordFields</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span>, <span class="ident">fields</span>: <span class="ident">R</span>) -&gt; <span class="ident">fmt::Result</span>;
 
     <span class="doccomment">/// Record additional field(s) on an existing span.</span>
     <span class="doccomment">///</span>
@@ -1918,7 +1918,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">current</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;writer</span> <span class="kw-2">mut</span> <span class="ident">FormattedFields</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    ) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">current</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>() {
             <span class="ident">current</span>.<span class="ident">fields</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
         }
@@ -1943,14 +1943,14 @@
 <span class="doccomment">///     .event_format(format)</span>
 <span class="doccomment">///     .init();</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>() -&gt; <span class="ident">Format</span> {
     <span class="ident">Format::default</span>()
 }
 
 <span class="doccomment">/// Returns the default configuration for a JSON [event formatter].</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json</span>() -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span><span class="op">&gt;</span> {
     <span class="ident">format</span>().<span class="ident">json</span>()
 }
 
@@ -1958,9 +1958,9 @@
 <span class="doccomment">/// provided function or closure.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`FormatFields`]: trait.FormatFields.html</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug_fn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldFn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug_fn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FieldFn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) -&gt; <span class="ident">fmt::Result</span> <span class="op">+</span> <span class="ident">Clone</span>,
 {
     <span class="ident">FieldFn</span>(<span class="ident">f</span>)
 }
@@ -2038,7 +2038,7 @@
     <span class="comment">// We may not want to do that if we choose to expose specialized</span>
     <span class="comment">// constructors instead (e.g. `from_string` that stores whether the string</span>
     <span class="comment">// is empty...?)</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;writer</span> <span class="kw-2">mut</span> <span class="kw">impl</span> <span class="ident">fmt::Write</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;writer</span> <span class="kw-2">mut</span> <span class="kw">impl</span> <span class="ident">fmt::Write</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">writer</span>: <span class="ident">writer</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span>,
             <span class="ident">is_ansi</span>: <span class="bool-val">false</span>,
@@ -2046,7 +2046,7 @@
     }
 
     <span class="comment">// TODO(eliza): consider making this a public API?</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_ansi</span>(<span class="self">self</span>, <span class="ident">is_ansi</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_ansi</span>(<span class="self">self</span>, <span class="ident">is_ansi</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">is_ansi</span>, ..<span class="self">self</span> }
     }
 
@@ -2055,7 +2055,7 @@
     <span class="doccomment">/// This can be used to temporarily borrow a `Writer` to pass a new `Writer`</span>
     <span class="doccomment">/// to a function that takes a `Writer` by value, allowing the original writer</span>
     <span class="doccomment">/// to still be used once that function returns.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">by_ref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">by_ref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">is_ansi</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">is_ansi</span>;
         <span class="ident">Writer</span> {
             <span class="ident">writer</span>: <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span>,
@@ -2080,7 +2080,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`write_str` method]: std::fmt::Write::write_str</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">write_str</span>(<span class="ident">s</span>)
     }
 
@@ -2102,7 +2102,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`write_char` method]: std::fmt::Write::write_char</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">write_char</span>(<span class="ident">c</span>)
     }
 
@@ -2118,7 +2118,7 @@
     <span class="doccomment">/// [`std::fmt::Write`] trait.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`write_fmt` method]: std::fmt::Write::write_fmt</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">args</span>: <span class="ident">fmt::Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">args</span>: <span class="ident">fmt::Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">write_fmt</span>(<span class="ident">args</span>)
     }
 
@@ -2128,11 +2128,11 @@
     <span class="doccomment">/// If this returns `false`, formatters should not emit ANSI escape codes.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [ANSI escape codes]: https://en.wikipedia.org/wiki/ANSI_escape_code</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_ansi_escapes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_ansi_escapes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">is_ansi</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::fmt::format</span>) <span class="kw">fn</span> <span class="ident">bold</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Style</span> {
+    <span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::fmt::format</span>) <span class="kw">fn</span> <span class="ident">bold</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Style</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_ansi</span> {
@@ -2143,7 +2143,7 @@
         <span class="ident">Style::new</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::fmt::format</span>) <span class="kw">fn</span> <span class="ident">dimmed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Style</span> {
+    <span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::fmt::format</span>) <span class="kw">fn</span> <span class="ident">dimmed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Style</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_ansi</span> {
@@ -2154,7 +2154,7 @@
         <span class="ident">Style::new</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::fmt::format</span>) <span class="kw">fn</span> <span class="ident">italic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Style</span> {
+    <span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::fmt::format</span>) <span class="kw">fn</span> <span class="ident">italic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Style</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_ansi</span> {
@@ -2168,23 +2168,23 @@
 
 <span class="kw">impl</span> <span class="ident">fmt::Write</span> <span class="kw">for</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">Writer::write_str</span>(<span class="self">self</span>, <span class="ident">s</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">write_char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">write_char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">Writer::write_char</span>(<span class="self">self</span>, <span class="ident">c</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">write_fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">args</span>: <span class="ident">fmt::Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">write_fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">args</span>: <span class="ident">fmt::Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">Writer::write_fmt</span>(<span class="self">self</span>, <span class="ident">args</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Writer&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;writer&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;&lt;&amp;mut dyn fmt::Write&gt;&quot;</span>))
             .<span class="ident">field</span>(<span class="string">&quot;is_ansi&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_ansi</span>)
@@ -2195,7 +2195,7 @@
 <span class="comment">// === impl Format ===</span>
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Full</span>, <span class="ident">SystemTime</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Format</span> {
             <span class="ident">format</span>: <span class="ident">Full</span>,
             <span class="ident">timer</span>: <span class="ident">SystemTime</span>,
@@ -2213,7 +2213,7 @@
     <span class="doccomment">/// Use a less verbose output format.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See [`Compact`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compact</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Compact</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compact</span>(<span class="self">self</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Compact</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Format</span> {
             <span class="ident">format</span>: <span class="ident">Compact</span>,
             <span class="ident">timer</span>: <span class="self">self</span>.<span class="ident">timer</span>,
@@ -2250,7 +2250,7 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pretty</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Pretty</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pretty</span>(<span class="self">self</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Pretty</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Format</span> {
             <span class="ident">format</span>: <span class="ident">Pretty::default</span>(),
             <span class="ident">timer</span>: <span class="self">self</span>.<span class="ident">timer</span>,
@@ -2281,7 +2281,7 @@
     <span class="doccomment">/// [`Format::flatten_event`]: #method.flatten_event</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json</span>(<span class="self">self</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Format</span> {
             <span class="ident">format</span>: <span class="ident">Json::default</span>(),
             <span class="ident">timer</span>: <span class="self">self</span>.<span class="ident">timer</span>,
@@ -2308,7 +2308,7 @@
     <span class="doccomment">/// [`UtcTime`]: super::time::UtcTime</span>
     <span class="doccomment">/// [`LocalTime`]: super::time::LocalTime</span>
     <span class="doccomment">/// [`time` crate]: https://docs.rs/time/0.3</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_timer</span><span class="op">&lt;</span><span class="ident">T2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">timer</span>: <span class="ident">T2</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T2</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_timer</span><span class="op">&lt;</span><span class="ident">T2</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">timer</span>: <span class="ident">T2</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T2</span><span class="op">&gt;</span> {
         <span class="ident">Format</span> {
             <span class="ident">format</span>: <span class="self">self</span>.<span class="ident">format</span>,
             <span class="ident">timer</span>,
@@ -2322,7 +2322,7 @@
     }
 
     <span class="doccomment">/// Do not emit timestamps with log messages.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">without_time</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">without_time</span>(<span class="self">self</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, ()<span class="op">&gt;</span> {
         <span class="ident">Format</span> {
             <span class="ident">format</span>: <span class="self">self</span>.<span class="ident">format</span>,
             <span class="ident">timer</span>: (),
@@ -2336,7 +2336,7 @@
     }
 
     <span class="doccomment">/// Enable ANSI terminal colors for formatted output.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_ansi</span>(<span class="self">self</span>, <span class="ident">ansi</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_ansi</span>(<span class="self">self</span>, <span class="ident">ansi</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Format</span> {
             <span class="ident">ansi</span>: <span class="prelude-val">Some</span>(<span class="ident">ansi</span>),
             ..<span class="self">self</span>
@@ -2344,7 +2344,7 @@
     }
 
     <span class="doccomment">/// Sets whether or not an event&#39;s target is displayed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_target</span>(<span class="self">self</span>, <span class="ident">display_target</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_target</span>(<span class="self">self</span>, <span class="ident">display_target</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Format</span> {
             <span class="ident">display_target</span>,
             ..<span class="self">self</span>
@@ -2352,7 +2352,7 @@
     }
 
     <span class="doccomment">/// Sets whether or not an event&#39;s level is displayed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_level</span>(<span class="self">self</span>, <span class="ident">display_level</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_level</span>(<span class="self">self</span>, <span class="ident">display_level</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Format</span> {
             <span class="ident">display_level</span>,
             ..<span class="self">self</span>
@@ -2363,7 +2363,7 @@
     <span class="doccomment">/// when formatting events</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [thread ID]: https://doc.rust-lang.org/stable/std/thread/struct.ThreadId.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_thread_ids</span>(<span class="self">self</span>, <span class="ident">display_thread_id</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_thread_ids</span>(<span class="self">self</span>, <span class="ident">display_thread_id</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Format</span> {
             <span class="ident">display_thread_id</span>,
             ..<span class="self">self</span>
@@ -2374,7 +2374,7 @@
     <span class="doccomment">/// when formatting events</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [name]: https://doc.rust-lang.org/stable/std/thread/index.html#naming-threads</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_thread_names</span>(<span class="self">self</span>, <span class="ident">display_thread_name</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_thread_names</span>(<span class="self">self</span>, <span class="ident">display_thread_name</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Format</span> {
             <span class="ident">display_thread_name</span>,
             ..<span class="self">self</span>
@@ -2382,7 +2382,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">format_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span>
+    <span class="kw">fn</span> <span class="ident">format_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">FormatTime</span>,
     {
@@ -2423,7 +2423,7 @@
     <span class="doccomment">/// See [`Json`](../format/struct.Json.html).</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flatten_event</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flatten_event</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flatten_event</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flatten_event</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">flatten_event</span>(<span class="ident">flatten_event</span>);
         <span class="self">self</span>
     }
@@ -2434,7 +2434,7 @@
     <span class="doccomment">/// See [`format::Json`](../fmt/format/struct.Json.html)</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_current_span</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">display_current_span</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_current_span</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">display_current_span</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">with_current_span</span>(<span class="ident">display_current_span</span>);
         <span class="self">self</span>
     }
@@ -2445,7 +2445,7 @@
     <span class="doccomment">/// See [`format::Json`](../fmt/format/struct.Json.html)</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_span_list</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">display_span_list</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_span_list</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">display_span_list</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">with_span_list</span>(<span class="ident">display_span_list</span>);
         <span class="self">self</span>
     }
@@ -2462,7 +2462,7 @@
         <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">FmtContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span>,
         <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    ) -&gt; <span class="ident">fmt::Result</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">normalized_meta</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">normalized_metadata</span>();
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
@@ -2497,14 +2497,14 @@
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_thread_name</span> {
             <span class="kw">let</span> <span class="ident">current_thread</span> <span class="op">=</span> <span class="ident">std::thread::current</span>();
             <span class="kw">match</span> <span class="ident">current_thread</span>.<span class="ident">name</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; {
                     <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{} &quot;</span>, <span class="ident">FmtThreadName::new</span>(<span class="ident">name</span>))<span class="question-mark">?</span>;
                 }
                 <span class="comment">// fall-back to thread id when name is absent and ids are not enabled</span>
-                <span class="prelude-val">None</span> <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">display_thread_id</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">display_thread_id</span> =&gt; {
                     <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:0&gt;2?} &quot;</span>, <span class="ident">current_thread</span>.<span class="ident">id</span>())<span class="question-mark">?</span>;
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                <span class="kw">_</span> =&gt; {}
             }
         }
 
@@ -2562,7 +2562,7 @@
         <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">FmtContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span>,
         <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    ) -&gt; <span class="ident">fmt::Result</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">normalized_meta</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">normalized_metadata</span>();
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
@@ -2597,14 +2597,14 @@
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_thread_name</span> {
             <span class="kw">let</span> <span class="ident">current_thread</span> <span class="op">=</span> <span class="ident">std::thread::current</span>();
             <span class="kw">match</span> <span class="ident">current_thread</span>.<span class="ident">name</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; {
                     <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{} &quot;</span>, <span class="ident">FmtThreadName::new</span>(<span class="ident">name</span>))<span class="question-mark">?</span>;
                 }
                 <span class="comment">// fall-back to thread id when name is absent and ids are not enabled</span>
-                <span class="prelude-val">None</span> <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">display_thread_id</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">display_thread_id</span> =&gt; {
                     <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:0&gt;2?} &quot;</span>, <span class="ident">current_thread</span>.<span class="ident">id</span>())<span class="question-mark">?</span>;
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                <span class="kw">_</span> =&gt; {}
             }
         }
 
@@ -2657,7 +2657,7 @@
     <span class="ident">M</span>: <span class="ident">MakeOutput</span><span class="op">&lt;</span><span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span>, <span class="ident">fmt::Result</span><span class="op">&gt;</span>,
     <span class="ident">M::Visitor</span>: <span class="ident">VisitFmt</span> <span class="op">+</span> <span class="ident">VisitOutput</span><span class="op">&lt;</span><span class="ident">fmt::Result</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">format_fields</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RecordFields</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span>, <span class="ident">fields</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">format_fields</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RecordFields</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span>, <span class="ident">fields</span>: <span class="ident">R</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">make_visitor</span>(<span class="ident">writer</span>);
         <span class="ident">fields</span>.<span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>);
         <span class="ident">v</span>.<span class="ident">finish</span>()
@@ -2689,13 +2689,13 @@
     <span class="doccomment">/// Returns a new default [`FormatFields`] implementation.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`FormatFields`]: trait.FormatFields.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">_private</span>: () }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">DefaultFields</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
@@ -2704,7 +2704,7 @@
     <span class="kw">type</span> <span class="ident">Visitor</span> <span class="op">=</span> <span class="ident">DefaultVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">make_visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Visitor</span> {
+    <span class="kw">fn</span> <span class="ident">make_visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Visitor</span> {
         <span class="ident">DefaultVisitor::new</span>(<span class="ident">target</span>, <span class="bool-val">true</span>)
     }
 }
@@ -2718,7 +2718,7 @@
     <span class="doccomment">/// - `writer`: the writer to format to.</span>
     <span class="doccomment">/// - `is_empty`: whether or not any fields have been previously written to</span>
     <span class="doccomment">///   that writer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">is_empty</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">is_empty</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">writer</span>,
             <span class="ident">is_empty</span>,
@@ -2741,7 +2741,7 @@
             <span class="kw">return</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;message&quot;</span> {
+        <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;message&quot;</span> {
             <span class="self">self</span>.<span class="ident">record_debug</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>))
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">record_debug</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">value</span>)
@@ -2774,18 +2774,18 @@
 
         <span class="self">self</span>.<span class="ident">maybe_pad</span>();
         <span class="self">self</span>.<span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">name</span>() {
-            <span class="string">&quot;message&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">writer</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>),
+            <span class="string">&quot;message&quot;</span> =&gt; <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">writer</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>),
             <span class="comment">// Skip fields that are actually log metadata that have already been handled</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;r#&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;r#&quot;</span>) =&gt; <span class="macro">write!</span>(
                 <span class="self">self</span>.<span class="ident">writer</span>,
                 <span class="string">&quot;{}{}{:?}&quot;</span>,
                 <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">italic</span>().<span class="ident">paint</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>[<span class="number">2</span>..]),
                 <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">dimmed</span>().<span class="ident">paint</span>(<span class="string">&quot;=&quot;</span>),
                 <span class="ident">value</span>
             ),
-            <span class="ident">name</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+            <span class="ident">name</span> =&gt; <span class="macro">write!</span>(
                 <span class="self">self</span>.<span class="ident">writer</span>,
                 <span class="string">&quot;{}{}{:?}&quot;</span>,
                 <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">italic</span>().<span class="ident">paint</span>(<span class="ident">name</span>),
@@ -2797,13 +2797,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::field::VisitOutput</span><span class="op">&lt;</span><span class="ident">fmt::Result</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DefaultVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">result</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::field::VisitFmt</span> <span class="kw">for</span> <span class="ident">DefaultVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span> {
+    <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">writer</span>
     }
 }
@@ -2812,7 +2812,7 @@
 <span class="kw">struct</span> <span class="ident">ErrorSourceList</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>));
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ErrorSourceList</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">list</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_list</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">curr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>);
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">curr_err</span>) <span class="op">=</span> <span class="ident">curr</span> {
@@ -2840,16 +2840,16 @@
         <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FmtContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span>,
         <span class="ident">span</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">span::Id</span><span class="op">&gt;</span>,
         <span class="ident">ansi</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">ctx</span>, <span class="ident">span</span>, <span class="ident">ansi</span> }
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FmtContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span>, <span class="ident">span</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">span::Id</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FmtContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span>, <span class="ident">span</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">span::Id</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">ctx</span>, <span class="ident">span</span> }
     }
 
-    <span class="kw">fn</span> <span class="ident">bold</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Style</span> {
+    <span class="kw">fn</span> <span class="ident">bold</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Style</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ansi</span> {
@@ -2866,7 +2866,7 @@
     <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span>,
     <span class="ident">N</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">bold</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bold</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seen</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
@@ -2894,15 +2894,15 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>))]</span>
 <span class="kw">impl</span> <span class="ident">Style</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Style</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">bold</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">bold</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">paint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">d</span>: <span class="kw">impl</span> <span class="ident">fmt::Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">fmt::Display</span> {
+    <span class="kw">fn</span> <span class="ident">paint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">d</span>: <span class="kw">impl</span> <span class="ident">fmt::Display</span>) -&gt; <span class="kw">impl</span> <span class="ident">fmt::Display</span> {
         <span class="ident">d</span>
     }
 }
@@ -2912,13 +2912,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FmtThreadName</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">name</span> }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FmtThreadName</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{
             <span class="ident">AtomicUsize</span>,
             <span class="ident">Ordering</span>::{<span class="ident">AcqRel</span>, <span class="ident">Acquire</span>, <span class="ident">Relaxed</span>},
@@ -2936,12 +2936,12 @@
             <span class="comment">// snapshot of.</span>
             <span class="kw">match</span> <span class="ident">MAX_LEN</span>.<span class="ident">compare_exchange</span>(<span class="ident">max_len</span>, <span class="ident">len</span>, <span class="ident">AcqRel</span>, <span class="ident">Acquire</span>) {
                 <span class="comment">// We successfully set the new max value</span>
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
                 <span class="comment">// Another thread set a new max value since we last observed</span>
                 <span class="comment">// it! It&#39;s possible that the new length is actually longer than</span>
                 <span class="comment">// ours, so we&#39;ll loop again and check whether our length is</span>
                 <span class="comment">// still the longest. If not, we&#39;ll just use the newer value.</span>
-                <span class="prelude-val">Err</span>(<span class="ident">actual</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">max_len</span> <span class="op">=</span> <span class="ident">actual</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; <span class="ident">max_len</span> <span class="op">=</span> <span class="ident">actual</span>,
             }
         }
 
@@ -2958,12 +2958,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FmtLevel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">level</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Level</span>, <span class="ident">ansi</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">level</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Level</span>, <span class="ident">ansi</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">level</span>, <span class="ident">ansi</span> }
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">level</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Level</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">level</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Level</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">level</span> }
     }
 }
@@ -2976,35 +2976,35 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FmtLevel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">level</span> {
-            <span class="ident">Level::TRACE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">TRACE_STR</span>),
-            <span class="ident">Level::DEBUG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">DEBUG_STR</span>),
-            <span class="ident">Level::INFO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">INFO_STR</span>),
-            <span class="ident">Level::WARN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">WARN_STR</span>),
-            <span class="ident">Level::ERROR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">ERROR_STR</span>),
+            <span class="ident">Level::TRACE</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">TRACE_STR</span>),
+            <span class="ident">Level::DEBUG</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">DEBUG_STR</span>),
+            <span class="ident">Level::INFO</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">INFO_STR</span>),
+            <span class="ident">Level::WARN</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">WARN_STR</span>),
+            <span class="ident">Level::ERROR</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">ERROR_STR</span>),
         }
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FmtLevel</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ansi</span> {
             <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">level</span> {
-                <span class="ident">Level::TRACE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">Colour::Purple</span>.<span class="ident">paint</span>(<span class="ident">TRACE_STR</span>)),
-                <span class="ident">Level::DEBUG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">Colour::Blue</span>.<span class="ident">paint</span>(<span class="ident">DEBUG_STR</span>)),
-                <span class="ident">Level::INFO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">Colour::Green</span>.<span class="ident">paint</span>(<span class="ident">INFO_STR</span>)),
-                <span class="ident">Level::WARN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">Colour::Yellow</span>.<span class="ident">paint</span>(<span class="ident">WARN_STR</span>)),
-                <span class="ident">Level::ERROR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">Colour::Red</span>.<span class="ident">paint</span>(<span class="ident">ERROR_STR</span>)),
+                <span class="ident">Level::TRACE</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">Colour::Purple</span>.<span class="ident">paint</span>(<span class="ident">TRACE_STR</span>)),
+                <span class="ident">Level::DEBUG</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">Colour::Blue</span>.<span class="ident">paint</span>(<span class="ident">DEBUG_STR</span>)),
+                <span class="ident">Level::INFO</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">Colour::Green</span>.<span class="ident">paint</span>(<span class="ident">INFO_STR</span>)),
+                <span class="ident">Level::WARN</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">Colour::Yellow</span>.<span class="ident">paint</span>(<span class="ident">WARN_STR</span>)),
+                <span class="ident">Level::ERROR</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">Colour::Red</span>.<span class="ident">paint</span>(<span class="ident">ERROR_STR</span>)),
             }
         } <span class="kw">else</span> {
             <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">level</span> {
-                <span class="ident">Level::TRACE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">TRACE_STR</span>),
-                <span class="ident">Level::DEBUG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">DEBUG_STR</span>),
-                <span class="ident">Level::INFO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">INFO_STR</span>),
-                <span class="ident">Level::WARN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">WARN_STR</span>),
-                <span class="ident">Level::ERROR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">ERROR_STR</span>),
+                <span class="ident">Level::TRACE</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">TRACE_STR</span>),
+                <span class="ident">Level::DEBUG</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">DEBUG_STR</span>),
+                <span class="ident">Level::INFO</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">INFO_STR</span>),
+                <span class="ident">Level::WARN</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">WARN_STR</span>),
+                <span class="ident">Level::ERROR</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">ERROR_STR</span>),
             }
         }
     }
@@ -3014,11 +3014,11 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">MakeVisitor</span><span class="op">&lt;</span><span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FieldFn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) -&gt; <span class="ident">fmt::Result</span> <span class="op">+</span> <span class="ident">Clone</span>,
 {
     <span class="kw">type</span> <span class="ident">Visitor</span> <span class="op">=</span> <span class="ident">FieldFnVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">make_visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Visitor</span> {
+    <span class="kw">fn</span> <span class="ident">make_visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Visitor</span> {
         <span class="ident">FieldFnVisitor</span> {
             <span class="ident">writer</span>,
             <span class="ident">f</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>(),
@@ -3029,7 +3029,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Visit</span> <span class="kw">for</span> <span class="ident">FieldFnVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) -&gt; <span class="ident">fmt::Result</span>,
 {
     <span class="kw">fn</span> <span class="ident">record_debug</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">is_ok</span>() {
@@ -3040,24 +3040,24 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">VisitOutput</span><span class="op">&lt;</span><span class="ident">fmt::Result</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FieldFnVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) -&gt; <span class="ident">fmt::Result</span>,
 {
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">result</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">VisitFmt</span> <span class="kw">for</span> <span class="ident">FieldFnVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) -&gt; <span class="ident">fmt::Result</span>,
 {
-    <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span> {
+    <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">writer</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FieldFnVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;FieldFnVisitor&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;f&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>()))
             .<span class="ident">field</span>(<span class="string">&quot;writer&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">writer</span>)
@@ -3093,17 +3093,17 @@
         <span class="ident">FmtSpan</span>(<span class="ident">FmtSpan::NEW</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">FmtSpan::ENTER</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">FmtSpan::EXIT</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">FmtSpan::CLOSE</span>.<span class="number">0</span>);
 
     <span class="doccomment">/// Check whether or not a certain flag is set for this [`FmtSpan`]</span>
-    <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="ident">FmtSpan</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">clone</span>() <span class="op">&amp;</span> <span class="ident">other</span>.<span class="ident">clone</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>
+    <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="ident">FmtSpan</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">clone</span>() <span class="op">&amp;</span> <span class="ident">other</span>.<span class="ident">clone</span>() <span class="op">==</span> <span class="ident">other</span>
     }
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_fmt_span_bit_op</span> {
-    (<span class="macro-nonterminal">$</span><span class="kw">trait</span>:<span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>:<span class="ident">tt</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="kw">trait</span>:<span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>:<span class="ident">tt</span>) =&gt; {
         <span class="kw">impl</span> <span class="ident">std::ops</span>::<span class="macro-nonterminal">$</span><span class="kw">trait</span> <span class="kw">for</span> <span class="macro-nonterminal">FmtSpan</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">FmtSpan</span>;
 
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Output</span> {
+            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
                 <span class="ident">FmtSpan</span>(<span class="self">self</span>.<span class="number">0</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span> <span class="ident">rhs</span>.<span class="number">0</span>)
             }
         }
@@ -3111,7 +3111,7 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_fmt_span_bit_assign_op</span> {
-    (<span class="macro-nonterminal">$</span><span class="kw">trait</span>:<span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>:<span class="ident">tt</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="kw">trait</span>:<span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>:<span class="ident">tt</span>) =&gt; {
         <span class="kw">impl</span> <span class="ident">std::ops</span>::<span class="macro-nonterminal">$</span><span class="kw">trait</span> <span class="kw">for</span> <span class="macro-nonterminal">FmtSpan</span> {
             <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) {
                 <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">FmtSpan</span>(<span class="self">self</span>.<span class="number">0</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span> <span class="ident">rhs</span>.<span class="number">0</span>)
@@ -3129,9 +3129,9 @@
 <span class="macro">impl_fmt_span_bit_assign_op!</span>(<span class="ident">BitXorAssign</span>, <span class="ident">bitxor_assign</span>, <span class="op">^</span>);
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">FmtSpan</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">wrote_flag</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">write_flags</span> <span class="op">=</span> <span class="op">|</span><span class="ident">flag</span>, <span class="ident">flag_str</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">write_flags</span> <span class="op">=</span> <span class="op">|</span><span class="ident">flag</span>, <span class="ident">flag_str</span><span class="op">|</span> -&gt; <span class="ident">fmt::Result</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">flag</span>) {
                 <span class="kw">if</span> <span class="ident">wrote_flag</span> {
                     <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; | &quot;</span>)<span class="question-mark">?</span>;
@@ -3144,7 +3144,7 @@
             <span class="prelude-val">Ok</span>(())
         };
 
-        <span class="kw">if</span> <span class="ident">FmtSpan::NONE</span> <span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">FmtSpan::NONE</span> {
+        <span class="kw">if</span> <span class="ident">FmtSpan::NONE</span> <span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>() <span class="op">==</span> <span class="ident">FmtSpan::NONE</span> {
             <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;FmtSpan::NONE&quot;</span>)<span class="question-mark">?</span>;
         } <span class="kw">else</span> {
             <span class="ident">write_flags</span>(<span class="ident">FmtSpan::NEW</span>, <span class="string">&quot;FmtSpan::NEW&quot;</span>)<span class="question-mark">?</span>;
@@ -3163,40 +3163,40 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FmtSpanConfig</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">without_time</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">without_time</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">kind</span>: <span class="self">self</span>.<span class="ident">kind</span>,
             <span class="ident">fmt_timing</span>: <span class="bool-val">false</span>,
         }
     }
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">with_kind</span>(<span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">FmtSpan</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">with_kind</span>(<span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">FmtSpan</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">kind</span>,
             <span class="ident">fmt_timing</span>: <span class="self">self</span>.<span class="ident">fmt_timing</span>,
         }
     }
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">trace_new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">trace_new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">contains</span>(<span class="ident">FmtSpan::NEW</span>)
     }
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">trace_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">trace_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">contains</span>(<span class="ident">FmtSpan::ENTER</span>)
     }
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">trace_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">trace_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">contains</span>(<span class="ident">FmtSpan::EXIT</span>)
     }
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">trace_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">trace_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">contains</span>(<span class="ident">FmtSpan::CLOSE</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">FmtSpanConfig</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">FmtSpanConfig</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">kind</span>: <span class="ident">FmtSpan::NONE</span>,
             <span class="ident">fmt_timing</span>: <span class="bool-val">true</span>,
@@ -3206,7 +3206,7 @@
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">TimingDisplay</span>(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">u64</span>);
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">TimingDisplay</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">f64</span>;
         <span class="kw">for</span> <span class="ident">unit</span> <span class="kw">in</span> [<span class="string">&quot;ns&quot;</span>, <span class="string">&quot;µs&quot;</span>, <span class="string">&quot;ms&quot;</span>, <span class="string">&quot;s&quot;</span>].<span class="ident">iter</span>() {
             <span class="kw">if</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="number">10.0</span> {
@@ -3236,7 +3236,7 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MockTime</span>;
     <span class="kw">impl</span> <span class="ident">FormatTime</span> <span class="kw">for</span> <span class="ident">MockTime</span> {
-        <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
             <span class="macro">write!</span>(<span class="ident">w</span>, <span class="string">&quot;fake time&quot;</span>)
         }
     }
@@ -3364,7 +3364,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">format_nanos</span>() {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="ident">t</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="ident">t</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
             <span class="ident">TimingDisplay</span>(<span class="ident">t</span>).<span class="ident">to_string</span>()
         }
 

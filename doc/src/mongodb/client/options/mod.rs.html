@@ -2555,7 +2555,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ServerAddress</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -2565,7 +2565,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ServerAddress</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Tcp</span> {
             <span class="ident">host</span>: <span class="string">&quot;localhost&quot;</span>.<span class="ident">into</span>(),
             <span class="ident">port</span>: <span class="prelude-val">None</span>,
@@ -2574,7 +2574,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">ServerAddress</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
             (
                 <span class="ident"><span class="self">Self</span>::Tcp</span> { <span class="ident">host</span>, <span class="ident">port</span> },
@@ -2582,7 +2582,7 @@
                     <span class="ident">host</span>: <span class="ident">other_host</span>,
                     <span class="ident">port</span>: <span class="ident">other_port</span>,
                 },
-            ) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">host</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other_host</span> <span class="op">&amp;&amp;</span> <span class="ident">port</span>.<span class="ident">unwrap_or</span>(<span class="number">27017</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">other_port</span>.<span class="ident">unwrap_or</span>(<span class="number">27017</span>),
+            ) =&gt; <span class="ident">host</span> <span class="op">==</span> <span class="ident">other_host</span> <span class="op">&amp;&amp;</span> <span class="ident">port</span>.<span class="ident">unwrap_or</span>(<span class="number">27017</span>) <span class="op">==</span> <span class="ident">other_port</span>.<span class="ident">unwrap_or</span>(<span class="number">27017</span>),
         }
     }
 }
@@ -2593,7 +2593,7 @@
         <span class="ident">H</span>: <span class="ident">Hasher</span>,
     {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Tcp</span> { <span class="ident">host</span>, <span class="ident">port</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Tcp</span> { <span class="ident">host</span>, <span class="ident">port</span> } =&gt; {
                 <span class="ident">host</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
                 <span class="ident">port</span>.<span class="ident">unwrap_or</span>(<span class="number">27017</span>).<span class="ident">hash</span>(<span class="ident">state</span>);
             }
@@ -2603,18 +2603,18 @@
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">ServerAddress</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">ServerAddress::parse</span>(<span class="ident">address</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ServerAddress</span> {
     <span class="doccomment">/// Parses an address string into a `ServerAddress`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">address</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">address</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">address</span>.<span class="ident">as_ref</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">address</span>.<span class="ident">split</span>(<span class="string">&#39;:&#39;</span>);
         <span class="kw">let</span> <span class="ident">hostname</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parts</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">part</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">part</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">part</span>.<span class="ident">is_empty</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="macro">format!</span>(
@@ -2626,7 +2626,7 @@
                 }
                 <span class="ident">part</span>
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid server address: \&quot;{}\&quot;&quot;</span>, <span class="ident">address</span>),
                 }
@@ -2635,7 +2635,7 @@
         };
 
         <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parts</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">part</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">part</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident">u16::from_str</span>(<span class="ident">part</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: <span class="macro">format!</span>(
                         <span class="string">&quot;port must be valid 16-bit unsigned integer, instead got: {}&quot;</span>,
@@ -2643,7 +2643,7 @@
                     ),
                 })<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="ident">port</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">port</span> <span class="op">==</span> <span class="number">0</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="macro">format!</span>(
                             <span class="string">&quot;invalid server address: \&quot;{}\&quot;; port must be non-zero&quot;</span>,
@@ -2664,7 +2664,7 @@
 
                 <span class="prelude-val">Some</span>(<span class="ident">port</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">ServerAddress::Tcp</span> {
@@ -2674,9 +2674,9 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_document</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Document</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_document</span>(<span class="self">self</span>) -&gt; <span class="ident">Document</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Tcp</span> { <span class="ident">host</span>, <span class="ident">port</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Tcp</span> { <span class="ident">host</span>, <span class="ident">port</span> } =&gt; {
                 <span class="macro">doc!</span> {
                     <span class="string">&quot;host&quot;</span>: <span class="ident">host</span>,
                     <span class="string">&quot;port&quot;</span>: <span class="ident">port</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">Bson::Int32</span>(<span class="ident">i</span>.<span class="ident">into</span>())).<span class="ident">unwrap_or</span>(<span class="ident">Bson::Null</span>)
@@ -2685,23 +2685,23 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Tcp</span> { <span class="ident">host</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">host</span>.<span class="ident">as_str</span>(),
+            <span class="ident"><span class="self">Self</span>::Tcp</span> { <span class="ident">host</span>, .. } =&gt; <span class="ident">host</span>.<span class="ident">as_str</span>(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Tcp</span> { <span class="ident">port</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">port</span>,
+            <span class="ident"><span class="self">Self</span>::Tcp</span> { <span class="ident">port</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">port</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ServerAddress</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Tcp</span> { <span class="ident">host</span>, <span class="ident">port</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Tcp</span> { <span class="ident">host</span>, <span class="ident">port</span> } =&gt; {
                 <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}:{}&quot;</span>, <span class="ident">host</span>, <span class="ident">port</span>.<span class="ident">unwrap_or</span>(<span class="ident">DEFAULT_PORT</span>))
             }
         }
@@ -2720,10 +2720,10 @@
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">ServerApiVersion</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">str</span> {
-            <span class="string">&quot;1&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::V1</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
+            <span class="string">&quot;1&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::V1</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                 <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid server api version string: {}&quot;</span>, <span class="ident">str</span>),
             }
             .<span class="ident">into</span>()),
@@ -2732,15 +2732,15 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ServerApiVersion</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::V1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;1&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::V1</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;1&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ServerApiVersion</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -3013,19 +3013,19 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">mock_service_id</span>: <span class="ident">bool</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">default_hosts</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">default_hosts</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span> {
     <span class="macro">vec!</span>[<span class="ident">ServerAddress::default</span>()]
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ClientOptions</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::builder</span>().<span class="ident">build</span>()
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">ClientOptions</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
     {
@@ -3162,13 +3162,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TlsOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Tls</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">options</span>: <span class="ident">TlsOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">options</span>: <span class="ident">TlsOptions</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Enabled</span>(<span class="ident">options</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TlsOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Tls</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">options</span>: <span class="ident">TlsOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">options</span>: <span class="ident">TlsOptions</span>) -&gt; <span class="self">Self</span> {
         <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="ident">options</span>))
     }
 }
@@ -3178,15 +3178,15 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_for_client_options</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
         <span class="ident">tls</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Tls</span><span class="op">&gt;</span>,
         <span class="ident">serializer</span>: <span class="ident">S</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
     {
         <span class="kw">match</span> <span class="ident">tls</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="ident">tls_options</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="ident">tls_options</span>)) =&gt; {
                 <span class="ident">TlsOptions::serialize_for_client_options</span>(<span class="ident">tls_options</span>, <span class="ident">serializer</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+            <span class="kw">_</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
         }
     }
 }
@@ -3224,14 +3224,14 @@
         <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">Certificate</span>],
         <span class="kw">_</span>: <span class="ident">webpki::DNSNameRef</span>,
         <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">ServerCertVerified</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">ServerCertVerified</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">ServerCertVerified::assertion</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">TlsOptions</span> {
     <span class="doccomment">/// Converts `TlsOptions` into a rustls::ClientConfig.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_rustls_config</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">rustls::ClientConfig</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_rustls_config</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">rustls::ClientConfig</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">rustls::ClientConfig::new</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">allow_invalid_certificates</span> {
@@ -3259,8 +3259,8 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">cert_key_file_path</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">BufReader::new</span>(<span class="ident">File::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>);
             <span class="kw">let</span> <span class="ident">certs</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pemfile::certs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">file</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">certs</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">certs</span>,
-                <span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">certs</span>) =&gt; <span class="ident">certs</span>,
+                <span class="prelude-val">Err</span>(()) =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidTlsConfig</span> {
                         <span class="ident">message</span>: <span class="macro">format!</span>(
                             <span class="string">&quot;Unable to parse PEM-encoded client certificate from {}&quot;</span>,
@@ -3273,8 +3273,8 @@
 
             <span class="ident">file</span>.<span class="ident">seek</span>(<span class="ident">SeekFrom::Start</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pemfile::rsa_private_keys</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">file</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">key</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">key</span>,
-                <span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">key</span>) =&gt; <span class="ident">key</span>,
+                <span class="prelude-val">Err</span>(()) =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidTlsConfig</span> {
                         <span class="ident">message</span>: <span class="macro">format!</span>(
                             <span class="string">&quot;Unable to parse PEM-encoded RSA key from {}&quot;</span>,
@@ -3300,7 +3300,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_for_client_options</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
         <span class="ident">tls_options</span>: <span class="kw-2">&amp;</span><span class="ident">TlsOptions</span>,
         <span class="ident">serializer</span>: <span class="ident">S</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
     {
@@ -3347,7 +3347,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ClientOptionsParser</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ClientOptions</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">parser</span>: <span class="ident">ClientOptionsParser</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">parser</span>: <span class="ident">ClientOptionsParser</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">hosts</span>: <span class="ident">parser</span>.<span class="ident">hosts</span>,
             <span class="ident">app_name</span>: <span class="ident">parser</span>.<span class="ident">app_name</span>,
@@ -3389,7 +3389,7 @@
     <span class="doccomment">/// Creates a new ClientOptions with the `original_srv_hostname` field set to the testing value</span>
     <span class="doccomment">/// used in the SRV tests.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_srv</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_srv</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">original_srv_info</span>: <span class="prelude-val">Some</span>(<span class="ident">OriginalSrvInfo</span> {
                 <span class="ident">hostname</span>: <span class="string">&quot;localhost.test.test.build.10gen.cc&quot;</span>.<span class="ident">into</span>(),
@@ -3457,7 +3457,7 @@
     <span class="doccomment">/// Note: if the `sync` feature is enabled, then this method will be replaced with [the sync</span>
     <span class="doccomment">/// version](#method.parse-1).</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::parse_uri</span>(<span class="ident">s</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -3465,7 +3465,7 @@
     <span class="doccomment">/// [the async version](#method.parse)</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">docsrs</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident"><span class="kw">crate</span>::RUNTIME</span>.<span class="ident">block_on</span>(<span class="ident"><span class="self">Self</span>::parse_uri</span>(<span class="ident">s</span>.<span class="ident">as_ref</span>(), <span class="prelude-val">None</span>))
     }
 
@@ -3487,7 +3487,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">parse_with_resolver_config</span>(
         <span class="ident">uri</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">resolver_config</span>: <span class="ident">ResolverConfig</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::parse_uri</span>(<span class="ident">uri</span>, <span class="prelude-val">Some</span>(<span class="ident">resolver_config</span>)).<span class="kw">await</span>
     }
 
@@ -3495,7 +3495,7 @@
     <span class="doccomment">/// [the async version](#method.parse_with_resolver_config)</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">docsrs</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_with_resolver_config</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">resolver_config</span>: <span class="ident">ResolverConfig</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_with_resolver_config</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">resolver_config</span>: <span class="ident">ResolverConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident"><span class="kw">crate</span>::RUNTIME</span>.<span class="ident">block_on</span>(<span class="ident"><span class="self">Self</span>::parse_uri</span>(<span class="ident">uri</span>, <span class="prelude-val">Some</span>(<span class="ident">resolver_config</span>)))
     }
 
@@ -3504,7 +3504,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">parse_uri</span>(
         <span class="ident">uri</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">resolver_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResolverConfig</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">ClientOptionsParser::parse</span>(<span class="ident">uri</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">srv</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">srv</span>;
         <span class="kw">let</span> <span class="ident">auth_source_present</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">auth_source</span>.<span class="ident">is_some</span>();
@@ -3561,7 +3561,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_without_srv_resolution</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_without_srv_resolution</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">ClientOptionsParser::parse</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">options</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">into</span>();
         <span class="ident">options</span>.<span class="ident">validate</span>()<span class="question-mark">?</span>;
@@ -3569,15 +3569,15 @@
         <span class="prelude-val">Ok</span>(<span class="ident">options</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tls_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TlsOptions</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tls_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TlsOptions</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tls</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="kw-2">ref</span> <span class="ident">opts</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">opts</span>.<span class="ident">clone</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="kw-2">ref</span> <span class="ident">opts</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">opts</span>.<span class="ident">clone</span>()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Ensure the options set are valid, returning an error describing the problem if they are not.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">direct_connection</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">hosts</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
@@ -3604,7 +3604,7 @@
                 }
                 .<span class="ident">into</span>());
             }
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">direct_connection</span> <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">direct_connection</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: <span class="string">&quot;cannot specify directConnection=true with loadBalanced=true&quot;</span>
                         .<span class="ident">to_string</span>(),
@@ -3665,14 +3665,14 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">test_options_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TestOptions</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">test_options_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TestOptions</span> {
         <span class="self">self</span>.<span class="ident">test_options</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Default::default</span>)
     }
 }
 
 <span class="doccomment">/// Splits a string into a section before a given index and a section exclusively after the index.</span>
 <span class="doccomment">/// Empty portions are returned as `None`.</span>
-<span class="kw">fn</span> <span class="ident">exclusive_split_at</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">i</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) {
+<span class="kw">fn</span> <span class="ident">exclusive_split_at</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> (<span class="ident">l</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split_at</span>(<span class="ident">i</span>);
 
     <span class="kw">let</span> <span class="ident">lout</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">l</span>.<span class="ident">is_empty</span>() { <span class="prelude-val">Some</span>(<span class="ident">l</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> };
@@ -3681,17 +3681,17 @@
     (<span class="ident">lout</span>, <span class="ident">rout</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">percent_decode</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">err_message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">percent_decode</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">err_message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">percent_encoding::percent_decode_str</span>(<span class="ident">s</span>).<span class="ident">decode_utf8</span>() {
-        <span class="prelude-val">Ok</span>(<span class="ident">result</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">result</span>.<span class="ident">to_string</span>()),
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">result</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">result</span>.<span class="ident">to_string</span>()),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
             <span class="ident">message</span>: <span class="ident">err_message</span>.<span class="ident">to_string</span>(),
         }
         .<span class="ident">into</span>()),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">validate_userinfo</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">userinfo_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">validate_userinfo</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">userinfo_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">USERINFO_RESERVED_CHARACTERS</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>)) {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
             <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{} must be URL encoded&quot;</span>, <span class="ident">userinfo_type</span>),
@@ -3715,10 +3715,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ClientOptionsParser</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">end_of_scheme</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">find</span>(<span class="string">&quot;://&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">index</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="ident">index</span>,
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: <span class="string">&quot;connection string contains no scheme&quot;</span>.<span class="ident">to_string</span>(),
                 }
@@ -3727,9 +3727,9 @@
         };
 
         <span class="kw">let</span> <span class="ident">srv</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[..<span class="ident">end_of_scheme</span>] {
-            <span class="string">&quot;mongodb&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="string">&quot;mongodb+srv&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;mongodb&quot;</span> =&gt; <span class="bool-val">false</span>,
+            <span class="string">&quot;mongodb+srv&quot;</span> =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                     <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;invalid connection string scheme: {}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>[..<span class="ident">end_of_scheme</span>]),
                 }
@@ -3740,16 +3740,16 @@
         <span class="kw">let</span> <span class="ident">after_scheme</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">end_of_scheme</span> <span class="op">+</span> <span class="number">3</span>..];
 
         <span class="kw">let</span> (<span class="ident">pre_slash</span>, <span class="ident">post_slash</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">after_scheme</span>.<span class="ident">find</span>(<span class="string">&#39;/&#39;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">slash_index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">exclusive_split_at</span>(<span class="ident">after_scheme</span>, <span class="ident">slash_index</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">section</span>), <span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">section</span>, <span class="ident">o</span>),
-                (<span class="prelude-val">None</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">slash_index</span>) =&gt; <span class="kw">match</span> <span class="ident">exclusive_split_at</span>(<span class="ident">after_scheme</span>, <span class="ident">slash_index</span>) {
+                (<span class="prelude-val">Some</span>(<span class="ident">section</span>), <span class="ident">o</span>) =&gt; (<span class="ident">section</span>, <span class="ident">o</span>),
+                (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="string">&quot;missing hosts&quot;</span>.<span class="ident">to_string</span>(),
                     }
                     .<span class="ident">into</span>())
                 }
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">after_scheme</span>.<span class="ident">find</span>(<span class="string">&#39;?&#39;</span>).<span class="ident">is_some</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="string">&quot;Missing delimiting slash between hosts and options&quot;</span>.<span class="ident">to_string</span>(),
@@ -3761,15 +3761,15 @@
         };
 
         <span class="kw">let</span> (<span class="ident">database</span>, <span class="ident">options_section</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">post_slash</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">section</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">section</span>.<span class="ident">find</span>(<span class="string">&#39;?&#39;</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">exclusive_split_at</span>(<span class="ident">section</span>, <span class="ident">index</span>),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">post_slash</span>, <span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">section</span>) =&gt; <span class="kw">match</span> <span class="ident">section</span>.<span class="ident">find</span>(<span class="string">&#39;?&#39;</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="ident">exclusive_split_at</span>(<span class="ident">section</span>, <span class="ident">index</span>),
+                <span class="prelude-val">None</span> =&gt; (<span class="ident">post_slash</span>, <span class="prelude-val">None</span>),
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="prelude-val">None</span> =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
         };
 
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">database</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">db</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">db</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">percent_decode</span>(<span class="ident">db</span>, <span class="string">&quot;database name must be URL encoded&quot;</span>)<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="ident">decoded</span>
                     .<span class="ident">chars</span>()
@@ -3782,17 +3782,17 @@
                 }
                 <span class="prelude-val">Some</span>(<span class="ident">decoded</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> (<span class="ident">authentication_requested</span>, <span class="ident">cred_section</span>, <span class="ident">hosts_section</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">pre_slash</span>.<span class="ident">rfind</span>(<span class="string">&#39;@&#39;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; {
                 <span class="comment">// if &#39;@&#39; is in the host section, it MUST be interpreted as a request for</span>
                 <span class="comment">// authentication, even if the credentials are empty.</span>
                 <span class="kw">let</span> (<span class="ident">creds</span>, <span class="ident">hosts</span>) <span class="op">=</span> <span class="ident">exclusive_split_at</span>(<span class="ident">pre_slash</span>, <span class="ident">index</span>);
                 <span class="kw">match</span> <span class="ident">hosts</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">hs</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="bool-val">true</span>, <span class="ident">creds</span>, <span class="ident">hs</span>),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">hs</span>) =&gt; (<span class="bool-val">true</span>, <span class="ident">creds</span>, <span class="ident">hs</span>),
+                    <span class="prelude-val">None</span> =&gt; {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                             <span class="ident">message</span>: <span class="string">&quot;missing hosts&quot;</span>.<span class="ident">to_string</span>(),
                         }
@@ -3800,18 +3800,18 @@
                     }
                 }
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="bool-val">false</span>, <span class="prelude-val">None</span>, <span class="ident">pre_slash</span>),
+            <span class="prelude-val">None</span> =&gt; (<span class="bool-val">false</span>, <span class="prelude-val">None</span>, <span class="ident">pre_slash</span>),
         };
 
         <span class="kw">let</span> (<span class="ident">username</span>, <span class="ident">password</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">cred_section</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">creds</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">creds</span>.<span class="ident">find</span>(<span class="string">&#39;:&#39;</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">exclusive_split_at</span>(<span class="ident">creds</span>, <span class="ident">index</span>) {
-                    (<span class="ident">username</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">username</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>)),
-                    (<span class="ident">username</span>, <span class="ident">password</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">username</span>, <span class="ident">password</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">creds</span>) =&gt; <span class="kw">match</span> <span class="ident">creds</span>.<span class="ident">find</span>(<span class="string">&#39;:&#39;</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="kw">match</span> <span class="ident">exclusive_split_at</span>(<span class="ident">creds</span>, <span class="ident">index</span>) {
+                    (<span class="ident">username</span>, <span class="prelude-val">None</span>) =&gt; (<span class="ident">username</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>)),
+                    (<span class="ident">username</span>, <span class="ident">password</span>) =&gt; (<span class="ident">username</span>, <span class="ident">password</span>),
                 },
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="prelude-val">Some</span>(<span class="ident">creds</span>), <span class="prelude-val">None</span>), <span class="comment">// Lack of &quot;:&quot; implies whole string is username</span>
+                <span class="prelude-val">None</span> =&gt; (<span class="prelude-val">Some</span>(<span class="ident">creds</span>), <span class="prelude-val">None</span>), <span class="comment">// Lack of &quot;:&quot; implies whole string is username</span>
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="prelude-val">None</span> =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
         };
 
         <span class="kw">let</span> <span class="ident">hosts</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">hosts_section</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">map</span>(<span class="ident">ServerAddress::parse</span>).<span class="ident">collect</span>();
@@ -3860,7 +3860,7 @@
             }
         }
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">auth_source</span>.<span class="ident">as_deref</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) {
+        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">auth_source</span>.<span class="ident">as_deref</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                 <span class="ident">message</span>: <span class="string">&quot;empty authSource provided&quot;</span>.<span class="ident">to_string</span>(),
             }
@@ -3870,7 +3870,7 @@
         <span class="kw">let</span> <span class="ident">db_str</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">as_deref</span>();
 
         <span class="kw">match</span> <span class="ident">options</span>.<span class="ident">auth_mechanism</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">mechanism</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">mechanism</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">credential</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">credential</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Default::default</span>);
 
                 <span class="ident">credential</span>.<span class="ident">source</span> <span class="op">=</span> <span class="ident">options</span>
@@ -3880,18 +3880,18 @@
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">doc</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">auth_mechanism_properties</span>.<span class="ident">take</span>() {
                     <span class="kw">match</span> <span class="ident">doc</span>.<span class="ident">remove</span>(<span class="string">&quot;CANONICALIZE_HOST_NAME&quot;</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">Bson::String</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">Bson::String</span>(<span class="ident">s</span>)) =&gt; {
                             <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">to_lowercase</span>()[..] {
-                                <span class="string">&quot;true&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Boolean</span>(<span class="bool-val">true</span>),
-                                <span class="string">&quot;false&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Boolean</span>(<span class="bool-val">false</span>),
-                                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::String</span>(<span class="ident">s</span>),
+                                <span class="string">&quot;true&quot;</span> =&gt; <span class="ident">Bson::Boolean</span>(<span class="bool-val">true</span>),
+                                <span class="string">&quot;false&quot;</span> =&gt; <span class="ident">Bson::Boolean</span>(<span class="bool-val">false</span>),
+                                <span class="kw">_</span> =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>),
                             };
                             <span class="ident">doc</span>.<span class="ident">insert</span>(<span class="string">&quot;CANONICALIZE_HOST_NAME&quot;</span>, <span class="ident">val</span>);
                         }
-                        <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
                             <span class="ident">doc</span>.<span class="ident">insert</span>(<span class="string">&quot;CANONICALIZE_HOST_NAME&quot;</span>, <span class="ident">val</span>);
                         }
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                        <span class="prelude-val">None</span> =&gt; {}
                     }
 
                     <span class="ident">credential</span>.<span class="ident">mechanism_properties</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">doc</span>);
@@ -3900,7 +3900,7 @@
                 <span class="ident">mechanism</span>.<span class="ident">validate_credential</span>(<span class="ident">credential</span>)<span class="question-mark">?</span>;
                 <span class="ident">credential</span>.<span class="ident">mechanism</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">auth_mechanism</span>.<span class="ident">take</span>();
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">credential</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">credential</span> {
                     <span class="comment">// If credentials exist (i.e. username is specified) but no mechanism, the</span>
                     <span class="comment">// default source is chosen from the following list in</span>
@@ -3932,7 +3932,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">options</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_options</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_options</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
@@ -3941,8 +3941,8 @@
 
         <span class="kw">for</span> <span class="ident">option_pair</span> <span class="kw">in</span> <span class="ident">options</span>.<span class="ident">split</span>(<span class="string">&#39;&amp;&#39;</span>) {
             <span class="kw">let</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">option_pair</span>.<span class="ident">find</span>(<span class="string">&#39;=&#39;</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">option_pair</span>.<span class="ident">split_at</span>(<span class="ident">index</span>),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="ident">option_pair</span>.<span class="ident">split_at</span>(<span class="ident">index</span>),
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="macro">format!</span>(
                             <span class="string">&quot;connection string options is not a `key=value` pair: {}&quot;</span>,
@@ -3974,8 +3974,8 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">tags</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_preference_tags</span>.<span class="ident">take</span>() {
             <span class="self">self</span>.<span class="ident">read_preference</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">read_preference</span>.<span class="ident">take</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>.<span class="ident">with_tags</span>(<span class="ident">tags</span>)<span class="question-mark">?</span>),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>.<span class="ident">with_tags</span>(<span class="ident">tags</span>)<span class="question-mark">?</span>),
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="string">&quot;cannot set read preference tags without also setting read \
                                   preference mode&quot;</span>
@@ -3988,8 +3988,8 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_staleness</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_staleness</span>.<span class="ident">take</span>() {
             <span class="self">self</span>.<span class="ident">read_preference</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">read_preference</span>.<span class="ident">take</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>.<span class="ident">with_max_staleness</span>(<span class="ident">max_staleness</span>)<span class="question-mark">?</span>),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">read_pref</span>.<span class="ident">with_max_staleness</span>(<span class="ident">max_staleness</span>)<span class="question-mark">?</span>),
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="string">&quot;cannot set max staleness without also setting read preference \
                                   mode&quot;</span>
@@ -4024,13 +4024,13 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_option_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_option_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">macro_rules!</span> <span class="ident">get_bool</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">option</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">option</span>:<span class="ident">expr</span>) =&gt; {
                 <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> {
-                    <span class="string">&quot;true&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-                    <span class="string">&quot;false&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="string">&quot;true&quot;</span> =&gt; <span class="bool-val">true</span>,
+                    <span class="string">&quot;false&quot;</span> =&gt; <span class="bool-val">false</span>,
+                    <span class="kw">_</span> =&gt; {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                             <span class="ident">message</span>: <span class="macro">format!</span>(
                                 <span class="string">&quot;connection string `{}` option must be a boolean&quot;</span>,
@@ -4044,10 +4044,10 @@
         }
 
         <span class="macro">macro_rules!</span> <span class="ident">get_duration</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">option</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">option</span>:<span class="ident">expr</span>) =&gt; {
                 <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
+                    <span class="kw">_</span> =&gt; {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                             <span class="ident">message</span>: <span class="macro">format!</span>(
                                 <span class="string">&quot;connection string `{}` option must be a non-negative integer&quot;</span>,
@@ -4061,10 +4061,10 @@
         }
 
         <span class="macro">macro_rules!</span> <span class="ident">get_u32</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">option</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">option</span>:<span class="ident">expr</span>) =&gt; {
                 <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">u</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u</span>,
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">u</span>) =&gt; <span class="ident">u</span>,
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                             <span class="ident">message</span>: <span class="macro">format!</span>(
                                 <span class="string">&quot;connection string `{}` argument must be a positive integer&quot;</span>,
@@ -4078,10 +4078,10 @@
         }
 
         <span class="macro">macro_rules!</span> <span class="ident">get_i32</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">option</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">option</span>:<span class="ident">expr</span>) =&gt; {
                 <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">u</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u</span>,
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">u</span>) =&gt; <span class="ident">u</span>,
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                             <span class="ident">message</span>: <span class="macro">format!</span>(
                                 <span class="string">&quot;connection string `{}` argument must be an integer&quot;</span>,
@@ -4095,14 +4095,14 @@
         }
 
         <span class="kw">match</span> <span class="ident">key</span> {
-            <span class="string">&quot;appname&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;appname&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">app_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">into</span>());
             }
-            <span class="string">&quot;authmechanism&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;authmechanism&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">auth_mechanism</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">AuthMechanism::from_str</span>(<span class="ident">value</span>)<span class="question-mark">?</span>);
             }
-            <span class="string">&quot;authsource&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">auth_source</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()),
-            <span class="string">&quot;authmechanismproperties&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;authsource&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">auth_source</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()),
+            <span class="string">&quot;authmechanismproperties&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Document::new</span>();
                 <span class="kw">let</span> <span class="ident">err_func</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
                     <span class="ident">ErrorKind::InvalidArgument</span> {
@@ -4113,18 +4113,18 @@
 
                 <span class="kw">for</span> <span class="ident">kvp</span> <span class="kw">in</span> <span class="ident">value</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>) {
                     <span class="kw">match</span> <span class="ident">kvp</span>.<span class="ident">find</span>(<span class="string">&#39;:&#39;</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; {
                             <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">exclusive_split_at</span>(<span class="ident">kvp</span>, <span class="ident">index</span>);
                             <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">k</span>.<span class="ident">ok_or_else</span>(<span class="ident">err_func</span>)<span class="question-mark">?</span>;
                             <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">ok_or_else</span>(<span class="ident">err_func</span>)<span class="question-mark">?</span>;
                             <span class="ident">doc</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">value</span>);
                         }
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err_func</span>()),
+                        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err_func</span>()),
                     };
                 }
                 <span class="self">self</span>.<span class="ident">auth_mechanism_properties</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">doc</span>);
             }
-            <span class="string">&quot;compressors&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;compressors&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">compressors</span> <span class="op">=</span> <span class="ident">value</span>
                     .<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>)
                     .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Compressor::parse_str</span>(<span class="ident">x</span>).<span class="ident">ok</span>())
@@ -4135,13 +4135,13 @@
                     <span class="prelude-val">Some</span>(<span class="ident">compressors</span>)
                 }
             }
-            <span class="ident">k</span> @ <span class="string">&quot;connecttimeoutms&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;connecttimeoutms&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">connect_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="macro">get_duration!</span>(<span class="ident">value</span>, <span class="ident">k</span>)));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;directconnection&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;directconnection&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">direct_connection</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">get_bool!</span>(<span class="ident">value</span>, <span class="ident">k</span>));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;heartbeatfrequencyms&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;heartbeatfrequencyms&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="macro">get_duration!</span>(<span class="ident">value</span>, <span class="ident">k</span>);
 
                 <span class="kw">if</span> <span class="ident">duration</span> <span class="op">&lt;</span> <span class="ident">MIN_HEARTBEAT_FREQUENCY</span>.<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">u64</span> {
@@ -4156,20 +4156,20 @@
 
                 <span class="self">self</span>.<span class="ident">heartbeat_freq</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="ident">duration</span>));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;journal&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;journal&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">write_concern</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_concern</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Default::default</span>);
                 <span class="ident">write_concern</span>.<span class="ident">journal</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">get_bool!</span>(<span class="ident">value</span>, <span class="ident">k</span>));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;loadbalanced&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;loadbalanced&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">load_balanced</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">get_bool!</span>(<span class="ident">value</span>, <span class="ident">k</span>));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;localthresholdms&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;localthresholdms&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">local_threshold</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="macro">get_duration!</span>(<span class="ident">value</span>, <span class="ident">k</span>)))
             }
-            <span class="ident">k</span> @ <span class="string">&quot;maxidletimems&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;maxidletimems&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">max_idle_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="macro">get_duration!</span>(<span class="ident">value</span>, <span class="ident">k</span>)));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;maxstalenessseconds&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;maxstalenessseconds&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">max_staleness</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="macro">get_duration!</span>(<span class="ident">value</span>, <span class="ident">k</span>));
 
                 <span class="kw">if</span> <span class="ident">max_staleness</span> <span class="op">&gt;</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>) <span class="op">&amp;&amp;</span> <span class="ident">max_staleness</span> <span class="op">&lt;</span> <span class="ident">Duration::from_secs</span>(<span class="number">90</span>)
@@ -4183,31 +4183,31 @@
 
                 <span class="self">self</span>.<span class="ident">max_staleness</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max_staleness</span>);
             }
-            <span class="ident">k</span> @ <span class="string">&quot;maxpoolsize&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;maxpoolsize&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">max_pool_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">get_u32!</span>(<span class="ident">value</span>, <span class="ident">k</span>));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;minpoolsize&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;minpoolsize&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">min_pool_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">get_u32!</span>(<span class="ident">value</span>, <span class="ident">k</span>));
             }
-            <span class="string">&quot;readconcernlevel&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;readconcernlevel&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">read_concern</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ReadConcernLevel::from_str</span>(<span class="ident">value</span>).<span class="ident">into</span>());
             }
-            <span class="string">&quot;readpreference&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;readpreference&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">read_preference</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">to_lowercase</span>()[..] {
-                    <span class="string">&quot;primary&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ReadPreference::Primary</span>,
-                    <span class="string">&quot;secondary&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ReadPreference::Secondary</span> {
+                    <span class="string">&quot;primary&quot;</span> =&gt; <span class="ident">ReadPreference::Primary</span>,
+                    <span class="string">&quot;secondary&quot;</span> =&gt; <span class="ident">ReadPreference::Secondary</span> {
                         <span class="ident">options</span>: <span class="ident">Default::default</span>(),
                     },
-                    <span class="string">&quot;primarypreferred&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ReadPreference::PrimaryPreferred</span> {
+                    <span class="string">&quot;primarypreferred&quot;</span> =&gt; <span class="ident">ReadPreference::PrimaryPreferred</span> {
                         <span class="ident">options</span>: <span class="ident">Default::default</span>(),
                     },
-                    <span class="string">&quot;secondarypreferred&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ReadPreference::SecondaryPreferred</span> {
+                    <span class="string">&quot;secondarypreferred&quot;</span> =&gt; <span class="ident">ReadPreference::SecondaryPreferred</span> {
                         <span class="ident">options</span>: <span class="ident">Default::default</span>(),
                     },
-                    <span class="string">&quot;nearest&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ReadPreference::Nearest</span> {
+                    <span class="string">&quot;nearest&quot;</span> =&gt; <span class="ident">ReadPreference::Nearest</span> {
                         <span class="ident">options</span>: <span class="ident">Default::default</span>(),
                     },
-                    <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">other</span> =&gt; {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                             <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;&#39;{}&#39; is not a valid read preference&quot;</span>, <span class="ident">other</span>),
                         }
@@ -4215,7 +4215,7 @@
                     }
                 });
             }
-            <span class="string">&quot;readpreferencetags&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;readpreferencetags&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">tags</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TagSet</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">is_empty</span>() {
                     <span class="prelude-val">Ok</span>(<span class="ident">TagSet::new</span>())
                 } <span class="kw">else</span> {
@@ -4225,10 +4225,10 @@
                             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">tag</span>.<span class="ident">split</span>(<span class="string">&#39;:&#39;</span>);
 
                             <span class="kw">match</span> (<span class="ident">values</span>.<span class="ident">next</span>(), <span class="ident">values</span>.<span class="ident">next</span>()) {
-                                (<span class="prelude-val">Some</span>(<span class="ident">key</span>), <span class="prelude-val">Some</span>(<span class="ident">value</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                                (<span class="prelude-val">Some</span>(<span class="ident">key</span>), <span class="prelude-val">Some</span>(<span class="ident">value</span>)) =&gt; {
                                     <span class="prelude-val">Ok</span>((<span class="ident">key</span>.<span class="ident">to_string</span>(), <span class="ident">value</span>.<span class="ident">to_string</span>()))
                                 }
-                                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
+                                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                                     <span class="ident">message</span>: <span class="macro">format!</span>(
                                         <span class="string">&quot;&#39;{}&#39; is not a valid read preference tag (which must be \
                                          of the form &#39;key:value&#39;&quot;</span>,
@@ -4245,26 +4245,26 @@
                     .<span class="ident">get_or_insert_with</span>(<span class="ident">Vec::new</span>)
                     .<span class="ident">push</span>(<span class="ident">tags</span><span class="question-mark">?</span>);
             }
-            <span class="string">&quot;replicaset&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;replicaset&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">repl_set_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">to_string</span>());
             }
-            <span class="ident">k</span> @ <span class="string">&quot;retrywrites&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;retrywrites&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">retry_writes</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">get_bool!</span>(<span class="ident">value</span>, <span class="ident">k</span>));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;retryreads&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;retryreads&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">retry_reads</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">get_bool!</span>(<span class="ident">value</span>, <span class="ident">k</span>));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;serverselectiontimeoutms&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;serverselectiontimeoutms&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">server_selection_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="macro">get_duration!</span>(<span class="ident">value</span>, <span class="ident">k</span>)))
             }
-            <span class="ident">k</span> @ <span class="string">&quot;sockettimeoutms&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;sockettimeoutms&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">socket_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="macro">get_duration!</span>(<span class="ident">value</span>, <span class="ident">k</span>)));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;tls&quot;</span> <span class="op">|</span> <span class="ident">k</span> @ <span class="string">&quot;ssl&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;tls&quot;</span> <span class="op">|</span> <span class="ident">k</span> @ <span class="string">&quot;ssl&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">tls</span> <span class="op">=</span> <span class="macro">get_bool!</span>(<span class="ident">value</span>, <span class="ident">k</span>);
 
                 <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">tls</span>.<span class="ident">as_ref</span>(), <span class="ident">tls</span>) {
-                    (<span class="prelude-val">Some</span>(<span class="ident">Tls::Disabled</span>), <span class="bool-val">true</span>) <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(..)), <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="prelude-val">Some</span>(<span class="ident">Tls::Disabled</span>), <span class="bool-val">true</span>) <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(..)), <span class="bool-val">false</span>) =&gt; {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                             <span class="ident">message</span>: <span class="string">&quot;All instances of `tls` and `ssl` must have the same
  value&quot;</span>
@@ -4272,7 +4272,7 @@
                         }
                         .<span class="ident">into</span>());
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                    <span class="kw">_</span> =&gt; {}
                 };
 
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tls</span>.<span class="ident">is_none</span>() {
@@ -4285,13 +4285,13 @@
                     <span class="self">self</span>.<span class="ident">tls</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tls</span>);
                 }
             }
-            <span class="ident">k</span> @ <span class="string">&quot;tlsinsecure&quot;</span> <span class="op">|</span> <span class="ident">k</span> @ <span class="string">&quot;tlsallowinvalidcertificates&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;tlsinsecure&quot;</span> <span class="op">|</span> <span class="ident">k</span> @ <span class="string">&quot;tlsallowinvalidcertificates&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="macro">get_bool!</span>(<span class="ident">value</span>, <span class="ident">k</span>);
 
-                <span class="kw">let</span> <span class="ident">allow_invalid_certificates</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">k</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;tlsinsecure&quot;</span> { <span class="op">!</span><span class="ident">val</span> } <span class="kw">else</span> { <span class="ident">val</span> };
+                <span class="kw">let</span> <span class="ident">allow_invalid_certificates</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">k</span> <span class="op">==</span> <span class="string">&quot;tlsinsecure&quot;</span> { <span class="op">!</span><span class="ident">val</span> } <span class="kw">else</span> { <span class="ident">val</span> };
 
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tls</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">Tls::Disabled</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">Tls::Disabled</span>) =&gt; {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                             <span class="ident">message</span>: <span class="string">&quot;&#39;tlsInsecure&#39; can&#39;t be set if tls=false&quot;</span>.<span class="ident">into</span>(),
                         }
@@ -4300,7 +4300,7 @@
                     <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="kw-2">ref</span> <span class="ident">options</span>))
                         <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">allow_invalid_certificates</span>.<span class="ident">is_some</span>()
                             <span class="op">&amp;&amp;</span> <span class="ident">options</span>.<span class="ident">allow_invalid_certificates</span>
-                                <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">allow_invalid_certificates</span>) <span class="op">=</span><span class="op">&gt;</span>
+                                <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">allow_invalid_certificates</span>) =&gt;
                     {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                             <span class="ident">message</span>: <span class="string">&quot;all instances of &#39;tlsInsecure&#39; and \
@@ -4311,10 +4311,10 @@
                         }
                         .<span class="ident">into</span>());
                     }
-                    <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span>)) =&gt; {
                         <span class="ident">options</span>.<span class="ident">allow_invalid_certificates</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">allow_invalid_certificates</span>);
                     }
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">None</span> =&gt; {
                         <span class="self">self</span>.<span class="ident">tls</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(
                             <span class="ident">TlsOptions::builder</span>()
                                 .<span class="ident">allow_invalid_certificates</span>(<span class="ident">allow_invalid_certificates</span>)
@@ -4323,17 +4323,17 @@
                     }
                 }
             }
-            <span class="string">&quot;tlscafile&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tls</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">Tls::Disabled</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;tlscafile&quot;</span> =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tls</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">Tls::Disabled</span>) =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="string">&quot;&#39;tlsCAFile&#39; can&#39;t be set if tls=false&quot;</span>.<span class="ident">into</span>(),
                     }
                     .<span class="ident">into</span>());
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span>)) =&gt; {
                     <span class="ident">options</span>.<span class="ident">ca_file_path</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">into</span>());
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="self">self</span>.<span class="ident">tls</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(
                         <span class="ident">TlsOptions::builder</span>()
                             .<span class="ident">ca_file_path</span>(<span class="ident">PathBuf::from</span>(<span class="ident">value</span>))
@@ -4341,17 +4341,17 @@
                     ))
                 }
             },
-            <span class="string">&quot;tlscertificatekeyfile&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tls</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">Tls::Disabled</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;tlscertificatekeyfile&quot;</span> =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tls</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">Tls::Disabled</span>) =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                         <span class="ident">message</span>: <span class="string">&quot;&#39;tlsCertificateKeyFile&#39; can&#39;t be set if tls=false&quot;</span>.<span class="ident">into</span>(),
                     }
                     .<span class="ident">into</span>());
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span>)) =&gt; {
                     <span class="ident">options</span>.<span class="ident">cert_key_file_path</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">into</span>());
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="self">self</span>.<span class="ident">tls</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Tls::Enabled</span>(
                         <span class="ident">TlsOptions::builder</span>()
                             .<span class="ident">cert_key_file_path</span>(<span class="ident">PathBuf::from</span>(<span class="ident">value</span>))
@@ -4359,13 +4359,13 @@
                     ))
                 }
             },
-            <span class="string">&quot;w&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;w&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">write_concern</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_concern</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Default::default</span>);
 
                 <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">w</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">u32::try_from</span>(<span class="ident">w</span>) {
-                        <span class="prelude-val">Ok</span>(<span class="ident">uw</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">write_concern</span>.<span class="ident">w</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Acknowledgment::from</span>(<span class="ident">uw</span>)),
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">w</span>) =&gt; <span class="kw">match</span> <span class="ident">u32::try_from</span>(<span class="ident">w</span>) {
+                        <span class="prelude-val">Ok</span>(<span class="ident">uw</span>) =&gt; <span class="ident">write_concern</span>.<span class="ident">w</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Acknowledgment::from</span>(<span class="ident">uw</span>)),
+                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
                                 <span class="ident">message</span>: <span class="string">&quot;connection string `w` option cannot be a negative \
                                           integer&quot;</span>
@@ -4374,19 +4374,19 @@
                             .<span class="ident">into</span>())
                         }
                     },
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                         <span class="ident">write_concern</span>.<span class="ident">w</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Acknowledgment::from</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()));
                     }
                 };
             }
-            <span class="ident">k</span> @ <span class="string">&quot;waitqueuetimeoutms&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;waitqueuetimeoutms&quot;</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">wait_queue_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="macro">get_duration!</span>(<span class="ident">value</span>, <span class="ident">k</span>)));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;wtimeoutms&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;wtimeoutms&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">write_concern</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_concern</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Default::default</span>);
                 <span class="ident">write_concern</span>.<span class="ident">w_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_millis</span>(<span class="macro">get_duration!</span>(<span class="ident">value</span>, <span class="ident">k</span>)));
             }
-            <span class="ident">k</span> @ <span class="string">&quot;zlibcompressionlevel&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">k</span> @ <span class="string">&quot;zlibcompressionlevel&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="macro">get_i32!</span>(<span class="ident">value</span>, <span class="ident">k</span>);
                 <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="op">-</span><span class="number">1</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
@@ -4405,7 +4405,7 @@
                 <span class="self">self</span>.<span class="ident">zlib_compression</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>);
             }
 
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">other</span> =&gt; {
                 <span class="kw">let</span> (<span class="ident">jaro_winkler</span>, <span class="ident">option</span>) <span class="op">=</span> <span class="ident">URI_OPTIONS</span>.<span class="ident">iter</span>().<span class="ident">fold</span>((<span class="number">0.0</span>, <span class="string">&quot;&quot;</span>), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">option</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">jaro_winkler</span> <span class="op">=</span> <span class="ident">jaro_winkler</span>(<span class="ident">option</span>, <span class="ident">other</span>).<span class="ident">abs</span>();
                     <span class="kw">if</span> <span class="ident">jaro_winkler</span> <span class="op">&gt;</span> <span class="ident">acc</span>.<span class="number">0</span> {
@@ -4441,7 +4441,7 @@
     };
 
     <span class="macro">macro_rules!</span> <span class="ident">tag_set</span> {
-        ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>:<span class="ident">expr</span>),<span class="op">*</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+        ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>:<span class="ident">expr</span>),<span class="op">*</span> ) =&gt; {
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_and_return</span>)]</span>
             {
                 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -4457,7 +4457,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">host_without_port</span>(<span class="ident">hostname</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServerAddress</span> {
+    <span class="kw">fn</span> <span class="ident">host_without_port</span>(<span class="ident">hostname</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ServerAddress</span> {
         <span class="ident">ServerAddress::Tcp</span> {
             <span class="ident">host</span>: <span class="ident">hostname</span>.<span class="ident">to_string</span>(),
             <span class="ident">port</span>: <span class="prelude-val">None</span>,
@@ -4780,11 +4780,11 @@
                         <span class="ident">options</span>: <span class="ident">ReadPreferenceOptions::builder</span>()
                             .<span class="ident">tag_sets</span>(<span class="macro">vec!</span>[
                                 <span class="macro">tag_set!</span> {
-                                    <span class="string">&quot;dc&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ny&quot;</span>,
-                                    <span class="string">&quot;rack&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;1&quot;</span>
+                                    <span class="string">&quot;dc&quot;</span> =&gt; <span class="string">&quot;ny&quot;</span>,
+                                    <span class="string">&quot;rack&quot;</span> =&gt; <span class="string">&quot;1&quot;</span>
                                 },
                                 <span class="macro">tag_set!</span> {
-                                    <span class="string">&quot;dc&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ny&quot;</span>
+                                    <span class="string">&quot;dc&quot;</span> =&gt; <span class="string">&quot;ny&quot;</span>
                                 },
                                 <span class="macro">tag_set!</span> {},
                             ])

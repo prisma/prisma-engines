@@ -201,7 +201,7 @@
 
 <span class="kw">impl</span> <span class="ident">CacheDirective</span> {
     <span class="doccomment">/// Check whether this directive is valid in an HTTP request.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_in_req</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_in_req</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">use</span> <span class="ident">CacheDirective</span>::<span class="kw-2">*</span>;
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
@@ -210,7 +210,7 @@
     }
 
     <span class="doccomment">/// Check whether this directive is valid in an HTTP response.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_in_res</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_in_res</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">use</span> <span class="ident">CacheDirective</span>::<span class="kw-2">*</span>;
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
@@ -234,7 +234,7 @@
     <span class="comment">// input string is a single-value only. This is upheld by the calling</span>
     <span class="comment">// function, but we cannot guarantee this to be true in the general</span>
     <span class="comment">// sense.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">CacheDirective</span>::<span class="kw-2">*</span>;
 
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">trim</span>();
@@ -248,7 +248,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;=&#39;</span>);
         <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">get_dur</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">get_dur</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">dur</span> <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">next</span>().<span class="ident">status</span>(<span class="number">400</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">dur</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">dur</span>.<span class="ident">parse</span>().<span class="ident">status</span>(<span class="number">400</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">Duration::new</span>(<span class="ident">dur</span>, <span class="number">0</span>))
@@ -256,57 +256,57 @@
 
         <span class="comment">// This won&#39;t panic because each input string has at least one part.</span>
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="string">&quot;immutable&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Immutable</span>),
-            <span class="string">&quot;no-cache&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">NoCache</span>),
-            <span class="string">&quot;no-store&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">NoStore</span>),
-            <span class="string">&quot;no-transform&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">NoTransform</span>),
-            <span class="string">&quot;only-if-cached&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">OnlyIfCached</span>),
-            <span class="string">&quot;must-revalidate&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MustRevalidate</span>),
-            <span class="string">&quot;public&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Public</span>),
-            <span class="string">&quot;private&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Private</span>),
-            <span class="string">&quot;proxy-revalidate&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ProxyRevalidate</span>),
-            <span class="string">&quot;max-age&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MaxAge</span>(<span class="ident">get_dur</span>()<span class="question-mark">?</span>)),
-            <span class="string">&quot;max-stale&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">parts</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">secs</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;immutable&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Immutable</span>),
+            <span class="string">&quot;no-cache&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">NoCache</span>),
+            <span class="string">&quot;no-store&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">NoStore</span>),
+            <span class="string">&quot;no-transform&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">NoTransform</span>),
+            <span class="string">&quot;only-if-cached&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OnlyIfCached</span>),
+            <span class="string">&quot;must-revalidate&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">MustRevalidate</span>),
+            <span class="string">&quot;public&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Public</span>),
+            <span class="string">&quot;private&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Private</span>),
+            <span class="string">&quot;proxy-revalidate&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ProxyRevalidate</span>),
+            <span class="string">&quot;max-age&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">MaxAge</span>(<span class="ident">get_dur</span>()<span class="question-mark">?</span>)),
+            <span class="string">&quot;max-stale&quot;</span> =&gt; <span class="kw">match</span> <span class="ident">parts</span>.<span class="ident">next</span>() {
+                <span class="prelude-val">Some</span>(<span class="ident">secs</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">dur</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">secs</span>.<span class="ident">parse</span>().<span class="ident">status</span>(<span class="number">400</span>)<span class="question-mark">?</span>;
                     <span class="prelude-val">Some</span>(<span class="ident">MaxStale</span>(<span class="prelude-val">Some</span>(<span class="ident">Duration::new</span>(<span class="ident">dur</span>, <span class="number">0</span>))))
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MaxStale</span>(<span class="prelude-val">None</span>)),
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">MaxStale</span>(<span class="prelude-val">None</span>)),
             },
-            <span class="string">&quot;min-fresh&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MinFresh</span>(<span class="ident">get_dur</span>()<span class="question-mark">?</span>)),
-            <span class="string">&quot;s-maxage&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">SMaxAge</span>(<span class="ident">get_dur</span>()<span class="question-mark">?</span>)),
-            <span class="string">&quot;stale-if-error&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">StaleIfError</span>(<span class="ident">get_dur</span>()<span class="question-mark">?</span>)),
-            <span class="string">&quot;stale-while-revalidate&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">StaleWhileRevalidate</span>(<span class="ident">get_dur</span>()<span class="question-mark">?</span>)),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="string">&quot;min-fresh&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">MinFresh</span>(<span class="ident">get_dur</span>()<span class="question-mark">?</span>)),
+            <span class="string">&quot;s-maxage&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SMaxAge</span>(<span class="ident">get_dur</span>()<span class="question-mark">?</span>)),
+            <span class="string">&quot;stale-if-error&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">StaleIfError</span>(<span class="ident">get_dur</span>()<span class="question-mark">?</span>)),
+            <span class="string">&quot;stale-while-revalidate&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">StaleWhileRevalidate</span>(<span class="ident">get_dur</span>()<span class="question-mark">?</span>)),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         };
         <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CacheDirective</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HeaderValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">directive</span>: <span class="ident">CacheDirective</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">directive</span>: <span class="ident">CacheDirective</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">use</span> <span class="ident">CacheDirective</span>::<span class="kw-2">*</span>;
         <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="op">|</span><span class="ident">s</span>: <span class="ident">String</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">HeaderValue::from_bytes_unchecked</span>(<span class="ident">s</span>.<span class="ident">into_bytes</span>()) };
 
         <span class="kw">match</span> <span class="ident">directive</span> {
-            <span class="ident">Immutable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="string">&quot;immutable&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">MaxAge</span>(<span class="ident">dur</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="macro">format!</span>(<span class="string">&quot;max-age={}&quot;</span>, <span class="ident">dur</span>.<span class="ident">as_secs</span>())),
-            <span class="ident">MaxStale</span>(<span class="ident">dur</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">dur</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">dur</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="macro">format!</span>(<span class="string">&quot;max-stale={}&quot;</span>, <span class="ident">dur</span>.<span class="ident">as_secs</span>())),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="string">&quot;max-stale&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">Immutable</span> =&gt; <span class="ident">h</span>(<span class="string">&quot;immutable&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">MaxAge</span>(<span class="ident">dur</span>) =&gt; <span class="ident">h</span>(<span class="macro">format!</span>(<span class="string">&quot;max-age={}&quot;</span>, <span class="ident">dur</span>.<span class="ident">as_secs</span>())),
+            <span class="ident">MaxStale</span>(<span class="ident">dur</span>) =&gt; <span class="kw">match</span> <span class="ident">dur</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">dur</span>) =&gt; <span class="ident">h</span>(<span class="macro">format!</span>(<span class="string">&quot;max-stale={}&quot;</span>, <span class="ident">dur</span>.<span class="ident">as_secs</span>())),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">h</span>(<span class="string">&quot;max-stale&quot;</span>.<span class="ident">to_string</span>()),
             },
-            <span class="ident">MinFresh</span>(<span class="ident">dur</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="macro">format!</span>(<span class="string">&quot;min-fresh={}&quot;</span>, <span class="ident">dur</span>.<span class="ident">as_secs</span>())),
-            <span class="ident">MustRevalidate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="string">&quot;must-revalidate&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">NoCache</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="string">&quot;no-cache&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">NoStore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="string">&quot;no-store&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">NoTransform</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="string">&quot;no-transform&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">OnlyIfCached</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="string">&quot;only-if-cached&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Private</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="string">&quot;private&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">ProxyRevalidate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="string">&quot;proxy-revalidate&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Public</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="string">&quot;public&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">SMaxAge</span>(<span class="ident">dur</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="macro">format!</span>(<span class="string">&quot;s-max-age={}&quot;</span>, <span class="ident">dur</span>.<span class="ident">as_secs</span>())),
-            <span class="ident">StaleIfError</span>(<span class="ident">dur</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="macro">format!</span>(<span class="string">&quot;stale-if-error={}&quot;</span>, <span class="ident">dur</span>.<span class="ident">as_secs</span>())),
-            <span class="ident">StaleWhileRevalidate</span>(<span class="ident">dur</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">h</span>(<span class="macro">format!</span>(<span class="string">&quot;stale-while-revalidate={}&quot;</span>, <span class="ident">dur</span>.<span class="ident">as_secs</span>())),
+            <span class="ident">MinFresh</span>(<span class="ident">dur</span>) =&gt; <span class="ident">h</span>(<span class="macro">format!</span>(<span class="string">&quot;min-fresh={}&quot;</span>, <span class="ident">dur</span>.<span class="ident">as_secs</span>())),
+            <span class="ident">MustRevalidate</span> =&gt; <span class="ident">h</span>(<span class="string">&quot;must-revalidate&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">NoCache</span> =&gt; <span class="ident">h</span>(<span class="string">&quot;no-cache&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">NoStore</span> =&gt; <span class="ident">h</span>(<span class="string">&quot;no-store&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">NoTransform</span> =&gt; <span class="ident">h</span>(<span class="string">&quot;no-transform&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">OnlyIfCached</span> =&gt; <span class="ident">h</span>(<span class="string">&quot;only-if-cached&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">Private</span> =&gt; <span class="ident">h</span>(<span class="string">&quot;private&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">ProxyRevalidate</span> =&gt; <span class="ident">h</span>(<span class="string">&quot;proxy-revalidate&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">Public</span> =&gt; <span class="ident">h</span>(<span class="string">&quot;public&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">SMaxAge</span>(<span class="ident">dur</span>) =&gt; <span class="ident">h</span>(<span class="macro">format!</span>(<span class="string">&quot;s-max-age={}&quot;</span>, <span class="ident">dur</span>.<span class="ident">as_secs</span>())),
+            <span class="ident">StaleIfError</span>(<span class="ident">dur</span>) =&gt; <span class="ident">h</span>(<span class="macro">format!</span>(<span class="string">&quot;stale-if-error={}&quot;</span>, <span class="ident">dur</span>.<span class="ident">as_secs</span>())),
+            <span class="ident">StaleWhileRevalidate</span>(<span class="ident">dur</span>) =&gt; <span class="ident">h</span>(<span class="macro">format!</span>(<span class="string">&quot;stale-while-revalidate={}&quot;</span>, <span class="ident">dur</span>.<span class="ident">as_secs</span>())),
         }
     }
 }

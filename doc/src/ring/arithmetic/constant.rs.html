@@ -13,14 +13,14 @@
 <span id="13">13</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">limbs</span> {
-    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">limb</span>:<span class="ident">expr</span>),<span class="op">+</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">limb</span>:<span class="ident">expr</span>),<span class="op">+</span> ) =&gt; {
         [ $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">limb</span>),<span class="op">+</span> ]
     };
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">limbs</span> {
-    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">limb_lo</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">limb_hi</span>:<span class="ident">expr</span>),<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">limb_lo</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">limb_hi</span>:<span class="ident">expr</span>),<span class="op">+</span>) =&gt; {
         [ $(((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">limb_hi</span> <span class="op">|</span> <span class="number">0u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">limb_lo</span>),<span class="op">+</span> ]
     };
 }

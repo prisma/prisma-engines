@@ -142,13 +142,13 @@
     <span class="ident">I::Item</span>: <span class="ident">Clone</span>,
 {
     <span class="doccomment">/// Map the current mask over the pool to get an output combination</span>
-    <span class="kw">fn</span> <span class="ident">current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">I::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">I::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">pool</span>[<span class="kw-2">*</span><span class="ident">i</span>].<span class="ident">clone</span>()).<span class="ident">collect</span>()
     }
 }
 
 <span class="doccomment">/// Create a new `CombinationsWithReplacement` from a clonable iterator.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">combinations_with_replacement</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">k</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CombinationsWithReplacement</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">combinations_with_replacement</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">k</span>: <span class="ident">usize</span>) -&gt; <span class="ident">CombinationsWithReplacement</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Iterator</span>,
     <span class="ident">I::Item</span>: <span class="ident">Clone</span>,
@@ -169,7 +169,7 @@
     <span class="ident">I::Item</span>: <span class="ident">Clone</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">I::Item</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="comment">// If this is the first iteration, return early</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">first</span> {
             <span class="comment">// In empty edge cases, stop iterating immediately</span>
@@ -197,7 +197,7 @@
 
         <span class="kw">match</span> <span class="ident">increment</span> {
             <span class="comment">// If we can update the indices further</span>
-            <span class="prelude-val">Some</span>((<span class="ident">increment_from</span>, <span class="ident">increment_value</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>((<span class="ident">increment_from</span>, <span class="ident">increment_value</span>)) =&gt; {
                 <span class="comment">// We need to update the rightmost non-max value</span>
                 <span class="comment">// and all those to the right</span>
                 <span class="kw">for</span> <span class="ident">indices_index</span> <span class="kw">in</span> <span class="ident">increment_from</span>..<span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">len</span>() {
@@ -206,7 +206,7 @@
                 <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">current</span>())
             }
             <span class="comment">// Otherwise, we&#39;re done</span>
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }

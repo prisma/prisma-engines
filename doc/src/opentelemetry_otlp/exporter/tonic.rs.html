@@ -86,7 +86,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">TonicConfig</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">TonicConfig</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
             <span class="ident">tls_config</span>: <span class="prelude-val">None</span>,
@@ -114,13 +114,13 @@
 <span class="kw">impl</span> <span class="ident">TonicExporterBuilder</span> {
     <span class="doccomment">/// Set the TLS settings for the collector endpoint.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tls_config</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tls_config</span>: <span class="ident">ClientTlsConfig</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tls_config</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tls_config</span>: <span class="ident">ClientTlsConfig</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">tonic_config</span>.<span class="ident">tls_config</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tls_config</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set custom metadata entries to send to the collector.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_metadata</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">metadata</span>: <span class="ident">MetadataMap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_metadata</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">metadata</span>: <span class="ident">MetadataMap</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">tonic_config</span>.<span class="ident">metadata</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">metadata</span>);
         <span class="self">self</span>
     }
@@ -131,7 +131,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Users MUST make sure the [`ExportConfig::timeout`] is</span>
     <span class="doccomment">/// the same as the channel&#39;s timeout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_channel</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="ident">tonic::transport::Channel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_channel</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="ident">tonic::transport::Channel</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">channel</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>);
         <span class="self">self</span>
     }

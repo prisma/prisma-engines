@@ -32,12 +32,12 @@
 <span class="doccomment">/// informative as possible.</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait</span> <span class="ident">Check</span> {
     <span class="doccomment">/// Indicates that the row count for the table with the returned name should be inspected.</span>
-    <span class="kw">fn</span> <span class="ident">needed_table_row_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">needed_table_row_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 
     <span class="doccomment">/// Indicates that the the number of non-null values should be inspected for the returned table and column.</span>
-    <span class="kw">fn</span> <span class="ident">needed_column_value_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">needed_column_value_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 
@@ -50,7 +50,7 @@
     <span class="doccomment">/// The only case where `None` should be returned is when there is data about the current state</span>
     <span class="doccomment">/// of the database, and that data indicates that the migration step would be executable and</span>
     <span class="doccomment">/// safe.</span>
-    <span class="kw">fn</span> <span class="ident">evaluate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_check_results</span>: <span class="kw-2">&amp;</span><span class="ident">DatabaseInspectionResults</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">evaluate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_check_results</span>: <span class="kw-2">&amp;</span><span class="ident">DatabaseInspectionResults</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

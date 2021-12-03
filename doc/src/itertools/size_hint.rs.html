@@ -129,11 +129,11 @@
 
 <span class="doccomment">/// Add **SizeHint** correctly.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="ident">a</span>: <span class="ident">SizeHint</span>, <span class="ident">b</span>: <span class="ident">SizeHint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SizeHint</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="ident">a</span>: <span class="ident">SizeHint</span>, <span class="ident">b</span>: <span class="ident">SizeHint</span>) -&gt; <span class="ident">SizeHint</span> {
     <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">a</span>.<span class="number">0</span>.<span class="ident">saturating_add</span>(<span class="ident">b</span>.<span class="number">0</span>);
     <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">a</span>.<span class="number">1</span>, <span class="ident">b</span>.<span class="number">1</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">x</span>), <span class="prelude-val">Some</span>(<span class="ident">y</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">checked_add</span>(<span class="ident">y</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        (<span class="prelude-val">Some</span>(<span class="ident">x</span>), <span class="prelude-val">Some</span>(<span class="ident">y</span>)) =&gt; <span class="ident">x</span>.<span class="ident">checked_add</span>(<span class="ident">y</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     (<span class="ident">min</span>, <span class="ident">max</span>)
@@ -141,7 +141,7 @@
 
 <span class="doccomment">/// Add **x** correctly to a **SizeHint**.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_scalar</span>(<span class="ident">sh</span>: <span class="ident">SizeHint</span>, <span class="ident">x</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SizeHint</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_scalar</span>(<span class="ident">sh</span>: <span class="ident">SizeHint</span>, <span class="ident">x</span>: <span class="ident">usize</span>) -&gt; <span class="ident">SizeHint</span> {
     <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">low</span>, <span class="kw-2">mut</span> <span class="ident">hi</span>) <span class="op">=</span> <span class="ident">sh</span>;
     <span class="ident">low</span> <span class="op">=</span> <span class="ident">low</span>.<span class="ident">saturating_add</span>(<span class="ident">x</span>);
     <span class="ident">hi</span> <span class="op">=</span> <span class="ident">hi</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">elt</span><span class="op">|</span> <span class="ident">elt</span>.<span class="ident">checked_add</span>(<span class="ident">x</span>));
@@ -151,7 +151,7 @@
 <span class="doccomment">/// Sbb **x** correctly to a **SizeHint**.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sub_scalar</span>(<span class="ident">sh</span>: <span class="ident">SizeHint</span>, <span class="ident">x</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SizeHint</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sub_scalar</span>(<span class="ident">sh</span>: <span class="ident">SizeHint</span>, <span class="ident">x</span>: <span class="ident">usize</span>) -&gt; <span class="ident">SizeHint</span> {
     <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">low</span>, <span class="kw-2">mut</span> <span class="ident">hi</span>) <span class="op">=</span> <span class="ident">sh</span>;
     <span class="ident">low</span> <span class="op">=</span> <span class="ident">low</span>.<span class="ident">saturating_sub</span>(<span class="ident">x</span>);
     <span class="ident">hi</span> <span class="op">=</span> <span class="ident">hi</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">elt</span><span class="op">|</span> <span class="ident">elt</span>.<span class="ident">saturating_sub</span>(<span class="ident">x</span>));
@@ -175,19 +175,19 @@
 <span class="doccomment">///            (0, Some(0)));</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul</span>(<span class="ident">a</span>: <span class="ident">SizeHint</span>, <span class="ident">b</span>: <span class="ident">SizeHint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SizeHint</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul</span>(<span class="ident">a</span>: <span class="ident">SizeHint</span>, <span class="ident">b</span>: <span class="ident">SizeHint</span>) -&gt; <span class="ident">SizeHint</span> {
     <span class="kw">let</span> <span class="ident">low</span> <span class="op">=</span> <span class="ident">a</span>.<span class="number">0</span>.<span class="ident">saturating_mul</span>(<span class="ident">b</span>.<span class="number">0</span>);
     <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">a</span>.<span class="number">1</span>, <span class="ident">b</span>.<span class="number">1</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">x</span>), <span class="prelude-val">Some</span>(<span class="ident">y</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">checked_mul</span>(<span class="ident">y</span>),
-        (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="number">0</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        (<span class="prelude-val">Some</span>(<span class="ident">x</span>), <span class="prelude-val">Some</span>(<span class="ident">y</span>)) =&gt; <span class="ident">x</span>.<span class="ident">checked_mul</span>(<span class="ident">y</span>),
+        (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="number">0</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     };
     (<span class="ident">low</span>, <span class="ident">hi</span>)
 }
 
 <span class="doccomment">/// Multiply **x** correctly with a **SizeHint**.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul_scalar</span>(<span class="ident">sh</span>: <span class="ident">SizeHint</span>, <span class="ident">x</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SizeHint</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul_scalar</span>(<span class="ident">sh</span>: <span class="ident">SizeHint</span>, <span class="ident">x</span>: <span class="ident">usize</span>) -&gt; <span class="ident">SizeHint</span> {
     <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">low</span>, <span class="kw-2">mut</span> <span class="ident">hi</span>) <span class="op">=</span> <span class="ident">sh</span>;
     <span class="ident">low</span> <span class="op">=</span> <span class="ident">low</span>.<span class="ident">saturating_mul</span>(<span class="ident">x</span>);
     <span class="ident">hi</span> <span class="op">=</span> <span class="ident">hi</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">elt</span><span class="op">|</span> <span class="ident">elt</span>.<span class="ident">checked_mul</span>(<span class="ident">x</span>));
@@ -196,7 +196,7 @@
 
 <span class="doccomment">/// Raise `base` correctly by a **`SizeHint`** exponent.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pow_scalar_base</span>(<span class="ident">base</span>: <span class="ident">usize</span>, <span class="ident">exp</span>: <span class="ident">SizeHint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SizeHint</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pow_scalar_base</span>(<span class="ident">base</span>: <span class="ident">usize</span>, <span class="ident">exp</span>: <span class="ident">SizeHint</span>) -&gt; <span class="ident">SizeHint</span> {
     <span class="kw">let</span> <span class="ident">exp_low</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">exp</span>.<span class="number">0</span>, <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">u32</span>;
     <span class="kw">let</span> <span class="ident">low</span> <span class="op">=</span> <span class="ident">base</span>.<span class="ident">saturating_pow</span>(<span class="ident">exp_low</span>);
 
@@ -210,15 +210,15 @@
 
 <span class="doccomment">/// Return the maximum</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max</span>(<span class="ident">a</span>: <span class="ident">SizeHint</span>, <span class="ident">b</span>: <span class="ident">SizeHint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SizeHint</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max</span>(<span class="ident">a</span>: <span class="ident">SizeHint</span>, <span class="ident">b</span>: <span class="ident">SizeHint</span>) -&gt; <span class="ident">SizeHint</span> {
     <span class="kw">let</span> (<span class="ident">a_lower</span>, <span class="ident">a_upper</span>) <span class="op">=</span> <span class="ident">a</span>;
     <span class="kw">let</span> (<span class="ident">b_lower</span>, <span class="ident">b_upper</span>) <span class="op">=</span> <span class="ident">b</span>;
 
     <span class="kw">let</span> <span class="ident">lower</span> <span class="op">=</span> <span class="ident">cmp::max</span>(<span class="ident">a_lower</span>, <span class="ident">b_lower</span>);
 
     <span class="kw">let</span> <span class="ident">upper</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">a_upper</span>, <span class="ident">b_upper</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">x</span>), <span class="prelude-val">Some</span>(<span class="ident">y</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">cmp::max</span>(<span class="ident">x</span>, <span class="ident">y</span>)),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        (<span class="prelude-val">Some</span>(<span class="ident">x</span>), <span class="prelude-val">Some</span>(<span class="ident">y</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">cmp::max</span>(<span class="ident">x</span>, <span class="ident">y</span>)),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     (<span class="ident">lower</span>, <span class="ident">upper</span>)
@@ -226,13 +226,13 @@
 
 <span class="doccomment">/// Return the minimum</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min</span>(<span class="ident">a</span>: <span class="ident">SizeHint</span>, <span class="ident">b</span>: <span class="ident">SizeHint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SizeHint</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min</span>(<span class="ident">a</span>: <span class="ident">SizeHint</span>, <span class="ident">b</span>: <span class="ident">SizeHint</span>) -&gt; <span class="ident">SizeHint</span> {
     <span class="kw">let</span> (<span class="ident">a_lower</span>, <span class="ident">a_upper</span>) <span class="op">=</span> <span class="ident">a</span>;
     <span class="kw">let</span> (<span class="ident">b_lower</span>, <span class="ident">b_upper</span>) <span class="op">=</span> <span class="ident">b</span>;
     <span class="kw">let</span> <span class="ident">lower</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">a_lower</span>, <span class="ident">b_lower</span>);
     <span class="kw">let</span> <span class="ident">upper</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">a_upper</span>, <span class="ident">b_upper</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">u1</span>), <span class="prelude-val">Some</span>(<span class="ident">u2</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">cmp::min</span>(<span class="ident">u1</span>, <span class="ident">u2</span>)),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">a_upper</span>.<span class="ident">or</span>(<span class="ident">b_upper</span>),
+        (<span class="prelude-val">Some</span>(<span class="ident">u1</span>), <span class="prelude-val">Some</span>(<span class="ident">u2</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">cmp::min</span>(<span class="ident">u1</span>, <span class="ident">u2</span>)),
+        <span class="kw">_</span> =&gt; <span class="ident">a_upper</span>.<span class="ident">or</span>(<span class="ident">b_upper</span>),
     };
     (<span class="ident">lower</span>, <span class="ident">upper</span>)
 }

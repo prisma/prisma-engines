@@ -267,7 +267,7 @@
     <span class="doccomment">/// for information on why this could be a potential security risk.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`new_with_max_length`]: crate::codec::LinesCodec::new_with_max_length()</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LinesCodec</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">LinesCodec</span> {
         <span class="ident">LinesCodec</span> {
             <span class="ident">next_index</span>: <span class="number">0</span>,
             <span class="ident">max_length</span>: <span class="ident">usize::MAX</span>,
@@ -293,7 +293,7 @@
     <span class="doccomment">/// without any `\n` characters, causing unbounded memory consumption.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`LinesCodecError`]: crate::codec::LinesCodecError</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_max_length</span>(<span class="ident">max_length</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_max_length</span>(<span class="ident">max_length</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">LinesCodec</span> {
             <span class="ident">max_length</span>,
             ..<span class="ident">LinesCodec::new</span>()
@@ -315,17 +315,17 @@
     <span class="doccomment">/// let codec = LinesCodec::new_with_max_length(256);</span>
     <span class="doccomment">/// assert_eq!(codec.max_length(), 256);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">max_length</span>
     }
 }
 
-<span class="kw">fn</span> <span class="ident">utf8</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">utf8</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
     <span class="ident">str::from_utf8</span>(<span class="ident">buf</span>)
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidData</span>, <span class="string">&quot;Unable to decode input as UTF8&quot;</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">without_carriage_return</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+<span class="kw">fn</span> <span class="ident">without_carriage_return</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;\r&#39;</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">last</span>() {
         <span class="kw-2">&amp;</span><span class="ident">s</span>[..<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>]
     } <span class="kw">else</span> {
@@ -337,7 +337,7 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">String</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">LinesCodecError</span>;
 
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">LinesCodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">LinesCodecError</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="comment">// Determine how far into the buffer we&#39;ll search for a newline. If</span>
             <span class="comment">// there&#39;s no max_length set, we&#39;ll read to the end of the buffer.</span>
@@ -345,10 +345,10 @@
 
             <span class="kw">let</span> <span class="ident">newline_offset</span> <span class="op">=</span> <span class="ident">buf</span>[<span class="self">self</span>.<span class="ident">next_index</span>..<span class="ident">read_to</span>]
                 .<span class="ident">iter</span>()
-                .<span class="ident">position</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;\n&#39;</span>);
+                .<span class="ident">position</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;\n&#39;</span>);
 
             <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">is_discarding</span>, <span class="ident">newline_offset</span>) {
-                (<span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) =&gt; {
                     <span class="comment">// If we found a newline, discard up to that offset and</span>
                     <span class="comment">// then stop discarding. On the next iteration, we&#39;ll try</span>
                     <span class="comment">// to read a line normally.</span>
@@ -356,7 +356,7 @@
                     <span class="self">self</span>.<span class="ident">is_discarding</span> <span class="op">=</span> <span class="bool-val">false</span>;
                     <span class="self">self</span>.<span class="ident">next_index</span> <span class="op">=</span> <span class="number">0</span>;
                 }
-                (<span class="bool-val">true</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="bool-val">true</span>, <span class="prelude-val">None</span>) =&gt; {
                     <span class="comment">// Otherwise, we didn&#39;t find a newline, so we&#39;ll discard</span>
                     <span class="comment">// everything we read. On the next iteration, we&#39;ll continue</span>
                     <span class="comment">// discarding up to max_len bytes unless we find a newline.</span>
@@ -366,7 +366,7 @@
                         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
                     }
                 }
-                (<span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="bool-val">false</span>, <span class="prelude-val">Some</span>(<span class="ident">offset</span>)) =&gt; {
                     <span class="comment">// Found a line!</span>
                     <span class="kw">let</span> <span class="ident">newline_index</span> <span class="op">=</span> <span class="ident">offset</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">next_index</span>;
                     <span class="self">self</span>.<span class="ident">next_index</span> <span class="op">=</span> <span class="number">0</span>;
@@ -376,14 +376,14 @@
                     <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="ident">utf8</span>(<span class="ident">line</span>)<span class="question-mark">?</span>;
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">line</span>.<span class="ident">to_string</span>()));
                 }
-                (<span class="bool-val">false</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">max_length</span> <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="bool-val">false</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">max_length</span> =&gt; {
                     <span class="comment">// Reached the maximum length without finding a</span>
                     <span class="comment">// newline, return an error and start discarding on the</span>
                     <span class="comment">// next call.</span>
                     <span class="self">self</span>.<span class="ident">is_discarding</span> <span class="op">=</span> <span class="bool-val">true</span>;
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">LinesCodecError::MaxLineLengthExceeded</span>);
                 }
-                (<span class="bool-val">false</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="bool-val">false</span>, <span class="prelude-val">None</span>) =&gt; {
                     <span class="comment">// We didn&#39;t find a line or reach the length limit, so the next</span>
                     <span class="comment">// call will resume searching at the current offset.</span>
                     <span class="self">self</span>.<span class="ident">next_index</span> <span class="op">=</span> <span class="ident">read_to</span>;
@@ -393,12 +393,12 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">decode_eof</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">LinesCodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">decode_eof</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">LinesCodecError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">buf</span>)<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">frame</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">frame</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">frame</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">frame</span>),
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="comment">// No terminating newline - return remaining data, if any</span>
-                <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">buf</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="string">b&quot;\r&quot;</span>[..] {
+                <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">buf</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="string">b&quot;\r&quot;</span>[..] {
                     <span class="prelude-val">None</span>
                 } <span class="kw">else</span> {
                     <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">split_to</span>(<span class="ident">buf</span>.<span class="ident">len</span>());
@@ -418,7 +418,7 @@
 {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">LinesCodecError</span>;
 
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">line</span>: <span class="ident">T</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">LinesCodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">line</span>: <span class="ident">T</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">LinesCodecError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">as_ref</span>();
         <span class="ident">buf</span>.<span class="ident">reserve</span>(<span class="ident">line</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>);
         <span class="ident">buf</span>.<span class="ident">put</span>(<span class="ident">line</span>.<span class="ident">as_bytes</span>());
@@ -428,7 +428,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">LinesCodec</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
@@ -443,16 +443,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">LinesCodecError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">LinesCodecError::MaxLineLengthExceeded</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;max line length exceeded&quot;</span>),
-            <span class="ident">LinesCodecError::Io</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>),
+            <span class="ident">LinesCodecError::MaxLineLengthExceeded</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;max line length exceeded&quot;</span>),
+            <span class="ident">LinesCodecError::Io</span>(<span class="ident">e</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LinesCodecError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LinesCodecError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">LinesCodecError</span> {
         <span class="ident">LinesCodecError::Io</span>(<span class="ident">e</span>)
     }
 }

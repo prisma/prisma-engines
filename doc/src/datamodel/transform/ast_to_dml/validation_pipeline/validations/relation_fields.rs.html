@@ -233,13 +233,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> [<span class="ident">ast::FieldId</span>], <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> [<span class="ident">ast::FieldId</span>], <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">fields</span>, <span class="ident">model</span> }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">fields</span>
             .<span class="ident">iter</span>()
@@ -247,9 +247,9 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">name</span>));
 
         <span class="kw">match</span> <span class="ident">fields</span>.<span class="ident">len</span>() {
-            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)),
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>.<span class="ident">join</span>(<span class="string">&quot; and &quot;</span>)),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="number">2</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)),
+            <span class="number">2</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>.<span class="ident">join</span>(<span class="string">&quot; and &quot;</span>)),
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">len</span>();
 
                 <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">name</span>) <span class="kw">in</span> <span class="ident">fields</span>.<span class="ident">enumerate</span>() {
@@ -268,20 +268,20 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ambiguity</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ambiguity</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>();
     <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_model</span>();
 
     <span class="kw">let</span> <span class="ident">identifier</span> <span class="op">=</span> (<span class="ident">model</span>.<span class="ident">model_id</span>(), <span class="ident">related_model</span>.<span class="ident">model_id</span>(), <span class="ident">field</span>.<span class="ident">relation_name</span>());
 
     <span class="kw">match</span> <span class="ident">names</span>.<span class="ident">relation_names</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">identifier</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> =&gt; {
             <span class="kw">let</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="ident">Fields::new</span>(<span class="ident">fields</span>, <span class="ident">model</span>);
             <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">identifier</span>.<span class="number">2</span>;
-            <span class="kw">let</span> <span class="ident">is_self_relation</span> <span class="op">=</span> <span class="ident">model</span> <span class="op">=</span><span class="op">=</span> <span class="ident">related_model</span>;
+            <span class="kw">let</span> <span class="ident">is_self_relation</span> <span class="op">=</span> <span class="ident">model</span> <span class="op">==</span> <span class="ident">related_model</span>;
 
             <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation_name</span> {
-                <span class="ident">RelationName::Generated</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">RelationName::Generated</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span> =&gt; {
                     <span class="macro">format!</span>(
                         <span class="string">&quot;Ambiguous self relation detected. The fields {} in model `{}` both refer to `{}`. If they are part of the same relation add the same relation name for them with `@relation(&lt;name&gt;)`.&quot;</span>,
                         <span class="ident">field_names</span>,
@@ -289,22 +289,22 @@
                         <span class="ident">related_model</span>.<span class="ident">name</span>(),
                     )
                 }
-                <span class="ident">RelationName::Generated</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">RelationName::Generated</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">2</span> =&gt; {
                     <span class="macro">format!</span>(
                         <span class="string">&quot;Unnamed self relation detected. The fields {} in model `{}` have no relation name. Please provide a relation name for one of them by adding `@relation(&lt;name&gt;).&quot;</span>,
                         <span class="ident">field_names</span>,
                         <span class="ident">model</span>.<span class="ident">name</span>(),
                     )
                 }
-                <span class="ident">RelationName::Explicit</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">RelationName::Explicit</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">2</span> =&gt; {
                     <span class="macro">format!</span>(
                         <span class="string">&quot;Wrongly named self relation detected. The fields {} in model `{}` have the same relation name. At most two relation fields can belong to the same relation and therefore have the same name. Please assign a different relation name to one of them.&quot;</span>,
                         <span class="ident">field_names</span>,
                         <span class="ident">model</span>.<span class="ident">name</span>(),
                     )
                 }
-                <span class="ident">RelationName::Explicit</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
-                <span class="ident">RelationName::Generated</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">RelationName::Explicit</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">is_self_relation</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+                <span class="ident">RelationName::Generated</span>(<span class="kw">_</span>) =&gt; {
                     <span class="macro">format!</span>(
                         <span class="string">&quot;Ambiguous relation detected. The fields {} in model `{}` both refer to `{}`. Please provide different relation names for them by adding `@relation(&lt;name&gt;).&quot;</span>,
                         <span class="ident">field_names</span>,
@@ -312,7 +312,7 @@
                         <span class="ident">related_model</span>.<span class="ident">name</span>(),
                     )
                 }
-                <span class="ident">RelationName::Explicit</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">RelationName::Explicit</span>(<span class="kw">_</span>) =&gt; {
                     <span class="macro">format!</span>(
                         <span class="string">&quot;Wrongly named relation detected. The fields {} in model `{}` both use the same relation name. Please provide different relation names for them through `@relation(&lt;name&gt;).&quot;</span>,
                         <span class="ident">field_names</span>,
@@ -327,7 +327,7 @@
                 <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
             ))
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(()),
     }
 }
 
@@ -419,7 +419,7 @@
         .<span class="ident">ast_field</span>()
         .<span class="ident">attributes</span>
         .<span class="ident">iter</span>()
-        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;relation&quot;</span>)
+        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;relation&quot;</span>)
     {
         <span class="ident">validate_db_name</span>(
             <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),

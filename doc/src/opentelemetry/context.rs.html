@@ -468,7 +468,7 @@
     <span class="doccomment">/// allocate. Use [`with_value`] to create a new context that has entries.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`with_value`]: Context::with_value()</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Context::default</span>()
     }
 
@@ -489,7 +489,7 @@
     <span class="doccomment">/// let _guard = Context::new().with_value(ValueA(&quot;a&quot;)).attach();</span>
     <span class="doccomment">/// do_work()</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">get_current</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="ident">cx</span>.<span class="ident">clone</span>())
     }
 
@@ -519,7 +519,7 @@
     <span class="doccomment">/// assert_eq!(all_current_and_b.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));</span>
     <span class="doccomment">/// assert_eq!(all_current_and_b.get::&lt;ValueB&gt;(), Some(&amp;ValueB(42)));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_with_value</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_with_value</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_context</span> <span class="op">=</span> <span class="ident">Context::current</span>();
         <span class="ident">new_context</span>
             .<span class="ident">entries</span>
@@ -549,7 +549,7 @@
     <span class="doccomment">/// // And return none if not yet set</span>
     <span class="doccomment">/// assert_eq!(cx.get::&lt;MyUser&gt;(), None);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">entries</span>
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>())
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">rc</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">rc</span>).<span class="ident">downcast_ref</span>())
@@ -582,7 +582,7 @@
     <span class="doccomment">/// assert_eq!(cx_with_a_and_b.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));</span>
     <span class="doccomment">/// assert_eq!(cx_with_a_and_b.get::&lt;ValueB&gt;(), Some(&amp;ValueB(42)));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_value</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_value</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_context</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="ident">new_context</span>
             .<span class="ident">entries</span>
@@ -665,7 +665,7 @@
     <span class="doccomment">/// // this is back in the default empty context</span>
     <span class="doccomment">/// assert_eq!(Context::current().get::&lt;ValueA&gt;(), None);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attach</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ContextGuard</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attach</span>(<span class="self">self</span>) -&gt; <span class="ident">ContextGuard</span> {
         <span class="kw">let</span> <span class="ident">previous_cx</span> <span class="op">=</span> <span class="ident">CURRENT_CONTEXT</span>
             .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">current</span><span class="op">|</span> <span class="ident">current</span>.<span class="ident">replace</span>(<span class="self">self</span>))
             .<span class="ident">ok</span>();
@@ -678,7 +678,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Context</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Context&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;entries&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">len</span>())
             .<span class="ident">finish</span>()
@@ -705,7 +705,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Note: This function will panic if you attempt to attach another context</span>
 <span class="doccomment">/// while the context is still borrowed.</span>
-<span class="kw">fn</span> <span class="ident">get_current</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+<span class="kw">fn</span> <span class="ident">get_current</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span> {
     <span class="ident">CURRENT_CONTEXT</span>
         .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">cx</span>.<span class="ident">borrow</span>()))
         .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">DEFAULT_CONTEXT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">cx</span>)))
@@ -728,7 +728,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }

@@ -327,7 +327,7 @@
     <span class="doccomment">/// [local time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_local</span>
     <span class="doccomment">/// [RFC 3339]: https://datatracker.ietf.org/doc/html/rfc3339</span>
     <span class="doccomment">/// [ISO 8601]: https://en.wikipedia.org/wiki/ISO_8601</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rfc_3339</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rfc_3339</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">well_known::Rfc3339</span>)
     }
 }
@@ -400,7 +400,7 @@
     <span class="doccomment">/// [`format_description!`]: https://docs.rs/time/0.3/time/macros/macro.format_description.html</span>
     <span class="doccomment">/// [`time::format_description::parse`]: https://docs.rs/time/0.3/time/format_description/fn.parse.html</span>
     <span class="doccomment">/// [`time` book]: https://time-rs.github.io/book/api/format-description.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">format</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">format</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">format</span> }
     }
 }
@@ -410,7 +410,7 @@
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Formattable</span>,
 {
-    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">OffsetDateTime::now_local</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fmt::Error</span>)<span class="question-mark">?</span>;
         <span class="ident">format_datetime</span>(<span class="ident">now</span>, <span class="ident">w</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">format</span>)
     }
@@ -421,7 +421,7 @@
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Formattable</span> <span class="op">+</span> <span class="ident">Default</span>,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">F::default</span>())
     }
 }
@@ -445,7 +445,7 @@
     <span class="doccomment">/// [local time]: https://docs.rs/time/0.3/time/struct.OffsetDateTime.html#method.now_utc</span>
     <span class="doccomment">/// [RFC 3339]: https://datatracker.ietf.org/doc/html/rfc3339</span>
     <span class="doccomment">/// [ISO 8601]: https://en.wikipedia.org/wiki/ISO_8601</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rfc_3339</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rfc_3339</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">well_known::Rfc3339</span>)
     }
 }
@@ -517,7 +517,7 @@
     <span class="doccomment">/// [`format_description!`]: https://docs.rs/time/0.3/time/macros/macro.format_description.html</span>
     <span class="doccomment">/// [`time::format_description::parse`]: https://docs.rs/time/0.3/time/format_description/fn.parse.html</span>
     <span class="doccomment">/// [`time` book]: https://time-rs.github.io/book/api/format-description.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">format</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">format</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">format</span> }
     }
 }
@@ -526,7 +526,7 @@
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Formattable</span>,
 {
-    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">format_datetime</span>(<span class="ident">OffsetDateTime::now_utc</span>(), <span class="ident">w</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">format</span>)
     }
 }
@@ -535,7 +535,7 @@
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Formattable</span> <span class="op">+</span> <span class="ident">Default</span>,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">F::default</span>())
     }
 }
@@ -544,7 +544,7 @@
     <span class="ident">now</span>: <span class="ident">OffsetDateTime</span>,
     <span class="ident">into</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">Formattable</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+) -&gt; <span class="ident">fmt::Result</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">into</span> <span class="op">=</span> <span class="ident">WriteAdaptor::new</span>(<span class="ident">into</span>);
     <span class="ident">now</span>.<span class="ident">format_into</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">into</span>, <span class="ident">fmt</span>)
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fmt::Error</span>)

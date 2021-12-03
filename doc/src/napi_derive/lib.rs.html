@@ -280,7 +280,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">ArgLength</span> {
-  <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+  <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">vars</span> <span class="op">=</span> <span class="ident">Punctuated</span>::<span class="op">&lt;</span><span class="ident">Literal</span>, <span class="macro">Token!</span>[,]<span class="op">&gt;</span><span class="ident">::parse_terminated</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">ArgLength</span> {
       <span class="ident">length</span>: <span class="ident">vars</span>
@@ -301,7 +301,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">JsFunction</span> {
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
     <span class="ident">JsFunction</span> {
       <span class="ident">args</span>: <span class="macro">vec!</span>[],
       <span class="ident">name</span>: <span class="prelude-val">None</span>,
@@ -314,12 +314,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Fold</span> <span class="kw">for</span> <span class="ident">JsFunction</span> {
-  <span class="kw">fn</span> <span class="ident">fold_fn_arg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">FnArg</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FnArg</span> {
+  <span class="kw">fn</span> <span class="ident">fold_fn_arg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">arg</span>: <span class="ident">FnArg</span>) -&gt; <span class="ident">FnArg</span> {
     <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">arg</span>.<span class="ident">clone</span>());
     <span class="ident">fold_fn_arg</span>(<span class="self">self</span>, <span class="ident">arg</span>)
   }
 
-  <span class="kw">fn</span> <span class="ident">fold_signature</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">signature</span>: <span class="ident">Signature</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Signature</span> {
+  <span class="kw">fn</span> <span class="ident">fold_signature</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">signature</span>: <span class="ident">Signature</span>) -&gt; <span class="ident">Signature</span> {
     <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">format_ident!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">signature</span>.<span class="ident">ident</span>));
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_signature</span> <span class="op">=</span> <span class="ident">signature</span>.<span class="ident">clone</span>();
     <span class="ident">new_signature</span>.<span class="ident">ident</span> <span class="op">=</span> <span class="macro">format_ident!</span>(<span class="string">&quot;_generated_{}_generated_&quot;</span>, <span class="ident">signature</span>.<span class="ident">ident</span>);
@@ -328,19 +328,19 @@
     <span class="ident">fold_signature</span>(<span class="self">self</span>, <span class="ident">signature</span>)
   }
 
-  <span class="kw">fn</span> <span class="ident">fold_visibility</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Visibility</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Visibility</span> {
+  <span class="kw">fn</span> <span class="ident">fold_visibility</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Visibility</span>) -&gt; <span class="ident">Visibility</span> {
     <span class="self">self</span>.<span class="ident">visibility</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">clone</span>();
     <span class="ident">v</span>
   }
 
-  <span class="kw">fn</span> <span class="ident">fold_block</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="ident">Block</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Block</span> {
+  <span class="kw">fn</span> <span class="ident">fold_block</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="ident">Block</span>) -&gt; <span class="ident">Block</span> {
     <span class="self">self</span>.<span class="ident">block</span>.<span class="ident">push</span>(<span class="ident">node</span>.<span class="ident">clone</span>());
     <span class="ident">node</span>
   }
 }
 
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_function</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_function</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
   <span class="kw">let</span> <span class="ident">arg_len</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">attr</span> <span class="kw">as</span> <span class="ident">ArgLength</span>);
   <span class="kw">let</span> <span class="ident">arg_len_span</span> <span class="op">=</span> <span class="ident">arg_len</span>.<span class="ident">length</span>;
   <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">ItemFn</span>);
@@ -359,7 +359,7 @@
     #<span class="ident">visibility</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> #<span class="ident">fn_name</span>(
       <span class="ident">raw_env</span>: <span class="ident">napi::sys::napi_env</span>,
       <span class="ident">cb_info</span>: <span class="ident">napi::sys::napi_callback_info</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">napi::sys::napi_value</span> {
+    ) -&gt; <span class="ident">napi::sys::napi_value</span> {
       <span class="kw">use</span> <span class="ident">std::ptr</span>;
       <span class="kw">use</span> <span class="ident">std::panic</span>::{<span class="self">self</span>, <span class="ident">AssertUnwindSafe</span>};
       <span class="kw">use</span> <span class="ident">std::ffi::CString</span>;
@@ -380,7 +380,7 @@
           <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">raw_this</span>,
           <span class="ident">ptr::null_mut</span>(),
         );
-        <span class="macro">debug_assert!</span>(<span class="ident">Status::from</span>(<span class="ident">status</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">Status::Ok</span>, <span class="string">&quot;napi_get_cb_info failed&quot;</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">Status::from</span>(<span class="ident">status</span>) <span class="op">==</span> <span class="ident">Status::Ok</span>, <span class="string">&quot;napi_get_cb_info failed&quot;</span>);
       }
 
       <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">env</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Env::from_raw</span>(<span class="ident">raw_env</span>) };
@@ -396,7 +396,7 @@
 }
 
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contextless_function</span>(<span class="ident">_attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contextless_function</span>(<span class="ident">_attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
   <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">ItemFn</span>);
   <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">js_fn</span> <span class="op">=</span> <span class="ident">JsFunction::new</span>();
   <span class="ident">js_fn</span>.<span class="ident">fold_item_fn</span>(<span class="ident">input</span>);
@@ -414,7 +414,7 @@
     #<span class="ident">visibility</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> #<span class="ident">fn_name</span>(
       <span class="ident">raw_env</span>: <span class="ident">napi::sys::napi_env</span>,
       <span class="ident">cb_info</span>: <span class="ident">napi::sys::napi_callback_info</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">napi::sys::napi_value</span> {
+    ) -&gt; <span class="ident">napi::sys::napi_value</span> {
       <span class="kw">use</span> <span class="ident">std::ptr</span>;
       <span class="kw">use</span> <span class="ident">std::panic</span>::{<span class="self">self</span>, <span class="ident">AssertUnwindSafe</span>};
       <span class="kw">use</span> <span class="ident">std::ffi::CString</span>;
@@ -437,17 +437,17 @@
 <span class="kw">fn</span> <span class="ident">get_execute_js_code</span>(
   <span class="ident">new_fn_name</span>: <span class="ident">Ident</span>,
   <span class="ident">function_kind</span>: <span class="ident">FunctionKind</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro2::TokenStream</span> {
+) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
   <span class="kw">let</span> <span class="ident">return_token_stream</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">function_kind</span> {
-    <span class="ident">FunctionKind::Contextless</span> <span class="op">=</span><span class="op">&gt;</span> {
+    <span class="ident">FunctionKind::Contextless</span> =&gt; {
       <span class="macro">quote!</span> {
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> { <span class="ident">v</span>.<span class="ident">raw</span>() },
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ptr::null_mut</span>(),
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>)) =&gt; <span class="kw">unsafe</span> { <span class="ident">v</span>.<span class="ident">raw</span>() },
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">ptr::null_mut</span>(),
       }
     }
-    <span class="ident">FunctionKind::JsFunction</span> <span class="op">=</span><span class="op">&gt;</span> {
+    <span class="ident">FunctionKind::JsFunction</span> =&gt; {
       <span class="macro">quote!</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> { <span class="ident">v</span>.<span class="ident">raw</span>() },
+        <span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; <span class="kw">unsafe</span> { <span class="ident">v</span>.<span class="ident">raw</span>() },
       }
     }
   };
@@ -465,7 +465,7 @@
       <span class="ident">Error::from_reason</span>(<span class="ident">message</span>)
     }).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>) {
       #<span class="ident">return_token_stream</span>
-      <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
         <span class="kw">unsafe</span> { <span class="ident">napi::JsError::from</span>(<span class="ident">e</span>).<span class="ident">throw_into</span>(<span class="ident">raw_env</span>) };
         <span class="ident">ptr::null_mut</span>()
       }
@@ -474,7 +474,7 @@
 }
 
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">module_exports</span>(<span class="ident">_attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">module_exports</span>(<span class="ident">_attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
   <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">ItemFn</span>);
   <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">js_fn</span> <span class="op">=</span> <span class="ident">JsFunction::new</span>();
   <span class="ident">js_fn</span>.<span class="ident">fold_item_fn</span>(<span class="ident">input</span>);
@@ -482,9 +482,9 @@
   <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">js_fn</span>.<span class="ident">name</span>.<span class="ident">unwrap</span>();
   <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="ident">js_fn</span>.<span class="ident">signature_raw</span>.<span class="ident">unwrap</span>();
   <span class="kw">let</span> <span class="ident">args_len</span> <span class="op">=</span> <span class="ident">js_fn</span>.<span class="ident">args</span>.<span class="ident">len</span>();
-  <span class="kw">let</span> <span class="ident">call_expr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">args_len</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+  <span class="kw">let</span> <span class="ident">call_expr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">args_len</span> <span class="op">==</span> <span class="number">1</span> {
     <span class="macro">quote!</span> { #<span class="ident">fn_name</span>(<span class="ident">exports</span>) }
-  } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">args_len</span> <span class="op">=</span><span class="op">=</span> <span class="number">2</span> {
+  } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">args_len</span> <span class="op">==</span> <span class="number">2</span> {
     <span class="macro">quote!</span> { #<span class="ident">fn_name</span>(<span class="ident">exports</span>, <span class="ident">env</span>) }
   } <span class="kw">else</span> {
     <span class="macro">panic!</span>(<span class="string">&quot;Arguments length of #[module_exports] function must be 1 or 2&quot;</span>);
@@ -497,7 +497,7 @@
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">napi_register_module_v1</span>(
       <span class="ident">raw_env</span>: <span class="ident">napi::sys::napi_env</span>,
       <span class="ident">raw_exports</span>: <span class="ident">napi::sys::napi_value</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">napi::sys::napi_value</span> {
+    ) -&gt; <span class="ident">napi::sys::napi_value</span> {
       <span class="kw">use</span> <span class="ident">std::ffi::CString</span>;
       <span class="kw">use</span> <span class="ident">std::ptr</span>;
       <span class="kw">use</span> <span class="ident">napi</span>::{<span class="ident">Env</span>, <span class="ident">JsObject</span>, <span class="ident">NapiValue</span>, <span class="ident">NapiRaw</span>};
@@ -514,8 +514,8 @@
       <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_rt&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi4&quot;</span>)))]</span>
       <span class="kw">let</span> <span class="ident">hook_result</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(());
       <span class="kw">match</span> <span class="ident">hook_result</span>.<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">result</span>) {
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">raw_exports</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="ident">raw_exports</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
           <span class="kw">let</span> <span class="ident">c_string</span> <span class="op">=</span> <span class="ident">CString::from_vec_unchecked</span>(<span class="macro">format!</span>(<span class="string">&quot;Error initializing module: {}&quot;</span>, <span class="ident">e</span>).<span class="ident">into</span>());
           <span class="kw">unsafe</span> {
             <span class="ident">napi::sys::napi_throw_error</span>(

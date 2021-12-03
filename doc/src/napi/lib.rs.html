@@ -318,15 +318,15 @@
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;1.0.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;[module_exports] macro instead&quot;</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">register_module</span> {
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module_name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">init</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module_name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">init</span>:<span class="ident">ident</span>) =&gt; {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_rt&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi4&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">check_status</span>(<span class="ident">code</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::sys::napi_status</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">check_status</span>(<span class="ident">code</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::sys::napi_status</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
       <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::{<span class="macro-nonterminal">Error</span>, <span class="ident">Status</span>};
       <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">Status::from</span>(<span class="ident">code</span>);
       <span class="kw">match</span> <span class="ident">status</span> {
-        <span class="ident">Status::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from_status</span>(<span class="ident">status</span>)),
+        <span class="ident">Status::Ok</span> =&gt; <span class="prelude-val">Ok</span>(()),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::from_status</span>(<span class="ident">status</span>)),
       }
     }
 
@@ -334,7 +334,7 @@
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">napi_register_module_v1</span>(
       <span class="ident">raw_env</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::sys::napi_env</span>,
       <span class="ident">raw_exports</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::sys::napi_value</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::sys::napi_value</span> {
+    ) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::sys::napi_value</span> {
       <span class="kw">use</span> <span class="ident">std::ffi::CString</span>;
       <span class="kw">use</span> <span class="ident">std::io::Write</span>;
       <span class="kw">use</span> <span class="ident">std::os::raw::c_char</span>;
@@ -359,8 +359,8 @@
       <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_rt&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi4&quot;</span>)))]</span>
       <span class="kw">let</span> <span class="ident">hook_result</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(());
       <span class="kw">match</span> <span class="ident">hook_result</span>.<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">result</span>) {
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cjs_module</span>.<span class="ident">exports</span>.<span class="ident">raw</span>(),
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="ident">cjs_module</span>.<span class="ident">exports</span>.<span class="ident">raw</span>(),
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
           <span class="kw">let</span> <span class="ident">c_string</span> <span class="op">=</span>
             <span class="ident">CString::from_vec_unchecked</span>(<span class="macro">format!</span>(<span class="string">&quot;Error initializing module: {}&quot;</span>, <span class="ident">e</span>).<span class="ident">into</span>());
           <span class="kw">unsafe</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::sys::napi_throw_error</span>(<span class="ident">raw_env</span>, <span class="ident">ptr::null</span>(), <span class="ident">c_string</span>.<span class="ident">as_ptr</span>()) };

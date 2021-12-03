@@ -319,7 +319,7 @@
     <span class="doccomment">/// [RFC 8410 Section 10.3]: https://tools.ietf.org/html/rfc8410#section-10.3</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_pkcs8</span>(
         <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">pkcs8::Document</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">pkcs8::Document</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">seed</span>: [<span class="ident">u8</span>; <span class="ident">SEED_LEN</span>] <span class="op">=</span> <span class="ident">rand::generate</span>(<span class="ident">rng</span>)<span class="question-mark">?</span>.<span class="ident">expose</span>();
         <span class="kw">let</span> <span class="ident">key_pair</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_seed_</span>(<span class="kw-2">&amp;</span><span class="ident">seed</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">pkcs8::wrap_key</span>(
@@ -343,7 +343,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If you need to parse PKCS#8 v1 files (without the public key) then use</span>
     <span class="doccomment">/// `Ed25519KeyPair::from_pkcs8_maybe_unchecked()` instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pkcs8</span>(<span class="ident">pkcs8</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pkcs8</span>(<span class="ident">pkcs8</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">seed</span>, <span class="ident">public_key</span>) <span class="op">=</span>
             <span class="ident">unwrap_pkcs8</span>(<span class="ident">pkcs8::Version::V2Only</span>, <span class="ident">untrusted::Input::from</span>(<span class="ident">pkcs8</span>))<span class="question-mark">?</span>;
         <span class="ident"><span class="self">Self</span>::from_seed_and_public_key</span>(
@@ -366,7 +366,7 @@
     <span class="doccomment">/// between the public key and the private key.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// PKCS#8 v2 files are parsed exactly like `Ed25519KeyPair::from_pkcs8()`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pkcs8_maybe_unchecked</span>(<span class="ident">pkcs8</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pkcs8_maybe_unchecked</span>(<span class="ident">pkcs8</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">seed</span>, <span class="ident">public_key</span>) <span class="op">=</span>
             <span class="ident">unwrap_pkcs8</span>(<span class="ident">pkcs8::Version::V1OrV2</span>, <span class="ident">untrusted::Input::from</span>(<span class="ident">pkcs8</span>))<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">public_key</span>) <span class="op">=</span> <span class="ident">public_key</span> {
@@ -392,7 +392,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_seed_and_public_key</span>(
         <span class="ident">seed</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">public_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">pair</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_seed_unchecked</span>(<span class="ident">seed</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// This implicitly verifies that `public_key` is the right length.</span>
@@ -419,14 +419,14 @@
     <span class="doccomment">/// Since the public key is not given, the public key will be computed from</span>
     <span class="doccomment">/// the private key. It is not possible to detect misuse or corruption of</span>
     <span class="doccomment">/// the private key since the public key isn&#39;t given as input.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_seed_unchecked</span>(<span class="ident">seed</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_seed_unchecked</span>(<span class="ident">seed</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">seed</span> <span class="op">=</span> <span class="ident">seed</span>
             .<span class="ident">try_into</span>()
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_seed_</span>(<span class="ident">seed</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">from_seed_</span>(<span class="ident">seed</span>: <span class="kw-2">&amp;</span><span class="ident">Seed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from_seed_</span>(<span class="ident">seed</span>: <span class="kw-2">&amp;</span><span class="ident">Seed</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">digest::digest</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA512</span>, <span class="ident">seed</span>);
         <span class="kw">let</span> (<span class="ident">private_scalar</span>, <span class="ident">private_prefix</span>) <span class="op">=</span> <span class="ident">h</span>.<span class="ident">as_ref</span>().<span class="ident">split_at</span>(<span class="ident">SCALAR_LEN</span>);
 
@@ -446,7 +446,7 @@
     }
 
     <span class="doccomment">/// Returns the signature of the message `msg`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">signature::Signature</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">signature::Signature</span> {
         <span class="ident">signature::Signature::new</span>(<span class="op">|</span><span class="ident">signature_bytes</span><span class="op">|</span> {
             <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
                 <span class="kw">fn</span> <span class="ident">GFp_x25519_sc_muladd</span>(
@@ -491,7 +491,7 @@
 <span class="kw">impl</span> <span class="ident">signature::KeyPair</span> <span class="kw">for</span> <span class="ident">Ed25519KeyPair</span> {
     <span class="kw">type</span> <span class="ident">PublicKey</span> <span class="op">=</span> <span class="ident">PublicKey</span>;
 
-    <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::PublicKey</span> {
+    <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::PublicKey</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">public_key</span>
     }
 }
@@ -500,7 +500,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PublicKey</span>([<span class="ident">u8</span>; <span class="ident">ED25519_PUBLIC_KEY_LEN</span>]);
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
     }
 }
@@ -510,7 +510,7 @@
 <span class="kw">fn</span> <span class="ident">unwrap_pkcs8</span>(
     <span class="ident">version</span>: <span class="ident">pkcs8::Version</span>,
     <span class="ident">input</span>: <span class="ident">untrusted::Input</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">private_key</span>, <span class="ident">public_key</span>) <span class="op">=</span> <span class="ident">pkcs8::unwrap_key</span>(<span class="kw-2">&amp;</span><span class="ident">PKCS8_TEMPLATE</span>, <span class="ident">version</span>, <span class="ident">input</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">private_key</span> <span class="op">=</span> <span class="ident">private_key</span>
         .<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {

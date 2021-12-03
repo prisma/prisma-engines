@@ -581,13 +581,13 @@ impl ToSql for DateTimeSql {
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Type</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Type::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Null&quot;</span>),
-            <span class="ident">Type::Integer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Integer&quot;</span>),
-            <span class="ident">Type::Real</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Real&quot;</span>),
-            <span class="ident">Type::Text</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Text&quot;</span>),
-            <span class="ident">Type::Blob</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Blob&quot;</span>),
+            <span class="ident">Type::Null</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Null&quot;</span>),
+            <span class="ident">Type::Integer</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Integer&quot;</span>),
+            <span class="ident">Type::Real</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Real&quot;</span>),
+            <span class="ident">Type::Text</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Text&quot;</span>),
+            <span class="ident">Type::Blob</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Blob&quot;</span>),
         }
     }
 }
@@ -599,14 +599,14 @@ impl ToSql for DateTimeSql {
     <span class="kw">use</span> <span class="ident">std::f64::EPSILON</span>;
     <span class="kw">use</span> <span class="ident">std::os::raw</span>::{<span class="ident">c_double</span>, <span class="ident">c_int</span>};
 
-    <span class="kw">fn</span> <span class="ident">checked_memory_handle</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">checked_memory_handle</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo (b BLOB, t TEXT, i INTEGER, f FLOAT, n)&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">db</span>)
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_blob</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_blob</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">v1234</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1u8</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
@@ -618,7 +618,7 @@ impl ToSql for DateTimeSql {
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_empty_blob</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_empty_blob</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">empty</span> <span class="op">=</span> <span class="macro">vec!</span>[];
@@ -630,7 +630,7 @@ impl ToSql for DateTimeSql {
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_str</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_str</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">&quot;hello, world!&quot;</span>;
@@ -642,7 +642,7 @@ impl ToSql for DateTimeSql {
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_string</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_string</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">&quot;hello, world!&quot;</span>;
@@ -654,7 +654,7 @@ impl ToSql for DateTimeSql {
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_value</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_value</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
 
         <span class="ident">db</span>.<span class="ident">execute</span>(<span class="string">&quot;INSERT INTO foo(i) VALUES (?)&quot;</span>, [<span class="ident">Value::Integer</span>(<span class="number">10</span>)])<span class="question-mark">?</span>;
@@ -667,7 +667,7 @@ impl ToSql for DateTimeSql {
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_option</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_option</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&quot;hello, world!&quot;</span>);
@@ -699,8 +699,8 @@ impl ToSql for DateTimeSql {
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::cognitive_complexity</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_mismatched_types</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">is_invalid_column_type</span>(<span class="ident">err</span>: <span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">test_mismatched_types</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">is_invalid_column_type</span>(<span class="ident">err</span>: <span class="ident">Error</span>) -&gt; <span class="ident">bool</span> {
             <span class="macro">matches!</span>(<span class="ident">err</span>, <span class="ident">Error::InvalidColumnType</span>(..))
         }
 
@@ -812,7 +812,7 @@ impl ToSql for DateTimeSql {
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_dynamic_type</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_dynamic_type</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Value</span>;
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
 
@@ -829,15 +829,15 @@ impl ToSql for DateTimeSql {
         <span class="macro">assert_eq!</span>(<span class="ident">Value::Text</span>(<span class="ident">String::from</span>(<span class="string">&quot;text&quot;</span>)), <span class="ident">row</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Value</span><span class="op">&gt;</span>(<span class="number">1</span>)<span class="question-mark">?</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">Value::Integer</span>(<span class="number">1</span>), <span class="ident">row</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Value</span><span class="op">&gt;</span>(<span class="number">2</span>)<span class="question-mark">?</span>);
         <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Value</span><span class="op">&gt;</span>(<span class="number">3</span>)<span class="question-mark">?</span> {
-            <span class="ident">Value::Real</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>((<span class="number">1.5</span> <span class="op">-</span> <span class="ident">val</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">EPSILON</span>),
-            <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Invalid Value {:?}&quot;</span>, <span class="ident">x</span>),
+            <span class="ident">Value::Real</span>(<span class="ident">val</span>) =&gt; <span class="macro">assert!</span>((<span class="number">1.5</span> <span class="op">-</span> <span class="ident">val</span>).<span class="ident">abs</span>() <span class="op">&lt;</span> <span class="ident">EPSILON</span>),
+            <span class="ident">x</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid Value {:?}&quot;</span>, <span class="ident">x</span>),
         }
         <span class="macro">assert_eq!</span>(<span class="ident">Value::Null</span>, <span class="ident">row</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Value</span><span class="op">&gt;</span>(<span class="number">4</span>)<span class="question-mark">?</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="macro">macro_rules!</span> <span class="ident">test_conversion</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">insert_value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">get_type</span>:<span class="ident">ty</span>,<span class="ident">expect</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected_value</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">insert_value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">get_type</span>:<span class="ident">ty</span>,<span class="ident">expect</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected_value</span>:<span class="ident">expr</span>) =&gt; {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>.<span class="ident">insert_statement</span>.<span class="ident">execute</span>(<span class="macro">params!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">insert_value</span>])<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>
                 .<span class="ident">query_statement</span>
@@ -845,7 +845,7 @@ impl ToSql for DateTimeSql {
             <span class="macro">assert_eq!</span>(<span class="ident">res</span><span class="question-mark">?</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected_value</span>);
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>.<span class="ident">delete_statement</span>.<span class="ident">execute</span>([])<span class="question-mark">?</span>;
         };
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">insert_value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">get_type</span>:<span class="ident">ty</span>,<span class="ident">expect_from_sql_error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">insert_value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">get_type</span>:<span class="ident">ty</span>,<span class="ident">expect_from_sql_error</span>) =&gt; {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>.<span class="ident">insert_statement</span>.<span class="ident">execute</span>(<span class="macro">params!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">insert_value</span>])<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>
                 .<span class="ident">query_statement</span>
@@ -853,7 +853,7 @@ impl ToSql for DateTimeSql {
             <span class="ident">res</span>.<span class="ident">unwrap_err</span>();
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>.<span class="ident">delete_statement</span>.<span class="ident">execute</span>([])<span class="question-mark">?</span>;
         };
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">insert_value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">get_type</span>:<span class="ident">ty</span>,<span class="ident">expect_to_sql_error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">insert_value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">get_type</span>:<span class="ident">ty</span>,<span class="ident">expect_to_sql_error</span>) =&gt; {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">db_etc</span>
                 .<span class="ident">insert_statement</span>
                 .<span class="ident">execute</span>(<span class="macro">params!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">insert_value</span>])
@@ -862,7 +862,7 @@ impl ToSql for DateTimeSql {
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_numeric_conversions</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_numeric_conversions</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::float_cmp</span>)]</span>
 
         <span class="comment">// Test what happens when we store an f32 and retrieve an i32 etc.</span>

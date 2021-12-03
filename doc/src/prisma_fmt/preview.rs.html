@@ -5,7 +5,7 @@
 <span id="5">5</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel::common::preview_features::GENERATOR</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>() -&gt; <span class="ident">String</span> {
     <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">GENERATOR</span>.<span class="ident">active_features</span>()).<span class="ident">unwrap</span>()
 }
 </code></pre></div>

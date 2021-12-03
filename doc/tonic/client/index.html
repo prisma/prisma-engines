@@ -4,7 +4,7 @@ provides a codec agnostic gRPC client dispatcher and a decorated tower
 service trait.</p>
 <p>This client is generally used by some code generation tool to provide stubs
 for the gRPC service. Thusly, they are a bit cumbersome to use by hand.</p>
-<h2 id="concurrent-usage" class="section-header"><a href="#concurrent-usage">Concurrent usage</a></h2>
+<h3 id="concurrent-usage" class="section-header"><a href="#concurrent-usage">Concurrent usage</a></h3>
 <p>Upon using the your generated client, you will discover all the functions
 corresponding to your rpc methods take <code>&amp;mut self</code>, making concurrent
 usage of the client difficult. The answer is simply to clone the client,
@@ -12,9 +12,9 @@ which is cheap as all client instances will share the same channel for
 communication. For more details, see
 <a href="../transport/struct.Channel.html#multiplexing-requests">transport::Channel</a>.</p>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Grpc.html" title="tonic::client::Grpc struct">Grpc</a></div><div class="item-right docblock-short"><p>A gRPC client dispatcher.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.GrpcService.html" title="tonic::client::GrpcService trait">GrpcService</a></div><div class="item-right docblock-short"><p>Definition of the gRPC trait alias for <a href="https://docs.rs/tower-service"><code>tower_service</code></a>.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tonic" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Grpc.html" title="tonic::client::Grpc struct">Grpc</a></div><div class="item-right docblock-short"><p>A gRPC client dispatcher.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.GrpcService.html" title="tonic::client::GrpcService trait">GrpcService</a></div><div class="item-right docblock-short"><p>Definition of the gRPC trait alias for <a href="https://docs.rs/tower-service"><code>tower_service</code></a>.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tonic" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

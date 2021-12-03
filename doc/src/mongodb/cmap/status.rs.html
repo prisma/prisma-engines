@@ -56,7 +56,7 @@
 }
 
 <span class="doccomment">/// Create a channel for publishing and receiving updates to the pool&#39;s generation.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">channel</span>(<span class="ident">init</span>: <span class="ident">PoolGeneration</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">PoolGenerationPublisher</span>, <span class="ident">PoolGenerationSubscriber</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">channel</span>(<span class="ident">init</span>: <span class="ident">PoolGeneration</span>) -&gt; (<span class="ident">PoolGenerationPublisher</span>, <span class="ident">PoolGenerationSubscriber</span>) {
     <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">tokio::sync::watch::channel</span>(<span class="ident">PoolStatus</span> { <span class="ident">generation</span>: <span class="ident">init</span> });
     (
         <span class="ident">PoolGenerationPublisher</span> { <span class="ident">sender</span> },
@@ -90,7 +90,7 @@
 
 <span class="kw">impl</span> <span class="ident">PoolGenerationSubscriber</span> {
     <span class="doccomment">/// Get a copy of the latest generation.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">generation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PoolGeneration</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">generation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PoolGeneration</span> {
         <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">borrow</span>().<span class="ident">generation</span>.<span class="ident">clone</span>()
     }
 }

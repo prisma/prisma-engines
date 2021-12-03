@@ -197,7 +197,7 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">has_trailing_comma</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Punct</span>(<span class="ident">punct</span>)) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">last</span>() {
-            <span class="kw">if</span> <span class="ident">punct</span>.<span class="ident">as_char</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&#39;,&#39;</span> {
+            <span class="kw">if</span> <span class="ident">punct</span>.<span class="ident">as_char</span>() <span class="op">==</span> <span class="string">&#39;,&#39;</span> {
                 <span class="ident">has_trailing_comma</span> <span class="op">=</span> <span class="bool-val">true</span>;
             }
         }
@@ -211,15 +211,15 @@
                 <span class="kw">continue</span>;
             }
             <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">read</span>.<span class="ident">chars</span>().<span class="ident">next</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">next</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">next</span>) =&gt; <span class="ident">next</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
             };
             <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="string">&#39;0&#39;</span>..<span class="op">=</span><span class="string">&#39;9&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&#39;0&#39;</span>..<span class="op">=</span><span class="string">&#39;9&#39;</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">int</span> <span class="op">=</span> <span class="ident">take_int</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">read</span>);
                     <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">int</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>() {
-                        <span class="prelude-val">Ok</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Member::Unnamed</span>(<span class="ident">Index</span> { <span class="ident">index</span>, <span class="ident">span</span> }),
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
+                        <span class="prelude-val">Ok</span>(<span class="ident">index</span>) =&gt; <span class="ident">Member::Unnamed</span>(<span class="ident">Index</span> { <span class="ident">index</span>, <span class="ident">span</span> }),
+                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
                     };
                     <span class="kw">if</span> <span class="op">!</span><span class="ident">member_index</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">member</span>) {
                         <span class="ident">out</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">int</span>;
@@ -227,34 +227,34 @@
                     }
                     <span class="ident">member</span>
                 }
-                <span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span> <span class="op">|</span> <span class="string">&#39;A&#39;</span>..<span class="op">=</span><span class="string">&#39;Z&#39;</span> <span class="op">|</span> <span class="string">&#39;_&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span> <span class="op">|</span> <span class="string">&#39;A&#39;</span>..<span class="op">=</span><span class="string">&#39;Z&#39;</span> <span class="op">|</span> <span class="string">&#39;_&#39;</span> =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">take_ident</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">read</span>);
                     <span class="ident">ident</span>.<span class="ident">set_span</span>(<span class="ident">span</span>);
                     <span class="ident">Member::Named</span>(<span class="ident">ident</span>)
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
+                <span class="kw">_</span> =&gt; <span class="kw">continue</span>,
             };
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>) <span class="op">=</span> <span class="ident">member_index</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">member</span>) {
                 <span class="kw">let</span> <span class="ident">end_spec</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">read</span>.<span class="ident">find</span>(<span class="string">&#39;}&#39;</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">end_spec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">end_spec</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">end_spec</span>) =&gt; <span class="ident">end_spec</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
                 };
                 <span class="kw">let</span> <span class="ident">bound</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">read</span>[..<span class="ident">end_spec</span>].<span class="ident">chars</span>().<span class="ident">next_back</span>() {
-                    <span class="prelude-val">Some</span>(<span class="string">&#39;?&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trait::Debug</span>,
-                    <span class="prelude-val">Some</span>(<span class="string">&#39;o&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trait::Octal</span>,
-                    <span class="prelude-val">Some</span>(<span class="string">&#39;x&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trait::LowerHex</span>,
-                    <span class="prelude-val">Some</span>(<span class="string">&#39;X&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trait::UpperHex</span>,
-                    <span class="prelude-val">Some</span>(<span class="string">&#39;p&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trait::Pointer</span>,
-                    <span class="prelude-val">Some</span>(<span class="string">&#39;b&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trait::Binary</span>,
-                    <span class="prelude-val">Some</span>(<span class="string">&#39;e&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trait::LowerExp</span>,
-                    <span class="prelude-val">Some</span>(<span class="string">&#39;E&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trait::UpperExp</span>,
-                    <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trait::Display</span>,
+                    <span class="prelude-val">Some</span>(<span class="string">&#39;?&#39;</span>) =&gt; <span class="ident">Trait::Debug</span>,
+                    <span class="prelude-val">Some</span>(<span class="string">&#39;o&#39;</span>) =&gt; <span class="ident">Trait::Octal</span>,
+                    <span class="prelude-val">Some</span>(<span class="string">&#39;x&#39;</span>) =&gt; <span class="ident">Trait::LowerHex</span>,
+                    <span class="prelude-val">Some</span>(<span class="string">&#39;X&#39;</span>) =&gt; <span class="ident">Trait::UpperHex</span>,
+                    <span class="prelude-val">Some</span>(<span class="string">&#39;p&#39;</span>) =&gt; <span class="ident">Trait::Pointer</span>,
+                    <span class="prelude-val">Some</span>(<span class="string">&#39;b&#39;</span>) =&gt; <span class="ident">Trait::Binary</span>,
+                    <span class="prelude-val">Some</span>(<span class="string">&#39;e&#39;</span>) =&gt; <span class="ident">Trait::LowerExp</span>,
+                    <span class="prelude-val">Some</span>(<span class="string">&#39;E&#39;</span>) =&gt; <span class="ident">Trait::UpperExp</span>,
+                    <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="ident">Trait::Display</span>,
                 };
                 <span class="ident">implied_bounds</span>.<span class="ident">insert</span>((<span class="ident">field</span>, <span class="ident">bound</span>));
             }
             <span class="kw">let</span> <span class="ident">local</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">member</span> {
-                <span class="ident">Member::Unnamed</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format_ident!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="ident">index</span>),
-                <span class="ident">Member::Named</span>(<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ident</span>.<span class="ident">clone</span>(),
+                <span class="ident">Member::Unnamed</span>(<span class="ident">index</span>) =&gt; <span class="macro">format_ident!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="ident">index</span>),
+                <span class="ident">Member::Named</span>(<span class="ident">ident</span>) =&gt; <span class="ident">ident</span>.<span class="ident">clone</span>(),
             };
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">formatvar</span> <span class="op">=</span> <span class="ident">local</span>.<span class="ident">clone</span>();
             <span class="kw">if</span> <span class="ident">formatvar</span>.<span class="ident">to_string</span>().<span class="ident">starts_with</span>(<span class="string">&quot;r#&quot;</span>) {
@@ -271,12 +271,12 @@
                 <span class="kw">continue</span>;
             }
             <span class="kw">if</span> <span class="op">!</span><span class="ident">has_trailing_comma</span> {
-                <span class="ident">args</span>.<span class="ident">extend</span>(<span class="macro">quote_spanned!</span>(<span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span> ,));
+                <span class="ident">args</span>.<span class="ident">extend</span>(<span class="macro">quote_spanned!</span>(<span class="ident">span</span>=&gt; ,));
             }
-            <span class="ident">args</span>.<span class="ident">extend</span>(<span class="macro">quote_spanned!</span>(<span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span> #<span class="ident">formatvar</span> <span class="op">=</span> #<span class="ident">local</span>));
+            <span class="ident">args</span>.<span class="ident">extend</span>(<span class="macro">quote_spanned!</span>(<span class="ident">span</span>=&gt; #<span class="ident">formatvar</span> <span class="op">=</span> #<span class="ident">local</span>));
             <span class="kw">if</span> <span class="ident">read</span>.<span class="ident">starts_with</span>(<span class="string">&#39;}&#39;</span>) <span class="op">&amp;&amp;</span> <span class="ident">member_index</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">member</span>) {
                 <span class="ident">has_bonus_display</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="ident">args</span>.<span class="ident">extend</span>(<span class="macro">quote_spanned!</span>(<span class="ident">span</span><span class="op">=</span><span class="op">&gt;</span> .<span class="ident">as_display</span>()));
+                <span class="ident">args</span>.<span class="ident">extend</span>(<span class="macro">quote_spanned!</span>(<span class="ident">span</span>=&gt; .<span class="ident">as_display</span>()));
             }
             <span class="ident">has_trailing_comma</span> <span class="op">=</span> <span class="bool-val">false</span>;
         }
@@ -289,7 +289,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">explicit_named_args</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Set</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">explicit_named_args</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Set</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">named_args</span> <span class="op">=</span> <span class="ident">Set::new</span>();
 
     <span class="kw">while</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_empty</span>() {
@@ -306,12 +306,12 @@
     <span class="prelude-val">Ok</span>(<span class="ident">named_args</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">take_int</span>(<span class="ident">read</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">take_int</span>(<span class="ident">read</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">int</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">ch</span>) <span class="kw">in</span> <span class="ident">read</span>.<span class="ident">char_indices</span>() {
         <span class="kw">match</span> <span class="ident">ch</span> {
-            <span class="string">&#39;0&#39;</span>..<span class="op">=</span><span class="string">&#39;9&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">int</span>.<span class="ident">push</span>(<span class="ident">ch</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&#39;0&#39;</span>..<span class="op">=</span><span class="string">&#39;9&#39;</span> =&gt; <span class="ident">int</span>.<span class="ident">push</span>(<span class="ident">ch</span>),
+            <span class="kw">_</span> =&gt; {
                 <span class="kw-2">*</span><span class="ident">read</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">read</span>[<span class="ident">i</span>..];
                 <span class="kw">break</span>;
             }
@@ -320,7 +320,7 @@
     <span class="ident">int</span>
 }
 
-<span class="kw">fn</span> <span class="ident">take_ident</span>(<span class="ident">read</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ident</span> {
+<span class="kw">fn</span> <span class="ident">take_ident</span>(<span class="ident">read</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Ident</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">read</span>.<span class="ident">starts_with</span>(<span class="string">&quot;r#&quot;</span>);
     <span class="kw">if</span> <span class="ident">raw</span> {
@@ -329,8 +329,8 @@
     }
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">ch</span>) <span class="kw">in</span> <span class="ident">read</span>.<span class="ident">char_indices</span>() {
         <span class="kw">match</span> <span class="ident">ch</span> {
-            <span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span> <span class="op">|</span> <span class="string">&#39;A&#39;</span>..<span class="op">=</span><span class="string">&#39;Z&#39;</span> <span class="op">|</span> <span class="string">&#39;0&#39;</span>..<span class="op">=</span><span class="string">&#39;9&#39;</span> <span class="op">|</span> <span class="string">&#39;_&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ident</span>.<span class="ident">push</span>(<span class="ident">ch</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span> <span class="op">|</span> <span class="string">&#39;A&#39;</span>..<span class="op">=</span><span class="string">&#39;Z&#39;</span> <span class="op">|</span> <span class="string">&#39;0&#39;</span>..<span class="op">=</span><span class="string">&#39;9&#39;</span> <span class="op">|</span> <span class="string">&#39;_&#39;</span> =&gt; <span class="ident">ident</span>.<span class="ident">push</span>(<span class="ident">ch</span>),
+            <span class="kw">_</span> =&gt; {
                 <span class="kw-2">*</span><span class="ident">read</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">read</span>[<span class="ident">i</span>..];
                 <span class="kw">break</span>;
             }

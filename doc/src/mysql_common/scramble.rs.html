@@ -125,7 +125,7 @@
 <span class="kw">use</span> <span class="ident">sha1::Sha1</span>;
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Digest</span>, <span class="ident">Sha256</span>};
 
-<span class="kw">fn</span> <span class="ident">xor</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">left</span>: <span class="ident">T</span>, <span class="ident">right</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+<span class="kw">fn</span> <span class="ident">xor</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">left</span>: <span class="ident">T</span>, <span class="ident">right</span>: <span class="ident">U</span>) -&gt; <span class="ident">T</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     <span class="ident">U</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
@@ -138,7 +138,7 @@
     <span class="ident">left</span>
 }
 
-<span class="kw">fn</span> <span class="ident">to_u8_32</span>(<span class="ident">bytes</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+<span class="kw">fn</span> <span class="ident">to_u8_32</span>(<span class="ident">bytes</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; [<span class="ident">u8</span>; <span class="number">32</span>] {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">32</span>];
     (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out</span>[..]).<span class="ident">copy_from_slice</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>());
     <span class="ident">out</span>
@@ -147,14 +147,14 @@
 <span class="doccomment">/// Scramble algorithm used in mysql_native_password.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// SHA1(password) XOR SHA1(nonce, SHA1(SHA1(password)))</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scramble_native</span>(<span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">20</span>]<span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">sha1_1</span>(<span class="ident">bytes</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">20</span>] {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scramble_native</span>(<span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">20</span>]<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sha1_1</span>(<span class="ident">bytes</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; [<span class="ident">u8</span>; <span class="number">20</span>] {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">Sha1::default</span>();
         <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>());
         <span class="ident">hasher</span>.<span class="ident">digest</span>().<span class="ident">bytes</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">sha1_2</span>(<span class="ident">bytes1</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">bytes2</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">20</span>] {
+    <span class="kw">fn</span> <span class="ident">sha1_2</span>(<span class="ident">bytes1</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">bytes2</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; [<span class="ident">u8</span>; <span class="number">20</span>] {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">Sha1::default</span>();
         <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="ident">bytes1</span>.<span class="ident">as_ref</span>());
         <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="ident">bytes2</span>.<span class="ident">as_ref</span>());
@@ -174,14 +174,14 @@
 <span class="doccomment">/// Scramble algorithm used in cached_sha2_password fast path.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// XOR(SHA256(password), SHA256(SHA256(SHA256(password)), nonce))</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scramble_sha256</span>(<span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">sha256_1</span>(<span class="ident">bytes</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scramble_sha256</span>(<span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sha256_1</span>(<span class="ident">bytes</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; [<span class="ident">u8</span>; <span class="number">32</span>] {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">Sha256::default</span>();
         <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>());
         <span class="ident">to_u8_32</span>(<span class="ident">hasher</span>.<span class="ident">finalize</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">sha256_2</span>(<span class="ident">bytes1</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">bytes2</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+    <span class="kw">fn</span> <span class="ident">sha256_2</span>(<span class="ident">bytes1</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">bytes2</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; [<span class="ident">u8</span>; <span class="number">32</span>] {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">Sha256::default</span>();
         <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="ident">bytes1</span>.<span class="ident">as_ref</span>());
         <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="ident">bytes2</span>.<span class="ident">as_ref</span>());

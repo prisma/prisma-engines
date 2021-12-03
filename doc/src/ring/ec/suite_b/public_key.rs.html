@@ -136,7 +136,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_uncompressed_point</span>(
     <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">PublicKeyOps</span>,
     <span class="ident">input</span>: <span class="ident">untrusted::Input</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
     <span class="comment">// NIST SP 800-56A Step 1: &quot;Verify that Q is not the point at infinity.</span>
     <span class="comment">// This can be done by inspection if the point is entered in the standard</span>
     <span class="comment">// affine representation.&quot; (We do it by inspection since we only accept</span>
@@ -187,7 +187,7 @@
 
                 <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Q&quot;</span>);
                 <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span><span class="ident">public_key</span>);
-                <span class="kw">let</span> <span class="ident">is_valid</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Result&quot;</span>) <span class="op">=</span><span class="op">=</span> <span class="string">&quot;P&quot;</span>;
+                <span class="kw">let</span> <span class="ident">is_valid</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Result&quot;</span>) <span class="op">==</span> <span class="string">&quot;P&quot;</span>;
 
                 <span class="kw">let</span> <span class="ident">curve_ops</span> <span class="op">=</span> <span class="ident">public_key_ops_from_curve_name</span>(<span class="kw-2">&amp;</span><span class="ident">curve_name</span>);
 
@@ -202,10 +202,10 @@
         );
     }
 
-    <span class="kw">fn</span> <span class="ident">public_key_ops_from_curve_name</span>(<span class="ident">curve_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">PublicKeyOps</span> {
-        <span class="kw">if</span> <span class="ident">curve_name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;P-256&quot;</span> {
+    <span class="kw">fn</span> <span class="ident">public_key_ops_from_curve_name</span>(<span class="ident">curve_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">PublicKeyOps</span> {
+        <span class="kw">if</span> <span class="ident">curve_name</span> <span class="op">==</span> <span class="string">&quot;P-256&quot;</span> {
             <span class="kw-2">&amp;</span><span class="ident">ops::p256::PUBLIC_KEY_OPS</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">curve_name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;P-384&quot;</span> {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">curve_name</span> <span class="op">==</span> <span class="string">&quot;P-384&quot;</span> {
             <span class="kw-2">&amp;</span><span class="ident">ops::p384::PUBLIC_KEY_OPS</span>
         } <span class="kw">else</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;Unsupported curve: {}&quot;</span>, <span class="ident">curve_name</span>);

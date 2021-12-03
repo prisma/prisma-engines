@@ -401,7 +401,7 @@
 <span class="doccomment">/// Creates a new mutex in an unlocked state ready for use.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This allows creating a mutex in a constant context on stable Rust.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">const_mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">const_mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">Mutex::const_new</span>(<span class="op">&lt;</span><span class="ident">RawMutex</span> <span class="kw">as</span> <span class="ident">lock_api::RawMutex</span><span class="op">&gt;</span><span class="ident">::INIT</span>, <span class="ident">val</span>)
 }
 

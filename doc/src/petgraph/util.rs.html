@@ -24,21 +24,21 @@
 </pre><pre class="rust"><code>
 <span class="kw">use</span> <span class="ident">std::iter</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enumerate</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">iter::Enumerate</span><span class="op">&lt;</span><span class="ident">I::IntoIter</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enumerate</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="ident">iter::Enumerate</span><span class="op">&lt;</span><span class="ident">I::IntoIter</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">IntoIterator</span>
 {
     <span class="ident">iterable</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>()
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-1&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rev</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">iter::Rev</span><span class="op">&lt;</span><span class="ident">I::IntoIter</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rev</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="ident">iter::Rev</span><span class="op">&lt;</span><span class="ident">I::IntoIter</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
           <span class="ident">I::IntoIter</span>: <span class="ident">DoubleEndedIterator</span>
 {
     <span class="ident">iterable</span>.<span class="ident">into_iter</span>().<span class="ident">rev</span>()
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zip</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">J</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="ident">I</span>, <span class="ident">j</span>: <span class="ident">J</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">iter::Zip</span><span class="op">&lt;</span><span class="ident">I::IntoIter</span>, <span class="ident">J::IntoIter</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zip</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">J</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="ident">I</span>, <span class="ident">j</span>: <span class="ident">J</span>) -&gt; <span class="ident">iter::Zip</span><span class="op">&lt;</span><span class="ident">I::IntoIter</span>, <span class="ident">J::IntoIter</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
           <span class="ident">J</span>: <span class="ident">IntoIterator</span>
 {

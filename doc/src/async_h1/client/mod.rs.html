@@ -36,7 +36,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">encode::Encoder</span>;
 
 <span class="doccomment">/// Opens an HTTP/1.1 connection to a remote host.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">RW</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">stream</span>: <span class="ident">RW</span>, <span class="ident">req</span>: <span class="ident">Request</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">http_types::Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">RW</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">stream</span>: <span class="ident">RW</span>, <span class="ident">req</span>: <span class="ident">Request</span>) -&gt; <span class="ident">http_types::Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">RW</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {

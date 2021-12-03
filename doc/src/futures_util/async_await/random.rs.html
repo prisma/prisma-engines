@@ -71,24 +71,24 @@
 }
 
 <span class="doccomment">/// Return a value from `0..n`.</span>
-<span class="kw">fn</span> <span class="ident">gen_index</span>(<span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">gen_index</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     (<span class="ident">random</span>() <span class="op">%</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="kw">as</span> <span class="ident">usize</span>
 }
 
 <span class="doccomment">/// Pseudorandom number generator based on [xorshift*].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [xorshift*]: https://en.wikipedia.org/wiki/Xorshift#xorshift*</span>
-<span class="kw">fn</span> <span class="ident">random</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">random</span>() -&gt; <span class="ident">u64</span> {
     <span class="macro">thread_local!</span> {
         <span class="kw">static</span> <span class="ident">RNG</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Cell::new</span>(<span class="ident">Wrapping</span>(<span class="ident">prng_seed</span>()));
     }
 
-    <span class="kw">fn</span> <span class="ident">prng_seed</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">prng_seed</span>() -&gt; <span class="ident">u64</span> {
         <span class="kw">static</span> <span class="ident">COUNTER</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
 
         <span class="comment">// Any non-zero seed will do</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seed</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">seed</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">while</span> <span class="ident">seed</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">DefaultHasher::new</span>();
             <span class="ident">hasher</span>.<span class="ident">write_usize</span>(<span class="ident">COUNTER</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>));
             <span class="ident">seed</span> <span class="op">=</span> <span class="ident">hasher</span>.<span class="ident">finish</span>();

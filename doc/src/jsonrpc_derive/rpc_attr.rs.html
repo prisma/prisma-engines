@@ -363,7 +363,7 @@
 <span class="kw">const</span> <span class="ident">NEITHER_SUB_OR_UNSUB_ERR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;pubsub attribute not annotated with either subscribe or unsubscribe&quot;</span>;
 
 <span class="kw">impl</span> <span class="ident">RpcMethodAttribute</span> {
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_attr</span>(<span class="ident">method</span>: <span class="kw-2">&amp;</span><span class="ident">syn::TraitItemMethod</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RpcMethodAttribute</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_attr</span>(<span class="ident">method</span>: <span class="kw-2">&amp;</span><span class="ident">syn::TraitItemMethod</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RpcMethodAttribute</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">sig</span>.<span class="ident">output</span>;
 		<span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">method</span>
 			.<span class="ident">attrs</span>
@@ -378,13 +378,13 @@
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">parse_meta</span>(<span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Attribute</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">syn::ReturnType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RpcMethodAttribute</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">parse_meta</span>(<span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Attribute</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">syn::ReturnType</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RpcMethodAttribute</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="ident">attr</span>.<span class="ident">parse_meta</span>().<span class="ident">and_then</span>(<span class="ident">validate_attribute_meta</span>) {
-			<span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="ident">meta</span>) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="ident">meta</span>) =&gt; {
 				<span class="kw">let</span> <span class="ident">attr_kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">path_to_str</span>(<span class="ident">meta</span>.<span class="ident">path</span>()).<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String::as_str</span>) {
-					<span class="prelude-val">Some</span>(<span class="ident">RPC_ATTR_NAME</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::parse_rpc</span>(<span class="ident">meta</span>, <span class="ident">output</span>)),
-					<span class="prelude-val">Some</span>(<span class="ident">PUB_SUB_ATTR_NAME</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::parse_pubsub</span>(<span class="ident">meta</span>)),
-					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+					<span class="prelude-val">Some</span>(<span class="ident">RPC_ATTR_NAME</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::parse_rpc</span>(<span class="ident">meta</span>, <span class="ident">output</span>)),
+					<span class="prelude-val">Some</span>(<span class="ident">PUB_SUB_ATTR_NAME</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::parse_pubsub</span>(<span class="ident">meta</span>)),
+					<span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
 				};
 				<span class="ident">attr_kind</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">kind</span><span class="op">|</span> {
 					<span class="ident">kind</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">kind</span><span class="op">|</span> {
@@ -395,11 +395,11 @@
 								<span class="kw">let</span> <span class="ident">raw_params</span> <span class="op">=</span>
 									<span class="ident">get_meta_list</span>(<span class="ident">meta</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">ml</span><span class="op">|</span> <span class="ident">has_meta_word</span>(<span class="ident">RAW_PARAMS_META_WORD</span>, <span class="ident">ml</span>));
 								<span class="kw">let</span> <span class="ident">params_style</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">raw_params</span> {
-									<span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> {
+									<span class="bool-val">true</span> =&gt; {
 										<span class="comment">// &quot;`raw_params` will be deprecated in a future release. Use `params = \&quot;raw\&quot; instead`&quot;</span>
 										<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ParamStyle::Raw</span>))
 									}
-									<span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> {
+									<span class="bool-val">false</span> =&gt; {
 										<span class="ident">get_meta_list</span>(<span class="ident">meta</span>).<span class="ident">map_or</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="op">|</span><span class="ident">ml</span><span class="op">|</span> <span class="ident">get_params_style</span>(<span class="ident">ml</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>)))
 									}
 								}<span class="question-mark">?</span>;
@@ -414,18 +414,18 @@
 					})
 				})
 			}
-			<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)),
+			<span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)),
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">parse_rpc</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Meta</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">syn::ReturnType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AttributeKind</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">parse_rpc</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Meta</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">syn::ReturnType</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AttributeKind</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">has_metadata</span> <span class="op">=</span> <span class="ident">get_meta_list</span>(<span class="ident">meta</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">ml</span><span class="op">|</span> <span class="ident">has_meta_word</span>(<span class="ident">METADATA_META_WORD</span>, <span class="ident">ml</span>));
 		<span class="kw">let</span> <span class="ident">returns</span> <span class="op">=</span> <span class="ident">get_meta_list</span>(<span class="ident">meta</span>).<span class="ident">map_or</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="ident">ml</span><span class="op">|</span> <span class="ident">get_name_value</span>(<span class="ident">RETURNS_META_WORD</span>, <span class="ident">ml</span>));
 		<span class="kw">let</span> <span class="ident">is_notification</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">output</span> {
-			<span class="ident">syn::ReturnType::Default</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-			<span class="ident">syn::ReturnType::Type</span>(<span class="kw">_</span>, <span class="ident">ret</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ret</span> {
-				<span class="ident">syn::Type::Tuple</span>(<span class="kw-2">ref</span> <span class="ident">tup</span>) <span class="kw">if</span> <span class="ident">tup</span>.<span class="ident">elems</span>.<span class="ident">empty_or_trailing</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+			<span class="ident">syn::ReturnType::Default</span> =&gt; <span class="bool-val">true</span>,
+			<span class="ident">syn::ReturnType::Type</span>(<span class="kw">_</span>, <span class="ident">ret</span>) =&gt; <span class="kw">match</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ret</span> {
+				<span class="ident">syn::Type::Tuple</span>(<span class="kw-2">ref</span> <span class="ident">tup</span>) <span class="kw">if</span> <span class="ident">tup</span>.<span class="ident">elems</span>.<span class="ident">empty_or_trailing</span>() =&gt; <span class="bool-val">true</span>,
+				<span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
 			},
 		};
 
@@ -440,7 +440,7 @@
 		})
 	}
 
-	<span class="kw">fn</span> <span class="ident">parse_pubsub</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Meta</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AttributeKind</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">parse_pubsub</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Meta</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AttributeKind</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">name_and_list</span> <span class="op">=</span>
 			<span class="ident">get_meta_list</span>(<span class="ident">meta</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">ml</span><span class="op">|</span> <span class="ident">get_name_value</span>(<span class="ident">SUBSCRIPTION_NAME_KEY</span>, <span class="ident">ml</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> (<span class="ident">name</span>, <span class="ident">ml</span>)));
 
@@ -448,10 +448,10 @@
 			<span class="kw">let</span> <span class="ident">is_subscribe</span> <span class="op">=</span> <span class="ident">has_meta_word</span>(<span class="ident">SUBSCRIBE_META_WORD</span>, <span class="ident">ml</span>);
 			<span class="kw">let</span> <span class="ident">is_unsubscribe</span> <span class="op">=</span> <span class="ident">has_meta_word</span>(<span class="ident">UNSUBSCRIBE_META_WORD</span>, <span class="ident">ml</span>);
 			<span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">is_subscribe</span>, <span class="ident">is_unsubscribe</span>) {
-				(<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">PubSubMethodKind::Subscribe</span>),
-				(<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">PubSubMethodKind::Unsubscribe</span>),
-				(<span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">meta</span>, <span class="ident">BOTH_SUB_AND_UNSUB_ERR</span>)),
-				(<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">meta</span>, <span class="ident">NEITHER_SUB_OR_UNSUB_ERR</span>)),
+				(<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PubSubMethodKind::Subscribe</span>),
+				(<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PubSubMethodKind::Unsubscribe</span>),
+				(<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">meta</span>, <span class="ident">BOTH_SUB_AND_UNSUB_ERR</span>)),
+				(<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new_spanned</span>(<span class="ident">meta</span>, <span class="ident">NEITHER_SUB_OR_UNSUB_ERR</span>)),
 			};
 			<span class="ident">kind</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">kind</span><span class="op">|</span> <span class="ident">AttributeKind::PubSub</span> {
 				<span class="ident">subscription_name</span>: <span class="ident">sub_name</span>,
@@ -460,22 +460,22 @@
 		})
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_pubsub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_pubsub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-			<span class="ident">AttributeKind::PubSub</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-			<span class="ident">AttributeKind::Rpc</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+			<span class="ident">AttributeKind::PubSub</span> { .. } =&gt; <span class="bool-val">true</span>,
+			<span class="ident">AttributeKind::Rpc</span> { .. } =&gt; <span class="bool-val">false</span>,
 		}
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_notification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_notification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-			<span class="ident">AttributeKind::Rpc</span> { <span class="ident">is_notification</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">is_notification</span>,
-			<span class="ident">AttributeKind::PubSub</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+			<span class="ident">AttributeKind::Rpc</span> { <span class="ident">is_notification</span>, .. } =&gt; <span class="ident">is_notification</span>,
+			<span class="ident">AttributeKind::PubSub</span> { .. } =&gt; <span class="bool-val">false</span>,
 		}
 	}
 }
 
-<span class="kw">fn</span> <span class="ident">validate_attribute_meta</span>(<span class="ident">meta</span>: <span class="ident">syn::Meta</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">syn::Meta</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">validate_attribute_meta</span>(<span class="ident">meta</span>: <span class="ident">syn::Meta</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">syn::Meta</span><span class="op">&gt;</span> {
 	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
 	<span class="kw">struct</span> <span class="ident">Visitor</span> {
 		<span class="ident">meta_words</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -486,9 +486,9 @@
 		<span class="kw">fn</span> <span class="ident">visit_meta</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Meta</span>) {
 			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="op">=</span> <span class="ident">path_to_str</span>(<span class="ident">meta</span>.<span class="ident">path</span>()) {
 				<span class="kw">match</span> <span class="ident">meta</span> {
-					<span class="ident">syn::Meta::Path</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">meta_words</span>.<span class="ident">push</span>(<span class="ident">ident</span>),
-					<span class="ident">syn::Meta::List</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">meta_list_names</span>.<span class="ident">push</span>(<span class="ident">ident</span>),
-					<span class="ident">syn::Meta::NameValue</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">name_value_names</span>.<span class="ident">push</span>(<span class="ident">ident</span>),
+					<span class="ident">syn::Meta::Path</span>(<span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">meta_words</span>.<span class="ident">push</span>(<span class="ident">ident</span>),
+					<span class="ident">syn::Meta::List</span>(<span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">meta_list_names</span>.<span class="ident">push</span>(<span class="ident">ident</span>),
+					<span class="ident">syn::Meta::NameValue</span>(<span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">name_value_names</span>.<span class="ident">push</span>(<span class="ident">ident</span>),
 				}
 			}
 		}
@@ -499,7 +499,7 @@
 
 	<span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">path_to_str</span>(<span class="ident">meta</span>.<span class="ident">path</span>());
 	<span class="kw">match</span> <span class="ident">ident</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String::as_str</span>) {
-		<span class="prelude-val">Some</span>(<span class="ident">RPC_ATTR_NAME</span>) <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="prelude-val">Some</span>(<span class="ident">RPC_ATTR_NAME</span>) =&gt; {
 			<span class="ident">validate_idents</span>(<span class="kw-2">&amp;</span><span class="ident">meta</span>, <span class="kw-2">&amp;</span><span class="ident">visitor</span>.<span class="ident">meta_words</span>, <span class="kw-2">&amp;</span>[<span class="ident">METADATA_META_WORD</span>, <span class="ident">RAW_PARAMS_META_WORD</span>])<span class="question-mark">?</span>;
 			<span class="ident">validate_idents</span>(
 				<span class="kw-2">&amp;</span><span class="ident">meta</span>,
@@ -508,7 +508,7 @@
 			)<span class="question-mark">?</span>;
 			<span class="ident">validate_idents</span>(<span class="kw-2">&amp;</span><span class="ident">meta</span>, <span class="kw-2">&amp;</span><span class="ident">visitor</span>.<span class="ident">meta_list_names</span>, <span class="kw-2">&amp;</span>[<span class="ident">ALIASES_KEY</span>])
 		}
-		<span class="prelude-val">Some</span>(<span class="ident">PUB_SUB_ATTR_NAME</span>) <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="prelude-val">Some</span>(<span class="ident">PUB_SUB_ATTR_NAME</span>) =&gt; {
 			<span class="ident">validate_idents</span>(
 				<span class="kw-2">&amp;</span><span class="ident">meta</span>,
 				<span class="kw-2">&amp;</span><span class="ident">visitor</span>.<span class="ident">meta_words</span>,
@@ -517,14 +517,14 @@
 			<span class="ident">validate_idents</span>(<span class="kw-2">&amp;</span><span class="ident">meta</span>, <span class="kw-2">&amp;</span><span class="ident">visitor</span>.<span class="ident">name_value_names</span>, <span class="kw-2">&amp;</span>[<span class="ident">SUBSCRIPTION_NAME_KEY</span>, <span class="ident">RPC_NAME_KEY</span>])<span class="question-mark">?</span>;
 			<span class="ident">validate_idents</span>(<span class="kw-2">&amp;</span><span class="ident">meta</span>, <span class="kw-2">&amp;</span><span class="ident">visitor</span>.<span class="ident">meta_list_names</span>, <span class="kw-2">&amp;</span>[<span class="ident">ALIASES_KEY</span>])
 		}
-		<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">meta</span>), <span class="comment">// ignore other attributes - compiler will catch unknown ones</span>
+		<span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">meta</span>), <span class="comment">// ignore other attributes - compiler will catch unknown ones</span>
 	}
 }
 
-<span class="kw">fn</span> <span class="ident">validate_idents</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Meta</span>, <span class="ident">attr_idents</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>], <span class="ident">valid</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">syn::Meta</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">validate_idents</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Meta</span>, <span class="ident">attr_idents</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>], <span class="ident">valid</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">syn::Meta</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="ident">invalid_meta_words</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">attr_idents</span>
 		.<span class="ident">iter</span>()
-		.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="op">!</span><span class="ident">valid</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">=</span><span class="op">=</span> <span class="ident">w</span>))
+		.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="op">!</span><span class="ident">valid</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">==</span> <span class="ident">w</span>))
 		.<span class="ident">cloned</span>()
 		.<span class="ident">collect</span>();
 	<span class="kw">if</span> <span class="ident">invalid_meta_words</span>.<span class="ident">is_empty</span>() {
@@ -541,7 +541,7 @@
 	}
 }
 
-<span class="kw">fn</span> <span class="ident">get_meta_list</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Meta</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">syn::MetaList</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">get_meta_list</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Meta</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">syn::MetaList</span><span class="op">&gt;</span> {
 	<span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Meta::List</span>(<span class="ident">ml</span>) <span class="op">=</span> <span class="ident">meta</span> {
 		<span class="prelude-val">Some</span>(<span class="ident">ml</span>)
 	} <span class="kw">else</span> {
@@ -549,7 +549,7 @@
 	}
 }
 
-<span class="kw">fn</span> <span class="ident">get_name_value</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ml</span>: <span class="kw-2">&amp;</span><span class="ident">syn::MetaList</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">get_name_value</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ml</span>: <span class="kw-2">&amp;</span><span class="ident">syn::MetaList</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
 	<span class="ident">ml</span>.<span class="ident">nested</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">nested</span><span class="op">|</span> {
 		<span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::NestedMeta::Meta</span>(<span class="ident">syn::Meta::NameValue</span>(<span class="ident">mnv</span>)) <span class="op">=</span> <span class="ident">nested</span> {
 			<span class="kw">if</span> <span class="ident">path_eq_str</span>(<span class="kw-2">&amp;</span><span class="ident">mnv</span>.<span class="ident">path</span>, <span class="ident">key</span>) {
@@ -567,7 +567,7 @@
 	})
 }
 
-<span class="kw">fn</span> <span class="ident">has_meta_word</span>(<span class="ident">word</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ml</span>: <span class="kw-2">&amp;</span><span class="ident">syn::MetaList</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">has_meta_word</span>(<span class="ident">word</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ml</span>: <span class="kw-2">&amp;</span><span class="ident">syn::MetaList</span>) -&gt; <span class="ident">bool</span> {
 	<span class="ident">ml</span>.<span class="ident">nested</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">nested</span><span class="op">|</span> {
 		<span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::NestedMeta::Meta</span>(<span class="ident">syn::Meta::Path</span>(<span class="ident">p</span>)) <span class="op">=</span> <span class="ident">nested</span> {
 			<span class="ident">path_eq_str</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>, <span class="ident">word</span>)
@@ -577,7 +577,7 @@
 	})
 }
 
-<span class="kw">fn</span> <span class="ident">get_aliases</span>(<span class="ident">ml</span>: <span class="kw-2">&amp;</span><span class="ident">syn::MetaList</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">get_aliases</span>(<span class="ident">ml</span>: <span class="kw-2">&amp;</span><span class="ident">syn::MetaList</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
 	<span class="ident">ml</span>.<span class="ident">nested</span>
 		.<span class="ident">iter</span>()
 		.<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">nested</span><span class="op">|</span> {
@@ -605,17 +605,17 @@
 		})
 }
 
-<span class="kw">fn</span> <span class="ident">get_params_style</span>(<span class="ident">ml</span>: <span class="kw-2">&amp;</span><span class="ident">syn::MetaList</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParamStyle</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">get_params_style</span>(<span class="ident">ml</span>: <span class="kw-2">&amp;</span><span class="ident">syn::MetaList</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParamStyle</span><span class="op">&gt;</span> {
 	<span class="ident">get_name_value</span>(<span class="ident">PARAMS_STYLE_KEY</span>, <span class="ident">ml</span>).<span class="ident">map_or</span>(<span class="prelude-val">Ok</span>(<span class="ident">ParamStyle::default</span>()), <span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
 		<span class="ident">ParamStyle::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::new_spanned</span>(<span class="ident">ml</span>, <span class="ident">e</span>))
 	})
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path_eq_str</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Path</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-	<span class="ident">path</span>.<span class="ident">get_ident</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="ident">s</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path_eq_str</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Path</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+	<span class="ident">path</span>.<span class="ident">get_ident</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">s</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">path_to_str</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">path_to_str</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Path</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
 	<span class="prelude-val">Some</span>(<span class="ident">path</span>.<span class="ident">get_ident</span>()<span class="question-mark">?</span>.<span class="ident">to_string</span>())
 }
 </code></pre></div>

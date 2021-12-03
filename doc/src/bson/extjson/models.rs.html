@@ -375,7 +375,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Int32</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">i</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
             <span class="ident">extjson::de::Error::invalid_value</span>(
                 <span class="ident">Unexpected::Str</span>(<span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_str</span>()),
@@ -394,7 +394,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Int64</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">i</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
             <span class="ident">extjson::de::Error::invalid_value</span>(
                 <span class="ident">Unexpected::Str</span>(<span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_str</span>()),
@@ -413,12 +413,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Double</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_str</span>() {
-            <span class="string">&quot;Infinity&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">std::f64::INFINITY</span>),
-            <span class="string">&quot;-Infinity&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">std::f64::NEG_INFINITY</span>),
-            <span class="string">&quot;NaN&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">std::f64::NAN</span>),
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;Infinity&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">std::f64::INFINITY</span>),
+            <span class="string">&quot;-Infinity&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">std::f64::NEG_INFINITY</span>),
+            <span class="string">&quot;NaN&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">std::f64::NAN</span>),
+            <span class="ident">other</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">d</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
                     <span class="ident">extjson::de::Error::invalid_value</span>(
                         <span class="ident">Unexpected::Str</span>(<span class="ident">other</span>),
@@ -439,14 +439,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ObjectId</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">oid::ObjectId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">oid::ObjectId</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="ident">oid::ObjectId::parse_str</span>(<span class="self">self</span>.<span class="ident">oid</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">oid</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::oid::ObjectId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ObjectId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident"><span class="kw">crate</span>::oid::ObjectId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident"><span class="kw">crate</span>::oid::ObjectId</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">oid</span>: <span class="ident">id</span>.<span class="ident">to_hex</span>() }
     }
 }
@@ -473,7 +473,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Regex</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Regex</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Regex</span> {
         <span class="ident"><span class="kw">crate</span>::Regex::new</span>(<span class="self">self</span>.<span class="ident">body</span>.<span class="ident">pattern</span>, <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">options</span>)
     }
 }
@@ -495,7 +495,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Binary</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Binary</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Binary</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">base64::decode</span>(<span class="self">self</span>.<span class="ident">body</span>.<span class="ident">base64</span>.<span class="ident">as_str</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
             <span class="ident">extjson::de::Error::invalid_value</span>(
                 <span class="ident">Unexpected::Str</span>(<span class="self">self</span>.<span class="ident">body</span>.<span class="ident">base64</span>.<span class="ident">as_str</span>()),
@@ -510,7 +510,7 @@
             )
         })<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">subtype</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">subtype</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
             <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::Binary</span> {
                 <span class="ident">bytes</span>,
                 <span class="ident">subtype</span>: <span class="ident">subtype</span>[<span class="number">0</span>].<span class="ident">into</span>(),
@@ -532,7 +532,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Uuid</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Binary</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Binary</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span> <span class="ident">uuid::Uuid::parse_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
             <span class="ident">extjson::de::Error::invalid_value</span>(
                 <span class="ident">Unexpected::Str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>),
@@ -576,7 +576,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Timestamp</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Timestamp</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Timestamp</span> {
         <span class="ident"><span class="kw">crate</span>::Timestamp</span> {
             <span class="ident">time</span>: <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">t</span>,
             <span class="ident">increment</span>: <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">i</span>,
@@ -599,7 +599,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DateTimeBody</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_millis</span>(<span class="ident">m</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_millis</span>(<span class="ident">m</span>: <span class="ident">i64</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">DateTimeBody::Canonical</span>(<span class="ident">Int64</span> {
             <span class="ident">value</span>: <span class="ident">m</span>.<span class="ident">to_string</span>(),
         })
@@ -607,13 +607,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DateTime</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">body</span> {
-            <span class="ident">DateTimeBody::Canonical</span>(<span class="ident">date</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">DateTimeBody::Canonical</span>(<span class="ident">date</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">date</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::DateTime::from_millis</span>(<span class="ident">date</span>))
             }
-            <span class="ident">DateTimeBody::Relaxed</span>(<span class="ident">date</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">DateTimeBody::Relaxed</span>(<span class="ident">date</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">datetime</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> <span class="op">=</span>
                     <span class="ident">chrono::DateTime::parse_from_rfc3339</span>(<span class="ident">date</span>.<span class="ident">as_str</span>())
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
@@ -637,8 +637,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MinKey</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">==</span> <span class="number">1</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">Bson::MinKey</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="ident">extjson::de::Error::invalid_value</span>(
@@ -657,8 +657,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MaxKey</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">==</span> <span class="number">1</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">Bson::MaxKey</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="ident">extjson::de::Error::invalid_value</span>(
@@ -687,7 +687,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DbPointer</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DbPointer</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DbPointer</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::DbPointer</span> {
             <span class="ident">namespace</span>: <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">ref_ns</span>,
             <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">id</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>,
@@ -703,7 +703,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Undefined</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="self">self</span>) -&gt; <span class="ident">extjson::de::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">Bson::Undefined</span>)
         } <span class="kw">else</span> {

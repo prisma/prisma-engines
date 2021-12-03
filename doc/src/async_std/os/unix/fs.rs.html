@@ -94,7 +94,7 @@
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # Ok(()) }) }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">symlink</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>, <span class="ident">Q</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="ident">P</span>, <span class="ident">dst</span>: <span class="ident">Q</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">symlink</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>, <span class="ident">Q</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="ident">P</span>, <span class="ident">dst</span>: <span class="ident">Q</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>();
     <span class="kw">let</span> <span class="ident">dst</span> <span class="op">=</span> <span class="ident">dst</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>();
     <span class="ident">spawn_blocking</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">std::os::unix::fs::symlink</span>(<span class="kw-2">&amp;</span><span class="ident">src</span>, <span class="kw-2">&amp;</span><span class="ident">dst</span>)).<span class="kw">await</span>
@@ -109,14 +109,14 @@
     <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DirBuilderExt</span> {
         <span class="doccomment">/// Sets the mode to create new directories with. This option defaults to</span>
         <span class="doccomment">/// `0o777`.</span>
-        <span class="kw">fn</span> <span class="ident">mode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>;
+        <span class="kw">fn</span> <span class="ident">mode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>;
     }
 
     <span class="doccomment">/// Unix-specific extension methods for `DirEntry`.</span>
     <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DirEntryExt</span> {
         <span class="doccomment">/// Returns the underlying `d_ino` field in the contained `dirent`</span>
         <span class="doccomment">/// structure.</span>
-        <span class="kw">fn</span> <span class="ident">ino</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>;
+        <span class="kw">fn</span> <span class="ident">ino</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span>;
     }
 
     <span class="doccomment">/// Unix-specific extensions to `OpenOptions`.</span>
@@ -128,7 +128,7 @@
         <span class="doccomment">/// If no `mode` is set, the default of `0o666` will be used.</span>
         <span class="doccomment">/// The operating system masks out bits with the systems `umask`, to produce</span>
         <span class="doccomment">/// the final permissions.</span>
-        <span class="kw">fn</span> <span class="ident">mode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>;
+        <span class="kw">fn</span> <span class="ident">mode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mode</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>;
 
         <span class="doccomment">/// Pass custom flags to the `flags` argument of `open`.</span>
         <span class="doccomment">///</span>
@@ -137,7 +137,7 @@
         <span class="doccomment">///</span>
         <span class="doccomment">/// Custom flags can only set flags, not remove flags set by Rusts options.</span>
         <span class="doccomment">/// This options overwrites any previously set custom flags.</span>
-        <span class="kw">fn</span> <span class="ident">custom_flags</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>;
+        <span class="kw">fn</span> <span class="ident">custom_flags</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">i32</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>;
     }
 }
 </code></pre></div>

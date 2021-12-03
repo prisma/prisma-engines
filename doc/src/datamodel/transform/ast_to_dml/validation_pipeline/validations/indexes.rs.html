@@ -598,12 +598,12 @@
 
     <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>() {
         <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">state</span> {
-            <span class="ident">State::Init</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">is_some</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">State::SortParamHead</span>,
-            <span class="ident">State::SortParamHead</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">is_some</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">State::SortParamHead</span>,
-            <span class="ident">State::TextFieldBundle</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">is_some</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">State::SortParamTail</span>,
-            <span class="ident">State::SortParamTail</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">is_some</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">State::SortParamTail</span>,
-            <span class="ident">State::Init</span> <span class="op">|</span> <span class="ident">State::SortParamHead</span> <span class="op">|</span> <span class="ident">State::TextFieldBundle</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">State::TextFieldBundle</span>,
-            <span class="ident">State::SortParamTail</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">State::Init</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">is_some</span>() =&gt; <span class="ident">State::SortParamHead</span>,
+            <span class="ident">State::SortParamHead</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">is_some</span>() =&gt; <span class="ident">State::SortParamHead</span>,
+            <span class="ident">State::TextFieldBundle</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">is_some</span>() =&gt; <span class="ident">State::SortParamTail</span>,
+            <span class="ident">State::SortParamTail</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">is_some</span>() =&gt; <span class="ident">State::SortParamTail</span>,
+            <span class="ident">State::Init</span> <span class="op">|</span> <span class="ident">State::SortParamHead</span> <span class="op">|</span> <span class="ident">State::TextFieldBundle</span> =&gt; <span class="ident">State::TextFieldBundle</span>,
+            <span class="ident">State::SortParamTail</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;All index fields must be listed adjacently in the fields argument.&quot;</span>;
 
                 <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">index</span>

@@ -53,13 +53,13 @@
 <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time</span>::{<span class="ident">delay_for</span>, <span class="ident">interval</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">timeout</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">timeout</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
     <span class="macro">select!</span> {
-        () <span class="op">=</span> <span class="ident">delay_for</span>(<span class="ident">duration</span>).<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Timeout</span>),
-        <span class="ident">rsp</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">fuse</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rsp</span>,
+        () <span class="op">=</span> <span class="ident">delay_for</span>(<span class="ident">duration</span>).<span class="ident">fuse</span>() =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::Timeout</span>),
+        <span class="ident">rsp</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">fuse</span>() =&gt; <span class="ident">rsp</span>,
     }
 }
 
@@ -74,7 +74,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">Interval</span> {
-        <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">tick</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Instant</span> {
+        <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">tick</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Instant</span> {
             <span class="kw">let</span> <span class="ident">timer</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">timer</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
             <span class="ident">timer</span>.<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
@@ -84,7 +84,7 @@
     }
 
     <span class="doccomment">/// Creates new Interval that yields with interval of duration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interval</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interval</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interval</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">Interval</span> {
         <span class="ident">Interval</span> {
             <span class="ident">timer</span>: <span class="prelude-val">Some</span>(<span class="ident">Delay::new</span>(<span class="ident">Duration::from_secs</span>(<span class="number">0</span>))),
             <span class="ident">interval</span>: <span class="ident">duration</span>,
@@ -92,7 +92,7 @@
     }
 
     <span class="doccomment">/// Wait until duration has elapsed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delay_for</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Delay</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delay_for</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">Delay</span> {
         <span class="ident">Delay::new</span>(<span class="ident">duration</span>)
     }
 }

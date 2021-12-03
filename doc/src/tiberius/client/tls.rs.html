@@ -258,10 +258,10 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">MaybeTlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">S</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">S</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Raw</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="ident"><span class="self">Self</span>::Tls</span>(<span class="kw-2">mut</span> <span class="ident">tls</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tls</span>.<span class="ident">get_mut</span>().<span class="ident">stream</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>(),
+            <span class="ident"><span class="self">Self</span>::Raw</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+            <span class="ident"><span class="self">Self</span>::Tls</span>(<span class="kw-2">mut</span> <span class="ident">tls</span>) =&gt; <span class="ident">tls</span>.<span class="ident">get_mut</span>().<span class="ident">stream</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>(),
         }
     }
 }
@@ -271,10 +271,10 @@
         <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
-            <span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+            <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+            <span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
         }
     }
 }
@@ -284,24 +284,24 @@
         <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
-            <span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+            <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+            <span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
-            <span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
+            <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
+            <span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_close</span>(<span class="ident">cx</span>),
-            <span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_close</span>(<span class="ident">cx</span>),
+            <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_close</span>(<span class="ident">cx</span>),
+            <span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_close</span>(<span class="ident">cx</span>),
         }
     }
 }
@@ -325,7 +325,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">TlsPreloginWrapper</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">TlsPreloginWrapper</span> {
             <span class="ident">stream</span>: <span class="prelude-val">Some</span>(<span class="ident">stream</span>),
             <span class="ident">pending_handshake</span>: <span class="bool-val">true</span>,
@@ -348,7 +348,7 @@
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Normal operation does not need any extra treatment, we handle packets</span>
         <span class="comment">// in the codec.</span>
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">pending_handshake</span> {
@@ -364,7 +364,7 @@
                 <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>())
                     .<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">inner</span>.<span class="ident">header_buf</span>[<span class="ident">inner</span>.<span class="ident">header_pos</span>..]))<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="ident">read</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">read</span> <span class="op">==</span> <span class="number">0</span> {
                     <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>));
                 }
 
@@ -397,7 +397,7 @@
         <span class="ident">inner</span>.<span class="ident">read_remaining</span> <span class="op">-</span><span class="op">=</span> <span class="ident">read</span>;
 
         <span class="comment">// All data is read, after this we&#39;re expecting a new header.</span>
-        <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">read_remaining</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">read_remaining</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="ident">inner</span>.<span class="ident">header_pos</span> <span class="op">=</span> <span class="number">0</span>;
         }
 
@@ -410,7 +410,7 @@
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Normal operation does not need any extra treatment, we handle</span>
         <span class="comment">// packets in the codec.</span>
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">pending_handshake</span> {
@@ -423,7 +423,7 @@
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">buf</span>.<span class="ident">len</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>();
 
         <span class="comment">// If on handshake mode, wraps the data to a TDS packet before sending.</span>
@@ -464,7 +464,7 @@
         <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_close</span>(<span class="ident">cx</span>)
     }
 }

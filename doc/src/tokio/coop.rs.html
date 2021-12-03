@@ -336,19 +336,19 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that as more yield points are added in the ecosystem, this value</span>
     <span class="doccomment">/// will probably also have to be raised.</span>
-    <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">initial</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Budget</span> {
+    <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">initial</span>() -&gt; <span class="ident">Budget</span> {
         <span class="ident">Budget</span>(<span class="prelude-val">Some</span>(<span class="number">128</span>))
     }
 
     <span class="doccomment">/// Returns an unconstrained budget. Operations will not be limited.</span>
-    <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">unconstrained</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Budget</span> {
+    <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">unconstrained</span>() -&gt; <span class="ident">Budget</span> {
         <span class="ident">Budget</span>(<span class="prelude-val">None</span>)
     }
 }
 
 <span class="macro">cfg_rt_multi_thread!</span> {
     <span class="kw">impl</span> <span class="ident">Budget</span> {
-        <span class="kw">fn</span> <span class="ident">has_remaining</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">fn</span> <span class="ident">has_remaining</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">budget</span><span class="op">|</span> <span class="ident">budget</span> <span class="op">&gt;</span> <span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
         }
     }
@@ -357,19 +357,19 @@
 <span class="doccomment">/// Run the given closure with a cooperative task budget. When the function</span>
 <span class="doccomment">/// returns, the budget is reset to the value prior to calling the function.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">budget</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">budget</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">R</span>) -&gt; <span class="ident">R</span> {
     <span class="ident">with_budget</span>(<span class="ident">Budget::initial</span>(), <span class="ident">f</span>)
 }
 
 <span class="doccomment">/// Run the given closure with an unconstrained task budget. When the function returns, the budget</span>
 <span class="doccomment">/// is reset to the value prior to calling the function.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_unconstrained</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_unconstrained</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">R</span>) -&gt; <span class="ident">R</span> {
     <span class="ident">with_budget</span>(<span class="ident">Budget::unconstrained</span>(), <span class="ident">f</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">with_budget</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">budget</span>: <span class="ident">Budget</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
+<span class="kw">fn</span> <span class="ident">with_budget</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">budget</span>: <span class="ident">Budget</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">R</span>) -&gt; <span class="ident">R</span> {
     <span class="kw">struct</span> <span class="ident">ResetGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">cell</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">Budget</span><span class="op">&gt;</span>,
         <span class="ident">prev</span>: <span class="ident">Budget</span>,
@@ -399,7 +399,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_budget_remaining</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_budget_remaining</span>() -&gt; <span class="ident">bool</span> {
         <span class="ident">CURRENT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">cell</span><span class="op">|</span> <span class="ident">cell</span>.<span class="ident">get</span>().<span class="ident">has_remaining</span>())
     }
 }
@@ -408,7 +408,7 @@
     <span class="doccomment">/// Forcibly remove the budgeting constraints early.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns the remaining budget</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">stop</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Budget</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">stop</span>() -&gt; <span class="ident">Budget</span> {
         <span class="ident">CURRENT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">cell</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">cell</span>.<span class="ident">get</span>();
             <span class="ident">cell</span>.<span class="ident">set</span>(<span class="ident">Budget::unconstrained</span>());
@@ -455,7 +455,7 @@
     <span class="doccomment">/// `RestRestoreOnPending` is dropped, those adjustments are erased unless the caller indicates</span>
     <span class="doccomment">/// that progress was made.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_proceed</span>(<span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">RestoreOnPending</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_proceed</span>(<span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">RestoreOnPending</span><span class="op">&gt;</span> {
         <span class="ident">CURRENT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">cell</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">budget</span> <span class="op">=</span> <span class="ident">cell</span>.<span class="ident">get</span>();
 
@@ -473,7 +473,7 @@
     <span class="kw">impl</span> <span class="ident">Budget</span> {
         <span class="doccomment">/// Decrement the budget. Returns `true` if successful. Decrementing fails</span>
         <span class="doccomment">/// when there is not enough remaining budget.</span>
-        <span class="kw">fn</span> <span class="ident">decrement</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">fn</span> <span class="ident">decrement</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">num</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span> {
                 <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">num</span> <span class="op">&gt;</span> <span class="number">0</span> {
                     <span class="kw-2">*</span><span class="ident">num</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
@@ -486,7 +486,7 @@
             }
         }
 
-        <span class="kw">fn</span> <span class="ident">is_unconstrained</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">fn</span> <span class="ident">is_unconstrained</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_none</span>()
         }
     }
@@ -496,7 +496,7 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">fn</span> <span class="ident">get</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Budget</span> {
+    <span class="kw">fn</span> <span class="ident">get</span>() -&gt; <span class="ident">Budget</span> {
         <span class="ident">CURRENT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">cell</span><span class="op">|</span> <span class="ident">cell</span>.<span class="ident">get</span>())
     }
 

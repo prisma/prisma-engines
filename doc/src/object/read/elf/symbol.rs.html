@@ -542,7 +542,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">SymbolTable</span> {
             <span class="ident">section</span>: <span class="number">0</span>,
             <span class="ident">symbols</span>: <span class="kw-2">&amp;</span>[],
@@ -560,10 +560,10 @@
         <span class="ident">sections</span>: <span class="kw-2">&amp;</span><span class="ident">SectionTable</span><span class="op">&lt;</span><span class="ident">Elf</span><span class="op">&gt;</span>,
         <span class="ident">section_index</span>: <span class="ident">usize</span>,
         <span class="ident">section</span>: <span class="kw-2">&amp;</span><span class="ident">Elf::SectionHeader</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">read::Result</span><span class="op">&lt;</span><span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert!</span>(
-            <span class="ident">section</span>.<span class="ident">sh_type</span>(<span class="ident">endian</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">elf::SHT_DYNSYM</span>
-                <span class="op">|</span><span class="op">|</span> <span class="ident">section</span>.<span class="ident">sh_type</span>(<span class="ident">endian</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">elf::SHT_SYMTAB</span>
+            <span class="ident">section</span>.<span class="ident">sh_type</span>(<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHT_DYNSYM</span>
+                <span class="op">|</span><span class="op">|</span> <span class="ident">section</span>.<span class="ident">sh_type</span>(<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHT_SYMTAB</span>
         );
 
         <span class="kw">let</span> <span class="ident">symbols</span> <span class="op">=</span> <span class="ident">section</span>
@@ -579,8 +579,8 @@
         <span class="kw">let</span> <span class="ident">shndx</span> <span class="op">=</span> <span class="ident">sections</span>
             .<span class="ident">iter</span>()
             .<span class="ident">find</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-                <span class="ident">s</span>.<span class="ident">sh_type</span>(<span class="ident">endian</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">elf::SHT_SYMTAB_SHNDX</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">sh_link</span>(<span class="ident">endian</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">=</span><span class="op">=</span> <span class="ident">section_index</span>
+                <span class="ident">s</span>.<span class="ident">sh_type</span>(<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHT_SYMTAB_SHNDX</span>
+                    <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">sh_link</span>(<span class="ident">endian</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">==</span> <span class="ident">section_index</span>
             })
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">section</span><span class="op">|</span> {
                 <span class="ident">section</span>
@@ -600,36 +600,36 @@
 
     <span class="doccomment">/// Return the section index of this symbol table.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">section</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">section</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">section</span>
     }
 
     <span class="doccomment">/// Return the string table used for the symbol names.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">strings</span>
     }
 
     <span class="doccomment">/// Iterate over the symbols.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf::Sym</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Elf::Sym</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">iter</span>()
     }
 
     <span class="doccomment">/// Return true if the symbol table is empty.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">is_empty</span>()
     }
 
     <span class="doccomment">/// The number of symbols.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// Return the symbol at the given index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">symbol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Elf::Sym</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">symbol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Elf::Sym</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">symbols</span>
             .<span class="ident">get</span>(<span class="ident">index</span>)
             .<span class="ident">read_error</span>(<span class="string">&quot;Invalid ELF symbol index&quot;</span>)
@@ -637,7 +637,7 @@
 
     <span class="doccomment">/// Return the extended section index for the given symbol if present.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shndx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shndx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">shndx</span>.<span class="ident">get</span>(<span class="ident">index</span>).<span class="ident">cloned</span>()
     }
 
@@ -646,16 +646,16 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
         <span class="ident">symbol</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Elf::Sym</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
         <span class="ident">symbol</span>.<span class="ident">name</span>(<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">strings</span>)
     }
 
     <span class="doccomment">/// Construct a map from addresses to a user-defined map entry.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">Entry</span>: <span class="ident">SymbolMapEntry</span>, <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Elf::Sym</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">Entry</span>: <span class="ident">SymbolMapEntry</span>, <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Elf::Sym</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">endian</span>: <span class="ident">Elf::Endian</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SymbolMap</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">SymbolMap</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">symbols</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">len</span>());
         <span class="kw">for</span> <span class="ident">symbol</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">symbols</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">symbol</span>.<span class="ident">is_definition</span>(<span class="ident">endian</span>) {
@@ -693,7 +693,7 @@
     <span class="kw">type</span> <span class="ident">Symbol</span> <span class="op">=</span> <span class="ident">ElfSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">SymbolIterator</span> <span class="op">=</span> <span class="ident">ElfSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">symbols</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::SymbolIterator</span> {
+    <span class="kw">fn</span> <span class="ident">symbols</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::SymbolIterator</span> {
         <span class="ident">ElfSymbolIterator</span> {
             <span class="ident">endian</span>: <span class="self">self</span>.<span class="ident">endian</span>,
             <span class="ident">symbols</span>: <span class="self">self</span>.<span class="ident">symbols</span>,
@@ -701,7 +701,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">symbol_by_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">SymbolIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">read::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Symbol</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">symbol_by_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">SymbolIndex</span>) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Symbol</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">symbol</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">symbol</span>(<span class="ident">index</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">ElfSymbol</span> {
             <span class="ident">endian</span>: <span class="self">self</span>.<span class="ident">endian</span>,
@@ -731,7 +731,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ElfSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ElfSymbolIterator&quot;</span>).<span class="ident">finish</span>()
     }
 }
@@ -739,7 +739,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ElfSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">ElfSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>;
         <span class="kw">let</span> <span class="ident">symbol</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">symbols</span>.<span class="ident">get</span>(<span class="ident">index</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -776,11 +776,11 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span>: <span class="ident">FileHeader</span><span class="op">&gt;</span> <span class="ident">ObjectSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ElfSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Elf</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SymbolIndex</span> {
+    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolIndex</span> {
         <span class="self">self</span>.<span class="ident">index</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">name</span>(<span class="self">self</span>.<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">strings</span>())<span class="question-mark">?</span>;
         <span class="ident">str::from_utf8</span>(<span class="ident">name</span>)
             .<span class="ident">ok</span>()
@@ -788,99 +788,99 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_value</span>(<span class="self">self</span>.<span class="ident">endian</span>).<span class="ident">into</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_size</span>(<span class="self">self</span>.<span class="ident">endian</span>).<span class="ident">into</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SymbolKind</span> {
+    <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolKind</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_type</span>() {
-            <span class="ident">elf::STT_NOTYPE</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolKind::Null</span>,
-            <span class="ident">elf::STT_OBJECT</span> <span class="op">|</span> <span class="ident">elf::STT_COMMON</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolKind::Data</span>,
-            <span class="ident">elf::STT_FUNC</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolKind::Text</span>,
-            <span class="ident">elf::STT_SECTION</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolKind::Section</span>,
-            <span class="ident">elf::STT_FILE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolKind::File</span>,
-            <span class="ident">elf::STT_TLS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolKind::Tls</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolKind::Unknown</span>,
+            <span class="ident">elf::STT_NOTYPE</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="number">0</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">SymbolKind::Null</span>,
+            <span class="ident">elf::STT_OBJECT</span> <span class="op">|</span> <span class="ident">elf::STT_COMMON</span> =&gt; <span class="ident">SymbolKind::Data</span>,
+            <span class="ident">elf::STT_FUNC</span> =&gt; <span class="ident">SymbolKind::Text</span>,
+            <span class="ident">elf::STT_SECTION</span> =&gt; <span class="ident">SymbolKind::Section</span>,
+            <span class="ident">elf::STT_FILE</span> =&gt; <span class="ident">SymbolKind::File</span>,
+            <span class="ident">elf::STT_TLS</span> =&gt; <span class="ident">SymbolKind::Tls</span>,
+            <span class="kw">_</span> =&gt; <span class="ident">SymbolKind::Unknown</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">section</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SymbolSection</span> {
+    <span class="kw">fn</span> <span class="ident">section</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolSection</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_shndx</span>(<span class="self">self</span>.<span class="ident">endian</span>) {
-            <span class="ident">elf::SHN_UNDEF</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolSection::Undefined</span>,
-            <span class="ident">elf::SHN_ABS</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">elf::STT_FILE</span> {
+            <span class="ident">elf::SHN_UNDEF</span> =&gt; <span class="ident">SymbolSection::Undefined</span>,
+            <span class="ident">elf::SHN_ABS</span> =&gt; {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_type</span>() <span class="op">==</span> <span class="ident">elf::STT_FILE</span> {
                     <span class="ident">SymbolSection::None</span>
                 } <span class="kw">else</span> {
                     <span class="ident">SymbolSection::Absolute</span>
                 }
             }
-            <span class="ident">elf::SHN_COMMON</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolSection::Common</span>,
-            <span class="ident">elf::SHN_XINDEX</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">shndx</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="number">0</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolSection::Section</span>(<span class="ident">SectionIndex</span>(<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span>)),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolSection::Unknown</span>,
+            <span class="ident">elf::SHN_COMMON</span> =&gt; <span class="ident">SymbolSection::Common</span>,
+            <span class="ident">elf::SHN_XINDEX</span> =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">shndx</span>(<span class="self">self</span>.<span class="ident">index</span>.<span class="number">0</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="ident">SymbolSection::Section</span>(<span class="ident">SectionIndex</span>(<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span>)),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">SymbolSection::Unknown</span>,
             },
-            <span class="ident">index</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">elf::SHN_LORESERVE</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">index</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">elf::SHN_LORESERVE</span> =&gt; {
                 <span class="ident">SymbolSection::Section</span>(<span class="ident">SectionIndex</span>(<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span>))
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolSection::Unknown</span>,
+            <span class="kw">_</span> =&gt; <span class="ident">SymbolSection::Unknown</span>,
         }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_undefined</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_shndx</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">elf::SHN_UNDEF</span>
+    <span class="kw">fn</span> <span class="ident">is_undefined</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_shndx</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHN_UNDEF</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_definition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_definition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">is_definition</span>(<span class="self">self</span>.<span class="ident">endian</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_common</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_shndx</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">elf::SHN_COMMON</span>
+    <span class="kw">fn</span> <span class="ident">is_common</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_shndx</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHN_COMMON</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_weak</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_bind</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">elf::STB_WEAK</span>
+    <span class="kw">fn</span> <span class="ident">is_weak</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_bind</span>() <span class="op">==</span> <span class="ident">elf::STB_WEAK</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">scope</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SymbolScope</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_shndx</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">elf::SHN_UNDEF</span> {
+    <span class="kw">fn</span> <span class="ident">scope</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolScope</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_shndx</span>(<span class="self">self</span>.<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHN_UNDEF</span> {
             <span class="ident">SymbolScope::Unknown</span>
         } <span class="kw">else</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_bind</span>() {
-                <span class="ident">elf::STB_LOCAL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolScope::Compilation</span>,
-                <span class="ident">elf::STB_GLOBAL</span> <span class="op">|</span> <span class="ident">elf::STB_WEAK</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_visibility</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">elf::STV_HIDDEN</span> {
+                <span class="ident">elf::STB_LOCAL</span> =&gt; <span class="ident">SymbolScope::Compilation</span>,
+                <span class="ident">elf::STB_GLOBAL</span> <span class="op">|</span> <span class="ident">elf::STB_WEAK</span> =&gt; {
+                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_visibility</span>() <span class="op">==</span> <span class="ident">elf::STV_HIDDEN</span> {
                         <span class="ident">SymbolScope::Linkage</span>
                     } <span class="kw">else</span> {
                         <span class="ident">SymbolScope::Dynamic</span>
                     }
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SymbolScope::Unknown</span>,
+                <span class="kw">_</span> =&gt; <span class="ident">SymbolScope::Unknown</span>,
             }
         }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_global</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_global</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_bind</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">elf::STB_LOCAL</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_bind</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">elf::STB_LOCAL</span>
+    <span class="kw">fn</span> <span class="ident">is_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_bind</span>() <span class="op">==</span> <span class="ident">elf::STB_LOCAL</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SymbolFlags</span><span class="op">&lt;</span><span class="ident">SectionIndex</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolFlags</span><span class="op">&lt;</span><span class="ident">SectionIndex</span><span class="op">&gt;</span> {
         <span class="ident">SymbolFlags::Elf</span> {
             <span class="ident">st_info</span>: <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_info</span>(),
             <span class="ident">st_other</span>: <span class="self">self</span>.<span class="ident">symbol</span>.<span class="ident">st_other</span>(),
@@ -894,22 +894,22 @@
     <span class="kw">type</span> <span class="ident">Word</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Endian</span>: <span class="ident">endian::Endian</span>;
 
-    <span class="kw">fn</span> <span class="ident">st_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span>;
-    <span class="kw">fn</span> <span class="ident">st_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">st_bind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">st_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">st_other</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">st_visibility</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">st_shndx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span>;
-    <span class="kw">fn</span> <span class="ident">st_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Word</span>;
-    <span class="kw">fn</span> <span class="ident">st_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Word</span>;
+    <span class="kw">fn</span> <span class="ident">st_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span>;
+    <span class="kw">fn</span> <span class="ident">st_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
+    <span class="kw">fn</span> <span class="ident">st_bind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
+    <span class="kw">fn</span> <span class="ident">st_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
+    <span class="kw">fn</span> <span class="ident">st_other</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
+    <span class="kw">fn</span> <span class="ident">st_visibility</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
+    <span class="kw">fn</span> <span class="ident">st_shndx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u16</span>;
+    <span class="kw">fn</span> <span class="ident">st_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span>;
+    <span class="kw">fn</span> <span class="ident">st_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span>;
 
     <span class="doccomment">/// Parse the symbol name from the string table.</span>
     <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>,
         <span class="ident">strings</span>: <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">read::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
         <span class="ident">strings</span>
             .<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">st_name</span>(<span class="ident">endian</span>))
             .<span class="ident">read_error</span>(<span class="string">&quot;Invalid ELF symbol name offset&quot;</span>)
@@ -917,14 +917,14 @@
 
     <span class="doccomment">/// Return true if the symbol is undefined.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_undefined</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">st_shndx</span>(<span class="ident">endian</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">elf::SHN_UNDEF</span>
+    <span class="kw">fn</span> <span class="ident">is_undefined</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">st_shndx</span>(<span class="ident">endian</span>) <span class="op">==</span> <span class="ident">elf::SHN_UNDEF</span>
     }
 
     <span class="doccomment">/// Return true if the symbol is a definition of a function or data object.</span>
-    <span class="kw">fn</span> <span class="ident">is_definition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_definition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">st_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">st_type</span>();
-        (<span class="ident">st_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">elf::STT_NOTYPE</span> <span class="op">|</span><span class="op">|</span> <span class="ident">st_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">elf::STT_FUNC</span> <span class="op">|</span><span class="op">|</span> <span class="ident">st_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">elf::STT_OBJECT</span>)
+        (<span class="ident">st_type</span> <span class="op">==</span> <span class="ident">elf::STT_NOTYPE</span> <span class="op">|</span><span class="op">|</span> <span class="ident">st_type</span> <span class="op">==</span> <span class="ident">elf::STT_FUNC</span> <span class="op">|</span><span class="op">|</span> <span class="ident">st_type</span> <span class="op">==</span> <span class="ident">elf::STT_OBJECT</span>)
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">st_shndx</span>(<span class="ident">endian</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">elf::SHN_UNDEF</span>
     }
 }
@@ -934,47 +934,47 @@
     <span class="kw">type</span> <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endian</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">st_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">st_name</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">st_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">st_info</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_bind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">st_bind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">st_bind</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">st_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">st_type</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_other</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">st_other</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">st_other</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_visibility</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">st_visibility</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">st_visibility</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_shndx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">fn</span> <span class="ident">st_shndx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u16</span> {
         <span class="self">self</span>.<span class="ident">st_shndx</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Word</span> {
+    <span class="kw">fn</span> <span class="ident">st_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
         <span class="self">self</span>.<span class="ident">st_value</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Word</span> {
+    <span class="kw">fn</span> <span class="ident">st_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
         <span class="self">self</span>.<span class="ident">st_size</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 }
@@ -984,47 +984,47 @@
     <span class="kw">type</span> <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endian</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">st_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">st_name</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">st_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">st_info</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_bind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">st_bind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">st_bind</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">st_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">st_type</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_other</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">st_other</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">st_other</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_visibility</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">st_visibility</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">st_visibility</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_shndx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">fn</span> <span class="ident">st_shndx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u16</span> {
         <span class="self">self</span>.<span class="ident">st_shndx</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Word</span> {
+    <span class="kw">fn</span> <span class="ident">st_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
         <span class="self">self</span>.<span class="ident">st_value</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">st_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Word</span> {
+    <span class="kw">fn</span> <span class="ident">st_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
         <span class="self">self</span>.<span class="ident">st_size</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
     }
 }

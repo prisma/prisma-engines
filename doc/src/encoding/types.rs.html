@@ -646,47 +646,47 @@
 <span class="doccomment">/// This is a lower level interface, and normally `Encoding::encode` should be used instead.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RawEncoder</span>: <span class="lifetime">&#39;static</span> {
     <span class="doccomment">/// Creates a fresh `RawEncoder` instance which parameters are same as `self`.</span>
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Returns true if this encoding is compatible to ASCII,</span>
     <span class="doccomment">/// i.e. U+0000 through U+007F always map to bytes 00 through 7F and nothing else.</span>
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">false</span> }
+    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">false</span> }
 
     <span class="doccomment">/// Feeds given portion of string to the encoder,</span>
     <span class="doccomment">/// pushes the an encoded byte sequence at the end of the given output,</span>
     <span class="doccomment">/// and returns a byte offset to the first unprocessed character</span>
     <span class="doccomment">/// (that can be zero when the first such character appeared in the prior calls to `raw_feed`)</span>
     <span class="doccomment">/// and optional error information (None means success).</span>
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>);
+    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>);
 
     <span class="doccomment">/// Finishes the encoder,</span>
     <span class="doccomment">/// pushes the an encoded byte sequence at the end of the given output,</span>
     <span class="doccomment">/// and returns optional error information (None means success).</span>
     <span class="doccomment">/// `remaining` value of the error information, if any, is always an empty string.</span>
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Decoder converting a byte sequence into a Unicode string.</span>
 <span class="doccomment">/// This is a lower level interface, and normally `Encoding::decode` should be used instead.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RawDecoder</span>: <span class="lifetime">&#39;static</span> {
     <span class="doccomment">/// Creates a fresh `RawDecoder` instance which parameters are same as `self`.</span>
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Returns true if this encoding is compatible to ASCII,</span>
     <span class="doccomment">/// i.e. bytes 00 through 7F always map to U+0000 through U+007F and nothing else.</span>
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">false</span> }
+    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">false</span> }
 
     <span class="doccomment">/// Feeds given portion of byte sequence to the encoder,</span>
     <span class="doccomment">/// pushes the a decoded string at the end of the given output,</span>
     <span class="doccomment">/// and returns an offset to the first unprocessed byte</span>
     <span class="doccomment">/// (that can be zero when the first such byte appeared in the prior calls to `raw_feed`)</span>
     <span class="doccomment">/// and optional error information (None means success).</span>
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>);
+    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>);
 
     <span class="doccomment">/// Finishes the decoder,</span>
     <span class="doccomment">/// pushes the a decoded string at the end of the given output,</span>
     <span class="doccomment">/// and returns optional error information (None means success).</span>
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// A trait object using dynamic dispatch which is a sendable reference to the encoding,</span>
@@ -698,30 +698,30 @@
     <span class="doccomment">/// Returns the canonical name of given encoding.</span>
     <span class="doccomment">/// This name is guaranteed to be unique across built-in encodings,</span>
     <span class="doccomment">/// but it is not normative and would be at most arbitrary.</span>
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
 
     <span class="doccomment">/// Returns a name of given encoding defined in the WHATWG Encoding standard, if any.</span>
     <span class="doccomment">/// This name often differs from `name` due to the compatibility reason.</span>
-    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">None</span> }
+    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">None</span> }
 
     <span class="doccomment">/// Creates a new encoder.</span>
-    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Creates a new decoder.</span>
-    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// An easy-to-use interface to `RawEncoder`.</span>
     <span class="doccomment">/// On the encoder error `trap` is called,</span>
     <span class="doccomment">/// which may return a replacement sequence to continue processing,</span>
     <span class="doccomment">/// or a failure to return the error.</span>
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">trap</span>: <span class="ident">EncoderTrap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">trap</span>: <span class="ident">EncoderTrap</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="self">self</span>.<span class="ident">encode_to</span>(<span class="ident">input</span>, <span class="ident">trap</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ret</span>)
     }
 
     <span class="doccomment">/// Encode into a `ByteWriter`.</span>
     <span class="kw">fn</span> <span class="ident">encode_to</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">trap</span>: <span class="ident">EncoderTrap</span>, <span class="ident">ret</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>
+        -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>
     {
         <span class="comment">// we don&#39;t need to keep `unprocessed` here;</span>
         <span class="comment">// `raw_feed` should process as much input as possible.</span>
@@ -732,22 +732,22 @@
             <span class="kw">let</span> (<span class="ident">offset</span>, <span class="ident">err</span>) <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">remaining</span>..], <span class="ident">ret</span>);
             <span class="kw">let</span> <span class="ident">unprocessed</span> <span class="op">=</span> <span class="ident">remaining</span> <span class="op">+</span> <span class="ident">offset</span>;
             <span class="kw">match</span> <span class="ident">err</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">err</span>) =&gt; {
                     <span class="ident">remaining</span> <span class="op">=</span> (<span class="ident">remaining</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">err</span>.<span class="ident">upto</span>) <span class="kw">as</span> <span class="ident">usize</span>;
                     <span class="kw">if</span> <span class="op">!</span><span class="ident">trap</span>.<span class="ident">trap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">unprocessed</span>..<span class="ident">remaining</span>], <span class="ident">ret</span>) {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">cause</span>);
                     }
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="ident">remaining</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>();
                     <span class="kw">match</span> <span class="ident">encoder</span>.<span class="ident">raw_finish</span>(<span class="ident">ret</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">err</span>) =&gt; {
                             <span class="ident">remaining</span> <span class="op">=</span> (<span class="ident">remaining</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">err</span>.<span class="ident">upto</span>) <span class="kw">as</span> <span class="ident">usize</span>;
                             <span class="kw">if</span> <span class="op">!</span><span class="ident">trap</span>.<span class="ident">trap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">unprocessed</span>..<span class="ident">remaining</span>], <span class="ident">ret</span>) {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">cause</span>);
                             }
                         }
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                        <span class="prelude-val">None</span> =&gt; {}
                     }
                     <span class="kw">if</span> <span class="ident">remaining</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>() { <span class="kw">return</span> <span class="prelude-val">Ok</span>(()); }
                 }
@@ -759,7 +759,7 @@
     <span class="doccomment">/// On the decoder error `trap` is called,</span>
     <span class="doccomment">/// which may return a replacement string to continue processing,</span>
     <span class="doccomment">/// or a failure to return the error.</span>
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">trap</span>: <span class="ident">DecoderTrap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">trap</span>: <span class="ident">DecoderTrap</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">String::new</span>();
         <span class="self">self</span>.<span class="ident">decode_to</span>(<span class="ident">input</span>, <span class="ident">trap</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ret</span>)
     }
@@ -769,7 +769,7 @@
     <span class="doccomment">/// This does *not* handle partial characters at the beginning or end of `input`!</span>
     <span class="doccomment">/// Use `RawDecoder` for incremental decoding.</span>
     <span class="kw">fn</span> <span class="ident">decode_to</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">trap</span>: <span class="ident">DecoderTrap</span>, <span class="ident">ret</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>
+        -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>
     {
         <span class="comment">// we don&#39;t need to keep `unprocessed` here;</span>
         <span class="comment">// `raw_feed` should process as much input as possible.</span>
@@ -780,22 +780,22 @@
             <span class="kw">let</span> (<span class="ident">offset</span>, <span class="ident">err</span>) <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">remaining</span>..], <span class="ident">ret</span>);
             <span class="kw">let</span> <span class="ident">unprocessed</span> <span class="op">=</span> <span class="ident">remaining</span> <span class="op">+</span> <span class="ident">offset</span>;
             <span class="kw">match</span> <span class="ident">err</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">err</span>) =&gt; {
                     <span class="ident">remaining</span> <span class="op">=</span> (<span class="ident">remaining</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">err</span>.<span class="ident">upto</span>) <span class="kw">as</span> <span class="ident">usize</span>;
                     <span class="kw">if</span> <span class="op">!</span><span class="ident">trap</span>.<span class="ident">trap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">decoder</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">unprocessed</span>..<span class="ident">remaining</span>], <span class="ident">ret</span>) {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">cause</span>);
                     }
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="ident">remaining</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>();
                     <span class="kw">match</span> <span class="ident">decoder</span>.<span class="ident">raw_finish</span>(<span class="ident">ret</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">err</span>) =&gt; {
                             <span class="ident">remaining</span> <span class="op">=</span> (<span class="ident">remaining</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">err</span>.<span class="ident">upto</span>) <span class="kw">as</span> <span class="ident">usize</span>;
                             <span class="kw">if</span> <span class="op">!</span><span class="ident">trap</span>.<span class="ident">trap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">decoder</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">unprocessed</span>..<span class="ident">remaining</span>], <span class="ident">ret</span>) {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">cause</span>);
                             }
                         }
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                        <span class="prelude-val">None</span> =&gt; {}
                     }
                     <span class="kw">if</span> <span class="ident">remaining</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>() { <span class="kw">return</span> <span class="prelude-val">Ok</span>(()); }
                 }
@@ -806,11 +806,11 @@
 
 <span class="doccomment">/// A type of the bare function in `EncoderTrap` values.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">EncoderTrapFunc</span> <span class="op">=</span>
-    <span class="kw">extern</span> <span class="string">&quot;Rust&quot;</span> <span class="kw">fn</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RawEncoder</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">extern</span> <span class="string">&quot;Rust&quot;</span> <span class="kw">fn</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RawEncoder</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; <span class="ident">bool</span>;
 
 <span class="doccomment">/// A type of the bare function in `DecoderTrap` values.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DecoderTrapFunc</span> <span class="op">=</span>
-    <span class="kw">extern</span> <span class="string">&quot;Rust&quot;</span> <span class="kw">fn</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RawDecoder</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">extern</span> <span class="string">&quot;Rust&quot;</span> <span class="kw">fn</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RawDecoder</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) -&gt; <span class="ident">bool</span>;
 
 <span class="doccomment">/// Trap, which handles decoder errors.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>)]</span>
@@ -832,23 +832,23 @@
 <span class="kw">impl</span> <span class="ident">DecoderTrap</span> {
     <span class="doccomment">/// Handles a decoder error. May write to the output writer.</span>
     <span class="doccomment">/// Returns true only when it is fine to keep going.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RawDecoder</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RawDecoder</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">DecoderTrap::Strict</span>     <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">DecoderTrap::Replace</span>    <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">output</span>.<span class="ident">write_char</span>(<span class="string">&#39;\u{fffd}&#39;</span>); <span class="bool-val">true</span> },
-            <span class="ident">DecoderTrap::Ignore</span>     <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">DecoderTrap::Call</span>(<span class="ident">func</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">func</span>(<span class="ident">decoder</span>, <span class="ident">input</span>, <span class="ident">output</span>),
+            <span class="ident">DecoderTrap::Strict</span>     =&gt; <span class="bool-val">false</span>,
+            <span class="ident">DecoderTrap::Replace</span>    =&gt; { <span class="ident">output</span>.<span class="ident">write_char</span>(<span class="string">&#39;\u{fffd}&#39;</span>); <span class="bool-val">true</span> },
+            <span class="ident">DecoderTrap::Ignore</span>     =&gt; <span class="bool-val">true</span>,
+            <span class="ident">DecoderTrap::Call</span>(<span class="ident">func</span>) =&gt; <span class="ident">func</span>(<span class="ident">decoder</span>, <span class="ident">input</span>, <span class="ident">output</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">DecoderTrap</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DecoderTrap</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DecoderTrap</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">DecoderTrap::Strict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DecoderTrap::Strict</span>,
-            <span class="ident">DecoderTrap::Replace</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DecoderTrap::Replace</span>,
-            <span class="ident">DecoderTrap::Ignore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DecoderTrap::Ignore</span>,
-            <span class="ident">DecoderTrap::Call</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DecoderTrap::Call</span>(<span class="ident">f</span>),
+            <span class="ident">DecoderTrap::Strict</span> =&gt; <span class="ident">DecoderTrap::Strict</span>,
+            <span class="ident">DecoderTrap::Replace</span> =&gt; <span class="ident">DecoderTrap::Replace</span>,
+            <span class="ident">DecoderTrap::Ignore</span> =&gt; <span class="ident">DecoderTrap::Ignore</span>,
+            <span class="ident">DecoderTrap::Call</span>(<span class="ident">f</span>) =&gt; <span class="ident">DecoderTrap::Call</span>(<span class="ident">f</span>),
         }
     }
 }
@@ -877,9 +877,9 @@
 <span class="kw">impl</span> <span class="ident">EncoderTrap</span> {
     <span class="doccomment">/// Handles an encoder error. May write to the output writer.</span>
     <span class="doccomment">/// Returns true only when it is fine to keep going.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RawEncoder</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RawEncoder</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">fn</span> <span class="ident">reencode</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RawEncoder</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>,
-                    <span class="ident">trapname</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+                    <span class="ident">trapname</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
             <span class="kw">if</span> <span class="ident">encoder</span>.<span class="ident">is_ascii_compatible</span>() { <span class="comment">// optimization!</span>
                 <span class="ident">output</span>.<span class="ident">write_bytes</span>(<span class="ident">input</span>.<span class="ident">as_bytes</span>());
             } <span class="kw">else</span> {
@@ -892,29 +892,29 @@
         }
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">EncoderTrap::Strict</span>     <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">EncoderTrap::Replace</span>    <span class="op">=</span><span class="op">&gt;</span> <span class="ident">reencode</span>(<span class="ident">encoder</span>, <span class="string">&quot;?&quot;</span>, <span class="ident">output</span>, <span class="string">&quot;Replace&quot;</span>),
-            <span class="ident">EncoderTrap::Ignore</span>     <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">EncoderTrap::NcrEscape</span>  <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">EncoderTrap::Strict</span>     =&gt; <span class="bool-val">false</span>,
+            <span class="ident">EncoderTrap::Replace</span>    =&gt; <span class="ident">reencode</span>(<span class="ident">encoder</span>, <span class="string">&quot;?&quot;</span>, <span class="ident">output</span>, <span class="string">&quot;Replace&quot;</span>),
+            <span class="ident">EncoderTrap::Ignore</span>     =&gt; <span class="bool-val">true</span>,
+            <span class="ident">EncoderTrap::NcrEscape</span>  =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">escapes</span> <span class="op">=</span> <span class="ident">String::new</span>();
                 <span class="kw">for</span> <span class="ident">ch</span> <span class="kw">in</span> <span class="ident">input</span>.<span class="ident">chars</span>() {
                     <span class="ident">escapes</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;#{};&quot;</span>, <span class="ident">ch</span> <span class="kw">as</span> <span class="ident">isize</span>));
                 }
                 <span class="ident">reencode</span>(<span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">escapes</span>, <span class="ident">output</span>, <span class="string">&quot;NcrEscape&quot;</span>)
             },
-            <span class="ident">EncoderTrap::Call</span>(<span class="ident">func</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">func</span>(<span class="ident">encoder</span>, <span class="ident">input</span>, <span class="ident">output</span>),
+            <span class="ident">EncoderTrap::Call</span>(<span class="ident">func</span>) =&gt; <span class="ident">func</span>(<span class="ident">encoder</span>, <span class="ident">input</span>, <span class="ident">output</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">EncoderTrap</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EncoderTrap</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">EncoderTrap</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">EncoderTrap::Strict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EncoderTrap::Strict</span>,
-            <span class="ident">EncoderTrap::Replace</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EncoderTrap::Replace</span>,
-            <span class="ident">EncoderTrap::Ignore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EncoderTrap::Ignore</span>,
-            <span class="ident">EncoderTrap::NcrEscape</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EncoderTrap::NcrEscape</span>,
-            <span class="ident">EncoderTrap::Call</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EncoderTrap::Call</span>(<span class="ident">f</span>),
+            <span class="ident">EncoderTrap::Strict</span> =&gt; <span class="ident">EncoderTrap::Strict</span>,
+            <span class="ident">EncoderTrap::Replace</span> =&gt; <span class="ident">EncoderTrap::Replace</span>,
+            <span class="ident">EncoderTrap::Ignore</span> =&gt; <span class="ident">EncoderTrap::Ignore</span>,
+            <span class="ident">EncoderTrap::NcrEscape</span> =&gt; <span class="ident">EncoderTrap::NcrEscape</span>,
+            <span class="ident">EncoderTrap::Call</span>(<span class="ident">f</span>) =&gt; <span class="ident">EncoderTrap::Call</span>(<span class="ident">f</span>),
         }
     }
 }
@@ -923,7 +923,7 @@
 <span class="doccomment">/// and decoded a single string in memory.</span>
 <span class="doccomment">/// Return the result and the used encoding.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">trap</span>: <span class="ident">DecoderTrap</span>, <span class="ident">fallback_encoding</span>: <span class="ident">EncodingRef</span>)
-           <span class="op">-</span><span class="op">&gt;</span> (<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">EncodingRef</span>) {
+           -&gt; (<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">EncodingRef</span>) {
     <span class="kw">use</span> <span class="ident">all</span>::{<span class="ident">UTF_8</span>, <span class="ident">UTF_16LE</span>, <span class="ident">UTF_16BE</span>};
     <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">starts_with</span>(<span class="kw-2">&amp;</span>[<span class="number">0xEF</span>, <span class="number">0xBB</span>, <span class="number">0xBF</span>]) {
         (<span class="ident">UTF_8</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="number">3</span>..], <span class="ident">trap</span>), <span class="ident">UTF_8</span> <span class="kw">as</span> <span class="ident">EncodingRef</span>)
@@ -948,22 +948,22 @@
     <span class="comment">// `e*ee*ease*l` where `*` is substituted by `prepend`) and prohibits `prohibit` character.</span>
     <span class="kw">struct</span> <span class="ident">MyEncoder</span> { <span class="ident">flag</span>: <span class="ident">bool</span>, <span class="ident">prohibit</span>: <span class="ident">char</span>, <span class="ident">prepend</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">toggle</span>: <span class="ident">bool</span> }
     <span class="kw">impl</span> <span class="ident">RawEncoder</span> <span class="kw">for</span> <span class="ident">MyEncoder</span> {
-        <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> {
             <span class="ident">Box::new</span>(<span class="ident">MyEncoder</span> { <span class="ident">flag</span>: <span class="self">self</span>.<span class="ident">flag</span>,
                                  <span class="ident">prohibit</span>: <span class="self">self</span>.<span class="ident">prohibit</span>,
                                  <span class="ident">prepend</span>: <span class="self">self</span>.<span class="ident">prepend</span>,
                                  <span class="ident">toggle</span>: <span class="bool-val">false</span> })
         }
-        <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="self">self</span>.<span class="ident">flag</span> }
+        <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="self">self</span>.<span class="ident">flag</span> }
         <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-                    <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
+                    <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
             <span class="kw">for</span> ((<span class="ident">i</span>,<span class="ident">j</span>), <span class="ident">ch</span>) <span class="kw">in</span> <span class="ident">input</span>.<span class="ident">index_iter</span>() {
                 <span class="kw">if</span> <span class="ident">ch</span> <span class="op">&lt;</span><span class="op">=</span> <span class="string">&#39;\u{7f}&#39;</span> <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">prohibit</span> {
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">toggle</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">prepend</span>.<span class="ident">is_empty</span>() {
                         <span class="ident">output</span>.<span class="ident">write_bytes</span>(<span class="self">self</span>.<span class="ident">prepend</span>.<span class="ident">as_bytes</span>());
                     }
                     <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u8</span>);
-                    <span class="kw">if</span> <span class="ident">ch</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;e&#39;</span> {
+                    <span class="kw">if</span> <span class="ident">ch</span> <span class="op">==</span> <span class="string">&#39;e&#39;</span> {
                         <span class="self">self</span>.<span class="ident">toggle</span> <span class="op">=</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">toggle</span>;
                     }
                 } <span class="kw">else</span> {
@@ -973,19 +973,19 @@
             }
             (<span class="ident">input</span>.<span class="ident">len</span>(), <span class="prelude-val">None</span>)
         }
-        <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> { <span class="prelude-val">None</span> }
+        <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> { <span class="prelude-val">None</span> }
     }
 
     <span class="kw">struct</span> <span class="ident">MyEncoding</span> { <span class="ident">flag</span>: <span class="ident">bool</span>, <span class="ident">prohibit</span>: <span class="ident">char</span>, <span class="ident">prepend</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> }
     <span class="kw">impl</span> <span class="ident">Encoding</span> <span class="kw">for</span> <span class="ident">MyEncoding</span> {
-        <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;my encoding&quot;</span> }
-        <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;my encoding&quot;</span> }
+        <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> {
             <span class="ident">Box::new</span>(<span class="ident">MyEncoder</span> { <span class="ident">flag</span>: <span class="self">self</span>.<span class="ident">flag</span>,
                                  <span class="ident">prohibit</span>: <span class="self">self</span>.<span class="ident">prohibit</span>,
                                  <span class="ident">prepend</span>: <span class="self">self</span>.<span class="ident">prepend</span>,
                                  <span class="ident">toggle</span>: <span class="bool-val">false</span> })
         }
-        <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="macro">panic!</span>(<span class="string">&quot;not supported&quot;</span>) }
+        <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="macro">panic!</span>(<span class="string">&quot;not supported&quot;</span>) }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>

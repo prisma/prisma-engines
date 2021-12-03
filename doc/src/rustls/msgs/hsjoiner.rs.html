@@ -310,14 +310,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">HandshakeJoiner</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">HandshakeJoiner</span> {
     <span class="doccomment">/// Make a new HandshakeJoiner.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandshakeJoiner</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">HandshakeJoiner</span> {
         <span class="ident">HandshakeJoiner</span> {
             <span class="ident">frames</span>: <span class="ident">VecDeque::new</span>(),
             <span class="ident">buf</span>: <span class="ident">Vec::new</span>(),
@@ -325,12 +325,12 @@
     }
 
     <span class="doccomment">/// Do we want to process this message?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">want_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">want_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">msg</span>.<span class="ident">is_content_type</span>(<span class="ident">ContentType::Handshake</span>)
     }
 
     <span class="doccomment">/// Do we have any buffered data?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>()
     }
 
@@ -341,7 +341,7 @@
     <span class="doccomment">/// Returns None if msg or a preceding message was corrupt.</span>
     <span class="doccomment">/// You cannot recover from this situation.  Otherwise returns</span>
     <span class="doccomment">/// a count of how many messages we queued.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">msg</span>: <span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">msg</span>: <span class="ident">Message</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="comment">// Input must be opaque, otherwise we might have already</span>
         <span class="comment">// lost information!</span>
         <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">take_opaque_payload</span>().<span class="ident">unwrap</span>();
@@ -364,7 +364,7 @@
     <span class="doccomment">/// Does our `buf` contain a full handshake payload?  It does if it is big</span>
     <span class="doccomment">/// enough to contain a header, and that header has a length which falls</span>
     <span class="doccomment">/// within `buf`.</span>
-    <span class="kw">fn</span> <span class="ident">buf_contains_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">buf_contains_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">HEADER_SIZE</span>
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>()
                 <span class="op">&gt;</span><span class="op">=</span> (<span class="ident">codec::u24::decode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[<span class="number">1</span>..<span class="number">4</span>])
@@ -377,7 +377,7 @@
     <span class="doccomment">/// the back of our `frames` deque inside a normal `Message`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns false if the stream is desynchronised beyond repair.</span>
-    <span class="kw">fn</span> <span class="ident">deframe_one</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">version</span>: <span class="ident">ProtocolVersion</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">deframe_one</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">version</span>: <span class="ident">ProtocolVersion</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">used</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rd</span> <span class="op">=</span> <span class="ident">codec::Reader::init</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>);
             <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">HandshakeMessagePayload::read_version</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rd</span>, <span class="ident">version</span>);

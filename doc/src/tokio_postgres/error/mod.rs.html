@@ -543,33 +543,33 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Severity</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Severity::Panic</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;PANIC&quot;</span>,
-            <span class="ident">Severity::Fatal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;FATAL&quot;</span>,
-            <span class="ident">Severity::Error</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ERROR&quot;</span>,
-            <span class="ident">Severity::Warning</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;WARNING&quot;</span>,
-            <span class="ident">Severity::Notice</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;NOTICE&quot;</span>,
-            <span class="ident">Severity::Debug</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;DEBUG&quot;</span>,
-            <span class="ident">Severity::Info</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;INFO&quot;</span>,
-            <span class="ident">Severity::Log</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;LOG&quot;</span>,
+            <span class="ident">Severity::Panic</span> =&gt; <span class="string">&quot;PANIC&quot;</span>,
+            <span class="ident">Severity::Fatal</span> =&gt; <span class="string">&quot;FATAL&quot;</span>,
+            <span class="ident">Severity::Error</span> =&gt; <span class="string">&quot;ERROR&quot;</span>,
+            <span class="ident">Severity::Warning</span> =&gt; <span class="string">&quot;WARNING&quot;</span>,
+            <span class="ident">Severity::Notice</span> =&gt; <span class="string">&quot;NOTICE&quot;</span>,
+            <span class="ident">Severity::Debug</span> =&gt; <span class="string">&quot;DEBUG&quot;</span>,
+            <span class="ident">Severity::Info</span> =&gt; <span class="string">&quot;INFO&quot;</span>,
+            <span class="ident">Severity::Log</span> =&gt; <span class="string">&quot;LOG&quot;</span>,
         };
         <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="ident">s</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Severity</span> {
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Severity</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Severity</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;PANIC&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Severity::Panic</span>),
-            <span class="string">&quot;FATAL&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Severity::Fatal</span>),
-            <span class="string">&quot;ERROR&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Severity::Error</span>),
-            <span class="string">&quot;WARNING&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Severity::Warning</span>),
-            <span class="string">&quot;NOTICE&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Severity::Notice</span>),
-            <span class="string">&quot;DEBUG&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Severity::Debug</span>),
-            <span class="string">&quot;INFO&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Severity::Info</span>),
-            <span class="string">&quot;LOG&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Severity::Log</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="string">&quot;PANIC&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Panic</span>),
+            <span class="string">&quot;FATAL&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Fatal</span>),
+            <span class="string">&quot;ERROR&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Error</span>),
+            <span class="string">&quot;WARNING&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Warning</span>),
+            <span class="string">&quot;NOTICE&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Notice</span>),
+            <span class="string">&quot;DEBUG&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Debug</span>),
+            <span class="string">&quot;INFO&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Info</span>),
+            <span class="string">&quot;LOG&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Log</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
@@ -596,7 +596,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DbError</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ErrorFields</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ErrorFields</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">severity</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parsed_severity</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">code</span> <span class="op">=</span> <span class="prelude-val">None</span>;
@@ -618,12 +618,12 @@
 
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>) <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
             <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">type_</span>() {
-                <span class="string">b&#39;S&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">severity</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;C&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">code</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SqlState::from_code</span>(<span class="ident">field</span>.<span class="ident">value</span>())),
-                <span class="string">b&#39;M&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">message</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;D&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">detail</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;H&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">hint</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;P&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">b&#39;S&#39;</span> =&gt; <span class="ident">severity</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;C&#39;</span> =&gt; <span class="ident">code</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SqlState::from_code</span>(<span class="ident">field</span>.<span class="ident">value</span>())),
+                <span class="string">b&#39;M&#39;</span> =&gt; <span class="ident">message</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;D&#39;</span> =&gt; <span class="ident">detail</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;H&#39;</span> =&gt; <span class="ident">hint</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;P&#39;</span> =&gt; {
                     <span class="ident">normal_position</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
                         <span class="ident">io::Error::new</span>(
                             <span class="ident">io::ErrorKind::InvalidInput</span>,
@@ -631,7 +631,7 @@
                         )
                     })<span class="question-mark">?</span>);
                 }
-                <span class="string">b&#39;p&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">b&#39;p&#39;</span> =&gt; {
                     <span class="ident">internal_position</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
                         <span class="ident">io::Error::new</span>(
                             <span class="ident">io::ErrorKind::InvalidInput</span>,
@@ -639,15 +639,15 @@
                         )
                     })<span class="question-mark">?</span>);
                 }
-                <span class="string">b&#39;q&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">internal_query</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;W&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">where_</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;s&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">schema</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;t&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">table</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;c&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">column</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;d&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">datatype</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;n&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;F&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">file</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;L&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">b&#39;q&#39;</span> =&gt; <span class="ident">internal_query</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;W&#39;</span> =&gt; <span class="ident">where_</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;s&#39;</span> =&gt; <span class="ident">schema</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;t&#39;</span> =&gt; <span class="ident">table</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;c&#39;</span> =&gt; <span class="ident">column</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;d&#39;</span> =&gt; <span class="ident">datatype</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;n&#39;</span> =&gt; <span class="ident">constraint</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;F&#39;</span> =&gt; <span class="ident">file</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;L&#39;</span> =&gt; {
                     <span class="ident">line</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
                         <span class="ident">io::Error::new</span>(
                             <span class="ident">io::ErrorKind::InvalidInput</span>,
@@ -655,8 +655,8 @@
                         )
                     })<span class="question-mark">?</span>);
                 }
-                <span class="string">b&#39;R&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">routine</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;V&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">b&#39;R&#39;</span> =&gt; <span class="ident">routine</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
+                <span class="string">b&#39;V&#39;</span> =&gt; {
                     <span class="ident">parsed_severity</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Severity::from_str</span>(<span class="ident">field</span>.<span class="ident">value</span>()).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                         <span class="ident">io::Error::new</span>(
                             <span class="ident">io::ErrorKind::InvalidInput</span>,
@@ -664,7 +664,7 @@
                         )
                     })<span class="question-mark">?</span>);
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                <span class="kw">_</span> =&gt; {}
             }
         }
 
@@ -679,9 +679,9 @@
             <span class="ident">detail</span>,
             <span class="ident">hint</span>,
             <span class="ident">position</span>: <span class="kw">match</span> <span class="ident">normal_position</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">position</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ErrorPosition::Original</span>(<span class="ident">position</span>)),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">internal_position</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">position</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ErrorPosition::Internal</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">position</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ErrorPosition::Original</span>(<span class="ident">position</span>)),
+                <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">internal_position</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">position</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ErrorPosition::Internal</span> {
                         <span class="ident">position</span>,
                         <span class="ident">query</span>: <span class="ident">internal_query</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                             <span class="ident">io::Error::new</span>(
@@ -690,7 +690,7 @@
                             )
                         })<span class="question-mark">?</span>,
                     }),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
                 },
             },
             <span class="ident">where_</span>,
@@ -708,24 +708,24 @@
     <span class="doccomment">/// The field contents are ERROR, FATAL, or PANIC (in an error message),</span>
     <span class="doccomment">/// or WARNING, NOTICE, DEBUG, INFO, or LOG (in a notice message), or a</span>
     <span class="doccomment">/// localized translation of one of these.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">severity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">severity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">severity</span>
     }
 
     <span class="doccomment">/// A parsed, nonlocalized version of `severity`. (PostgreSQL 9.6+)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parsed_severity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Severity</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parsed_severity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Severity</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">parsed_severity</span>
     }
 
     <span class="doccomment">/// The SQLSTATE code for the error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">SqlState</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">SqlState</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">code</span>
     }
 
     <span class="doccomment">/// The primary human-readable error message.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should be accurate but terse (typically one line).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>
     }
 
@@ -733,7 +733,7 @@
     <span class="doccomment">/// problem.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Might run to multiple lines.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">detail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">detail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">detail</span>.<span class="ident">as_deref</span>()
     }
 
@@ -742,13 +742,13 @@
     <span class="doccomment">/// This is intended to differ from `detail` in that it offers advice</span>
     <span class="doccomment">/// (potentially inappropriate) rather than hard facts. Might run to</span>
     <span class="doccomment">/// multiple lines.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">hint</span>.<span class="ident">as_deref</span>()
     }
 
     <span class="doccomment">/// An optional error cursor position into either the original query string</span>
     <span class="doccomment">/// or an internally generated query.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ErrorPosition</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ErrorPosition</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">as_ref</span>()
     }
 
@@ -757,20 +757,20 @@
     <span class="doccomment">/// Presently this includes a call stack traceback of active procedural</span>
     <span class="doccomment">/// language functions and internally-generated queries. The trace is one</span>
     <span class="doccomment">/// entry per line, most recent first.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">where_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">where_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">where_</span>.<span class="ident">as_deref</span>()
     }
 
     <span class="doccomment">/// If the error was associated with a specific database object, the name</span>
     <span class="doccomment">/// of the schema containing that object, if any. (PostgreSQL 9.3+)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">as_deref</span>()
     }
 
     <span class="doccomment">/// If the error was associated with a specific table, the name of the</span>
     <span class="doccomment">/// table. (Refer to the schema name field for the name of the table&#39;s</span>
     <span class="doccomment">/// schema.) (PostgreSQL 9.3+)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">as_deref</span>()
     }
 
@@ -779,14 +779,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// (Refer to the schema and table name fields to identify the table.)</span>
     <span class="doccomment">/// (PostgreSQL 9.3+)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">as_deref</span>()
     }
 
     <span class="doccomment">/// If the error was associated with a specific data type, the name of the</span>
     <span class="doccomment">/// data type. (Refer to the schema name field for the name of the data</span>
     <span class="doccomment">/// type&#39;s schema.) (PostgreSQL 9.3+)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datatype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datatype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">datatype</span>.<span class="ident">as_deref</span>()
     }
 
@@ -796,29 +796,29 @@
     <span class="doccomment">/// Refer to fields listed above for the associated table or domain.</span>
     <span class="doccomment">/// (For this purpose, indexes are treated as constraints, even if they</span>
     <span class="doccomment">/// weren&#39;t created with constraint syntax.) (PostgreSQL 9.3+)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constraint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constraint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">constraint</span>.<span class="ident">as_deref</span>()
     }
 
     <span class="doccomment">/// The file name of the source-code location where the error was reported.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">as_deref</span>()
     }
 
     <span class="doccomment">/// The line number of the source-code location where the error was</span>
     <span class="doccomment">/// reported.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">line</span>
     }
 
     <span class="doccomment">/// The name of the source-code routine reporting the error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">routine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">routine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">routine</span>.<span class="ident">as_deref</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DbError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}: {}&quot;</span>, <span class="self">self</span>.<span class="ident">severity</span>, <span class="self">self</span>.<span class="ident">message</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">detail</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">detail</span> {
             <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;\nDETAIL: {}&quot;</span>, <span class="ident">detail</span>)<span class="question-mark">?</span>;
@@ -876,7 +876,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Error</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ErrorInner</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Error&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;kind&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">kind</span>)
             .<span class="ident">field</span>(<span class="string">&quot;cause&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">cause</span>)
@@ -885,25 +885,25 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::Io</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error communicating with the server&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::UnexpectedMessage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;unexpected message from server&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Tls</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error performing TLS handshake&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::ToSql</span>(<span class="ident">idx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;error serializing parameter {}&quot;</span>, <span class="ident">idx</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::FromSql</span>(<span class="ident">idx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;error deserializing column {}&quot;</span>, <span class="ident">idx</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Column</span>(<span class="ident">column</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;invalid column `{}`&quot;</span>, <span class="ident">column</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Closed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;connection closed&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Db</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;db error&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Parse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error parsing response from server&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Encode</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error encoding message to server&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Authentication</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;authentication error&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::ConfigParse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid connection string&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Config</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid configuration&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::RowCount</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;query returned an unexpected number of rows&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Io</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error communicating with the server&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::UnexpectedMessage</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;unexpected message from server&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Tls</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error performing TLS handshake&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::ToSql</span>(<span class="ident">idx</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;error serializing parameter {}&quot;</span>, <span class="ident">idx</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::FromSql</span>(<span class="ident">idx</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;error deserializing column {}&quot;</span>, <span class="ident">idx</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Column</span>(<span class="ident">column</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;invalid column `{}`&quot;</span>, <span class="ident">column</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Closed</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;connection closed&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Db</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;db error&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Parse</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error parsing response from server&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Encode</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error encoding message to server&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Authentication</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;authentication error&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::ConfigParse</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid connection string&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Config</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid configuration&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::RowCount</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;query returned an unexpected number of rows&quot;</span>)<span class="question-mark">?</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-            <span class="ident">Kind::Connect</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error connecting to server&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Timeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;timeout waiting for server&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Connect</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error connecting to server&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Kind::Timeout</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;timeout waiting for server&quot;</span>)<span class="question-mark">?</span>,
         };
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">cause</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">cause</span> {
             <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;: {}&quot;</span>, <span class="ident">cause</span>)<span class="question-mark">?</span>;
@@ -913,108 +913,108 @@
 }
 
 <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">cause</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">e</span> <span class="kw">as</span> <span class="kw">_</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> {
     <span class="doccomment">/// Consumes the error, returning its cause.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_source</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_source</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">cause</span>
     }
 
     <span class="doccomment">/// Returns the source of this error if it was a `DbError`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is a simple convenience method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_db_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DbError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_db_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DbError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>())
     }
 
     <span class="doccomment">/// Determines if the error was associated with closed connection.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">kind</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Kind::Closed</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">Kind::Closed</span>
     }
 
     <span class="doccomment">/// Returns the SQLSTATE error code associated with the error.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is a convenience method that downcasts the cause to a `DbError` and returns its code.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlState</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlState</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">as_db_error</span>().<span class="ident">map</span>(<span class="ident">DbError::code</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">Kind</span>, <span class="ident">cause</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">Kind</span>, <span class="ident">cause</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error</span>(<span class="ident">Box::new</span>(<span class="ident">ErrorInner</span> { <span class="ident">kind</span>, <span class="ident">cause</span> }))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">closed</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">closed</span>() -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::Closed</span>, <span class="prelude-val">None</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unexpected_message</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unexpected_message</span>() -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::UnexpectedMessage</span>, <span class="prelude-val">None</span>)
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_pass_by_value</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">db</span>(<span class="ident">error</span>: <span class="ident">ErrorResponseBody</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">db</span>(<span class="ident">error</span>: <span class="ident">ErrorResponseBody</span>) -&gt; <span class="ident">Error</span> {
         <span class="kw">match</span> <span class="ident">DbError::parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">error</span>.<span class="ident">fields</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::new</span>(<span class="ident">Kind::Db</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>))),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::new</span>(<span class="ident">Kind::Parse</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>))),
+            <span class="prelude-val">Ok</span>(<span class="ident">e</span>) =&gt; <span class="ident">Error::new</span>(<span class="ident">Kind::Db</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>))),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">Error::new</span>(<span class="ident">Kind::Parse</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>))),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::Parse</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">encode</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">encode</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::Encode</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::ToSql</span>(<span class="ident">idx</span>), <span class="prelude-val">Some</span>(<span class="ident">e</span>))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::FromSql</span>(<span class="ident">idx</span>), <span class="prelude-val">Some</span>(<span class="ident">e</span>))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">column</span>(<span class="ident">column</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">column</span>(<span class="ident">column</span>: <span class="ident">String</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::Column</span>(<span class="ident">column</span>), <span class="prelude-val">None</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tls</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tls</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::Tls</span>, <span class="prelude-val">Some</span>(<span class="ident">e</span>))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">io</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">io</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::Io</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">authentication</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">authentication</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::Authentication</span>, <span class="prelude-val">Some</span>(<span class="ident">e</span>))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">config_parse</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">config_parse</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::ConfigParse</span>, <span class="prelude-val">Some</span>(<span class="ident">e</span>))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">config</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">config</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::Config</span>, <span class="prelude-val">Some</span>(<span class="ident">e</span>))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">row_count</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">row_count</span>() -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::RowCount</span>, <span class="prelude-val">None</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::Connect</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))
     }
 
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__private_api_timeout</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__private_api_timeout</span>() -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::new</span>(<span class="ident">Kind::Timeout</span>, <span class="prelude-val">None</span>)
     }
 }

@@ -90,42 +90,42 @@
 <span class="doccomment">/// The `join!` macro.</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">fn_like_proc_macro</span>, <span class="ident">proc_macro</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">fn_like_proc_macro</span>), <span class="ident">proc_macro_hack::proc_macro_hack</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">join_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">join_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="ident"><span class="kw">crate</span>::join::join</span>(<span class="ident">input</span>)
 }
 
 <span class="doccomment">/// The `try_join!` macro.</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">fn_like_proc_macro</span>, <span class="ident">proc_macro</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">fn_like_proc_macro</span>), <span class="ident">proc_macro_hack::proc_macro_hack</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_join_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_join_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="ident"><span class="kw">crate</span>::join::try_join</span>(<span class="ident">input</span>)
 }
 
 <span class="doccomment">/// The `select!` macro.</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">fn_like_proc_macro</span>, <span class="ident">proc_macro</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">fn_like_proc_macro</span>), <span class="ident">proc_macro_hack::proc_macro_hack</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">select_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">select_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="ident"><span class="kw">crate</span>::select::select</span>(<span class="ident">input</span>)
 }
 
 <span class="doccomment">/// The `select_biased!` macro.</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">fn_like_proc_macro</span>, <span class="ident">proc_macro</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">fn_like_proc_macro</span>), <span class="ident">proc_macro_hack::proc_macro_hack</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">select_biased_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">select_biased_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="ident"><span class="kw">crate</span>::select::select_biased</span>(<span class="ident">input</span>)
 }
 
 <span class="comment">// TODO: Change this to doc comment once rustdoc bug fixed.</span>
 <span class="comment">// The `test` attribute.</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="ident"><span class="kw">crate</span>::executor::test</span>(<span class="ident">input</span>, <span class="ident">item</span>)
 }
 
 <span class="doccomment">/// The `stream_select!` macro.</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">fn_like_proc_macro</span>, <span class="ident">proc_macro</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">fn_like_proc_macro</span>), <span class="ident">proc_macro_hack::proc_macro_hack</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stream_select_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stream_select_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="ident"><span class="kw">crate</span>::stream_select::stream_select</span>(<span class="ident">input</span>.<span class="ident">into</span>())
         .<span class="ident">unwrap_or_else</span>(<span class="ident">syn::Error::into_compile_error</span>)
         .<span class="ident">into</span>()

@@ -569,7 +569,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This exporter can be used in both `tracing` and `metrics` pipeline.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tonic</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TonicExporterBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tonic</span>(<span class="self">self</span>) -&gt; <span class="ident">TonicExporterBuilder</span> {
         <span class="ident">TonicExporterBuilder::default</span>()
     }
 
@@ -578,7 +578,7 @@
     <span class="doccomment">/// This exporter can only be used in `tracing` pipeline. Support for `metrics` pipeline will be</span>
     <span class="doccomment">/// added in the future.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">grpcio</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GrpcioExporterBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">grpcio</span>(<span class="self">self</span>) -&gt; <span class="ident">GrpcioExporterBuilder</span> {
         <span class="ident">GrpcioExporterBuilder::default</span>()
     }
 
@@ -588,7 +588,7 @@
     <span class="doccomment">/// This exporter can only be used in `tracing` pipeline. Support for `metrics` pipeline will be</span>
     <span class="doccomment">/// added in the future.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpExporterBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http</span>(<span class="self">self</span>) -&gt; <span class="ident">HttpExporterBuilder</span> {
         <span class="ident">HttpExporterBuilder::default</span>()
     }
 }
@@ -604,12 +604,12 @@
 <span class="doccomment">///     Ok(())</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_pipeline</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OtlpPipeline</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_pipeline</span>() -&gt; <span class="ident">OtlpPipeline</span> {
     <span class="ident">OtlpPipeline</span>
 }
 
 <span class="doccomment">/// Create a builder to build OTLP metrics exporter or tracing exporter.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_exporter</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OtlpExporterPipeline</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_exporter</span>() -&gt; <span class="ident">OtlpExporterPipeline</span> {
     <span class="ident">OtlpExporterPipeline</span>
 }
 
@@ -678,7 +678,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tonic::Status</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">status</span>: <span class="ident">tonic::Status</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">status</span>: <span class="ident">tonic::Status</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::Status</span> {
             <span class="ident">code</span>: <span class="ident">status</span>.<span class="ident">code</span>(),
             <span class="ident">message</span>: {
@@ -693,7 +693,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ExportError</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">exporter_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">exporter_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;otlp&quot;</span>
     }
 }

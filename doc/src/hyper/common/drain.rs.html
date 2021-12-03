@@ -222,7 +222,7 @@
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">task</span>, <span class="ident">Future</span>, <span class="ident">Pin</span>, <span class="ident">Poll</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">channel</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Signal</span>, <span class="ident">Watch</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">channel</span>() -&gt; (<span class="ident">Signal</span>, <span class="ident">Watch</span>) {
     <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">watch::channel</span>(());
     (<span class="ident">Signal</span> { <span class="ident">tx</span> }, <span class="ident">Watch</span> { <span class="ident">rx</span> })
 }
@@ -255,7 +255,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Signal</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">drain</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Draining</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">drain</span>(<span class="self">self</span>) -&gt; <span class="ident">Draining</span> {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">send</span>(());
         <span class="ident">Draining</span>(<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">closed</span>().<span class="kw">await</span> }))
     }
@@ -264,13 +264,13 @@
 <span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Draining</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="number">0</span>).<span class="ident">poll</span>(<span class="ident">cx</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Watch</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">watch</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FN</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">on_drain</span>: <span class="ident">FN</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Watching</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FN</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">watch</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FN</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">on_drain</span>: <span class="ident">FN</span>) -&gt; <span class="ident">Watching</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FN</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">Future</span>,
         <span class="ident">FN</span>: <span class="ident">FnOnce</span>(<span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">F</span><span class="op">&gt;</span>),
@@ -297,23 +297,23 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">F::Output</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="ident">mem::replace</span>(<span class="ident">me</span>.<span class="ident">state</span>, <span class="ident">State::Draining</span>) {
-                <span class="ident">State::Watch</span>(<span class="ident">on_drain</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">State::Watch</span>(<span class="ident">on_drain</span>) =&gt; {
                     <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">me</span>.<span class="ident">watch</span>).<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll::Ready</span>(()) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Poll::Ready</span>(()) =&gt; {
                             <span class="comment">// Drain has been triggered!</span>
                             <span class="ident">on_drain</span>(<span class="ident">me</span>.<span class="ident">future</span>.<span class="ident">as_mut</span>());
                         }
-                        <span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Poll::Pending</span> =&gt; {
                             <span class="kw-2">*</span><span class="ident">me</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Watch</span>(<span class="ident">on_drain</span>);
                             <span class="kw">return</span> <span class="ident">me</span>.<span class="ident">future</span>.<span class="ident">poll</span>(<span class="ident">cx</span>);
                         }
                     }
                 }
-                <span class="ident">State::Draining</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">me</span>.<span class="ident">future</span>.<span class="ident">poll</span>(<span class="ident">cx</span>),
+                <span class="ident">State::Draining</span> =&gt; <span class="kw">return</span> <span class="ident">me</span>.<span class="ident">future</span>.<span class="ident">poll</span>(<span class="ident">cx</span>),
             }
         }
     }
@@ -332,7 +332,7 @@
     <span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">TestMe</span> {
         <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-        <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">poll_cnt</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">finished</span> {
                 <span class="ident">Poll::Ready</span>(())

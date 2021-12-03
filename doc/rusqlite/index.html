@@ -10,7 +10,7 @@ expose an interface similar to <a href="https://github.com/sfackler/rust-postgre
     <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
 
     <span class="ident">conn</span>.<span class="ident">execute</span>(
@@ -46,72 +46,72 @@ expose an interface similar to <a href="https://github.com/sfackler/rust-postgre
     <span class="prelude-val">Ok</span>(())
 }</code></pre></div>
 </div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
-<div class="item-table"><div class="item-left import-item"><code>pub use <a class="mod" href="../libsqlite3_sys/index.html" title="mod libsqlite3_sys">libsqlite3_sys</a> as ffi;</code></div><div class="item-right docblock-short"></div></div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="config/index.html" title="rusqlite::config mod">config</a></div><div class="item-right docblock-short"><p>Configure database connections</p>
-</div><div class="item-left module-item"><a class="mod" href="types/index.html" title="rusqlite::types mod">types</a></div><div class="item-right docblock-short"><p>Traits dealing with SQLite data types.</p>
-</div></div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="macro" href="macro.named_params.html" title="rusqlite::named_params macro">named_params</a></div><div class="item-right docblock-short"><p>A macro making it more convenient to pass lists of named parameters
+<div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use <a class="mod" href="../libsqlite3_sys/index.html" title="mod libsqlite3_sys">libsqlite3_sys</a> as ffi;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="config/index.html" title="rusqlite::config mod">config</a></div><div class="item-right docblock-short"><p>Configure database connections</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="types/index.html" title="rusqlite::types mod">types</a></div><div class="item-right docblock-short"><p>Traits dealing with SQLite data types.</p>
+</div></div></div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.named_params.html" title="rusqlite::named_params macro">named_params</a></div><div class="item-right docblock-short"><p>A macro making it more convenient to pass lists of named parameters
 as a <code>&amp;[(&amp;str, &amp;dyn ToSql)]</code>.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.params.html" title="rusqlite::params macro">params</a></div><div class="item-right docblock-short"><p>A macro making it more convenient to pass heterogeneous or long lists of
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.params.html" title="rusqlite::params macro">params</a></div><div class="item-right docblock-short"><p>A macro making it more convenient to pass heterogeneous or long lists of
 parameters as a <code>&amp;[&amp;dyn ToSql]</code>.</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.AndThenRows.html" title="rusqlite::AndThenRows struct">AndThenRows</a></div><div class="item-right docblock-short"><p>An iterator over the mapped resulting rows of a query, with an Error type
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.AndThenRows.html" title="rusqlite::AndThenRows struct">AndThenRows</a></div><div class="item-right docblock-short"><p>An iterator over the mapped resulting rows of a query, with an Error type
 unifying with Error.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Batch.html" title="rusqlite::Batch struct">Batch</a></div><div class="item-right docblock-short"><p>Batch iterator</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.CachedStatement.html" title="rusqlite::CachedStatement struct">CachedStatement</a></div><div class="item-right docblock-short"><p>Cacheable statement.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Column.html" title="rusqlite::Column struct">Column</a></div><div class="item-right docblock-short"><p>Information about a column of a SQLite query.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Connection.html" title="rusqlite::Connection struct">Connection</a></div><div class="item-right docblock-short"><p>A connection to a SQLite database.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.InterruptHandle.html" title="rusqlite::InterruptHandle struct">InterruptHandle</a></div><div class="item-right docblock-short"><p>Allows interrupting a long-running computation.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Map.html" title="rusqlite::Map struct">Map</a></div><div class="item-right docblock-short"><p><code>F</code> is used to transform the <em>streaming</em> iterator into a <em>fallible</em>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Batch.html" title="rusqlite::Batch struct">Batch</a></div><div class="item-right docblock-short"><p>Batch iterator</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.CachedStatement.html" title="rusqlite::CachedStatement struct">CachedStatement</a></div><div class="item-right docblock-short"><p>Cacheable statement.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Column.html" title="rusqlite::Column struct">Column</a></div><div class="item-right docblock-short"><p>Information about a column of a SQLite query.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Connection.html" title="rusqlite::Connection struct">Connection</a></div><div class="item-right docblock-short"><p>A connection to a SQLite database.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.InterruptHandle.html" title="rusqlite::InterruptHandle struct">InterruptHandle</a></div><div class="item-right docblock-short"><p>Allows interrupting a long-running computation.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Map.html" title="rusqlite::Map struct">Map</a></div><div class="item-right docblock-short"><p><code>F</code> is used to transform the <em>streaming</em> iterator into a <em>fallible</em>
 iterator.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.MappedRows.html" title="rusqlite::MappedRows struct">MappedRows</a></div><div class="item-right docblock-short"><p>An iterator over the mapped resulting rows of a query.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.OpenFlags.html" title="rusqlite::OpenFlags struct">OpenFlags</a></div><div class="item-right docblock-short"><p>Flags for opening SQLite database connections.
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.MappedRows.html" title="rusqlite::MappedRows struct">MappedRows</a></div><div class="item-right docblock-short"><p>An iterator over the mapped resulting rows of a query.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OpenFlags.html" title="rusqlite::OpenFlags struct">OpenFlags</a></div><div class="item-right docblock-short"><p>Flags for opening SQLite database connections.
 See <a href="http://www.sqlite.org/c3ref/open.html">sqlite3_open_v2</a> for details.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.ParamsFromIter.html" title="rusqlite::ParamsFromIter struct">ParamsFromIter</a></div><div class="item-right docblock-short"><p>Adapter type which allows any iterator over <a href="types/trait.ToSql.html" title="ToSql"><code>ToSql</code></a> values to implement
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.ParamsFromIter.html" title="rusqlite::ParamsFromIter struct">ParamsFromIter</a></div><div class="item-right docblock-short"><p>Adapter type which allows any iterator over <a href="types/trait.ToSql.html" title="ToSql"><code>ToSql</code></a> values to implement
 <a href="trait.Params.html" title="Params"><code>Params</code></a>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Row.html" title="rusqlite::Row struct">Row</a></div><div class="item-right docblock-short"><p>A single result row of a query.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Rows.html" title="rusqlite::Rows struct">Rows</a></div><div class="item-right docblock-short"><p>An handle for the resulting rows of a query.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Savepoint.html" title="rusqlite::Savepoint struct">Savepoint</a></div><div class="item-right docblock-short"><p>Represents a savepoint on a database connection.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Statement.html" title="rusqlite::Statement struct">Statement</a></div><div class="item-right docblock-short"><p>A prepared statement.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Transaction.html" title="rusqlite::Transaction struct">Transaction</a></div><div class="item-right docblock-short"><p>Represents a transaction on a database connection.</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.DatabaseName.html" title="rusqlite::DatabaseName enum">DatabaseName</a></div><div class="item-right docblock-short"><p>Name for a database within a SQLite connection.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.DropBehavior.html" title="rusqlite::DropBehavior enum">DropBehavior</a></div><div class="item-right docblock-short"><p>Options for how a Transaction or Savepoint should behave when it is dropped.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.Error.html" title="rusqlite::Error enum">Error</a></div><div class="item-right docblock-short"><p>Enum listing possible errors from rusqlite.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.ErrorCode.html" title="rusqlite::ErrorCode enum">ErrorCode</a></div><div class="item-right docblock-short"><p>Error Codes</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.StatementStatus.html" title="rusqlite::StatementStatus enum">StatementStatus</a></div><div class="item-right docblock-short"><p>Prepared statement status counters.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.TransactionBehavior.html" title="rusqlite::TransactionBehavior enum">TransactionBehavior</a></div><div class="item-right docblock-short"><p>Options for transaction behavior. See <a href="http://www.sqlite.org/lang_transaction.html">BEGIN
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Row.html" title="rusqlite::Row struct">Row</a></div><div class="item-right docblock-short"><p>A single result row of a query.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Rows.html" title="rusqlite::Rows struct">Rows</a></div><div class="item-right docblock-short"><p>An handle for the resulting rows of a query.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Savepoint.html" title="rusqlite::Savepoint struct">Savepoint</a></div><div class="item-right docblock-short"><p>Represents a savepoint on a database connection.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Statement.html" title="rusqlite::Statement struct">Statement</a></div><div class="item-right docblock-short"><p>A prepared statement.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Transaction.html" title="rusqlite::Transaction struct">Transaction</a></div><div class="item-right docblock-short"><p>Represents a transaction on a database connection.</p>
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.DatabaseName.html" title="rusqlite::DatabaseName enum">DatabaseName</a></div><div class="item-right docblock-short"><p>Name for a database within a SQLite connection.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.DropBehavior.html" title="rusqlite::DropBehavior enum">DropBehavior</a></div><div class="item-right docblock-short"><p>Options for how a Transaction or Savepoint should behave when it is dropped.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Error.html" title="rusqlite::Error enum">Error</a></div><div class="item-right docblock-short"><p>Enum listing possible errors from rusqlite.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ErrorCode.html" title="rusqlite::ErrorCode enum">ErrorCode</a></div><div class="item-right docblock-short"><p>Error Codes</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.StatementStatus.html" title="rusqlite::StatementStatus enum">StatementStatus</a></div><div class="item-right docblock-short"><p>Prepared statement status counters.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.TransactionBehavior.html" title="rusqlite::TransactionBehavior enum">TransactionBehavior</a></div><div class="item-right docblock-short"><p>Options for transaction behavior. See <a href="http://www.sqlite.org/lang_transaction.html">BEGIN
 TRANSACTION</a> for details.</p>
-</div></div><h2 id="constants" class="section-header"><a href="#constants">Constants</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="constant" href="constant.MAIN_DB.html" title="rusqlite::MAIN_DB constant">MAIN_DB</a></div><div class="item-right docblock-short"><p>Shorthand for <a href="enum.DatabaseName.html#variant.Main" title="DatabaseName::Main"><code>DatabaseName::Main</code></a>.</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.NO_PARAMS.html" title="rusqlite::NO_PARAMS constant">NO_PARAMS</a><span class="stab deprecated" title="">Deprecated</span></div><div class="item-right docblock-short"><p>To be used when your statement has no <a href="https://sqlite.org/lang_expr.html#varparam">parameter</a>.</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.TEMP_DB.html" title="rusqlite::TEMP_DB constant">TEMP_DB</a></div><div class="item-right docblock-short"><p>Shorthand for <a href="enum.DatabaseName.html#variant.Temp" title="DatabaseName::Temp"><code>DatabaseName::Temp</code></a>.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.OptionalExtension.html" title="rusqlite::OptionalExtension trait">OptionalExtension</a></div><div class="item-right docblock-short"><p>See the <a href="#tymethod.optional">method documentation</a>.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Params.html" title="rusqlite::Params trait">Params</a></div><div class="item-right docblock-short"><p>Trait used for <a href="https://www.sqlite.org/c3ref/bind_blob.html">sets of parameter</a> passed into SQL
+</div></div></div><h2 id="constants" class="section-header"><a href="#constants">Constants</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.MAIN_DB.html" title="rusqlite::MAIN_DB constant">MAIN_DB</a></div><div class="item-right docblock-short"><p>Shorthand for <a href="enum.DatabaseName.html#variant.Main" title="DatabaseName::Main"><code>DatabaseName::Main</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.NO_PARAMS.html" title="rusqlite::NO_PARAMS constant">NO_PARAMS</a><span class="stab deprecated" title="">Deprecated</span></div><div class="item-right docblock-short"><p>To be used when your statement has no <a href="https://sqlite.org/lang_expr.html#varparam">parameter</a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.TEMP_DB.html" title="rusqlite::TEMP_DB constant">TEMP_DB</a></div><div class="item-right docblock-short"><p>Shorthand for <a href="enum.DatabaseName.html#variant.Temp" title="DatabaseName::Temp"><code>DatabaseName::Temp</code></a>.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.OptionalExtension.html" title="rusqlite::OptionalExtension trait">OptionalExtension</a></div><div class="item-right docblock-short"><p>See the <a href="#tymethod.optional">method documentation</a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Params.html" title="rusqlite::Params trait">Params</a></div><div class="item-right docblock-short"><p>Trait used for <a href="https://www.sqlite.org/c3ref/bind_blob.html">sets of parameter</a> passed into SQL
 statements/queries.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.RowIndex.html" title="rusqlite::RowIndex trait">RowIndex</a></div><div class="item-right docblock-short"><p>A trait implemented by types that can index into columns of a row.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.ToSql.html" title="rusqlite::ToSql trait">ToSql</a></div><div class="item-right docblock-short"><p>A trait for types that can be converted into SQLite values. Returns
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.RowIndex.html" title="rusqlite::RowIndex trait">RowIndex</a></div><div class="item-right docblock-short"><p>A trait implemented by types that can index into columns of a row.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ToSql.html" title="rusqlite::ToSql trait">ToSql</a></div><div class="item-right docblock-short"><p>A trait for types that can be converted into SQLite values. Returns
 <a href="enum.Error.html#variant.ToSqlConversionFailure" title="Error::ToSqlConversionFailure"><code>Error::ToSqlConversionFailure</code></a> if the conversion fails.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.bypass_sqlite_initialization.html" title="rusqlite::bypass_sqlite_initialization fn">bypass_sqlite_initialization</a><a title="unsafe function" href="#"><sup>⚠</sup></a></div><div class="item-right docblock-short"><p>rusqlite’s check for a safe SQLite threading mode requires SQLite 3.7.0 or
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.bypass_sqlite_initialization.html" title="rusqlite::bypass_sqlite_initialization fn">bypass_sqlite_initialization</a><a title="unsafe function" href="#"><sup>⚠</sup></a></div><div class="item-right docblock-short"><p>rusqlite’s check for a safe SQLite threading mode requires SQLite 3.7.0 or
 later. If you are running against a SQLite older than that, rusqlite
 attempts to ensure safety by performing configuration and initialization of
 SQLite itself the first time you
 attempt to open a connection. By default, rusqlite panics if that
 initialization fails, since that could mean SQLite has been initialized in
 single-thread mode.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.bypass_sqlite_version_check.html" title="rusqlite::bypass_sqlite_version_check fn">bypass_sqlite_version_check</a><a title="unsafe function" href="#"><sup>⚠</sup></a></div><div class="item-right docblock-short"><p>rusqlite performs a one-time check that the runtime SQLite version is at
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.bypass_sqlite_version_check.html" title="rusqlite::bypass_sqlite_version_check fn">bypass_sqlite_version_check</a><a title="unsafe function" href="#"><sup>⚠</sup></a></div><div class="item-right docblock-short"><p>rusqlite performs a one-time check that the runtime SQLite version is at
 least as new as the version of SQLite found when rusqlite was built.
 Bypassing this check may be dangerous; e.g., if you use features of SQLite
 that are not present in the runtime version.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.params_from_iter.html" title="rusqlite::params_from_iter fn">params_from_iter</a></div><div class="item-right docblock-short"><p>Constructor function for a <a href="struct.ParamsFromIter.html" title="ParamsFromIter"><code>ParamsFromIter</code></a>. See its documentation for
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.params_from_iter.html" title="rusqlite::params_from_iter fn">params_from_iter</a></div><div class="item-right docblock-short"><p>Constructor function for a <a href="struct.ParamsFromIter.html" title="ParamsFromIter"><code>ParamsFromIter</code></a>. See its documentation for
 more.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.version.html" title="rusqlite::version fn">version</a></div><div class="item-right docblock-short"><p>Returns the SQLite version as a string; e.g., <code>&quot;3.16.2&quot;</code> for version 3.16.2.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.version_number.html" title="rusqlite::version_number fn">version_number</a></div><div class="item-right docblock-short"><p>Returns the SQLite version as an integer; e.g., <code>3016002</code> for version
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.version.html" title="rusqlite::version fn">version</a></div><div class="item-right docblock-short"><p>Returns the SQLite version as a string; e.g., <code>&quot;3.16.2&quot;</code> for version 3.16.2.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.version_number.html" title="rusqlite::version_number fn">version_number</a></div><div class="item-right docblock-short"><p>Returns the SQLite version as an integer; e.g., <code>3016002</code> for version
 3.16.2.</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Result.html" title="rusqlite::Result type">Result</a></div><div class="item-right docblock-short"><p>A typedef of the result returned by many methods.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="rusqlite" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Result.html" title="rusqlite::Result type">Result</a></div><div class="item-right docblock-short"><p>A typedef of the result returned by many methods.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="rusqlite" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

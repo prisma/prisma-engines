@@ -82,7 +82,7 @@
 <span class="doccomment">/// assert_eq!(caret_encode(b&#39;E&#39;), None);</span>
 <span class="doccomment">/// assert_eq!(caret_encode(b&#39;\n&#39;), Some(AsciiChar::J));</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">caret_encode</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AsciiChar</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">caret_encode</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="ident">C</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AsciiChar</span><span class="op">&gt;</span> {
     <span class="comment">// The formula is explained in the Wikipedia article.</span>
     <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">into</span>() <span class="op">^</span> <span class="number">0b0100_0000</span>;
     <span class="kw">unsafe</span> {
@@ -117,12 +117,12 @@
 <span class="doccomment">/// assert_eq!(caret_encode(AsciiChar::US).and_then(caret_decode), Some(AsciiChar::US));</span>
 <span class="doccomment">/// assert_eq!(caret_decode(b&#39;@&#39;).and_then(caret_encode), Some(AsciiChar::At));</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">caret_decode</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AsciiChar</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">caret_decode</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="ident">C</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AsciiChar</span><span class="op">&gt;</span> {
     <span class="comment">// The formula is explained in the Wikipedia article.</span>
     <span class="kw">unsafe</span> {
         <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">into</span>() {
-            <span class="string">b&#39;?&#39;</span>...<span class="string">b&#39;_&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">AsciiChar::from_unchecked</span>(<span class="ident">c</span>.<span class="ident">into</span>() <span class="op">^</span> <span class="number">0b0100_0000</span>)),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="string">b&#39;?&#39;</span>...<span class="string">b&#39;_&#39;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">AsciiChar::from_unchecked</span>(<span class="ident">c</span>.<span class="ident">into</span>() <span class="op">^</span> <span class="number">0b0100_0000</span>)),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }

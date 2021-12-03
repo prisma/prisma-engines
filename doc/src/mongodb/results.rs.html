@@ -212,7 +212,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">InsertOneResult</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_insert_many_result</span>(<span class="ident">result</span>: <span class="ident">InsertManyResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_insert_many_result</span>(<span class="ident">result</span>: <span class="ident">InsertManyResult</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">inserted_id</span>: <span class="ident">result</span>.<span class="ident">inserted_ids</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">0</span>).<span class="ident">cloned</span>().<span class="ident">unwrap_or</span>(<span class="ident">Bson::Null</span>),
         }
@@ -230,7 +230,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">InsertManyResult</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">InsertManyResult</span> {
             <span class="ident">inserted_ids</span>: <span class="ident">HashMap::new</span>(),
         }
@@ -285,7 +285,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CreateIndexesResult</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_create_index_result</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CreateIndexResult</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_create_index_result</span>(<span class="self">self</span>) -&gt; <span class="ident">CreateIndexResult</span> {
         <span class="ident">CreateIndexResult</span> {
             <span class="ident">index_name</span>: <span class="self">self</span>.<span class="ident">index_names</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(),
         }

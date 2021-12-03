@@ -18,15 +18,15 @@
 <span id="18">18</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">sql_read_bytes::SqlReadBytes</span>, <span class="ident">time::DateTime2</span>, <span class="ident">ColumnData</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
 {
     <span class="kw">let</span> <span class="ident">rlen</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">rlen</span> {
-        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::DateTime2</span>(<span class="prelude-val">None</span>),
-        <span class="ident">rlen</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="number">0</span> =&gt; <span class="ident">ColumnData::DateTime2</span>(<span class="prelude-val">None</span>),
+        <span class="ident">rlen</span> =&gt; {
             <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">DateTime2::decode</span>(<span class="ident">src</span>, <span class="ident">len</span>, <span class="ident">rlen</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">3</span>).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="ident">ColumnData::DateTime2</span>(<span class="prelude-val">Some</span>(<span class="ident">dt</span>))
         }

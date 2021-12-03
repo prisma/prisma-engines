@@ -445,13 +445,13 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FilterNode</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
 {
     <span class="doccomment">/// Return true to have the node be part of the graph</span>
-    <span class="kw">fn</span> <span class="ident">include_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">include_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="ident">N</span>) -&gt; <span class="ident">bool</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">FilterNode</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span>
-    <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">N</span>) -&gt; <span class="ident">bool</span>,
 {
-    <span class="kw">fn</span> <span class="ident">include_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">include_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">N</span>) -&gt; <span class="ident">bool</span> {
         (<span class="kw-2">*</span><span class="self">self</span>)(<span class="ident">n</span>)
     }
 }
@@ -460,7 +460,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="ident">FilterNode</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FixedBitSet</span>
     <span class="kw">where</span> <span class="ident">FixedBitSet</span>: <span class="ident">VisitMap</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">include_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">include_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">N</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>)
     }
 }
@@ -469,7 +469,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">FilterNode</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">S</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">VisitMap</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">include_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">include_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">N</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>)
     }
 }
@@ -480,10 +480,10 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="ident">NodeFiltered</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">GraphBase</span>,
-          <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">G::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+          <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">G::NodeId</span>) -&gt; <span class="ident">bool</span>,
 {
     <span class="doccomment">/// Create an `NodeFiltered` adaptor from the closure `filter`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_fn</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">filter</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_fn</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">filter</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">NodeFiltered</span>(<span class="ident">graph</span>, <span class="ident">filter</span>)
     }
 }
@@ -498,7 +498,7 @@
           <span class="ident">F</span>: <span class="ident">FilterNode</span><span class="op">&lt;</span><span class="ident">G::NodeId</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Neighbors</span> <span class="op">=</span> <span class="ident">NodeFilteredNeighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G::Neighbors</span>, <span class="ident">F</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">neighbors</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">G::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Neighbors</span> {
+    <span class="kw">fn</span> <span class="ident">neighbors</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">G::NodeId</span>) -&gt; <span class="ident"><span class="self">Self</span>::Neighbors</span> {
         <span class="ident">NodeFilteredNeighbors</span> {
             <span class="ident">include_source</span>: <span class="self">self</span>.<span class="number">1</span>.<span class="ident">include_node</span>(<span class="ident">n</span>),
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">neighbors</span>(<span class="ident">n</span>),
@@ -521,7 +521,7 @@
           <span class="ident">F</span>: <span class="ident">FilterNode</span><span class="op">&lt;</span><span class="ident">I::Item</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span>;
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">include_source</span> {
             <span class="prelude-val">None</span>
@@ -537,7 +537,7 @@
 {
     <span class="kw">type</span> <span class="ident">NeighborsDirected</span> <span class="op">=</span> <span class="ident">NodeFilteredNeighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G::NeighborsDirected</span>, <span class="ident">F</span><span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">neighbors_directed</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">G::NodeId</span>, <span class="ident">dir</span>: <span class="ident">Direction</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NeighborsDirected</span> {
+        -&gt; <span class="ident"><span class="self">Self</span>::NeighborsDirected</span> {
         <span class="ident">NodeFilteredNeighbors</span> {
             <span class="ident">include_source</span>: <span class="self">self</span>.<span class="number">1</span>.<span class="ident">include_node</span>(<span class="ident">n</span>),
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">neighbors_directed</span>(<span class="ident">n</span>, <span class="ident">dir</span>),
@@ -551,7 +551,7 @@
           <span class="ident">F</span>: <span class="ident">FilterNode</span><span class="op">&lt;</span><span class="ident">G::NodeId</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">NodeIdentifiers</span> <span class="op">=</span> <span class="ident">NodeFilteredNeighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G::NodeIdentifiers</span>, <span class="ident">F</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">node_identifiers</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NodeIdentifiers</span> {
+    <span class="kw">fn</span> <span class="ident">node_identifiers</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeIdentifiers</span> {
         <span class="ident">NodeFilteredNeighbors</span> {
             <span class="ident">include_source</span>: <span class="bool-val">true</span>,
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">node_identifiers</span>(),
@@ -566,7 +566,7 @@
 {
     <span class="kw">type</span> <span class="ident">NodeRef</span> <span class="op">=</span> <span class="ident">G::NodeRef</span>;
     <span class="kw">type</span> <span class="ident">NodeReferences</span> <span class="op">=</span> <span class="ident">NodeFilteredNodes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G::NodeReferences</span>, <span class="ident">F</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">node_references</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NodeReferences</span> {
+    <span class="kw">fn</span> <span class="ident">node_references</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeReferences</span> {
         <span class="ident">NodeFilteredNodes</span> {
             <span class="ident">include_source</span>: <span class="bool-val">true</span>,
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">node_references</span>(),
@@ -589,7 +589,7 @@
           <span class="ident">F</span>: <span class="ident">FilterNode</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">I::Item</span> <span class="kw">as</span> <span class="ident">NodeRef</span><span class="op">&gt;</span><span class="ident">::NodeId</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span>;
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">include_source</span> {
             <span class="prelude-val">None</span>
@@ -605,7 +605,7 @@
 {
     <span class="kw">type</span> <span class="ident">EdgeRef</span> <span class="op">=</span> <span class="ident">G::EdgeRef</span>;
     <span class="kw">type</span> <span class="ident">EdgeReferences</span> <span class="op">=</span> <span class="ident">NodeFilteredEdgeReferences</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span>, <span class="ident">G::EdgeReferences</span>, <span class="ident">F</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edge_references</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::EdgeReferences</span> {
+    <span class="kw">fn</span> <span class="ident">edge_references</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeReferences</span> {
         <span class="ident">NodeFilteredEdgeReferences</span> {
             <span class="ident">graph</span>: <span class="ident">PhantomData</span>,
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">edge_references</span>(),
@@ -628,7 +628,7 @@
           <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">G::EdgeRef</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span>;
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">find</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">edge</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">include_node</span>(<span class="ident">edge</span>.<span class="ident">source</span>()) <span class="op">&amp;&amp;</span>
                                     <span class="ident">f</span>.<span class="ident">include_node</span>(<span class="ident">edge</span>.<span class="ident">target</span>()))
@@ -640,7 +640,7 @@
           <span class="ident">F</span>: <span class="ident">FilterNode</span><span class="op">&lt;</span><span class="ident">G::NodeId</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Edges</span> <span class="op">=</span> <span class="ident">NodeFilteredEdges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span>, <span class="ident">G::Edges</span>, <span class="ident">F</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edges</span>(<span class="self">self</span>, <span class="ident">a</span>: <span class="ident">G::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Edges</span> {
+    <span class="kw">fn</span> <span class="ident">edges</span>(<span class="self">self</span>, <span class="ident">a</span>: <span class="ident">G::NodeId</span>) -&gt; <span class="ident"><span class="self">Self</span>::Edges</span> {
         <span class="ident">NodeFilteredEdges</span> {
             <span class="ident">graph</span>: <span class="ident">PhantomData</span>,
             <span class="ident">include_source</span>: <span class="self">self</span>.<span class="number">1</span>.<span class="ident">include_node</span>(<span class="ident">a</span>),
@@ -667,7 +667,7 @@
           <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">G::EdgeRef</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">include_source</span> {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -681,7 +681,7 @@
     <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">DataMap</span>,
           <span class="ident">F</span>: <span class="ident">FilterNode</span><span class="op">&lt;</span><span class="ident">G::NodeId</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">node_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">node_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::NodeWeight</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">1</span>.<span class="ident">include_node</span>(<span class="ident">id</span>) {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">node_weight</span>(<span class="ident">id</span>)
         } <span class="kw">else</span> {
@@ -689,13 +689,13 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">edge_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">edge_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident"><span class="self">Self</span>::EdgeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::EdgeWeight</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">edge_weight</span>(<span class="ident">id</span>)
     }
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">access0</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>.<span class="number">0</span>)
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>.<span class="number">0</span>)
 }
 
 <span class="macro">Data!</span>{<span class="ident">delegate_impl</span> [[<span class="ident">G</span>, <span class="ident">F</span>], <span class="ident">G</span>, <span class="ident">NodeFiltered</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">access0</span>]}
@@ -706,13 +706,13 @@
 <span class="doccomment">/// A graph filter for edges</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FilterEdge</span><span class="op">&lt;</span><span class="ident">Edge</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Return true to have the edge be part of the graph</span>
-    <span class="kw">fn</span> <span class="ident">include_edge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">include_edge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span>) -&gt; <span class="ident">bool</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">FilterEdge</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span>
-    <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">N</span>) -&gt; <span class="ident">bool</span>,
 {
-    <span class="kw">fn</span> <span class="ident">include_edge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">include_edge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">N</span>) -&gt; <span class="ident">bool</span> {
         (<span class="kw-2">*</span><span class="self">self</span>)(<span class="ident">n</span>)
     }
 }
@@ -730,10 +730,10 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="ident">EdgeFiltered</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoEdgeReferences</span>,
-          <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">G::EdgeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+          <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">G::EdgeRef</span>) -&gt; <span class="ident">bool</span>,
 {
     <span class="doccomment">/// Create an `EdgeFiltered` adaptor from the closure `filter`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_fn</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">filter</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_fn</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">filter</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">EdgeFiltered</span>(<span class="ident">graph</span>, <span class="ident">filter</span>)
     }
 }
@@ -748,7 +748,7 @@
           <span class="ident">F</span>: <span class="ident">FilterEdge</span><span class="op">&lt;</span><span class="ident">G::EdgeRef</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Neighbors</span> <span class="op">=</span> <span class="ident">EdgeFilteredNeighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span>, <span class="ident">F</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">neighbors</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">G::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Neighbors</span> {
+    <span class="kw">fn</span> <span class="ident">neighbors</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">G::NodeId</span>) -&gt; <span class="ident"><span class="self">Self</span>::Neighbors</span> {
         <span class="ident">EdgeFilteredNeighbors</span> {
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">edges</span>(<span class="ident">n</span>),
             <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>,
@@ -769,7 +769,7 @@
           <span class="ident">G</span>: <span class="ident">IntoEdges</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">G::NodeId</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span>;
         (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">iter</span>).<span class="ident">filter_map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
             <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">include_edge</span>(<span class="ident">edge</span>) {
@@ -785,7 +785,7 @@
 {
     <span class="kw">type</span> <span class="ident">EdgeRef</span> <span class="op">=</span> <span class="ident">G::EdgeRef</span>;
     <span class="kw">type</span> <span class="ident">EdgeReferences</span> <span class="op">=</span> <span class="ident">EdgeFilteredEdges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span>, <span class="ident">G::EdgeReferences</span>, <span class="ident">F</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edge_references</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::EdgeReferences</span> {
+    <span class="kw">fn</span> <span class="ident">edge_references</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeReferences</span> {
         <span class="ident">EdgeFilteredEdges</span> {
             <span class="ident">graph</span>: <span class="ident">PhantomData</span>,
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">edge_references</span>(),
@@ -799,7 +799,7 @@
           <span class="ident">F</span>: <span class="ident">FilterEdge</span><span class="op">&lt;</span><span class="ident">G::EdgeRef</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Edges</span> <span class="op">=</span> <span class="ident">EdgeFilteredEdges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span>, <span class="ident">G::Edges</span>, <span class="ident">F</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edges</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">G::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Edges</span> {
+    <span class="kw">fn</span> <span class="ident">edges</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">G::NodeId</span>) -&gt; <span class="ident"><span class="self">Self</span>::Edges</span> {
         <span class="ident">EdgeFilteredEdges</span> {
             <span class="ident">graph</span>: <span class="ident">PhantomData</span>,
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">edges</span>(<span class="ident">n</span>),
@@ -822,7 +822,7 @@
           <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">G::EdgeRef</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span>;
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">find</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">edge</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">include_edge</span>(<span class="ident">edge</span>))
     }

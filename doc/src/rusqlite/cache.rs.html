@@ -382,7 +382,7 @@
     <span class="doccomment">/// Will return `Err` if `sql` cannot be converted to a C-compatible string</span>
     <span class="doccomment">/// or if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prepare_cached</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CachedStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prepare_cached</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CachedStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">get</span>(<span class="self">self</span>, <span class="ident">sql</span>)
     }
 
@@ -421,14 +421,14 @@
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">CachedStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()
     }
 }
@@ -445,7 +445,7 @@
 
 <span class="kw">impl</span> <span class="ident">CachedStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(<span class="ident">stmt</span>: <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="ident">StatementCache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CachedStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(<span class="ident">stmt</span>: <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="ident">StatementCache</span>) -&gt; <span class="ident">CachedStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
         <span class="ident">CachedStatement</span> {
             <span class="ident">stmt</span>: <span class="prelude-val">Some</span>(<span class="ident">stmt</span>),
             <span class="ident">cache</span>,
@@ -463,7 +463,7 @@
 <span class="kw">impl</span> <span class="ident">StatementCache</span> {
     <span class="doccomment">/// Create a statement cache.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StatementCache</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="ident">StatementCache</span> {
         <span class="ident">StatementCache</span>(<span class="ident">RefCell::new</span>(<span class="ident">LruCache::new</span>(<span class="ident">capacity</span>)))
     }
 
@@ -483,12 +483,12 @@
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="self">self</span>,
         <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="ident">Connection</span>,
         <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CachedStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CachedStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="ident">sql</span>.<span class="ident">trim</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow_mut</span>();
         <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">remove</span>(<span class="ident">trimmed</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">raw_stmt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Statement::new</span>(<span class="ident">conn</span>, <span class="ident">raw_stmt</span>)),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">conn</span>.<span class="ident">prepare</span>(<span class="ident">trimmed</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">raw_stmt</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Statement::new</span>(<span class="ident">conn</span>, <span class="ident">raw_stmt</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">conn</span>.<span class="ident">prepare</span>(<span class="ident">trimmed</span>),
         };
         <span class="ident">stmt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">stmt</span><span class="op">|</span> {
             <span class="ident">stmt</span>.<span class="ident">stmt</span>.<span class="ident">set_statement_cache_key</span>(<span class="ident">trimmed</span>);
@@ -531,17 +531,17 @@
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow_mut</span>().<span class="ident">clear</span>();
         }
 
-        <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow</span>().<span class="ident">len</span>()
         }
 
-        <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow</span>().<span class="ident">capacity</span>()
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_cache</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_cache</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">db</span>.<span class="ident">cache</span>;
         <span class="kw">let</span> <span class="ident">initial_capacity</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">capacity</span>();
@@ -570,7 +570,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_set_capacity</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_set_capacity</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">db</span>.<span class="ident">cache</span>;
 
@@ -603,7 +603,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_discard</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_discard</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">db</span>.<span class="ident">cache</span>;
 
@@ -619,7 +619,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_ddl</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_ddl</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(
             <span class="string">r#&quot;
@@ -653,7 +653,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_connection_close</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_connection_close</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
         <span class="ident">conn</span>.<span class="ident">prepare_cached</span>(<span class="string">&quot;SELECT * FROM sqlite_master;&quot;</span>)<span class="question-mark">?</span>;
 
@@ -662,7 +662,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_cache_key</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_cache_key</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">db</span>.<span class="ident">cache</span>;
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">cache</span>.<span class="ident">len</span>());
@@ -686,7 +686,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_empty_stmt</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_empty_stmt</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
         <span class="ident">conn</span>.<span class="ident">prepare_cached</span>(<span class="string">&quot;&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())

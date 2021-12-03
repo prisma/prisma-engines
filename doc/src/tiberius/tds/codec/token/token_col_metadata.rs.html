@@ -222,83 +222,83 @@
 }
 
 <span class="kw">impl</span> <span class="ident">BaseMetaDataColumn</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">null_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">null_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">ty</span> {
-            <span class="ident">TypeInfo::FixedLen</span>(<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">ty</span> {
-                <span class="ident">FixedLenType::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::I32</span>(<span class="prelude-val">None</span>),
-                <span class="ident">FixedLenType::Int1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::U8</span>(<span class="prelude-val">None</span>),
-                <span class="ident">FixedLenType::Bit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Bit</span>(<span class="prelude-val">None</span>),
-                <span class="ident">FixedLenType::Int2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::I16</span>(<span class="prelude-val">None</span>),
-                <span class="ident">FixedLenType::Int4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::I32</span>(<span class="prelude-val">None</span>),
-                <span class="ident">FixedLenType::Datetime4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::SmallDateTime</span>(<span class="prelude-val">None</span>),
-                <span class="ident">FixedLenType::Float4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::F32</span>(<span class="prelude-val">None</span>),
-                <span class="ident">FixedLenType::Money</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::F64</span>(<span class="prelude-val">None</span>),
-                <span class="ident">FixedLenType::Datetime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::DateTime</span>(<span class="prelude-val">None</span>),
-                <span class="ident">FixedLenType::Float8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::F64</span>(<span class="prelude-val">None</span>),
-                <span class="ident">FixedLenType::Money4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::F32</span>(<span class="prelude-val">None</span>),
-                <span class="ident">FixedLenType::Int8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::I64</span>(<span class="prelude-val">None</span>),
+            <span class="ident">TypeInfo::FixedLen</span>(<span class="ident">ty</span>) =&gt; <span class="kw">match</span> <span class="ident">ty</span> {
+                <span class="ident">FixedLenType::Null</span> =&gt; <span class="ident">ColumnData::I32</span>(<span class="prelude-val">None</span>),
+                <span class="ident">FixedLenType::Int1</span> =&gt; <span class="ident">ColumnData::U8</span>(<span class="prelude-val">None</span>),
+                <span class="ident">FixedLenType::Bit</span> =&gt; <span class="ident">ColumnData::Bit</span>(<span class="prelude-val">None</span>),
+                <span class="ident">FixedLenType::Int2</span> =&gt; <span class="ident">ColumnData::I16</span>(<span class="prelude-val">None</span>),
+                <span class="ident">FixedLenType::Int4</span> =&gt; <span class="ident">ColumnData::I32</span>(<span class="prelude-val">None</span>),
+                <span class="ident">FixedLenType::Datetime4</span> =&gt; <span class="ident">ColumnData::SmallDateTime</span>(<span class="prelude-val">None</span>),
+                <span class="ident">FixedLenType::Float4</span> =&gt; <span class="ident">ColumnData::F32</span>(<span class="prelude-val">None</span>),
+                <span class="ident">FixedLenType::Money</span> =&gt; <span class="ident">ColumnData::F64</span>(<span class="prelude-val">None</span>),
+                <span class="ident">FixedLenType::Datetime</span> =&gt; <span class="ident">ColumnData::DateTime</span>(<span class="prelude-val">None</span>),
+                <span class="ident">FixedLenType::Float8</span> =&gt; <span class="ident">ColumnData::F64</span>(<span class="prelude-val">None</span>),
+                <span class="ident">FixedLenType::Money4</span> =&gt; <span class="ident">ColumnData::F32</span>(<span class="prelude-val">None</span>),
+                <span class="ident">FixedLenType::Int8</span> =&gt; <span class="ident">ColumnData::I64</span>(<span class="prelude-val">None</span>),
             },
-            <span class="ident">TypeInfo::VarLenSized</span>(<span class="ident">cx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">cx</span>.<span class="ident">r#type</span>() {
-                <span class="ident">VarLenType::Guid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Guid</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Intn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::I32</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Bitn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Bit</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Decimaln</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Numericn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Floatn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::F32</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Money</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::F64</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Datetimen</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::DateTime</span>(<span class="prelude-val">None</span>),
+            <span class="ident">TypeInfo::VarLenSized</span>(<span class="ident">cx</span>) =&gt; <span class="kw">match</span> <span class="ident">cx</span>.<span class="ident">r#type</span>() {
+                <span class="ident">VarLenType::Guid</span> =&gt; <span class="ident">ColumnData::Guid</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Intn</span> =&gt; <span class="ident">ColumnData::I32</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Bitn</span> =&gt; <span class="ident">ColumnData::Bit</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Decimaln</span> =&gt; <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Numericn</span> =&gt; <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Floatn</span> =&gt; <span class="ident">ColumnData::F32</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Money</span> =&gt; <span class="ident">ColumnData::F64</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Datetimen</span> =&gt; <span class="ident">ColumnData::DateTime</span>(<span class="prelude-val">None</span>),
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::Daten</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Date</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Daten</span> =&gt; <span class="ident">ColumnData::Date</span>(<span class="prelude-val">None</span>),
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::Timen</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Time</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Timen</span> =&gt; <span class="ident">ColumnData::Time</span>(<span class="prelude-val">None</span>),
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::Datetime2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::DateTime2</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Datetime2</span> =&gt; <span class="ident">ColumnData::DateTime2</span>(<span class="prelude-val">None</span>),
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::DatetimeOffsetn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::DateTimeOffset</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::BigVarBin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::BigVarChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::BigBinary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::BigChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::NVarchar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::NChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Xml</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Xml</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Udt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">todo!</span>(<span class="string">&quot;User-defined types not supported&quot;</span>),
-                <span class="ident">VarLenType::Text</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Image</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::NText</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::SSVariant</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">todo!</span>(),
+                <span class="ident">VarLenType::DatetimeOffsetn</span> =&gt; <span class="ident">ColumnData::DateTimeOffset</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::BigVarBin</span> =&gt; <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::BigVarChar</span> =&gt; <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::BigBinary</span> =&gt; <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::BigChar</span> =&gt; <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::NVarchar</span> =&gt; <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::NChar</span> =&gt; <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Xml</span> =&gt; <span class="ident">ColumnData::Xml</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Udt</span> =&gt; <span class="macro">todo!</span>(<span class="string">&quot;User-defined types not supported&quot;</span>),
+                <span class="ident">VarLenType::Text</span> =&gt; <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Image</span> =&gt; <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::NText</span> =&gt; <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::SSVariant</span> =&gt; <span class="macro">todo!</span>(),
             },
-            <span class="ident">TypeInfo::VarLenSizedPrecision</span> { <span class="ident">ty</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">ty</span> {
-                <span class="ident">VarLenType::Guid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Guid</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Intn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::I32</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Bitn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Bit</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Decimaln</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Numericn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Floatn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::F32</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Money</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::F64</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Datetimen</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::DateTime</span>(<span class="prelude-val">None</span>),
+            <span class="ident">TypeInfo::VarLenSizedPrecision</span> { <span class="ident">ty</span>, .. } =&gt; <span class="kw">match</span> <span class="ident">ty</span> {
+                <span class="ident">VarLenType::Guid</span> =&gt; <span class="ident">ColumnData::Guid</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Intn</span> =&gt; <span class="ident">ColumnData::I32</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Bitn</span> =&gt; <span class="ident">ColumnData::Bit</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Decimaln</span> =&gt; <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Numericn</span> =&gt; <span class="ident">ColumnData::Numeric</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Floatn</span> =&gt; <span class="ident">ColumnData::F32</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Money</span> =&gt; <span class="ident">ColumnData::F64</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Datetimen</span> =&gt; <span class="ident">ColumnData::DateTime</span>(<span class="prelude-val">None</span>),
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::Daten</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Date</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Daten</span> =&gt; <span class="ident">ColumnData::Date</span>(<span class="prelude-val">None</span>),
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::Timen</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Time</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Timen</span> =&gt; <span class="ident">ColumnData::Time</span>(<span class="prelude-val">None</span>),
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::Datetime2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::DateTime2</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Datetime2</span> =&gt; <span class="ident">ColumnData::DateTime2</span>(<span class="prelude-val">None</span>),
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                <span class="ident">VarLenType::DatetimeOffsetn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::DateTimeOffset</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::BigVarBin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::BigVarChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::BigBinary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::BigChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::NVarchar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::NChar</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Xml</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Xml</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Udt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">todo!</span>(<span class="string">&quot;User-defined types not supported&quot;</span>),
-                <span class="ident">VarLenType::Text</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::Image</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::NText</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
-                <span class="ident">VarLenType::SSVariant</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">todo!</span>(),
+                <span class="ident">VarLenType::DatetimeOffsetn</span> =&gt; <span class="ident">ColumnData::DateTimeOffset</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::BigVarBin</span> =&gt; <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::BigVarChar</span> =&gt; <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::BigBinary</span> =&gt; <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::BigChar</span> =&gt; <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::NVarchar</span> =&gt; <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::NChar</span> =&gt; <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Xml</span> =&gt; <span class="ident">ColumnData::Xml</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Udt</span> =&gt; <span class="macro">todo!</span>(<span class="string">&quot;User-defined types not supported&quot;</span>),
+                <span class="ident">VarLenType::Text</span> =&gt; <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::Image</span> =&gt; <span class="ident">ColumnData::Binary</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::NText</span> =&gt; <span class="ident">ColumnData::String</span>(<span class="prelude-val">None</span>),
+                <span class="ident">VarLenType::SSVariant</span> =&gt; <span class="macro">todo!</span>(),
             },
-            <span class="ident">TypeInfo::Xml</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnData::Xml</span>(<span class="prelude-val">None</span>),
+            <span class="ident">TypeInfo::Xml</span> { .. } =&gt; <span class="ident">ColumnData::Xml</span>(<span class="prelude-val">None</span>),
         }
     }
 }
@@ -341,7 +341,7 @@
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="kw">impl</span> <span class="ident">TokenColMetaData</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
     {
@@ -360,7 +360,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">TokenColMetaData</span> { <span class="ident">columns</span> })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Column</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Column</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Column</span> {
             <span class="ident">name</span>: <span class="ident">x</span>.<span class="ident">col_name</span>.<span class="ident">clone</span>(),
             <span class="ident">column_type</span>: <span class="ident">ColumnType::from</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">base</span>.<span class="ident">ty</span>),
@@ -369,7 +369,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">BaseMetaDataColumn</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
     {

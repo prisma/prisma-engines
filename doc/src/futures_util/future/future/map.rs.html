@@ -90,7 +90,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Fut</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="ident">Fut</span>, <span class="ident">F</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new Map.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">future</span>: <span class="ident">Fut</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">future</span>: <span class="ident">Fut</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Incomplete</span> { <span class="ident">future</span>, <span class="ident">f</span> }
     }
 }
@@ -100,10 +100,10 @@
     <span class="ident">Fut</span>: <span class="ident">Future</span>,
     <span class="ident">F</span>: <span class="ident">FnOnce1</span><span class="op">&lt;</span><span class="ident">Fut::Output</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">is_terminated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_terminated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Incomplete</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident"><span class="self">Self</span>::Complete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident"><span class="self">Self</span>::Incomplete</span> { .. } =&gt; <span class="bool-val">false</span>,
+            <span class="ident"><span class="self">Self</span>::Complete</span> =&gt; <span class="bool-val">true</span>,
         }
     }
 }
@@ -115,16 +115,16 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>() {
-            <span class="ident">MapProj::Incomplete</span> { <span class="ident">future</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">MapProj::Incomplete</span> { <span class="ident">future</span>, .. } =&gt; {
                 <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">future</span>.<span class="ident">poll</span>(<span class="ident">cx</span>));
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">project_replace</span>(<span class="ident">Map::Complete</span>) {
-                    <span class="ident">MapProjReplace::Incomplete</span> { <span class="ident">f</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Ready</span>(<span class="ident">f</span>.<span class="ident">call_once</span>(<span class="ident">output</span>)),
-                    <span class="ident">MapProjReplace::Complete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                    <span class="ident">MapProjReplace::Incomplete</span> { <span class="ident">f</span>, .. } =&gt; <span class="ident">Poll::Ready</span>(<span class="ident">f</span>.<span class="ident">call_once</span>(<span class="ident">output</span>)),
+                    <span class="ident">MapProjReplace::Complete</span> =&gt; <span class="macro">unreachable!</span>(),
                 }
             }
-            <span class="ident">MapProj::Complete</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">MapProj::Complete</span> =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;Map must not be polled after it returned `Poll::Ready`&quot;</span>)
             }
         }

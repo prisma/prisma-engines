@@ -55,12 +55,12 @@
 
 <span class="kw">impl</span> <span class="ident">Iv</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assume_unique_for_key</span>(<span class="ident">a</span>: [<span class="ident">u8</span>; <span class="ident">IV_LEN</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assume_unique_for_key</span>(<span class="ident">a</span>: [<span class="ident">u8</span>; <span class="ident">IV_LEN</span>]) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">a</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bytes_less_safe</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="ident">IV_LEN</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bytes_less_safe</span>(<span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="ident">IV_LEN</span>] {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }

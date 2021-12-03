@@ -181,7 +181,7 @@
         <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
         <span class="ident">prisma_schema</span>: <span class="ident">String</span>,
         <span class="ident">rt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">tokio::runtime::Runtime</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="ident">EvaluateDataLoss</span> {
             <span class="ident">api</span>,
             <span class="ident">migrations_directory</span>,
@@ -190,7 +190,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">send_impl</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EvaluateDataLossAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">send_impl</span>(<span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EvaluateDataLossAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rt</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">api</span>.<span class="ident">evaluate_data_loss</span>(<span class="kw-2">&amp;</span><span class="ident">EvaluateDataLossInput</span> {
             <span class="ident">migrations_directory_path</span>: <span class="self">self</span>.<span class="ident">migrations_directory</span>.<span class="ident">path</span>().<span class="ident">to_str</span>().<span class="ident">unwrap</span>().<span class="ident">to_owned</span>(),
             <span class="ident">prisma_schema</span>: <span class="self">self</span>.<span class="ident">prisma_schema</span>,
@@ -204,7 +204,7 @@
     }
 
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EvaluateDataLossAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) -&gt; <span class="ident">EvaluateDataLossAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">send_impl</span>().<span class="ident">unwrap</span>()
     }
 }
@@ -216,16 +216,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">EvaluateDataLossAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;EvaluateDataLossAssertion&quot;</span>).<span class="ident">finish</span>()
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EvaluateDataLossAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_steps_count</span>(<span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_steps_count</span>(<span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">migration_steps</span> <span class="op">=</span><span class="op">=</span> <span class="ident">count</span>,
+            <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">migration_steps</span> <span class="op">==</span> <span class="ident">count</span>,
             <span class="string">&quot;Assertion failed. Expected evaluateDataLoss to return {} steps, found {}&quot;</span>,
             <span class="ident">count</span>,
             <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">migration_steps</span>,
@@ -234,7 +234,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_warnings</span>(<span class="self">self</span>, <span class="ident">warnings</span>: <span class="kw-2">&amp;</span>[<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_warnings</span>(<span class="self">self</span>, <span class="ident">warnings</span>: <span class="kw-2">&amp;</span>[<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>]) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_eq!</span>(
             <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">warnings</span>.<span class="ident">len</span>(),
             <span class="ident">warnings</span>.<span class="ident">len</span>(),
@@ -256,9 +256,9 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_warnings_with_indices</span>(<span class="self">self</span>, <span class="ident">warnings</span>: <span class="kw-2">&amp;</span>[(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">usize</span>)]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_warnings_with_indices</span>(<span class="self">self</span>, <span class="ident">warnings</span>: <span class="kw-2">&amp;</span>[(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">usize</span>)]) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">warnings</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">warnings</span>.<span class="ident">len</span>(),
+            <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">warnings</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">warnings</span>.<span class="ident">len</span>(),
             <span class="string">&quot;Expected {} warnings, got {}.\n{:#?}&quot;</span>,
             <span class="ident">warnings</span>.<span class="ident">len</span>(),
             <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">warnings</span>.<span class="ident">len</span>(),
@@ -277,9 +277,9 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_unexecutable</span>(<span class="self">self</span>, <span class="ident">unexecutable_steps</span>: <span class="kw-2">&amp;</span>[<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_unexecutable</span>(<span class="self">self</span>, <span class="ident">unexecutable_steps</span>: <span class="kw-2">&amp;</span>[<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>]) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">unexecutable_steps</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">unexecutable_steps</span>.<span class="ident">len</span>(),
+            <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">unexecutable_steps</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">unexecutable_steps</span>.<span class="ident">len</span>(),
             <span class="string">&quot;Expected {} unexecutable_steps, got {}.\n{:#?}&quot;</span>,
             <span class="ident">unexecutable_steps</span>.<span class="ident">len</span>(),
             <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">unexecutable_steps</span>.<span class="ident">len</span>(),
@@ -298,9 +298,9 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_unexecutables_with_indices</span>(<span class="self">self</span>, <span class="ident">unexecutables</span>: <span class="kw-2">&amp;</span>[(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">usize</span>)]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_unexecutables_with_indices</span>(<span class="self">self</span>, <span class="ident">unexecutables</span>: <span class="kw-2">&amp;</span>[(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">usize</span>)]) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">unexecutable_steps</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">unexecutables</span>.<span class="ident">len</span>(),
+            <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">unexecutable_steps</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">unexecutables</span>.<span class="ident">len</span>(),
             <span class="string">&quot;Expected {} unexecutables, got {}.\n{:#?}&quot;</span>,
             <span class="ident">unexecutables</span>.<span class="ident">len</span>(),
             <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">unexecutable_steps</span>.<span class="ident">len</span>(),
@@ -318,7 +318,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_output</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EvaluateDataLossOutput</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_output</span>(<span class="self">self</span>) -&gt; <span class="ident">EvaluateDataLossOutput</span> {
         <span class="self">self</span>.<span class="ident">output</span>
     }
 }

@@ -444,7 +444,7 @@ types.
 	<span class="doccomment">///   This is placed as a function type parameter rather than a trait type</span>
 	<span class="doccomment">///   parameter so that it can be specified in ambiguous call sites.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">pipe</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+	<span class="kw">fn</span> <span class="ident">pipe</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="self">Self</span>) -&gt; <span class="ident">R</span>) -&gt; <span class="ident">R</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">Sized</span> {
 		<span class="ident">func</span>(<span class="self">self</span>)
 	}
@@ -485,7 +485,7 @@ in this trait operate by various mechanisms, including:
 	<span class="doccomment">/// - `&#39;a`: The lifetime of the `self` value. `.pipe_ref` borrows `self` for</span>
 	<span class="doccomment">///   the duration `&#39;a`, and extends it through the return value of `func`.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">pipe_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+	<span class="kw">fn</span> <span class="ident">pipe_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>) -&gt; <span class="ident">R</span>) -&gt; <span class="ident">R</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Sized</span> {
 		<span class="ident">func</span>(<span class="self">self</span>)
 	}
@@ -513,7 +513,7 @@ in this trait operate by various mechanisms, including:
 	<span class="doccomment">/// - `&#39;a`: The lifetime of the `self` value. `.pipe_mut` borrows `self` for</span>
 	<span class="doccomment">///   the duration `&#39;a`, and extends it through the return value of `func`.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">pipe_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+	<span class="kw">fn</span> <span class="ident">pipe_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span>) -&gt; <span class="ident">R</span>) -&gt; <span class="ident">R</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Sized</span> {
 		<span class="ident">func</span>(<span class="self">self</span>)
 	}
@@ -546,7 +546,7 @@ in this trait operate by various mechanisms, including:
 	<span class="doccomment">/// - `&#39;a`: The lifetime of the `self` value. `.pipe_mut` borrows `self` for</span>
 	<span class="doccomment">///   the duration `&#39;a`, and extends it through the return value of `func`.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">pipe_borrow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+	<span class="kw">fn</span> <span class="ident">pipe_borrow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>) -&gt; <span class="ident">R</span>
 	<span class="kw">where</span>
 		<span class="self">Self</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 		<span class="ident">T</span>: <span class="lifetime">&#39;a</span>,
@@ -581,8 +581,8 @@ in this trait operate by various mechanisms, including:
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">pipe_borrow_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>(
 		<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-		<span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+		<span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
+	) -&gt; <span class="ident">R</span>
 	<span class="kw">where</span>
 		<span class="self">Self</span>: <span class="ident">BorrowMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 		<span class="ident">T</span>: <span class="lifetime">&#39;a</span>,
@@ -609,7 +609,7 @@ in this trait operate by various mechanisms, including:
 	<span class="doccomment">/// - `&#39;a`: The lifetime of the `self` value. `.pipe_mut` borrows `self` for</span>
 	<span class="doccomment">///   the duration `&#39;a`, and extends it through the return value of `func`.</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">pipe_as_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+	<span class="kw">fn</span> <span class="ident">pipe_as_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>) -&gt; <span class="ident">R</span>
 	<span class="kw">where</span>
 		<span class="self">Self</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 		<span class="ident">T</span>: <span class="lifetime">&#39;a</span>,
@@ -635,8 +635,8 @@ in this trait operate by various mechanisms, including:
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">pipe_as_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>(
 		<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-		<span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+		<span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
+	) -&gt; <span class="ident">R</span>
 	<span class="kw">where</span>
 		<span class="self">Self</span>: <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 		<span class="ident">T</span>: <span class="lifetime">&#39;a</span>,
@@ -664,8 +664,8 @@ in this trait operate by various mechanisms, including:
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">pipe_deref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>(
 		<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-		<span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Deref</span><span class="op">&gt;</span><span class="ident">::Target</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+		<span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Deref</span><span class="op">&gt;</span><span class="ident">::Target</span>) -&gt; <span class="ident">R</span>,
+	) -&gt; <span class="ident">R</span>
 	<span class="kw">where</span>
 		<span class="self">Self</span>: <span class="ident">Deref</span>,
 		<span class="ident">R</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Sized</span>,
@@ -690,8 +690,8 @@ in this trait operate by various mechanisms, including:
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">pipe_deref_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>(
 		<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-		<span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Deref</span><span class="op">&gt;</span><span class="ident">::Target</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+		<span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Deref</span><span class="op">&gt;</span><span class="ident">::Target</span>) -&gt; <span class="ident">R</span>,
+	) -&gt; <span class="ident">R</span>
 	<span class="kw">where</span>
 		<span class="self">Self</span>: <span class="ident">DerefMut</span>,
 		<span class="ident">R</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Sized</span>,

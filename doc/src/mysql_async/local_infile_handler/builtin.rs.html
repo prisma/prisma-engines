@@ -94,7 +94,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">WhiteListFsLocalInfileHandler</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">white_list</span>: <span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">WhiteListFsLocalInfileHandler</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">white_list</span>: <span class="ident">B</span>) -&gt; <span class="ident">WhiteListFsLocalInfileHandler</span>
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>,
         <span class="ident">B</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span>,
@@ -110,10 +110,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">LocalInfileHandler</span> <span class="kw">for</span> <span class="ident">WhiteListFsLocalInfileHandler</span> {
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file_name</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::InfileHandlerFuture</span> {
+    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file_name</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident"><span class="kw">super</span>::InfileHandlerFuture</span> {
         <span class="kw">let</span> <span class="ident">path</span>: <span class="ident">PathBuf</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">from_utf8</span>(<span class="ident">file_name</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">path_str</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">path_str</span>.<span class="ident">into</span>(),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Box::pin</span>(<span class="ident">futures_util::future::err</span>(<span class="string">&quot;Invalid file name&quot;</span>.<span class="ident">into</span>())),
+            <span class="prelude-val">Ok</span>(<span class="ident">path_str</span>) =&gt; <span class="ident">path_str</span>.<span class="ident">into</span>(),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Box::pin</span>(<span class="ident">futures_util::future::err</span>(<span class="string">&quot;Invalid file name&quot;</span>.<span class="ident">into</span>())),
         };
 
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">white_list</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>) {

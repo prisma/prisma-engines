@@ -80,12 +80,12 @@
     <span class="kw">static</span> <span class="ident">CONTEXT</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Handle</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">RefCell::new</span>(<span class="prelude-val">None</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">current</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Handle</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">current</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Handle</span><span class="op">&gt;</span> {
     <span class="ident">CONTEXT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">ctx</span><span class="op">|</span> <span class="ident">ctx</span>.<span class="ident">borrow</span>().<span class="ident">clone</span>())
 }
 
 <span class="macro">cfg_io_driver!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">io_handle</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::runtime::driver::IoHandle</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">io_handle</span>() -&gt; <span class="ident"><span class="kw">crate</span>::runtime::driver::IoHandle</span> {
         <span class="ident">CONTEXT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">ctx</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">borrow</span>();
             <span class="ident">ctx</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="ident"><span class="kw">crate</span>::util::error::CONTEXT_MISSING_ERROR</span>).<span class="ident">io_handle</span>.<span class="ident">clone</span>()
@@ -95,7 +95,7 @@
 
 <span class="macro">cfg_signal_internal!</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">signal_handle</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::runtime::driver::SignalHandle</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">signal_handle</span>() -&gt; <span class="ident"><span class="kw">crate</span>::runtime::driver::SignalHandle</span> {
         <span class="ident">CONTEXT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">ctx</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">borrow</span>();
             <span class="ident">ctx</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="ident"><span class="kw">crate</span>::util::error::CONTEXT_MISSING_ERROR</span>).<span class="ident">signal_handle</span>.<span class="ident">clone</span>()
@@ -104,7 +104,7 @@
 }
 
 <span class="macro">cfg_time!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">time_handle</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::runtime::driver::TimeHandle</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">time_handle</span>() -&gt; <span class="ident"><span class="kw">crate</span>::runtime::driver::TimeHandle</span> {
         <span class="ident">CONTEXT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">ctx</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">borrow</span>();
             <span class="ident">ctx</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="ident"><span class="kw">crate</span>::util::error::CONTEXT_MISSING_ERROR</span>).<span class="ident">time_handle</span>.<span class="ident">clone</span>()
@@ -112,14 +112,14 @@
     }
 
     <span class="macro">cfg_test_util!</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clock</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::runtime::driver::Clock</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clock</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::runtime::driver::Clock</span><span class="op">&gt;</span> {
             <span class="ident">CONTEXT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">ctx</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">ctx</span>.<span class="ident">borrow</span>()).<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ctx</span><span class="op">|</span> <span class="ident">ctx</span>.<span class="ident">clock</span>.<span class="ident">clone</span>()))
         }
     }
 }
 
 <span class="macro">cfg_rt!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">spawn_handle</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::runtime::Spawner</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">spawn_handle</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::runtime::Spawner</span><span class="op">&gt;</span> {
         <span class="ident">CONTEXT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">ctx</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">ctx</span>.<span class="ident">borrow</span>()).<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ctx</span><span class="op">|</span> <span class="ident">ctx</span>.<span class="ident">spawner</span>.<span class="ident">clone</span>()))
     }
 }
@@ -127,7 +127,7 @@
 <span class="doccomment">/// Set this [`Handle`] as the current active [`Handle`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Handle`]: Handle</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">enter</span>(<span class="ident">new</span>: <span class="ident">Handle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EnterGuard</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">enter</span>(<span class="ident">new</span>: <span class="ident">Handle</span>) -&gt; <span class="ident">EnterGuard</span> {
     <span class="ident">CONTEXT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">ctx</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">borrow_mut</span>().<span class="ident">replace</span>(<span class="ident">new</span>);
         <span class="ident">EnterGuard</span>(<span class="ident">old</span>)

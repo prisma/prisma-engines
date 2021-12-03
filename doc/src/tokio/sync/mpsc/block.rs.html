@@ -446,18 +446,18 @@
 
 <span class="doccomment">/// Returns the index of the first slot in the block referenced by `slot_index`.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start_index</span>(<span class="ident">slot_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start_index</span>(<span class="ident">slot_index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">BLOCK_MASK</span> <span class="op">&amp;</span> <span class="ident">slot_index</span>
 }
 
 <span class="doccomment">/// Returns the offset into the block referenced by `slot_index`.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">offset</span>(<span class="ident">slot_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">offset</span>(<span class="ident">slot_index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">SLOT_MASK</span> <span class="op">&amp;</span> <span class="ident">slot_index</span>
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">start_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">start_index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Block</span> {
             <span class="comment">// The absolute index in the channel of the first slot in the block.</span>
             <span class="ident">start_index</span>,
@@ -475,17 +475,17 @@
     }
 
     <span class="doccomment">/// Returns `true` if the block matches the given index</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_at_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">offset</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span>);
-        <span class="self">self</span>.<span class="ident">start_index</span> <span class="op">=</span><span class="op">=</span> <span class="ident">index</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_at_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">debug_assert!</span>(<span class="ident">offset</span>(<span class="ident">index</span>) <span class="op">==</span> <span class="number">0</span>);
+        <span class="self">self</span>.<span class="ident">start_index</span> <span class="op">==</span> <span class="ident">index</span>
     }
 
     <span class="doccomment">/// Returns the number of blocks between `self` and the block at the</span>
     <span class="doccomment">/// specified index.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `start_index` must represent a block *after* `self`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">offset</span>(<span class="ident">other_index</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other_index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
+        <span class="macro">debug_assert!</span>(<span class="ident">offset</span>(<span class="ident">other_index</span>) <span class="op">==</span> <span class="number">0</span>);
         <span class="ident">other_index</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">start_index</span>) <span class="op">/</span> <span class="ident">BLOCK_CAP</span>
     }
 
@@ -498,7 +498,7 @@
     <span class="doccomment">/// To maintain safety, the caller must ensure:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * No concurrent access to the slot.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">slot_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Read</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">slot_index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Read</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">offset</span>(<span class="ident">slot_index</span>);
 
         <span class="kw">let</span> <span class="ident">ready_bits</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ready_slots</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>);
@@ -598,13 +598,13 @@
     <span class="doccomment">/// be that it would make more sense to coalesce ready flags as bits in a</span>
     <span class="doccomment">/// single atomic cell. However, this could have negative impact on cache</span>
     <span class="doccomment">/// behavior as there would be many more mutations to a single slot.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_final</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">ready_slots</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>) <span class="op">&amp;</span> <span class="ident">READY_MASK</span> <span class="op">=</span><span class="op">=</span> <span class="ident">READY_MASK</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_final</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ready_slots</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>) <span class="op">&amp;</span> <span class="ident">READY_MASK</span> <span class="op">==</span> <span class="ident">READY_MASK</span>
     }
 
     <span class="doccomment">/// Returns the `observed_tail_position` value, if set</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">observed_tail_position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RELEASED</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">ready_slots</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">observed_tail_position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="number">0</span> <span class="op">==</span> <span class="ident">RELEASED</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">ready_slots</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>) {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
             <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">observed_tail_position</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="ident">ptr</span> }))
@@ -612,11 +612,11 @@
     }
 
     <span class="doccomment">/// Loads the next block</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">load_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ordering</span>: <span class="ident">Ordering</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">load_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ordering</span>: <span class="ident">Ordering</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">NonNull::new</span>(<span class="self">self</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">ordering</span>));
 
         <span class="macro">debug_assert!</span>(<span class="kw">unsafe</span> {
-            <span class="ident">ret</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">block</span><span class="op">|</span> <span class="ident">block</span>.<span class="ident">as_ref</span>().<span class="ident">start_index</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">start_index</span>.<span class="ident">wrapping_add</span>(<span class="ident">BLOCK_CAP</span>))
+            <span class="ident">ret</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">block</span><span class="op">|</span> <span class="ident">block</span>.<span class="ident">as_ref</span>().<span class="ident">start_index</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">start_index</span>.<span class="ident">wrapping_add</span>(<span class="ident">BLOCK_CAP</span>))
                 .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
         });
 
@@ -644,7 +644,7 @@
         <span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">success</span>: <span class="ident">Ordering</span>,
         <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">block</span>.<span class="ident">as_mut</span>().<span class="ident">start_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">start_index</span>.<span class="ident">wrapping_add</span>(<span class="ident">BLOCK_CAP</span>);
 
         <span class="kw">let</span> <span class="ident">next_ptr</span> <span class="op">=</span> <span class="self">self</span>
@@ -653,8 +653,8 @@
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>);
 
         <span class="kw">match</span> <span class="ident">NonNull::new</span>(<span class="ident">next_ptr</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">next_ptr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">next_ptr</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">Some</span>(<span class="ident">next_ptr</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">next_ptr</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 
@@ -672,7 +672,7 @@
     <span class="doccomment">/// linked list. If the compare-and-swap fails, the current thread acquires</span>
     <span class="doccomment">/// the next block in the linked list, allowing the current thread to access</span>
     <span class="doccomment">/// the slots.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">grow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">grow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Create the new block. It is assumed that the block will become the</span>
         <span class="comment">// next one after `&amp;self`. If this turns out to not be the case,</span>
         <span class="comment">// `start_index` is updated accordingly.</span>
@@ -699,8 +699,8 @@
         );
 
         <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">next</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">next</span>) =&gt; <span class="ident">next</span>,
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="comment">// The compare-and-swap succeeded and the newly allocated block</span>
                 <span class="comment">// is successfully pushed.</span>
                 <span class="kw">return</span> <span class="ident">new_block</span>;
@@ -722,10 +722,10 @@
             <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">curr</span>.<span class="ident">as_ref</span>().<span class="ident">try_push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">new_block</span>, <span class="ident">AcqRel</span>, <span class="ident">Acquire</span>) };
 
             <span class="ident">curr</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">actual</span> {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
                     <span class="kw">return</span> <span class="ident">next</span>;
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">curr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">curr</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">curr</span>) =&gt; <span class="ident">curr</span>,
             };
 
             <span class="ident"><span class="kw">crate</span>::loom::thread::yield_now</span>();
@@ -734,18 +734,18 @@
 }
 
 <span class="doccomment">/// Returns `true` if the specified slot has a value ready to be consumed.</span>
-<span class="kw">fn</span> <span class="ident">is_ready</span>(<span class="ident">bits</span>: <span class="ident">usize</span>, <span class="ident">slot</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">is_ready</span>(<span class="ident">bits</span>: <span class="ident">usize</span>, <span class="ident">slot</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">slot</span>;
-    <span class="ident">mask</span> <span class="op">=</span><span class="op">=</span> <span class="ident">mask</span> <span class="op">&amp;</span> <span class="ident">bits</span>
+    <span class="ident">mask</span> <span class="op">==</span> <span class="ident">mask</span> <span class="op">&amp;</span> <span class="ident">bits</span>
 }
 
 <span class="doccomment">/// Returns `true` if the closed flag has been set.</span>
-<span class="kw">fn</span> <span class="ident">is_tx_closed</span>(<span class="ident">bits</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">TX_CLOSED</span> <span class="op">=</span><span class="op">=</span> <span class="ident">bits</span> <span class="op">&amp;</span> <span class="ident">TX_CLOSED</span>
+<span class="kw">fn</span> <span class="ident">is_tx_closed</span>(<span class="ident">bits</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">TX_CLOSED</span> <span class="op">==</span> <span class="ident">bits</span> <span class="op">&amp;</span> <span class="ident">TX_CLOSED</span>
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">uninitialized</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">uninitialized</span>() -&gt; <span class="ident">Values</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vals</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
 
         <span class="comment">// When fuzzing, `UnsafeCell` needs to be initialized.</span>
@@ -764,7 +764,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ops::Index</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
+    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">index</span>(<span class="ident">index</span>)
     }
 }

@@ -267,7 +267,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PendingRequests</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Wraps an `S`-typed service so that its load is tracked by the number of pending requests.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">service</span>: <span class="ident">S</span>, <span class="ident">completion</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">service</span>: <span class="ident">S</span>, <span class="ident">completion</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">service</span>,
             <span class="ident">completion</span>,
@@ -275,7 +275,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Handle</span> {
+    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Handle</span> {
         <span class="ident">Handle</span>(<span class="self">self</span>.<span class="ident">ref_count</span>.<span class="ident">clone</span>())
     }
 }
@@ -283,7 +283,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Load</span> <span class="kw">for</span> <span class="ident">PendingRequests</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Metric</span> <span class="op">=</span> <span class="ident">Count</span>;
 
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Count</span> {
+    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Count</span> {
         <span class="comment">// Count the number of references that aren&#39;t `self`.</span>
         <span class="ident">Count</span>(<span class="self">self</span>.<span class="ident">ref_count</span>.<span class="ident">ref_count</span>() <span class="op">-</span> <span class="number">1</span>)
     }
@@ -298,11 +298,11 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">TrackCompletionFuture</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">C</span>, <span class="ident">Handle</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">service</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="ident">TrackCompletionFuture::new</span>(
             <span class="self">self</span>.<span class="ident">completion</span>.<span class="ident">clone</span>(),
             <span class="self">self</span>.<span class="ident">handle</span>(),
@@ -316,7 +316,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PendingRequestsDiscover</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Wraps a [`Discover`], wrapping all of its services with [`PendingRequests`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>(<span class="ident">discover</span>: <span class="ident">D</span>, <span class="ident">completion</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>(<span class="ident">discover</span>: <span class="ident">D</span>, <span class="ident">completion</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Discover</span>,
         <span class="ident">D::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
@@ -338,14 +338,14 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Change</span><span class="op">&lt;</span><span class="ident">D::Key</span>, <span class="ident">PendingRequests</span><span class="op">&lt;</span><span class="ident">D::Service</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Yields the next discovery change set.</span>
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Change</span>::<span class="kw-2">*</span>;
 
         <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
         <span class="kw">let</span> <span class="ident">change</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">discover</span>.<span class="ident">poll_discover</span>(<span class="ident">cx</span>)).<span class="ident">transpose</span>()<span class="question-mark">?</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">Insert</span>(<span class="ident">k</span>, <span class="ident">svc</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Insert</span>(<span class="ident">k</span>, <span class="ident">PendingRequests::new</span>(<span class="ident">svc</span>, <span class="ident">this</span>.<span class="ident">completion</span>.<span class="ident">clone</span>())),
-            <span class="prelude-val">Some</span>(<span class="ident">Remove</span>(<span class="ident">k</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Remove</span>(<span class="ident">k</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">Insert</span>(<span class="ident">k</span>, <span class="ident">svc</span>)) =&gt; <span class="ident">Insert</span>(<span class="ident">k</span>, <span class="ident">PendingRequests::new</span>(<span class="ident">svc</span>, <span class="ident">this</span>.<span class="ident">completion</span>.<span class="ident">clone</span>())),
+            <span class="prelude-val">Some</span>(<span class="ident">Remove</span>(<span class="ident">k</span>)) =&gt; <span class="ident">Remove</span>(<span class="ident">k</span>),
         };
 
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">change</span>)))
@@ -355,7 +355,7 @@
 <span class="comment">// ==== RefCount ====</span>
 
 <span class="kw">impl</span> <span class="ident">RefCount</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ref_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ref_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident">Arc::strong_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -372,11 +372,11 @@
         <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
         <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">future::Ready</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span>;
 
-        <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span> {
             <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
         }
 
-        <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, (): ()) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+        <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, (): ()) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
             <span class="ident">future::ok</span>(())
         }
     }
@@ -405,7 +405,7 @@
         <span class="kw">struct</span> <span class="ident">IntoHandle</span>;
         <span class="kw">impl</span> <span class="ident">TrackCompletion</span><span class="op">&lt;</span><span class="ident">Handle</span>, ()<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntoHandle</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Handle</span>;
-            <span class="kw">fn</span> <span class="ident">track_completion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">Handle</span>, (): ()) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Handle</span> {
+            <span class="kw">fn</span> <span class="ident">track_completion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">Handle</span>, (): ()) -&gt; <span class="ident">Handle</span> {
                 <span class="ident">i</span>
             }
         }

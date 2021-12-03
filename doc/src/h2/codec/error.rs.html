@@ -158,22 +158,22 @@
 <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">SendError</span> {}
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SendError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Connection</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
-            <span class="ident"><span class="self">Self</span>::User</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
+            <span class="ident"><span class="self">Self</span>::Connection</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
+            <span class="ident"><span class="self">Self</span>::User</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SendError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">io::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Connection</span>(<span class="ident">src</span>.<span class="ident">into</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UserError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SendError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">UserError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">UserError</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SendError::User</span>(<span class="ident">src</span>)
     }
 }
@@ -183,22 +183,22 @@
 <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">UserError</span> {}
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">UserError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::UserError</span>::<span class="kw-2">*</span>;
 
         <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">InactiveStreamId</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;inactive stream&quot;</span>,
-            <span class="ident">UnexpectedFrameType</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;unexpected frame type&quot;</span>,
-            <span class="ident">PayloadTooBig</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;payload too big&quot;</span>,
-            <span class="ident">Rejected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;rejected&quot;</span>,
-            <span class="ident">ReleaseCapacityTooBig</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;release capacity too big&quot;</span>,
-            <span class="ident">OverflowedStreamId</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;stream ID overflowed&quot;</span>,
-            <span class="ident">MalformedHeaders</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;malformed headers&quot;</span>,
-            <span class="ident">MissingUriSchemeAndAuthority</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;request URI missing scheme and authority&quot;</span>,
-            <span class="ident">PollResetAfterSendResponse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;poll_reset after send_response is illegal&quot;</span>,
-            <span class="ident">SendPingWhilePending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;send_ping before received previous pong&quot;</span>,
-            <span class="ident">SendSettingsWhilePending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;sending SETTINGS before received previous ACK&quot;</span>,
-            <span class="ident">PeerDisabledServerPush</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;sending PUSH_PROMISE to peer who disabled server push&quot;</span>,
+            <span class="ident">InactiveStreamId</span> =&gt; <span class="string">&quot;inactive stream&quot;</span>,
+            <span class="ident">UnexpectedFrameType</span> =&gt; <span class="string">&quot;unexpected frame type&quot;</span>,
+            <span class="ident">PayloadTooBig</span> =&gt; <span class="string">&quot;payload too big&quot;</span>,
+            <span class="ident">Rejected</span> =&gt; <span class="string">&quot;rejected&quot;</span>,
+            <span class="ident">ReleaseCapacityTooBig</span> =&gt; <span class="string">&quot;release capacity too big&quot;</span>,
+            <span class="ident">OverflowedStreamId</span> =&gt; <span class="string">&quot;stream ID overflowed&quot;</span>,
+            <span class="ident">MalformedHeaders</span> =&gt; <span class="string">&quot;malformed headers&quot;</span>,
+            <span class="ident">MissingUriSchemeAndAuthority</span> =&gt; <span class="string">&quot;request URI missing scheme and authority&quot;</span>,
+            <span class="ident">PollResetAfterSendResponse</span> =&gt; <span class="string">&quot;poll_reset after send_response is illegal&quot;</span>,
+            <span class="ident">SendPingWhilePending</span> =&gt; <span class="string">&quot;send_ping before received previous pong&quot;</span>,
+            <span class="ident">SendSettingsWhilePending</span> =&gt; <span class="string">&quot;sending SETTINGS before received previous ACK&quot;</span>,
+            <span class="ident">PeerDisabledServerPush</span> =&gt; <span class="string">&quot;sending PUSH_PROMISE to peer who disabled server push&quot;</span>,
         })
     }
 }

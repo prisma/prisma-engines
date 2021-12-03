@@ -131,18 +131,18 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_hex_to_writer</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">u8</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_hex_to_writer</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="ident">u8</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
     <span class="ident">output</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&amp;#x{:02X};&quot;</span>, <span class="ident">e</span>))
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_html_entity_to_vec</span>(<span class="ident">e</span>: <span class="ident">u8</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
     <span class="kw">match</span> <span class="ident">e</span> {
-        <span class="string">b&#39;&amp;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">output</span>.<span class="ident">extend_from_slice</span>(<span class="string">b&quot;&amp;amp;&quot;</span>),
-        <span class="string">b&#39;&lt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">output</span>.<span class="ident">extend_from_slice</span>(<span class="string">b&quot;&amp;lt;&quot;</span>),
-        <span class="string">b&#39;&gt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">output</span>.<span class="ident">extend_from_slice</span>(<span class="string">b&quot;&amp;gt;&quot;</span>),
-        <span class="string">b&#39;&quot;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">output</span>.<span class="ident">extend_from_slice</span>(<span class="string">b&quot;&amp;quot;&quot;</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">write_hex_to_vec</span>(<span class="ident">e</span>, <span class="ident">output</span>),
+        <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="ident">output</span>.<span class="ident">extend_from_slice</span>(<span class="string">b&quot;&amp;amp;&quot;</span>),
+        <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="ident">output</span>.<span class="ident">extend_from_slice</span>(<span class="string">b&quot;&amp;lt;&quot;</span>),
+        <span class="string">b&#39;&gt;&#39;</span> =&gt; <span class="ident">output</span>.<span class="ident">extend_from_slice</span>(<span class="string">b&quot;&amp;gt;&quot;</span>),
+        <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="ident">output</span>.<span class="ident">extend_from_slice</span>(<span class="string">b&quot;&amp;quot;&quot;</span>),
+        <span class="kw">_</span> =&gt; <span class="ident">write_hex_to_vec</span>(<span class="ident">e</span>, <span class="ident">output</span>),
     }
 }
 
@@ -151,13 +151,13 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_html_entity_to_writer</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(
     <span class="ident">e</span>: <span class="ident">u8</span>,
     <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">e</span> {
-        <span class="string">b&#39;&amp;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="string">b&quot;&amp;amp;&quot;</span>),
-        <span class="string">b&#39;&lt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="string">b&quot;&amp;lt;&quot;</span>),
-        <span class="string">b&#39;&gt;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="string">b&quot;&amp;gt;&quot;</span>),
-        <span class="string">b&#39;&quot;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="string">b&quot;&amp;quot;&quot;</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">write_hex_to_writer</span>(<span class="ident">e</span>, <span class="ident">output</span>),
+        <span class="string">b&#39;&amp;&#39;</span> =&gt; <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="string">b&quot;&amp;amp;&quot;</span>),
+        <span class="string">b&#39;&lt;&#39;</span> =&gt; <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="string">b&quot;&amp;lt;&quot;</span>),
+        <span class="string">b&#39;&gt;&#39;</span> =&gt; <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="string">b&quot;&amp;gt;&quot;</span>),
+        <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="string">b&quot;&amp;quot;&quot;</span>),
+        <span class="kw">_</span> =&gt; <span class="ident">write_hex_to_writer</span>(<span class="ident">e</span>, <span class="ident">output</span>),
     }
 }
 
@@ -178,7 +178,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_char_to_writer</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="ident">char</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_char_to_writer</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="ident">char</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">4</span>];
     <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">encode_utf8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>).<span class="ident">len</span>();
 

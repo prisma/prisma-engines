@@ -7,7 +7,7 @@ streamed payloads that are computed on the fly.</p>
 <p>To send trailing headers, see <code>Request::{</code><a href="../struct.Request.html#method.send_trailers"><code>send_trailers, </code></a>
 <a href="../struct.Request.html#method.recv_trailers"><code>recv_trailers</code></a><code>}</code> and
 <code>Response::{</code><a href="../struct.Response.html#method.send_trailers"><code>send_trailers, </code></a><a href="../struct.Response.html#method.recv_trailers"><code>recv_trailers</code></a><code>}</code>.</p>
-<h2 id="example" class="section-header"><a href="#example">Example</a></h2>
+<h3 id="example" class="section-header"><a href="#example">Example</a></h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">http_types</span>::{<span class="ident">Url</span>, <span class="ident">Method</span>, <span class="ident">Request</span>, <span class="ident">Trailers</span>};
 <span class="kw">use</span> <span class="ident">http_types::headers</span>::{<span class="ident">HeaderName</span>, <span class="ident">HeaderValue</span>};
 <span class="kw">use</span> <span class="ident">async_std::task</span>;
@@ -24,15 +24,15 @@ streamed payloads that are computed on the fly.</p>
 });
 
 <span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">trailers</span>).<span class="kw">await</span>;</code></pre></div>
-<h2 id="see-also" class="section-header"><a href="#see-also">See Also</a></h2>
+<h3 id="see-also" class="section-header"><a href="#see-also">See Also</a></h3>
 <ul>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Trailer">MDN HTTP Headers: Trailer</a></li>
 <li><a href="https://http2.github.io/http2-spec/#HttpSequence">HTTP/2 spec: HTTP Sequence</a></li>
 </ul>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Receiver.html" title="tide::http::trailers::Receiver struct">Receiver</a></div><div class="item-right docblock-short"><p>The receiving half of a channel to send trailers.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Sender.html" title="tide::http::trailers::Sender struct">Sender</a></div><div class="item-right docblock-short"><p>The sending half of a channel to send trailers.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Trailers.html" title="tide::http::trailers::Trailers struct">Trailers</a></div><div class="item-right docblock-short"><p>A collection of trailing HTTP headers.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tide" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Receiver.html" title="tide::http::trailers::Receiver struct">Receiver</a></div><div class="item-right docblock-short"><p>The receiving half of a channel to send trailers.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Sender.html" title="tide::http::trailers::Sender struct">Sender</a></div><div class="item-right docblock-short"><p>The sending half of a channel to send trailers.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Trailers.html" title="tide::http::trailers::Trailers struct">Trailers</a></div><div class="item-right docblock-short"><p>A collection of trailing HTTP headers.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tide" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script>
 </body></html>

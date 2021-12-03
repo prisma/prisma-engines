@@ -92,7 +92,7 @@
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">__unless_target_features</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>:<span class="ident">tt</span>),<span class="op">+</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">expr</span> ) <span class="op">=</span><span class="op">&gt;</span> {{
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>:<span class="ident">tt</span>),<span class="op">+</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">expr</span> ) =&gt; {{
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>($(<span class="ident">target_feature</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>,)<span class="kw-2">*</span>)))]</span>
         {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_env</span> <span class="op">=</span> <span class="string">&quot;sgx&quot;</span>))]</span>
@@ -112,7 +112,7 @@
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">__detect_target_features</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>:<span class="ident">tt</span>),<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>:<span class="ident">tt</span>),<span class="op">+</span>) =&gt; {{
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>)]</span>
         <span class="kw">use</span> <span class="ident">core::arch::x86</span>::{<span class="ident">__cpuid</span>, <span class="ident">__cpuid_count</span>};
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
@@ -127,12 +127,12 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">__expand_check_macro</span> {
-    ($((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">reg</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>:<span class="ident">expr</span>)),<span class="op">*</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">reg</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>:<span class="ident">expr</span>)),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="attribute">#[<span class="ident">macro_export</span>]</span>
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
         <span class="macro">macro_rules!</span> <span class="ident">check</span> {
             $(
-                (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cr</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">=</span><span class="op">&gt;</span> { (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cr</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>].<span class="macro-nonterminal">$</span><span class="macro-nonterminal">reg</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) };
+                (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cr</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) =&gt; { (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cr</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>].<span class="macro-nonterminal">$</span><span class="macro-nonterminal">reg</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) };
             )<span class="op">*</span>
         }
     };

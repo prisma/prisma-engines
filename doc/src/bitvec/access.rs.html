@@ -634,7 +634,7 @@ constrained in the `store` module.
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">get_writer</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(
 		<span class="ident">value</span>: <span class="ident">bool</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>, <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>)
+	) -&gt; <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>, <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>)
 	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
 		[<span class="ident"><span class="self">Self</span>::clear_bit</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::set_bit</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>][<span class="ident">value</span> <span class="kw">as</span> <span class="ident">usize</span>]
 	}
@@ -657,7 +657,7 @@ constrained in the `store` module.
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">get_writers</span>(
 		<span class="ident">value</span>: <span class="ident">bool</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>, <span class="ident">BitMask</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>) {
+	) -&gt; <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>, <span class="ident">BitMask</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>) {
 		[<span class="ident"><span class="self">Self</span>::clear_bits</span>, <span class="ident"><span class="self">Self</span>::set_bits</span>][<span class="ident">value</span> <span class="kw">as</span> <span class="ident">usize</span>]
 	}
 

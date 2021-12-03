@@ -90,21 +90,21 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ParsedListener</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="ident">ParsedListener::Unix</span>(<span class="ident">unix</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Debug::fmt</span>(<span class="ident">unix</span>, <span class="ident">f</span>),
-            <span class="ident">ParsedListener::Tcp</span>(<span class="ident">tcp</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Debug::fmt</span>(<span class="ident">tcp</span>, <span class="ident">f</span>),
+            <span class="ident">ParsedListener::Unix</span>(<span class="ident">unix</span>) =&gt; <span class="ident">Debug::fmt</span>(<span class="ident">unix</span>, <span class="ident">f</span>),
+            <span class="ident">ParsedListener::Tcp</span>(<span class="ident">tcp</span>) =&gt; <span class="ident">Debug::fmt</span>(<span class="ident">tcp</span>, <span class="ident">f</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ParsedListener</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Unix</span>(<span class="ident">u</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">u</span>),
-            <span class="ident"><span class="self">Self</span>::Tcp</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">t</span>),
+            <span class="ident"><span class="self">Self</span>::Unix</span>(<span class="ident">u</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">u</span>),
+            <span class="ident"><span class="self">Self</span>::Tcp</span>(<span class="ident">t</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">t</span>),
         }
     }
 }
@@ -114,27 +114,27 @@
 <span class="kw">where</span>
     <span class="ident">State</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">server</span>: <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">server</span>: <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Unix</span>(<span class="ident">u</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u</span>.<span class="ident">bind</span>(<span class="ident">server</span>).<span class="kw">await</span>,
-            <span class="ident"><span class="self">Self</span>::Tcp</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>.<span class="ident">bind</span>(<span class="ident">server</span>).<span class="kw">await</span>,
+            <span class="ident"><span class="self">Self</span>::Unix</span>(<span class="ident">u</span>) =&gt; <span class="ident">u</span>.<span class="ident">bind</span>(<span class="ident">server</span>).<span class="kw">await</span>,
+            <span class="ident"><span class="self">Self</span>::Tcp</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">bind</span>(<span class="ident">server</span>).<span class="kw">await</span>,
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::Unix</span>(<span class="ident">u</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u</span>.<span class="ident">accept</span>().<span class="kw">await</span>,
-            <span class="ident"><span class="self">Self</span>::Tcp</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>.<span class="ident">accept</span>().<span class="kw">await</span>,
+            <span class="ident"><span class="self">Self</span>::Unix</span>(<span class="ident">u</span>) =&gt; <span class="ident">u</span>.<span class="ident">accept</span>().<span class="kw">await</span>,
+            <span class="ident"><span class="self">Self</span>::Tcp</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">accept</span>().<span class="kw">await</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ListenInfo</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ListenInfo</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="ident">ParsedListener::Unix</span>(<span class="ident">unix</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">unix</span>.<span class="ident">info</span>(),
-            <span class="ident">ParsedListener::Tcp</span>(<span class="ident">tcp</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tcp</span>.<span class="ident">info</span>(),
+            <span class="ident">ParsedListener::Unix</span>(<span class="ident">unix</span>) =&gt; <span class="ident">unix</span>.<span class="ident">info</span>(),
+            <span class="ident">ParsedListener::Tcp</span>(<span class="ident">tcp</span>) =&gt; <span class="ident">tcp</span>.<span class="ident">info</span>(),
         }
     }
 }

@@ -183,31 +183,31 @@
 }
 
 <span class="kw">impl</span> <span class="ident">OrderBy</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">clone</span>(),
-            <span class="ident">OrderBy::Aggregation</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">clone</span>(),
-            <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
+            <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">clone</span>(),
+            <span class="ident">OrderBy::Aggregation</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">clone</span>(),
+            <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[],
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort_order</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SortOrder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort_order</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SortOrder</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>.<span class="ident">sort_order</span>,
-            <span class="ident">OrderBy::Aggregation</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>.<span class="ident">sort_order</span>,
-            <span class="ident">OrderBy::Relevance</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>.<span class="ident">sort_order</span>,
+            <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">sort_order</span>,
+            <span class="ident">OrderBy::Aggregation</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">sort_order</span>,
+            <span class="ident">OrderBy::Relevance</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">sort_order</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">clone</span>()),
-            <span class="ident">OrderBy::Aggregation</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">o</span>.<span class="ident">field</span>()),
-            <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">clone</span>()),
+            <span class="ident">OrderBy::Aggregation</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">o</span>.<span class="ident">field</span>()),
+            <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_middle_to_one_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_middle_to_one_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>();
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">len</span>();
 
@@ -235,15 +235,15 @@
 }
 
 <span class="kw">impl</span> <span class="ident">OrderByAggregation</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ScalarFieldRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ScalarFieldRef</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">sf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sf</span>.<span class="ident">clone</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">clone</span>(),
             <span class="comment">// TODO: This is a hack that should be removed once MongoDB is refactored too</span>
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">id_field_from_relation</span>(),
+            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">id_field_from_relation</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">id_field_from_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ScalarFieldRef</span> {
+    <span class="kw">fn</span> <span class="ident">id_field_from_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ScalarFieldRef</span> {
         <span class="kw">let</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">path</span>
             .<span class="ident">last</span>()
@@ -257,7 +257,7 @@
         <span class="ident">id</span>.<span class="ident">clone</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_scalar_aggregation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_scalar_aggregation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">is_empty</span>()
     }
 }
@@ -269,7 +269,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">OrderBy</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldRef</span>, <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>, <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldRef</span>, <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>, <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">OrderByScalar</span> {
             <span class="ident">field</span>,
             <span class="ident">path</span>,
@@ -282,7 +282,7 @@
         <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
         <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>,
         <span class="ident">sort_aggregation</span>: <span class="ident">SortAggregation</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Aggregation</span>(<span class="ident">OrderByAggregation</span> {
             <span class="ident">field</span>,
             <span class="ident">path</span>,
@@ -291,7 +291,7 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relevance</span>(<span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>, <span class="ident">search</span>: <span class="ident">String</span>, <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relevance</span>(<span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>, <span class="ident">search</span>: <span class="ident">String</span>, <span class="ident">sort_order</span>: <span class="ident">SortOrder</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Relevance</span>(<span class="ident">OrderByRelevance</span> {
             <span class="ident">fields</span>,
             <span class="ident">sort_order</span>,
@@ -307,12 +307,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SortOrder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_order</span>(<span class="self">self</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Order</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_order</span>(<span class="self">self</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Order</span> {
         <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">reverse</span>) {
-            (<span class="ident">SortOrder::Ascending</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Order::Asc</span>,
-            (<span class="ident">SortOrder::Descending</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Order::Desc</span>,
-            (<span class="ident">SortOrder::Ascending</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Order::Desc</span>,
-            (<span class="ident">SortOrder::Descending</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Order::Asc</span>,
+            (<span class="ident">SortOrder::Ascending</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">Order::Asc</span>,
+            (<span class="ident">SortOrder::Descending</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">Order::Desc</span>,
+            (<span class="ident">SortOrder::Ascending</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">Order::Desc</span>,
+            (<span class="ident">SortOrder::Descending</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">Order::Asc</span>,
         }
     }
 }
@@ -327,16 +327,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ToString</span> <span class="kw">for</span> <span class="ident">SortOrder</span> {
-    <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SortOrder::Ascending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;ASC&quot;</span>),
-            <span class="ident">SortOrder::Descending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;DESC&quot;</span>),
+            <span class="ident">SortOrder::Ascending</span> =&gt; <span class="ident">String::from</span>(<span class="string">&quot;ASC&quot;</span>),
+            <span class="ident">SortOrder::Descending</span> =&gt; <span class="ident">String::from</span>(<span class="string">&quot;DESC&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OrderBy</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">OrderByScalar</span> {
             <span class="ident">field</span>,
             <span class="ident">path</span>: <span class="macro">vec!</span>[],

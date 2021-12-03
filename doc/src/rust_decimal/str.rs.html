@@ -548,7 +548,7 @@
     <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>,
     <span class="ident">append_sign</span>: <span class="ident">bool</span>,
     <span class="ident">precision</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ArrayString</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">MAX_STR_BUFFER_SIZE</span>]<span class="op">&gt;</span> {
+) -&gt; <span class="ident">ArrayString</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">MAX_STR_BUFFER_SIZE</span>]<span class="op">&gt;</span> {
     <span class="comment">// Get the scale - where we need to put the decimal point</span>
     <span class="kw">let</span> <span class="ident">scale</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">scale</span>() <span class="kw">as</span> <span class="ident">usize</span>;
 
@@ -564,8 +564,8 @@
     }
 
     <span class="kw">let</span> <span class="ident">prec</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">precision</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">prec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">prec</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">scale</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">prec</span>) =&gt; <span class="ident">prec</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="ident">scale</span>,
     };
 
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">len</span>();
@@ -579,8 +579,8 @@
         <span class="number">0</span>
     };
     <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">whole_len</span> <span class="op">+</span> <span class="ident">prec</span> {
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="ident">len</span> <span class="op">-</span> <span class="ident">scale</span> {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">len</span> <span class="op">-</span> <span class="ident">scale</span> {
+            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="ident">rep</span>.<span class="ident">push</span>(<span class="string">&#39;0&#39;</span>);
             }
             <span class="ident">rep</span>.<span class="ident">push</span>(<span class="string">&#39;.&#39;</span>);
@@ -595,7 +595,7 @@
     }
 
     <span class="comment">// corner case for when we truncated everything in a low fractional</span>
-    <span class="kw">if</span> <span class="ident">rep</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">empty_len</span> {
+    <span class="kw">if</span> <span class="ident">rep</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">empty_len</span> {
         <span class="ident">rep</span>.<span class="ident">push</span>(<span class="string">&#39;0&#39;</span>);
     }
 
@@ -606,7 +606,7 @@
     <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>,
     <span class="ident">exponent_symbol</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+) -&gt; <span class="ident">fmt::Result</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
     <span class="kw">use</span> <span class="ident">alloc::string::ToString</span>;
 
@@ -630,7 +630,7 @@
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">len</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rep</span>;
     <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">1</span> {
-        <span class="kw">if</span> <span class="ident">chars</span>.<span class="ident">iter</span>().<span class="ident">take</span>(<span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">all</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;0&#39;</span>) {
+        <span class="kw">if</span> <span class="ident">chars</span>.<span class="ident">iter</span>().<span class="ident">take</span>(<span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">all</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;0&#39;</span>) {
             <span class="comment">// Chomp off the zero&#39;s.</span>
             <span class="ident">rep</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">iter</span>().<span class="ident">skip</span>(<span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>();
         } <span class="kw">else</span> {
@@ -648,7 +648,7 @@
 }
 
 <span class="comment">// dedicated implementation for the most common case.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_str_radix_10</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_str_radix_10</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">str</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: empty&quot;</span>));
     }
@@ -659,11 +659,11 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">negative</span> <span class="op">=</span> <span class="bool-val">false</span>; <span class="comment">// assume positive</span>
 
     <span class="comment">// handle the sign</span>
-    <span class="kw">if</span> <span class="ident">bytes</span>[<span class="ident">offset</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;-&#39;</span> {
+    <span class="kw">if</span> <span class="ident">bytes</span>[<span class="ident">offset</span>] <span class="op">==</span> <span class="string">b&#39;-&#39;</span> {
         <span class="ident">negative</span> <span class="op">=</span> <span class="bool-val">true</span>; <span class="comment">// leading minus means negative</span>
         <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">bytes</span>[<span class="ident">offset</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;+&#39;</span> {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">bytes</span>[<span class="ident">offset</span>] <span class="op">==</span> <span class="string">b&#39;+&#39;</span> {
         <span class="comment">// leading + allowed</span>
         <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
@@ -677,7 +677,7 @@
     <span class="kw">while</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0</span> {
         <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">bytes</span>[<span class="ident">offset</span>];
         <span class="kw">match</span> <span class="ident">b</span> {
-            <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> =&gt; {
                 <span class="ident">coeff</span>.<span class="ident">push</span>(<span class="ident">u32::from</span>(<span class="ident">b</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>));
                 <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
@@ -688,7 +688,7 @@
                     <span class="kw">break</span>;
                 }
             }
-            <span class="string">b&#39;.&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;.&#39;</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">digits_before_dot</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: two decimal points&quot;</span>));
                 }
@@ -696,7 +696,7 @@
                 <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
             }
-            <span class="string">b&#39;_&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;_&#39;</span> =&gt; {
                 <span class="comment">// Must start with a number...</span>
                 <span class="kw">if</span> <span class="ident">coeff</span>.<span class="ident">is_empty</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: must start lead with a number&quot;</span>));
@@ -704,7 +704,7 @@
                 <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: unknown character&quot;</span>)),
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: unknown character&quot;</span>)),
         }
     }
 
@@ -712,16 +712,16 @@
     <span class="kw">if</span> <span class="ident">maybe_round</span> <span class="op">&amp;&amp;</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="ident">bytes</span>.<span class="ident">len</span>() {
         <span class="kw">let</span> <span class="ident">next_byte</span> <span class="op">=</span> <span class="ident">bytes</span>[<span class="ident">offset</span>];
         <span class="kw">let</span> <span class="ident">digit</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">next_byte</span> {
-            <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u32::from</span>(<span class="ident">next_byte</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>),
-            <span class="string">b&#39;_&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="string">b&#39;.&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> =&gt; <span class="ident">u32::from</span>(<span class="ident">next_byte</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>),
+            <span class="string">b&#39;_&#39;</span> =&gt; <span class="number">0</span>,
+            <span class="string">b&#39;.&#39;</span> =&gt; {
                 <span class="comment">// Still an error if we have a second dp</span>
                 <span class="kw">if</span> <span class="ident">digits_before_dot</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: two decimal points&quot;</span>));
                 }
                 <span class="number">0</span>
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: unknown character&quot;</span>)),
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: unknown character&quot;</span>)),
         };
 
         <span class="comment">// Round at midpoint</span>
@@ -734,7 +734,7 @@
                     <span class="kw">break</span>;
                 } <span class="kw">else</span> {
                     <span class="ident">coeff</span>[<span class="ident">index</span>] <span class="op">=</span> <span class="number">0</span>;
-                    <span class="kw">if</span> <span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="ident">coeff</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="number">1u32</span>);
                         <span class="ident">digits_before_dot</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                         <span class="ident">coeff</span>.<span class="ident">pop</span>();
@@ -804,7 +804,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">Decimal::from_parts</span>(<span class="ident">data</span>[<span class="number">0</span>], <span class="ident">data</span>[<span class="number">1</span>], <span class="ident">data</span>[<span class="number">2</span>], <span class="ident">negative</span>, <span class="ident">scale</span>))
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_str_radix_n</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_str_radix_n</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">str</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: empty&quot;</span>));
     }
@@ -822,11 +822,11 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">negative</span> <span class="op">=</span> <span class="bool-val">false</span>; <span class="comment">// assume positive</span>
 
     <span class="comment">// handle the sign</span>
-    <span class="kw">if</span> <span class="ident">bytes</span>[<span class="ident">offset</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;-&#39;</span> {
+    <span class="kw">if</span> <span class="ident">bytes</span>[<span class="ident">offset</span>] <span class="op">==</span> <span class="string">b&#39;-&#39;</span> {
         <span class="ident">negative</span> <span class="op">=</span> <span class="bool-val">true</span>; <span class="comment">// leading minus means negative</span>
         <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">bytes</span>[<span class="ident">offset</span>] <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;+&#39;</span> {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">bytes</span>[<span class="ident">offset</span>] <span class="op">==</span> <span class="string">b&#39;+&#39;</span> {
         <span class="comment">// leading + allowed</span>
         <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
@@ -848,49 +848,49 @@
     <span class="comment">// Rather than try to estimate, I&#39;ve included the constants directly in here. We could,</span>
     <span class="comment">// perhaps, replace this with a formula if it&#39;s faster - though it does appear to be log2.</span>
     <span class="kw">let</span> <span class="ident">estimated_max_precision</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">radix</span> {
-        <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">96</span>,
-        <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">61</span>,
-        <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">48</span>,
-        <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">42</span>,
-        <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">38</span>,
-        <span class="number">7</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">35</span>,
-        <span class="number">8</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">32</span>,
-        <span class="number">9</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">31</span>,
-        <span class="number">10</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">28</span>,
-        <span class="number">11</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">28</span>,
-        <span class="number">12</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">27</span>,
-        <span class="number">13</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">26</span>,
-        <span class="number">14</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">26</span>,
-        <span class="number">15</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">25</span>,
-        <span class="number">16</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">24</span>,
-        <span class="number">17</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">24</span>,
-        <span class="number">18</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">24</span>,
-        <span class="number">19</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">23</span>,
-        <span class="number">20</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">23</span>,
-        <span class="number">21</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">22</span>,
-        <span class="number">22</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">22</span>,
-        <span class="number">23</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">22</span>,
-        <span class="number">24</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">21</span>,
-        <span class="number">25</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">21</span>,
-        <span class="number">26</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">21</span>,
-        <span class="number">27</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">21</span>,
-        <span class="number">28</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">20</span>,
-        <span class="number">29</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">20</span>,
-        <span class="number">30</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">20</span>,
-        <span class="number">31</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">20</span>,
-        <span class="number">32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">20</span>,
-        <span class="number">33</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">20</span>,
-        <span class="number">34</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">19</span>,
-        <span class="number">35</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">19</span>,
-        <span class="number">36</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">19</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Unsupported radix&quot;</span>)),
+        <span class="number">2</span> =&gt; <span class="number">96</span>,
+        <span class="number">3</span> =&gt; <span class="number">61</span>,
+        <span class="number">4</span> =&gt; <span class="number">48</span>,
+        <span class="number">5</span> =&gt; <span class="number">42</span>,
+        <span class="number">6</span> =&gt; <span class="number">38</span>,
+        <span class="number">7</span> =&gt; <span class="number">35</span>,
+        <span class="number">8</span> =&gt; <span class="number">32</span>,
+        <span class="number">9</span> =&gt; <span class="number">31</span>,
+        <span class="number">10</span> =&gt; <span class="number">28</span>,
+        <span class="number">11</span> =&gt; <span class="number">28</span>,
+        <span class="number">12</span> =&gt; <span class="number">27</span>,
+        <span class="number">13</span> =&gt; <span class="number">26</span>,
+        <span class="number">14</span> =&gt; <span class="number">26</span>,
+        <span class="number">15</span> =&gt; <span class="number">25</span>,
+        <span class="number">16</span> =&gt; <span class="number">24</span>,
+        <span class="number">17</span> =&gt; <span class="number">24</span>,
+        <span class="number">18</span> =&gt; <span class="number">24</span>,
+        <span class="number">19</span> =&gt; <span class="number">23</span>,
+        <span class="number">20</span> =&gt; <span class="number">23</span>,
+        <span class="number">21</span> =&gt; <span class="number">22</span>,
+        <span class="number">22</span> =&gt; <span class="number">22</span>,
+        <span class="number">23</span> =&gt; <span class="number">22</span>,
+        <span class="number">24</span> =&gt; <span class="number">21</span>,
+        <span class="number">25</span> =&gt; <span class="number">21</span>,
+        <span class="number">26</span> =&gt; <span class="number">21</span>,
+        <span class="number">27</span> =&gt; <span class="number">21</span>,
+        <span class="number">28</span> =&gt; <span class="number">20</span>,
+        <span class="number">29</span> =&gt; <span class="number">20</span>,
+        <span class="number">30</span> =&gt; <span class="number">20</span>,
+        <span class="number">31</span> =&gt; <span class="number">20</span>,
+        <span class="number">32</span> =&gt; <span class="number">20</span>,
+        <span class="number">33</span> =&gt; <span class="number">20</span>,
+        <span class="number">34</span> =&gt; <span class="number">19</span>,
+        <span class="number">35</span> =&gt; <span class="number">19</span>,
+        <span class="number">36</span> =&gt; <span class="number">19</span>,
+        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Unsupported radix&quot;</span>)),
     };
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">maybe_round</span> <span class="op">=</span> <span class="bool-val">false</span>;
     <span class="kw">while</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0</span> {
         <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">bytes</span>[<span class="ident">offset</span>];
         <span class="kw">match</span> <span class="ident">b</span> {
-            <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">b</span> <span class="op">&gt;</span> <span class="ident">max_n</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: invalid character&quot;</span>));
                 }
@@ -904,7 +904,7 @@
                     <span class="kw">break</span>;
                 }
             }
-            <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;z&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;z&#39;</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">b</span> <span class="op">&gt;</span> <span class="ident">max_alpha_lower</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: invalid character&quot;</span>));
                 }
@@ -917,7 +917,7 @@
                     <span class="kw">break</span>;
                 }
             }
-            <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;Z&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;Z&#39;</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">b</span> <span class="op">&gt;</span> <span class="ident">max_alpha_upper</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: invalid character&quot;</span>));
                 }
@@ -930,7 +930,7 @@
                     <span class="kw">break</span>;
                 }
             }
-            <span class="string">b&#39;.&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;.&#39;</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">digits_before_dot</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: two decimal points&quot;</span>));
                 }
@@ -938,7 +938,7 @@
                 <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
             }
-            <span class="string">b&#39;_&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;_&#39;</span> =&gt; {
                 <span class="comment">// Must start with a number...</span>
                 <span class="kw">if</span> <span class="ident">coeff</span>.<span class="ident">is_empty</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: must start lead with a number&quot;</span>));
@@ -946,7 +946,7 @@
                 <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: unknown character&quot;</span>)),
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: unknown character&quot;</span>)),
         }
     }
 
@@ -954,37 +954,37 @@
     <span class="kw">if</span> <span class="ident">maybe_round</span> <span class="op">&amp;&amp;</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="ident">bytes</span>.<span class="ident">len</span>() {
         <span class="kw">let</span> <span class="ident">next_byte</span> <span class="op">=</span> <span class="ident">bytes</span>[<span class="ident">offset</span>];
         <span class="kw">let</span> <span class="ident">digit</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">next_byte</span> {
-            <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">next_byte</span> <span class="op">&gt;</span> <span class="ident">max_n</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: invalid character&quot;</span>));
                 }
                 <span class="ident">u32::from</span>(<span class="ident">next_byte</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>)
             }
-            <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;z&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;z&#39;</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">next_byte</span> <span class="op">&gt;</span> <span class="ident">max_alpha_lower</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: invalid character&quot;</span>));
                 }
                 <span class="ident">u32::from</span>(<span class="ident">next_byte</span> <span class="op">-</span> <span class="string">b&#39;a&#39;</span>) <span class="op">+</span> <span class="number">10</span>
             }
-            <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;Z&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;Z&#39;</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">next_byte</span> <span class="op">&gt;</span> <span class="ident">max_alpha_upper</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: invalid character&quot;</span>));
                 }
                 <span class="ident">u32::from</span>(<span class="ident">next_byte</span> <span class="op">-</span> <span class="string">b&#39;A&#39;</span>) <span class="op">+</span> <span class="number">10</span>
             }
-            <span class="string">b&#39;_&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="string">b&#39;.&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">b&#39;_&#39;</span> =&gt; <span class="number">0</span>,
+            <span class="string">b&#39;.&#39;</span> =&gt; {
                 <span class="comment">// Still an error if we have a second dp</span>
                 <span class="kw">if</span> <span class="ident">digits_before_dot</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: two decimal points&quot;</span>));
                 }
                 <span class="number">0</span>
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: unknown character&quot;</span>)),
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="string">&quot;Invalid decimal: unknown character&quot;</span>)),
         };
 
         <span class="comment">// Round at midpoint</span>
-        <span class="kw">let</span> <span class="ident">midpoint</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">radix</span> <span class="op">&amp;</span> <span class="number">0x1</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> { <span class="ident">radix</span> <span class="op">/</span> <span class="number">2</span> } <span class="kw">else</span> { (<span class="ident">radix</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">2</span> };
+        <span class="kw">let</span> <span class="ident">midpoint</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">radix</span> <span class="op">&amp;</span> <span class="number">0x1</span> <span class="op">==</span> <span class="number">1</span> { <span class="ident">radix</span> <span class="op">/</span> <span class="number">2</span> } <span class="kw">else</span> { (<span class="ident">radix</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">2</span> };
         <span class="kw">if</span> <span class="ident">digit</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">midpoint</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">coeff</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
             <span class="kw">loop</span> {
@@ -994,7 +994,7 @@
                     <span class="kw">break</span>;
                 } <span class="kw">else</span> {
                     <span class="ident">coeff</span>[<span class="ident">index</span>] <span class="op">=</span> <span class="number">0</span>;
-                    <span class="kw">if</span> <span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="ident">coeff</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="number">1u32</span>);
                         <span class="ident">digits_before_dot</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                         <span class="ident">coeff</span>.<span class="ident">pop</span>();

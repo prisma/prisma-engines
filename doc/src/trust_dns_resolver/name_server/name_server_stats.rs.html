@@ -146,13 +146,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">NameServerStats</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="number">0</span>, <span class="number">0</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">NameServerStats</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">successes</span>: <span class="ident">usize</span>, <span class="ident">failures</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">successes</span>: <span class="ident">usize</span>, <span class="ident">failures</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">NameServerStats</span> {
             <span class="ident">successes</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">successes</span>),
             <span class="ident">failures</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">failures</span>),
@@ -172,13 +172,13 @@
         <span class="ident">other_successes</span>: <span class="ident">usize</span>,
         <span class="ident">self_failures</span>: <span class="ident">usize</span>,
         <span class="ident">other_failures</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">self_successes</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other_successes</span> <span class="op">&amp;&amp;</span> <span class="ident">self_failures</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other_failures</span>
+    ) -&gt; <span class="ident">bool</span> {
+        <span class="ident">self_successes</span> <span class="op">==</span> <span class="ident">other_successes</span> <span class="op">&amp;&amp;</span> <span class="ident">self_failures</span> <span class="op">==</span> <span class="ident">other_failures</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">NameServerStats</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">self_successes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">successes</span>.<span class="ident">load</span>(<span class="ident">atomic::Ordering::Acquire</span>);
         <span class="kw">let</span> <span class="ident">other_successes</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">successes</span>.<span class="ident">load</span>(<span class="ident">atomic::Ordering::Acquire</span>);
 
@@ -199,7 +199,7 @@
 
 <span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">NameServerStats</span> {
     <span class="doccomment">/// Custom implementation of Ord for NameServer which incorporates the performance of the connection into it&#39;s ranking</span>
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
         <span class="kw">let</span> <span class="ident">self_successes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">successes</span>.<span class="ident">load</span>(<span class="ident">atomic::Ordering::Acquire</span>);
         <span class="kw">let</span> <span class="ident">other_successes</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">successes</span>.<span class="ident">load</span>(<span class="ident">atomic::Ordering::Acquire</span>);
 
@@ -229,7 +229,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">NameServerStats</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
     }
 }
@@ -238,7 +238,7 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">fn</span> <span class="ident">is_send_sync</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_send_sync</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>() -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 

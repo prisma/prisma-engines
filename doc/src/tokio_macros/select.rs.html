@@ -46,11 +46,11 @@
 <span class="kw">use</span> <span class="ident">quote::quote</span>;
 <span class="kw">use</span> <span class="ident">syn::Ident</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">declare_output_enum</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">declare_output_enum</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="comment">// passed in is: `(_ _ _)` with one `_` per branch</span>
     <span class="kw">let</span> <span class="ident">branches</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Group</span>(<span class="ident">group</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">group</span>.<span class="ident">stream</span>().<span class="ident">into_iter</span>().<span class="ident">count</span>(),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;unexpected macro input&quot;</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Group</span>(<span class="ident">group</span>)) =&gt; <span class="ident">group</span>.<span class="ident">stream</span>().<span class="ident">into_iter</span>().<span class="ident">count</span>(),
+        <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unexpected macro input&quot;</span>),
     };
 
     <span class="kw">let</span> <span class="ident">variants</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">branches</span>)

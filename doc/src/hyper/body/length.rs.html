@@ -118,7 +118,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DecodedLength</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">len</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> {
             <span class="comment">// If the length is u64::MAX, oh well, just reported chunked.</span>
             <span class="ident"><span class="self">Self</span>::checked_new</span>(<span class="ident">len</span>).<span class="ident">ok</span>()
@@ -136,7 +136,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">ZERO</span>: <span class="ident">DecodedLength</span> <span class="op">=</span> <span class="ident">DecodedLength</span>(<span class="number">0</span>);
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">len</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">len</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">debug_assert!</span>(<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_LEN</span>);
         <span class="ident">DecodedLength</span>(<span class="ident">len</span>)
     }
@@ -147,22 +147,22 @@
     <span class="doccomment">/// CLOSE_DELIMITED or CHUNKED.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">danger_len</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">danger_len</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::CHUNKED</span>.<span class="number">0</span>);
         <span class="self">self</span>.<span class="number">0</span>
     }
 
     <span class="doccomment">/// Converts to an Option&lt;u64&gt; representing a Known or Unknown length.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_opt</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_opt</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DecodedLength::CHUNKED</span> <span class="op">|</span> <span class="ident">DecodedLength::CLOSE_DELIMITED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">DecodedLength</span>(<span class="ident">known</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">known</span>),
+            <span class="ident">DecodedLength::CHUNKED</span> <span class="op">|</span> <span class="ident">DecodedLength::CLOSE_DELIMITED</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">DecodedLength</span>(<span class="ident">known</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">known</span>),
         }
     }
 
     <span class="doccomment">/// Checks the `u64` is within the maximum allowed for content-length.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">checked_new</span>(<span class="ident">len</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::error::Parse</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">checked_new</span>(<span class="ident">len</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::error::Parse</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">tracing::warn</span>;
 
         <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_LEN</span> {
@@ -175,8 +175,8 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sub_if</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">amt</span>: <span class="ident">u64</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">DecodedLength::CHUNKED</span> <span class="op">|</span> <span class="ident">DecodedLength::CLOSE_DELIMITED</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">DecodedLength</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">known</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">DecodedLength::CHUNKED</span> <span class="op">|</span> <span class="ident">DecodedLength::CLOSE_DELIMITED</span> =&gt; (),
+            <span class="ident">DecodedLength</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">known</span>) =&gt; {
                 <span class="kw-2">*</span><span class="ident">known</span> <span class="op">-</span><span class="op">=</span> <span class="ident">amt</span>;
             }
         }
@@ -184,22 +184,22 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">DecodedLength</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">DecodedLength::CLOSE_DELIMITED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;CLOSE_DELIMITED&quot;</span>),
-            <span class="ident">DecodedLength::CHUNKED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;CHUNKED&quot;</span>),
-            <span class="ident">DecodedLength</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;DecodedLength&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>).<span class="ident">finish</span>(),
+            <span class="ident">DecodedLength::CLOSE_DELIMITED</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;CLOSE_DELIMITED&quot;</span>),
+            <span class="ident">DecodedLength::CHUNKED</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;CHUNKED&quot;</span>),
+            <span class="ident">DecodedLength</span>(<span class="ident">n</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;DecodedLength&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>).<span class="ident">finish</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DecodedLength</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">DecodedLength::CLOSE_DELIMITED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;close-delimited&quot;</span>),
-            <span class="ident">DecodedLength::CHUNKED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;chunked encoding&quot;</span>),
-            <span class="ident">DecodedLength::ZERO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;empty&quot;</span>),
-            <span class="ident">DecodedLength</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;content-length ({} bytes)&quot;</span>, <span class="ident">n</span>),
+            <span class="ident">DecodedLength::CLOSE_DELIMITED</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;close-delimited&quot;</span>),
+            <span class="ident">DecodedLength::CHUNKED</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;chunked encoding&quot;</span>),
+            <span class="ident">DecodedLength::ZERO</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;empty&quot;</span>),
+            <span class="ident">DecodedLength</span>(<span class="ident">n</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;content-length ({} bytes)&quot;</span>, <span class="ident">n</span>),
         }
     }
 }

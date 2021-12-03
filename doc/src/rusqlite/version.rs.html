@@ -27,7 +27,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// See [`sqlite3_libversion_number()`](https://www.sqlite.org/c3ref/libversion.html).</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version_number</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version_number</span>() -&gt; <span class="ident">i32</span> {
     <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_libversion_number</span>() }
 }
 
@@ -35,7 +35,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// See [`sqlite3_libversion()`](https://www.sqlite.org/c3ref/libversion.html).</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
     <span class="kw">let</span> <span class="ident">cstr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">CStr::from_ptr</span>(<span class="ident">ffi::sqlite3_libversion</span>()) };
     <span class="ident">cstr</span>.<span class="ident">to_str</span>()
         .<span class="ident">expect</span>(<span class="string">&quot;SQLite version string is not valid UTF8 ?!&quot;</span>)

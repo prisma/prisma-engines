@@ -610,7 +610,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CharSet</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">low_mask</span>: <span class="number">0</span>,
             <span class="ident">high_mask</span>: <span class="number">0</span>,
@@ -632,7 +632,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">char</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">char</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">char</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">1</span>;
 
         <span class="kw">if</span> <span class="ident">val</span> <span class="op">&gt;</span> <span class="number">127</span> {
@@ -655,19 +655,19 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CharacterClass</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Ascii</span>(<span class="ident">u64::max_value</span>(), <span class="ident">u64::max_value</span>(), <span class="bool-val">true</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid</span>(<span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid</span>(<span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ValidChars</span>(<span class="ident"><span class="self">Self</span>::str_to_set</span>(<span class="ident">string</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">InvalidChars</span>(<span class="ident"><span class="self">Self</span>::str_to_set</span>(<span class="ident">string</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_char</span>(<span class="ident">char</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_char</span>(<span class="ident">char</span>: <span class="ident">char</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">char</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">1</span>;
 
         <span class="kw">if</span> <span class="ident">val</span> <span class="op">&gt;</span> <span class="number">127</span> {
@@ -679,7 +679,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalid_char</span>(<span class="ident">char</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalid_char</span>(<span class="ident">char</span>: <span class="ident">char</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">char</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">1</span>;
 
         <span class="kw">if</span> <span class="ident">val</span> <span class="op">&gt;</span> <span class="number">127</span> {
@@ -691,11 +691,11 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">matches</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">char</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">matches</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">char</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ValidChars</span>(<span class="kw-2">ref</span> <span class="ident">valid</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">valid</span>.<span class="ident">contains</span>(<span class="ident">char</span>),
-            <span class="ident">InvalidChars</span>(<span class="kw-2">ref</span> <span class="ident">invalid</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">invalid</span>.<span class="ident">contains</span>(<span class="ident">char</span>),
-            <span class="ident">Ascii</span>(<span class="ident">high</span>, <span class="ident">low</span>, <span class="ident">unicode</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ValidChars</span>(<span class="kw-2">ref</span> <span class="ident">valid</span>) =&gt; <span class="ident">valid</span>.<span class="ident">contains</span>(<span class="ident">char</span>),
+            <span class="ident">InvalidChars</span>(<span class="kw-2">ref</span> <span class="ident">invalid</span>) =&gt; <span class="op">!</span><span class="ident">invalid</span>.<span class="ident">contains</span>(<span class="ident">char</span>),
+            <span class="ident">Ascii</span>(<span class="ident">high</span>, <span class="ident">low</span>, <span class="ident">unicode</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">char</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">1</span>;
                 <span class="kw">if</span> <span class="ident">val</span> <span class="op">&gt;</span> <span class="number">127</span> {
                     <span class="ident">unicode</span>
@@ -708,13 +708,13 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">char_to_set</span>(<span class="ident">char</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CharSet</span> {
+    <span class="kw">fn</span> <span class="ident">char_to_set</span>(<span class="ident">char</span>: <span class="ident">char</span>) -&gt; <span class="ident">CharSet</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident">CharSet::new</span>();
         <span class="ident">set</span>.<span class="ident">insert</span>(<span class="ident">char</span>);
         <span class="ident">set</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">str_to_set</span>(<span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CharSet</span> {
+    <span class="kw">fn</span> <span class="ident">str_to_set</span>(<span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">CharSet</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident">CharSet::new</span>();
         <span class="kw">for</span> <span class="ident">char</span> <span class="kw">in</span> <span class="ident">string</span>.<span class="ident">chars</span>() {
             <span class="ident">set</span>.<span class="ident">insert</span>(<span class="ident">char</span>);
@@ -731,7 +731,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Thread</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">state</span>: <span class="number">0</span>,
             <span class="ident">captures</span>: <span class="ident">Vec::new</span>(),
@@ -750,7 +750,7 @@
         <span class="self">self</span>.<span class="ident">capture_begin</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">captures</span>
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">begin</span>, <span class="ident">end</span>)<span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">source</span>[<span class="ident">begin</span>..<span class="ident">end</span>])
@@ -770,13 +770,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">index</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">index</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">index</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">chars</span>: <span class="ident">CharacterClass</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">chars</span>: <span class="ident">CharacterClass</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">index</span>,
             <span class="ident">chars</span>,
@@ -795,7 +795,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Match</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="ident">usize</span>, <span class="ident">captures</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Match</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="ident">usize</span>, <span class="ident">captures</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">Match</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
         <span class="ident">Match</span> { <span class="ident">state</span>, <span class="ident">captures</span> }
     }
 }
@@ -809,7 +809,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">NFA</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">State::new</span>(<span class="number">0</span>, <span class="ident">CharacterClass::any</span>());
         <span class="self">Self</span> {
             <span class="ident">states</span>: <span class="macro">vec!</span>[<span class="ident">root</span>],
@@ -819,10 +819,10 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">mut</span> <span class="ident">ord</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Match</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">mut</span> <span class="ident">ord</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Match</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">Ord</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">I</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">usize</span>) -&gt; <span class="ident">I</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">threads</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">Thread::new</span>()];
 
@@ -844,8 +844,8 @@
             .<span class="ident">fold</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="ident">prev</span>, <span class="ident">y</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">y_v</span> <span class="op">=</span> <span class="ident">ord</span>(<span class="ident">y</span>.<span class="ident">state</span>);
                 <span class="kw">match</span> <span class="ident">prev</span> {
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">y_v</span>, <span class="ident">y</span>)),
-                    <span class="prelude-val">Some</span>((<span class="ident">x_v</span>, <span class="ident">x</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>((<span class="ident">y_v</span>, <span class="ident">y</span>)),
+                    <span class="prelude-val">Some</span>((<span class="ident">x_v</span>, <span class="ident">x</span>)) =&gt; {
                         <span class="kw">if</span> <span class="ident">x_v</span> <span class="op">&lt;</span> <span class="ident">y_v</span> {
                             <span class="prelude-val">Some</span>((<span class="ident">y_v</span>, <span class="ident">y</span>))
                         } <span class="kw">else</span> {
@@ -857,10 +857,10 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="number">1</span>);
 
         <span class="kw">match</span> <span class="ident">thread</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="string">&quot;The string was exhausted before reaching an \
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;The string was exhausted before reaching an \
                          acceptance state&quot;</span>
                 .<span class="ident">to_string</span>()),
-            <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">thread</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">thread</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">thread</span>.<span class="ident">capture_begin</span>.<span class="ident">is_some</span>() {
                     <span class="ident">thread</span>.<span class="ident">end_capture</span>(<span class="ident">string</span>.<span class="ident">len</span>());
                 }
@@ -871,7 +871,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">process_char</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">threads</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Thread</span><span class="op">&gt;</span>, <span class="ident">char</span>: <span class="ident">char</span>, <span class="ident">pos</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Thread</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">process_char</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">threads</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Thread</span><span class="op">&gt;</span>, <span class="ident">char</span>: <span class="ident">char</span>, <span class="ident">pos</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Thread</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returned</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">threads</span>.<span class="ident">len</span>());
 
         <span class="kw">for</span> <span class="kw-2">mut</span> <span class="ident">thread</span> <span class="kw">in</span> <span class="ident">threads</span> {
@@ -889,7 +889,7 @@
                 }
             }
 
-            <span class="kw">if</span> <span class="ident">count</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+            <span class="kw">if</span> <span class="ident">count</span> <span class="op">==</span> <span class="number">1</span> {
                 <span class="ident">thread</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">found_state</span>;
                 <span class="ident">capture</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">thread</span>, <span class="ident">current_state</span>.<span class="ident">index</span>, <span class="ident">found_state</span>, <span class="ident">pos</span>);
                 <span class="ident">returned</span>.<span class="ident">push</span>(<span class="ident">thread</span>);
@@ -910,21 +910,21 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">states</span>[<span class="ident">state</span>]
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">states</span>[<span class="ident">state</span>]
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">chars</span>: <span class="ident">CharacterClass</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">chars</span>: <span class="ident">CharacterClass</span>) -&gt; <span class="ident">usize</span> {
         {
             <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">index</span>);
 
             <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">index</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">next_states</span> {
                 <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">index</span>);
-                <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">chars</span> <span class="op">=</span><span class="op">=</span> <span class="ident">chars</span> {
+                <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">chars</span> <span class="op">==</span> <span class="ident">chars</span> {
                     <span class="kw">return</span> <span class="ident">index</span>;
                 }
             }
@@ -960,7 +960,7 @@
         <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>).<span class="ident">metadata</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">metadata</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">new_state</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">chars</span>: <span class="ident">CharacterClass</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">new_state</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">chars</span>: <span class="ident">CharacterClass</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">states</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::new</span>(<span class="ident">index</span>, <span class="ident">chars</span>);
         <span class="self">self</span>.<span class="ident">states</span>.<span class="ident">push</span>(<span class="ident">state</span>);
@@ -974,7 +974,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">fork_thread</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">thread</span>: <span class="kw-2">&amp;</span><span class="ident">Thread</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Thread</span> {
+<span class="kw">fn</span> <span class="ident">fork_thread</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">thread</span>: <span class="kw-2">&amp;</span><span class="ident">Thread</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Thread</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_trace</span> <span class="op">=</span> <span class="ident">thread</span>.<span class="ident">clone</span>();
     <span class="ident">new_trace</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">index</span>;
     <span class="ident">new_trace</span>
@@ -988,7 +988,7 @@
     <span class="ident">next_state</span>: <span class="ident">usize</span>,
     <span class="ident">pos</span>: <span class="ident">usize</span>,
 ) {
-    <span class="kw">if</span> <span class="ident">thread</span>.<span class="ident">capture_begin</span> <span class="op">=</span><span class="op">=</span> <span class="prelude-val">None</span> <span class="op">&amp;&amp;</span> <span class="ident">nfa</span>.<span class="ident">start_capture</span>[<span class="ident">next_state</span>] {
+    <span class="kw">if</span> <span class="ident">thread</span>.<span class="ident">capture_begin</span> <span class="op">==</span> <span class="prelude-val">None</span> <span class="op">&amp;&amp;</span> <span class="ident">nfa</span>.<span class="ident">start_capture</span>[<span class="ident">next_state</span>] {
         <span class="ident">thread</span>.<span class="ident">start_capture</span>(<span class="ident">pos</span>);
     }
 
@@ -1015,7 +1015,7 @@
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">process</span>(<span class="string">&quot;hello&quot;</span>, <span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>);
 
         <span class="macro">assert!</span>(
-            <span class="ident">m</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">e</span>,
+            <span class="ident">m</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">==</span> <span class="ident">e</span>,
             <span class="string">&quot;You didn&#39;t get the right final state&quot;</span>
         );
     }
@@ -1035,7 +1035,7 @@
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">process</span>(<span class="string">&quot;new&quot;</span>, <span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>);
 
-        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">c2</span>, <span class="string">&quot;The two states were not found&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">==</span> <span class="ident">c2</span>, <span class="string">&quot;The two states were not found&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1059,8 +1059,8 @@
         <span class="kw">let</span> <span class="ident">thom</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">process</span>(<span class="string">&quot;thom&quot;</span>, <span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>);
         <span class="kw">let</span> <span class="ident">nope</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">process</span>(<span class="string">&quot;nope&quot;</span>, <span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>);
 
-        <span class="macro">assert!</span>(<span class="ident">thomas</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">f1</span>, <span class="string">&quot;thomas was parsed correctly&quot;</span>);
-        <span class="macro">assert!</span>(<span class="ident">tom</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">c2</span>, <span class="string">&quot;tom was parsed correctly&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">thomas</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">==</span> <span class="ident">f1</span>, <span class="string">&quot;thomas was parsed correctly&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">tom</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">==</span> <span class="ident">c2</span>, <span class="string">&quot;tom was parsed correctly&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">thom</span>.<span class="ident">is_err</span>(), <span class="string">&quot;thom didn&#39;t reach an acceptance state&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">nope</span>.<span class="ident">is_err</span>(), <span class="string">&quot;nope wasn&#39;t parsed&quot;</span>);
     }
@@ -1083,8 +1083,8 @@
         <span class="kw">let</span> <span class="ident">new_post</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">process</span>(<span class="string">&quot;posts/new&quot;</span>, <span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>);
         <span class="kw">let</span> <span class="ident">invalid</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">process</span>(<span class="string">&quot;posts/&quot;</span>, <span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>);
 
-        <span class="macro">assert!</span>(<span class="ident">post</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">g</span>, <span class="string">&quot;posts/1 was parsed&quot;</span>);
-        <span class="macro">assert!</span>(<span class="ident">new_post</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">g</span>, <span class="string">&quot;posts/new was parsed&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">post</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">==</span> <span class="ident">g</span>, <span class="string">&quot;posts/1 was parsed&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">new_post</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">==</span> <span class="ident">g</span>, <span class="string">&quot;posts/new was parsed&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">invalid</span>.<span class="ident">is_err</span>(), <span class="string">&quot;posts/ was invalid&quot;</span>);
     }
 
@@ -1111,8 +1111,8 @@
         <span class="kw">let</span> <span class="ident">ambiguous</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">process</span>(<span class="string">&quot;posts/new&quot;</span>, <span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>);
         <span class="kw">let</span> <span class="ident">invalid</span> <span class="op">=</span> <span class="ident">nfa</span>.<span class="ident">process</span>(<span class="string">&quot;posts/&quot;</span>, <span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>);
 
-        <span class="macro">assert!</span>(<span class="ident">post</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">g1</span>, <span class="string">&quot;posts/1 was parsed&quot;</span>);
-        <span class="macro">assert!</span>(<span class="ident">ambiguous</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">i2</span>, <span class="string">&quot;posts/new was ambiguous&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">post</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">==</span> <span class="ident">g1</span>, <span class="string">&quot;posts/1 was parsed&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">ambiguous</span>.<span class="ident">unwrap</span>().<span class="ident">state</span> <span class="op">==</span> <span class="ident">i2</span>, <span class="string">&quot;posts/new was ambiguous&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">invalid</span>.<span class="ident">is_err</span>(), <span class="string">&quot;posts/ was invalid&quot;</span>);
     }
 
@@ -1190,11 +1190,11 @@
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">set</span>.<span class="ident">contains</span>(<span class="string">&#39;ü&#39;</span>), <span class="string">&quot;The set does not contain ü&quot;</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">valid</span>(<span class="ident">char</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CharacterClass</span> {
+    <span class="kw">fn</span> <span class="ident">valid</span>(<span class="ident">char</span>: <span class="ident">char</span>) -&gt; <span class="ident">CharacterClass</span> {
         <span class="ident">CharacterClass::valid_char</span>(<span class="ident">char</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="ident">char</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CharacterClass</span> {
+    <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="ident">char</span>: <span class="ident">char</span>) -&gt; <span class="ident">CharacterClass</span> {
         <span class="ident">CharacterClass::invalid_char</span>(<span class="ident">char</span>)
     }
 }

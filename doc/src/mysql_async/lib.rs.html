@@ -433,13 +433,13 @@
     <span class="kw">fn</span> <span class="ident">poll</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::task::Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">std::task::Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;BoxFuture&quot;</span>)
             .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">&quot;dyn Future&lt;Output = {}&gt;&quot;</span>,
@@ -596,7 +596,7 @@
         };
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_opts</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OptsBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_opts</span>() -&gt; <span class="ident">OptsBuilder</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">OptsBuilder::from_opts</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">DATABASE_URL</span>);
         <span class="kw">if</span> <span class="ident">test_ssl</span>() {
             <span class="kw">let</span> <span class="ident">ssl_opts</span> <span class="op">=</span> <span class="ident">SslOpts::default</span>()
@@ -610,11 +610,11 @@
         <span class="ident">builder</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_compression</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_compression</span>() -&gt; <span class="ident">bool</span> {
         [<span class="string">&quot;true&quot;</span>, <span class="string">&quot;1&quot;</span>].<span class="ident">contains</span>(<span class="op">&amp;&amp;</span><span class="kw-2">*</span><span class="ident">env::var</span>(<span class="string">&quot;COMPRESS&quot;</span>).<span class="ident">unwrap_or_default</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_ssl</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_ssl</span>() -&gt; <span class="ident">bool</span> {
         [<span class="string">&quot;true&quot;</span>, <span class="string">&quot;1&quot;</span>].<span class="ident">contains</span>(<span class="op">&amp;&amp;</span><span class="kw-2">*</span><span class="ident">env::var</span>(<span class="string">&quot;SSL&quot;</span>).<span class="ident">unwrap_or_default</span>())
     }
 }

@@ -151,14 +151,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RelationCondition</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert_of_subselect</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert_of_subselect</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">RelationCondition::EveryRelatedRecord</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">RelationCompare</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Every related record matches the filter.</span>
-    <span class="kw">fn</span> <span class="ident">every_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">every_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
     {
@@ -170,7 +170,7 @@
     }
 
     <span class="doccomment">/// At least one related record matches the filter.</span>
-    <span class="kw">fn</span> <span class="ident">at_least_one_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">at_least_one_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
     {
@@ -182,7 +182,7 @@
     }
 
     <span class="doccomment">/// To one related record. FIXME</span>
-    <span class="kw">fn</span> <span class="ident">to_one_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">to_one_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
     {
@@ -194,7 +194,7 @@
     }
 
     <span class="doccomment">/// None of the related records matches the filter.</span>
-    <span class="kw">fn</span> <span class="ident">no_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">no_related</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
     {
@@ -206,7 +206,7 @@
     }
 
     <span class="doccomment">/// One of the relations is `Null`.</span>
-    <span class="kw">fn</span> <span class="ident">one_relation_is_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span> {
+    <span class="kw">fn</span> <span class="ident">one_relation_is_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Filter</span> {
         <span class="ident">Filter::from</span>(<span class="ident">OneRelationIsNullFilter</span> {
             <span class="ident">field</span>: <span class="ident">Arc::clone</span>(<span class="self">self</span>),
         })

@@ -429,7 +429,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Converts the walker to either an implicit many to many, or a inline relation walker</span>
     <span class="doccomment">/// gathering 1:1 and 1:n relations.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">refine</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RefinedRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">refine</span>(<span class="self">self</span>) -&gt; <span class="ident">RefinedRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">is_many_to_many</span>() {
             <span class="ident">RefinedRelationWalker::ImplicitManyToMany</span>(<span class="ident">ImplicitManyToManyRelationWalker</span> {
                 <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
@@ -444,7 +444,7 @@
     }
 
     <span class="doccomment">/// The relation attributes parsed from the AST.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">relations</span>.<span class="ident">relations_storage</span>[<span class="self">self</span>.<span class="ident">relation_id</span>]
     }
 }
@@ -458,10 +458,10 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">RefinedRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_inline</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_inline</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RefinedRelationWalker::Inline</span>(<span class="ident">inline</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">inline</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RefinedRelationWalker::Inline</span>(<span class="ident">inline</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">inline</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
@@ -490,34 +490,34 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Get the relation attributes defined in the AST.</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">relations</span>.<span class="ident">relations_storage</span>[<span class="self">self</span>.<span class="ident">relation_id</span>]
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">db</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">db</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>
     }
 
     <span class="doccomment">/// The relation is 1:1, having at most one record on both sides of the relation.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_one_to_one</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_one_to_one</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span>, <span class="ident">RelationAttributes::OneToOne</span>(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// The model which holds the relation arguments.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referencing_model</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referencing_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_a</span>)
     }
 
     <span class="doccomment">/// The model referenced and which hold the back-relation field.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_model</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_b</span>)
     }
 
     <span class="doccomment">/// If the relation is defined from both sides, convert to an explicit relation</span>
     <span class="doccomment">/// walker.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_complete</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_complete</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">forward_relation_field</span>(), <span class="self">self</span>.<span class="ident">back_relation_field</span>()) {
-            (<span class="prelude-val">Some</span>(<span class="ident">field_a</span>), <span class="prelude-val">Some</span>(<span class="ident">field_b</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="prelude-val">Some</span>(<span class="ident">field_a</span>), <span class="prelude-val">Some</span>(<span class="ident">field_b</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="ident">CompleteInlineRelationWalker</span> {
                     <span class="ident">side_a</span>: (<span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">model_id</span>, <span class="ident">field_a</span>.<span class="ident">field_id</span>),
                     <span class="ident">side_b</span>: (<span class="self">self</span>.<span class="ident">referenced_model</span>().<span class="ident">model_id</span>, <span class="ident">field_b</span>.<span class="ident">field_id</span>),
@@ -527,19 +527,19 @@
 
                 <span class="prelude-val">Some</span>(<span class="ident">walker</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="comment">// Should only be used for lifting</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referencing_fields</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReferencingFields</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referencing_fields</span>(<span class="self">self</span>) -&gt; <span class="ident">ReferencingFields</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::NameNormalizer</span>;
 
         <span class="self">self</span>.<span class="ident">forward_relation_field</span>()
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">fields</span>())
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> <span class="ident">ReferencingFields::Concrete</span>(<span class="ident">Box::new</span>(<span class="ident">fields</span>)))
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">referenced_model</span>().<span class="ident">unique_criterias</span>().<span class="ident">next</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">first_unique_criteria</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ReferencingFields::Inferred</span>(
+                <span class="prelude-val">Some</span>(<span class="ident">first_unique_criteria</span>) =&gt; <span class="ident">ReferencingFields::Inferred</span>(
                     <span class="ident">first_unique_criteria</span>
                         .<span class="ident">fields</span>()
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
@@ -550,7 +550,7 @@
                             );
 
                             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing_field</span>) <span class="op">=</span>
-                                <span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">scalar_fields</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>)
+                                <span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">scalar_fields</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span>)
                             {
                                 <span class="ident">InferredField</span> {
                                     <span class="ident">name</span>,
@@ -569,15 +569,15 @@
                         })
                         .<span class="ident">collect</span>(),
                 ),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ReferencingFields::NA</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="ident">ReferencingFields::NA</span>,
             })
     }
 
     <span class="comment">// Should only be used for lifting</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">forward_relation_field</span>()
             .<span class="ident">and_then</span>(
-                <span class="op">|</span><span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+                <span class="op">|</span><span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">|</span> -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
                     <span class="ident">field</span>.<span class="ident">referenced_fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> <span class="ident">Box::new</span>(<span class="ident">fields</span>) <span class="kw">as</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>)
                 },
             )
@@ -592,26 +592,26 @@
             })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">forward_relation_field</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">forward_relation_field</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referencing_model</span>();
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span> {
             <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Forward</span>(<span class="ident">a</span>))
             <span class="op">|</span> <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Both</span>(<span class="ident">a</span>, <span class="kw">_</span>))
             <span class="op">|</span> <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Both</span>(<span class="ident">a</span>, <span class="kw">_</span>))
-            <span class="op">|</span> <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Forward</span>(<span class="ident">a</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">model</span>.<span class="ident">relation_field</span>(<span class="ident">a</span>)),
-            <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Back</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="op">|</span> <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Forward</span>(<span class="ident">a</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">model</span>.<span class="ident">relation_field</span>(<span class="ident">a</span>)),
+            <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Back</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">forward_relation_field_arity</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ast::FieldArity</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">forward_relation_field_arity</span>(<span class="self">self</span>) -&gt; <span class="ident">ast::FieldArity</span> {
         <span class="self">self</span>.<span class="ident">forward_relation_field</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">is_required</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">referencing_fields</span>() {
-                    <span class="ident">ReferencingFields::Concrete</span>(<span class="kw-2">mut</span> <span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fields</span>.<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_required</span>()),
-                    <span class="ident">ReferencingFields::Inferred</span>(<span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">arity</span>.<span class="ident">is_required</span>()),
-                    <span class="ident">ReferencingFields::NA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">todo!</span>(),
+                    <span class="ident">ReferencingFields::Concrete</span>(<span class="kw-2">mut</span> <span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_required</span>()),
+                    <span class="ident">ReferencingFields::Inferred</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">arity</span>.<span class="ident">is_required</span>()),
+                    <span class="ident">ReferencingFields::NA</span> =&gt; <span class="macro">todo!</span>(),
                 };
                 <span class="kw">if</span> <span class="ident">is_required</span> {
                     <span class="ident">ast::FieldArity::Required</span>
@@ -621,21 +621,21 @@
             })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">back_relation_field</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">back_relation_field</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referenced_model</span>();
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span> {
             <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Both</span>(<span class="kw">_</span>, <span class="ident">b</span>))
             <span class="op">|</span> <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Both</span>(<span class="kw">_</span>, <span class="ident">b</span>))
-            <span class="op">|</span> <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Back</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">model</span>.<span class="ident">relation_field</span>(<span class="ident">b</span>)),
+            <span class="op">|</span> <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Back</span>(<span class="ident">b</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">model</span>.<span class="ident">relation_field</span>(<span class="ident">b</span>)),
             <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Forward</span>(<span class="kw">_</span>))
-            <span class="op">|</span> <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Forward</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="op">|</span> <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Forward</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
     <span class="doccomment">/// The name of the relation. Either uses the `name` (or default) argument,</span>
     <span class="doccomment">/// or generates an implicit name.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get</span>()
             .<span class="ident">relation_name</span>
             .<span class="ident">map</span>(<span class="ident">RelationName::Explicit</span>)
@@ -653,33 +653,33 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">ImplicitManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Gets the relation attributes from the AST.</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">relations</span>.<span class="ident">relations_storage</span>[<span class="self">self</span>.<span class="ident">relation_id</span>]
     }
 
     <span class="doccomment">/// The model which comes first in the alphabetical order.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">model_a</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">model_a</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_a</span>)
     }
 
     <span class="doccomment">/// The model which comes after model a in the alphabetical order.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">model_b</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">model_b</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">model_b</span>)
     }
 
     <span class="doccomment">/// The field that defines the relation in model a.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_a</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_a</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span> {
-            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">model_a</span>().<span class="ident">relation_field</span>(<span class="ident">field_a</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>, <span class="ident">field_b</span>: <span class="kw">_</span> } =&gt; <span class="self">self</span>.<span class="ident">model_a</span>().<span class="ident">relation_field</span>(<span class="ident">field_a</span>),
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
     <span class="doccomment">/// The field that defines the relation in model b.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_b</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_b</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span> {
-            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">model_b</span>().<span class="ident">relation_field</span>(<span class="ident">field_b</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>: <span class="kw">_</span>, <span class="ident">field_b</span> } =&gt; <span class="self">self</span>.<span class="ident">model_b</span>().<span class="ident">relation_field</span>(<span class="ident">field_b</span>),
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 }
@@ -696,7 +696,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The model that defines the relation fields and actions.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referencing_model</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referencing_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="ident">ModelWalker</span> {
             <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">side_a</span>.<span class="number">0</span>,
             <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
@@ -705,7 +705,7 @@
     }
 
     <span class="doccomment">/// The implicit relation side.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_model</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="ident">ModelWalker</span> {
             <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">side_b</span>.<span class="number">0</span>,
             <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
@@ -713,7 +713,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referencing_field</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referencing_field</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="ident">RelationFieldWalker</span> {
             <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">side_a</span>.<span class="number">0</span>,
             <span class="ident">field_id</span>: <span class="self">self</span>.<span class="ident">side_a</span>.<span class="number">1</span>,
@@ -722,7 +722,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_field</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_field</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="ident">RelationFieldWalker</span> {
             <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">side_b</span>.<span class="number">0</span>,
             <span class="ident">field_id</span>: <span class="self">self</span>.<span class="ident">side_b</span>.<span class="number">1</span>,
@@ -733,7 +733,7 @@
 
     <span class="doccomment">/// The name of the foreign key. Either taken from the `map` attribute, or generated following</span>
     <span class="doccomment">/// the Prisma defaults.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">foreign_key_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">foreign_key_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">from_forward</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referencing_field</span>().<span class="ident">final_foreign_key_name</span>(<span class="ident">connector</span>);
         <span class="kw">let</span> <span class="ident">from_back</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referenced_field</span>().<span class="ident">final_foreign_key_name</span>(<span class="ident">connector</span>);
 
@@ -741,7 +741,7 @@
     }
 
     <span class="doccomment">/// The scalar fields defining the relation on the referenced model.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span><span class="ident">field_id</span>: <span class="kw-2">&amp;</span><span class="ident">ast::FieldId</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referenced_model</span>().<span class="ident">model_id</span>;
 
@@ -754,13 +754,13 @@
         };
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">referencing_field</span>().<span class="ident">relation_field</span>.<span class="ident">references</span>.<span class="ident">as_ref</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">references</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">references</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> [].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">references</span>) =&gt; <span class="ident">references</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>),
+            <span class="prelude-val">None</span> =&gt; [].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>),
         }
     }
 
     <span class="doccomment">/// The scalar fields on the defining the relation on the referencing model.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referencing_fields</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referencing_fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span><span class="ident">field_id</span>: <span class="kw-2">&amp;</span><span class="ident">ast::FieldId</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">model_id</span>;
 
@@ -773,14 +773,14 @@
         };
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">referencing_field</span>().<span class="ident">relation_field</span>.<span class="ident">fields</span>.<span class="ident">as_ref</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">references</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">references</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> [].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">references</span>) =&gt; <span class="ident">references</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>),
+            <span class="prelude-val">None</span> =&gt; [].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>),
         }
     }
 
     <span class="doccomment">/// Gives the onUpdate referential action of the relation. If not defined</span>
     <span class="doccomment">/// explicitly, returns the default value.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">on_update</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReferentialAction</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">on_update</span>(<span class="self">self</span>) -&gt; <span class="ident">ReferentialAction</span> {
         <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
 
         <span class="self">self</span>.<span class="ident">referencing_field</span>().<span class="ident">attributes</span>().<span class="ident">on_update</span>.<span class="ident">unwrap_or</span>(<span class="ident">Cascade</span>)
@@ -792,16 +792,16 @@
         <span class="self">self</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
         <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReferentialAction</span> {
+    ) -&gt; <span class="ident">ReferentialAction</span> {
         <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
 
         <span class="self">self</span>.<span class="ident">referencing_field</span>().<span class="ident">attributes</span>().<span class="ident">on_delete</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">supports_restrict</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="ident">referential_integrity</span>, <span class="ident">Restrict</span>);
 
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">referential_arity</span>() {
-                <span class="ident">ast::FieldArity::Required</span> <span class="kw">if</span> <span class="ident">supports_restrict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Restrict</span>,
-                <span class="ident">ast::FieldArity::Required</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">NoAction</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SetNull</span>,
+                <span class="ident">ast::FieldArity::Required</span> <span class="kw">if</span> <span class="ident">supports_restrict</span> =&gt; <span class="ident">Restrict</span>,
+                <span class="ident">ast::FieldArity::Required</span> =&gt; <span class="ident">NoAction</span>,
+                <span class="kw">_</span> =&gt; <span class="ident">SetNull</span>,
             }
         })
     }
@@ -810,13 +810,13 @@
     <span class="doccomment">/// underlying scalar fields is required. For the purpose of referential</span>
     <span class="doccomment">/// actions, we count the relation field required if any of the underlying</span>
     <span class="doccomment">/// fields is required.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referential_arity</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ast::FieldArity</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referential_arity</span>(<span class="self">self</span>) -&gt; <span class="ident">ast::FieldArity</span> {
         <span class="self">self</span>.<span class="ident">referencing_field</span>().<span class="ident">referential_arity</span>()
     }
 
     <span class="doccomment">/// 1:1, 1:n or m:n</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">relation_type</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationType</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">relation_type</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationType</span> {
         <span class="self">self</span>.<span class="ident">relation</span>.<span class="ident">r#type</span>()
     }
 }

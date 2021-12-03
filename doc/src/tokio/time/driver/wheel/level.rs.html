@@ -315,7 +315,7 @@
 <span class="kw">const</span> <span class="ident">LEVEL_MULT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">64</span>;
 
 <span class="kw">impl</span> <span class="ident">Level</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">level</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Level</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">level</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Level</span> {
         <span class="comment">// A value has to be Copy in order to use syntax like:</span>
         <span class="comment">//     let stack = Stack::default();</span>
         <span class="comment">//     ...</span>
@@ -404,12 +404,12 @@
 
     <span class="doccomment">/// Finds the slot that needs to be processed next and returns the slot and</span>
     <span class="doccomment">/// `Instant` at which this slot must be processed.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">next_expiration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">now</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Expiration</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">next_expiration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">now</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Expiration</span><span class="op">&gt;</span> {
         <span class="comment">// Use the `occupied` bit field to get the index of the next slot that</span>
         <span class="comment">// needs to be processed.</span>
         <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">next_occupied_slot</span>(<span class="ident">now</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">slot</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">slot</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">slot</span>) =&gt; <span class="ident">slot</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
         };
 
         <span class="comment">// From the slot index, calculate the `Instant` at which it needs to be</span>
@@ -463,8 +463,8 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">next_occupied_slot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">now</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">occupied</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">fn</span> <span class="ident">next_occupied_slot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">now</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">occupied</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
@@ -498,7 +498,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_slot</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">slot</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EntryList</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_slot</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">slot</span>: <span class="ident">usize</span>) -&gt; <span class="ident">EntryList</span> {
         <span class="self">self</span>.<span class="ident">occupied</span> <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">occupied_bit</span>(<span class="ident">slot</span>);
 
         <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">slot</span>[<span class="ident">slot</span>])
@@ -506,27 +506,27 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Level</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Level&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;occupied&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">occupied</span>)
             .<span class="ident">finish</span>()
     }
 }
 
-<span class="kw">fn</span> <span class="ident">occupied_bit</span>(<span class="ident">slot</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">occupied_bit</span>(<span class="ident">slot</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
     <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">slot</span>
 }
 
-<span class="kw">fn</span> <span class="ident">slot_range</span>(<span class="ident">level</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">slot_range</span>(<span class="ident">level</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
     <span class="ident">LEVEL_MULT</span>.<span class="ident">pow</span>(<span class="ident">level</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="kw">as</span> <span class="ident">u64</span>
 }
 
-<span class="kw">fn</span> <span class="ident">level_range</span>(<span class="ident">level</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">level_range</span>(<span class="ident">level</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
     <span class="ident">LEVEL_MULT</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="ident">slot_range</span>(<span class="ident">level</span>)
 }
 
 <span class="doccomment">/// Convert a duration (milliseconds) and a level to a slot position</span>
-<span class="kw">fn</span> <span class="ident">slot_for</span>(<span class="ident">duration</span>: <span class="ident">u64</span>, <span class="ident">level</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">fn</span> <span class="ident">slot_for</span>(<span class="ident">duration</span>: <span class="ident">u64</span>, <span class="ident">level</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     ((<span class="ident">duration</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">level</span> <span class="op">*</span> <span class="number">6</span>)) <span class="op">%</span> <span class="ident">LEVEL_MULT</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="kw">as</span> <span class="ident">usize</span>
 }
 

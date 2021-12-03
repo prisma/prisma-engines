@@ -406,30 +406,30 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MapTy</span> {
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MapTy</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MapTy</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;map&quot;</span> <span class="op">|</span> <span class="string">&quot;hash_map&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MapTy::HashMap</span>),
-            <span class="string">&quot;btree_map&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MapTy::BTreeMap</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="string">&quot;map&quot;</span> <span class="op">|</span> <span class="string">&quot;hash_map&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">MapTy::HashMap</span>),
+            <span class="string">&quot;btree_map&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">MapTy::BTreeMap</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">module</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ident</span> {
+    <span class="kw">fn</span> <span class="ident">module</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Ident</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">MapTy::HashMap</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ident::new</span>(<span class="string">&quot;hash_map&quot;</span>, <span class="ident">Span::call_site</span>()),
-            <span class="ident">MapTy::BTreeMap</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ident::new</span>(<span class="string">&quot;btree_map&quot;</span>, <span class="ident">Span::call_site</span>()),
+            <span class="ident">MapTy::HashMap</span> =&gt; <span class="ident">Ident::new</span>(<span class="string">&quot;hash_map&quot;</span>, <span class="ident">Span::call_site</span>()),
+            <span class="ident">MapTy::BTreeMap</span> =&gt; <span class="ident">Ident::new</span>(<span class="string">&quot;btree_map&quot;</span>, <span class="ident">Span::call_site</span>()),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">lib</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">fn</span> <span class="ident">lib</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">MapTy::HashMap</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span> { <span class="ident">std</span> },
-            <span class="ident">MapTy::BTreeMap</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span> { <span class="ident">prost::alloc</span> },
+            <span class="ident">MapTy::HashMap</span> =&gt; <span class="macro">quote!</span> { <span class="ident">std</span> },
+            <span class="ident">MapTy::BTreeMap</span> =&gt; <span class="macro">quote!</span> { <span class="ident">prost::alloc</span> },
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">fake_scalar</span>(<span class="ident">ty</span>: <span class="ident">scalar::Ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">scalar::Field</span> {
+<span class="kw">fn</span> <span class="ident">fake_scalar</span>(<span class="ident">ty</span>: <span class="ident">scalar::Ty</span>) -&gt; <span class="ident">scalar::Field</span> {
     <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">scalar::Kind::Plain</span>(<span class="ident">scalar::DefaultValue::new</span>(<span class="kw-2">&amp;</span><span class="ident">ty</span>));
     <span class="ident">scalar::Field</span> {
         <span class="ident">ty</span>,
@@ -447,7 +447,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Field</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Meta</span>], <span class="ident">inferred_tag</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Meta</span>], <span class="ident">inferred_tag</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">types</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tag</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
@@ -462,39 +462,39 @@
                 <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>): (<span class="ident">String</span>, <span class="ident">String</span>) <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">attr</span> {
                     <span class="ident">Meta::NameValue</span>(<span class="ident">MetaNameValue</span> {
                         <span class="ident">lit</span>: <span class="ident">Lit::Str</span>(<span class="ident">lit</span>), ..
-                    }) <span class="op">=</span><span class="op">&gt;</span> {
+                    }) =&gt; {
                         <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">lit</span>.<span class="ident">value</span>();
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">map</span>(<span class="ident">ToString::to_string</span>);
                         <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
                         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">items</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">Some</span>(<span class="ident">k</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">k</span>,
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;invalid map attribute: must have key and value types&quot;</span>),
+                            <span class="prelude-val">Some</span>(<span class="ident">k</span>) =&gt; <span class="ident">k</span>,
+                            <span class="prelude-val">None</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;invalid map attribute: must have key and value types&quot;</span>),
                         };
                         <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
                             <span class="macro">bail!</span>(<span class="string">&quot;invalid map attribute: {:?}&quot;</span>, <span class="ident">attr</span>);
                         }
                         (<span class="ident">k</span>, <span class="ident">v</span>)
                     }
-                    <span class="ident">Meta::List</span>(<span class="ident">meta_list</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">Meta::List</span>(<span class="ident">meta_list</span>) =&gt; {
                         <span class="comment">// TODO(rustlang/rust#23121): slice pattern matching would make this much nicer.</span>
                         <span class="kw">if</span> <span class="ident">meta_list</span>.<span class="ident">nested</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">2</span> {
                             <span class="macro">bail!</span>(<span class="string">&quot;invalid map attribute: must contain key and value types&quot;</span>);
                         }
                         <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">meta_list</span>.<span class="ident">nested</span>[<span class="number">0</span>] {
-                            <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::Path</span>(<span class="ident">k</span>)) <span class="kw">if</span> <span class="ident">k</span>.<span class="ident">get_ident</span>().<span class="ident">is_some</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::Path</span>(<span class="ident">k</span>)) <span class="kw">if</span> <span class="ident">k</span>.<span class="ident">get_ident</span>().<span class="ident">is_some</span>() =&gt; {
                                 <span class="ident">k</span>.<span class="ident">get_ident</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>()
                             }
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;invalid map attribute: key must be an identifier&quot;</span>),
+                            <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;invalid map attribute: key must be an identifier&quot;</span>),
                         };
                         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">meta_list</span>.<span class="ident">nested</span>[<span class="number">1</span>] {
-                            <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::Path</span>(<span class="ident">v</span>)) <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">get_ident</span>().<span class="ident">is_some</span>() <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::Path</span>(<span class="ident">v</span>)) <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">get_ident</span>().<span class="ident">is_some</span>() =&gt; {
                                 <span class="ident">v</span>.<span class="ident">get_ident</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>()
                             }
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;invalid map attribute: value must be an identifier&quot;</span>),
+                            <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;invalid map attribute: value must be an identifier&quot;</span>),
                         };
                         (<span class="ident">k</span>, <span class="ident">v</span>)
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                    <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
                 };
                 <span class="ident">set_option</span>(
                     <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">types</span>,
@@ -507,29 +507,29 @@
         }
 
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> (<span class="ident">types</span>, <span class="ident">tag</span>.<span class="ident">or</span>(<span class="ident">inferred_tag</span>)) {
-            (<span class="prelude-val">Some</span>((<span class="ident">map_ty</span>, <span class="ident">key_ty</span>, <span class="ident">value_ty</span>)), <span class="prelude-val">Some</span>(<span class="ident">tag</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Field</span> {
+            (<span class="prelude-val">Some</span>((<span class="ident">map_ty</span>, <span class="ident">key_ty</span>, <span class="ident">value_ty</span>)), <span class="prelude-val">Some</span>(<span class="ident">tag</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Field</span> {
                 <span class="ident">map_ty</span>,
                 <span class="ident">key_ty</span>,
                 <span class="ident">value_ty</span>,
                 <span class="ident">tag</span>,
             }),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_oneof</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Meta</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_oneof</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Meta</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">Field::new</span>(<span class="ident">attrs</span>, <span class="prelude-val">None</span>)
     }
 
     <span class="doccomment">/// Returns a statement which encodes the map field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tag</span>;
         <span class="kw">let</span> <span class="ident">key_mod</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">key_ty</span>.<span class="ident">module</span>();
         <span class="kw">let</span> <span class="ident">ke</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">::prost::encoding</span>::#<span class="ident">key_mod::encode</span>);
         <span class="kw">let</span> <span class="ident">kl</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">::prost::encoding</span>::#<span class="ident">key_mod::encoded_len</span>);
         <span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map_ty</span>.<span class="ident">module</span>();
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value_ty</span> {
-            <span class="ident">ValueTy::Scalar</span>(<span class="ident">scalar::Ty::Enumeration</span>(<span class="ident">ty</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ValueTy::Scalar</span>(<span class="ident">scalar::Ty::Enumeration</span>(<span class="ident">ty</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="macro">quote!</span>(#<span class="ident">ty::default</span>() <span class="kw">as</span> <span class="ident">i32</span>);
                 <span class="macro">quote!</span> {
                     <span class="ident">::prost::encoding</span>::#<span class="ident">module::encode_with_default</span>(
@@ -544,7 +544,7 @@
                     );
                 }
             }
-            <span class="ident">ValueTy::Scalar</span>(<span class="ident">value_ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ValueTy::Scalar</span>(<span class="ident">value_ty</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">val_mod</span> <span class="op">=</span> <span class="ident">value_ty</span>.<span class="ident">module</span>();
                 <span class="kw">let</span> <span class="ident">ve</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">::prost::encoding</span>::#<span class="ident">val_mod::encode</span>);
                 <span class="kw">let</span> <span class="ident">vl</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">::prost::encoding</span>::#<span class="ident">val_mod::encoded_len</span>);
@@ -560,7 +560,7 @@
                     );
                 }
             }
-            <span class="ident">ValueTy::Message</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span> {
+            <span class="ident">ValueTy::Message</span> =&gt; <span class="macro">quote!</span> {
                 <span class="ident">::prost::encoding</span>::#<span class="ident">module::encode</span>(
                     #<span class="ident">ke</span>,
                     #<span class="ident">kl</span>,
@@ -576,12 +576,12 @@
 
     <span class="doccomment">/// Returns an expression which evaluates to the result of merging a decoded key value pair</span>
     <span class="doccomment">/// into the map.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">let</span> <span class="ident">key_mod</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">key_ty</span>.<span class="ident">module</span>();
         <span class="kw">let</span> <span class="ident">km</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">::prost::encoding</span>::#<span class="ident">key_mod::merge</span>);
         <span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map_ty</span>.<span class="ident">module</span>();
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value_ty</span> {
-            <span class="ident">ValueTy::Scalar</span>(<span class="ident">scalar::Ty::Enumeration</span>(<span class="ident">ty</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ValueTy::Scalar</span>(<span class="ident">scalar::Ty::Enumeration</span>(<span class="ident">ty</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="macro">quote!</span>(#<span class="ident">ty::default</span>() <span class="kw">as</span> <span class="ident">i32</span>);
                 <span class="macro">quote!</span> {
                     <span class="ident">::prost::encoding</span>::#<span class="ident">module::merge_with_default</span>(
@@ -594,12 +594,12 @@
                     )
                 }
             }
-            <span class="ident">ValueTy::Scalar</span>(<span class="ident">value_ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ValueTy::Scalar</span>(<span class="ident">value_ty</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">val_mod</span> <span class="op">=</span> <span class="ident">value_ty</span>.<span class="ident">module</span>();
                 <span class="kw">let</span> <span class="ident">vm</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">::prost::encoding</span>::#<span class="ident">val_mod::merge</span>);
                 <span class="macro">quote!</span>(<span class="ident">::prost::encoding</span>::#<span class="ident">module::merge</span>(#<span class="ident">km</span>, #<span class="ident">vm</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> #<span class="ident">ident</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>))
             }
-            <span class="ident">ValueTy::Message</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span> {
+            <span class="ident">ValueTy::Message</span> =&gt; <span class="macro">quote!</span> {
                 <span class="ident">::prost::encoding</span>::#<span class="ident">module::merge</span>(
                     #<span class="ident">km</span>,
                     <span class="ident">::prost::encoding::message::merge</span>,
@@ -612,13 +612,13 @@
     }
 
     <span class="doccomment">/// Returns an expression which evaluates to the encoded length of the map.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoded_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoded_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tag</span>;
         <span class="kw">let</span> <span class="ident">key_mod</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">key_ty</span>.<span class="ident">module</span>();
         <span class="kw">let</span> <span class="ident">kl</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">::prost::encoding</span>::#<span class="ident">key_mod::encoded_len</span>);
         <span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map_ty</span>.<span class="ident">module</span>();
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value_ty</span> {
-            <span class="ident">ValueTy::Scalar</span>(<span class="ident">scalar::Ty::Enumeration</span>(<span class="ident">ty</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ValueTy::Scalar</span>(<span class="ident">scalar::Ty::Enumeration</span>(<span class="ident">ty</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="macro">quote!</span>(#<span class="ident">ty::default</span>() <span class="kw">as</span> <span class="ident">i32</span>);
                 <span class="macro">quote!</span> {
                     <span class="ident">::prost::encoding</span>::#<span class="ident">module::encoded_len_with_default</span>(
@@ -630,12 +630,12 @@
                     )
                 }
             }
-            <span class="ident">ValueTy::Scalar</span>(<span class="ident">value_ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ValueTy::Scalar</span>(<span class="ident">value_ty</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">val_mod</span> <span class="op">=</span> <span class="ident">value_ty</span>.<span class="ident">module</span>();
                 <span class="kw">let</span> <span class="ident">vl</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">::prost::encoding</span>::#<span class="ident">val_mod::encoded_len</span>);
                 <span class="macro">quote!</span>(<span class="ident">::prost::encoding</span>::#<span class="ident">module::encoded_len</span>(#<span class="ident">kl</span>, #<span class="ident">vl</span>, #<span class="ident">tag</span>, <span class="kw-2">&amp;</span>#<span class="ident">ident</span>))
             }
-            <span class="ident">ValueTy::Message</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span> {
+            <span class="ident">ValueTy::Message</span> =&gt; <span class="macro">quote!</span> {
                 <span class="ident">::prost::encoding</span>::#<span class="ident">module::encoded_len</span>(
                     #<span class="ident">kl</span>,
                     <span class="ident">::prost::encoding::message::encoded_len</span>,
@@ -646,12 +646,12 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="macro">quote!</span>(#<span class="ident">ident</span>.<span class="ident">clear</span>())
     }
 
     <span class="doccomment">/// Returns methods to embed in the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">methods</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">methods</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ValueTy::Scalar</span>(<span class="ident">scalar::Ty::Enumeration</span>(<span class="ident">ty</span>)) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value_ty</span> {
             <span class="kw">let</span> <span class="ident">key_ty</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">key_ty</span>.<span class="ident">rust_type</span>();
             <span class="kw">let</span> <span class="ident">key_ref_ty</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">key_ty</span>.<span class="ident">rust_ref_type</span>();
@@ -672,11 +672,11 @@
             <span class="kw">let</span> <span class="ident">insert_doc</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Inserts a key value pair into `{}`.&quot;</span>, <span class="ident">ident</span>);
             <span class="prelude-val">Some</span>(<span class="macro">quote!</span> {
                 <span class="attribute">#[<span class="ident">doc</span><span class="op">=</span>#<span class="ident">get_doc</span>]</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: #<span class="ident">key_ref_ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::option::Option</span><span class="op">&lt;</span>#<span class="ident">ty</span><span class="op">&gt;</span> {
+                <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: #<span class="ident">key_ref_ty</span>) -&gt; <span class="ident">::core::option::Option</span><span class="op">&lt;</span>#<span class="ident">ty</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.#<span class="ident">ident</span>.<span class="ident">get</span>(#<span class="ident">take_ref</span> <span class="ident">key</span>).<span class="ident">cloned</span>().<span class="ident">and_then</span>(#<span class="ident">ty::from_i32</span>)
                 }
                 <span class="attribute">#[<span class="ident">doc</span><span class="op">=</span>#<span class="ident">insert_doc</span>]</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: #<span class="ident">key_ty</span>, <span class="ident">value</span>: #<span class="ident">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::option::Option</span><span class="op">&lt;</span>#<span class="ident">ty</span><span class="op">&gt;</span> {
+                <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: #<span class="ident">key_ty</span>, <span class="ident">value</span>: #<span class="ident">ty</span>) -&gt; <span class="ident">::core::option::Option</span><span class="op">&lt;</span>#<span class="ident">ty</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.#<span class="ident">ident</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">value</span> <span class="kw">as</span> <span class="ident">i32</span>).<span class="ident">and_then</span>(#<span class="ident">ty::from_i32</span>)
                 }
             })
@@ -689,10 +689,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The Debug tries to convert any enumerations met into the variants if possible, instead of</span>
     <span class="doccomment">/// outputting the raw numbers.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">wrapper_name</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">wrapper_name</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">let</span> <span class="ident">type_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map_ty</span> {
-            <span class="ident">MapTy::HashMap</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ident::new</span>(<span class="string">&quot;HashMap&quot;</span>, <span class="ident">Span::call_site</span>()),
-            <span class="ident">MapTy::BTreeMap</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Ident::new</span>(<span class="string">&quot;BTreeMap&quot;</span>, <span class="ident">Span::call_site</span>()),
+            <span class="ident">MapTy::HashMap</span> =&gt; <span class="ident">Ident::new</span>(<span class="string">&quot;HashMap&quot;</span>, <span class="ident">Span::call_site</span>()),
+            <span class="ident">MapTy::BTreeMap</span> =&gt; <span class="ident">Ident::new</span>(<span class="string">&quot;BTreeMap&quot;</span>, <span class="ident">Span::call_site</span>()),
         };
 
         <span class="comment">// A fake field for generating the debug wrapper</span>
@@ -701,7 +701,7 @@
         <span class="kw">let</span> <span class="ident">value_wrapper</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value_ty</span>.<span class="ident">debug</span>();
         <span class="kw">let</span> <span class="ident">libname</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map_ty</span>.<span class="ident">lib</span>();
         <span class="kw">let</span> <span class="ident">fmt</span> <span class="op">=</span> <span class="macro">quote!</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::fmt::Result</span> {
+            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::core::fmt::Formatter</span>) -&gt; <span class="ident">::core::fmt::Result</span> {
                 #<span class="ident">key_wrapper</span>
                 #<span class="ident">value_wrapper</span>
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_map</span>();
@@ -712,7 +712,7 @@
             }
         };
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value_ty</span> {
-            <span class="ident">ValueTy::Scalar</span>(<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ValueTy::Scalar</span>(<span class="ident">ty</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">ty</span>.<span class="ident">rust_type</span>();
                 <span class="macro">quote!</span> {
                     <span class="kw">struct</span> #<span class="ident">wrapper_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ::#<span class="ident">libname::collections</span>::#<span class="ident">type_name</span><span class="op">&lt;</span>#<span class="ident">key</span>, #<span class="ident">value</span><span class="op">&gt;</span>);
@@ -721,7 +721,7 @@
                     }
                 }
             }
-            <span class="ident">ValueTy::Message</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span> {
+            <span class="ident">ValueTy::Message</span> =&gt; <span class="macro">quote!</span> {
                 <span class="kw">struct</span> #<span class="ident">wrapper_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">V</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ::#<span class="ident">libname::collections</span>::#<span class="ident">type_name</span><span class="op">&lt;</span>#<span class="ident">key</span>, <span class="ident">V</span><span class="op">&gt;</span>);
                 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">::core::fmt::Debug</span> <span class="kw">for</span> #<span class="ident">wrapper_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">V</span><span class="op">&gt;</span>
                 <span class="kw">where</span>
@@ -734,7 +734,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">key_ty_from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">scalar::Ty</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">key_ty_from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">scalar::Ty</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">scalar::Ty::from_str</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
     <span class="kw">match</span> <span class="ident">ty</span> {
         <span class="ident">scalar::Ty::Int32</span>
@@ -748,8 +748,8 @@
         <span class="op">|</span> <span class="ident">scalar::Ty::Sfixed32</span>
         <span class="op">|</span> <span class="ident">scalar::Ty::Sfixed64</span>
         <span class="op">|</span> <span class="ident">scalar::Ty::Bool</span>
-        <span class="op">|</span> <span class="ident">scalar::Ty::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ty</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="string">&quot;invalid map key type: {}&quot;</span>, <span class="ident">s</span>),
+        <span class="op">|</span> <span class="ident">scalar::Ty::String</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ty</span>),
+        <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;invalid map key type: {}&quot;</span>, <span class="ident">s</span>),
     }
 }
 
@@ -761,10 +761,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ValueTy</span> {
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValueTy</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValueTy</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ty</span>) <span class="op">=</span> <span class="ident">scalar::Ty::from_str</span>(<span class="ident">s</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">ValueTy::Scalar</span>(<span class="ident">ty</span>))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">trim</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;message&quot;</span> {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">trim</span>() <span class="op">==</span> <span class="string">&quot;message&quot;</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">ValueTy::Message</span>)
         } <span class="kw">else</span> {
             <span class="macro">bail!</span>(<span class="string">&quot;invalid map value type: {}&quot;</span>, <span class="ident">s</span>);
@@ -775,11 +775,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the contained value is enumeration, it tries to convert it to the variant. If not, it</span>
     <span class="doccomment">/// just forwards the implementation.</span>
-    <span class="kw">fn</span> <span class="ident">debug</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">fn</span> <span class="ident">debug</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ValueTy::Scalar</span>(<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fake_scalar</span>(<span class="ident">ty</span>.<span class="ident">clone</span>()).<span class="ident">debug</span>(<span class="macro">quote!</span>(<span class="ident">ValueWrapper</span>)),
-            <span class="ident">ValueTy::Message</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span>(
-                <span class="kw">fn</span> <span class="ident">ValueWrapper</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+            <span class="ident">ValueTy::Scalar</span>(<span class="ident">ty</span>) =&gt; <span class="ident">fake_scalar</span>(<span class="ident">ty</span>.<span class="ident">clone</span>()).<span class="ident">debug</span>(<span class="macro">quote!</span>(<span class="ident">ValueWrapper</span>)),
+            <span class="ident">ValueTy::Message</span> =&gt; <span class="macro">quote!</span>(
+                <span class="kw">fn</span> <span class="ident">ValueWrapper</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="ident">T</span>) -&gt; <span class="ident">T</span> {
                     <span class="ident">v</span>
                 }
             ),

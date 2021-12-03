@@ -180,7 +180,7 @@
 
 <span class="doccomment">/// Most basic datamodel containing only a model with ID</span>
 <span class="doccomment">/// for the most rudimentary testing.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generic</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generic</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">&quot;model TestModel {
             #id(id, Int, @id)
@@ -192,7 +192,7 @@
 }
 
 <span class="doccomment">/// User model with some basic fields and unique constraints.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">&quot;model User {
             #id(id, Int, @id)
@@ -210,7 +210,7 @@
 
 <span class="doccomment">/// Test model containing all possible Prisma scalar types, nullable.</span>
 <span class="doccomment">/// Excludes capability-dependent types (e.g. JSON).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_nullable_types</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_nullable_types</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">&quot;model TestModel {
             #id(id, Int, @id)
@@ -229,7 +229,7 @@
 }
 
 <span class="doccomment">/// Test model containing all common Prisma numeric types.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_numeric_types</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_numeric_types</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">&quot;model TestModel {
             #id(id, Int, @id)
@@ -244,7 +244,7 @@
 }
 
 <span class="doccomment">/// Test model containing all common Prisma numeric and string types.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_text_and_numeric_types</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_text_and_numeric_types</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">&quot;model TestModel {
             #id(id, Int, @id)
@@ -260,7 +260,7 @@
 }
 
 <span class="doccomment">/// Test model containing all common Prisma numeric and string types, optional.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_text_and_numeric_types_optional</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_text_and_numeric_types_optional</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">&quot;model TestModel {
             #id(id, Int, @id)
@@ -277,7 +277,7 @@
 
 <span class="doccomment">/// Test model containing all possible Prisma scalar types.</span>
 <span class="doccomment">/// Excludes capability-dependent types (e.g. JSON).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_types</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_types</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">&quot;model TestModel {
             #id(id, Int, @id)
@@ -297,7 +297,7 @@
 
 <span class="doccomment">/// Test model containing all possible Prisma list types.</span>
 <span class="doccomment">/// Excludes capability-dependent types (e.g. JSON).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_list_types</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_list_types</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">&quot;model TestModel {
             #id(id, Int, @id)
@@ -315,7 +315,7 @@
     <span class="ident">schema</span>.<span class="ident">to_owned</span>()
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string_combination_unique</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string_combination_unique</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">r#&quot;model TestModel {
             #id(id, Int, @id)
@@ -331,7 +331,7 @@
     <span class="ident">schema</span>.<span class="ident">to_owned</span>()
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string_combination</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string_combination</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">r#&quot;model TestModel {
             #id(id, Int, @id)
@@ -345,7 +345,7 @@
     <span class="ident">schema</span>.<span class="ident">to_owned</span>()
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">autoinc_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">autoinc_id</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">&quot;model TestModel {
             #id(id, Int, @id, @default(autoincrement()))

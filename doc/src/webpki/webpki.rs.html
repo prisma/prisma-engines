@@ -386,7 +386,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EndEntityCert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Parse the ASN.1 DER-encoded X.509 encoding of the certificate</span>
     <span class="doccomment">/// `cert_der`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">cert_der</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">cert_der</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="ident">cert::parse_cert</span>(
                 <span class="ident">untrusted::Input::from</span>(<span class="ident">cert_der</span>),
@@ -409,7 +409,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">supported_sig_algs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">SignatureAlgorithm</span>],
         <span class="kw-2">&amp;</span><span class="ident">TLSServerTrustAnchors</span>(<span class="ident">trust_anchors</span>): <span class="kw-2">&amp;</span><span class="ident">TLSServerTrustAnchors</span>,
         <span class="ident">intermediate_certs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]], <span class="ident">time</span>: <span class="ident">Time</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">verify_cert::build_chain</span>(
             <span class="ident">verify_cert::EKU_SERVER_AUTH</span>,
             <span class="ident">supported_sig_algs</span>,
@@ -439,7 +439,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">supported_sig_algs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">SignatureAlgorithm</span>],
         <span class="kw-2">&amp;</span><span class="ident">TLSClientTrustAnchors</span>(<span class="ident">trust_anchors</span>): <span class="kw-2">&amp;</span><span class="ident">TLSClientTrustAnchors</span>,
         <span class="ident">intermediate_certs</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]], <span class="ident">time</span>: <span class="ident">Time</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">verify_cert::build_chain</span>(
             <span class="ident">verify_cert::EKU_CLIENT_AUTH</span>,
             <span class="ident">supported_sig_algs</span>,
@@ -452,7 +452,7 @@
     }
 
     <span class="doccomment">/// Verifies that the certificate is valid for the given DNS host name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_is_valid_for_dns_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dns_name</span>: <span class="ident">DNSNameRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_is_valid_for_dns_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dns_name</span>: <span class="ident">DNSNameRef</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">name::verify_cert_dns_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dns_name</span>)
     }
 
@@ -468,7 +468,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_is_valid_for_at_least_one_dns_name</span><span class="op">&lt;</span><span class="lifetime">&#39;names</span>, <span class="ident">Names</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dns_names</span>: <span class="ident">Names</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DNSNameRef</span><span class="op">&lt;</span><span class="lifetime">&#39;names</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DNSNameRef</span><span class="op">&lt;</span><span class="lifetime">&#39;names</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Names</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">DNSNameRef</span><span class="op">&lt;</span><span class="lifetime">&#39;names</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -503,7 +503,7 @@
     <span class="doccomment">/// `SignatureAlgorithm`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_signature</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">signature_alg</span>: <span class="kw-2">&amp;</span><span class="ident">SignatureAlgorithm</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">signature</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">signed_data::verify_signature</span>(
             <span class="ident">signature_alg</span>,
             <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">spki</span>.<span class="ident">value</span>(),

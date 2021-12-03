@@ -135,7 +135,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Read the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> {
     <span class="ident">Name::read</span>(<span class="ident">decoder</span>)
 }
 
@@ -157,7 +157,7 @@
 <span class="doccomment">///        US-ASCII letters in the DNS names contained within the RDATA are replaced</span>
 <span class="doccomment">///        by the corresponding lowercase US-ASCII letters;</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">name_data</span>: <span class="kw-2">&amp;</span><span class="ident">Name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">name_data</span>: <span class="kw-2">&amp;</span><span class="ident">Name</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">is_canonical_names</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">is_canonical_names</span>();
     <span class="ident">name_data</span>.<span class="ident">emit_with_lowercase</span>(<span class="ident">encoder</span>, <span class="ident">is_canonical_names</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())

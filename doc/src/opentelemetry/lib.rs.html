@@ -529,12 +529,12 @@
     <span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">now</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SystemTime</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="ident">SystemTime</span> {
         <span class="ident">SystemTime::now</span>()
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">now</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SystemTime</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="ident">SystemTime</span> {
         <span class="ident">SystemTime::UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">std::time::Duration::from_millis</span>(<span class="ident">js_sys::Date::now</span>() <span class="kw">as</span> <span class="ident">u64</span>)
     }
 }

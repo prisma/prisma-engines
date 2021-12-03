@@ -1300,7 +1300,7 @@
         <span class="ident">svc_priority</span>: <span class="ident">u16</span>,
         <span class="ident">target_name</span>: <span class="ident">Name</span>,
         <span class="ident">svc_params</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">SvcParamKey</span>, <span class="ident">SvcParamValue</span>)<span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">svc_priority</span>,
             <span class="ident">target_name</span>,
@@ -1329,7 +1329,7 @@
     <span class="doccomment">///   a priority level to the records before using them, to ensure uniform</span>
     <span class="doccomment">///   load-balancing.</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">svc_priority</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">svc_priority</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
         <span class="self">self</span>.<span class="ident">svc_priority</span>
     }
 
@@ -1361,12 +1361,12 @@
     <span class="doccomment">///    svc2.example.net. 300   IN A     192.0.2.2</span>
     <span class="doccomment">///    svc2.example.net. 300   IN AAAA  2001:db8::2</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Name</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Name</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target_name</span>
     }
 
     <span class="doccomment">/// See [`SvcParamKey`] for details on each parameter</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">svc_params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[(<span class="ident">SvcParamKey</span>, <span class="ident">SvcParamValue</span>)] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">svc_params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[(<span class="ident">SvcParamKey</span>, <span class="ident">SvcParamValue</span>)] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">svc_params</span>
     }
 }
@@ -1437,35 +1437,35 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SvcParamKey</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">val</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">val</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">val</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Mandatory</span>,
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Alpn</span>,
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::NoDefaultAlpn</span>,
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Port</span>,
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Ipv4Hint</span>,
-            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::EchConfig</span>,
-            <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Ipv6Hint</span>,
-            <span class="number">65280</span>..<span class="op">=</span><span class="number">65534</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Key</span>(<span class="ident">val</span>),
-            <span class="number">65535</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Key65535</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Unknown</span>(<span class="ident">val</span>),
+            <span class="number">0</span> =&gt; <span class="ident">SvcParamKey::Mandatory</span>,
+            <span class="number">1</span> =&gt; <span class="ident">SvcParamKey::Alpn</span>,
+            <span class="number">2</span> =&gt; <span class="ident">SvcParamKey::NoDefaultAlpn</span>,
+            <span class="number">3</span> =&gt; <span class="ident">SvcParamKey::Port</span>,
+            <span class="number">4</span> =&gt; <span class="ident">SvcParamKey::Ipv4Hint</span>,
+            <span class="number">5</span> =&gt; <span class="ident">SvcParamKey::EchConfig</span>,
+            <span class="number">6</span> =&gt; <span class="ident">SvcParamKey::Ipv6Hint</span>,
+            <span class="number">65280</span>..<span class="op">=</span><span class="number">65534</span> =&gt; <span class="ident">SvcParamKey::Key</span>(<span class="ident">val</span>),
+            <span class="number">65535</span> =&gt; <span class="ident">SvcParamKey::Key65535</span>,
+            <span class="kw">_</span> =&gt; <span class="ident">SvcParamKey::Unknown</span>(<span class="ident">val</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SvcParamKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">val</span>: <span class="ident">SvcParamKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">val</span>: <span class="ident">SvcParamKey</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">val</span> {
-            <span class="ident">SvcParamKey::Mandatory</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">SvcParamKey::Alpn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">SvcParamKey::NoDefaultAlpn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">SvcParamKey::Port</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-            <span class="ident">SvcParamKey::Ipv4Hint</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-            <span class="ident">SvcParamKey::EchConfig</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
-            <span class="ident">SvcParamKey::Ipv6Hint</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">6</span>,
-            <span class="ident">SvcParamKey::Key</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
-            <span class="ident">SvcParamKey::Key65535</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">65535</span>,
-            <span class="ident">SvcParamKey::Unknown</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
+            <span class="ident">SvcParamKey::Mandatory</span> =&gt; <span class="number">0</span>,
+            <span class="ident">SvcParamKey::Alpn</span> =&gt; <span class="number">1</span>,
+            <span class="ident">SvcParamKey::NoDefaultAlpn</span> =&gt; <span class="number">2</span>,
+            <span class="ident">SvcParamKey::Port</span> =&gt; <span class="number">3</span>,
+            <span class="ident">SvcParamKey::Ipv4Hint</span> =&gt; <span class="number">4</span>,
+            <span class="ident">SvcParamKey::EchConfig</span> =&gt; <span class="number">5</span>,
+            <span class="ident">SvcParamKey::Ipv6Hint</span> =&gt; <span class="number">6</span>,
+            <span class="ident">SvcParamKey::Key</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>,
+            <span class="ident">SvcParamKey::Key65535</span> =&gt; <span class="number">65535</span>,
+            <span class="ident">SvcParamKey::Unknown</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>,
         }
     }
 }
@@ -1473,7 +1473,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="ident">BinDecodable</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SvcParamKey</span> {
     <span class="comment">// a 2 octet field containing the SvcParamKey as an integer in</span>
     <span class="comment">//      network byte order.  (See Section 14.3.2 for the defined values.)</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any u16 is valid*/</span>).<span class="ident">into</span>())
     }
 }
@@ -1481,26 +1481,26 @@
 <span class="kw">impl</span> <span class="ident">BinEncodable</span> <span class="kw">for</span> <span class="ident">SvcParamKey</span> {
     <span class="comment">// a 2 octet field containing the SvcParamKey as an integer in</span>
     <span class="comment">//      network byte order.  (See Section 14.3.2 for the defined values.)</span>
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">encoder</span>.<span class="ident">emit_u16</span>((<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SvcParamKey</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">write_key</span> <span class="op">=</span> <span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">name</span>);
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">SvcParamKey::Mandatory</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">write_key</span>(<span class="string">&quot;mandatory&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamKey::Alpn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">write_key</span>(<span class="string">&quot;alpn&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamKey::NoDefaultAlpn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">write_key</span>(<span class="string">&quot;no-default-alpn&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamKey::Port</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">write_key</span>(<span class="string">&quot;port&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamKey::Ipv4Hint</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">write_key</span>(<span class="string">&quot;ipv4hint&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamKey::EchConfig</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">write_key</span>(<span class="string">&quot;echconfig&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamKey::Ipv6Hint</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">write_key</span>(<span class="string">&quot;ipv6hint&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamKey::Key</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;key{}&quot;</span>, <span class="ident">val</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamKey::Key65535</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">write_key</span>(<span class="string">&quot;key65535&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamKey::Unknown</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unknown{}&quot;</span>, <span class="ident">val</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamKey::Mandatory</span> =&gt; <span class="ident">write_key</span>(<span class="string">&quot;mandatory&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamKey::Alpn</span> =&gt; <span class="ident">write_key</span>(<span class="string">&quot;alpn&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamKey::NoDefaultAlpn</span> =&gt; <span class="ident">write_key</span>(<span class="string">&quot;no-default-alpn&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamKey::Port</span> =&gt; <span class="ident">write_key</span>(<span class="string">&quot;port&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamKey::Ipv4Hint</span> =&gt; <span class="ident">write_key</span>(<span class="string">&quot;ipv4hint&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamKey::EchConfig</span> =&gt; <span class="ident">write_key</span>(<span class="string">&quot;echconfig&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamKey::Ipv6Hint</span> =&gt; <span class="ident">write_key</span>(<span class="string">&quot;ipv6hint&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamKey::Key</span>(<span class="ident">val</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;key{}&quot;</span>, <span class="ident">val</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamKey::Key65535</span> =&gt; <span class="ident">write_key</span>(<span class="string">&quot;key65535&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamKey::Unknown</span>(<span class="ident">val</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unknown{}&quot;</span>, <span class="ident">val</span>)<span class="question-mark">?</span>,
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -1510,9 +1510,9 @@
 <span class="kw">impl</span> <span class="ident">std::str::FromStr</span> <span class="kw">for</span> <span class="ident">SvcParamKey</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ProtoError</span>;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="doccomment">/// keys are in the format of key#, e.g. key12344, with a max value of u16</span>
-        <span class="kw">fn</span> <span class="ident">parse_unknown_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SvcParamKey</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">parse_unknown_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SvcParamKey</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">key_value</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">strip_prefix</span>(<span class="string">&quot;key&quot;</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="ident">ProtoError::from</span>(<span class="ident">ProtoErrorKind::Msg</span>(<span class="macro">format!</span>(
                     <span class="string">&quot;bad formatted key ({}), expected key1234&quot;</span>,
@@ -1526,15 +1526,15 @@
         }
 
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;mandatory&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Mandatory</span>,
-            <span class="string">&quot;alpn&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Alpn</span>,
-            <span class="string">&quot;no-default-alpn&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::NoDefaultAlpn</span>,
-            <span class="string">&quot;port&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Port</span>,
-            <span class="string">&quot;ipv4hint&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Ipv4Hint</span>,
-            <span class="string">&quot;echconfig&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::EchConfig</span>,
-            <span class="string">&quot;ipv6hint&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Ipv6Hint</span>,
-            <span class="string">&quot;key65535&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SvcParamKey::Key65535</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_unknown_key</span>(<span class="ident">s</span>)<span class="question-mark">?</span>,
+            <span class="string">&quot;mandatory&quot;</span> =&gt; <span class="ident">SvcParamKey::Mandatory</span>,
+            <span class="string">&quot;alpn&quot;</span> =&gt; <span class="ident">SvcParamKey::Alpn</span>,
+            <span class="string">&quot;no-default-alpn&quot;</span> =&gt; <span class="ident">SvcParamKey::NoDefaultAlpn</span>,
+            <span class="string">&quot;port&quot;</span> =&gt; <span class="ident">SvcParamKey::Port</span>,
+            <span class="string">&quot;ipv4hint&quot;</span> =&gt; <span class="ident">SvcParamKey::Ipv4Hint</span>,
+            <span class="string">&quot;echconfig&quot;</span> =&gt; <span class="ident">SvcParamKey::EchConfig</span>,
+            <span class="string">&quot;ipv6hint&quot;</span> =&gt; <span class="ident">SvcParamKey::Ipv6Hint</span>,
+            <span class="string">&quot;key65535&quot;</span> =&gt; <span class="ident">SvcParamKey::Key65535</span>,
+            <span class="kw">_</span> =&gt; <span class="ident">parse_unknown_key</span>(<span class="ident">s</span>)<span class="question-mark">?</span>,
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">key</span>)
@@ -1542,13 +1542,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">SvcParamKey</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
         <span class="ident">u16::from</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">u16::from</span>(<span class="kw-2">*</span><span class="ident">other</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">SvcParamKey</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
     }
 }
@@ -1651,7 +1651,7 @@
     <span class="comment">// a 2 octet field containing the length of the SvcParamValue as an</span>
     <span class="comment">//      integer between 0 and 65535 in network byte order (but constrained</span>
     <span class="comment">//      by the RDATA and DNS message sizes).</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">key</span>: <span class="ident">SvcParamKey</span>, <span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">key</span>: <span class="ident">SvcParamKey</span>, <span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">decoder</span>
             .<span class="ident">read_u16</span>()<span class="question-mark">?</span>
             .<span class="ident">verify_unwrap</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">len</span>())
@@ -1668,10 +1668,10 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">param_data</span>);
 
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">key</span> {
-            <span class="ident">SvcParamKey::Mandatory</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Mandatory</span>(<span class="ident">Mandatory::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>),
-            <span class="ident">SvcParamKey::Alpn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Alpn</span>(<span class="ident">Alpn::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>),
+            <span class="ident">SvcParamKey::Mandatory</span> =&gt; <span class="ident"><span class="self">Self</span>::Mandatory</span>(<span class="ident">Mandatory::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>),
+            <span class="ident">SvcParamKey::Alpn</span> =&gt; <span class="ident"><span class="self">Self</span>::Alpn</span>(<span class="ident">Alpn::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>),
             <span class="comment">// should always be empty</span>
-            <span class="ident">SvcParamKey::NoDefaultAlpn</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SvcParamKey::NoDefaultAlpn</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoError::from</span>(<span class="string">&quot;Alpn expects at least one value&quot;</span>));
                 }
@@ -1680,14 +1680,14 @@
             }
             <span class="comment">// The wire format of the SvcParamValue is the corresponding 2 octet</span>
             <span class="comment">// numeric value in network byte order.</span>
-            <span class="ident">SvcParamKey::Port</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SvcParamKey::Port</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*all values are legal ports*/</span>);
                 <span class="ident"><span class="self">Self</span>::Port</span>(<span class="ident">port</span>)
             }
-            <span class="ident">SvcParamKey::Ipv4Hint</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Ipv4Hint</span>(<span class="ident">IpHint</span>::<span class="op">&lt;</span><span class="ident">Ipv4Addr</span><span class="op">&gt;</span><span class="ident">::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>),
-            <span class="ident">SvcParamKey::EchConfig</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::EchConfig</span>(<span class="ident">EchConfig::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>),
-            <span class="ident">SvcParamKey::Ipv6Hint</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Ipv6Hint</span>(<span class="ident">IpHint</span>::<span class="op">&lt;</span><span class="ident">Ipv6Addr</span><span class="op">&gt;</span><span class="ident">::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>),
-            <span class="ident">SvcParamKey::Key</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">SvcParamKey::Key65535</span> <span class="op">|</span> <span class="ident">SvcParamKey::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SvcParamKey::Ipv4Hint</span> =&gt; <span class="ident"><span class="self">Self</span>::Ipv4Hint</span>(<span class="ident">IpHint</span>::<span class="op">&lt;</span><span class="ident">Ipv4Addr</span><span class="op">&gt;</span><span class="ident">::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>),
+            <span class="ident">SvcParamKey::EchConfig</span> =&gt; <span class="ident"><span class="self">Self</span>::EchConfig</span>(<span class="ident">EchConfig::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>),
+            <span class="ident">SvcParamKey::Ipv6Hint</span> =&gt; <span class="ident"><span class="self">Self</span>::Ipv6Hint</span>(<span class="ident">IpHint</span>::<span class="op">&lt;</span><span class="ident">Ipv6Addr</span><span class="op">&gt;</span><span class="ident">::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>),
+            <span class="ident">SvcParamKey::Key</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">SvcParamKey::Key65535</span> <span class="op">|</span> <span class="ident">SvcParamKey::Unknown</span>(<span class="kw">_</span>) =&gt; {
                 <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">Unknown::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>)
             }
         };
@@ -1700,19 +1700,19 @@
     <span class="comment">// a 2 octet field containing the length of the SvcParamValue as an</span>
     <span class="comment">//      integer between 0 and 65535 in network byte order (but constrained</span>
     <span class="comment">//      by the RDATA and DNS message sizes).</span>
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// set the place for the length...</span>
         <span class="kw">let</span> <span class="ident">place</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">place</span>::<span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SvcParamValue::Mandatory</span>(<span class="ident">mandatory</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">mandatory</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamValue::Alpn</span>(<span class="ident">alpn</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">alpn</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamValue::NoDefaultAlpn</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">SvcParamValue::Port</span>(<span class="ident">port</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="kw-2">*</span><span class="ident">port</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamValue::Ipv4Hint</span>(<span class="ident">ip_hint</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ip_hint</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamValue::EchConfig</span>(<span class="ident">ech_config</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ech_config</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamValue::Ipv6Hint</span>(<span class="ident">ip_hint</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ip_hint</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamValue::Unknown</span>(<span class="ident">unknown</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">unknown</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::Mandatory</span>(<span class="ident">mandatory</span>) =&gt; <span class="ident">mandatory</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::Alpn</span>(<span class="ident">alpn</span>) =&gt; <span class="ident">alpn</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::NoDefaultAlpn</span> =&gt; (),
+            <span class="ident">SvcParamValue::Port</span>(<span class="ident">port</span>) =&gt; <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="kw-2">*</span><span class="ident">port</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::Ipv4Hint</span>(<span class="ident">ip_hint</span>) =&gt; <span class="ident">ip_hint</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::EchConfig</span>(<span class="ident">ech_config</span>) =&gt; <span class="ident">ech_config</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::Ipv6Hint</span>(<span class="ident">ip_hint</span>) =&gt; <span class="ident">ip_hint</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::Unknown</span>(<span class="ident">unknown</span>) =&gt; <span class="ident">unknown</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>,
         }
 
         <span class="comment">// go back and set the length</span>
@@ -1725,16 +1725,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SvcParamValue</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SvcParamValue::Mandatory</span>(<span class="ident">mandatory</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">mandatory</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamValue::Alpn</span>(<span class="ident">alpn</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">alpn</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamValue::NoDefaultAlpn</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">SvcParamValue::Port</span>(<span class="ident">port</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">port</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamValue::Ipv4Hint</span>(<span class="ident">ip_hint</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">ip_hint</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamValue::EchConfig</span>(<span class="ident">ech_config</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">ech_config</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamValue::Ipv6Hint</span>(<span class="ident">ip_hint</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">ip_hint</span>)<span class="question-mark">?</span>,
-            <span class="ident">SvcParamValue::Unknown</span>(<span class="ident">unknown</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">unknown</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::Mandatory</span>(<span class="ident">mandatory</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">mandatory</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::Alpn</span>(<span class="ident">alpn</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">alpn</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::NoDefaultAlpn</span> =&gt; (),
+            <span class="ident">SvcParamValue::Port</span>(<span class="ident">port</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">port</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::Ipv4Hint</span>(<span class="ident">ip_hint</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">ip_hint</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::EchConfig</span>(<span class="ident">ech_config</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">ech_config</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::Ipv6Hint</span>(<span class="ident">ip_hint</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">ip_hint</span>)<span class="question-mark">?</span>,
+            <span class="ident">SvcParamValue::Unknown</span>(<span class="ident">unknown</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">unknown</span>)<span class="question-mark">?</span>,
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -1792,7 +1792,7 @@
     <span class="doccomment">///    In wire format, the keys are represented by their numeric values in</span>
     <span class="doccomment">///    network byte order, concatenated in ascending order.</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">1</span>);
 
         <span class="kw">while</span> <span class="ident">decoder</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {
@@ -1815,7 +1815,7 @@
     <span class="doccomment">///    In wire format, the keys are represented by their numeric values in</span>
     <span class="doccomment">///    network byte order, concatenated in ascending order.</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoError::from</span>(<span class="string">&quot;Alpn expects at least one value&quot;</span>));
         }
@@ -1843,7 +1843,7 @@
     <span class="doccomment">///    For example, the following is a valid list of SvcParams:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///    echconfig=... key65333=ex1 key65444=ex2 mandatory=key65444,echconfig</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>() {
             <span class="comment">// TODO: confirm in the RFC that trailing commas are ok</span>
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{},&quot;</span>, <span class="ident">key</span>)<span class="question-mark">?</span>;
@@ -1958,7 +1958,7 @@
     <span class="doccomment">///   exactly fill the SvcParamValue; otherwise, the SvcParamValue is</span>
     <span class="doccomment">///   malformed.</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">alpns</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">1</span>);
 
         <span class="kw">while</span> <span class="ident">decoder</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {
@@ -1981,7 +1981,7 @@
     <span class="doccomment">///   pairs are concatenated to form the SvcParamValue.  These pairs MUST</span>
     <span class="doccomment">///   exactly fill the SvcParamValue; otherwise, the SvcParamValue is</span>
     <span class="doccomment">///   malformed.</span>
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoError::from</span>(<span class="string">&quot;Alpn expects at least one value&quot;</span>));
         }
@@ -1997,7 +1997,7 @@
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Alpn</span> {
     <span class="doccomment">///   The presentation &quot;value&quot; SHALL be a comma-separated list</span>
     <span class="doccomment">///   (Appendix A.1) of one or more &quot;alpn-id&quot;s.</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">alpn</span> <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>() {
             <span class="comment">// TODO: confirm in the RFC that trailing commas are ok</span>
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{},&quot;</span>, <span class="ident">alpn</span>)<span class="question-mark">?</span>;
@@ -2037,7 +2037,7 @@
     <span class="doccomment">///   of the parameter is an ECHConfigs vector [ECH], including the</span>
     <span class="doccomment">///   redundant length prefix (a 2 octet field containing the length of the SvcParamValue</span>
     <span class="doccomment">///   as an integer between 0 and 65535 in network byte order).</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">redundant_len</span> <span class="op">=</span> <span class="ident">decoder</span>
             .<span class="ident">read_u16</span>()<span class="question-mark">?</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)
@@ -2056,7 +2056,7 @@
     <span class="doccomment">///   of the parameter is an ECHConfigs vector [ECH], including the</span>
     <span class="doccomment">///   redundant length prefix (a 2 octet field containing the length of the SvcParamValue</span>
     <span class="doccomment">///   as an integer between 0 and 65535 in network byte order).</span>
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">u16::try_from</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>())
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="string">&quot;ECH value length exceeds max size of u16::MAX&quot;</span>))<span class="question-mark">?</span>;
 
@@ -2076,7 +2076,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// *note* while the on the wire the EchConfig has a redundant length,</span>
     <span class="doccomment">///   the RFC is not explicit about including it in the base64</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="ident">data_encoding::BASE64</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>))
     }
 }
@@ -2134,7 +2134,7 @@
     <span class="doccomment">///   network byte order.  Like an A or AAAA RRSet, the list of addresses</span>
     <span class="doccomment">///   represents an unordered collection, and clients SHOULD pick addresses</span>
     <span class="doccomment">///   to use in a random order.  An empty list of addresses is invalid.</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ips</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">while</span> <span class="ident">decoder</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {
@@ -2153,7 +2153,7 @@
     <span class="doccomment">///   network byte order.  Like an A or AAAA RRSet, the list of addresses</span>
     <span class="doccomment">///   represents an unordered collection, and clients SHOULD pick addresses</span>
     <span class="doccomment">///   to use in a random order.  An empty list of addresses is invalid.</span>
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">ip</span> <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>() {
             <span class="ident">ip</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>;
         }
@@ -2170,7 +2170,7 @@
     <span class="doccomment">///   (Appendix A.1) of one or more IP addresses of the appropriate family</span>
     <span class="doccomment">///   in standard textual format [RFC5952].  To enable simpler parsing,</span>
     <span class="doccomment">///   this SvcParamValue MUST NOT contain escape sequences.</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">ip</span> <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>() {
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{},&quot;</span>, <span class="ident">ip</span>)<span class="question-mark">?</span>;
         }
@@ -2199,7 +2199,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Unknown</span>(<span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="ident">BinDecodable</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Unknown</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unknowns</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">while</span> <span class="ident">decoder</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {
@@ -2213,7 +2213,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">BinEncodable</span> <span class="kw">for</span> <span class="ident">Unknown</span> {
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">unknown</span> <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>() {
             <span class="ident">encoder</span>.<span class="ident">emit_character_data</span>(<span class="ident">unknown</span>)<span class="question-mark">?</span>;
         }
@@ -2223,7 +2223,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Unknown</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">unknown</span> <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>() {
             <span class="comment">// TODO: this needs to be properly encoded</span>
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\&quot;{}\&quot;,&quot;</span>, <span class="ident">String::from_utf8_lossy</span>(<span class="ident">unknown</span>))<span class="question-mark">?</span>;
@@ -2249,7 +2249,7 @@
 <span class="doccomment">///   If any RRs are malformed, the client MUST reject the entire RRSet and</span>
 <span class="doccomment">///   fall back to non-SVCB connection establishment.</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">rdata_length</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">SVCB</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">rdata_length</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">SVCB</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">start_index</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">index</span>();
 
     <span class="kw">let</span> <span class="ident">svc_priority</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any u16 is valid*/</span>);
@@ -2287,7 +2287,7 @@
 }
 
 <span class="doccomment">/// Write the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">svcb</span>: <span class="kw-2">&amp;</span><span class="ident">SVCB</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">svcb</span>: <span class="kw-2">&amp;</span><span class="ident">SVCB</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">svcb</span>.<span class="ident">svc_priority</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>;
     <span class="ident">svcb</span>.<span class="ident">target_name</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>;
 
@@ -2318,7 +2318,7 @@
 <span class="doccomment">/// _8765._baz.api.example.com. 7200 IN SVCB 0 svc4-baz.example.net.</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SVCB</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;{svc_priority} {target_name}&quot;</span>,

@@ -285,7 +285,7 @@
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ALL</span>: <span class="ident">Ready</span> <span class="op">=</span> <span class="ident">Ready</span>(<span class="ident">READABLE</span> <span class="op">|</span> <span class="ident">WRITABLE</span> <span class="op">|</span> <span class="ident">READ_CLOSED</span> <span class="op">|</span> <span class="ident">WRITE_CLOSED</span>);
 
     <span class="comment">// Must remain crate-private to avoid adding a public dependency on Mio.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_mio</span>(<span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">mio::event::Event</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ready</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_mio</span>(<span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">mio::event::Event</span>) -&gt; <span class="ident">Ready</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ready</span> <span class="op">=</span> <span class="ident">Ready::EMPTY</span>;
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;net&quot;</span>))]</span>
@@ -328,8 +328,8 @@
     <span class="doccomment">/// assert!(Ready::EMPTY.is_empty());</span>
     <span class="doccomment">/// assert!(!Ready::READABLE.is_empty());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Ready::EMPTY</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span> <span class="op">==</span> <span class="ident">Ready::EMPTY</span>
     }
 
     <span class="doccomment">/// Returns `true` if the value includes `readable`</span>
@@ -344,7 +344,7 @@
     <span class="doccomment">/// assert!(Ready::READ_CLOSED.is_readable());</span>
     <span class="doccomment">/// assert!(!Ready::WRITABLE.is_readable());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_readable</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_readable</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">Ready::READABLE</span>) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_read_closed</span>()
     }
 
@@ -360,7 +360,7 @@
     <span class="doccomment">/// assert!(Ready::WRITABLE.is_writable());</span>
     <span class="doccomment">/// assert!(Ready::WRITE_CLOSED.is_writable());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_writable</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_writable</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">Ready::WRITABLE</span>) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_write_closed</span>()
     }
 
@@ -375,7 +375,7 @@
     <span class="doccomment">/// assert!(!Ready::READABLE.is_read_closed());</span>
     <span class="doccomment">/// assert!(Ready::READ_CLOSED.is_read_closed());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_read_closed</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_read_closed</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">Ready::READ_CLOSED</span>)
     }
 
@@ -390,7 +390,7 @@
     <span class="doccomment">/// assert!(!Ready::WRITABLE.is_write_closed());</span>
     <span class="doccomment">/// assert!(Ready::WRITE_CLOSED.is_write_closed());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_write_closed</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_write_closed</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">Ready::WRITE_CLOSED</span>)
     }
 
@@ -399,9 +399,9 @@
     <span class="doccomment">/// `other` may represent more than one readiness operations, in which case</span>
     <span class="doccomment">/// the function only returns true if `self` contains all readiness</span>
     <span class="doccomment">/// specified in `other`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">other</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">into</span>();
-        (<span class="self">self</span> <span class="op">&amp;</span> <span class="ident">other</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>
+        (<span class="self">self</span> <span class="op">&amp;</span> <span class="ident">other</span>) <span class="op">==</span> <span class="ident">other</span>
     }
 
     <span class="doccomment">/// Create a `Ready` instance using the given `usize` representation.</span>
@@ -411,7 +411,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function is mainly provided to allow the caller to get a</span>
     <span class="doccomment">/// readiness value from an `AtomicUsize`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_usize</span>(<span class="ident">val</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ready</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_usize</span>(<span class="ident">val</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Ready</span> {
         <span class="ident">Ready</span>(<span class="ident">val</span> <span class="op">&amp;</span> <span class="ident">Ready::ALL</span>.<span class="ident">as_usize</span>())
     }
 
@@ -419,7 +419,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function is mainly provided to allow the caller to store a</span>
     <span class="doccomment">/// readiness value in an `AtomicUsize`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -428,7 +428,7 @@
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::io::Interest</span>;
 
     <span class="kw">impl</span> <span class="ident">Ready</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_interest</span>(<span class="ident">interest</span>: <span class="ident">Interest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ready</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_interest</span>(<span class="ident">interest</span>: <span class="ident">Interest</span>) -&gt; <span class="ident">Ready</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ready</span> <span class="op">=</span> <span class="ident">Ready::EMPTY</span>;
 
             <span class="kw">if</span> <span class="ident">interest</span>.<span class="ident">is_readable</span>() {
@@ -444,11 +444,11 @@
             <span class="ident">ready</span>
         }
 
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">intersection</span>(<span class="self">self</span>, <span class="ident">interest</span>: <span class="ident">Interest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ready</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">intersection</span>(<span class="self">self</span>, <span class="ident">interest</span>: <span class="ident">Interest</span>) -&gt; <span class="ident">Ready</span> {
             <span class="ident">Ready</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">Ready::from_interest</span>(<span class="ident">interest</span>).<span class="number">0</span>)
         }
 
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">satisfies</span>(<span class="self">self</span>, <span class="ident">interest</span>: <span class="ident">Interest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">satisfies</span>(<span class="self">self</span>, <span class="ident">interest</span>: <span class="ident">Interest</span>) -&gt; <span class="ident">bool</span> {
             <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">Ready::from_interest</span>(<span class="ident">interest</span>).<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
         }
     }
@@ -458,7 +458,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Ready</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Ready</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ready</span> {
+    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Ready</span>) -&gt; <span class="ident">Ready</span> {
         <span class="ident">Ready</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">other</span>.<span class="number">0</span>)
     }
 }
@@ -474,7 +474,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Ready</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Ready</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ready</span> {
+    <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Ready</span>) -&gt; <span class="ident">Ready</span> {
         <span class="ident">Ready</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">other</span>.<span class="number">0</span>)
     }
 }
@@ -483,13 +483,13 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Ready</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Ready</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ready</span> {
+    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Ready</span>) -&gt; <span class="ident">Ready</span> {
         <span class="ident">Ready</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">other</span>.<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Ready</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Ready&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;is_readable&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_readable</span>())
             .<span class="ident">field</span>(<span class="string">&quot;is_writable&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">is_writable</span>())

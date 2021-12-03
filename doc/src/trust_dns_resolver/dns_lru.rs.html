@@ -703,12 +703,12 @@
 
 <span class="kw">impl</span> <span class="ident">LruValue</span> {
     <span class="doccomment">/// Returns true if this set of ips is still valid</span>
-    <span class="kw">fn</span> <span class="ident">is_current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">now</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">valid_until</span>
     }
 
     <span class="doccomment">/// Returns the ttl as a Duration of time remaining.</span>
-    <span class="kw">fn</span> <span class="ident">ttl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Duration</span> {
+    <span class="kw">fn</span> <span class="ident">ttl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) -&gt; <span class="ident">Duration</span> {
         <span class="self">self</span>.<span class="ident">valid_until</span>.<span class="ident">saturating_duration_since</span>(<span class="ident">now</span>)
     }
 }
@@ -786,7 +786,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TtlConfig</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_opts</span>(<span class="ident">opts</span>: <span class="kw-2">&amp;</span><span class="ident">config::ResolverOpts</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TtlConfig</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_opts</span>(<span class="ident">opts</span>: <span class="kw-2">&amp;</span><span class="ident">config::ResolverOpts</span>) -&gt; <span class="ident">TtlConfig</span> {
         <span class="ident">TtlConfig</span> {
             <span class="ident">positive_min_ttl</span>: <span class="ident">opts</span>.<span class="ident">positive_min_ttl</span>,
             <span class="ident">negative_min_ttl</span>: <span class="ident">opts</span>.<span class="ident">negative_min_ttl</span>,
@@ -797,7 +797,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DnsLru</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>, <span class="ident">ttl_cfg</span>: <span class="ident">TtlConfig</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>, <span class="ident">ttl_cfg</span>: <span class="ident">TtlConfig</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">TtlConfig</span> {
             <span class="ident">positive_min_ttl</span>,
             <span class="ident">negative_min_ttl</span>,
@@ -821,7 +821,7 @@
         <span class="ident">query</span>: <span class="ident">Query</span>,
         <span class="ident">records_and_ttl</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Record</span>, <span class="ident">u32</span>)<span class="op">&gt;</span>,
         <span class="ident">now</span>: <span class="ident">Instant</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Lookup</span> {
+    ) -&gt; <span class="ident">Lookup</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">records_and_ttl</span>.<span class="ident">len</span>();
         <span class="comment">// collapse the values, we&#39;re going to take the Minimum TTL as the correct one</span>
         <span class="kw">let</span> (<span class="ident">records</span>, <span class="ident">ttl</span>): (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>, <span class="ident">Duration</span>) <span class="op">=</span> <span class="ident">records_and_ttl</span>.<span class="ident">into_iter</span>().<span class="ident">fold</span>(
@@ -853,7 +853,7 @@
     }
 
     <span class="doccomment">/// Generally for inserting a set of records that have already been cached, but with a different Query.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">duplicate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Query</span>, <span class="ident">lookup</span>: <span class="ident">Lookup</span>, <span class="ident">ttl</span>: <span class="ident">u32</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Lookup</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">duplicate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Query</span>, <span class="ident">lookup</span>: <span class="ident">Lookup</span>, <span class="ident">ttl</span>: <span class="ident">u32</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) -&gt; <span class="ident">Lookup</span> {
         <span class="kw">let</span> <span class="ident">ttl</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">u64::from</span>(<span class="ident">ttl</span>));
         <span class="kw">let</span> <span class="ident">valid_until</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">+</span> <span class="ident">ttl</span>;
 
@@ -889,7 +889,7 @@
         <span class="ident">query</span>: <span class="ident">Query</span>,
         <span class="kw-2">mut</span> <span class="ident">error</span>: <span class="ident">ResolveError</span>,
         <span class="ident">now</span>: <span class="ident">Instant</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolveError</span> {
+    ) -&gt; <span class="ident">ResolveError</span> {
         <span class="comment">// TODO: if we are getting a negative response, should we instead fallback to cache?</span>
         <span class="comment">//   this would cache indefinitely, probably not correct</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ResolveError</span> {
@@ -929,7 +929,7 @@
     }
 
     <span class="doccomment">/// This needs to be mut b/c it&#39;s an LRU, meaning the ordering of elements will potentially change on retrieval...</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">Query</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">Query</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out_of_date</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">lock</span>();
         <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">get_mut</span>(<span class="ident">query</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
@@ -1050,12 +1050,12 @@
         };
         <span class="kw">let</span> <span class="ident">nx_error</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">negative</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">err</span>.<span class="ident">into</span>(), <span class="ident">now</span>);
         <span class="kw">match</span> <span class="ident">nx_error</span>.<span class="ident">kind</span>() {
-            <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">negative_ttl</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">negative_ttl</span>, .. } =&gt; {
                 <span class="kw">let</span> <span class="ident">valid_until</span> <span class="op">=</span> <span class="ident">negative_ttl</span>.<span class="ident">expect</span>(<span class="string">&quot;resolve error should have a deadline&quot;</span>);
                 <span class="comment">// the error&#39;s `valid_until` field should have been limited to 2 seconds.</span>
                 <span class="macro">assert_eq!</span>(<span class="ident">valid_until</span>, <span class="number">2</span>);
             }
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, <span class="ident">other</span>),
+            <span class="ident">other</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, <span class="ident">other</span>),
         }
 
         <span class="comment">// neg response should have TTL of 3 seconds.</span>
@@ -1068,13 +1068,13 @@
         };
         <span class="kw">let</span> <span class="ident">nx_error</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">negative</span>(<span class="ident">name</span>, <span class="ident">err</span>.<span class="ident">into</span>(), <span class="ident">now</span>);
         <span class="kw">match</span> <span class="ident">nx_error</span>.<span class="ident">kind</span>() {
-            <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">negative_ttl</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">negative_ttl</span>, .. } =&gt; {
                 <span class="kw">let</span> <span class="ident">negative_ttl</span> <span class="op">=</span> <span class="ident">negative_ttl</span>.<span class="ident">expect</span>(<span class="string">&quot;ResolveError should have a deadline&quot;</span>);
                 <span class="comment">// the error&#39;s `valid_until` field should not have been limited, as it was</span>
                 <span class="comment">// over the min TTL.</span>
                 <span class="macro">assert_eq!</span>(<span class="ident">negative_ttl</span>, <span class="number">3</span>);
             }
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, <span class="ident">other</span>),
+            <span class="ident">other</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, <span class="ident">other</span>),
         }
     }
 
@@ -1140,12 +1140,12 @@
         };
         <span class="kw">let</span> <span class="ident">nx_error</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">negative</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">err</span>.<span class="ident">into</span>(), <span class="ident">now</span>);
         <span class="kw">match</span> <span class="ident">nx_error</span>.<span class="ident">kind</span>() {
-            <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">negative_ttl</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">negative_ttl</span>, .. } =&gt; {
                 <span class="kw">let</span> <span class="ident">negative_ttl</span> <span class="op">=</span> <span class="ident">negative_ttl</span>.<span class="ident">expect</span>(<span class="string">&quot;resolve error should have a deadline&quot;</span>);
                 <span class="comment">// the error&#39;s `valid_until` field should have been limited to 60 seconds.</span>
                 <span class="macro">assert_eq!</span>(<span class="ident">negative_ttl</span>, <span class="number">60</span>);
             }
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, <span class="ident">other</span>),
+            <span class="ident">other</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, <span class="ident">other</span>),
         }
 
         <span class="comment">// neg response should have TTL of 59 seconds.</span>
@@ -1158,13 +1158,13 @@
         };
         <span class="kw">let</span> <span class="ident">nx_error</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">negative</span>(<span class="ident">name</span>, <span class="ident">err</span>.<span class="ident">into</span>(), <span class="ident">now</span>);
         <span class="kw">match</span> <span class="ident">nx_error</span>.<span class="ident">kind</span>() {
-            <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">negative_ttl</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">negative_ttl</span>, .. } =&gt; {
                 <span class="kw">let</span> <span class="ident">negative_ttl</span> <span class="op">=</span> <span class="ident">negative_ttl</span>.<span class="ident">expect</span>(<span class="string">&quot;resolve error should have a deadline&quot;</span>);
                 <span class="comment">// the error&#39;s `valid_until` field should not have been limited, as it was</span>
                 <span class="comment">// under the max TTL.</span>
                 <span class="macro">assert_eq!</span>(<span class="ident">negative_ttl</span>, <span class="number">59</span>);
             }
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, <span class="ident">other</span>),
+            <span class="ident">other</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, <span class="ident">other</span>),
         }
     }
 

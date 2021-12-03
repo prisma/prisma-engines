@@ -303,28 +303,28 @@
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Ops</span> {
     <span class="kw">type</span> <span class="ident">Flush</span>: <span class="ident">Flush</span>;
-    <span class="kw">fn</span> <span class="ident">total_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>;
-    <span class="kw">fn</span> <span class="ident">total_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span>;
+    <span class="kw">fn</span> <span class="ident">total_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span>;
+    <span class="kw">fn</span> <span class="ident">total_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span>;
     <span class="kw">fn</span> <span class="ident">run</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">flush</span>: <span class="ident"><span class="self">Self</span>::Flush</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">run_vec</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">flush</span>: <span class="ident"><span class="self">Self</span>::Flush</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">Ops</span> <span class="kw">for</span> <span class="ident">Compress</span> {
     <span class="kw">type</span> <span class="ident">Flush</span> <span class="op">=</span> <span class="ident">FlushCompress</span>;
-    <span class="kw">fn</span> <span class="ident">total_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">total_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">total_in</span>()
     }
-    <span class="kw">fn</span> <span class="ident">total_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">total_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">total_out</span>()
     }
     <span class="kw">fn</span> <span class="ident">run</span>(
@@ -332,7 +332,7 @@
         <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">flush</span>: <span class="ident">FlushCompress</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">compress</span>(<span class="ident">input</span>, <span class="ident">output</span>, <span class="ident">flush</span>).<span class="ident">unwrap</span>())
     }
     <span class="kw">fn</span> <span class="ident">run_vec</span>(
@@ -340,17 +340,17 @@
         <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">flush</span>: <span class="ident">FlushCompress</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">compress_vec</span>(<span class="ident">input</span>, <span class="ident">output</span>, <span class="ident">flush</span>).<span class="ident">unwrap</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Ops</span> <span class="kw">for</span> <span class="ident">Decompress</span> {
     <span class="kw">type</span> <span class="ident">Flush</span> <span class="op">=</span> <span class="ident">FlushDecompress</span>;
-    <span class="kw">fn</span> <span class="ident">total_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">total_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">total_in</span>()
     }
-    <span class="kw">fn</span> <span class="ident">total_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">total_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">total_out</span>()
     }
     <span class="kw">fn</span> <span class="ident">run</span>(
@@ -358,7 +358,7 @@
         <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">flush</span>: <span class="ident">FlushDecompress</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">decompress</span>(<span class="ident">input</span>, <span class="ident">output</span>, <span class="ident">flush</span>)
     }
     <span class="kw">fn</span> <span class="ident">run_vec</span>(
@@ -366,46 +366,46 @@
         <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">flush</span>: <span class="ident">FlushDecompress</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span>, <span class="ident">DecompressError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">decompress_vec</span>(<span class="ident">input</span>, <span class="ident">output</span>, <span class="ident">flush</span>)
     }
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Flush</span> {
-    <span class="kw">fn</span> <span class="ident">none</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">sync</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">finish</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">sync</span>() -&gt; <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">finish</span>() -&gt; <span class="self">Self</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">Flush</span> <span class="kw">for</span> <span class="ident">FlushCompress</span> {
-    <span class="kw">fn</span> <span class="ident">none</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">FlushCompress::None</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">sync</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">sync</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">FlushCompress::Sync</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">finish</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">FlushCompress::Finish</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Flush</span> <span class="kw">for</span> <span class="ident">FlushDecompress</span> {
-    <span class="kw">fn</span> <span class="ident">none</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">FlushDecompress::None</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">sync</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">sync</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">FlushDecompress::Sync</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">finish</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">FlushDecompress::Finish</span>
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">obj</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">D</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">obj</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">D</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="ident">BufRead</span>,
     <span class="ident">D</span>: <span class="ident">Ops</span>,
@@ -433,10 +433,10 @@
             <span class="comment">// then we need to keep asking for more data because if we</span>
             <span class="comment">// return that 0 bytes of data have been read then it will</span>
             <span class="comment">// be interpreted as EOF.</span>
-            <span class="prelude-val">Ok</span>(<span class="ident">Status::Ok</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Status::BufError</span>) <span class="kw">if</span> <span class="ident">read</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">eof</span> <span class="op">&amp;&amp;</span> <span class="ident">dst</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
-            <span class="prelude-val">Ok</span>(<span class="ident">Status::Ok</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Status::BufError</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Status::StreamEnd</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">read</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">Status::Ok</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Status::BufError</span>) <span class="kw">if</span> <span class="ident">read</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">eof</span> <span class="op">&amp;&amp;</span> <span class="ident">dst</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> =&gt; <span class="kw">continue</span>,
+            <span class="prelude-val">Ok</span>(<span class="ident">Status::Ok</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Status::BufError</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Status::StreamEnd</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">read</span>),
 
-            <span class="prelude-val">Err</span>(..) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(..) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                     <span class="ident">io::ErrorKind::InvalidInput</span>,
                     <span class="string">&quot;corrupt deflate stream&quot;</span>,
@@ -447,7 +447,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span>, <span class="ident">D</span>: <span class="ident">Ops</span><span class="op">&gt;</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="ident">W</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">w</span>: <span class="ident">W</span>, <span class="ident">d</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="ident">W</span>, <span class="ident">D</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">w</span>: <span class="ident">W</span>, <span class="ident">d</span>: <span class="ident">D</span>) -&gt; <span class="ident">Writer</span><span class="op">&lt;</span><span class="ident">W</span>, <span class="ident">D</span><span class="op">&gt;</span> {
         <span class="ident">Writer</span> {
             <span class="ident">obj</span>: <span class="prelude-val">Some</span>(<span class="ident">w</span>),
             <span class="ident">data</span>: <span class="ident">d</span>,
@@ -455,28 +455,28 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="self">self</span>.<span class="ident">dump</span>()<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">total_out</span>();
             <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">run_vec</span>(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buf</span>, <span class="ident">D::Flush::finish</span>())<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">before</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">total_out</span>() {
+            <span class="kw">if</span> <span class="ident">before</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">total_out</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">w</span>: <span class="ident">W</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">W</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">w</span>: <span class="ident">W</span>) -&gt; <span class="ident">W</span> {
         <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">truncate</span>(<span class="number">0</span>);
         <span class="ident">mem::replace</span>(<span class="self">self</span>.<span class="ident">get_mut</span>(), <span class="ident">w</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">W</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">W</span> {
         <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span> {
         <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()
     }
 
@@ -484,16 +484,16 @@
     <span class="comment">// to be consumed!</span>
     <span class="comment">//</span>
     <span class="comment">// (e.g. an implementation of `into_inner`)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_inner</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">W</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_inner</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">W</span> {
         <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_present</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_present</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">is_some</span>()
     }
 
     <span class="comment">// Returns total written bytes and status of underlying codec</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_with_status</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">Status</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_with_status</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">Status</span>)<span class="op">&gt;</span> {
         <span class="comment">// miniz isn&#39;t guaranteed to actually write any of the buffer provided,</span>
         <span class="comment">// it may be in a flushing mode where it&#39;s just giving us data before</span>
         <span class="comment">// we&#39;re actually giving it any data. We don&#39;t want to spuriously return</span>
@@ -508,18 +508,18 @@
             <span class="kw">let</span> <span class="ident">written</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">total_in</span>() <span class="op">-</span> <span class="ident">before_in</span>) <span class="kw">as</span> <span class="ident">usize</span>;
 
             <span class="kw">let</span> <span class="ident">is_stream_end</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ret</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">Status::StreamEnd</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+                <span class="prelude-val">Ok</span>(<span class="ident">Status::StreamEnd</span>) =&gt; <span class="bool-val">true</span>,
+                <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
             };
 
-            <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">written</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">ret</span>.<span class="ident">is_ok</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_stream_end</span> {
+            <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">written</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">ret</span>.<span class="ident">is_ok</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_stream_end</span> {
                 <span class="kw">continue</span>;
             }
             <span class="kw">return</span> <span class="kw">match</span> <span class="ident">ret</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">st</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">st</span> {
-                    <span class="ident">Status::Ok</span> <span class="op">|</span> <span class="ident">Status::BufError</span> <span class="op">|</span> <span class="ident">Status::StreamEnd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="ident">written</span>, <span class="ident">st</span>)),
+                <span class="prelude-val">Ok</span>(<span class="ident">st</span>) =&gt; <span class="kw">match</span> <span class="ident">st</span> {
+                    <span class="ident">Status::Ok</span> <span class="op">|</span> <span class="ident">Status::BufError</span> <span class="op">|</span> <span class="ident">Status::StreamEnd</span> =&gt; <span class="prelude-val">Ok</span>((<span class="ident">written</span>, <span class="ident">st</span>)),
                 },
-                <span class="prelude-val">Err</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
+                <span class="prelude-val">Err</span>(..) =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                     <span class="ident">io::ErrorKind::InvalidInput</span>,
                     <span class="string">&quot;corrupt deflate stream&quot;</span>,
                 )),
@@ -527,12 +527,12 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">dump</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">dump</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// TODO: should manage this buffer not with `drain` but probably more of</span>
         <span class="comment">// a deque-like strategy.</span>
         <span class="kw">while</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>)<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::ErrorKind::WriteZero</span>.<span class="ident">into</span>());
             }
             <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">drain</span>(..<span class="ident">n</span>);
@@ -542,11 +542,11 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span>, <span class="ident">D</span>: <span class="ident">Ops</span><span class="op">&gt;</span> <span class="ident">Write</span> <span class="kw">for</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="ident">W</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">write_with_status</span>(<span class="ident">buf</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">res</span>.<span class="number">0</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">data</span>
             .<span class="ident">run_vec</span>(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buf</span>, <span class="ident">D::Flush::sync</span>())
             .<span class="ident">unwrap</span>();
@@ -562,7 +562,7 @@
             <span class="self">self</span>.<span class="ident">data</span>
                 .<span class="ident">run_vec</span>(<span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buf</span>, <span class="ident">D::Flush::none</span>())
                 .<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="ident">before</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">total_out</span>() {
+            <span class="kw">if</span> <span class="ident">before</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">total_out</span>() {
                 <span class="kw">break</span>;
             }
         }

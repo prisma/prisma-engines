@@ -494,25 +494,25 @@
     <span class="ident">function_name_mut</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>,
     <span class="ident">function_name</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>,
     <span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+) -&gt; <span class="ident">TokenStream</span> {
     <span class="macro">quote!</span>(
         <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span> <span class="op">=</span><span class="op">&gt;</span> {
+                #<span class="ident">name</span>::#<span class="ident">variant_name</span> =&gt; {
                     <span class="prelude-val">Some</span>(())
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
             }
         }
 
         <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span> <span class="op">=</span><span class="op">&gt;</span> {
+                #<span class="ident">name</span>::#<span class="ident">variant_name</span> =&gt; {
                     <span class="prelude-val">Some</span>(())
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
             }
         }
     )
@@ -526,9 +526,9 @@
     (<span class="ident">function_name_ref</span>, <span class="ident">doc_ref</span>): (<span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>),
     (<span class="ident">function_name_val</span>, <span class="ident">doc_val</span>): (<span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>),
     <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">syn::FieldsUnnamed</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> (<span class="ident">returns_mut_ref</span>, <span class="ident">returns_ref</span>, <span class="ident">returns_val</span>, <span class="ident">matches</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">fields</span>.<span class="ident">unnamed</span>.<span class="ident">len</span>() {
-        <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="number">1</span> =&gt; {
             <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">unnamed</span>.<span class="ident">first</span>().<span class="ident">expect</span>(<span class="string">&quot;no fields on type&quot;</span>);
 
             <span class="kw">let</span> <span class="ident">returns</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ty</span>;
@@ -539,8 +539,8 @@
 
             (<span class="ident">returns_mut_ref</span>, <span class="ident">returns_ref</span>, <span class="ident">returns_val</span>, <span class="ident">matches</span>)
         }
-        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>()),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="number">0</span> =&gt; (<span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>()),
+        <span class="kw">_</span> =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returns_mut_ref</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returns_ref</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returns_val</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
@@ -566,32 +566,32 @@
 
     <span class="macro">quote!</span>(
         <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc_mut_ref</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_mut_ref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">returns_mut_ref</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_mut_ref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">returns_mut_ref</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span>(#<span class="ident">matches</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                #<span class="ident">name</span>::#<span class="ident">variant_name</span>(#<span class="ident">matches</span>) =&gt; {
                     <span class="prelude-val">Some</span>((#<span class="ident">matches</span>))
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
             }
         }
 
         <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc_ref</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">returns_ref</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">returns_ref</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span>(#<span class="ident">matches</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                #<span class="ident">name</span>::#<span class="ident">variant_name</span>(#<span class="ident">matches</span>) =&gt; {
                     <span class="prelude-val">Some</span>((#<span class="ident">matches</span>))
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
             }
         }
 
         <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc_val</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_val</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::result::Result</span><span class="op">&lt;</span>#<span class="ident">returns_val</span>, <span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_val</span>(<span class="self">self</span>) -&gt; <span class="ident">::core::result::Result</span><span class="op">&lt;</span>#<span class="ident">returns_val</span>, <span class="self">Self</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span>(#<span class="ident">matches</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                #<span class="ident">name</span>::#<span class="ident">variant_name</span>(#<span class="ident">matches</span>) =&gt; {
                     <span class="prelude-val">Ok</span>((#<span class="ident">matches</span>))
                 },
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="self">self</span>)
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>)
             }
         }
     )
@@ -605,9 +605,9 @@
     (<span class="ident">function_name_ref</span>, <span class="ident">doc_ref</span>): (<span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>),
     (<span class="ident">function_name_val</span>, <span class="ident">doc_val</span>): (<span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>),
     <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">syn::FieldsNamed</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> (<span class="ident">returns_mut_ref</span>, <span class="ident">returns_ref</span>, <span class="ident">returns_val</span>, <span class="ident">matches</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">fields</span>.<span class="ident">named</span>.<span class="ident">len</span>() {
-        <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="number">1</span> =&gt; {
             <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">named</span>.<span class="ident">first</span>().<span class="ident">expect</span>(<span class="string">&quot;no fields on type&quot;</span>);
             <span class="kw">let</span> <span class="ident">match_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ident</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="string">&quot;expected a named field&quot;</span>);
 
@@ -619,8 +619,8 @@
 
             (<span class="ident">returns_mut_ref</span>, <span class="ident">returns_ref</span>, <span class="ident">returns_val</span>, <span class="ident">matches</span>)
         }
-        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>(())),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="number">0</span> =&gt; (<span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>(())),
+        <span class="kw">_</span> =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returns_mut_ref</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returns_ref</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returns_val</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
@@ -647,38 +647,38 @@
 
     <span class="macro">quote!</span>(
         <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc_mut_ref</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_mut_ref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">returns_mut_ref</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_mut_ref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">returns_mut_ref</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span>{ #<span class="ident">matches</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                #<span class="ident">name</span>::#<span class="ident">variant_name</span>{ #<span class="ident">matches</span> } =&gt; {
                     <span class="prelude-val">Some</span>((#<span class="ident">matches</span>))
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
             }
         }
 
         <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc_ref</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">returns_ref</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">returns_ref</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span>{ #<span class="ident">matches</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                #<span class="ident">name</span>::#<span class="ident">variant_name</span>{ #<span class="ident">matches</span> } =&gt; {
                     <span class="prelude-val">Some</span>((#<span class="ident">matches</span>))
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
             }
         }
 
         <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc_val</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_val</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::result::Result</span><span class="op">&lt;</span>#<span class="ident">returns_val</span>, <span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_val</span>(<span class="self">self</span>) -&gt; <span class="ident">::core::result::Result</span><span class="op">&lt;</span>#<span class="ident">returns_val</span>, <span class="self">Self</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span>{ #<span class="ident">matches</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                #<span class="ident">name</span>::#<span class="ident">variant_name</span>{ #<span class="ident">matches</span> } =&gt; {
                     <span class="prelude-val">Ok</span>((#<span class="ident">matches</span>))
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="self">self</span>)
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>)
             }
         }
     )
 }
 
-<span class="kw">fn</span> <span class="ident">impl_all_as_fns</span>(<span class="ident">ast</span>: <span class="kw-2">&amp;</span><span class="ident">DeriveInput</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">fn</span> <span class="ident">impl_all_as_fns</span>(<span class="ident">ast</span>: <span class="kw-2">&amp;</span><span class="ident">DeriveInput</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast</span>.<span class="ident">ident</span>;
     <span class="kw">let</span> <span class="ident">generics</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast</span>.<span class="ident">generics</span>;
 
@@ -722,14 +722,14 @@
         );
 
         <span class="kw">let</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">variant_data</span>.<span class="ident">fields</span> {
-            <span class="ident">syn::Fields::Unit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">unit_fields_return</span>(
+            <span class="ident">syn::Fields::Unit</span> =&gt; <span class="ident">unit_fields_return</span>(
                 <span class="ident">name</span>,
                 <span class="ident">variant_name</span>,
                 <span class="kw-2">&amp;</span><span class="ident">function_name_mut_ref</span>,
                 <span class="kw-2">&amp;</span><span class="ident">function_name_ref</span>,
                 <span class="kw-2">&amp;</span><span class="ident">doc_ref</span>,
             ),
-            <span class="ident">syn::Fields::Unnamed</span>(<span class="ident">unnamed</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">unnamed_fields_return</span>(
+            <span class="ident">syn::Fields::Unnamed</span>(<span class="ident">unnamed</span>) =&gt; <span class="ident">unnamed_fields_return</span>(
                 <span class="ident">name</span>,
                 <span class="ident">variant_name</span>,
                 (<span class="kw-2">&amp;</span><span class="ident">function_name_mut_ref</span>, <span class="kw-2">&amp;</span><span class="ident">doc_mut_ref</span>),
@@ -737,7 +737,7 @@
                 (<span class="kw-2">&amp;</span><span class="ident">function_name_val</span>, <span class="kw-2">&amp;</span><span class="ident">doc_val</span>),
                 <span class="kw-2">&amp;</span><span class="ident">unnamed</span>,
             ),
-            <span class="ident">syn::Fields::Named</span>(<span class="ident">named</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">named_fields_return</span>(
+            <span class="ident">syn::Fields::Named</span>(<span class="ident">named</span>) =&gt; <span class="ident">named_fields_return</span>(
                 <span class="ident">name</span>,
                 <span class="ident">variant_name</span>,
                 (<span class="kw-2">&amp;</span><span class="ident">function_name_mut_ref</span>, <span class="kw-2">&amp;</span><span class="ident">doc_mut_ref</span>),
@@ -760,7 +760,7 @@
 }
 
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">EnumAsInner</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_as_inner</span>(<span class="ident">input</span>: <span class="ident">proc_macro::TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro::TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_as_inner</span>(<span class="ident">input</span>: <span class="ident">proc_macro::TokenStream</span>) -&gt; <span class="ident">proc_macro::TokenStream</span> {
     <span class="comment">// get a usable token stream</span>
     <span class="kw">let</span> <span class="ident">ast</span>: <span class="ident">DeriveInput</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">DeriveInput</span>);
 

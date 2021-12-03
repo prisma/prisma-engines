@@ -75,9 +75,9 @@
     <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">T</span> <span class="op">=</span> <span class="ident">as_cast</span>(<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>() <span class="op">*</span> <span class="number">8</span>);
     <span class="macro">debug_assert!</span>(<span class="ident">shift</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">bits</span>, <span class="string">&quot;overflowing_shr() overflow in shift right.&quot;</span>);
 
-    <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">shift</span> <span class="op">=</span><span class="op">=</span> <span class="ident">bits</span> {
-        <span class="bool-val">true</span>  <span class="op">=</span><span class="op">&gt;</span> <span class="ident">M::ZERO</span>,
-        <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">as_cast</span>::<span class="op">&lt;</span><span class="ident">M</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">shift</span>),
+    <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">shift</span> <span class="op">==</span> <span class="ident">bits</span> {
+        <span class="bool-val">true</span>  =&gt; <span class="ident">M::ZERO</span>,
+        <span class="bool-val">false</span> =&gt; <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">as_cast</span>::<span class="op">&lt;</span><span class="ident">M</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">shift</span>),
     };
     <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">+</span><span class="op">=</span> <span class="ident">shift</span>.<span class="ident">as_i32</span>();
 }}

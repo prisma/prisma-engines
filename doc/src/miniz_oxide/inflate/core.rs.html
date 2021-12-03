@@ -1899,7 +1899,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">HuffmanTable</span> {
-    <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HuffmanTable</span> {
+    <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">HuffmanTable</span> {
         <span class="ident">HuffmanTable</span> {
             <span class="ident">code_size</span>: [<span class="number">0</span>; <span class="ident">MAX_HUFF_SYMBOLS_0</span>],
             <span class="ident">look_up</span>: [<span class="number">0</span>; <span class="ident">FAST_LOOKUP_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>],
@@ -1912,13 +1912,13 @@
     <span class="doccomment">/// If the returned value is negative, the code wasn&#39;t found in the</span>
     <span class="doccomment">/// fast lookup table and the full tree has to be traversed to find the code.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fast_lookup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bit_buf</span>: <span class="ident">BitBuffer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i16</span> {
+    <span class="kw">fn</span> <span class="ident">fast_lookup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bit_buf</span>: <span class="ident">BitBuffer</span>) -&gt; <span class="ident">i16</span> {
         <span class="self">self</span>.<span class="ident">look_up</span>[(<span class="ident">bit_buf</span> <span class="op">&amp;</span> <span class="ident">BitBuffer::from</span>(<span class="ident">FAST_LOOKUP_SIZE</span> <span class="op">-</span> <span class="number">1</span>)) <span class="kw">as</span> <span class="ident">usize</span>]
     }
 
     <span class="doccomment">/// Get the symbol and the code length from the huffman tree.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">tree_lookup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fast_symbol</span>: <span class="ident">i32</span>, <span class="ident">bit_buf</span>: <span class="ident">BitBuffer</span>, <span class="kw-2">mut</span> <span class="ident">code_len</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">i32</span>, <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">tree_lookup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fast_symbol</span>: <span class="ident">i32</span>, <span class="ident">bit_buf</span>: <span class="ident">BitBuffer</span>, <span class="kw-2">mut</span> <span class="ident">code_len</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">i32</span>, <span class="ident">u32</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">symbol</span> <span class="op">=</span> <span class="ident">fast_symbol</span>;
         <span class="comment">// We step through the tree until we encounter a positive value, which indicates a</span>
         <span class="comment">// symbol.</span>
@@ -1942,7 +1942,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// It&#39;s possible we could avoid checking for 0 if we can guarantee a sane table.</span>
     <span class="doccomment">/// TODO: Check if a smaller type for code_len helps performance.</span>
-    <span class="kw">fn</span> <span class="ident">lookup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bit_buf</span>: <span class="ident">BitBuffer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">i32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">lookup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bit_buf</span>: <span class="ident">BitBuffer</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">i32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">symbol</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fast_lookup</span>(<span class="ident">bit_buf</span>).<span class="ident">into</span>();
         <span class="kw">if</span> <span class="ident">symbol</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
             <span class="kw">if</span> (<span class="ident">symbol</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">9</span>) <span class="kw">as</span> <span class="ident">u32</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
@@ -2035,7 +2035,7 @@
 
 <span class="kw">impl</span> <span class="ident">DecompressorOxide</span> {
     <span class="doccomment">/// Create a new tinfl_decompressor with all fields set to 0.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DecompressorOxide</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">DecompressorOxide</span> {
         <span class="ident">DecompressorOxide::default</span>()
     }
 
@@ -2048,7 +2048,7 @@
 
     <span class="doccomment">/// Returns the adler32 checksum of the currently decompressed data.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adler32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">adler32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">State::Start</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">is_failure</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">z_header0</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
             <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">check_adler32</span>)
         } <span class="kw">else</span> {
@@ -2060,7 +2060,7 @@
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">DecompressorOxide</span> {
     <span class="doccomment">/// Create a new tinfl_decompressor with all fields set to 0.</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">DecompressorOxide</span> {
             <span class="ident">state</span>: <span class="ident">core::State::Start</span>,
             <span class="ident">num_bits</span>: <span class="number">0</span>,
@@ -2130,18 +2130,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">is_failure</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_failure</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">BlockTypeUnexpected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">BadCodeSizeSum</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">BadTotalSymbols</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">BadZlibHeader</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">DistanceOutOfBounds</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">BadRawLength</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">BadCodeSizeDistPrevLookup</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">InvalidLitlen</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">InvalidDist</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">BlockTypeUnexpected</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">BadCodeSizeSum</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">BadTotalSymbols</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">BadZlibHeader</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">DistanceOutOfBounds</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">BadRawLength</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">BadCodeSizeDistPrevLookup</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">InvalidLitlen</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">InvalidDist</span> =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
@@ -2207,7 +2207,7 @@
 <span class="doccomment">/// # Panics</span>
 <span class="doccomment">/// Panics if there are less than two bytes left.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">read_u16_le</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+<span class="kw">fn</span> <span class="ident">read_u16_le</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">u16</span> {
     <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> {
         <span class="kw">let</span> <span class="ident">two_bytes</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">as_ref</span>()[..<span class="number">2</span>].<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
         <span class="ident">u16::from_le_bytes</span>(<span class="ident">two_bytes</span>)
@@ -2222,7 +2222,7 @@
 <span class="doccomment">/// Panics if there are less than four bytes left.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">read_u32_le</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">fn</span> <span class="ident">read_u32_le</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">u32</span> {
     <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> {
         <span class="kw">let</span> <span class="ident">four_bytes</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">as_ref</span>()[..<span class="number">4</span>].<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
         <span class="ident">u32::from_le_bytes</span>(<span class="ident">four_bytes</span>)
@@ -2263,7 +2263,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// See https://tools.ietf.org/html/rfc1950</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">validate_zlib_header</span>(<span class="ident">cmf</span>: <span class="ident">u32</span>, <span class="ident">flg</span>: <span class="ident">u32</span>, <span class="ident">flags</span>: <span class="ident">u32</span>, <span class="ident">mask</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Action</span> {
+<span class="kw">fn</span> <span class="ident">validate_zlib_header</span>(<span class="ident">cmf</span>: <span class="ident">u32</span>, <span class="ident">flg</span>: <span class="ident">u32</span>, <span class="ident">flags</span>: <span class="ident">u32</span>, <span class="ident">mask</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Action</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">failed</span> <span class="op">=</span>
     <span class="comment">// cmf + flg should be divisible by 31.</span>
         (((<span class="ident">cmf</span> <span class="op">*</span> <span class="number">256</span>) <span class="op">+</span> <span class="ident">flg</span>) <span class="op">%</span> <span class="number">31</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) <span class="op">|</span><span class="op">|</span>
@@ -2274,7 +2274,7 @@
         ((<span class="ident">cmf</span> <span class="op">&amp;</span> <span class="number">15</span>) <span class="op">!</span><span class="op">=</span> <span class="number">8</span>);
 
     <span class="kw">let</span> <span class="ident">window_size</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> ((<span class="ident">cmf</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>) <span class="op">+</span> <span class="number">8</span>);
-    <span class="kw">if</span> (<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> (<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF</span>) <span class="op">==</span> <span class="number">0</span> {
         <span class="comment">// Bail if the buffer is wrapping and the window size is larger than the buffer.</span>
         <span class="ident">failed</span> <span class="op">|</span><span class="op">=</span> (<span class="ident">mask</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">&lt;</span> <span class="ident">window_size</span>;
     }
@@ -2308,9 +2308,9 @@
     <span class="ident">flags</span>: <span class="ident">u32</span>,
     <span class="ident">in_iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
     <span class="ident">f</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Action</span>
+) -&gt; <span class="ident">Action</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DecompressorOxide</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>, <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Action</span>,
+    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DecompressorOxide</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>, <span class="ident">i32</span>) -&gt; <span class="ident">Action</span>,
 {
     <span class="comment">// As the huffman codes can be up to 15 bits long we need at least 15 bits</span>
     <span class="comment">// ready in the bit buffer to start decoding the next huffman code.</span>
@@ -2401,7 +2401,7 @@
         <span class="ident">code_len</span> <span class="op">=</span> <span class="ident">res</span>.<span class="number">1</span> <span class="kw">as</span> <span class="ident">u32</span>;
     };
 
-    <span class="kw">if</span> <span class="ident">code_len</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">code_len</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="kw">return</span> <span class="ident">Action::Jump</span>(<span class="ident">InvalidCodeLen</span>);
     }
 
@@ -2414,13 +2414,13 @@
 <span class="doccomment">/// returning the result.</span>
 <span class="doccomment">/// If reading fails, `Action::End is returned`</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">read_byte</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">in_iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">flags</span>: <span class="ident">u32</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Action</span>
+<span class="kw">fn</span> <span class="ident">read_byte</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">in_iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">flags</span>: <span class="ident">u32</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Action</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Action</span>,
+    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">u8</span>) -&gt; <span class="ident">Action</span>,
 {
     <span class="kw">match</span> <span class="ident">in_iter</span>.<span class="ident">next</span>() {
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">end_of_input</span>(<span class="ident">flags</span>),
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">byte</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>(<span class="ident">byte</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">end_of_input</span>(<span class="ident">flags</span>),
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">byte</span>) =&gt; <span class="ident">f</span>(<span class="ident">byte</span>),
     }
 }
 
@@ -2436,9 +2436,9 @@
     <span class="ident">in_iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
     <span class="ident">flags</span>: <span class="ident">u32</span>,
     <span class="ident">f</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Action</span>
+) -&gt; <span class="ident">Action</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>, <span class="ident">BitBuffer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Action</span>,
+    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>, <span class="ident">BitBuffer</span>) -&gt; <span class="ident">Action</span>,
 {
     <span class="comment">// Clippy gives a false positive warning here due to the closure.</span>
     <span class="comment">// Read enough bytes from the input iterator to cover the number of bits we want.</span>
@@ -2448,10 +2448,10 @@
             <span class="ident">l</span>.<span class="ident">num_bits</span> <span class="op">+</span><span class="op">=</span> <span class="number">8</span>;
             <span class="ident">Action::None</span>
         }) {
-            <span class="ident">Action::None</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="ident">Action::None</span> =&gt; (),
             <span class="comment">// If there are not enough bytes in the input iterator, return and signal that we need</span>
             <span class="comment">// more.</span>
-            <span class="ident">action</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">action</span>,
+            <span class="ident">action</span> =&gt; <span class="kw">return</span> <span class="ident">action</span>,
         }
     }
 
@@ -2462,16 +2462,16 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">pad_to_bytes</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">l</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>, <span class="ident">in_iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">flags</span>: <span class="ident">u32</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Action</span>
+<span class="kw">fn</span> <span class="ident">pad_to_bytes</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">l</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>, <span class="ident">in_iter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">flags</span>: <span class="ident">u32</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Action</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Action</span>,
+    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>) -&gt; <span class="ident">Action</span>,
 {
     <span class="kw">let</span> <span class="ident">num_bits</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">num_bits</span> <span class="op">&amp;</span> <span class="number">7</span>;
     <span class="ident">read_bits</span>(<span class="ident">l</span>, <span class="ident">num_bits</span>, <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="ident">l</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">l</span>))
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">end_of_input</span>(<span class="ident">flags</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Action</span> {
+<span class="kw">fn</span> <span class="ident">end_of_input</span>(<span class="ident">flags</span>: <span class="ident">u32</span>) -&gt; <span class="ident">Action</span> {
     <span class="ident">Action::End</span>(<span class="kw">if</span> <span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">TINFL_FLAG_HAS_MORE_INPUT</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
         <span class="ident">TINFLStatus::NeedsMoreInput</span>
     } <span class="kw">else</span> {
@@ -2480,7 +2480,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">undo_bytes</span>(<span class="ident">l</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>, <span class="ident">max</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">fn</span> <span class="ident">undo_bytes</span>(<span class="ident">l</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>, <span class="ident">max</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">l</span>.<span class="ident">num_bits</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">3</span>, <span class="ident">max</span>);
     <span class="ident">l</span>.<span class="ident">num_bits</span> <span class="op">-</span><span class="op">=</span> <span class="ident">res</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
     <span class="ident">res</span>
@@ -2496,7 +2496,7 @@
     <span class="ident">memset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>.<span class="ident">tables</span>[<span class="ident">DIST_TABLE</span>].<span class="ident">code_size</span>[<span class="number">0</span>..<span class="number">32</span>], <span class="number">5</span>);
 }
 
-<span class="kw">fn</span> <span class="ident">init_tree</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DecompressorOxide</span>, <span class="ident">l</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Action</span> {
+<span class="kw">fn</span> <span class="ident">init_tree</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DecompressorOxide</span>, <span class="ident">l</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>) -&gt; <span class="ident">Action</span> {
     <span class="kw">loop</span> {
         <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>.<span class="ident">tables</span>[<span class="ident">r</span>.<span class="ident">block_type</span> <span class="kw">as</span> <span class="ident">usize</span>];
         <span class="kw">let</span> <span class="ident">table_size</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">table_sizes</span>[<span class="ident">r</span>.<span class="ident">block_type</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="ident">usize</span>;
@@ -2526,7 +2526,7 @@
         <span class="kw">for</span> <span class="ident">symbol_index</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">table_size</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rev_code</span> <span class="op">=</span> <span class="number">0</span>;
             <span class="kw">let</span> <span class="ident">code_size</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">code_size</span>[<span class="ident">symbol_index</span>];
-            <span class="kw">if</span> <span class="ident">code_size</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">code_size</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="kw">continue</span>;
             }
 
@@ -2548,7 +2548,7 @@
             }
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tree_cur</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">look_up</span>[(<span class="ident">rev_code</span> <span class="op">&amp;</span> (<span class="ident">FAST_LOOKUP_SIZE</span> <span class="op">-</span> <span class="number">1</span>)) <span class="kw">as</span> <span class="ident">usize</span>];
-            <span class="kw">if</span> <span class="ident">tree_cur</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">tree_cur</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="ident">table</span>.<span class="ident">look_up</span>[(<span class="ident">rev_code</span> <span class="op">&amp;</span> (<span class="ident">FAST_LOOKUP_SIZE</span> <span class="op">-</span> <span class="number">1</span>)) <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="ident">tree_next</span> <span class="kw">as</span> <span class="ident">i16</span>;
                 <span class="ident">tree_cur</span> <span class="op">=</span> <span class="ident">tree_next</span>;
                 <span class="ident">tree_next</span> <span class="op">-</span><span class="op">=</span> <span class="number">2</span>;
@@ -2558,7 +2558,7 @@
             <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="ident">FAST_LOOKUP_BITS</span> <span class="op">+</span> <span class="number">1</span>..<span class="ident">code_size</span> {
                 <span class="ident">rev_code</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">tree_cur</span> <span class="op">-</span><span class="op">=</span> (<span class="ident">rev_code</span> <span class="op">&amp;</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">i16</span>;
-                <span class="kw">if</span> <span class="ident">table</span>.<span class="ident">tree</span>[(<span class="op">-</span><span class="ident">tree_cur</span> <span class="op">-</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">table</span>.<span class="ident">tree</span>[(<span class="op">-</span><span class="ident">tree_cur</span> <span class="op">-</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">==</span> <span class="number">0</span> {
                     <span class="ident">table</span>.<span class="ident">tree</span>[(<span class="op">-</span><span class="ident">tree_cur</span> <span class="op">-</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="ident">tree_next</span> <span class="kw">as</span> <span class="ident">i16</span>;
                     <span class="ident">tree_cur</span> <span class="op">=</span> <span class="ident">tree_next</span>;
                     <span class="ident">tree_next</span> <span class="op">-</span><span class="op">=</span> <span class="number">2</span>;
@@ -2572,12 +2572,12 @@
             <span class="ident">table</span>.<span class="ident">tree</span>[(<span class="op">-</span><span class="ident">tree_cur</span> <span class="op">-</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="ident">symbol_index</span> <span class="kw">as</span> <span class="ident">i16</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">block_type</span> <span class="op">=</span><span class="op">=</span> <span class="number">2</span> {
+        <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">block_type</span> <span class="op">==</span> <span class="number">2</span> {
             <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span> <span class="number">0</span>;
             <span class="kw">return</span> <span class="ident">Action::Jump</span>(<span class="ident">ReadLitlenDistTablesCodeSize</span>);
         }
 
-        <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">block_type</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">block_type</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">break</span>;
         }
         <span class="ident">r</span>.<span class="ident">block_type</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
@@ -2592,15 +2592,15 @@
 <span class="comment">// As Rust doesn&#39;t have fallthrough on matches, we have to return to the match statement</span>
 <span class="comment">// and jump for each state change. (Which would ideally be optimized away, but often isn&#39;t.)</span>
 <span class="macro">macro_rules!</span> <span class="ident">generate_state</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state_machine</span>: <span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>: <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state_machine</span>: <span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>: <span class="ident">expr</span>) =&gt; {
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span> {
-                <span class="ident">Action::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
-                <span class="ident">Action::Jump</span>(<span class="ident">new_state</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Action::None</span> =&gt; <span class="kw">continue</span>,
+                <span class="ident">Action::Jump</span>(<span class="ident">new_state</span>) =&gt; {
                     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span> <span class="op">=</span> <span class="ident">new_state</span>;
                     <span class="kw">continue</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state_machine</span>;
                 },
-                <span class="ident">Action::End</span>(<span class="ident">result</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state_machine</span> <span class="ident">result</span>,
+                <span class="ident">Action::End</span>(<span class="ident">result</span>) =&gt; <span class="kw">break</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state_machine</span> <span class="ident">result</span>,
             }
         }
     };
@@ -2633,18 +2633,18 @@
     }
 
     <span class="kw">match</span> <span class="ident">match_len</span> <span class="op">&amp;</span> <span class="number">3</span> {
-        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> (),
-        <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">out_slice</span>[<span class="ident">out_pos</span>] <span class="op">=</span> <span class="ident">out_slice</span>[<span class="ident">source_pos</span> <span class="op">&amp;</span> <span class="ident">out_buf_size_mask</span>],
-        <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="number">0</span> =&gt; (),
+        <span class="number">1</span> =&gt; <span class="ident">out_slice</span>[<span class="ident">out_pos</span>] <span class="op">=</span> <span class="ident">out_slice</span>[<span class="ident">source_pos</span> <span class="op">&amp;</span> <span class="ident">out_buf_size_mask</span>],
+        <span class="number">2</span> =&gt; {
             <span class="ident">out_slice</span>[<span class="ident">out_pos</span>] <span class="op">=</span> <span class="ident">out_slice</span>[<span class="ident">source_pos</span> <span class="op">&amp;</span> <span class="ident">out_buf_size_mask</span>];
             <span class="ident">out_slice</span>[<span class="ident">out_pos</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">out_slice</span>[(<span class="ident">source_pos</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">&amp;</span> <span class="ident">out_buf_size_mask</span>];
         }
-        <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="number">3</span> =&gt; {
             <span class="ident">out_slice</span>[<span class="ident">out_pos</span>] <span class="op">=</span> <span class="ident">out_slice</span>[<span class="ident">source_pos</span> <span class="op">&amp;</span> <span class="ident">out_buf_size_mask</span>];
             <span class="ident">out_slice</span>[<span class="ident">out_pos</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">out_slice</span>[(<span class="ident">source_pos</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">&amp;</span> <span class="ident">out_buf_size_mask</span>];
             <span class="ident">out_slice</span>[<span class="ident">out_pos</span> <span class="op">+</span> <span class="number">2</span>] <span class="op">=</span> <span class="ident">out_slice</span>[(<span class="ident">source_pos</span> <span class="op">+</span> <span class="number">2</span>) <span class="op">&amp;</span> <span class="ident">out_buf_size_mask</span>];
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
@@ -2661,7 +2661,7 @@
 
     <span class="kw">let</span> <span class="ident">source_pos</span> <span class="op">=</span> <span class="ident">out_pos</span>.<span class="ident">wrapping_sub</span>(<span class="ident">dist</span>) <span class="op">&amp;</span> <span class="ident">out_buf_size_mask</span>;
 
-    <span class="kw">if</span> <span class="ident">match_len</span> <span class="op">=</span><span class="op">=</span> <span class="number">3</span> {
+    <span class="kw">if</span> <span class="ident">match_len</span> <span class="op">==</span> <span class="number">3</span> {
         <span class="comment">// Fast path for match len 3.</span>
         <span class="ident">out_slice</span>[<span class="ident">out_pos</span>] <span class="op">=</span> <span class="ident">out_slice</span>[<span class="ident">source_pos</span>];
         <span class="ident">out_slice</span>[<span class="ident">out_pos</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">out_slice</span>[(<span class="ident">source_pos</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">&amp;</span> <span class="ident">out_buf_size_mask</span>];
@@ -2707,7 +2707,7 @@
     <span class="ident">flags</span>: <span class="ident">u32</span>,
     <span class="ident">local_vars</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LocalVars</span>,
     <span class="ident">out_buf_size_mask</span>: <span class="ident">usize</span>,
-) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">TINFLStatus</span>, <span class="ident">State</span>) {
+) -&gt; (<span class="ident">TINFLStatus</span>, <span class="ident">State</span>) {
     <span class="comment">// Make a local copy of the most used variables, to avoid having to update and read from values</span>
     <span class="comment">// in a random memory location and to encourage more register use.</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">l</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">local_vars</span>;
@@ -2771,7 +2771,7 @@
 
         <span class="comment">// Mask the top bits since they may contain length info.</span>
         <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">&amp;=</span> <span class="number">511</span>;
-        <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span><span class="op">=</span> <span class="number">256</span> {
+        <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">==</span> <span class="number">256</span> {
             <span class="comment">// We hit the end of block symbol.</span>
             <span class="ident">state</span>.<span class="ident">begin</span>(<span class="ident">BlockDone</span>);
             <span class="kw">break</span> <span class="lifetime">&#39;o</span> <span class="ident">TINFLStatus::Done</span>;
@@ -2896,7 +2896,7 @@
     <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
     <span class="ident">out_pos</span>: <span class="ident">usize</span>,
     <span class="ident">flags</span>: <span class="ident">u32</span>,
-) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">TINFLStatus</span>, <span class="ident">usize</span>, <span class="ident">usize</span>) {
+) -&gt; (<span class="ident">TINFLStatus</span>, <span class="ident">usize</span>, <span class="ident">usize</span>) {
     <span class="kw">let</span> <span class="ident">out_buf_size_mask</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
         <span class="ident">usize::max_value</span>()
     } <span class="kw">else</span> {
@@ -2931,7 +2931,7 @@
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">status</span> <span class="op">=</span> <span class="lifetime">&#39;state_machine</span>: <span class="kw">loop</span> {
         <span class="kw">match</span> <span class="ident">state</span> {
-            <span class="ident">Start</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">Start</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="ident">l</span>.<span class="ident">bit_buf</span> <span class="op">=</span> <span class="number">0</span>;
                 <span class="ident">l</span>.<span class="ident">num_bits</span> <span class="op">=</span> <span class="number">0</span>;
                 <span class="ident">l</span>.<span class="ident">dist</span> <span class="op">=</span> <span class="number">0</span>;
@@ -2948,14 +2948,14 @@
                 }
             }),
 
-            <span class="ident">ReadZlibCmf</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">ReadZlibCmf</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="ident">read_byte</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="ident">cmf</span><span class="op">|</span> {
                     <span class="ident">r</span>.<span class="ident">z_header0</span> <span class="op">=</span> <span class="ident">u32::from</span>(<span class="ident">cmf</span>);
                     <span class="ident">Action::Jump</span>(<span class="ident">State::ReadZlibFlg</span>)
                 })
             }),
 
-            <span class="ident">ReadZlibFlg</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">ReadZlibFlg</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="ident">read_byte</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="ident">flg</span><span class="op">|</span> {
                     <span class="ident">r</span>.<span class="ident">z_header1</span> <span class="op">=</span> <span class="ident">u32::from</span>(<span class="ident">flg</span>);
                     <span class="ident">validate_zlib_header</span>(<span class="ident">r</span>.<span class="ident">z_header0</span>, <span class="ident">r</span>.<span class="ident">z_header1</span>, <span class="ident">flags</span>, <span class="ident">out_buf_size_mask</span>)
@@ -2963,28 +2963,28 @@
             }),
 
             <span class="comment">// Read the block header and jump to the relevant section depending on the block type.</span>
-            <span class="ident">ReadBlockHeader</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">ReadBlockHeader</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="ident">read_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l</span>, <span class="number">3</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="ident">l</span>, <span class="ident">bits</span><span class="op">|</span> {
                     <span class="ident">r</span>.<span class="ident">finish</span> <span class="op">=</span> (<span class="ident">bits</span> <span class="op">&amp;</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u32</span>;
                     <span class="ident">r</span>.<span class="ident">block_type</span> <span class="op">=</span> (<span class="ident">bits</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u32</span> <span class="op">&amp;</span> <span class="number">3</span>;
                     <span class="kw">match</span> <span class="ident">r</span>.<span class="ident">block_type</span> {
-                        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Jump</span>(<span class="ident">BlockTypeNoCompression</span>),
-                        <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="number">0</span> =&gt; <span class="ident">Action::Jump</span>(<span class="ident">BlockTypeNoCompression</span>),
+                        <span class="number">1</span> =&gt; {
                             <span class="ident">start_static_table</span>(<span class="ident">r</span>);
                             <span class="ident">init_tree</span>(<span class="ident">r</span>, <span class="ident">l</span>)
                         },
-                        <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="number">2</span> =&gt; {
                             <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span> <span class="number">0</span>;
                             <span class="ident">Action::Jump</span>(<span class="ident">ReadTableSizes</span>)
                         },
-                        <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Jump</span>(<span class="ident">BlockTypeUnexpected</span>),
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>()
+                        <span class="number">3</span> =&gt; <span class="ident">Action::Jump</span>(<span class="ident">BlockTypeUnexpected</span>),
+                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>()
                     }
                 })
             }),
 
             <span class="comment">// Raw/Stored/uncompressed block.</span>
-            <span class="ident">BlockTypeNoCompression</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">BlockTypeNoCompression</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="ident">pad_to_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="ident">l</span><span class="op">|</span> {
                     <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span> <span class="number">0</span>;
                     <span class="ident">Action::Jump</span>(<span class="ident">RawHeader</span>)
@@ -2992,7 +2992,7 @@
             }),
 
             <span class="comment">// Check that the raw block header is correct.</span>
-            <span class="ident">RawHeader</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">RawHeader</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">&lt;</span> <span class="number">4</span> {
                     <span class="comment">// Read block length and block length check.</span>
                     <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">num_bits</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
@@ -3014,12 +3014,12 @@
                     <span class="comment">// ones complement of the length.</span>
                     <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">u16::from</span>(<span class="ident">r</span>.<span class="ident">raw_header</span>[<span class="number">0</span>]) <span class="op">|</span> (<span class="ident">u16::from</span>(<span class="ident">r</span>.<span class="ident">raw_header</span>[<span class="number">1</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
                     <span class="kw">let</span> <span class="ident">check</span> <span class="op">=</span> <span class="ident">u16::from</span>(<span class="ident">r</span>.<span class="ident">raw_header</span>[<span class="number">2</span>]) <span class="op">|</span> (<span class="ident">u16::from</span>(<span class="ident">r</span>.<span class="ident">raw_header</span>[<span class="number">3</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-                    <span class="kw">let</span> <span class="ident">valid</span> <span class="op">=</span> <span class="ident">length</span> <span class="op">=</span><span class="op">=</span> <span class="op">!</span><span class="ident">check</span>;
+                    <span class="kw">let</span> <span class="ident">valid</span> <span class="op">=</span> <span class="ident">length</span> <span class="op">==</span> <span class="op">!</span><span class="ident">check</span>;
                     <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span> <span class="ident">length</span>.<span class="ident">into</span>();
 
                     <span class="kw">if</span> <span class="op">!</span><span class="ident">valid</span> {
                         <span class="ident">Action::Jump</span>(<span class="ident">BadRawLength</span>)
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="comment">// Empty raw block. Sometimes used for synchronization.</span>
                         <span class="ident">Action::Jump</span>(<span class="ident">BlockDone</span>)
                     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">num_bits</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
@@ -3034,7 +3034,7 @@
             }),
 
             <span class="comment">// Read the byte from the bit buffer.</span>
-            <span class="ident">RawReadFirstByte</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">RawReadFirstByte</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="ident">read_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l</span>, <span class="number">8</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="ident">l</span>, <span class="ident">bits</span><span class="op">|</span> {
                     <span class="ident">l</span>.<span class="ident">dist</span> <span class="op">=</span> <span class="ident">bits</span> <span class="kw">as</span> <span class="ident">u32</span>;
                     <span class="ident">Action::Jump</span>(<span class="ident">RawStoreFirstByte</span>)
@@ -3042,13 +3042,13 @@
             }),
 
             <span class="comment">// Write the byte we just read to the output buffer.</span>
-            <span class="ident">RawStoreFirstByte</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
-                <span class="kw">if</span> <span class="ident">out_buf</span>.<span class="ident">bytes_left</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="ident">RawStoreFirstByte</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+                <span class="kw">if</span> <span class="ident">out_buf</span>.<span class="ident">bytes_left</span>() <span class="op">==</span> <span class="number">0</span> {
                     <span class="ident">Action::End</span>(<span class="ident">TINFLStatus::HasMoreOutput</span>)
                 } <span class="kw">else</span> {
                     <span class="ident">out_buf</span>.<span class="ident">write_byte</span>(<span class="ident">l</span>.<span class="ident">dist</span> <span class="kw">as</span> <span class="ident">u8</span>);
                     <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">num_bits</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">num_bits</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="ident">Action::Jump</span>(<span class="ident">RawMemcpy1</span>)
                     } <span class="kw">else</span> {
                         <span class="comment">// There is still some data left in the bit buffer that needs to be output.</span>
@@ -3060,17 +3060,17 @@
                 }
             }),
 
-            <span class="ident">RawMemcpy1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
-                <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="ident">RawMemcpy1</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+                <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">==</span> <span class="number">0</span> {
                     <span class="ident">Action::Jump</span>(<span class="ident">BlockDone</span>)
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">out_buf</span>.<span class="ident">bytes_left</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">out_buf</span>.<span class="ident">bytes_left</span>() <span class="op">==</span> <span class="number">0</span> {
                     <span class="ident">Action::End</span>(<span class="ident">TINFLStatus::HasMoreOutput</span>)
                 } <span class="kw">else</span> {
                     <span class="ident">Action::Jump</span>(<span class="ident">RawMemcpy2</span>)
                 }
             }),
 
-            <span class="ident">RawMemcpy2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">RawMemcpy2</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">if</span> <span class="ident">in_iter</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
                     <span class="comment">// Copy as many raw bytes as possible from the input to the output using memcpy.</span>
                     <span class="comment">// Raw block lengths are limited to 64 * 1024, so casting through usize and u32</span>
@@ -3093,7 +3093,7 @@
             }),
 
             <span class="comment">// Read how many huffman codes/symbols are used for each table.</span>
-            <span class="ident">ReadTableSizes</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">ReadTableSizes</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">&lt;</span> <span class="number">3</span> {
                     <span class="kw">let</span> <span class="ident">num_bits</span> <span class="op">=</span> [<span class="number">5</span>, <span class="number">5</span>, <span class="number">4</span>][<span class="ident">l</span>.<span class="ident">counter</span> <span class="kw">as</span> <span class="ident">usize</span>];
                     <span class="ident">read_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l</span>, <span class="ident">num_bits</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="ident">l</span>, <span class="ident">bits</span><span class="op">|</span> {
@@ -3111,7 +3111,7 @@
 
             <span class="comment">// Read the 3-bit lengths of the huffman codes describing the huffman code lengths used</span>
             <span class="comment">// to decode the lengths of the main tables.</span>
-            <span class="ident">ReadHufflenTableCodeSize</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">ReadHufflenTableCodeSize</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">&lt;</span> <span class="ident">r</span>.<span class="ident">table_sizes</span>[<span class="ident">HUFFLEN_TABLE</span>] {
                     <span class="ident">read_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l</span>, <span class="number">3</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="ident">l</span>, <span class="ident">bits</span><span class="op">|</span> {
                         <span class="comment">// These lengths are not stored in a normal ascending order, but rather one</span>
@@ -3129,7 +3129,7 @@
                 }
             }),
 
-            <span class="ident">ReadLitlenDistTablesCodeSize</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">ReadLitlenDistTablesCodeSize</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">&lt;</span> <span class="ident">r</span>.<span class="ident">table_sizes</span>[<span class="ident">LITLEN_TABLE</span>] <span class="op">+</span> <span class="ident">r</span>.<span class="ident">table_sizes</span>[<span class="ident">DIST_TABLE</span>] {
                     <span class="ident">decode_huffman_code</span>(
                         <span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l</span>, <span class="ident">HUFFLEN_TABLE</span>,
@@ -3139,7 +3139,7 @@
                                 <span class="ident">r</span>.<span class="ident">len_codes</span>[<span class="ident">l</span>.<span class="ident">counter</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="ident">l</span>.<span class="ident">dist</span> <span class="kw">as</span> <span class="ident">u8</span>;
                                 <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                                 <span class="ident">Action::None</span>
-                            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">dist</span> <span class="op">=</span><span class="op">=</span> <span class="number">16</span> <span class="op">&amp;&amp;</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">dist</span> <span class="op">==</span> <span class="number">16</span> <span class="op">&amp;&amp;</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">==</span> <span class="number">0</span> {
                                 <span class="ident">Action::Jump</span>(<span class="ident">BadCodeSizeDistPrevLookup</span>)
                             } <span class="kw">else</span> {
                                 <span class="ident">l</span>.<span class="ident">num_extra</span> <span class="op">=</span> [<span class="number">2</span>, <span class="number">3</span>, <span class="number">7</span>][<span class="ident">l</span>.<span class="ident">dist</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">16</span>];
@@ -3164,12 +3164,12 @@
                 }
             }),
 
-            <span class="ident">ReadExtraBitsCodeSize</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">ReadExtraBitsCodeSize</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">let</span> <span class="ident">num_extra</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">num_extra</span>;
                 <span class="ident">read_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l</span>, <span class="ident">num_extra</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="ident">l</span>, <span class="kw-2">mut</span> <span class="ident">extra_bits</span><span class="op">|</span> {
                     <span class="comment">// Mask to avoid a bounds check.</span>
                     <span class="ident">extra_bits</span> <span class="op">+</span><span class="op">=</span> [<span class="number">3</span>, <span class="number">3</span>, <span class="number">11</span>][(<span class="ident">l</span>.<span class="ident">dist</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">16</span>) <span class="op">&amp;</span> <span class="number">3</span>];
-                    <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">dist</span> <span class="op">=</span><span class="op">=</span> <span class="number">16</span> {
+                    <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">dist</span> <span class="op">==</span> <span class="number">16</span> {
                         <span class="ident">r</span>.<span class="ident">len_codes</span>[<span class="ident">l</span>.<span class="ident">counter</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>]
                     } <span class="kw">else</span> {
                         <span class="number">0</span>
@@ -3186,7 +3186,7 @@
                 })
             }),
 
-            <span class="ident">DecodeLitlen</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">DecodeLitlen</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">if</span> <span class="ident">in_iter</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> <span class="op">|</span><span class="op">|</span> <span class="ident">out_buf</span>.<span class="ident">bytes_left</span>() <span class="op">&lt;</span> <span class="number">2</span> {
                     <span class="comment">// See if we can decode a literal with the data we have left.</span>
                     <span class="comment">// Jumps to next state (WriteSymbol) if successful.</span>
@@ -3217,7 +3217,7 @@
                     );
 
                     <span class="ident">state</span> <span class="op">=</span> <span class="ident">new_state</span>;
-                    <span class="kw">if</span> <span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TINFLStatus::Done</span> {
+                    <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">TINFLStatus::Done</span> {
                         <span class="ident">Action::Jump</span>(<span class="ident">new_state</span>)
                     } <span class="kw">else</span> {
                         <span class="ident">Action::End</span>(<span class="ident">status</span>)
@@ -3267,7 +3267,7 @@
                 }
             }),
 
-            <span class="ident">WriteSymbol</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">WriteSymbol</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">256</span> {
                     <span class="ident">Action::Jump</span>(<span class="ident">HuffDecodeOuterLoop1</span>)
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">out_buf</span>.<span class="ident">bytes_left</span>() <span class="op">&gt;</span> <span class="number">0</span> {
@@ -3278,11 +3278,11 @@
                 }
             }),
 
-            <span class="ident">HuffDecodeOuterLoop1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">HuffDecodeOuterLoop1</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="comment">// Mask the top bits since they may contain length info.</span>
                 <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">&amp;=</span> <span class="number">511</span>;
 
-                <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span><span class="op">=</span> <span class="number">256</span> {
+                <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">==</span> <span class="number">256</span> {
                     <span class="comment">// We hit the end of block symbol.</span>
                     <span class="ident">Action::Jump</span>(<span class="ident">BlockDone</span>)
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">&gt;</span> <span class="number">285</span> {
@@ -3307,7 +3307,7 @@
                 }
             }),
 
-            <span class="ident">ReadExtraBitsLitlen</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">ReadExtraBitsLitlen</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">let</span> <span class="ident">num_extra</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">num_extra</span>;
                 <span class="ident">read_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l</span>, <span class="ident">num_extra</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="ident">l</span>, <span class="ident">extra_bits</span><span class="op">|</span> {
                     <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">+</span><span class="op">=</span> <span class="ident">extra_bits</span> <span class="kw">as</span> <span class="ident">u32</span>;
@@ -3315,7 +3315,7 @@
                 })
             }),
 
-            <span class="ident">DecodeDistance</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">DecodeDistance</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="comment">// Try to read a huffman code from the input buffer and look up what</span>
                 <span class="comment">// length code the decoded symbol refers to.</span>
                 <span class="ident">decode_huffman_code</span>(<span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l</span>, <span class="ident">DIST_TABLE</span>, <span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="op">|</span><span class="ident">_r</span>, <span class="ident">l</span>, <span class="ident">symbol</span><span class="op">|</span> {
@@ -3338,7 +3338,7 @@
                 })
             }),
 
-            <span class="ident">ReadExtraBitsDistance</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">ReadExtraBitsDistance</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">let</span> <span class="ident">num_extra</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">num_extra</span>;
                 <span class="ident">read_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l</span>, <span class="ident">num_extra</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="ident">l</span>, <span class="ident">extra_bits</span><span class="op">|</span> {
                     <span class="ident">l</span>.<span class="ident">dist</span> <span class="op">+</span><span class="op">=</span> <span class="ident">extra_bits</span> <span class="kw">as</span> <span class="ident">u32</span>;
@@ -3346,7 +3346,7 @@
                 })
             }),
 
-            <span class="ident">HuffDecodeOuterLoop2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">HuffDecodeOuterLoop2</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">dist</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;</span> <span class="ident">out_buf</span>.<span class="ident">position</span>() <span class="op">&amp;&amp;</span>
                     (<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
                 {
@@ -3368,7 +3368,7 @@
                     {
                         <span class="comment">// Not enough space for all of the data in the output buffer,</span>
                         <span class="comment">// so copy what we have space for.</span>
-                        <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                        <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">==</span> <span class="number">0</span> {
                             <span class="ident">Action::Jump</span>(<span class="ident">DecodeLitlen</span>)
                         } <span class="kw">else</span> {
                             <span class="ident">Action::Jump</span>(<span class="ident">WriteLenBytesToEnd</span>)
@@ -3387,7 +3387,7 @@
                 }
             }),
 
-            <span class="ident">WriteLenBytesToEnd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">WriteLenBytesToEnd</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">if</span> <span class="ident">out_buf</span>.<span class="ident">bytes_left</span>() <span class="op">&gt;</span> <span class="number">0</span> {
                     <span class="kw">let</span> <span class="ident">out_pos</span> <span class="op">=</span> <span class="ident">out_buf</span>.<span class="ident">position</span>();
                     <span class="kw">let</span> <span class="ident">source_pos</span> <span class="op">=</span> <span class="ident">out_buf</span>.<span class="ident">position</span>()
@@ -3400,7 +3400,7 @@
 
                     <span class="ident">out_buf</span>.<span class="ident">set_position</span>(<span class="ident">out_pos</span> <span class="op">+</span> <span class="ident">len</span>);
                     <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">-</span><span class="op">=</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u32</span>;
-                    <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="ident">Action::Jump</span>(<span class="ident">DecodeLitlen</span>)
                     } <span class="kw">else</span> {
                         <span class="ident">Action::None</span>
@@ -3410,7 +3410,7 @@
                 }
             }),
 
-            <span class="ident">BlockDone</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">BlockDone</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="comment">// End once we&#39;ve read the last block.</span>
                 <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">finish</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                     <span class="ident">pad_to_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Action::None</span>);
@@ -3433,7 +3433,7 @@
                 }
             }),
 
-            <span class="ident">ReadAdler32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
+            <span class="ident">ReadAdler32</span> =&gt; <span class="macro">generate_state!</span>(<span class="ident">state</span>, <span class="lifetime">&#39;state_machine</span>, {
                 <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">counter</span> <span class="op">&lt;</span> <span class="number">4</span> {
                     <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">num_bits</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                         <span class="ident">read_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l</span>, <span class="number">8</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">in_iter</span>, <span class="ident">flags</span>, <span class="op">|</span><span class="ident">l</span>, <span class="ident">bits</span><span class="op">|</span> {
@@ -3456,13 +3456,13 @@
             }),
 
             <span class="comment">// We are done.</span>
-            <span class="ident">DoneForever</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span> <span class="ident">TINFLStatus::Done</span>,
+            <span class="ident">DoneForever</span> =&gt; <span class="kw">break</span> <span class="ident">TINFLStatus::Done</span>,
 
             <span class="comment">// Anything else indicates failure.</span>
             <span class="comment">// BadZlibHeader | BadRawLength | BlockTypeUnexpected | DistanceOutOfBounds |</span>
             <span class="comment">// BadTotalSymbols | BadCodeSizeDistPrevLookup | BadCodeSizeSum | InvalidLitlen |</span>
             <span class="comment">// InvalidDist | InvalidCodeLen</span>
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span> <span class="ident">TINFLStatus::Failed</span>,
+            <span class="kw">_</span> =&gt; <span class="kw">break</span> <span class="ident">TINFLStatus::Failed</span>,
         };
     };
 
@@ -3474,7 +3474,7 @@
         <span class="number">0</span>
     };
 
-    <span class="kw">if</span> <span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TINFLStatus::NeedsMoreInput</span> <span class="op">&amp;&amp;</span> <span class="ident">out_buf</span>.<span class="ident">bytes_left</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">TINFLStatus::NeedsMoreInput</span> <span class="op">&amp;&amp;</span> <span class="ident">out_buf</span>.<span class="ident">bytes_left</span>() <span class="op">==</span> <span class="number">0</span> {
         <span class="ident">status</span> <span class="op">=</span> <span class="ident">TINFLStatus::HasMoreOutput</span>
     }
 
@@ -3498,7 +3498,7 @@
         <span class="comment">// before it has a chance to reach interesting parts of code</span>
         <span class="kw">if</span> <span class="op">!</span><span class="macro">cfg!</span>(<span class="ident">fuzzing</span>) {
             <span class="comment">// Once we are done, check if the checksum matches with the one provided in the zlib header.</span>
-            <span class="kw">if</span> <span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TINFLStatus::Done</span>
+            <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">TINFLStatus::Done</span>
                 <span class="op">&amp;&amp;</span> <span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">TINFL_FLAG_PARSE_ZLIB_HEADER</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
                 <span class="op">&amp;&amp;</span> <span class="ident">r</span>.<span class="ident">check_adler32</span> <span class="op">!</span><span class="op">=</span> <span class="ident">r</span>.<span class="ident">z_adler32</span>
             {
@@ -3525,7 +3525,7 @@
         <span class="ident">input_buffer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> [<span class="ident">u8</span>],
         <span class="ident">output_buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
         <span class="ident">flags</span>: <span class="ident">u32</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">TINFLStatus</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> [<span class="ident">u8</span>], <span class="ident">usize</span>) {
+    ) -&gt; (<span class="ident">TINFLStatus</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> [<span class="ident">u8</span>], <span class="ident">usize</span>) {
         <span class="kw">let</span> (<span class="ident">status</span>, <span class="ident">in_pos</span>, <span class="ident">out_pos</span>) <span class="op">=</span> <span class="ident">decompress</span>(<span class="ident">r</span>, <span class="ident">input_buffer</span>, <span class="ident">output_buffer</span>, <span class="number">0</span>, <span class="ident">flags</span>);
         (<span class="ident">status</span>, <span class="kw-2">&amp;</span><span class="ident">input_buffer</span>[<span class="ident">in_pos</span>..], <span class="ident">out_pos</span>)
     }
@@ -3588,7 +3588,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">b_status</span>.<span class="number">0</span>, <span class="ident">TINFLStatus::Done</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">masked_lookup</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">HuffmanTable</span>, <span class="ident">bit_buf</span>: <span class="ident">BitBuffer</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">i32</span>, <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">masked_lookup</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">HuffmanTable</span>, <span class="ident">bit_buf</span>: <span class="ident">BitBuffer</span>) -&gt; (<span class="ident">i32</span>, <span class="ident">u32</span>) {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">lookup</span>(<span class="ident">bit_buf</span>).<span class="ident">unwrap</span>();
         (<span class="ident">ret</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="number">511</span>, <span class="ident">ret</span>.<span class="number">1</span>)
     }

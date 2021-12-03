@@ -265,7 +265,7 @@
 <span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">add</span>(<span class="ident">a</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">b</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u32</span>; <span class="number">4</span>] {
+<span class="kw">fn</span> <span class="ident">add</span>(<span class="ident">a</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">b</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) -&gt; [<span class="ident">u32</span>; <span class="number">4</span>] {
     [
         <span class="ident">a</span>[<span class="number">0</span>].<span class="ident">wrapping_add</span>(<span class="ident">b</span>[<span class="number">0</span>]),
         <span class="ident">a</span>[<span class="number">1</span>].<span class="ident">wrapping_add</span>(<span class="ident">b</span>[<span class="number">1</span>]),
@@ -275,23 +275,23 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">xor</span>(<span class="ident">a</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">b</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u32</span>; <span class="number">4</span>] {
+<span class="kw">fn</span> <span class="ident">xor</span>(<span class="ident">a</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">b</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) -&gt; [<span class="ident">u32</span>; <span class="number">4</span>] {
     [<span class="ident">a</span>[<span class="number">0</span>] <span class="op">^</span> <span class="ident">b</span>[<span class="number">0</span>], <span class="ident">a</span>[<span class="number">1</span>] <span class="op">^</span> <span class="ident">b</span>[<span class="number">1</span>], <span class="ident">a</span>[<span class="number">2</span>] <span class="op">^</span> <span class="ident">b</span>[<span class="number">2</span>], <span class="ident">a</span>[<span class="number">3</span>] <span class="op">^</span> <span class="ident">b</span>[<span class="number">3</span>]]
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha1_first_add</span>(<span class="ident">e</span>: <span class="ident">u32</span>, <span class="ident">w0</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u32</span>; <span class="number">4</span>] {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha1_first_add</span>(<span class="ident">e</span>: <span class="ident">u32</span>, <span class="ident">w0</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) -&gt; [<span class="ident">u32</span>; <span class="number">4</span>] {
     <span class="kw">let</span> [<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>] <span class="op">=</span> <span class="ident">w0</span>;
     [<span class="ident">e</span>.<span class="ident">wrapping_add</span>(<span class="ident">a</span>), <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>]
 }
 
-<span class="kw">fn</span> <span class="ident">sha1msg1</span>(<span class="ident">a</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">b</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u32</span>; <span class="number">4</span>] {
+<span class="kw">fn</span> <span class="ident">sha1msg1</span>(<span class="ident">a</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">b</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) -&gt; [<span class="ident">u32</span>; <span class="number">4</span>] {
     <span class="kw">let</span> [<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">w2</span>, <span class="ident">w3</span>] <span class="op">=</span> <span class="ident">a</span>;
     <span class="kw">let</span> [<span class="ident">w4</span>, <span class="ident">w5</span>, <span class="kw">_</span>, <span class="kw">_</span>] <span class="op">=</span> <span class="ident">b</span>;
     [<span class="ident">a</span>[<span class="number">0</span>] <span class="op">^</span> <span class="ident">w2</span>, <span class="ident">a</span>[<span class="number">1</span>] <span class="op">^</span> <span class="ident">w3</span>, <span class="ident">a</span>[<span class="number">2</span>] <span class="op">^</span> <span class="ident">w4</span>, <span class="ident">a</span>[<span class="number">3</span>] <span class="op">^</span> <span class="ident">w5</span>]
 }
 
-<span class="kw">fn</span> <span class="ident">sha1msg2</span>(<span class="ident">a</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">b</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u32</span>; <span class="number">4</span>] {
+<span class="kw">fn</span> <span class="ident">sha1msg2</span>(<span class="ident">a</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">b</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) -&gt; [<span class="ident">u32</span>; <span class="number">4</span>] {
     <span class="kw">let</span> [<span class="ident">x0</span>, <span class="ident">x1</span>, <span class="ident">x2</span>, <span class="ident">x3</span>] <span class="op">=</span> <span class="ident">a</span>;
     <span class="kw">let</span> [<span class="kw">_</span>, <span class="ident">w13</span>, <span class="ident">w14</span>, <span class="ident">w15</span>] <span class="op">=</span> <span class="ident">b</span>;
 
@@ -304,32 +304,32 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">sha1_first_half</span>(<span class="ident">abcd</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">msg</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u32</span>; <span class="number">4</span>] {
+<span class="kw">fn</span> <span class="ident">sha1_first_half</span>(<span class="ident">abcd</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">msg</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) -&gt; [<span class="ident">u32</span>; <span class="number">4</span>] {
     <span class="ident">sha1_first_add</span>(<span class="ident">abcd</span>[<span class="number">0</span>].<span class="ident">rotate_left</span>(<span class="number">30</span>), <span class="ident">msg</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">sha1_digest_round_x4</span>(<span class="ident">abcd</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">work</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">i</span>: <span class="ident">i8</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u32</span>; <span class="number">4</span>] {
+<span class="kw">fn</span> <span class="ident">sha1_digest_round_x4</span>(<span class="ident">abcd</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">work</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">i</span>: <span class="ident">i8</span>) -&gt; [<span class="ident">u32</span>; <span class="number">4</span>] {
     <span class="kw">const</span> <span class="ident">K0V</span>: [<span class="ident">u32</span>; <span class="number">4</span>] <span class="op">=</span> [<span class="ident">K0</span>, <span class="ident">K0</span>, <span class="ident">K0</span>, <span class="ident">K0</span>];
     <span class="kw">const</span> <span class="ident">K1V</span>: [<span class="ident">u32</span>; <span class="number">4</span>] <span class="op">=</span> [<span class="ident">K1</span>, <span class="ident">K1</span>, <span class="ident">K1</span>, <span class="ident">K1</span>];
     <span class="kw">const</span> <span class="ident">K2V</span>: [<span class="ident">u32</span>; <span class="number">4</span>] <span class="op">=</span> [<span class="ident">K2</span>, <span class="ident">K2</span>, <span class="ident">K2</span>, <span class="ident">K2</span>];
     <span class="kw">const</span> <span class="ident">K3V</span>: [<span class="ident">u32</span>; <span class="number">4</span>] <span class="op">=</span> [<span class="ident">K3</span>, <span class="ident">K3</span>, <span class="ident">K3</span>, <span class="ident">K3</span>];
 
     <span class="kw">match</span> <span class="ident">i</span> {
-        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sha1rnds4c</span>(<span class="ident">abcd</span>, <span class="ident">add</span>(<span class="ident">work</span>, <span class="ident">K0V</span>)),
-        <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sha1rnds4p</span>(<span class="ident">abcd</span>, <span class="ident">add</span>(<span class="ident">work</span>, <span class="ident">K1V</span>)),
-        <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sha1rnds4m</span>(<span class="ident">abcd</span>, <span class="ident">add</span>(<span class="ident">work</span>, <span class="ident">K2V</span>)),
-        <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sha1rnds4p</span>(<span class="ident">abcd</span>, <span class="ident">add</span>(<span class="ident">work</span>, <span class="ident">K3V</span>)),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;unknown icosaround index&quot;</span>),
+        <span class="number">0</span> =&gt; <span class="ident">sha1rnds4c</span>(<span class="ident">abcd</span>, <span class="ident">add</span>(<span class="ident">work</span>, <span class="ident">K0V</span>)),
+        <span class="number">1</span> =&gt; <span class="ident">sha1rnds4p</span>(<span class="ident">abcd</span>, <span class="ident">add</span>(<span class="ident">work</span>, <span class="ident">K1V</span>)),
+        <span class="number">2</span> =&gt; <span class="ident">sha1rnds4m</span>(<span class="ident">abcd</span>, <span class="ident">add</span>(<span class="ident">work</span>, <span class="ident">K2V</span>)),
+        <span class="number">3</span> =&gt; <span class="ident">sha1rnds4p</span>(<span class="ident">abcd</span>, <span class="ident">add</span>(<span class="ident">work</span>, <span class="ident">K3V</span>)),
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;unknown icosaround index&quot;</span>),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">sha1rnds4c</span>(<span class="ident">abcd</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">msg</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u32</span>; <span class="number">4</span>] {
+<span class="kw">fn</span> <span class="ident">sha1rnds4c</span>(<span class="ident">abcd</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">msg</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) -&gt; [<span class="ident">u32</span>; <span class="number">4</span>] {
     <span class="kw">let</span> [<span class="kw-2">mut</span> <span class="ident">a</span>, <span class="kw-2">mut</span> <span class="ident">b</span>, <span class="kw-2">mut</span> <span class="ident">c</span>, <span class="kw-2">mut</span> <span class="ident">d</span>] <span class="op">=</span> <span class="ident">abcd</span>;
     <span class="kw">let</span> [<span class="ident">t</span>, <span class="ident">u</span>, <span class="ident">v</span>, <span class="ident">w</span>] <span class="op">=</span> <span class="ident">msg</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="number">0u32</span>;
 
     <span class="macro">macro_rules!</span> <span class="ident">bool3ary_202</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>) =&gt; {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> <span class="op">^</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">&amp;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>))
         };
     } <span class="comment">// Choose, MD5F, SHA1C</span>
@@ -361,13 +361,13 @@
     [<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>]
 }
 
-<span class="kw">fn</span> <span class="ident">sha1rnds4p</span>(<span class="ident">abcd</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">msg</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u32</span>; <span class="number">4</span>] {
+<span class="kw">fn</span> <span class="ident">sha1rnds4p</span>(<span class="ident">abcd</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">msg</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) -&gt; [<span class="ident">u32</span>; <span class="number">4</span>] {
     <span class="kw">let</span> [<span class="kw-2">mut</span> <span class="ident">a</span>, <span class="kw-2">mut</span> <span class="ident">b</span>, <span class="kw-2">mut</span> <span class="ident">c</span>, <span class="kw-2">mut</span> <span class="ident">d</span>] <span class="op">=</span> <span class="ident">abcd</span>;
     <span class="kw">let</span> [<span class="ident">t</span>, <span class="ident">u</span>, <span class="ident">v</span>, <span class="ident">w</span>] <span class="op">=</span> <span class="ident">msg</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="number">0u32</span>;
 
     <span class="macro">macro_rules!</span> <span class="ident">bool3ary_150</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>) =&gt; {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>
         };
     } <span class="comment">// Parity, XOR, MD5H, SHA1P</span>
@@ -399,13 +399,13 @@
     [<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>]
 }
 
-<span class="kw">fn</span> <span class="ident">sha1rnds4m</span>(<span class="ident">abcd</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">msg</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u32</span>; <span class="number">4</span>] {
+<span class="kw">fn</span> <span class="ident">sha1rnds4m</span>(<span class="ident">abcd</span>: [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">msg</span>: [<span class="ident">u32</span>; <span class="number">4</span>]) -&gt; [<span class="ident">u32</span>; <span class="number">4</span>] {
     <span class="kw">let</span> [<span class="kw-2">mut</span> <span class="ident">a</span>, <span class="kw-2">mut</span> <span class="ident">b</span>, <span class="kw-2">mut</span> <span class="ident">c</span>, <span class="kw-2">mut</span> <span class="ident">d</span>] <span class="op">=</span> <span class="ident">abcd</span>;
     <span class="kw">let</span> [<span class="ident">t</span>, <span class="ident">u</span>, <span class="ident">v</span>, <span class="ident">w</span>] <span class="op">=</span> <span class="ident">msg</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="number">0u32</span>;
 
     <span class="macro">macro_rules!</span> <span class="ident">bool3ary_232</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>) =&gt; {
             (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>) <span class="op">^</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>) <span class="op">^</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>)
         };
     } <span class="comment">// Majority, SHA1M</span>
@@ -438,13 +438,13 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">rounds4</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h0</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h1</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wk</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h0</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h1</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wk</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>) =&gt; {
         <span class="ident">sha1_digest_round_x4</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h0</span>, <span class="ident">sha1_first_half</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h1</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wk</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>)
     };
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">schedule</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v0</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v2</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v3</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v0</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v2</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v3</span>:<span class="ident">expr</span>) =&gt; {
         <span class="ident">sha1msg2</span>(<span class="ident">xor</span>(<span class="ident">sha1msg1</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v1</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v2</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v3</span>)
     };
 }
@@ -454,7 +454,7 @@
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h0</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h1</span>:<span class="ident">ident</span>,
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w0</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w2</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w3</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w4</span>:<span class="ident">expr</span>,
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w4</span> <span class="op">=</span> <span class="macro">schedule!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">w0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w1</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w2</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w3</span>);
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h1</span> <span class="op">=</span> <span class="macro">rounds4!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">h0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">h1</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w4</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>);
     };

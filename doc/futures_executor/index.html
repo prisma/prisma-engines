@@ -4,17 +4,17 @@ capable of spawning futures as tasks. This module provides several
 built-in executors, as well as tools for building your own.</p>
 <p>All items are only available when the <code>std</code> feature of this
 library is activated, and it is activated by default.</p>
-<h1 id="using-a-thread-pool-mn-task-scheduling" class="section-header"><a href="#using-a-thread-pool-mn-task-scheduling">Using a thread pool (M:N task scheduling)</a></h1>
+<h2 id="using-a-thread-pool-mn-task-scheduling" class="section-header"><a href="#using-a-thread-pool-mn-task-scheduling">Using a thread pool (M:N task scheduling)</a></h2>
 <p>Most of the time tasks should be executed on a <a href="ThreadPool">thread pool</a>.
 A small set of worker threads can handle a very large set of spawned tasks
 (which are much lighter weight than threads). Tasks spawned onto the pool
 with the <a href="ThreadPool::spawn_ok"><code>spawn_ok</code></a> function will run ambiently on
 the created threads.</p>
-<h1 id="spawning-additional-tasks" class="section-header"><a href="#spawning-additional-tasks">Spawning additional tasks</a></h1>
+<h2 id="spawning-additional-tasks" class="section-header"><a href="#spawning-additional-tasks">Spawning additional tasks</a></h2>
 <p>Tasks can be spawned onto a spawner by calling its <a href="https://docs.rs/futures/0.3/futures/task/trait.Spawn.html#tymethod.spawn_obj"><code>spawn_obj</code></a> method
 directly. In the case of <code>!Send</code> futures, <a href="https://docs.rs/futures/0.3/futures/task/trait.LocalSpawn.html#tymethod.spawn_local_obj"><code>spawn_local_obj</code></a> can be used
 instead.</p>
-<h1 id="single-threaded-execution" class="section-header"><a href="#single-threaded-execution">Single-threaded execution</a></h1>
+<h2 id="single-threaded-execution" class="section-header"><a href="#single-threaded-execution">Single-threaded execution</a></h2>
 <p>In addition to thread pools, it’s possible to run a task (and the tasks
 it spawns) entirely within a single thread via the <a href="struct.LocalPool.html" title="LocalPool"><code>LocalPool</code></a> executor.
 Aside from cutting down on synchronization costs, this executor also makes
@@ -24,18 +24,18 @@ little work between I/O operations.</p>
 <p>There is also a convenience function <a href="fn.block_on.html" title="block_on"><code>block_on</code></a> for simply running a
 future to completion on the current thread.</p>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.BlockingStream.html" title="futures_executor::BlockingStream struct">BlockingStream</a></div><div class="item-right docblock-short"><p>An iterator which blocks on values from a stream until they become available.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Enter.html" title="futures_executor::Enter struct">Enter</a></div><div class="item-right docblock-short"><p>Represents an executor context.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.EnterError.html" title="futures_executor::EnterError struct">EnterError</a></div><div class="item-right docblock-short"><p>An error returned by <code>enter</code> if an execution scope has already been
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.BlockingStream.html" title="futures_executor::BlockingStream struct">BlockingStream</a></div><div class="item-right docblock-short"><p>An iterator which blocks on values from a stream until they become available.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Enter.html" title="futures_executor::Enter struct">Enter</a></div><div class="item-right docblock-short"><p>Represents an executor context.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.EnterError.html" title="futures_executor::EnterError struct">EnterError</a></div><div class="item-right docblock-short"><p>An error returned by <code>enter</code> if an execution scope has already been
 entered.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.LocalPool.html" title="futures_executor::LocalPool struct">LocalPool</a></div><div class="item-right docblock-short"><p>A single-threaded task pool for polling futures to completion.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.LocalSpawner.html" title="futures_executor::LocalSpawner struct">LocalSpawner</a></div><div class="item-right docblock-short"><p>A handle to a <a href="struct.LocalPool.html"><code>LocalPool</code></a> that implements
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.LocalPool.html" title="futures_executor::LocalPool struct">LocalPool</a></div><div class="item-right docblock-short"><p>A single-threaded task pool for polling futures to completion.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.LocalSpawner.html" title="futures_executor::LocalSpawner struct">LocalSpawner</a></div><div class="item-right docblock-short"><p>A handle to a <a href="struct.LocalPool.html"><code>LocalPool</code></a> that implements
 <a href="../futures_task/spawn/trait.Spawn.html"><code>Spawn</code></a>.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.block_on.html" title="futures_executor::block_on fn">block_on</a></div><div class="item-right docblock-short"><p>Run a future to completion on the current thread.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.block_on_stream.html" title="futures_executor::block_on_stream fn">block_on_stream</a></div><div class="item-right docblock-short"><p>Turn a stream into a blocking iterator.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.enter.html" title="futures_executor::enter fn">enter</a></div><div class="item-right docblock-short"><p>Marks the current thread as being within the dynamic extent of an
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.block_on.html" title="futures_executor::block_on fn">block_on</a></div><div class="item-right docblock-short"><p>Run a future to completion on the current thread.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.block_on_stream.html" title="futures_executor::block_on_stream fn">block_on_stream</a></div><div class="item-right docblock-short"><p>Turn a stream into a blocking iterator.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.enter.html" title="futures_executor::enter fn">enter</a></div><div class="item-right docblock-short"><p>Marks the current thread as being within the dynamic extent of an
 executor.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="futures_executor" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="futures_executor" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

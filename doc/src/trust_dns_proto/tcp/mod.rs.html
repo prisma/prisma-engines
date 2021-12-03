@@ -64,7 +64,7 @@
     <span class="kw">use</span> <span class="ident">std::net::SocketAddr</span>;
     <span class="kw">use</span> <span class="ident">tokio::net::TcpStream</span> <span class="kw">as</span> <span class="ident">TokioTcpStream</span>;
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokioTcpStream</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">SocketAddr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokioTcpStream</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">TokioTcpStream::connect</span>(<span class="ident">addr</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="ident">stream</span>.<span class="ident">set_nodelay</span>(<span class="bool-val">true</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">stream</span>)

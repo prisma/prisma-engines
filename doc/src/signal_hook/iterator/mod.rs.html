@@ -456,7 +456,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This registers all the signals listed. The same restrictions (panics, errors) apply as</span>
     <span class="doccomment">/// for the [`Handle::add_signal`] method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">signals</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">signals</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
         <span class="ident">S</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>,
@@ -466,7 +466,7 @@
     }
 
     <span class="doccomment">/// An advanced constructor with explicit [`Exfiltrator`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_exfiltrator</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">signals</span>: <span class="ident">I</span>, <span class="ident">exfiltrator</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_exfiltrator</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">signals</span>: <span class="ident">I</span>, <span class="ident">exfiltrator</span>: <span class="ident">E</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
         <span class="ident">S</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span>,
@@ -484,7 +484,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The same restrictions (panics, errors) apply as for the [`Handle::add_signal`]</span>
     <span class="doccomment">/// method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_signal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">signal</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_signal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">signal</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">handle</span>().<span class="ident">add_signal</span>(<span class="ident">signal</span>)
     }
 
@@ -497,20 +497,20 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method returns immediately (does not block) and may produce an empty iterator if there</span>
     <span class="doccomment">/// are no signals ready.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pending</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pending</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">pending</span>()
     }
 
     <span class="doccomment">/// Block until the stream contains some bytes.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns true if it was possible to read a byte and false otherwise.</span>
-    <span class="kw">fn</span> <span class="ident">has_signals</span>(<span class="ident">read</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UnixStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">has_signals</span>(<span class="ident">read</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UnixStream</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="ident">read</span>.<span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="number">0u8</span>]) {
-                <span class="prelude-val">Ok</span>(<span class="ident">num_read</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span> <span class="prelude-val">Ok</span>(<span class="ident">num_read</span> <span class="op">&gt;</span> <span class="number">0</span>),
+                <span class="prelude-val">Ok</span>(<span class="ident">num_read</span>) =&gt; <span class="kw">break</span> <span class="prelude-val">Ok</span>(<span class="ident">num_read</span> <span class="op">&gt;</span> <span class="number">0</span>),
                 <span class="comment">// If we get an EINTR error it is fine to retry reading from the stream.</span>
                 <span class="comment">// Otherwise we should pass on the error to the caller.</span>
-                <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; {
                     <span class="kw">if</span> <span class="ident">error</span>.<span class="ident">kind</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">ErrorKind::Interrupted</span> {
                         <span class="kw">break</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>);
                     }
@@ -529,23 +529,23 @@
     <span class="doccomment">/// another thread this method will return immediately.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that the blocking is done in this method, not in the iterator.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Pending</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">poll_pending</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::has_signals</span>) {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">pending</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pending</span>,
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">pending</span>)) =&gt; <span class="ident">pending</span>,
             <span class="comment">// Because of the blocking has_signals method the poll_pending method</span>
             <span class="comment">// only returns None if the instance is closed. But we want to return</span>
             <span class="comment">// a possibly empty pending object anyway.</span>
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">pending</span>(),
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="self">self</span>.<span class="ident">pending</span>(),
             <span class="comment">// Users can&#39;t manipulate the internal file descriptors and the way we use them</span>
             <span class="comment">// shouldn&#39;t produce any errors. So it is OK to panic.</span>
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error: {}&quot;</span>, <span class="ident">error</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error: {}&quot;</span>, <span class="ident">error</span>),
         }
     }
 
     <span class="doccomment">/// Is it closed?</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See [`close`][Handle::close].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">handle</span>().<span class="ident">is_closed</span>()
     }
 
@@ -588,14 +588,14 @@
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forever</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Forever</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forever</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Forever</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
         <span class="ident">Forever</span>(<span class="ident">RefSignalIterator::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>))
     }
 
     <span class="doccomment">/// Get a shareable handle to a [`Handle`] for this instance.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This can be used to add further signals or close the [`Signals`] instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Handle</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Handle</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">handle</span>()
     }
 }
@@ -605,7 +605,7 @@
     <span class="ident">E</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Exfiltrator</span>,
     <span class="ident">E::Storage</span>: <span class="ident">Debug</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FmtResult</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">FmtResult</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Signals&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).<span class="ident">finish</span>()
     }
 }
@@ -613,7 +613,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>: <span class="ident">Exfiltrator</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">SignalsInfo</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">E::Output</span>;
     <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Forever</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="self">self</span>.<span class="ident">forever</span>()
     }
 }
@@ -624,17 +624,17 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>: <span class="ident">Exfiltrator</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Forever</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">E::Output</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E::Output</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">poll_signal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SignalsInfo</span>::<span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="ident">::has_signals</span>) {
-            <span class="ident">PollResult::Signal</span>(<span class="ident">result</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">result</span>),
-            <span class="ident">PollResult::Closed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">PollResult::Pending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(
+            <span class="ident">PollResult::Signal</span>(<span class="ident">result</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">result</span>),
+            <span class="ident">PollResult::Closed</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">PollResult::Pending</span> =&gt; <span class="macro">unreachable!</span>(
                 <span class="string">&quot;Because of the blocking has_signals method the \
                 poll_signal method never returns Poll::Pending but blocks until a signal arrived&quot;</span>
             ),
             <span class="comment">// Users can&#39;t manipulate the internal file descriptors and the way we use them</span>
             <span class="comment">// shouldn&#39;t produce any errors. So it is OK to panic.</span>
-            <span class="ident">PollResult::Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error: {}&quot;</span>, <span class="ident">error</span>),
+            <span class="ident">PollResult::Err</span>(<span class="ident">error</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error: {}&quot;</span>, <span class="ident">error</span>),
         }
     }
 }

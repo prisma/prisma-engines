@@ -215,17 +215,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">GQLError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">user_facing_error</span>.<span class="ident">as_known</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">error_code</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">user_facing_error</span>.<span class="ident">message</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">GQLResponse</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">data</span>: <span class="ident">IndexMap::with_capacity</span>(<span class="ident">capacity</span>),
             ..<span class="ident">Default::default</span>()
@@ -240,17 +240,17 @@
         <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">into</span>());
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">remove</span>(<span class="ident">key</span>.<span class="ident">as_ref</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">errors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">GQLError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">errors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">GQLError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">iter</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">HandlerError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">HandlerError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">HandlerError</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">responses</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
         <span class="ident">responses</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
         <span class="ident">responses</span>
@@ -258,7 +258,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">GQLError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">GQLError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">GQLError</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">responses</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
         <span class="ident">responses</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
         <span class="ident">responses</span>
@@ -266,13 +266,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">HandlerError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">HandlerError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">HandlerError</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">GQLError::from</span>(<span class="ident">user_facing_errors::Error::from_dyn_error</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">user_facing_errors::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">user_facing_errors::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">user_facing_errors::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">responses</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
         <span class="ident">responses</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
         <span class="ident">responses</span>
@@ -280,7 +280,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">user_facing_errors::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">user_facing_errors::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GQLError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">user_facing_errors::Error</span>) -&gt; <span class="ident">GQLError</span> {
         <span class="ident">GQLError</span> {
             <span class="ident">error</span>: <span class="ident">err</span>.<span class="ident">message</span>().<span class="ident">to_owned</span>(),
             <span class="ident">user_facing_error</span>: <span class="ident">err</span>,
@@ -289,7 +289,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CoreError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">CoreError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GQLError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">CoreError</span>) -&gt; <span class="ident">GQLError</span> {
         <span class="ident">GQLError</span> {
             <span class="ident">error</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>),
             <span class="ident">user_facing_error</span>: <span class="ident">err</span>.<span class="ident">into</span>(),
@@ -298,7 +298,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">response</span>: <span class="ident">ResponseData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">response</span>: <span class="ident">ResponseData</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gql_response</span> <span class="op">=</span> <span class="ident">GQLResponse::with_capacity</span>(<span class="number">1</span>);
 
         <span class="ident">gql_response</span>.<span class="ident">insert_data</span>(<span class="ident">response</span>.<span class="ident">key</span>, <span class="ident">response</span>.<span class="ident">data</span>);
@@ -307,7 +307,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CoreError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">CoreError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GQLResponse</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">CoreError</span>) -&gt; <span class="ident">GQLResponse</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gql_response</span> <span class="op">=</span> <span class="ident">GQLResponse::default</span>();
 
         <span class="ident">gql_response</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
@@ -328,13 +328,13 @@
         <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">into</span>());
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">errors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">GQLError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">errors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">GQLError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">iter</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">user_facing_errors::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLBatchResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">user_facing_errors::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">user_facing_errors::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batch_response</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
         <span class="ident">batch_response</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
         <span class="ident">batch_response</span>
@@ -342,7 +342,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CoreError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLBatchResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">CoreError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">CoreError</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batch_response</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
 
         <span class="ident">batch_response</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
@@ -351,7 +351,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">HandlerError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLBatchResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">HandlerError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">HandlerError</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">responses</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
         <span class="ident">responses</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
         <span class="ident">responses</span>
@@ -359,7 +359,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GQLResponse</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLBatchResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">responses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GQLResponse</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">responses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GQLResponse</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batch_response</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
 
         <span class="ident">batch_response</span>.<span class="ident">insert_responses</span>(<span class="ident">responses</span>);

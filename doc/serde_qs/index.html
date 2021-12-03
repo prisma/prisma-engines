@@ -8,7 +8,7 @@ implementation.</p>
 <p>For users who do <em>not</em> require nested URL parameters, it is highly
 recommended that the <code>serde_urlencoded</code> crate is used instead, which
 will almost certainly perform better for deserializing simple inputs.</p>
-<h2 id="supported-types" class="section-header"><a href="#supported-types">Supported Types</a></h2>
+<h3 id="supported-types" class="section-header"><a href="#supported-types">Supported Types</a></h3>
 <p>At the <strong>top level</strong>, <code>serde_qs</code> only supports <code>struct</code>, <code>map</code>, and <code>enum</code>.
 These are the only top-level structs which can be de/serialized since
 Querystrings rely on having a (key, value) pair for each field, which
@@ -17,7 +17,7 @@ necessitates this kind of structure.</p>
 de/serialized.</p>
 <p>Note that integer keys are reserved for array indices. That is, a string of
 the form <code>a[0]=1&amp;a[1]=3</code> will deserialize to the ordered sequence <code>a = [1,3]</code>.</p>
-<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
+<h3 id="usage" class="section-header"><a href="#usage">Usage</a></h3>
 <p>See the examples folder for a more detailed introduction.</p>
 <p>Serializing/Deserializing is designed to work with maps and structs.</p>
 
@@ -56,7 +56,7 @@ the form <code>a[0]=1&amp;a[1]=3</code> will deserialize to the ordered sequence
     .<span class="ident">unwrap</span>();
 <span class="macro">assert_eq!</span>(<span class="ident">rec_params</span>, <span class="ident">params</span>);
 </code></pre></div>
-<h2 id="strict-vs-non-strict-modes" class="section-header"><a href="#strict-vs-non-strict-modes">Strict vs Non-Strict modes</a></h2>
+<h3 id="strict-vs-non-strict-modes" class="section-header"><a href="#strict-vs-non-strict-modes">Strict vs Non-Strict modes</a></h3>
 <p><code>serde_qs</code> supports two operating modes, which can be specified using
 <a href="struct.Config.html"><code>Config</code></a>, and is all about how <code>serde_qs</code> handles square brackets.</p>
 <p>Techncially, square brackets should be encoded in URLs as <code>%5B</code> and <code>%5D</code>.
@@ -75,7 +75,7 @@ now become <code>{&quot;a&quot;: {&quot;b&quot;: {&quot;c&quot;: 123 }}}</code>.
 automatically encodes the brackets. But care must be taken to avoid
 using keys with square brackets in them, or unexpected things can
 happen.</p>
-<h2 id="flatten-workaround" class="section-header"><a href="#flatten-workaround">Flatten workaround</a></h2>
+<h3 id="flatten-workaround" class="section-header"><a href="#flatten-workaround">Flatten workaround</a></h3>
 <p>A current <a href="https://github.com/serde-rs/serde/issues/1183">known limitation</a>
 in <code>serde</code> is deserializing <code>#[serde(flatten)]</code> structs for formats which
 are not self-describing. This includes query strings: <code>12</code> can be an integer
@@ -113,15 +113,15 @@ or a string, for example.</p>
     <span class="kw">let</span> <span class="ident">rec_query</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Query</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">qs::from_str</span>(<span class="ident">params</span>);
     <span class="macro">assert_eq!</span>(<span class="ident">rec_query</span>.<span class="ident">unwrap</span>(), <span class="ident">query</span>);
 }</code></pre></div>
-<h2 id="use-with-actix_web-extractors" class="section-header"><a href="#use-with-actix_web-extractors">Use with <code>actix_web</code> extractors</a></h2>
+<h3 id="use-with-actix_web-extractors" class="section-header"><a href="#use-with-actix_web-extractors">Use with <code>actix_web</code> extractors</a></h3>
 <p>The <code>actix</code> feature enables the use of <code>serde_qs::actix::QsQuery</code>, which
 is a direct substitute for the <code>actix_web::Query</code> and can be used as an extractor:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore"><code><span class="kw">fn</span> <span class="ident">index</span>(<span class="ident">info</span>: <span class="ident">QsQuery</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore"><code><span class="kw">fn</span> <span class="ident">index</span>(<span class="ident">info</span>: <span class="ident">QsQuery</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;Welcome {}!&quot;</span>, <span class="ident">info</span>.<span class="ident">username</span>))
 }</code></pre></div>
 <p>Support for <code>actix-web 2.0.0</code> is available via the <code>actix2</code> feature.</p>
-<h2 id="use-with-warp-filters" class="section-header"><a href="#use-with-warp-filters">Use with <code>warp</code> filters</a></h2>
+<h3 id="use-with-warp-filters" class="section-header"><a href="#use-with-warp-filters">Use with <code>warp</code> filters</a></h3>
 <p>The <code>warp</code> feature enables the use of <code>serde_qs::warp::query()</code>, which
 is a substitute for the <code>warp::query::query()</code> filter and can be used like this:</p>
 
@@ -131,16 +131,16 @@ is a substitute for the <code>warp::query::query()</code> filter and can be used
     })
     .<span class="ident">recover</span>(<span class="ident">serde_qs::warp::recover_fn</span>);</code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Config.html" title="serde_qs::Config struct">Config</a></div><div class="item-right docblock-short"><p>To override the default serialization parameters, first construct a new
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Config.html" title="serde_qs::Config struct">Config</a></div><div class="item-right docblock-short"><p>To override the default serialization parameters, first construct a new
 Config.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.QsSerializer.html" title="serde_qs::QsSerializer struct">QsSerializer</a></div><div class="item-right docblock-short"><p>A serializer for the querystring format.</p>
-</div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.Error.html" title="serde_qs::Error enum">Error</a></div><div class="item-right docblock-short"><p>Error type for <code>serde_qs</code>.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.from_bytes.html" title="serde_qs::from_bytes fn">from_bytes</a></div><div class="item-right docblock-short"><p>Deserializes a querystring from a <code>&amp;[u8]</code>.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.from_str.html" title="serde_qs::from_str fn">from_str</a></div><div class="item-right docblock-short"><p>Deserializes a querystring from a <code>&amp;str</code>.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.to_string.html" title="serde_qs::to_string fn">to_string</a></div><div class="item-right docblock-short"><p>Serializes a value into a querystring.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.to_writer.html" title="serde_qs::to_writer fn">to_writer</a></div><div class="item-right docblock-short"><p>Serializes a value into a generic writer object.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="serde_qs" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.QsSerializer.html" title="serde_qs::QsSerializer struct">QsSerializer</a></div><div class="item-right docblock-short"><p>A serializer for the querystring format.</p>
+</div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Error.html" title="serde_qs::Error enum">Error</a></div><div class="item-right docblock-short"><p>Error type for <code>serde_qs</code>.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.from_bytes.html" title="serde_qs::from_bytes fn">from_bytes</a></div><div class="item-right docblock-short"><p>Deserializes a querystring from a <code>&amp;[u8]</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.from_str.html" title="serde_qs::from_str fn">from_str</a></div><div class="item-right docblock-short"><p>Deserializes a querystring from a <code>&amp;str</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.to_string.html" title="serde_qs::to_string fn">to_string</a></div><div class="item-right docblock-short"><p>Serializes a value into a querystring.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.to_writer.html" title="serde_qs::to_writer fn">to_writer</a></div><div class="item-right docblock-short"><p>Serializes a value into a generic writer object.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="serde_qs" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

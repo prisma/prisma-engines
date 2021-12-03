@@ -4,7 +4,7 @@
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spec</span> <span class="op">=</span> <span class="ident">Specification::new</span>();
 <span class="ident">spec</span>.<span class="ident">symbols</span>.<span class="ident">push_str</span>(<span class="string">&quot;0123456789abcdef&quot;</span>);
 <span class="macro">assert_eq!</span>(<span class="ident">HEXLOWER</span>, <span class="ident">spec</span>.<span class="ident">encoding</span>().<span class="ident">unwrap</span>());</code></pre></div>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">data_encoding::HEXLOWER</span>;
 <span class="kw">let</span> <span class="ident">deadbeef</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0xde</span>, <span class="number">0xad</span>, <span class="number">0xbe</span>, <span class="number">0xef</span>];
 <span class="macro">assert_eq!</span>(<span class="ident">HEXLOWER</span>.<span class="ident">decode</span>(<span class="string">b&quot;deadbeef&quot;</span>).<span class="ident">unwrap</span>(), <span class="ident">deadbeef</span>);

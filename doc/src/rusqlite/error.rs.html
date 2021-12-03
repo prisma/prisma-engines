@@ -484,62 +484,62 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Error</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident">Error::SqliteFailure</span>(<span class="ident">e1</span>, <span class="ident">s1</span>), <span class="ident">Error::SqliteFailure</span>(<span class="ident">e2</span>, <span class="ident">s2</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">e2</span> <span class="op">&amp;&amp;</span> <span class="ident">s1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">s2</span>,
-            (<span class="ident">Error::SqliteSingleThreadedMode</span>, <span class="ident">Error::SqliteSingleThreadedMode</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            (<span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">i1</span>, <span class="ident">n1</span>), <span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">i2</span>, <span class="ident">n2</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">i1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">n1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">n2</span>
+            (<span class="ident">Error::SqliteFailure</span>(<span class="ident">e1</span>, <span class="ident">s1</span>), <span class="ident">Error::SqliteFailure</span>(<span class="ident">e2</span>, <span class="ident">s2</span>)) =&gt; <span class="ident">e1</span> <span class="op">==</span> <span class="ident">e2</span> <span class="op">&amp;&amp;</span> <span class="ident">s1</span> <span class="op">==</span> <span class="ident">s2</span>,
+            (<span class="ident">Error::SqliteSingleThreadedMode</span>, <span class="ident">Error::SqliteSingleThreadedMode</span>) =&gt; <span class="bool-val">true</span>,
+            (<span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">i1</span>, <span class="ident">n1</span>), <span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">i2</span>, <span class="ident">n2</span>)) =&gt; {
+                <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">n1</span> <span class="op">==</span> <span class="ident">n2</span>
             }
-            (<span class="ident">Error::Utf8Error</span>(<span class="ident">e1</span>), <span class="ident">Error::Utf8Error</span>(<span class="ident">e2</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">e2</span>,
-            (<span class="ident">Error::NulError</span>(<span class="ident">e1</span>), <span class="ident">Error::NulError</span>(<span class="ident">e2</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">e2</span>,
-            (<span class="ident">Error::InvalidParameterName</span>(<span class="ident">n1</span>), <span class="ident">Error::InvalidParameterName</span>(<span class="ident">n2</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">n2</span>,
-            (<span class="ident">Error::InvalidPath</span>(<span class="ident">p1</span>), <span class="ident">Error::InvalidPath</span>(<span class="ident">p2</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">p1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">p2</span>,
-            (<span class="ident">Error::ExecuteReturnedResults</span>, <span class="ident">Error::ExecuteReturnedResults</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            (<span class="ident">Error::QueryReturnedNoRows</span>, <span class="ident">Error::QueryReturnedNoRows</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            (<span class="ident">Error::InvalidColumnIndex</span>(<span class="ident">i1</span>), <span class="ident">Error::InvalidColumnIndex</span>(<span class="ident">i2</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">i2</span>,
-            (<span class="ident">Error::InvalidColumnName</span>(<span class="ident">n1</span>), <span class="ident">Error::InvalidColumnName</span>(<span class="ident">n2</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">n2</span>,
-            (<span class="ident">Error::InvalidColumnType</span>(<span class="ident">i1</span>, <span class="ident">n1</span>, <span class="ident">t1</span>), <span class="ident">Error::InvalidColumnType</span>(<span class="ident">i2</span>, <span class="ident">n2</span>, <span class="ident">t2</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">i1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">t1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">t2</span> <span class="op">&amp;&amp;</span> <span class="ident">n1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">n2</span>
+            (<span class="ident">Error::Utf8Error</span>(<span class="ident">e1</span>), <span class="ident">Error::Utf8Error</span>(<span class="ident">e2</span>)) =&gt; <span class="ident">e1</span> <span class="op">==</span> <span class="ident">e2</span>,
+            (<span class="ident">Error::NulError</span>(<span class="ident">e1</span>), <span class="ident">Error::NulError</span>(<span class="ident">e2</span>)) =&gt; <span class="ident">e1</span> <span class="op">==</span> <span class="ident">e2</span>,
+            (<span class="ident">Error::InvalidParameterName</span>(<span class="ident">n1</span>), <span class="ident">Error::InvalidParameterName</span>(<span class="ident">n2</span>)) =&gt; <span class="ident">n1</span> <span class="op">==</span> <span class="ident">n2</span>,
+            (<span class="ident">Error::InvalidPath</span>(<span class="ident">p1</span>), <span class="ident">Error::InvalidPath</span>(<span class="ident">p2</span>)) =&gt; <span class="ident">p1</span> <span class="op">==</span> <span class="ident">p2</span>,
+            (<span class="ident">Error::ExecuteReturnedResults</span>, <span class="ident">Error::ExecuteReturnedResults</span>) =&gt; <span class="bool-val">true</span>,
+            (<span class="ident">Error::QueryReturnedNoRows</span>, <span class="ident">Error::QueryReturnedNoRows</span>) =&gt; <span class="bool-val">true</span>,
+            (<span class="ident">Error::InvalidColumnIndex</span>(<span class="ident">i1</span>), <span class="ident">Error::InvalidColumnIndex</span>(<span class="ident">i2</span>)) =&gt; <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span>,
+            (<span class="ident">Error::InvalidColumnName</span>(<span class="ident">n1</span>), <span class="ident">Error::InvalidColumnName</span>(<span class="ident">n2</span>)) =&gt; <span class="ident">n1</span> <span class="op">==</span> <span class="ident">n2</span>,
+            (<span class="ident">Error::InvalidColumnType</span>(<span class="ident">i1</span>, <span class="ident">n1</span>, <span class="ident">t1</span>), <span class="ident">Error::InvalidColumnType</span>(<span class="ident">i2</span>, <span class="ident">n2</span>, <span class="ident">t2</span>)) =&gt; {
+                <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">t1</span> <span class="op">==</span> <span class="ident">t2</span> <span class="op">&amp;&amp;</span> <span class="ident">n1</span> <span class="op">==</span> <span class="ident">n2</span>
             }
-            (<span class="ident">Error::StatementChangedRows</span>(<span class="ident">n1</span>), <span class="ident">Error::StatementChangedRows</span>(<span class="ident">n2</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">n2</span>,
+            (<span class="ident">Error::StatementChangedRows</span>(<span class="ident">n1</span>), <span class="ident">Error::StatementChangedRows</span>(<span class="ident">n2</span>)) =&gt; <span class="ident">n1</span> <span class="op">==</span> <span class="ident">n2</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
             (
                 <span class="ident">Error::InvalidFunctionParameterType</span>(<span class="ident">i1</span>, <span class="ident">t1</span>),
                 <span class="ident">Error::InvalidFunctionParameterType</span>(<span class="ident">i2</span>, <span class="ident">t2</span>),
-            ) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">t1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">t2</span>,
+            ) =&gt; <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">t1</span> <span class="op">==</span> <span class="ident">t2</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
             (
                 <span class="ident">Error::InvalidFilterParameterType</span>(<span class="ident">i1</span>, <span class="ident">t1</span>),
                 <span class="ident">Error::InvalidFilterParameterType</span>(<span class="ident">i2</span>, <span class="ident">t2</span>),
-            ) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">t1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">t2</span>,
-            (<span class="ident">Error::InvalidQuery</span>, <span class="ident">Error::InvalidQuery</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            ) =&gt; <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">t1</span> <span class="op">==</span> <span class="ident">t2</span>,
+            (<span class="ident">Error::InvalidQuery</span>, <span class="ident">Error::InvalidQuery</span>) =&gt; <span class="bool-val">true</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-            (<span class="ident">Error::ModuleError</span>(<span class="ident">s1</span>), <span class="ident">Error::ModuleError</span>(<span class="ident">s2</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">s2</span>,
+            (<span class="ident">Error::ModuleError</span>(<span class="ident">s1</span>), <span class="ident">Error::ModuleError</span>(<span class="ident">s2</span>)) =&gt; <span class="ident">s1</span> <span class="op">==</span> <span class="ident">s2</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            (<span class="ident">Error::UnwindingPanic</span>, <span class="ident">Error::UnwindingPanic</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            (<span class="ident">Error::UnwindingPanic</span>, <span class="ident">Error::UnwindingPanic</span>) =&gt; <span class="bool-val">true</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            (<span class="ident">Error::GetAuxWrongType</span>, <span class="ident">Error::GetAuxWrongType</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            (<span class="ident">Error::InvalidParameterCount</span>(<span class="ident">i1</span>, <span class="ident">n1</span>), <span class="ident">Error::InvalidParameterCount</span>(<span class="ident">i2</span>, <span class="ident">n2</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">i1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">n1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">n2</span>
+            (<span class="ident">Error::GetAuxWrongType</span>, <span class="ident">Error::GetAuxWrongType</span>) =&gt; <span class="bool-val">true</span>,
+            (<span class="ident">Error::InvalidParameterCount</span>(<span class="ident">i1</span>, <span class="ident">n1</span>), <span class="ident">Error::InvalidParameterCount</span>(<span class="ident">i2</span>, <span class="ident">n2</span>)) =&gt; {
+                <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">n1</span> <span class="op">==</span> <span class="ident">n2</span>
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;blob&quot;</span>)]</span>
-            (<span class="ident">Error::BlobSizeError</span>, <span class="ident">Error::BlobSizeError</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            (..) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            (<span class="ident">Error::BlobSizeError</span>, <span class="ident">Error::BlobSizeError</span>) =&gt; <span class="bool-val">true</span>,
+            (..) =&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">str::Utf8Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">str::Utf8Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">str::Utf8Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::Utf8Error</span>(<span class="ident">err</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">::std::ffi::NulError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">::std::ffi::NulError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">::std::ffi::NulError</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::NulError</span>(<span class="ident">err</span>)
     }
 }
@@ -550,37 +550,37 @@
 <span class="doccomment">/// to allow use of `get_raw(…).as_…()?` in callbacks that take `Error`.</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FromSqlError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
     <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">FromSqlError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">FromSqlError</span>) -&gt; <span class="ident">Error</span> {
         <span class="comment">// The error type requires index and type fields, but they aren&#39;t known in this</span>
         <span class="comment">// context.</span>
         <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">FromSqlError::OutOfRange</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">UNKNOWN_COLUMN</span>, <span class="ident">val</span>),
+            <span class="ident">FromSqlError::OutOfRange</span>(<span class="ident">val</span>) =&gt; <span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">UNKNOWN_COLUMN</span>, <span class="ident">val</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;i128_blob&quot;</span>)]</span>
-            <span class="ident">FromSqlError::InvalidI128Size</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">FromSqlError::InvalidI128Size</span>(<span class="kw">_</span>) =&gt; {
                 <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">UNKNOWN_COLUMN</span>, <span class="ident">Type::Blob</span>, <span class="ident">Box::new</span>(<span class="ident">err</span>))
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-            <span class="ident">FromSqlError::InvalidUuidSize</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">FromSqlError::InvalidUuidSize</span>(<span class="kw">_</span>) =&gt; {
                 <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">UNKNOWN_COLUMN</span>, <span class="ident">Type::Blob</span>, <span class="ident">Box::new</span>(<span class="ident">err</span>))
             }
-            <span class="ident">FromSqlError::Other</span>(<span class="ident">source</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">FromSqlError::Other</span>(<span class="ident">source</span>) =&gt; {
                 <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">UNKNOWN_COLUMN</span>, <span class="ident">Type::Null</span>, <span class="ident">source</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">UNKNOWN_COLUMN</span>, <span class="ident">Type::Null</span>, <span class="ident">Box::new</span>(<span class="ident">err</span>)),
+            <span class="kw">_</span> =&gt; <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">UNKNOWN_COLUMN</span>, <span class="ident">Type::Null</span>, <span class="ident">Box::new</span>(<span class="ident">err</span>)),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::SqliteFailure</span>(<span class="kw-2">ref</span> <span class="ident">err</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error::SqliteFailure</span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">s</span>),
-            <span class="ident">Error::SqliteSingleThreadedMode</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+            <span class="ident">Error::SqliteFailure</span>(<span class="kw-2">ref</span> <span class="ident">err</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error::SqliteFailure</span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">s</span>),
+            <span class="ident">Error::SqliteSingleThreadedMode</span> =&gt; <span class="macro">write!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;SQLite was compiled or configured for single-threaded use only&quot;</span>
             ),
-            <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">t</span>, <span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">t</span>, <span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="ident">UNKNOWN_COLUMN</span> {
                     <span class="macro">write!</span>(
                         <span class="ident">f</span>,
@@ -591,67 +591,67 @@
                     <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
                 }
             }
-            <span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">col</span>, <span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">col</span>, <span class="ident">val</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">col</span> <span class="op">!</span><span class="op">=</span> <span class="ident">UNKNOWN_COLUMN</span> {
                     <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Integer {} out of range at index {}&quot;</span>, <span class="ident">val</span>, <span class="ident">col</span>)
                 } <span class="kw">else</span> {
                     <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Integer {} out of range&quot;</span>, <span class="ident">val</span>)
                 }
             }
-            <span class="ident">Error::Utf8Error</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error::NulError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error::InvalidParameterName</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid parameter name: {}&quot;</span>, <span class="ident">name</span>),
-            <span class="ident">Error::InvalidPath</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid path: {}&quot;</span>, <span class="ident">p</span>.<span class="ident">to_string_lossy</span>()),
-            <span class="ident">Error::ExecuteReturnedResults</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::Utf8Error</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error::NulError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error::InvalidParameterName</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid parameter name: {}&quot;</span>, <span class="ident">name</span>),
+            <span class="ident">Error::InvalidPath</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid path: {}&quot;</span>, <span class="ident">p</span>.<span class="ident">to_string_lossy</span>()),
+            <span class="ident">Error::ExecuteReturnedResults</span> =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Execute returned results - did you mean to call query?&quot;</span>)
             }
-            <span class="ident">Error::QueryReturnedNoRows</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Query returned no rows&quot;</span>),
-            <span class="ident">Error::InvalidColumnIndex</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid column index: {}&quot;</span>, <span class="ident">i</span>),
-            <span class="ident">Error::InvalidColumnName</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid column name: {}&quot;</span>, <span class="ident">name</span>),
-            <span class="ident">Error::InvalidColumnType</span>(<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+            <span class="ident">Error::QueryReturnedNoRows</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Query returned no rows&quot;</span>),
+            <span class="ident">Error::InvalidColumnIndex</span>(<span class="ident">i</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid column index: {}&quot;</span>, <span class="ident">i</span>),
+            <span class="ident">Error::InvalidColumnName</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid column name: {}&quot;</span>, <span class="ident">name</span>),
+            <span class="ident">Error::InvalidColumnType</span>(<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; <span class="macro">write!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;Invalid column type {} at index: {}, name: {}&quot;</span>,
                 <span class="ident">t</span>, <span class="ident">i</span>, <span class="ident">name</span>
             ),
-            <span class="ident">Error::InvalidParameterCount</span>(<span class="ident">i1</span>, <span class="ident">n1</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+            <span class="ident">Error::InvalidParameterCount</span>(<span class="ident">i1</span>, <span class="ident">n1</span>) =&gt; <span class="macro">write!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;Wrong number of parameters passed to query. Got {}, needed {}&quot;</span>,
                 <span class="ident">i1</span>, <span class="ident">n1</span>
             ),
-            <span class="ident">Error::StatementChangedRows</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Query changed {} rows&quot;</span>, <span class="ident">i</span>),
+            <span class="ident">Error::StatementChangedRows</span>(<span class="ident">i</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Query changed {} rows&quot;</span>, <span class="ident">i</span>),
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::InvalidFunctionParameterType</span>(<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::InvalidFunctionParameterType</span>(<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid function parameter type {} at index {}&quot;</span>, <span class="ident">t</span>, <span class="ident">i</span>)
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-            <span class="ident">Error::InvalidFilterParameterType</span>(<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::InvalidFilterParameterType</span>(<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid filter parameter type {} at index {}&quot;</span>, <span class="ident">t</span>, <span class="ident">i</span>)
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::UserFunctionError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error::ToSqlConversionFailure</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error::InvalidQuery</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Query is not read-only&quot;</span>),
+            <span class="ident">Error::UserFunctionError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error::ToSqlConversionFailure</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error::InvalidQuery</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Query is not read-only&quot;</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-            <span class="ident">Error::ModuleError</span>(<span class="kw-2">ref</span> <span class="ident">desc</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">desc</span>),
+            <span class="ident">Error::ModuleError</span>(<span class="kw-2">ref</span> <span class="ident">desc</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">desc</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::UnwindingPanic</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unwinding panic&quot;</span>),
+            <span class="ident">Error::UnwindingPanic</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unwinding panic&quot;</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::GetAuxWrongType</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;get_aux called with wrong type&quot;</span>),
-            <span class="ident">Error::MultipleStatement</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Multiple statements provided&quot;</span>),
+            <span class="ident">Error::GetAuxWrongType</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;get_aux called with wrong type&quot;</span>),
+            <span class="ident">Error::MultipleStatement</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Multiple statements provided&quot;</span>),
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;blob&quot;</span>)]</span>
-            <span class="ident">Error::BlobSizeError</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Blob size is insufficient&quot;</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">Error::BlobSizeError</span> =&gt; <span class="string">&quot;Blob size is insufficient&quot;</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::SqliteFailure</span>(<span class="kw-2">ref</span> <span class="ident">err</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error::Utf8Error</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error::NulError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">Error::SqliteFailure</span>(<span class="kw-2">ref</span> <span class="ident">err</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">Error::Utf8Error</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">Error::NulError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
 
             <span class="ident">Error::IntegralValueOutOfRange</span>(..)
             <span class="op">|</span> <span class="ident">Error::SqliteSingleThreadedMode</span>
@@ -665,30 +665,30 @@
             <span class="op">|</span> <span class="ident">Error::InvalidParameterCount</span>(..)
             <span class="op">|</span> <span class="ident">Error::StatementChangedRows</span>(<span class="kw">_</span>)
             <span class="op">|</span> <span class="ident">Error::InvalidQuery</span>
-            <span class="op">|</span> <span class="ident">Error::MultipleStatement</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="op">|</span> <span class="ident">Error::MultipleStatement</span> =&gt; <span class="prelude-val">None</span>,
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::InvalidFunctionParameterType</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Error::InvalidFunctionParameterType</span>(..) =&gt; <span class="prelude-val">None</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-            <span class="ident">Error::InvalidFilterParameterType</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Error::InvalidFilterParameterType</span>(..) =&gt; <span class="prelude-val">None</span>,
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::UserFunctionError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">err</span>),
+            <span class="ident">Error::UserFunctionError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">err</span>),
 
             <span class="ident">Error::FromSqlConversionFailure</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">err</span>)
-            <span class="op">|</span> <span class="ident">Error::ToSqlConversionFailure</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">err</span>),
+            <span class="op">|</span> <span class="ident">Error::ToSqlConversionFailure</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">err</span>),
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-            <span class="ident">Error::ModuleError</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Error::ModuleError</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::UnwindingPanic</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Error::UnwindingPanic</span> =&gt; <span class="prelude-val">None</span>,
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::GetAuxWrongType</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Error::GetAuxWrongType</span> =&gt; <span class="prelude-val">None</span>,
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;blob&quot;</span>)]</span>
-            <span class="ident">Error::BlobSizeError</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Error::BlobSizeError</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
@@ -696,12 +696,12 @@
 <span class="comment">// These are public but not re-exported by lib.rs, so only visible within crate.</span>
 
 <span class="attribute">#[<span class="ident">cold</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_from_sqlite_code</span>(<span class="ident">code</span>: <span class="ident">c_int</span>, <span class="ident">message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_from_sqlite_code</span>(<span class="ident">code</span>: <span class="ident">c_int</span>, <span class="ident">message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">Error</span> {
     <span class="ident">Error::SqliteFailure</span>(<span class="ident">ffi::Error::new</span>(<span class="ident">code</span>), <span class="ident">message</span>)
 }
 
 <span class="attribute">#[<span class="ident">cold</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">error_from_handle</span>(<span class="ident">db</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span>, <span class="ident">code</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">error_from_handle</span>(<span class="ident">db</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span>, <span class="ident">code</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">Error</span> {
     <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">db</span>.<span class="ident">is_null</span>() {
         <span class="prelude-val">None</span>
     } <span class="kw">else</span> {
@@ -711,7 +711,7 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">check</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">funcall</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">funcall</span>:<span class="ident">expr</span>) =&gt; {{
         <span class="kw">let</span> <span class="ident">rc</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">funcall</span>;
         <span class="kw">if</span> <span class="ident">rc</span> <span class="op">!</span><span class="op">=</span> <span class="ident"><span class="kw">crate</span>::ffi::SQLITE_OK</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::error::error_from_sqlite_code</span>(<span class="ident">rc</span>, <span class="prelude-val">None</span>).<span class="ident">into</span>());

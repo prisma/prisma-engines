@@ -9,7 +9,7 @@
 
 <span class="doccomment">/// The current time, in milliseconds.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;now&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="ident">f64</span> {
     <span class="ident">time::precise_time_s</span>() <span class="op">*</span> <span class="number">1000.0</span>
 }
 </code></pre></div>

@@ -790,7 +790,7 @@
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">type_of</span> {
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">env</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">env</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>) =&gt; {{
     <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
     <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::sys</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value_type</span> <span class="op">=</span> <span class="number">0</span>;
@@ -801,9 +801,9 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_napi_value_trait</span> {
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value_type</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value_type</span>:<span class="ident">ident</span>) =&gt; {
     <span class="kw">impl</span> <span class="ident">NapiValue</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span> {
-      <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">value</span>: <span class="ident">sys::napi_value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span><span class="op">&gt;</span> {
+      <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">value</span>: <span class="ident">sys::napi_value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">value_type</span> <span class="op">=</span> <span class="macro">type_of!</span>(<span class="ident">env</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">value_type</span> <span class="op">!</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value_type</span> {
           <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
@@ -819,7 +819,7 @@
         }
       }
 
-      <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_unchecked</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">value</span>: <span class="ident">sys::napi_value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span> {
+      <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_unchecked</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">value</span>: <span class="ident">sys::napi_value</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span> {
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span>(<span class="ident">Value</span> {
           <span class="ident">env</span>,
           <span class="ident">value</span>,
@@ -829,20 +829,20 @@
     }
 
     <span class="kw">impl</span> <span class="ident">NapiRaw</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span> {
-      <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::napi_value</span> {
+      <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">sys::napi_value</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>
       }
     }
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> <span class="ident">NapiRaw</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;env</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span> {
-      <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::napi_value</span> {
+      <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">sys::napi_value</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>
       }
     }
 
     <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">JsUnknown</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span> {
       <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
-      <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">JsUnknown</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span><span class="op">&gt;</span> {
+      <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">JsUnknown</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value::from_raw</span>(<span class="ident">value</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="ident">value</span>.<span class="number">0</span>.<span class="ident">value</span>) }
       }
     }
@@ -850,15 +850,15 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_js_value_methods</span> {
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span>:<span class="ident">ident</span>) =&gt; {
     <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span> {
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_unknown</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">JsUnknown</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_unknown</span>(<span class="self">self</span>) -&gt; <span class="ident">JsUnknown</span> {
         <span class="kw">unsafe</span> { <span class="ident">JsUnknown::from_raw_unchecked</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>) }
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coerce_to_bool</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsBoolean</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coerce_to_bool</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsBoolean</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_raw_value</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
           <span class="ident">sys::napi_coerce_to_bool</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">new_raw_value</span>)
@@ -871,7 +871,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coerce_to_number</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsNumber</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coerce_to_number</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsNumber</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_raw_value</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
           <span class="ident">sys::napi_coerce_to_number</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">new_raw_value</span>)
@@ -884,7 +884,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coerce_to_string</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsString</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coerce_to_string</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsString</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_raw_value</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
           <span class="ident">sys::napi_coerce_to_string</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">new_raw_value</span>)
@@ -897,7 +897,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coerce_to_object</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coerce_to_object</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_raw_value</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
           <span class="ident">sys::napi_coerce_to_object</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">new_raw_value</span>)
@@ -911,56 +911,56 @@
 
       <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi5&quot;</span>)]</span>
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_date</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_date</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_date</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> { <span class="ident">sys::napi_is_date</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">is_date</span>) })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">is_date</span>)
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_promise</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_promise</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_promise</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> { <span class="ident">sys::napi_is_promise</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">is_promise</span>) })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">is_promise</span>)
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> { <span class="ident">sys::napi_is_error</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>) })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_typedarray</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_typedarray</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> { <span class="ident">sys::napi_is_typedarray</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>) })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dataview</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dataview</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> { <span class="ident">sys::napi_is_dataview</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>) })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_array</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> { <span class="ident">sys::napi_is_array</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">is_array</span>) })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">is_array</span>)
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_buffer</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> { <span class="ident">sys::napi_is_buffer</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">is_buffer</span>) })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">is_buffer</span>)
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instanceof</span><span class="op">&lt;</span><span class="ident">Constructor</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">constructor</span>: <span class="ident">Constructor</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instanceof</span><span class="op">&lt;</span><span class="ident">Constructor</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">constructor</span>: <span class="ident">Constructor</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">Constructor</span>: <span class="ident">NapiRaw</span>,
       {
@@ -975,10 +975,10 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_object_methods</span> {
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span>:<span class="ident">ident</span>) =&gt; {
     <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">js_value</span> {
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_property</span><span class="op">&lt;</span><span class="ident">V</span>, <span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_property</span><span class="op">&lt;</span><span class="ident">V</span>, <span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">V</span>: <span class="ident">NapiRaw</span>,
         <span class="ident">K</span>: <span class="ident">NapiRaw</span>,
@@ -989,7 +989,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_property</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_property</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">K</span>: <span class="ident">NapiRaw</span>,
         <span class="ident">T</span>: <span class="ident">NapiValue</span>,
@@ -1002,7 +1002,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_property_unchecked</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_property_unchecked</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">K</span>: <span class="ident">NapiRaw</span>,
         <span class="ident">T</span>: <span class="ident">NapiValue</span>,
@@ -1015,7 +1015,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_named_property</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_named_property</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">NapiRaw</span>,
       {
@@ -1026,7 +1026,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_named_method</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">function</span>: <span class="ident">Callback</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_named_method</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">function</span>: <span class="ident">Callback</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">js_function</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">CString::new</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
@@ -1046,7 +1046,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_named_property</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_named_property</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">NapiValue</span>,
       {
@@ -1059,7 +1059,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_named_property_unchecked</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_named_property_unchecked</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">NapiValue</span>,
       {
@@ -1072,7 +1072,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_named_property</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_named_property</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">CString::new</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
@@ -1082,7 +1082,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_property</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_property</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">NapiRaw</span>,
       {
@@ -1094,7 +1094,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_named_property</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_named_property</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">let</span> <span class="ident">key_str</span> <span class="op">=</span> <span class="ident">CString::new</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">js_key</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
@@ -1108,7 +1108,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_own_property</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_own_property</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">CString::new</span>(<span class="ident">key</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">js_key</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
@@ -1122,7 +1122,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_own_property_js</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_own_property_js</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">K</span>: <span class="ident">NapiRaw</span>,
       {
@@ -1134,7 +1134,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_property</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_property</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">CString::new</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">js_key</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="bool-val">false</span>;
@@ -1148,7 +1148,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_property_js</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_property_js</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">K</span>: <span class="ident">NapiRaw</span>,
       {
@@ -1160,7 +1160,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_property_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_property_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw_value</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
           <span class="ident">sys::napi_get_property_names</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">raw_value</span>)
@@ -1177,7 +1177,7 @@
         <span class="ident">mode</span>: <span class="ident">KeyCollectionMode</span>,
         <span class="ident">filter</span>: <span class="ident">KeyFilter</span>,
         <span class="ident">conversion</span>: <span class="ident">KeyConversion</span>,
-      ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
+      ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsObject</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">properties_value</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
           <span class="ident">sys::napi_get_all_property_names</span>(
@@ -1194,7 +1194,7 @@
 
       <span class="doccomment">/// This returns the equivalent of `Object.getPrototypeOf` (which is not the same as the function&#39;s prototype property).</span>
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_prototype</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_prototype</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">NapiValue</span>,
       {
@@ -1204,7 +1204,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_prototype_unchecked</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_prototype_unchecked</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">NapiValue</span>,
       {
@@ -1214,7 +1214,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_element</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_element</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">NapiRaw</span>,
       {
@@ -1224,7 +1224,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_element</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_element</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
           <span class="ident">sys::napi_has_element</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>)
@@ -1233,7 +1233,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_element</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_element</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
           <span class="ident">sys::napi_delete_element</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>)
@@ -1242,7 +1242,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_element</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_element</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">NapiValue</span>,
       {
@@ -1254,7 +1254,7 @@
       }
 
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_element_unchecked</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_element_unchecked</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
       <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">NapiValue</span>,
       {
@@ -1267,7 +1267,7 @@
 
       <span class="doccomment">/// This method allows the efficient definition of multiple properties on a given object.</span>
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">define_properties</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">properties</span>: <span class="kw-2">&amp;</span>[<span class="ident">Property</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">define_properties</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">properties</span>: <span class="kw-2">&amp;</span>[<span class="ident">Property</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
           <span class="ident">sys::napi_define_properties</span>(
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>,
@@ -1285,7 +1285,7 @@
       <span class="doccomment">/// Perform `is_array` check before get the length</span>
       <span class="doccomment">/// if `Object` is not array, `ArrayExpected` error returned</span>
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_array_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_array_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_array</span>()<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="bool-val">true</span> {
           <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
             <span class="ident">Status::ArrayExpected</span>,
@@ -1297,7 +1297,7 @@
 
       <span class="doccomment">/// use this API if you can ensure this `Object` is `Array`</span>
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_array_length_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_array_length_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> {
           <span class="ident">sys::napi_get_array_length</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">length</span>)
@@ -1307,13 +1307,13 @@
 
       <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi8&quot;</span>)]</span>
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">freeze</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">freeze</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> { <span class="ident">sys::napi_object_freeze</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>) })
       }
 
       <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi8&quot;</span>)]</span>
       <span class="attribute">#[<span class="ident">inline</span>]</span>
-      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+      <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">check_status!</span>(<span class="kw">unsafe</span> { <span class="ident">sys::napi_object_seal</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>) })
       }
     }
@@ -1322,15 +1322,15 @@
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NapiRaw</span> {
   <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_safety_doc</span>)]</span>
-  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::napi_value</span>;
+  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">sys::napi_value</span>;
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NapiValue</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">NapiRaw</span> {
   <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_safety_doc</span>)]</span>
-  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">value</span>: <span class="ident">sys::napi_value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">value</span>: <span class="ident">sys::napi_value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
 
   <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_safety_doc</span>)]</span>
-  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_unchecked</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">value</span>: <span class="ident">sys::napi_value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_unchecked</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">value</span>: <span class="ident">sys::napi_value</span>) -&gt; <span class="self">Self</span>;
 }
 
 <span class="macro">impl_js_value_methods!</span>(<span class="ident">JsUnknown</span>);
@@ -1381,7 +1381,7 @@
 
 <span class="kw">impl</span> <span class="ident">NapiValue</span> <span class="kw">for</span> <span class="ident">JsUnknown</span> {
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">value</span>: <span class="ident">sys::napi_value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">value</span>: <span class="ident">sys::napi_value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="ident">JsUnknown</span>(<span class="ident">Value</span> {
       <span class="ident">env</span>,
       <span class="ident">value</span>,
@@ -1390,7 +1390,7 @@
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_unchecked</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">value</span>: <span class="ident">sys::napi_value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_unchecked</span>(<span class="ident">env</span>: <span class="ident">sys::napi_env</span>, <span class="ident">value</span>: <span class="ident">sys::napi_value</span>) -&gt; <span class="self">Self</span> {
     <span class="ident">JsUnknown</span>(<span class="ident">Value</span> {
       <span class="ident">env</span>,
       <span class="ident">value</span>,
@@ -1402,7 +1402,7 @@
 <span class="kw">impl</span> <span class="ident">NapiRaw</span> <span class="kw">for</span> <span class="ident">JsUnknown</span> {
   <span class="doccomment">/// get raw js value ptr</span>
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::napi_value</span> {
+  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">sys::napi_value</span> {
     <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>
   }
 }
@@ -1410,14 +1410,14 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;env</span><span class="op">&gt;</span> <span class="ident">NapiRaw</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;env</span> <span class="ident">JsUnknown</span> {
   <span class="doccomment">/// get raw js value ptr</span>
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sys::napi_value</span> {
+  <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">sys::napi_value</span> {
     <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>
   }
 }
 
 <span class="kw">impl</span> <span class="ident">JsUnknown</span> {
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValueType</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValueType</span><span class="op">&gt;</span> {
     <span class="kw">unsafe</span> { <span class="macro">type_of!</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">env</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">value</span>) }
   }
 
@@ -1427,7 +1427,7 @@
   <span class="doccomment">/// This function should be called after `JsUnknown::get_type`</span>
   <span class="doccomment">///</span>
   <span class="doccomment">/// And the `V` must be match with the return value of `get_type`</span>
-  <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">cast</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">V</span>
+  <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">cast</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">V</span>
   <span class="kw">where</span>
     <span class="ident">V</span>: <span class="ident">NapiValue</span>,
   {

@@ -408,12 +408,12 @@
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">parent_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputType</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputType</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">checked_input</span> <span class="op">=</span> <span class="ident">InputType::object</span>(<span class="ident">checked_update_one_input_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="ident">parent_field</span>));
     <span class="kw">let</span> <span class="ident">unchecked_input</span> <span class="op">=</span> <span class="ident">InputType::object</span>(<span class="ident">unchecked_update_one_input_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="ident">parent_field</span>));
 
     <span class="comment">// If the inputs are equal, only use one.</span>
-    <span class="kw">if</span> <span class="ident">checked_input</span> <span class="op">=</span><span class="op">=</span> <span class="ident">unchecked_input</span> {
+    <span class="kw">if</span> <span class="ident">checked_input</span> <span class="op">==</span> <span class="ident">unchecked_input</span> {
         <span class="macro">vec!</span>[<span class="ident">checked_input</span>]
     } <span class="kw">else</span> {
         <span class="macro">vec!</span>[<span class="ident">checked_input</span>, <span class="ident">unchecked_input</span>]
@@ -426,10 +426,10 @@
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">parent_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InputObjectTypeWeakRef</span> {
+) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_field</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="ident">pf</span>.<span class="ident">related_field</span>()) {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}UpdateWithout{}Input&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">capitalize</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}UpdateInput&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>),
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">f</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UpdateWithout{}Input&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">capitalize</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())),
+        <span class="kw">_</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UpdateInput&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>),
     };
 
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">name</span>, <span class="ident">PRISMA_NAMESPACE</span>);
@@ -455,14 +455,14 @@
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">parent_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InputObjectTypeWeakRef</span> {
+) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_field</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="ident">pf</span>.<span class="ident">related_field</span>()) {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">f</span>) =&gt; <span class="macro">format!</span>(
             <span class="string">&quot;{}UncheckedUpdateWithout{}Input&quot;</span>,
             <span class="ident">model</span>.<span class="ident">name</span>,
             <span class="ident">capitalize</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())
         ),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedUpdateInput&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>),
+        <span class="kw">_</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedUpdateInput&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>),
     };
 
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">name</span>, <span class="ident">PRISMA_NAMESPACE</span>);
@@ -483,7 +483,7 @@
 }
 
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">ctx</span>, <span class="ident">model</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">scalar_input_fields_for_checked_update</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">scalar_input_fields_for_checked_update</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
     <span class="ident">input_fields::scalar_input_fields</span>(
         <span class="ident">ctx</span>,
         <span class="ident">model</span>
@@ -502,7 +502,7 @@
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">parent_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">linking_fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parent_field</span>) <span class="op">=</span> <span class="ident">parent_field</span> {
         <span class="kw">let</span> <span class="ident">child_field</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">related_field</span>();
         <span class="kw">if</span> <span class="ident">child_field</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
@@ -548,26 +548,26 @@
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>,
     <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InputField</span> {
+) -&gt; <span class="ident">InputField</span> {
     <span class="kw">let</span> <span class="ident">base_update_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">type_identifier</span> {
-        <span class="ident">TypeIdentifier::Float</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Float&quot;</span>, <span class="ident">field</span>, <span class="bool-val">true</span>)),
-        <span class="ident">TypeIdentifier::Decimal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Decimal&quot;</span>, <span class="ident">field</span>, <span class="bool-val">true</span>)),
-        <span class="ident">TypeIdentifier::Int</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Int&quot;</span>, <span class="ident">field</span>, <span class="bool-val">true</span>)),
-        <span class="ident">TypeIdentifier::BigInt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;BigInt&quot;</span>, <span class="ident">field</span>, <span class="bool-val">true</span>)),
-        <span class="ident">TypeIdentifier::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;String&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::Boolean</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Bool&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::Enum</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Enum{}&quot;</span>, <span class="ident">e</span>), <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::Json</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">map_scalar_input_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">field</span>),
-        <span class="ident">TypeIdentifier::DateTime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;DateTime&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::UUID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Uuid&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::Xml</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Xml&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::Bytes</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Bytes&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::Unsupported</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),
+        <span class="ident">TypeIdentifier::Float</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Float&quot;</span>, <span class="ident">field</span>, <span class="bool-val">true</span>)),
+        <span class="ident">TypeIdentifier::Decimal</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Decimal&quot;</span>, <span class="ident">field</span>, <span class="bool-val">true</span>)),
+        <span class="ident">TypeIdentifier::Int</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Int&quot;</span>, <span class="ident">field</span>, <span class="bool-val">true</span>)),
+        <span class="ident">TypeIdentifier::BigInt</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;BigInt&quot;</span>, <span class="ident">field</span>, <span class="bool-val">true</span>)),
+        <span class="ident">TypeIdentifier::String</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;String&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
+        <span class="ident">TypeIdentifier::Boolean</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Bool&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
+        <span class="ident">TypeIdentifier::Enum</span>(<span class="ident">e</span>) =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Enum{}&quot;</span>, <span class="ident">e</span>), <span class="ident">field</span>, <span class="bool-val">false</span>)),
+        <span class="ident">TypeIdentifier::Json</span> =&gt; <span class="ident">map_scalar_input_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">field</span>),
+        <span class="ident">TypeIdentifier::DateTime</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;DateTime&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
+        <span class="ident">TypeIdentifier::UUID</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Uuid&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
+        <span class="ident">TypeIdentifier::Xml</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Xml&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
+        <span class="ident">TypeIdentifier::Bytes</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Bytes&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
+        <span class="ident">TypeIdentifier::Unsupported</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),
     };
 
     <span class="kw">let</span> <span class="ident">has_adv_json</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::AdvancedJsonNullability</span>);
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">type_identifier</span> {
-        <span class="ident">TypeIdentifier::Json</span> <span class="kw">if</span> <span class="ident">has_adv_json</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">TypeIdentifier::Json</span> <span class="kw">if</span> <span class="ident">has_adv_json</span> =&gt; {
             <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">json_null_input_enum</span>(<span class="op">!</span><span class="ident">field</span>.<span class="ident">is_required</span>());
             <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(
                 <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
@@ -578,7 +578,7 @@
             <span class="ident">input_field</span>.<span class="ident">optional</span>()
         }
 
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">_</span> =&gt; {
             <span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">map_scalar_input_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">field</span>), <span class="ident">base_update_type</span>];
 
             <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">types</span>, <span class="ident">default</span>);
@@ -593,7 +593,7 @@
     <span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>,
     <span class="ident">with_number_operators</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InputObjectTypeWeakRef</span> {
+) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
     <span class="comment">// Nullability is important for the `set` operation, so we need to</span>
     <span class="comment">// construct and cache different objects to reflect that.</span>
     <span class="kw">let</span> <span class="ident">nullable</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_required</span>() { <span class="string">&quot;&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;Nullable&quot;</span> };
@@ -632,7 +632,7 @@
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">parent_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
     <span class="ident">model</span>
         .<span class="ident">fields</span>()
         .<span class="ident">relation</span>()
@@ -643,9 +643,9 @@
 
             <span class="comment">// Compute input object name</span>
             <span class="kw">let</span> <span class="ident">arity_part</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">rf</span>.<span class="ident">is_list</span>(), <span class="ident">rf</span>.<span class="ident">is_required</span>()) {
-                (<span class="bool-val">true</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Many&quot;</span>,
-                (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;OneRequired&quot;</span>,
-                (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;One&quot;</span>,
+                (<span class="bool-val">true</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;Many&quot;</span>,
+                (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="string">&quot;OneRequired&quot;</span>,
+                (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; <span class="string">&quot;One&quot;</span>,
             };
 
             <span class="kw">let</span> <span class="ident">without_part</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Without{}&quot;</span>, <span class="ident">capitalize</span>(<span class="kw-2">&amp;</span><span class="ident">related_field</span>.<span class="ident">name</span>));
@@ -655,14 +655,14 @@
             );
 
             <span class="kw">let</span> <span class="ident">field_is_opposite_relation_field</span> <span class="op">=</span>
-                <span class="ident">parent_field</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="ident">pf</span>.<span class="ident">related_field</span>().<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">rf</span>.<span class="ident">name</span>).<span class="ident">is_some</span>();
+                <span class="ident">parent_field</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="ident">pf</span>.<span class="ident">related_field</span>().<span class="ident">name</span> <span class="op">==</span> <span class="ident">rf</span>.<span class="ident">name</span>).<span class="ident">is_some</span>();
 
             <span class="kw">if</span> <span class="ident">field_is_opposite_relation_field</span> {
                 <span class="prelude-val">None</span>
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">get_input_type</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
+                    <span class="prelude-val">None</span> =&gt; {
                         <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>()));
                         <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
 
@@ -689,7 +689,7 @@
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">parent_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
     <span class="ident">model</span>
         .<span class="ident">fields</span>()
         .<span class="ident">relation</span>()
@@ -700,9 +700,9 @@
 
             <span class="comment">// Compute input object name</span>
             <span class="kw">let</span> <span class="ident">arity_part</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">rf</span>.<span class="ident">is_list</span>(), <span class="ident">rf</span>.<span class="ident">is_required</span>()) {
-                (<span class="bool-val">true</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Many&quot;</span>,
-                (<span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;OneRequired&quot;</span>,
-                (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;One&quot;</span>,
+                (<span class="bool-val">true</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;Many&quot;</span>,
+                (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="string">&quot;OneRequired&quot;</span>,
+                (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; <span class="string">&quot;One&quot;</span>,
             };
 
             <span class="kw">let</span> <span class="ident">without_part</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Without{}&quot;</span>, <span class="ident">capitalize</span>(<span class="kw-2">&amp;</span><span class="ident">related_field</span>.<span class="ident">name</span>));
@@ -715,7 +715,7 @@
             );
 
             <span class="kw">let</span> <span class="ident">field_is_opposite_relation_field</span> <span class="op">=</span>
-                <span class="ident">parent_field</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="ident">pf</span>.<span class="ident">related_field</span>().<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">rf</span>.<span class="ident">name</span>).<span class="ident">is_some</span>();
+                <span class="ident">parent_field</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="ident">pf</span>.<span class="ident">related_field</span>().<span class="ident">name</span> <span class="op">==</span> <span class="ident">rf</span>.<span class="ident">name</span>).<span class="ident">is_some</span>();
 
             <span class="comment">// Filter out all inlined relations on `related_model`.</span>
             <span class="comment">// -&gt; Only relations that point to other models are allowed in the unchecked input.</span>
@@ -723,8 +723,8 @@
                 <span class="prelude-val">None</span>
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">get_input_type</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
+                    <span class="prelude-val">None</span> =&gt; {
                         <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>()));
                         <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
 
@@ -752,7 +752,7 @@
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">update_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputType</span><span class="op">&gt;</span>,
     <span class="ident">parent_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InputObjectTypeWeakRef</span> {
+) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
     <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">related_model</span>();
     <span class="kw">let</span> <span class="ident">where_input_object</span> <span class="op">=</span> <span class="ident">filter_objects::where_unique_object_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">related_model</span>);
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
@@ -778,7 +778,7 @@
     <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">field_should_be_kept_for_checked_update_input_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">BuilderContext</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">field_should_be_kept_for_checked_update_input_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">BuilderContext</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="ident">bool</span> {
     <span class="comment">// We forbid updating auto-increment integer unique fields as this can create problems with the</span>
     <span class="comment">// underlying sequences (checked inputs only).</span>
     <span class="kw">let</span> <span class="ident">is_not_autoinc</span> <span class="op">=</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">is_auto_generated_int_id</span>

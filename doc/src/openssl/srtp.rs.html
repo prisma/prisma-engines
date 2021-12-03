@@ -83,10 +83,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SrtpProtectionProfileRef</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SrtpProfileId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SrtpProfileId</span> {
         <span class="ident">SrtpProfileId::from_raw</span>(<span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">as_ptr</span>()).<span class="ident">id</span> })
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">unsafe</span> { <span class="ident">CStr::from_ptr</span>((<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">as_ptr</span>()).<span class="ident">name</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>) }
             .<span class="ident">to_str</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;should be UTF-8&quot;</span>)
@@ -110,13 +110,13 @@
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SRTP_AEAD_AES_256_GCM</span>: <span class="ident">SrtpProfileId</span> <span class="op">=</span> <span class="ident">SrtpProfileId</span>(<span class="ident">ffi::SRTP_AEAD_AES_256_GCM</span>);
 
     <span class="doccomment">/// Creates a `SrtpProfileId` from an integer representation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">value</span>: <span class="ident">c_ulong</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SrtpProfileId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">value</span>: <span class="ident">c_ulong</span>) -&gt; <span class="ident">SrtpProfileId</span> {
         <span class="ident">SrtpProfileId</span>(<span class="ident">value</span>)
     }
 
     <span class="doccomment">/// Returns the integer representation of `SrtpProfileId`.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::trivially_copy_pass_by_ref</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_ulong</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">c_ulong</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }

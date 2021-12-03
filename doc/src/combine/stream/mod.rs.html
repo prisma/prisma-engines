@@ -1071,12 +1071,12 @@
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">clone_resetable</span> {
-    (( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>: <span class="ident">tt</span>)<span class="op">*</span> ) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>: <span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>: <span class="ident">tt</span>)<span class="op">*</span> ) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>: <span class="ident">ty</span>) =&gt; {
         <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">Resetable</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>
         {
             <span class="kw">type</span> <span class="ident">Checkpoint</span> <span class="op">=</span> <span class="self">Self</span>;
 
-            <span class="kw">fn</span> <span class="ident">checkpoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+            <span class="kw">fn</span> <span class="ident">checkpoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
                 <span class="self">self</span>.<span class="ident">clone</span>()
             }
             <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">checkpoint</span>: <span class="self">Self</span>) {
@@ -1096,7 +1096,7 @@
 <span class="doccomment">/// A type which has a position.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Positioned</span>: <span class="ident">StreamOnce</span> {
     <span class="doccomment">/// Returns the current position of the stream.</span>
-    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Position</span>;
+    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Position</span>;
 }
 
 <span class="doccomment">/// Convenience alias over the `StreamError` for the input stream `I`</span>
@@ -1150,12 +1150,12 @@
     <span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident"><span class="self">Self</span>::Position</span><span class="op">&gt;</span>;
     <span class="doccomment">/// Takes a stream and removes its first item, yielding the item and the rest of the elements.</span>
     <span class="doccomment">/// Returns `Err` if no element could be retrieved.</span>
-    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Returns `true` if this stream only contains partial input.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See `PartialStream`.</span>
-    <span class="kw">fn</span> <span class="ident">is_partial</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_partial</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
 }
@@ -1163,7 +1163,7 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Resetable</span> {
     <span class="kw">type</span> <span class="ident">Checkpoint</span>: <span class="ident">Clone</span>;
 
-    <span class="kw">fn</span> <span class="ident">checkpoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Checkpoint</span>;
+    <span class="kw">fn</span> <span class="ident">checkpoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Checkpoint</span>;
     <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">checkpoint</span>: <span class="ident"><span class="self">Self</span>::Checkpoint</span>);
 }
 
@@ -1183,13 +1183,13 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uncons</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uncons</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Stream</span>,
 {
     <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">uncons</span>() {
-        <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConsumedOk</span>(<span class="ident">x</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">wrap_stream_error</span>(<span class="ident">input</span>, <span class="ident">err</span>),
+        <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="ident">ConsumedOk</span>(<span class="ident">x</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">wrap_stream_error</span>(<span class="ident">input</span>, <span class="ident">err</span>),
     }
 }
 
@@ -1197,13 +1197,13 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RangeStreamOnce</span>: <span class="ident">StreamOnce</span> <span class="op">+</span> <span class="ident">Resetable</span> {
     <span class="doccomment">/// Takes `size` elements from the stream.</span>
     <span class="doccomment">/// Fails if the length of the stream is less than `size`.</span>
-    <span class="kw">fn</span> <span class="ident">uncons_range</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">uncons_range</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Takes items from stream, testing each one with `predicate`.</span>
     <span class="doccomment">/// returns the range of items which passed `predicate`.</span>
-    <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="doccomment">/// Takes items from stream, testing each one with `predicate`</span>
@@ -1212,9 +1212,9 @@
     <span class="doccomment">/// # Note</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This may not return `EmptyOk` as it should uncons at least one item.</span>
-    <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">consumed</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">uncons_while</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
@@ -1224,8 +1224,8 @@
         });
         <span class="kw">if</span> <span class="ident">consumed</span> {
             <span class="kw">match</span> <span class="ident">result</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConsumedOk</span>(<span class="ident">x</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConsumedErr</span>(<span class="ident">x</span>),
+                <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="ident">ConsumedOk</span>(<span class="ident">x</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">x</span>),
             }
         } <span class="kw">else</span> {
             <span class="ident">EmptyErr</span>(<span class="ident">Tracked::from</span>(
@@ -1241,7 +1241,7 @@
     <span class="doccomment">/// stream.uncons_range(distance);</span>
     <span class="doccomment">/// stream.distance(&amp;start) == distance</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Checkpoint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>;
+    <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Checkpoint</span>) -&gt; <span class="ident">usize</span>;
 }
 
 <span class="doccomment">/// A `RangeStream` is an extension of `Stream` which allows for zero copy parsing.</span>
@@ -1252,7 +1252,7 @@
 <span class="doccomment">/// A `RangeStream` which is capable of providing it&#39;s entire range.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FullRangeStream</span>: <span class="ident">RangeStream</span> {
     <span class="doccomment">/// Returns the entire range of `self`</span>
-    <span class="kw">fn</span> <span class="ident">range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Range</span>;
+    <span class="kw">fn</span> <span class="ident">range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Range</span>;
 }
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
@@ -1260,7 +1260,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wrap_stream_error</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">I</span>,
     <span class="ident">err</span>: <span class="op">&lt;</span><span class="ident">I::Error</span> <span class="kw">as</span> <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::StreamError</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">StreamOnce</span> <span class="op">+</span> <span class="ident">Positioned</span>,
 {
@@ -1273,14 +1273,14 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uncons_range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uncons_range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">RangeStream</span>,
 {
     <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">uncons_range</span>(<span class="ident">size</span>) {
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">wrap_stream_error</span>(<span class="ident">input</span>, <span class="ident">err</span>),
-        <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="ident">size</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">wrap_stream_error</span>(<span class="ident">input</span>, <span class="ident">err</span>),
+        <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; {
+            <span class="kw">if</span> <span class="ident">size</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="ident">EmptyOk</span>(<span class="ident">x</span>)
             } <span class="kw">else</span> {
                 <span class="ident">ConsumedOk</span>(<span class="ident">x</span>)
@@ -1290,27 +1290,27 @@
 }
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">input_at_eof</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">input_at_eof</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>) -&gt; <span class="ident">bool</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Stream</span>,
 {
     <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
-    <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">uncons</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Err</span>(<span class="ident">StreamError::end_of_input</span>());
+    <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">uncons</span>() <span class="op">==</span> <span class="prelude-val">Err</span>(<span class="ident">StreamError::end_of_input</span>());
     <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
     <span class="ident">x</span>
 }
 
 <span class="doccomment">/// Removes items from the input while `predicate` returns `true`.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">predicate</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">predicate</span>: <span class="ident">F</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
     <span class="ident">I</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">RangeStream</span>,
     <span class="ident">I::Range</span>: <span class="ident">Range</span>,
 {
     <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">uncons_while</span>(<span class="ident">predicate</span>) {
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">wrap_stream_error</span>(<span class="ident">input</span>, <span class="ident">err</span>),
-        <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">wrap_stream_error</span>(<span class="ident">input</span>, <span class="ident">err</span>),
+        <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">is_partial</span>() <span class="op">&amp;&amp;</span> <span class="ident">input_at_eof</span>(<span class="ident">input</span>) {
                 <span class="comment">// Partial inputs which encounter end of file must fail to let more input be</span>
                 <span class="comment">// retrieved</span>
@@ -1318,7 +1318,7 @@
                     <span class="ident">input</span>.<span class="ident">position</span>(),
                     <span class="ident">StreamError::end_of_input</span>(),
                 ))
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
                 <span class="ident">EmptyOk</span>(<span class="ident">x</span>)
             } <span class="kw">else</span> {
                 <span class="ident">ConsumedOk</span>(<span class="ident">x</span>)
@@ -1334,13 +1334,13 @@
 <span class="doccomment">/// # Note</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This may not return `EmptyOk` as it should uncons at least one item.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">predicate</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>, <span class="ident">predicate</span>: <span class="ident">F</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
     <span class="ident">I</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">RangeStream</span>,
 {
     <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">uncons_while1</span>(<span class="ident">predicate</span>) {
-        <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">is_partial</span>() <span class="op">&amp;&amp;</span> <span class="ident">input_at_eof</span>(<span class="ident">input</span>) {
                 <span class="comment">// Partial inputs which encounter end of file must fail to let more input be</span>
                 <span class="comment">// retrieved</span>
@@ -1352,7 +1352,7 @@
                 <span class="ident">ConsumedOk</span>(<span class="ident">x</span>)
             }
         }
-        <span class="ident">EmptyErr</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">EmptyErr</span>(<span class="kw">_</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">is_partial</span>() <span class="op">&amp;&amp;</span> <span class="ident">input_at_eof</span>(<span class="ident">input</span>) {
                 <span class="comment">// Partial inputs which encounter end of file must fail to let more input be</span>
                 <span class="comment">// retrieved</span>
@@ -1364,7 +1364,7 @@
                 <span class="ident">EmptyErr</span>(<span class="ident">I::Error::empty</span>(<span class="ident">input</span>.<span class="ident">position</span>()).<span class="ident">into</span>())
             }
         }
-        <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">is_partial</span>() <span class="op">&amp;&amp;</span> <span class="ident">input_at_eof</span>(<span class="ident">input</span>) {
                 <span class="comment">// Partial inputs which encounter end of file must fail to let more input be</span>
                 <span class="comment">// retrieved</span>
@@ -1376,7 +1376,7 @@
                 <span class="ident">wrap_stream_error</span>(<span class="ident">input</span>, <span class="ident">err</span>)
             }
         }
-        <span class="ident">EmptyOk</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="ident">EmptyOk</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
@@ -1384,30 +1384,30 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Range</span> {
     <span class="doccomment">/// Returns the remaining length of `self`.</span>
     <span class="doccomment">/// The returned length need not be the same as the number of items left in the stream.</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>;
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
 
     <span class="doccomment">/// Returns `true` if the range does not contain any elements (`Range::len() == 0`)</span>
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
     }
 }
 
-<span class="kw">fn</span> <span class="ident">str_uncons_while</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">mut</span> <span class="ident">chars</span>: <span class="ident">Chars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>
+<span class="kw">fn</span> <span class="ident">str_uncons_while</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">mut</span> <span class="ident">chars</span>: <span class="ident">Chars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">char</span>) -&gt; <span class="ident">bool</span>,
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_char_size</span> <span class="op">=</span> <span class="number">0</span>;
 
     <span class="macro">macro_rules!</span> <span class="ident">test_next</span> {
-        () <span class="op">=</span><span class="op">&gt;</span> {
+        () =&gt; {
             <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; {
                     <span class="kw">if</span> <span class="op">!</span><span class="ident">f</span>(<span class="ident">c</span>) {
                         <span class="ident">last_char_size</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">len_utf8</span>();
                         <span class="kw">break</span>;
                     }
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
             }
         };
     }
@@ -1429,40 +1429,40 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RangeStreamOnce</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="prelude-val">Ok</span>(<span class="ident">str_uncons_while</span>(<span class="self">self</span>, <span class="self">self</span>.<span class="ident">chars</span>(), <span class="ident">f</span>))
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chars</span>();
         <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">f</span>(<span class="ident">c</span>) {
                     <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">Tracked::from</span>(<span class="ident">StringStreamError::UnexpectedParse</span>));
                 }
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">Tracked::from</span>(<span class="ident">StringStreamError::UnexpectedParse</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">Tracked::from</span>(<span class="ident">StringStreamError::UnexpectedParse</span>)),
         }
 
         <span class="ident">ConsumedOk</span>(<span class="ident">str_uncons_while</span>(<span class="self">self</span>, <span class="ident">chars</span>, <span class="ident">f</span>))
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_range</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">is_char_boundary</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-            <span class="kw">if</span> <span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() {
+    <span class="kw">fn</span> <span class="ident">uncons_range</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">is_char_boundary</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="ident">s</span>.<span class="ident">len</span>() {
                 <span class="kw">return</span> <span class="bool-val">true</span>;
             }
             <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">get</span>(<span class="ident">index</span>) {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="number">128</span> <span class="op">|</span><span class="op">|</span> <span class="ident">b</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">192</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>) =&gt; <span class="ident">b</span> <span class="op">&lt;</span> <span class="number">128</span> <span class="op">|</span><span class="op">|</span> <span class="ident">b</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">192</span>,
             }
         }
         <span class="kw">if</span> <span class="ident">size</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
@@ -1479,41 +1479,41 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">position</span>().<span class="number">0</span> <span class="op">-</span> <span class="ident">end</span>.<span class="ident">position</span>().<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FullRangeStream</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Range</span> {
+    <span class="kw">fn</span> <span class="ident">range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Range</span> {
         <span class="self">self</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Range</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident">str::len</span>(<span class="self">self</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Range</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>] {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span><span class="ident">::len</span>(<span class="self">self</span>)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">slice_uncons_while</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="kw-2">mut</span> <span class="ident">i</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>]
+<span class="kw">fn</span> <span class="ident">slice_uncons_while</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="kw-2">mut</span> <span class="ident">i</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>]
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>) -&gt; <span class="ident">bool</span>,
     <span class="ident">T</span>: <span class="ident">Clone</span>,
 {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">len</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">found</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
     <span class="macro">macro_rules!</span> <span class="ident">check</span> {
-        () <span class="op">=</span><span class="op">&gt;</span> {
+        () =&gt; {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">f</span>(<span class="kw">unsafe</span> { <span class="ident">slice</span>.<span class="ident">get_unchecked</span>(<span class="ident">i</span>).<span class="ident">clone</span>() }) {
                 <span class="ident">found</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="kw">break</span>;
@@ -1552,7 +1552,7 @@
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_range</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">uncons_range</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">size</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
             <span class="kw">let</span> (<span class="ident">result</span>, <span class="ident">remaining</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split_at</span>(<span class="ident">size</span>);
             <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">remaining</span>;
@@ -1563,17 +1563,17 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="prelude-val">Ok</span>(<span class="ident">slice_uncons_while</span>(<span class="self">self</span>, <span class="number">0</span>, <span class="ident">f</span>))
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>(<span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="number">0</span>)).<span class="ident">clone</span>() }) {
             <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">Tracked::from</span>(<span class="ident">UnexpectedParse::Unexpected</span>));
@@ -1583,7 +1583,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident">end</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">len</span>()
     }
 }
@@ -1592,14 +1592,14 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
 {
-    <span class="kw">fn</span> <span class="ident">range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Range</span> {
+    <span class="kw">fn</span> <span class="ident">range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Range</span> {
         <span class="self">self</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Positioned</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Position</span> {
+    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Position</span> {
         <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">position</span>()
     }
 }
@@ -1611,14 +1611,14 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">StringStreamError</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">char</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">char</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chars</span>();
         <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; {
                 <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">as_str</span>();
                 <span class="prelude-val">Ok</span>(<span class="ident">c</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">StringStreamError::Eoi</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">StringStreamError::Eoi</span>),
         }
     }
 }
@@ -1628,7 +1628,7 @@
     <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Position</span> {
+    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Position</span> {
         <span class="ident">PointerOffset</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>)
     }
 }
@@ -1643,13 +1643,13 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnexpectedParse</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">split_first</span>() {
-            <span class="prelude-val">Some</span>((<span class="ident">first</span>, <span class="ident">rest</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>((<span class="ident">first</span>, <span class="ident">rest</span>)) =&gt; {
                 <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">rest</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">first</span>.<span class="ident">clone</span>())
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">UnexpectedParse::Eoi</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnexpectedParse::Eoi</span>),
         }
     }
 }
@@ -1663,7 +1663,7 @@
     <span class="ident">S</span>: <span class="ident">Positioned</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Position</span> {
+    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Position</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">position</span>()
     }
 }
@@ -1675,7 +1675,7 @@
     <span class="kw">type</span> <span class="ident">Checkpoint</span> <span class="op">=</span> <span class="ident">S::Checkpoint</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">checkpoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Checkpoint</span> {
+    <span class="kw">fn</span> <span class="ident">checkpoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Checkpoint</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">checkpoint</span>()
     }
 
@@ -1695,11 +1695,11 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Item</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Item</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">uncons</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_partial</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_partial</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 }
@@ -1709,27 +1709,27 @@
     <span class="ident">S</span>: <span class="ident">RangeStreamOnce</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_range</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">uncons_range</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">uncons_range</span>(<span class="ident">size</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">uncons_while</span>(<span class="ident">f</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">uncons_while1</span>(<span class="ident">f</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Checkpoint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Checkpoint</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">distance</span>(<span class="ident">end</span>)
     }
 }
@@ -1739,7 +1739,7 @@
     <span class="ident">S</span>: <span class="ident">FullRangeStream</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Range</span> {
+    <span class="kw">fn</span> <span class="ident">range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Range</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">range</span>()
     }
 }
@@ -1749,7 +1749,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SliceStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>]);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">SliceStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SliceStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SliceStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">SliceStream</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -1759,7 +1759,7 @@
     <span class="ident">T</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Position</span> {
+    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Position</span> {
         <span class="ident">PointerOffset</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>)
     }
 }
@@ -1774,26 +1774,26 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnexpectedParse</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">split_first</span>() {
-            <span class="prelude-val">Some</span>((<span class="ident">first</span>, <span class="ident">rest</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>((<span class="ident">first</span>, <span class="ident">rest</span>)) =&gt; {
                 <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">rest</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">first</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">UnexpectedParse::Eoi</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnexpectedParse::Eoi</span>),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">slice_uncons_while_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="kw-2">mut</span> <span class="ident">i</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>]
+<span class="kw">fn</span> <span class="ident">slice_uncons_while_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="kw-2">mut</span> <span class="ident">i</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>]
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="ident">bool</span>,
 {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">len</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">found</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
     <span class="macro">macro_rules!</span> <span class="ident">check</span> {
-        () <span class="op">=</span><span class="op">&gt;</span> {
+        () =&gt; {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">f</span>(<span class="kw">unsafe</span> { <span class="ident">slice</span>.<span class="ident">get_unchecked</span>(<span class="ident">i</span>) }) {
                 <span class="ident">found</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 <span class="kw">break</span>;
@@ -1832,7 +1832,7 @@
     <span class="ident">T</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_range</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">uncons_range</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">size</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>() {
             <span class="kw">let</span> (<span class="ident">range</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">split_at</span>(<span class="ident">size</span>);
             <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">rest</span>;
@@ -1843,17 +1843,17 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="prelude-val">Ok</span>(<span class="ident">slice_uncons_while_ref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>, <span class="number">0</span>, <span class="ident">f</span>))
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
     {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get_unchecked</span>(<span class="number">0</span>) }) {
             <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">Tracked::from</span>(<span class="ident">UnexpectedParse::Unexpected</span>));
@@ -1863,7 +1863,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident">end</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>()
     }
 }
@@ -1872,7 +1872,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">fn</span> <span class="ident">range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Range</span> {
+    <span class="kw">fn</span> <span class="ident">range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Range</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -1892,7 +1892,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// NOTE: This type do not implement `Positioned` and `Clone` and must be wrapped with types</span>
     <span class="doccomment">///     such as `BufferedStreamRef` and `State` to become a `Stream` which can be parsed</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IteratorStream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">T</span>) -&gt; <span class="ident">IteratorStream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">I</span>, <span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span><span class="op">&gt;</span>,
     {
@@ -1905,7 +1905,7 @@
     <span class="ident">I</span>: <span class="ident">Iterator</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">I::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">I::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>()
     }
 }
@@ -1920,10 +1920,10 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnexpectedParse</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">x</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">UnexpectedParse::Eoi</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnexpectedParse::Eoi</span>),
         }
     }
 }
@@ -1941,11 +1941,11 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Errors</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">usize</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">b</span>),
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">StreamErrorFor</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::other</span>(<span class="ident">err</span>)),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">StreamErrorFor</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::end_of_input</span>()),
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">b</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">b</span>),
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">StreamErrorFor</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::other</span>(<span class="ident">err</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">StreamErrorFor</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::end_of_input</span>()),
         }
     }
 }
@@ -1979,7 +1979,7 @@
     <span class="doccomment">/// assert_eq!(result, Ok((vec![b&#39;1&#39;, b&#39;2&#39;, b&#39;3&#39;], b&#39;,&#39;)));</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">read</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReadStream</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">read</span>: <span class="ident">R</span>) -&gt; <span class="ident">ReadStream</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
         <span class="ident">ReadStream</span> {
             <span class="ident">bytes</span>: <span class="ident">read</span>.<span class="ident">bytes</span>(),
         }
@@ -1991,7 +1991,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PointerOffset</span>(<span class="kw">pub</span> <span class="ident">usize</span>);
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">PointerOffset</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> ())
     }
 }
@@ -2009,7 +2009,7 @@
     <span class="doccomment">/// assert_eq!(err.map_position(|p| p.translate_position(text)).position, 0);</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translate_position</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">initial_string</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translate_position</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">initial_string</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">usize</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
     {
@@ -2030,15 +2030,15 @@
     <span class="kw-2">mut</span> <span class="ident">parser</span>: <span class="ident">P</span>,
     <span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">P::Input</span>,
     <span class="ident">partial_state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">P::PartialState</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P::Output</span><span class="op">&gt;</span>, <span class="ident">usize</span>), <span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P::Output</span><span class="op">&gt;</span>, <span class="ident">usize</span>), <span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">Parser</span>,
     <span class="ident">P::Input</span>: <span class="ident">RangeStream</span>,
 {
     <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
     <span class="kw">match</span> <span class="ident">parser</span>.<span class="ident">parse_with_state</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>, <span class="ident">partial_state</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">message</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(<span class="ident">message</span>), <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">start</span>))),
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">message</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(<span class="ident">message</span>), <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">start</span>))),
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">is_partial</span>() <span class="op">&amp;&amp;</span> <span class="ident">err</span>.<span class="ident">is_unexpected_end_of_input</span>() {
                 <span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">start</span>)))
             } <span class="kw">else</span> {

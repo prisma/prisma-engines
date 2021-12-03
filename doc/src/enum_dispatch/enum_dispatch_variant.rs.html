@@ -96,7 +96,7 @@
 
 <span class="doccomment">/// Allows `EnumDispatchItem`s to be parsed from `String`s or `TokenStream`s.</span>
 <span class="kw">impl</span> <span class="ident">syn::parse::Parse</span> <span class="kw">for</span> <span class="ident">EnumDispatchVariant</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn::parse::ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::parse::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn::parse::ParseStream</span>) -&gt; <span class="ident">syn::parse::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">call</span>(<span class="ident">syn::Attribute::parse_outer</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">ident</span>: <span class="ident">syn::Ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">syn::token::Brace</span>) {
@@ -136,7 +136,7 @@
 <span class="doccomment">/// function-style procedural macro, each type must already be parseable as a unit enum variant.</span>
 <span class="doccomment">/// This rules out, for example, generic types with lifetime or type parameters. For these, an</span>
 <span class="doccomment">/// explicitly named variant must be used.</span>
-<span class="kw">fn</span> <span class="ident">into_type</span>(<span class="ident">ident</span>: <span class="ident">syn::Ident</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::Type</span> {
+<span class="kw">fn</span> <span class="ident">into_type</span>(<span class="ident">ident</span>: <span class="ident">syn::Ident</span>) -&gt; <span class="ident">syn::Type</span> {
     <span class="ident">syn::Type::Path</span>(<span class="ident">syn::TypePath</span> {
         <span class="ident">path</span>: <span class="ident">syn::Path</span> {
             <span class="ident">leading_colon</span>: <span class="prelude-val">None</span>,

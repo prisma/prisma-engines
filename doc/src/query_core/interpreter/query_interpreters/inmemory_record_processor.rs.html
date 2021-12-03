@@ -197,7 +197,7 @@
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">InMemoryRecordProcessor</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">QueryArguments</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span>
     }
 }
@@ -206,7 +206,7 @@
     <span class="doccomment">/// Creates a new processor from the given query args.</span>
     <span class="doccomment">/// The original args will be modified to prevent db level processing.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">args</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_query_args</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">QueryArguments</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_query_args</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">QueryArguments</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">processor</span> <span class="op">=</span> <span class="self">Self</span> { <span class="ident">args</span>: <span class="ident">args</span>.<span class="ident">clone</span>() };
 
         <span class="ident">args</span>.<span class="ident">distinct</span> <span class="op">=</span> <span class="prelude-val">None</span>;
@@ -216,18 +216,18 @@
         <span class="ident">processor</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">take_abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">take_abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">take</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="number">0</span> { <span class="op">-</span><span class="ident">t</span> } <span class="kw">else</span> { <span class="ident">t</span> })
     }
 
     <span class="doccomment">/// Checks whether or not we need to take records going backwards in the record list,</span>
     <span class="doccomment">/// which requires reversing the list of records at some point.</span>
-    <span class="kw">fn</span> <span class="ident">needs_reversed_order</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">needs_reversed_order</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">take</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">records</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">records</span>: <span class="ident">ManyRecords</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ManyRecords</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">records</span>: <span class="ident">ManyRecords</span>) -&gt; <span class="ident">ManyRecords</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">needs_reversed_order</span>() {
             <span class="ident">records</span>.<span class="ident">reverse</span>();
         }
@@ -248,7 +248,7 @@
         <span class="ident">records</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">order_by_parent</span>(<span class="kw-2">mut</span> <span class="ident">records</span>: <span class="ident">ManyRecords</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ManyRecords</span> {
+    <span class="kw">fn</span> <span class="ident">order_by_parent</span>(<span class="kw-2">mut</span> <span class="ident">records</span>: <span class="ident">ManyRecords</span>) -&gt; <span class="ident">ManyRecords</span> {
         <span class="ident">records</span>.<span class="ident">records</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">r</span>
                 .<span class="ident">parent_id</span>
@@ -263,11 +263,11 @@
         <span class="ident">records</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">is_nested</span>(<span class="ident">records</span>: <span class="kw-2">&amp;</span><span class="ident">ManyRecords</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_nested</span>(<span class="ident">records</span>: <span class="kw-2">&amp;</span><span class="ident">ManyRecords</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">records</span>.<span class="ident">records</span>.<span class="ident">first</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">parent_id</span>.<span class="ident">is_some</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">apply_distinct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">records</span>: <span class="ident">ManyRecords</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ManyRecords</span> {
+    <span class="kw">fn</span> <span class="ident">apply_distinct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">records</span>: <span class="ident">ManyRecords</span>) -&gt; <span class="ident">ManyRecords</span> {
         <span class="kw">let</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">records</span>.<span class="ident">field_names</span>;
 
         <span class="kw">let</span> <span class="ident">distinct</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">distinct</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">distinct</span> {
@@ -303,7 +303,7 @@
         <span class="ident">records</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">apply_pagination</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">many_records</span>: <span class="ident">ManyRecords</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ManyRecords</span> {
+    <span class="kw">fn</span> <span class="ident">apply_pagination</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">many_records</span>: <span class="ident">ManyRecords</span>) -&gt; <span class="ident">ManyRecords</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">must_apply_pagination</span>() {
             <span class="kw">return</span> <span class="ident">many_records</span>;
         }
@@ -329,7 +329,7 @@
 
                 <span class="comment">// As long as the cursor has not been seen we recheck every record.</span>
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">cursor_seen</span> {
-                    <span class="ident">cursor_seen</span> <span class="op">=</span> <span class="ident">record_values</span> <span class="op">=</span><span class="op">=</span> <span class="ident">cursor_values</span>;
+                    <span class="ident">cursor_seen</span> <span class="op">=</span> <span class="ident">record_values</span> <span class="op">==</span> <span class="ident">cursor_values</span>;
                 }
 
                 <span class="comment">// If the cursor has been seen for this parent, we retain all records coming afterwards (and including the cursor).</span>
@@ -342,7 +342,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_parent_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="ident">many_records</span>.<span class="ident">records</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">record</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">last_parent_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">record</span>.<span class="ident">parent_id</span> {
+            <span class="kw">if</span> <span class="ident">last_parent_id</span> <span class="op">==</span> <span class="ident">record</span>.<span class="ident">parent_id</span> {
                 <span class="ident">current_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             } <span class="kw">else</span> {
                 <span class="ident">last_parent_id</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">parent_id</span>.<span class="ident">clone</span>();
@@ -350,12 +350,12 @@
             };
 
             <span class="kw">let</span> <span class="ident">is_beyond_skip_range</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">skip</span> {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">skip</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">current_count</span> <span class="op">&gt;</span> <span class="ident">skip</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="bool-val">true</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">skip</span>) =&gt; <span class="ident">current_count</span> <span class="op">&gt;</span> <span class="ident">skip</span>,
             };
             <span class="kw">let</span> <span class="ident">is_within_take_range</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">take_abs</span>() {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">take</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">current_count</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">take</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">skip</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>),
+                <span class="prelude-val">None</span> =&gt; <span class="bool-val">true</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">take</span>) =&gt; <span class="ident">current_count</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">take</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">skip</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>),
             };
 
             <span class="ident">is_beyond_skip_range</span> <span class="op">&amp;&amp;</span> <span class="ident">is_within_take_range</span>
@@ -364,7 +364,7 @@
         <span class="ident">many_records</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">must_apply_pagination</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">must_apply_pagination</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">take</span>.<span class="ident">or</span>(<span class="self">self</span>.<span class="ident">skip</span>).<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_some</span>()
     }
 }

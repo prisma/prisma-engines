@@ -192,20 +192,20 @@
 
 <span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">MigrationPersistence</span> <span class="kw">for</span> <span class="ident">SqlMigrationConnector</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">baseline_initialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">baseline_initialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">create_migrations_table</span>(<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">describe_schema</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="ident">schema</span>
             .<span class="ident">tables</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table_name</span>())
+            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table_name</span>())
         {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
@@ -228,7 +228,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">checksum</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">checksum</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">Uuid::new_v4</span>().<span class="ident">to_string</span>();
         <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">chrono::Utc::now</span>();
@@ -246,7 +246,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">id</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back_by_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back_by_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">Update::table</span>(<span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table</span>())
@@ -258,7 +258,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_migration_started_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">checksum</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_migration_started_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">checksum</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">Uuid::new_v4</span>().<span class="ident">to_string</span>();
         <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">chrono::Utc::now</span>();
@@ -274,7 +274,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">id</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_successful_step</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_successful_step</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">quaint::ast</span>::<span class="kw-2">*</span>;
 
         <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">Update::table</span>(<span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table</span>())
@@ -289,7 +289,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_failed_step</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">logs</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_failed_step</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">logs</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">Update::table</span>(<span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table</span>())
             .<span class="ident">so_that</span>(<span class="ident">Column::from</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">equals</span>(<span class="ident">id</span>))
             .<span class="ident">set</span>(<span class="string">&quot;logs&quot;</span>, <span class="ident">logs</span>);
@@ -299,7 +299,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_migration_finished</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_migration_finished</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">Update::table</span>(<span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table</span>())
             .<span class="ident">so_that</span>(<span class="ident">Column::from</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">equals</span>(<span class="ident">id</span>))
             .<span class="ident">set</span>(<span class="string">&quot;finished_at&quot;</span>, <span class="ident">chrono::Utc::now</span>()); <span class="comment">// TODO maybe use a database generated timestamp</span>
@@ -310,7 +310,7 @@
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_migrations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MigrationRecord</span><span class="op">&gt;</span>, <span class="ident">PersistenceNotInitializedError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_migrations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MigrationRecord</span><span class="op">&gt;</span>, <span class="ident">PersistenceNotInitializedError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table</span>())
             .<span class="ident">column</span>(<span class="string">&quot;id&quot;</span>)
             .<span class="ident">column</span>(<span class="string">&quot;checksum&quot;</span>)
@@ -323,19 +323,19 @@
             .<span class="ident">order_by</span>(<span class="string">&quot;started_at&quot;</span>.<span class="ident">ascend</span>());
 
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">query</span>(<span class="ident">select</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">result</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">result</span>,
+            <span class="prelude-val">Ok</span>(<span class="ident">result</span>) =&gt; <span class="ident">result</span>,
             <span class="prelude-val">Err</span>(<span class="ident">err</span>)
                 <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::query_engine::TableDoesNotExist</span><span class="op">&gt;</span>()
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::common::InvalidModel</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">&gt;</span>
+                    <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::common::InvalidModel</span><span class="op">&gt;</span>() =&gt;
             {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">PersistenceNotInitializedError</span>))
             }
-            <span class="ident">err</span> @ <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span><span class="question-mark">?</span>,
+            <span class="ident">err</span> @ <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">err</span><span class="question-mark">?</span>,
         };
 
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">rows</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> {
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident">MigrationRecord</span> {
                     <span class="ident">id</span>: <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string</span>()).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                         <span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;Failed to extract `id` from `_prisma_migrations` row.&quot;</span>.<span class="ident">into</span>())

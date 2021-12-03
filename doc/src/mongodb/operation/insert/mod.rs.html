@@ -278,7 +278,7 @@
         <span class="ident">ns</span>: <span class="ident">Namespace</span>,
         <span class="ident">documents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InsertManyOptions</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">ns</span>,
             <span class="ident">options</span>,
@@ -287,7 +287,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">is_ordered</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_ordered</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">options</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">ordered</span>)
@@ -302,7 +302,7 @@
 
     <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;insert&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&lt;</span><span class="ident">InsertCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&lt;</span><span class="ident">InsertCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">docs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">size</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -314,8 +314,8 @@
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">bson::to_vec</span>(<span class="ident">d</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bson_util::raw_get</span>(<span class="ident">doc</span>.<span class="ident">as_slice</span>(), <span class="string">&quot;_id&quot;</span>)<span class="question-mark">?</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="comment">// TODO: RUST-924 Use raw document API here instead.</span>
                     <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="ident">ObjectId::new</span>();
 
@@ -371,7 +371,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">Command::new</span>(<span class="string">&quot;insert&quot;</span>.<span class="ident">to_string</span>(), <span class="self">self</span>.<span class="ident">ns</span>.<span class="ident">db</span>.<span class="ident">clone</span>(), <span class="ident">body</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_command</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cmd</span>: <span class="ident">Command</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Command</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">serialize_command</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cmd</span>: <span class="ident">Command</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Command</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// TODO: RUST-924 Use raw document API here instead.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">bson::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>)<span class="question-mark">?</span>;
 
@@ -417,7 +417,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">response</span>: <span class="ident">WriteResponseBody</span>,
         <span class="ident">_description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::O</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::O</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_ordered</span>() {
             <span class="comment">// in ordered inserts, only the first n were attempted.</span>
@@ -457,11 +457,11 @@
         <span class="prelude-val">Ok</span>(<span class="ident">InsertManyResult</span> { <span class="ident">inserted_ids</span>: <span class="ident">map</span> })
     }
 
-    <span class="kw">fn</span> <span class="ident">write_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">write_concern</span>.<span class="ident">as_ref</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">retryability</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Retryability</span> {
+    <span class="kw">fn</span> <span class="ident">retryability</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Retryability</span> {
         <span class="ident">Retryability::Write</span>
     }
 }

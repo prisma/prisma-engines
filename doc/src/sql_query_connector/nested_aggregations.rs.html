@@ -47,13 +47,13 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelAggregationJoins</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>]) -&gt; <span class="ident">RelAggregationJoins</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">joins</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
     <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">selection</span>) <span class="kw">in</span> <span class="ident">aggr_selections</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
         <span class="kw">match</span> <span class="ident">selection</span> {
-            <span class="ident">RelAggregationSelection::Count</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RelAggregationSelection::Count</span>(<span class="ident">rf</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">join_alias</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;aggr_selection_{}&quot;</span>, <span class="ident">index</span>);
                 <span class="kw">let</span> <span class="ident">aggregator_alias</span> <span class="op">=</span> <span class="ident">selection</span>.<span class="ident">db_alias</span>();
                 <span class="kw">let</span> <span class="ident">join</span> <span class="op">=</span> <span class="ident">compute_aggr_join</span>(

@@ -25,7 +25,7 @@
 <span class="kw">use</span> <span class="ident">std::iter::FromIterator</span>;
 
 <span class="doccomment">/// Builds an expression from an identifier, i.e. just a named variable</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">plain_identifier_expr</span>(<span class="ident">ident</span>: <span class="ident">Ident</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expr</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">plain_identifier_expr</span>(<span class="ident">ident</span>: <span class="ident">Ident</span>) -&gt; <span class="ident">Expr</span> {
     <span class="ident">Expr::Path</span>(<span class="ident">ExprPath</span> {
         <span class="ident">attrs</span>: <span class="macro">vec!</span>[],
         <span class="ident">qself</span>: <span class="prelude-val">None</span>,

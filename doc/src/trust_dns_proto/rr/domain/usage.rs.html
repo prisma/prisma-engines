@@ -969,7 +969,7 @@
         <span class="ident">auth</span>: <span class="ident">AuthUsage</span>,
         <span class="ident">op</span>: <span class="ident">OpUsage</span>,
         <span class="ident">registry</span>: <span class="ident">RegistryUsage</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="ident">ZoneUsage</span> {
             <span class="ident">name</span>,
             <span class="ident">user</span>,
@@ -983,7 +983,7 @@
     }
 
     <span class="doccomment">/// Constructs a new Default, with all no restrictions</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(
             <span class="ident">Name::root</span>(),
             <span class="ident">UserUsage::Normal</span>,
@@ -997,7 +997,7 @@
     }
 
     <span class="doccomment">/// Restrictions for reverse zones</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="ident">name</span>: <span class="ident">Name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(
             <span class="ident">name</span>,
             <span class="ident">UserUsage::Normal</span>,
@@ -1011,7 +1011,7 @@
     }
 
     <span class="doccomment">/// Restrictions for the .test. zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test</span>(<span class="ident">name</span>: <span class="ident">Name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test</span>(<span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(
             <span class="ident">name</span>,
             <span class="ident">UserUsage::Normal</span>,
@@ -1025,7 +1025,7 @@
     }
 
     <span class="doccomment">/// Restrictions for the .localhost. zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">localhost</span>(<span class="ident">name</span>: <span class="ident">Name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">localhost</span>(<span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(
             <span class="ident">name</span>,
             <span class="ident">UserUsage::Loopback</span>,
@@ -1039,7 +1039,7 @@
     }
 
     <span class="doccomment">/// Restrictions for the .local. zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local</span>(<span class="ident">name</span>: <span class="ident">Name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local</span>(<span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(
             <span class="ident">name</span>,
             <span class="ident">UserUsage::LinkLocal</span>,
@@ -1053,7 +1053,7 @@
     }
 
     <span class="doccomment">/// Restrictions for the .invalid. zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="ident">name</span>: <span class="ident">Name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(
             <span class="ident">name</span>,
             <span class="ident">UserUsage::NxDomain</span>,
@@ -1067,7 +1067,7 @@
     }
 
     <span class="doccomment">/// Restrictions for the .example. zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">example</span>(<span class="ident">name</span>: <span class="ident">Name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">example</span>(<span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(
             <span class="ident">name</span>,
             <span class="ident">UserUsage::Normal</span>,
@@ -1081,42 +1081,42 @@
     }
 
     <span class="doccomment">/// A reference to this zone name</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Name</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Name</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
     }
 
     <span class="doccomment">/// Returns the UserUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserUsage</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">UserUsage</span> {
         <span class="self">self</span>.<span class="ident">user</span>
     }
 
     <span class="doccomment">/// Returns the AppUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">app</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AppUsage</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">app</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AppUsage</span> {
         <span class="self">self</span>.<span class="ident">app</span>
     }
 
     <span class="doccomment">/// Returns the ResolverUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ResolverUsage</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ResolverUsage</span> {
         <span class="self">self</span>.<span class="ident">resolver</span>
     }
 
     <span class="doccomment">/// Returns the CacheUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CacheUsage</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CacheUsage</span> {
         <span class="self">self</span>.<span class="ident">cache</span>
     }
 
     <span class="doccomment">/// Returns the AuthUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auth</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AuthUsage</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auth</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AuthUsage</span> {
         <span class="self">self</span>.<span class="ident">auth</span>
     }
 
     <span class="doccomment">/// Returns the OpUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">op</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OpUsage</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">op</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OpUsage</span> {
         <span class="self">self</span>.<span class="ident">op</span>
     }
 
     <span class="doccomment">/// Returns the RegistryUsage of this zone</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">registry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RegistryUsage</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">registry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RegistryUsage</span> {
         <span class="self">self</span>.<span class="ident">registry</span>
     }
 }
@@ -1124,7 +1124,7 @@
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">ZoneUsage</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Name</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
     }
 }

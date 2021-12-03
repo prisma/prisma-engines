@@ -51,7 +51,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
     <span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>,
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">VarLenContext</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
 {
@@ -62,34 +62,34 @@
     <span class="kw">let</span> <span class="ident">collation</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">collation</span>();
 
     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
-        <span class="ident">Bitn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::bit::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">Intn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::int::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">Floatn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::float::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">Guid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::guid::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">BigChar</span> <span class="op">|</span> <span class="ident">BigVarChar</span> <span class="op">|</span> <span class="ident">NChar</span> <span class="op">|</span> <span class="ident">NVarchar</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Bitn</span> =&gt; <span class="ident"><span class="kw">super</span>::bit::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">Intn</span> =&gt; <span class="ident"><span class="kw">super</span>::int::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">Floatn</span> =&gt; <span class="ident"><span class="kw">super</span>::float::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">Guid</span> =&gt; <span class="ident"><span class="kw">super</span>::guid::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">BigChar</span> <span class="op">|</span> <span class="ident">BigVarChar</span> <span class="op">|</span> <span class="ident">NChar</span> <span class="op">|</span> <span class="ident">NVarchar</span> =&gt; {
             <span class="ident">ColumnData::String</span>(<span class="ident"><span class="kw">super</span>::string::decode</span>(<span class="ident">src</span>, <span class="ident">ty</span>, <span class="ident">len</span>, <span class="ident">collation</span>).<span class="kw">await</span><span class="question-mark">?</span>)
         }
-        <span class="ident">Money</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Money</span> =&gt; {
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="ident"><span class="kw">super</span>::money::decode</span>(<span class="ident">src</span>, <span class="ident">len</span>).<span class="kw">await</span><span class="question-mark">?</span>
         }
-        <span class="ident">Datetimen</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Datetimen</span> =&gt; {
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="ident"><span class="kw">super</span>::datetimen::decode</span>(<span class="ident">src</span>, <span class="ident">len</span>).<span class="kw">await</span><span class="question-mark">?</span>
         }
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-        <span class="ident">Daten</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::date::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">Daten</span> =&gt; <span class="ident"><span class="kw">super</span>::date::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>,
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-        <span class="ident">Timen</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::time::decode</span>(<span class="ident">src</span>, <span class="ident">len</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">Timen</span> =&gt; <span class="ident"><span class="kw">super</span>::time::decode</span>(<span class="ident">src</span>, <span class="ident">len</span>).<span class="kw">await</span><span class="question-mark">?</span>,
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-        <span class="ident">Datetime2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::datetime2::decode</span>(<span class="ident">src</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">Datetime2</span> =&gt; <span class="ident"><span class="kw">super</span>::datetime2::decode</span>(<span class="ident">src</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="kw">await</span><span class="question-mark">?</span>,
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-        <span class="ident">DatetimeOffsetn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::datetimeoffsetn::decode</span>(<span class="ident">src</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">BigBinary</span> <span class="op">|</span> <span class="ident">BigVarBin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::binary::decode</span>(<span class="ident">src</span>, <span class="ident">len</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">Text</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::text::decode</span>(<span class="ident">src</span>, <span class="ident">collation</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">NText</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::text::decode</span>(<span class="ident">src</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">Image</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::image::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">t</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">t</span>),
+        <span class="ident">DatetimeOffsetn</span> =&gt; <span class="ident"><span class="kw">super</span>::datetimeoffsetn::decode</span>(<span class="ident">src</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">BigBinary</span> <span class="op">|</span> <span class="ident">BigVarBin</span> =&gt; <span class="ident"><span class="kw">super</span>::binary::decode</span>(<span class="ident">src</span>, <span class="ident">len</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">Text</span> =&gt; <span class="ident"><span class="kw">super</span>::text::decode</span>(<span class="ident">src</span>, <span class="ident">collation</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">NText</span> =&gt; <span class="ident"><span class="kw">super</span>::text::decode</span>(<span class="ident">src</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">Image</span> =&gt; <span class="ident"><span class="kw">super</span>::image::decode</span>(<span class="ident">src</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="ident">t</span> =&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">t</span>),
     };
 
     <span class="prelude-val">Ok</span>(<span class="ident">res</span>)

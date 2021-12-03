@@ -42,7 +42,7 @@
 <span class="kw">use</span> <span class="ident">std::fs::File</span>;
 <span class="kw">use</span> <span class="ident">std::path::Path</span>;
 
-<span class="kw">fn</span> <span class="ident">load_file</span>(<span class="ident">builder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">impl</span> <span class="ident">RootStoreBuilder</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">load_file</span>(<span class="ident">builder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">impl</span> <span class="ident">RootStoreBuilder</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">BufReader::new</span>(<span class="ident">f</span>);
     <span class="kw">if</span> <span class="ident">builder</span>.<span class="ident">load_pem_file</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f</span>).<span class="ident">is_err</span>() {
@@ -53,16 +53,16 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_native_certs</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">RootStoreBuilder</span><span class="op">&gt;</span>(<span class="ident">builder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_native_certs</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">RootStoreBuilder</span><span class="op">&gt;</span>(<span class="ident">builder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">likely_locations</span> <span class="op">=</span> <span class="ident">openssl_probe::probe</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first_error</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">file</span>) <span class="op">=</span> <span class="ident">likely_locations</span>.<span class="ident">cert_file</span> {
         <span class="kw">match</span> <span class="ident">load_file</span>(<span class="ident">builder</span>, <span class="kw-2">&amp;</span><span class="ident">file</span>) {
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                 <span class="ident">first_error</span> <span class="op">=</span> <span class="ident">first_error</span>.<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>));
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">_</span> =&gt; {}
         }
     }
 

@@ -382,27 +382,27 @@
 
 <span class="doccomment">/// Coerce numeric types into an `i64` if it would be lossless to do so. If this Bson is not numeric</span>
 <span class="doccomment">/// or the conversion would be lossy (e.g. 1.5 -&gt; 1), this returns `None`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_int</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">Bson</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_int</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">Bson</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">val</span> {
-        <span class="ident">Bson::Int32</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i64::from</span>(<span class="ident">i</span>)),
-        <span class="ident">Bson::Int64</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>),
-        <span class="ident">Bson::Double</span>(<span class="ident">f</span>) <span class="kw">if</span> (<span class="ident">f</span> <span class="op">-</span> (<span class="ident">f</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="kw">as</span> <span class="ident">f64</span>)).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">f64::EPSILON</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">f</span> <span class="kw">as</span> <span class="ident">i64</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="ident">Bson::Int32</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i64::from</span>(<span class="ident">i</span>)),
+        <span class="ident">Bson::Int64</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+        <span class="ident">Bson::Double</span>(<span class="ident">f</span>) <span class="kw">if</span> (<span class="ident">f</span> <span class="op">-</span> (<span class="ident">f</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="kw">as</span> <span class="ident">f64</span>)).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">f64::EPSILON</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">f</span> <span class="kw">as</span> <span class="ident">i64</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 
 <span class="doccomment">/// Coerce numeric types into an `u64` if it would be lossless to do so. If this Bson is not numeric</span>
 <span class="doccomment">/// or the conversion would be lossy (e.g. 1.5 -&gt; 1), this returns `None`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_u64</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">Bson</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_u64</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">Bson</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">val</span> {
-        <span class="ident">Bson::Int32</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u64::try_from</span>(<span class="ident">i</span>).<span class="ident">ok</span>(),
-        <span class="ident">Bson::Int64</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u64::try_from</span>(<span class="ident">i</span>).<span class="ident">ok</span>(),
-        <span class="ident">Bson::Double</span>(<span class="ident">f</span>) <span class="kw">if</span> (<span class="ident">f</span> <span class="op">-</span> (<span class="ident">f</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">f64</span>)).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">f64::EPSILON</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">f</span> <span class="kw">as</span> <span class="ident">u64</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="ident">Bson::Int32</span>(<span class="ident">i</span>) =&gt; <span class="ident">u64::try_from</span>(<span class="ident">i</span>).<span class="ident">ok</span>(),
+        <span class="ident">Bson::Int64</span>(<span class="ident">i</span>) =&gt; <span class="ident">u64::try_from</span>(<span class="ident">i</span>).<span class="ident">ok</span>(),
+        <span class="ident">Bson::Double</span>(<span class="ident">f</span>) <span class="kw">if</span> (<span class="ident">f</span> <span class="op">-</span> (<span class="ident">f</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">f64</span>)).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">f64::EPSILON</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">f</span> <span class="kw">as</span> <span class="ident">u64</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bson_array</span>(<span class="ident">docs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Document</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bson</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bson_array</span>(<span class="ident">docs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Document</span>]) -&gt; <span class="ident">Bson</span> {
     <span class="ident">Bson::Array</span>(<span class="ident">docs</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">doc</span><span class="op">|</span> <span class="ident">Bson::Document</span>(<span class="ident">doc</span>.<span class="ident">clone</span>())).<span class="ident">collect</span>())
 }
 
@@ -416,24 +416,24 @@
     <span class="ident">document</span>.<span class="ident">extend</span>(<span class="ident">elements</span>);
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">first_key</span>(<span class="ident">document</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">first_key</span>(<span class="ident">document</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
     <span class="ident">document</span>.<span class="ident">keys</span>().<span class="ident">next</span>().<span class="ident">map</span>(<span class="ident">String::as_str</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">replacement_document_check</span>(<span class="ident">replacement</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">replacement_document_check</span>(<span class="ident">replacement</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">first_key</span>(<span class="ident">replacement</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;$&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;$&#39;</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
             <span class="ident">message</span>: <span class="string">&quot;replace document must have first key not starting with &#39;$&quot;</span>.<span class="ident">to_string</span>(),
         }
         .<span class="ident">into</span>()),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_document_check</span>(<span class="ident">update</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_document_check</span>(<span class="ident">update</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">first_key</span>(<span class="ident">update</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;$&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;$&#39;</span>) =&gt; <span class="prelude-val">Ok</span>(()),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
             <span class="ident">message</span>: <span class="string">&quot;update document must have first key starting with &#39;$&quot;</span>.<span class="ident">to_string</span>(),
         }
         .<span class="ident">into</span>()),
@@ -443,32 +443,32 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_duration_option_as_int_millis</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
     <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
     <span class="ident">serializer</span>: <span class="ident">S</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">as_millis</span>() <span class="op">&gt;</span> <span class="ident">i32::MAX</span> <span class="kw">as</span> <span class="ident">u128</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">as_millis</span>() <span class="op">&gt;</span> <span class="ident">i32::MAX</span> <span class="kw">as</span> <span class="ident">u128</span> =&gt; {
             <span class="ident">serializer</span>.<span class="ident">serialize_i64</span>(<span class="ident">duration</span>.<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">i64</span>)
         }
-        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="ident">duration</span>.<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">i32</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="ident">duration</span>.<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">i32</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
     }
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_duration_option_as_int_secs</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
     <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
     <span class="ident">serializer</span>: <span class="ident">S</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="op">&gt;</span> <span class="ident">i32::MAX</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="op">&gt;</span> <span class="ident">i32::MAX</span> <span class="kw">as</span> <span class="ident">u64</span> =&gt; {
             <span class="ident">serializer</span>.<span class="ident">serialize_i64</span>(<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">i64</span>)
         }
-        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">i32</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+        <span class="prelude-val">Some</span>(<span class="ident">duration</span>) =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">i32</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
     }
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">deserialize_duration_option_from_u64_millis</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(
     <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
 {
@@ -478,7 +478,7 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">deserialize_duration_option_from_u64_seconds</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(
     <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
 {
@@ -490,10 +490,10 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_u32_option_as_i32</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
     <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">serializer</span>: <span class="ident">S</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bson::serde_helpers::serialize_u32_as_i32</span>(<span class="ident">val</span>, <span class="ident">serializer</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="ident">bson::serde_helpers::serialize_u32_as_i32</span>(<span class="ident">val</span>, <span class="ident">serializer</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
     }
 }
 
@@ -501,14 +501,14 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_u32_option_as_batch_size</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
     <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">serializer</span>: <span class="ident">S</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">val</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">std::i32::MAX</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="macro">doc!</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">val</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">std::i32::MAX</span> <span class="kw">as</span> <span class="ident">u32</span> =&gt; (<span class="macro">doc!</span> {
             <span class="string">&quot;batchSize&quot;</span>: (<span class="kw-2">*</span><span class="ident">val</span> <span class="kw">as</span> <span class="ident">i32</span>)
         })
         .<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Document::new</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(
+        <span class="prelude-val">None</span> =&gt; <span class="ident">Document::new</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(
             <span class="string">&quot;batch size must be able to fit into a signed 32-bit integer&quot;</span>,
         )),
     }
@@ -517,17 +517,17 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_u64_option_as_i64</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
     <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="ident">serializer</span>: <span class="ident">S</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">val</span> {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bson::serde_helpers::serialize_u64_as_i64</span>(<span class="ident">v</span>, <span class="ident">serializer</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">bson::serde_helpers::serialize_u64_as_i64</span>(<span class="ident">v</span>, <span class="ident">serializer</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
     }
 }
 
 <span class="doccomment">/// Deserialize an u64 from any BSON number type if it could be done losslessly.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">deserialize_u64_from_bson_number</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(
     <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
 {
@@ -537,7 +537,7 @@
 }
 
 <span class="doccomment">/// The size in bytes of the provided document&#39;s entry in a BSON array at the given index.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">array_entry_size_bytes</span>(<span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">doc_len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">array_entry_size_bytes</span>(<span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">doc_len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
     <span class="comment">// </span>
     <span class="comment">//   * type (1 byte)</span>
     <span class="comment">//   * number of decimal digits in key</span>
@@ -549,21 +549,21 @@
 
 <span class="doccomment">/// The number of digits in `n` in base 10.</span>
 <span class="doccomment">/// Useful for calculating the size of an array entry in BSON.</span>
-<span class="kw">fn</span> <span class="ident">num_decimal_digits</span>(<span class="kw-2">mut</span> <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">num_decimal_digits</span>(<span class="kw-2">mut</span> <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">digits</span> <span class="op">=</span> <span class="number">0</span>;
 
     <span class="kw">loop</span> {
         <span class="ident">n</span> <span class="op">/</span><span class="op">=</span> <span class="number">10</span>;
         <span class="ident">digits</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 
-        <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="ident">digits</span>;
         }
     }
 }
 
 <span class="doccomment">/// Read a document&#39;s raw BSON bytes from the provided reader.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_document_bytes</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_document_bytes</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32</span>()<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">length</span> <span class="kw">as</span> <span class="ident">usize</span>);
@@ -579,20 +579,20 @@
 <span class="doccomment">/// If the BSON is not properly formatted, an internal error would be returned.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// TODO: RUST-924 replace this with raw document API usage.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">raw_get</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">read_i32</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::io::Cursor</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">raw_get</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read_i32</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::io::Cursor</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
         <span class="ident">reader</span>.<span class="ident">read_i32</span>().<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">read_u8</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::io::Cursor</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read_u8</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::io::Cursor</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="ident">reader</span>.<span class="ident">read_u8</span>().<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_error</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">std::error::Error</span><span class="op">&gt;</span>(<span class="ident">_e</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize_error</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">std::error::Error</span><span class="op">&gt;</span>(<span class="ident">_e</span>: <span class="ident">T</span>) -&gt; <span class="ident">Error</span> {
         <span class="ident">deserialize_error_no_arg</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_error_no_arg</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize_error_no_arg</span>() -&gt; <span class="ident">Error</span> {
         <span class="ident">Error::from</span>(<span class="ident">ErrorKind::Internal</span> {
             <span class="ident">message</span>: <span class="string">&quot;failed to read from serialized document&quot;</span>.<span class="ident">to_string</span>(),
         })
@@ -610,7 +610,7 @@
         <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// check if we reached the end of the document</span>
-        <span class="kw">if</span> <span class="ident">tag</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">reader</span>.<span class="ident">position</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">len</span> {
+        <span class="kw">if</span> <span class="ident">tag</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">reader</span>.<span class="ident">position</span>() <span class="op">==</span> <span class="ident">len</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
@@ -636,33 +636,33 @@
         <span class="kw">let</span> <span class="ident">skip_len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">element_type</span> {
             <span class="ident">ElementType::Array</span>
             <span class="op">|</span> <span class="ident">ElementType::EmbeddedDocument</span>
-            <span class="op">|</span> <span class="ident">ElementType::JavaScriptCodeWithScope</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="op">|</span> <span class="ident">ElementType::JavaScriptCodeWithScope</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
                 <span class="comment">// length includes the 4 bytes for the length, so subtrack them out</span>
                 <span class="ident">l</span>.<span class="ident">checked_sub</span>(<span class="number">4</span>).<span class="ident">ok_or_else</span>(<span class="ident">deserialize_error_no_arg</span>)<span class="question-mark">?</span>
             }
-            <span class="ident">ElementType::Binary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>
+            <span class="ident">ElementType::Binary</span> =&gt; <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>
                 .<span class="ident">checked_add</span>(<span class="number">1</span>) <span class="comment">// add one for subtype</span>
                 .<span class="ident">ok_or_else</span>(<span class="ident">deserialize_error_no_arg</span>)<span class="question-mark">?</span>,
-            <span class="ident">ElementType::Int32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-            <span class="ident">ElementType::Int64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">8</span>,
-            <span class="ident">ElementType::String</span> <span class="op">|</span> <span class="ident">ElementType::Symbol</span> <span class="op">|</span> <span class="ident">ElementType::JavaScriptCode</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ElementType::Int32</span> =&gt; <span class="number">4</span>,
+            <span class="ident">ElementType::Int64</span> =&gt; <span class="number">8</span>,
+            <span class="ident">ElementType::String</span> <span class="op">|</span> <span class="ident">ElementType::Symbol</span> <span class="op">|</span> <span class="ident">ElementType::JavaScriptCode</span> =&gt; {
                 <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>
             }
-            <span class="ident">ElementType::Boolean</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">ElementType::Double</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">8</span>,
-            <span class="ident">ElementType::Timestamp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">8</span>,
-            <span class="ident">ElementType::Decimal128</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">16</span>,
+            <span class="ident">ElementType::Boolean</span> =&gt; <span class="number">1</span>,
+            <span class="ident">ElementType::Double</span> =&gt; <span class="number">8</span>,
+            <span class="ident">ElementType::Timestamp</span> =&gt; <span class="number">8</span>,
+            <span class="ident">ElementType::Decimal128</span> =&gt; <span class="number">16</span>,
             <span class="ident">ElementType::MinKey</span>
             <span class="op">|</span> <span class="ident">ElementType::MaxKey</span>
             <span class="op">|</span> <span class="ident">ElementType::Null</span>
-            <span class="op">|</span> <span class="ident">ElementType::Undefined</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">ElementType::DateTime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">8</span>,
-            <span class="ident">ElementType::ObjectId</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">12</span>,
-            <span class="ident">ElementType::DbPointer</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>
+            <span class="op">|</span> <span class="ident">ElementType::Undefined</span> =&gt; <span class="number">0</span>,
+            <span class="ident">ElementType::DateTime</span> =&gt; <span class="number">8</span>,
+            <span class="ident">ElementType::ObjectId</span> =&gt; <span class="number">12</span>,
+            <span class="ident">ElementType::DbPointer</span> =&gt; <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>
                 .<span class="ident">checked_add</span>(<span class="number">12</span>) <span class="comment">// add 12 for objectid</span>
                 .<span class="ident">ok_or_else</span>(<span class="ident">deserialize_error_no_arg</span>)<span class="question-mark">?</span>,
-            <span class="ident">ElementType::RegularExpression</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ElementType::RegularExpression</span> =&gt; {
                 <span class="comment">// read two cstr&#39;s</span>
                 <span class="kw">for</span> <span class="ident">_i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">2</span> {
                     <span class="kw">while</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
@@ -683,7 +683,7 @@
                 .<span class="ident">ok_or_else</span>(<span class="ident">deserialize_error_no_arg</span>)<span class="question-mark">?</span>,
         );
 
-        <span class="kw">if</span> <span class="ident">k</span> <span class="op">=</span><span class="op">=</span> <span class="ident">key</span> {
+        <span class="kw">if</span> <span class="ident">k</span> <span class="op">==</span> <span class="ident">key</span> {
             <span class="comment">// if this is the element we&#39;re looking for, extract it.</span>
             <span class="kw">let</span> <span class="ident">element_end</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">position</span>().<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">deserialize_error</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">element_slice</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">reader</span>.<span class="ident">get_ref</span>()[<span class="ident">element_start</span>..<span class="ident">element_end</span>];

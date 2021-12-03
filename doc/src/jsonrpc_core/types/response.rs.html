@@ -337,15 +337,15 @@
 
 <span class="kw">impl</span> <span class="ident">Output</span> {
 	<span class="doccomment">/// Creates new output given `Result`, `Id` and `Version`.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">result</span>: <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="ident">Id</span>, <span class="ident">jsonrpc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">result</span>: <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="ident">Id</span>, <span class="ident">jsonrpc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
 		<span class="kw">match</span> <span class="ident">result</span> {
-			<span class="prelude-val">Ok</span>(<span class="ident">result</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Output::Success</span>(<span class="ident">Success</span> { <span class="ident">id</span>, <span class="ident">jsonrpc</span>, <span class="ident">result</span> }),
-			<span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Output::Failure</span>(<span class="ident">Failure</span> { <span class="ident">id</span>, <span class="ident">jsonrpc</span>, <span class="ident">error</span> }),
+			<span class="prelude-val">Ok</span>(<span class="ident">result</span>) =&gt; <span class="ident">Output::Success</span>(<span class="ident">Success</span> { <span class="ident">id</span>, <span class="ident">jsonrpc</span>, <span class="ident">result</span> }),
+			<span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; <span class="ident">Output::Failure</span>(<span class="ident">Failure</span> { <span class="ident">id</span>, <span class="ident">jsonrpc</span>, <span class="ident">error</span> }),
 		}
 	}
 
 	<span class="doccomment">/// Creates new failure output indicating malformed request.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalid_request</span>(<span class="ident">id</span>: <span class="ident">Id</span>, <span class="ident">jsonrpc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalid_request</span>(<span class="ident">id</span>: <span class="ident">Id</span>, <span class="ident">jsonrpc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident">Output::Failure</span>(<span class="ident">Failure</span> {
 			<span class="ident">id</span>,
 			<span class="ident">jsonrpc</span>,
@@ -354,28 +354,28 @@
 	}
 
 	<span class="doccomment">/// Get the jsonrpc protocol version.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-			<span class="ident">Output::Success</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">jsonrpc</span>,
-			<span class="ident">Output::Failure</span>(<span class="kw-2">ref</span> <span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">jsonrpc</span>,
+			<span class="ident">Output::Success</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">jsonrpc</span>,
+			<span class="ident">Output::Failure</span>(<span class="kw-2">ref</span> <span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">jsonrpc</span>,
 		}
 	}
 
 	<span class="doccomment">/// Get the correlation id.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Id</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Id</span> {
 		<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-			<span class="ident">Output::Success</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">id</span>,
-			<span class="ident">Output::Failure</span>(<span class="kw-2">ref</span> <span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">id</span>,
+			<span class="ident">Output::Success</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">id</span>,
+			<span class="ident">Output::Failure</span>(<span class="kw-2">ref</span> <span class="ident">f</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">id</span>,
 		}
 	}
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Convert into a result. Will be `Ok` if it is a `Success` and `Err` if `Failure`.</span>
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">output</span>: <span class="ident">Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">output</span>: <span class="ident">Output</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="ident">output</span> {
-			<span class="ident">Output::Success</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>.<span class="ident">result</span>),
-			<span class="ident">Output::Failure</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">f</span>.<span class="ident">error</span>),
+			<span class="ident">Output::Success</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>.<span class="ident">result</span>),
+			<span class="ident">Output::Failure</span>(<span class="ident">f</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">f</span>.<span class="ident">error</span>),
 		}
 	}
 }
@@ -393,7 +393,7 @@
 
 <span class="kw">impl</span> <span class="ident">Response</span> {
 	<span class="doccomment">/// Creates new `Response` with given error and `Version`</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">Error</span>, <span class="ident">jsonrpc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">Error</span>, <span class="ident">jsonrpc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident">Failure</span> {
 			<span class="ident">id</span>: <span class="ident">Id::Null</span>,
 			<span class="ident">jsonrpc</span>,
@@ -405,7 +405,7 @@
 	<span class="doccomment">/// Deserialize `Response` from given JSON string.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This method will handle an empty string as empty batch response.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">serde_json::Error</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">serde_json::Error</span><span class="op">&gt;</span> {
 		<span class="kw">if</span> <span class="ident">s</span>.<span class="ident">is_empty</span>() {
 			<span class="prelude-val">Ok</span>(<span class="ident">Response::Batch</span>(<span class="macro">vec!</span>[]))
 		} <span class="kw">else</span> {
@@ -415,13 +415,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Failure</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Response</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">failure</span>: <span class="ident">Failure</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">failure</span>: <span class="ident">Failure</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident">Response::Single</span>(<span class="ident">Output::Failure</span>(<span class="ident">failure</span>))
 	}
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Success</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Response</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">success</span>: <span class="ident">Success</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">success</span>: <span class="ident">Success</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident">Response::Single</span>(<span class="ident">Output::Success</span>(<span class="ident">success</span>))
 	}
 }

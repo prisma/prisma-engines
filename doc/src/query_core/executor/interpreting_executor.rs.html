@@ -294,7 +294,7 @@
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">Connector</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">connector</span>: <span class="ident">C</span>, <span class="ident">force_transactions</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">connector</span>: <span class="ident">C</span>, <span class="ident">force_transactions</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">InterpretingExecutor</span> {
             <span class="ident">connector</span>,
             <span class="ident">tx_cache</span>: <span class="ident">TransactionCache::default</span>(),
@@ -309,7 +309,7 @@
         <span class="ident">graph</span>: <span class="ident">QueryGraph</span>,
         <span class="ident">serializer</span>: <span class="ident">IrSerializer</span>,
         <span class="ident">force_transactions</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">force_transactions</span> <span class="op">|</span><span class="op">|</span> <span class="ident">graph</span>.<span class="ident">needs_transaction</span>() {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">start_transaction</span>().<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::execute_on</span>(<span class="ident">tx</span>.<span class="ident">as_connection_like</span>(), <span class="ident">graph</span>, <span class="ident">serializer</span>).<span class="kw">await</span>;
@@ -332,16 +332,16 @@
         <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
         <span class="ident">graph</span>: <span class="ident">QueryGraph</span>,
         <span class="ident">serializer</span>: <span class="ident">IrSerializer</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">interpreter</span> <span class="op">=</span> <span class="ident">QueryInterpreter::new</span>(<span class="ident">conn</span>);
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QueryPipeline::new</span>(<span class="ident">graph</span>, <span class="ident">interpreter</span>, <span class="ident">serializer</span>).<span class="ident">execute</span>().<span class="kw">await</span>;
 
         <span class="ident">result</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">finalize_tx</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>, <span class="ident">final_state</span>: <span class="ident">CachedTx</span>, <span class="ident">finalizer</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">finalize_tx</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>, <span class="ident">final_state</span>: <span class="ident">CachedTx</span>, <span class="ident">finalizer</span>: <span class="ident">F</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpenTx</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">connector::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpenTx</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">connector::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     {
         <span class="comment">// The references need to be dropped before finalization,</span>
         <span class="comment">// or else the DashMap deadlocks with the finalization cleanup task.</span>
@@ -382,7 +382,7 @@
         <span class="ident">tx_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span>,
         <span class="ident">operation</span>: <span class="ident">Operation</span>,
         <span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
         <span class="comment">// Parse, validate, and extract query graph from query document.</span>
         <span class="kw">let</span> (<span class="ident">query_graph</span>, <span class="ident">serializer</span>) <span class="op">=</span> <span class="ident">QueryGraphBuilder::new</span>(<span class="ident">query_schema</span>).<span class="ident">build</span>(<span class="ident">operation</span>)<span class="question-mark">?</span>;
 
@@ -417,7 +417,7 @@
         <span class="ident">operations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span>,
         <span class="ident">transactional</span>: <span class="ident">bool</span>,
         <span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">tx_id</span>) <span class="op">=</span> <span class="ident">tx_id</span> {
             <span class="kw">let</span> <span class="ident">queries</span> <span class="op">=</span> <span class="ident">operations</span>
                 .<span class="ident">into_iter</span>()
@@ -463,7 +463,7 @@
 
             <span class="kw">for</span> <span class="ident">op</span> <span class="kw">in</span> <span class="ident">operations</span> {
                 <span class="kw">match</span> <span class="ident">QueryGraphBuilder::new</span>(<span class="ident">query_schema</span>.<span class="ident">clone</span>()).<span class="ident">build</span>(<span class="ident">op</span>) {
-                    <span class="prelude-val">Ok</span>((<span class="ident">graph</span>, <span class="ident">serializer</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>((<span class="ident">graph</span>, <span class="ident">serializer</span>)) =&gt; {
                         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">get_connection</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
                         <span class="ident">futures</span>.<span class="ident">push</span>(<span class="ident">tokio::spawn</span>(<span class="ident"><span class="self">Self</span>::execute_self_contained</span>(
@@ -475,7 +475,7 @@
                     }
 
                     <span class="comment">// This looks unnecessary, but is the simplest way to preserve ordering of results for the batch.</span>
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">futures</span>.<span class="ident">push</span>(<span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()) })),
+                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">futures</span>.<span class="ident">push</span>(<span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()) })),
                 }
             }
 
@@ -489,7 +489,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">primary_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Connector</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>) {
+    <span class="kw">fn</span> <span class="ident">primary_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Connector</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>) {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>
     }
 }
@@ -499,7 +499,7 @@
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">Connector</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
 {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>, <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>, <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">TxId::default</span>();
         <span class="macro">debug!</span>(<span class="string">&quot;[{}] Starting...&quot;</span>, <span class="ident">id</span>);
 
@@ -518,13 +518,13 @@
         <span class="prelude-val">Ok</span>(<span class="ident">id</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">debug!</span>(<span class="string">&quot;[{}] Committing.&quot;</span>, <span class="ident">tx_id</span>);
         <span class="self">self</span>.<span class="ident">finalize_tx</span>(<span class="ident">tx_id</span>, <span class="ident">CachedTx::Committed</span>, <span class="op">|</span><span class="ident">otx</span><span class="op">|</span> <span class="ident">Box::new</span>(<span class="ident">otx</span>.<span class="ident">tx</span>.<span class="ident">commit</span>()))
             .<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">debug!</span>(<span class="string">&quot;[{}] Rolling back.&quot;</span>, <span class="ident">tx_id</span>);
         <span class="self">self</span>.<span class="ident">finalize_tx</span>(<span class="ident">tx_id</span>, <span class="ident">CachedTx::RolledBack</span>, <span class="op">|</span><span class="ident">otx</span><span class="op">|</span> <span class="ident">Box::new</span>(<span class="ident">otx</span>.<span class="ident">tx</span>.<span class="ident">rollback</span>()))
             .<span class="kw">await</span>

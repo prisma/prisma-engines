@@ -817,7 +817,7 @@
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">OpenTelemetryLayer::new</span>(<span class="ident">noop::NoopTracer::new</span>())
     }
 }
@@ -837,7 +837,7 @@
 <span class="doccomment">/// let subscriber = Registry::default().with(tracing_opentelemetry::layer());</span>
 <span class="doccomment">/// # drop(subscriber);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OpenTelemetryLayer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">noop::NoopTracer</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>() -&gt; <span class="ident">OpenTelemetryLayer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">noop::NoopTracer</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span><span class="op">&gt;</span>,
 {
@@ -870,23 +870,23 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">str_to_span_kind</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">otel::SpanKind</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">str_to_span_kind</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">otel::SpanKind</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">s</span> {
-        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;server&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">otel::SpanKind::Server</span>),
-        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;client&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">otel::SpanKind::Client</span>),
-        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;producer&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">otel::SpanKind::Producer</span>),
-        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;consumer&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">otel::SpanKind::Consumer</span>),
-        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;internal&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">otel::SpanKind::Internal</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;server&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">otel::SpanKind::Server</span>),
+        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;client&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">otel::SpanKind::Client</span>),
+        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;producer&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">otel::SpanKind::Producer</span>),
+        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;consumer&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">otel::SpanKind::Consumer</span>),
+        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;internal&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">otel::SpanKind::Internal</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">str_to_status_code</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">otel::StatusCode</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">str_to_status_code</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">otel::StatusCode</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">s</span> {
-        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;unset&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">otel::StatusCode::Unset</span>),
-        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;ok&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">otel::StatusCode::Ok</span>),
-        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;error&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">otel::StatusCode::Error</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;unset&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">otel::StatusCode::Unset</span>),
+        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;ok&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">otel::StatusCode::Ok</span>),
+        <span class="ident">s</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;error&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">otel::StatusCode::Error</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 
@@ -898,11 +898,11 @@
     <span class="doccomment">/// [`Span`]: opentelemetry::trace::Span</span>
     <span class="kw">fn</span> <span class="ident">record_bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">field::Field</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
         <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">name</span>() {
-            <span class="string">&quot;message&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
+            <span class="string">&quot;message&quot;</span> =&gt; <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
             <span class="comment">// Skip fields that are actually log metadata that have already been handled</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">name</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) =&gt; (),
+            <span class="ident">name</span> =&gt; {
                 <span class="self">self</span>.<span class="number">0</span>.<span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">KeyValue::new</span>(<span class="ident">name</span>, <span class="ident">value</span>));
             }
         }
@@ -913,11 +913,11 @@
     <span class="doccomment">/// [`Span`]: opentelemetry::trace::Span</span>
     <span class="kw">fn</span> <span class="ident">record_f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">field::Field</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
         <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">name</span>() {
-            <span class="string">&quot;message&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
+            <span class="string">&quot;message&quot;</span> =&gt; <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
             <span class="comment">// Skip fields that are actually log metadata that have already been handled</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">name</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) =&gt; (),
+            <span class="ident">name</span> =&gt; {
                 <span class="self">self</span>.<span class="number">0</span>.<span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">KeyValue::new</span>(<span class="ident">name</span>, <span class="ident">value</span>));
             }
         }
@@ -928,11 +928,11 @@
     <span class="doccomment">/// [`Span`]: opentelemetry::trace::Span</span>
     <span class="kw">fn</span> <span class="ident">record_i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">field::Field</span>, <span class="ident">value</span>: <span class="ident">i64</span>) {
         <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">name</span>() {
-            <span class="string">&quot;message&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
+            <span class="string">&quot;message&quot;</span> =&gt; <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
             <span class="comment">// Skip fields that are actually log metadata that have already been handled</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">name</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) =&gt; (),
+            <span class="ident">name</span> =&gt; {
                 <span class="self">self</span>.<span class="number">0</span>.<span class="ident">attributes</span>.<span class="ident">push</span>(<span class="ident">KeyValue::new</span>(<span class="ident">name</span>, <span class="ident">value</span>));
             }
         }
@@ -943,11 +943,11 @@
     <span class="doccomment">/// [`Span`]: opentelemetry::trace::Span</span>
     <span class="kw">fn</span> <span class="ident">record_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">field::Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">name</span>() {
-            <span class="string">&quot;message&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
+            <span class="string">&quot;message&quot;</span> =&gt; <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
             <span class="comment">// Skip fields that are actually log metadata that have already been handled</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">name</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) =&gt; (),
+            <span class="ident">name</span> =&gt; {
                 <span class="self">self</span>.<span class="number">0</span>
                     .<span class="ident">attributes</span>
                     .<span class="ident">push</span>(<span class="ident">KeyValue::new</span>(<span class="ident">name</span>, <span class="ident">value</span>.<span class="ident">to_string</span>()));
@@ -961,11 +961,11 @@
     <span class="doccomment">/// [`Span`]: opentelemetry::trace::Span</span>
     <span class="kw">fn</span> <span class="ident">record_debug</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">field::Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) {
         <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">name</span>() {
-            <span class="string">&quot;message&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>).<span class="ident">into</span>(),
+            <span class="string">&quot;message&quot;</span> =&gt; <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>).<span class="ident">into</span>(),
             <span class="comment">// Skip fields that are actually log metadata that have already been handled</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">name</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) =&gt; (),
+            <span class="ident">name</span> =&gt; {
                 <span class="self">self</span>.<span class="number">0</span>
                     .<span class="ident">attributes</span>
                     .<span class="ident">push</span>(<span class="ident">KeyValue::new</span>(<span class="ident">name</span>, <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>)));
@@ -1012,11 +1012,11 @@
     <span class="doccomment">/// [`Span`]: opentelemetry::trace::Span</span>
     <span class="kw">fn</span> <span class="ident">record_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">field::Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">name</span>() {
-            <span class="ident">SPAN_NAME_FIELD</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
-            <span class="ident">SPAN_KIND_FIELD</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">span_kind</span> <span class="op">=</span> <span class="ident">str_to_span_kind</span>(<span class="ident">value</span>),
-            <span class="ident">SPAN_STATUS_CODE_FIELD</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">status_code</span> <span class="op">=</span> <span class="ident">str_to_status_code</span>(<span class="ident">value</span>),
-            <span class="ident">SPAN_STATUS_MESSAGE_FIELD</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">status_message</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">to_owned</span>().<span class="ident">into</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">record</span>(<span class="ident">KeyValue::new</span>(<span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">value</span>.<span class="ident">to_string</span>())),
+            <span class="ident">SPAN_NAME_FIELD</span> =&gt; <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
+            <span class="ident">SPAN_KIND_FIELD</span> =&gt; <span class="self">self</span>.<span class="number">0</span>.<span class="ident">span_kind</span> <span class="op">=</span> <span class="ident">str_to_span_kind</span>(<span class="ident">value</span>),
+            <span class="ident">SPAN_STATUS_CODE_FIELD</span> =&gt; <span class="self">self</span>.<span class="number">0</span>.<span class="ident">status_code</span> <span class="op">=</span> <span class="ident">str_to_status_code</span>(<span class="ident">value</span>),
+            <span class="ident">SPAN_STATUS_MESSAGE_FIELD</span> =&gt; <span class="self">self</span>.<span class="number">0</span>.<span class="ident">status_message</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">to_owned</span>().<span class="ident">into</span>()),
+            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">record</span>(<span class="ident">KeyValue::new</span>(<span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">value</span>.<span class="ident">to_string</span>())),
         }
     }
 
@@ -1026,15 +1026,15 @@
     <span class="doccomment">/// [`Span`]: opentelemetry::trace::Span</span>
     <span class="kw">fn</span> <span class="ident">record_debug</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">field::Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) {
         <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">name</span>() {
-            <span class="ident">SPAN_NAME_FIELD</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>).<span class="ident">into</span>(),
-            <span class="ident">SPAN_KIND_FIELD</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">span_kind</span> <span class="op">=</span> <span class="ident">str_to_span_kind</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>)),
-            <span class="ident">SPAN_STATUS_CODE_FIELD</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SPAN_NAME_FIELD</span> =&gt; <span class="self">self</span>.<span class="number">0</span>.<span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>).<span class="ident">into</span>(),
+            <span class="ident">SPAN_KIND_FIELD</span> =&gt; <span class="self">self</span>.<span class="number">0</span>.<span class="ident">span_kind</span> <span class="op">=</span> <span class="ident">str_to_span_kind</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>)),
+            <span class="ident">SPAN_STATUS_CODE_FIELD</span> =&gt; {
                 <span class="self">self</span>.<span class="number">0</span>.<span class="ident">status_code</span> <span class="op">=</span> <span class="ident">str_to_status_code</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>))
             }
-            <span class="ident">SPAN_STATUS_MESSAGE_FIELD</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SPAN_STATUS_MESSAGE_FIELD</span> =&gt; {
                 <span class="self">self</span>.<span class="number">0</span>.<span class="ident">status_message</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>).<span class="ident">into</span>())
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">record</span>(<span class="ident">Key::new</span>(<span class="ident">field</span>.<span class="ident">name</span>()).<span class="ident">string</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>))),
+            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">record</span>(<span class="ident">Key::new</span>(<span class="ident">field</span>.<span class="ident">name</span>()).<span class="ident">string</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>))),
         }
     }
 }
@@ -1071,7 +1071,7 @@
     <span class="doccomment">/// let subscriber = Registry::default().with(otel_layer);</span>
     <span class="doccomment">/// # drop(subscriber);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tracer</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tracer</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">OpenTelemetryLayer</span> {
             <span class="ident">tracer</span>,
             <span class="ident">tracked_inactivity</span>: <span class="bool-val">true</span>,
@@ -1106,7 +1106,7 @@
     <span class="doccomment">/// let subscriber = Registry::default().with(otel_layer);</span>
     <span class="doccomment">/// # drop(subscriber);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tracer</span><span class="op">&lt;</span><span class="ident">Tracer</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">tracer</span>: <span class="ident">Tracer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OpenTelemetryLayer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Tracer</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tracer</span><span class="op">&lt;</span><span class="ident">Tracer</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">tracer</span>: <span class="ident">Tracer</span>) -&gt; <span class="ident">OpenTelemetryLayer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Tracer</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Tracer</span>: <span class="ident">otel::Tracer</span> <span class="op">+</span> <span class="ident">PreSampledTracer</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -1121,7 +1121,7 @@
     <span class="doccomment">/// Sets whether or not spans metadata should include the _busy time_</span>
     <span class="doccomment">/// (total time for which it was entered), and _idle time_ (total time</span>
     <span class="doccomment">/// the span existed but was not entered).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tracked_inactivity</span>(<span class="self">self</span>, <span class="ident">tracked_inactivity</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_tracked_inactivity</span>(<span class="self">self</span>, <span class="ident">tracked_inactivity</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">tracked_inactivity</span>,
             ..<span class="self">self</span>
@@ -1135,7 +1135,7 @@
     <span class="doccomment">/// [`Context`]: opentelemetry::Context</span>
     <span class="doccomment">/// [`span`]: tracing::Span</span>
     <span class="doccomment">/// [`Registry`]: tracing_subscriber::Registry</span>
-    <span class="kw">fn</span> <span class="ident">parent_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OtelContext</span> {
+    <span class="kw">fn</span> <span class="ident">parent_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">OtelContext</span> {
         <span class="comment">// If a span is specified, it _should_ exist in the underlying `Registry`.</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parent</span>) <span class="op">=</span> <span class="ident">attrs</span>.<span class="ident">parent</span>() {
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">span</span>(<span class="ident">parent</span>).<span class="ident">expect</span>(<span class="string">&quot;Span not found, this is a bug&quot;</span>);
@@ -1336,7 +1336,7 @@
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extensions</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">extensions_mut</span>();
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">builder</span>) <span class="op">=</span> <span class="ident">extensions</span>.<span class="ident">get_mut</span>::<span class="op">&lt;</span><span class="ident">otel::SpanBuilder</span><span class="op">&gt;</span>() {
-                <span class="kw">if</span> <span class="ident">builder</span>.<span class="ident">status_code</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">meta</span>.<span class="ident">level</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">tracing_core::Level::ERROR</span> {
+                <span class="kw">if</span> <span class="ident">builder</span>.<span class="ident">status_code</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">meta</span>.<span class="ident">level</span>() <span class="op">==</span> <span class="ident">tracing_core::Level::ERROR</span> {
                     <span class="ident">builder</span>.<span class="ident">status_code</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">otel::StatusCode::Error</span>);
                 }
 
@@ -1378,13 +1378,13 @@
 
     <span class="comment">// SAFETY: this is safe because the `WithContext` function pointer is valid</span>
     <span class="comment">// for the lifetime of `&amp;self`.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downcast_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> ()<span class="op">&gt;</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downcast_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> ()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">id</span> {
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> ()),
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">WithContext</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> ()),
+            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">WithContext</span><span class="op">&gt;</span>() =&gt; {
                 <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> ())
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
@@ -1396,7 +1396,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Timings</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">idle</span>: <span class="number">0</span>,
             <span class="ident">busy</span>: <span class="number">0</span>,
@@ -1418,35 +1418,35 @@
     <span class="kw">struct</span> <span class="ident">TestTracer</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">otel::SpanBuilder</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>);
     <span class="kw">impl</span> <span class="ident">otel::Tracer</span> <span class="kw">for</span> <span class="ident">TestTracer</span> {
         <span class="kw">type</span> <span class="ident">Span</span> <span class="op">=</span> <span class="ident">noop::NoopSpan</span>;
-        <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Span</span> {
+        <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span> {
             <span class="ident">noop::NoopSpan::new</span>()
         }
-        <span class="kw">fn</span> <span class="ident">start_with_context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_name</span>: <span class="ident">T</span>, <span class="ident">_context</span>: <span class="ident">OtelContext</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Span</span>
+        <span class="kw">fn</span> <span class="ident">start_with_context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_name</span>: <span class="ident">T</span>, <span class="ident">_context</span>: <span class="ident">OtelContext</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span>
         <span class="kw">where</span>
             <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         {
             <span class="self">self</span>.<span class="ident">invalid</span>()
         }
-        <span class="kw">fn</span> <span class="ident">span_builder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">otel::SpanBuilder</span>
+        <span class="kw">fn</span> <span class="ident">span_builder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="ident">otel::SpanBuilder</span>
         <span class="kw">where</span>
             <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         {
             <span class="ident">otel::SpanBuilder::from_name</span>(<span class="ident">name</span>)
         }
-        <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">builder</span>: <span class="ident">otel::SpanBuilder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Span</span> {
+        <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">builder</span>: <span class="ident">otel::SpanBuilder</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span> {
             <span class="kw-2">*</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>() <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">builder</span>);
             <span class="self">self</span>.<span class="ident">invalid</span>()
         }
     }
 
     <span class="kw">impl</span> <span class="ident">PreSampledTracer</span> <span class="kw">for</span> <span class="ident">TestTracer</span> {
-        <span class="kw">fn</span> <span class="ident">sampled_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_builder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">otel::SpanBuilder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OtelContext</span> {
+        <span class="kw">fn</span> <span class="ident">sampled_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_builder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">otel::SpanBuilder</span>) -&gt; <span class="ident">OtelContext</span> {
             <span class="ident">OtelContext::new</span>()
         }
-        <span class="kw">fn</span> <span class="ident">new_trace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">otel::TraceId</span> {
+        <span class="kw">fn</span> <span class="ident">new_trace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">otel::TraceId</span> {
             <span class="ident">otel::TraceId::invalid</span>()
         }
-        <span class="kw">fn</span> <span class="ident">new_span_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">otel::SpanId</span> {
+        <span class="kw">fn</span> <span class="ident">new_span_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">otel::SpanId</span> {
             <span class="ident">otel::SpanId::invalid</span>()
         }
     }
@@ -1455,10 +1455,10 @@
     <span class="kw">struct</span> <span class="ident">TestSpan</span>(<span class="ident">otel::SpanContext</span>);
     <span class="kw">impl</span> <span class="ident">otel::Span</span> <span class="kw">for</span> <span class="ident">TestSpan</span> {
         <span class="kw">fn</span> <span class="ident">add_event_with_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="ident">String</span>, <span class="kw">_</span>: <span class="ident">SystemTime</span>, <span class="kw">_</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>) {}
-        <span class="kw">fn</span> <span class="ident">span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">otel::SpanContext</span> {
+        <span class="kw">fn</span> <span class="ident">span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">otel::SpanContext</span> {
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
         }
-        <span class="kw">fn</span> <span class="ident">is_recording</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">fn</span> <span class="ident">is_recording</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
             <span class="bool-val">false</span>
         }
         <span class="kw">fn</span> <span class="ident">set_attribute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_attribute</span>: <span class="ident">KeyValue</span>) {}

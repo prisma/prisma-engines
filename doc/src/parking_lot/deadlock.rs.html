@@ -280,7 +280,7 @@
     <span class="comment">// We need to serialize these tests since deadlock detection uses global state</span>
     <span class="kw">static</span> <span class="ident">DEADLOCK_DETECTION_LOCK</span>: <span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::const_mutex</span>(());
 
-    <span class="kw">fn</span> <span class="ident">check_deadlock</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">check_deadlock</span>() -&gt; <span class="ident">bool</span> {
         <span class="kw">use</span> <span class="ident">parking_lot_core::deadlock::check_deadlock</span>;
         <span class="op">!</span><span class="ident">check_deadlock</span>().<span class="ident">is_empty</span>()
     }

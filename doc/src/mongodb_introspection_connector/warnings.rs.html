@@ -45,7 +45,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">introspection_connector::Warning</span>;
 <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unsupported_type</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[(<span class="ident">String</span>, <span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unsupported_type</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[(<span class="ident">String</span>, <span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)]) -&gt; <span class="ident">Warning</span> {
     <span class="kw">let</span> <span class="ident">affected</span> <span class="op">=</span> <span class="ident">serde_json::Value::Array</span>({
         <span class="ident">affected</span>
             .<span class="ident">iter</span>()
@@ -66,7 +66,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">undecided_field_type</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[(<span class="ident">String</span>, <span class="ident">String</span>, <span class="ident">String</span>)]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Warning</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">undecided_field_type</span>(<span class="ident">affected</span>: <span class="kw-2">&amp;</span>[(<span class="ident">String</span>, <span class="ident">String</span>, <span class="ident">String</span>)]) -&gt; <span class="ident">Warning</span> {
     <span class="kw">let</span> <span class="ident">affected</span> <span class="op">=</span> <span class="ident">serde_json::Value::Array</span>({
         <span class="ident">affected</span>
             .<span class="ident">iter</span>()

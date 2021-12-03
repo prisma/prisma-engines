@@ -425,7 +425,7 @@
     <span class="kw">let</span> <span class="ident">MASK</span> <span class="op">=</span> <span class="ident">_mm_setr_epi32</span>(<span class="number">0x04050607</span>, <span class="number">0x00010203</span>, <span class="number">0x0c0d0e0f</span>, <span class="number">0x08090a0b</span>);
 
     <span class="macro">macro_rules!</span> <span class="ident">unrolled_iterations</span> {
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">literal</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {$(
+        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">literal</span>),<span class="kw-2">*</span>) =&gt; {$(
             <span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> <span class="ident">_mm_loadu_si128</span>(<span class="ident">data</span>.<span class="ident">add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>);
             <span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> <span class="ident">_mm_shuffle_epi8</span>(<span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>], <span class="ident">MASK</span>);
 
@@ -457,7 +457,7 @@
     );
 
     <span class="macro">macro_rules!</span> <span class="ident">unrolled_iterations</span> {
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">literal</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {$(
+        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">literal</span>),<span class="kw-2">*</span>) =&gt; {$(
             <span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> <span class="ident">_mm256_insertf128_si256</span>(<span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>], <span class="ident">_mm_loadu_si128</span>(<span class="ident">data</span>.<span class="ident">add</span>(<span class="number">8</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>), <span class="number">1</span>);
             <span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> <span class="ident">_mm256_insertf128_si256</span>(<span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>], <span class="ident">_mm_loadu_si128</span>(<span class="ident">data</span>.<span class="ident">add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>), <span class="number">0</span>);
 
@@ -546,28 +546,28 @@
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">sha_round</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span>, <span class="ident">x</span>: <span class="ident">u64</span>) {
     <span class="macro">macro_rules!</span> <span class="ident">big_sigma0</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>) =&gt; {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">rotate_right</span>(<span class="number">28</span>) <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">rotate_right</span>(<span class="number">34</span>) <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">rotate_right</span>(<span class="number">39</span>)
         };
     }
     <span class="macro">macro_rules!</span> <span class="ident">big_sigma1</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>) =&gt; {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">rotate_right</span>(<span class="number">14</span>) <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">rotate_right</span>(<span class="number">18</span>) <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">rotate_right</span>(<span class="number">41</span>)
         };
     }
     <span class="macro">macro_rules!</span> <span class="ident">bool3ary_202</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>) =&gt; {
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> <span class="op">^</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">&amp;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>))
         };
     } <span class="comment">// Choose, MD5F, SHA1C</span>
     <span class="macro">macro_rules!</span> <span class="ident">bool3ary_232</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>) =&gt; {
             (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>) <span class="op">^</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>) <span class="op">^</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>)
         };
     } <span class="comment">// Majority, SHA1M</span>
 
     <span class="macro">macro_rules!</span> <span class="ident">rotate_state</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">ident</span>) =&gt; {{
             <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">7</span>];
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">7</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">6</span>];
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">6</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">5</span>];
@@ -607,8 +607,8 @@
         <span class="ident">SRL64</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SRL64</span>:<span class="ident">ident</span>,
         <span class="ident">SLL64</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SLL64</span>:<span class="ident">ident</span>,
         <span class="ident">XOR</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">XOR</span>:<span class="ident">ident</span>,
-    }) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>; <span class="number">8</span>], <span class="ident">k64</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
+    }) =&gt; {
+        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>; <span class="number">8</span>], <span class="ident">k64</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
             <span class="comment">// q[2:1]</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t0</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ALIGNR8</span>(<span class="ident">x</span>[<span class="number">1</span>], <span class="ident">x</span>[<span class="number">0</span>], <span class="number">8</span>);
             <span class="comment">// q[10:9]</span>

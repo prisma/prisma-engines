@@ -105,7 +105,7 @@
 <span class="kw">use</span> <span class="ident">std::path::Path</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io</span>, <span class="ident">mem</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">bind</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">net::UnixListener</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">bind</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">net::UnixListener</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">new_socket</span>(<span class="ident">libc::AF_UNIX</span>, <span class="ident">libc::SOCK_STREAM</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> (<span class="ident">sockaddr</span>, <span class="ident">socklen</span>) <span class="op">=</span> <span class="ident">socket_addr</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">sockaddr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sockaddr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc::sockaddr_un</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc::sockaddr</span>;
@@ -121,7 +121,7 @@
         .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">net::UnixListener::from_raw_fd</span>(<span class="ident">socket</span>) })
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">accept</span>(<span class="ident">listener</span>: <span class="kw-2">&amp;</span><span class="ident">net::UnixListener</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">UnixStream</span>, <span class="ident">SocketAddr</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">accept</span>(<span class="ident">listener</span>: <span class="kw-2">&amp;</span><span class="ident">net::UnixListener</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">UnixStream</span>, <span class="ident">SocketAddr</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">sockaddr</span> <span class="op">=</span> <span class="ident">mem::MaybeUninit</span>::<span class="op">&lt;</span><span class="ident">libc::sockaddr_un</span><span class="op">&gt;</span><span class="ident">::zeroed</span>();
 
     <span class="comment">// This is safe to assume because a `libc::sockaddr_un` filled with `0`</span>
@@ -193,7 +193,7 @@
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">stream</span><span class="op">|</span> (<span class="ident">stream</span>, <span class="ident">SocketAddr::from_parts</span>(<span class="ident">sockaddr</span>, <span class="ident">socklen</span>)))
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="ident">listener</span>: <span class="kw-2">&amp;</span><span class="ident">net::UnixListener</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="ident">listener</span>: <span class="kw-2">&amp;</span><span class="ident">net::UnixListener</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
     <span class="ident"><span class="kw">super</span>::local_addr</span>(<span class="ident">listener</span>.<span class="ident">as_raw_fd</span>())
 }
 </code></pre></div>

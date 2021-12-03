@@ -603,7 +603,7 @@
 
 <span class="kw">impl</span> <span class="ident">OtlpPipeline</span> {
     <span class="doccomment">/// Create a OTLP tracing pipeline.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tracing</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OtlpTracePipeline</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tracing</span>(<span class="self">self</span>) -&gt; <span class="ident">OtlpTracePipeline</span> {
         <span class="ident">OtlpTracePipeline::default</span>()
     }
 }
@@ -623,7 +623,7 @@
 
 <span class="kw">impl</span> <span class="ident">OtlpTracePipeline</span> {
     <span class="doccomment">/// Set the trace provider configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_trace_config</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">trace_config</span>: <span class="ident">sdk::trace::Config</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_trace_config</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">trace_config</span>: <span class="ident">sdk::trace::Config</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">trace_config</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">trace_config</span>);
         <span class="self">self</span>
     }
@@ -635,7 +635,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`install_batch`]: OtlpTracePipeline::install_batch</span>
     <span class="doccomment">/// [`install_simple`]: OtlpTracePipeline::install_simple</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_exporter</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SpanExporterBuilder</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pipeline</span>: <span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_exporter</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SpanExporterBuilder</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pipeline</span>: <span class="ident">B</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">exporter_builder</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">pipeline</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
@@ -645,7 +645,7 @@
     <span class="doccomment">/// Returns a [`Tracer`] with the name `opentelemetry-otlp` and current crate version.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Tracer`]: opentelemetry::trace::Tracer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">install_simple</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sdk::trace::Tracer</span>, <span class="ident">TraceError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">install_simple</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sdk::trace::Tracer</span>, <span class="ident">TraceError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">build_simple_with_exporter</span>(
             <span class="self">self</span>.<span class="ident">exporter_builder</span>
                 .<span class="ident">ok_or</span>(<span class="ident"><span class="kw">crate</span>::Error::NoExporterBuilder</span>)<span class="question-mark">?</span>
@@ -665,7 +665,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">install_batch</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">TraceRuntime</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
         <span class="ident">runtime</span>: <span class="ident">R</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sdk::trace::Tracer</span>, <span class="ident">TraceError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sdk::trace::Tracer</span>, <span class="ident">TraceError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">build_batch_with_exporter</span>(
             <span class="self">self</span>.<span class="ident">exporter_builder</span>
                 .<span class="ident">ok_or</span>(<span class="ident"><span class="kw">crate</span>::Error::NoExporterBuilder</span>)<span class="question-mark">?</span>
@@ -679,7 +679,7 @@
 <span class="kw">fn</span> <span class="ident">build_simple_with_exporter</span>(
     <span class="ident">exporter</span>: <span class="ident">SpanExporter</span>,
     <span class="ident">trace_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">sdk::trace::Config</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sdk::trace::Tracer</span> {
+) -&gt; <span class="ident">sdk::trace::Tracer</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">sdk::trace::TracerProvider::builder</span>().<span class="ident">with_simple_exporter</span>(<span class="ident">exporter</span>);
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">config</span>) <span class="op">=</span> <span class="ident">trace_config</span> {
         <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">with_config</span>(<span class="ident">config</span>);
@@ -694,7 +694,7 @@
     <span class="ident">exporter</span>: <span class="ident">SpanExporter</span>,
     <span class="ident">trace_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">sdk::trace::Config</span><span class="op">&gt;</span>,
     <span class="ident">runtime</span>: <span class="ident">R</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sdk::trace::Tracer</span> {
+) -&gt; <span class="ident">sdk::trace::Tracer</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">provider_builder</span> <span class="op">=</span>
         <span class="ident">sdk::trace::TracerProvider::builder</span>().<span class="ident">with_batch_exporter</span>(<span class="ident">exporter</span>, <span class="ident">runtime</span>);
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">config</span>) <span class="op">=</span> <span class="ident">trace_config</span> {
@@ -723,24 +723,24 @@
 
 <span class="kw">impl</span> <span class="ident">SpanExporterBuilder</span> {
     <span class="doccomment">/// Build a OTLP span exporter using the given tonic configuration and exporter configuration.</span>
-    <span class="kw">fn</span> <span class="ident">build_span_exporter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SpanExporter</span>, <span class="ident">TraceError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">build_span_exporter</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SpanExporter</span>, <span class="ident">TraceError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-            <span class="ident">SpanExporterBuilder::Tonic</span>(<span class="ident">builder</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">builder</span>.<span class="ident">channel</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SpanExporter::from_tonic_channel</span>(
+            <span class="ident">SpanExporterBuilder::Tonic</span>(<span class="ident">builder</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">builder</span>.<span class="ident">channel</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">channel</span>) =&gt; <span class="ident">SpanExporter::from_tonic_channel</span>(
                     <span class="ident">builder</span>.<span class="ident">exporter_config</span>,
                     <span class="ident">builder</span>.<span class="ident">tonic_config</span>,
                     <span class="ident">channel</span>,
                 ),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SpanExporter::new_tonic</span>(<span class="ident">builder</span>.<span class="ident">exporter_config</span>, <span class="ident">builder</span>.<span class="ident">tonic_config</span>),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">SpanExporter::new_tonic</span>(<span class="ident">builder</span>.<span class="ident">exporter_config</span>, <span class="ident">builder</span>.<span class="ident">tonic_config</span>),
             }<span class="question-mark">?</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-            <span class="ident">SpanExporterBuilder::Grpcio</span>(<span class="ident">builder</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">SpanExporter::new_grpcio</span>(
+            <span class="ident">SpanExporterBuilder::Grpcio</span>(<span class="ident">builder</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SpanExporter::new_grpcio</span>(
                 <span class="ident">builder</span>.<span class="ident">exporter_config</span>,
                 <span class="ident">builder</span>.<span class="ident">grpcio_config</span>,
             )),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-            <span class="ident">SpanExporterBuilder::Http</span>(<span class="ident">builder</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">SpanExporter::new_http</span>(
+            <span class="ident">SpanExporterBuilder::Http</span>(<span class="ident">builder</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SpanExporter::new_http</span>(
                 <span class="ident">builder</span>.<span class="ident">exporter_config</span>,
                 <span class="ident">builder</span>.<span class="ident">http_config</span>,
             )<span class="question-mark">?</span>),
@@ -750,21 +750,21 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TonicExporterBuilder</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SpanExporterBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">exporter</span>: <span class="ident">TonicExporterBuilder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">exporter</span>: <span class="ident">TonicExporterBuilder</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanExporterBuilder::Tonic</span>(<span class="ident">exporter</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">GrpcioExporterBuilder</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SpanExporterBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">exporter</span>: <span class="ident">GrpcioExporterBuilder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">exporter</span>: <span class="ident">GrpcioExporterBuilder</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanExporterBuilder::Grpcio</span>(<span class="ident">exporter</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">HttpExporterBuilder</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SpanExporterBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">exporter</span>: <span class="ident">HttpExporterBuilder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">exporter</span>: <span class="ident">HttpExporterBuilder</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanExporterBuilder::Http</span>(<span class="ident">exporter</span>)
     }
 }
@@ -806,12 +806,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">SpanExporter</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
             <span class="ident">SpanExporter::Tonic</span> {
                 <span class="ident">metadata</span>, <span class="ident">timeout</span>, ..
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>
+            } =&gt; <span class="ident">f</span>
                 .<span class="ident">debug_struct</span>(<span class="string">&quot;Exporter&quot;</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;metadata&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">metadata</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">timeout</span>)
@@ -820,7 +820,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
             <span class="ident">SpanExporter::Grpcio</span> {
                 <span class="ident">headers</span>, <span class="ident">timeout</span>, ..
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>
+            } =&gt; <span class="ident">f</span>
                 .<span class="ident">debug_struct</span>(<span class="string">&quot;Exporter&quot;</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;headers&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">timeout</span>)
@@ -829,7 +829,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
             <span class="ident">SpanExporter::Http</span> {
                 <span class="ident">headers</span>, <span class="ident">timeout</span>, ..
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>
+            } =&gt; <span class="ident">f</span>
                 .<span class="ident">debug_struct</span>(<span class="string">&quot;Exporter&quot;</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;headers&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">timeout</span>)
@@ -845,13 +845,13 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_tonic</span>(
         <span class="ident">config</span>: <span class="ident">ExportConfig</span>,
         <span class="ident">tonic_config</span>: <span class="ident">TonicConfig</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">endpoint</span> <span class="op">=</span> <span class="ident">TonicChannel::from_shared</span>(<span class="ident">config</span>.<span class="ident">endpoint</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tonic_config</span>.<span class="ident">tls_config</span>.<span class="ident">as_ref</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">tls_config</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">endpoint</span>.<span class="ident">tls_config</span>(<span class="ident">tls_config</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">endpoint</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">tls_config</span>) =&gt; <span class="ident">endpoint</span>.<span class="ident">tls_config</span>(<span class="ident">tls_config</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">endpoint</span>,
         }
         .<span class="ident">timeout</span>(<span class="ident">config</span>.<span class="ident">timeout</span>)
         .<span class="ident">connect_lazy</span>()<span class="question-mark">?</span>;
@@ -872,7 +872,7 @@
         <span class="ident">config</span>: <span class="ident">ExportConfig</span>,
         <span class="ident">tonic_config</span>: <span class="ident">TonicConfig</span>,
         <span class="ident">channel</span>: <span class="ident">tonic::transport::Channel</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">SpanExporter::Tonic</span> {
             <span class="ident">timeout</span>: <span class="ident">config</span>.<span class="ident">timeout</span>,
             <span class="ident">metadata</span>: <span class="ident">tonic_config</span>.<span class="ident">metadata</span>,
@@ -882,7 +882,7 @@
 
     <span class="doccomment">/// Builds a new span exporter with the given configuration</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_grpcio</span>(<span class="ident">config</span>: <span class="ident">ExportConfig</span>, <span class="ident">grpcio_config</span>: <span class="ident">GrpcioConfig</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_grpcio</span>(<span class="ident">config</span>: <span class="ident">ExportConfig</span>, <span class="ident">grpcio_config</span>: <span class="ident">GrpcioConfig</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span>: <span class="ident">ChannelBuilder</span> <span class="op">=</span> <span class="ident">ChannelBuilder::new</span>(<span class="ident">Arc::new</span>(<span class="ident">Environment::new</span>(
             <span class="ident">grpcio_config</span>.<span class="ident">completion_queue_count</span>,
         )));
@@ -892,12 +892,12 @@
         }
 
         <span class="kw">let</span> <span class="ident">channel</span>: <span class="ident">GrpcChannel</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">grpcio_config</span>.<span class="ident">credentials</span>, <span class="ident">grpcio_config</span>.<span class="ident">use_tls</span>) {
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">builder</span>.<span class="ident">secure_connect</span>(
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)) =&gt; <span class="ident">builder</span>.<span class="ident">secure_connect</span>(
                 <span class="ident">config</span>.<span class="ident">endpoint</span>.<span class="ident">as_str</span>(),
                 <span class="ident">ChannelCredentialsBuilder::new</span>().<span class="ident">build</span>(),
             ),
-            (<span class="prelude-val">None</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">builder</span>.<span class="ident">connect</span>(<span class="ident">config</span>.<span class="ident">endpoint</span>.<span class="ident">as_str</span>()),
-            (<span class="prelude-val">Some</span>(<span class="ident">credentials</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">builder</span>.<span class="ident">secure_connect</span>(
+            (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="ident">builder</span>.<span class="ident">connect</span>(<span class="ident">config</span>.<span class="ident">endpoint</span>.<span class="ident">as_str</span>()),
+            (<span class="prelude-val">Some</span>(<span class="ident">credentials</span>), <span class="kw">_</span>) =&gt; <span class="ident">builder</span>.<span class="ident">secure_connect</span>(
                 <span class="ident">config</span>.<span class="ident">endpoint</span>.<span class="ident">as_str</span>(),
                 <span class="ident">ChannelCredentialsBuilder::new</span>()
                     .<span class="ident">cert</span>(<span class="ident">credentials</span>.<span class="ident">cert</span>.<span class="ident">into</span>(), <span class="ident">credentials</span>.<span class="ident">key</span>.<span class="ident">into</span>())
@@ -914,7 +914,7 @@
 
     <span class="doccomment">/// Builds a new span exporter with the given configuration</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_http</span>(<span class="ident">config</span>: <span class="ident">ExportConfig</span>, <span class="ident">http_config</span>: <span class="ident">HttpConfig</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_http</span>(<span class="ident">config</span>: <span class="ident">ExportConfig</span>, <span class="ident">http_config</span>: <span class="ident">HttpConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">url</span>: <span class="ident">Uri</span> <span class="op">=</span> <span class="ident">config</span>
             .<span class="ident">endpoint</span>
             .<span class="ident">parse</span>()
@@ -931,14 +931,14 @@
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">opentelemetry::sdk::export::trace::SpanExporter</span> <span class="kw">for</span> <span class="ident">SpanExporter</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SpanData</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExportResult</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SpanData</span><span class="op">&gt;</span>) -&gt; <span class="ident">ExportResult</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
             <span class="ident">SpanExporter::Grpcio</span> {
                 <span class="ident">timeout</span>,
                 <span class="ident">headers</span>,
                 <span class="ident">trace_exporter</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">GrpcRequest</span> {
                     <span class="ident">resource_spans</span>: <span class="ident">RepeatedField::from_vec</span>(
                         <span class="ident">batch</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
@@ -971,7 +971,7 @@
                 <span class="ident">trace_exporter</span>,
                 <span class="ident">metadata</span>,
                 ..
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">Request::new</span>(<span class="ident">TonicRequest</span> {
                     <span class="ident">resource_spans</span>: <span class="ident">batch</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
                 });
@@ -979,10 +979,10 @@
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">metadata</span>) <span class="op">=</span> <span class="ident">metadata</span> {
                     <span class="kw">for</span> <span class="ident">key_and_value</span> <span class="kw">in</span> <span class="ident">metadata</span>.<span class="ident">iter</span>() {
                         <span class="kw">match</span> <span class="ident">key_and_value</span> {
-                            <span class="ident">KeyAndValueRef::Ascii</span>(<span class="ident">key</span>, <span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">KeyAndValueRef::Ascii</span>(<span class="ident">key</span>, <span class="ident">value</span>) =&gt; {
                                 <span class="ident">request</span>.<span class="ident">metadata_mut</span>().<span class="ident">append</span>(<span class="ident">key</span>, <span class="ident">value</span>.<span class="ident">to_owned</span>())
                             }
-                            <span class="ident">KeyAndValueRef::Binary</span>(<span class="ident">key</span>, <span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">KeyAndValueRef::Binary</span>(<span class="ident">key</span>, <span class="ident">value</span>) =&gt; {
                                 <span class="ident">request</span>.<span class="ident">metadata_mut</span>().<span class="ident">append_bin</span>(<span class="ident">key</span>, <span class="ident">value</span>.<span class="ident">to_owned</span>())
                             }
                         };
@@ -1004,7 +1004,7 @@
                 <span class="ident">collector_endpoint</span>,
                 <span class="ident">headers</span>,
                 ..
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">ProstRequest</span> {
                     <span class="ident">resource_spans</span>: <span class="ident">batch</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
                 };

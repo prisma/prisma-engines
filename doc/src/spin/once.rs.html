@@ -314,12 +314,12 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">try</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Once {{ data: &quot;</span>)
+            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Once {{ data: &quot;</span>)
 				.<span class="ident">and_then</span>(<span class="op">|</span>()<span class="op">|</span> <span class="ident">s</span>.<span class="ident">fmt</span>(<span class="ident">f</span>))
 				.<span class="ident">and_then</span>(<span class="op">|</span>()<span class="op">|</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;}}&quot;</span>)),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Once {{ &lt;uninitialized&gt; }}&quot;</span>)
+            <span class="prelude-val">None</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Once {{ &lt;uninitialized&gt; }}&quot;</span>)
         }
     }
 }
@@ -346,14 +346,14 @@
     };
 
     <span class="doccomment">/// Creates a new `Once` value.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::INIT</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">force_get</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">force_get</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> {
         <span class="kw">match</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get</span>() }.<span class="ident">as_ref</span>() {
-            <span class="prelude-val">None</span>    <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> { <span class="ident">unreachable</span>() },
-            <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">p</span>,
+            <span class="prelude-val">None</span>    =&gt; <span class="kw">unsafe</span> { <span class="ident">unreachable</span>() },
+            <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>,
         }
     }
 
@@ -385,16 +385,16 @@
     <span class="doccomment">/// # 2</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call_once</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">builder</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call_once</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">builder</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>
+        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span>
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
 
-        <span class="kw">if</span> <span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">INCOMPLETE</span> {
+        <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">INCOMPLETE</span> {
             <span class="ident">status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">compare_and_swap</span>(<span class="ident">INCOMPLETE</span>,
                                                  <span class="ident">RUNNING</span>,
                                                  <span class="ident">Ordering::SeqCst</span>);
-            <span class="kw">if</span> <span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">INCOMPLETE</span> { <span class="comment">// We init</span>
+            <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">INCOMPLETE</span> { <span class="comment">// We init</span>
                 <span class="comment">// We use a guard (Finish) to catch panics caused by builder</span>
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">finish</span> <span class="op">=</span> <span class="ident">Finish</span> { <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>, <span class="ident">panicked</span>: <span class="bool-val">true</span> };
                 <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get</span>() <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">builder</span>()) };
@@ -410,36 +410,36 @@
 
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="ident">status</span> {
-                <span class="ident">INCOMPLETE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
-                <span class="ident">RUNNING</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="comment">// We spin</span>
+                <span class="ident">INCOMPLETE</span> =&gt; <span class="macro">unreachable!</span>(),
+                <span class="ident">RUNNING</span> =&gt; { <span class="comment">// We spin</span>
                     <span class="ident">cpu_relax</span>();
                     <span class="ident">status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
                 },
-                <span class="ident">PANICKED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Once has panicked&quot;</span>),
-                <span class="ident">COMPLETE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="self">self</span>.<span class="ident">force_get</span>(),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> { <span class="ident">unreachable</span>() },
+                <span class="ident">PANICKED</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Once has panicked&quot;</span>),
+                <span class="ident">COMPLETE</span> =&gt; <span class="kw">return</span> <span class="self">self</span>.<span class="ident">force_get</span>(),
+                <span class="kw">_</span> =&gt; <span class="kw">unsafe</span> { <span class="ident">unreachable</span>() },
             }
         }
     }
 
     <span class="doccomment">/// Returns a pointer iff the `Once` was previously initialized</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) {
-            <span class="ident">COMPLETE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">force_get</span>()),
-            <span class="kw">_</span>        <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">COMPLETE</span> =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">force_get</span>()),
+            <span class="kw">_</span>        =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Like try, but will spin if the `Once` is in the process of being</span>
     <span class="doccomment">/// initialized</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) {
-                <span class="ident">INCOMPLETE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="ident">RUNNING</span>    <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cpu_relax</span>(), <span class="comment">// We spin</span>
-                <span class="ident">COMPLETE</span>   <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">force_get</span>()),
-                <span class="ident">PANICKED</span>   <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Once has panicked&quot;</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> { <span class="ident">unreachable</span>() },
+                <span class="ident">INCOMPLETE</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+                <span class="ident">RUNNING</span>    =&gt; <span class="ident">cpu_relax</span>(), <span class="comment">// We spin</span>
+                <span class="ident">COMPLETE</span>   =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">force_get</span>()),
+                <span class="ident">PANICKED</span>   =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Once has panicked&quot;</span>),
+                <span class="kw">_</span> =&gt; <span class="kw">unsafe</span> { <span class="ident">unreachable</span>() },
             }
         }
     }

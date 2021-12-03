@@ -1907,7 +1907,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RData</span> {
-    <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>);
@@ -1923,102 +1923,102 @@
         <span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">record_type</span>: <span class="ident">RecordType</span>,
         <span class="ident">rdata_length</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">start_idx</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">index</span>();
 
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">record_type</span> {
-            <span class="ident">RecordType::A</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::A</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading A&quot;</span>);
                 <span class="ident">rdata::a::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::A</span>)
             }
-            <span class="ident">RecordType::AAAA</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::AAAA</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading AAAA&quot;</span>);
                 <span class="ident">rdata::aaaa::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::AAAA</span>)
             }
-            <span class="ident">RecordType::ANAME</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::ANAME</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading ANAME&quot;</span>);
                 <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::ANAME</span>)
             }
-            <span class="ident">rt</span> @ <span class="ident">RecordType::ANY</span> <span class="op">|</span> <span class="ident">rt</span> @ <span class="ident">RecordType::AXFR</span> <span class="op">|</span> <span class="ident">rt</span> @ <span class="ident">RecordType::IXFR</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">rt</span> @ <span class="ident">RecordType::ANY</span> <span class="op">|</span> <span class="ident">rt</span> @ <span class="ident">RecordType::AXFR</span> <span class="op">|</span> <span class="ident">rt</span> @ <span class="ident">RecordType::IXFR</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoErrorKind::UnknownRecordTypeValue</span>(<span class="ident">rt</span>.<span class="ident">into</span>()).<span class="ident">into</span>());
             }
-            <span class="ident">RecordType::CAA</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::CAA</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading CAA&quot;</span>);
                 <span class="ident">rdata::caa::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::CAA</span>)
             }
-            <span class="ident">RecordType::CNAME</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::CNAME</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading CNAME&quot;</span>);
                 <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::CNAME</span>)
             }
-            <span class="ident">RecordType::HINFO</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::HINFO</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading HINFO&quot;</span>);
                 <span class="ident">rdata::hinfo::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::HINFO</span>)
             }
-            <span class="ident">RecordType::HTTPS</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::HTTPS</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading HTTPS&quot;</span>);
                 <span class="ident">rdata::svcb::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::HTTPS</span>)
             }
-            <span class="ident">RecordType::ZERO</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::ZERO</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading EMPTY&quot;</span>);
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RData::ZERO</span>);
             }
-            <span class="ident">RecordType::MX</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::MX</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading MX&quot;</span>);
                 <span class="ident">rdata::mx::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::MX</span>)
             }
-            <span class="ident">RecordType::NAPTR</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::NAPTR</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading NAPTR&quot;</span>);
                 <span class="ident">rdata::naptr::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::NAPTR</span>)
             }
-            <span class="ident">RecordType::NULL</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::NULL</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading NULL&quot;</span>);
                 <span class="ident">rdata::null::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::NULL</span>)
             }
-            <span class="ident">RecordType::NS</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::NS</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading NS&quot;</span>);
                 <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::NS</span>)
             }
-            <span class="ident">RecordType::OPENPGPKEY</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::OPENPGPKEY</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading OPENPGPKEY&quot;</span>);
                 <span class="ident">rdata::openpgpkey::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::OPENPGPKEY</span>)
             }
-            <span class="ident">RecordType::OPT</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::OPT</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading OPT&quot;</span>);
                 <span class="ident">rdata::opt::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::OPT</span>)
             }
-            <span class="ident">RecordType::PTR</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::PTR</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading PTR&quot;</span>);
                 <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::PTR</span>)
             }
-            <span class="ident">RecordType::SOA</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::SOA</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading SOA&quot;</span>);
                 <span class="ident">rdata::soa::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::SOA</span>)
             }
-            <span class="ident">RecordType::SRV</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::SRV</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading SRV&quot;</span>);
                 <span class="ident">rdata::srv::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident">RData::SRV</span>)
             }
-            <span class="ident">RecordType::SSHFP</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::SSHFP</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading SSHFP&quot;</span>);
                 <span class="ident">rdata::sshfp::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::SSHFP</span>)
             }
-            <span class="ident">RecordType::SVCB</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::SVCB</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading SVCB&quot;</span>);
                 <span class="ident">rdata::svcb::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::SVCB</span>)
             }
-            <span class="ident">RecordType::TLSA</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::TLSA</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading TLSA&quot;</span>);
                 <span class="ident">rdata::tlsa::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::TLSA</span>)
             }
-            <span class="ident">RecordType::TXT</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::TXT</span> =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading TXT&quot;</span>);
                 <span class="ident">rdata::txt::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::TXT</span>)
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RecordType::DNSSEC</span>(<span class="ident">record_type</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::DNSSEC</span>(<span class="ident">record_type</span>) =&gt; {
                 <span class="ident">DNSSECRData::read</span>(<span class="ident">decoder</span>, <span class="ident">record_type</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident">RData::DNSSEC</span>)
             }
-            <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>) =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading Unknown&quot;</span>);
                 <span class="ident">rdata::null::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">rdata</span><span class="op">|</span> <span class="ident">RData::Unknown</span> { <span class="ident">code</span>, <span class="ident">rdata</span> })
             }
@@ -2028,7 +2028,7 @@
         <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">index</span>() <span class="op">-</span> <span class="ident">start_idx</span>;
         <span class="ident">rdata_length</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">verify_unwrap</span>(<span class="op">|</span><span class="ident">rdata_length</span><span class="op">|</span> <span class="ident">read</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">rdata_length</span>)
+            .<span class="ident">verify_unwrap</span>(<span class="op">|</span><span class="ident">rdata_length</span><span class="op">|</span> <span class="ident">read</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">rdata_length</span>)
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">rdata_length</span><span class="op">|</span> {
                 <span class="ident">ProtoError::from</span>(<span class="ident">ProtoErrorKind::IncorrectRDataLengthRead</span> {
                     <span class="ident">read</span>,
@@ -2106,133 +2106,133 @@
     <span class="doccomment">///   DNAME, and A6.</span>
     <span class="doccomment">///   ...</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RData::A</span>(<span class="ident">address</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rdata::a::emit</span>(<span class="ident">encoder</span>, <span class="ident">address</span>),
-            <span class="ident">RData::AAAA</span>(<span class="kw-2">ref</span> <span class="ident">address</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rdata::aaaa::emit</span>(<span class="ident">encoder</span>, <span class="ident">address</span>),
-            <span class="ident">RData::ANAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RData::A</span>(<span class="ident">address</span>) =&gt; <span class="ident">rdata::a::emit</span>(<span class="ident">encoder</span>, <span class="ident">address</span>),
+            <span class="ident">RData::AAAA</span>(<span class="kw-2">ref</span> <span class="ident">address</span>) =&gt; <span class="ident">rdata::aaaa::emit</span>(<span class="ident">encoder</span>, <span class="ident">address</span>),
+            <span class="ident">RData::ANAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; {
                 <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::name::emit</span>(<span class="ident">encoder</span>, <span class="ident">name</span>))
             }
-            <span class="ident">RData::CAA</span>(<span class="kw-2">ref</span> <span class="ident">caa</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RData::CAA</span>(<span class="kw-2">ref</span> <span class="ident">caa</span>) =&gt; {
                 <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::caa::emit</span>(<span class="ident">encoder</span>, <span class="ident">caa</span>))
             }
             <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::CNAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::NS</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::PTR</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RData::CNAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::NS</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::PTR</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; {
                 <span class="ident">rdata::name::emit</span>(<span class="ident">encoder</span>, <span class="ident">name</span>)
             }
-            <span class="ident">RData::HINFO</span>(<span class="kw-2">ref</span> <span class="ident">hinfo</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rdata::hinfo::emit</span>(<span class="ident">encoder</span>, <span class="ident">hinfo</span>),
-            <span class="ident">RData::HTTPS</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rdata::svcb::emit</span>(<span class="ident">encoder</span>, <span class="ident">svcb</span>),
-            <span class="ident">RData::ZERO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+            <span class="ident">RData::HINFO</span>(<span class="kw-2">ref</span> <span class="ident">hinfo</span>) =&gt; <span class="ident">rdata::hinfo::emit</span>(<span class="ident">encoder</span>, <span class="ident">hinfo</span>),
+            <span class="ident">RData::HTTPS</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) =&gt; <span class="ident">rdata::svcb::emit</span>(<span class="ident">encoder</span>, <span class="ident">svcb</span>),
+            <span class="ident">RData::ZERO</span> =&gt; <span class="prelude-val">Ok</span>(()),
             <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::MX</span>(<span class="kw-2">ref</span> <span class="ident">mx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rdata::mx::emit</span>(<span class="ident">encoder</span>, <span class="ident">mx</span>),
-            <span class="ident">RData::NAPTR</span>(<span class="kw-2">ref</span> <span class="ident">naptr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RData::MX</span>(<span class="kw-2">ref</span> <span class="ident">mx</span>) =&gt; <span class="ident">rdata::mx::emit</span>(<span class="ident">encoder</span>, <span class="ident">mx</span>),
+            <span class="ident">RData::NAPTR</span>(<span class="kw-2">ref</span> <span class="ident">naptr</span>) =&gt; {
                 <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::naptr::emit</span>(<span class="ident">encoder</span>, <span class="ident">naptr</span>))
             }
-            <span class="ident">RData::NULL</span>(<span class="kw-2">ref</span> <span class="ident">null</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rdata::null::emit</span>(<span class="ident">encoder</span>, <span class="ident">null</span>),
-            <span class="ident">RData::OPENPGPKEY</span>(<span class="kw-2">ref</span> <span class="ident">openpgpkey</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RData::NULL</span>(<span class="kw-2">ref</span> <span class="ident">null</span>) =&gt; <span class="ident">rdata::null::emit</span>(<span class="ident">encoder</span>, <span class="ident">null</span>),
+            <span class="ident">RData::OPENPGPKEY</span>(<span class="kw-2">ref</span> <span class="ident">openpgpkey</span>) =&gt; {
                 <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::openpgpkey::emit</span>(<span class="ident">encoder</span>, <span class="ident">openpgpkey</span>))
             }
-            <span class="ident">RData::OPT</span>(<span class="kw-2">ref</span> <span class="ident">opt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rdata::opt::emit</span>(<span class="ident">encoder</span>, <span class="ident">opt</span>),
+            <span class="ident">RData::OPT</span>(<span class="kw-2">ref</span> <span class="ident">opt</span>) =&gt; <span class="ident">rdata::opt::emit</span>(<span class="ident">encoder</span>, <span class="ident">opt</span>),
             <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::SOA</span>(<span class="kw-2">ref</span> <span class="ident">soa</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rdata::soa::emit</span>(<span class="ident">encoder</span>, <span class="ident">soa</span>),
+            <span class="ident">RData::SOA</span>(<span class="kw-2">ref</span> <span class="ident">soa</span>) =&gt; <span class="ident">rdata::soa::emit</span>(<span class="ident">encoder</span>, <span class="ident">soa</span>),
             <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::SRV</span>(<span class="kw-2">ref</span> <span class="ident">srv</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RData::SRV</span>(<span class="kw-2">ref</span> <span class="ident">srv</span>) =&gt; {
                 <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::srv::emit</span>(<span class="ident">encoder</span>, <span class="ident">srv</span>))
             }
-            <span class="ident">RData::SSHFP</span>(<span class="kw-2">ref</span> <span class="ident">sshfp</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RData::SSHFP</span>(<span class="kw-2">ref</span> <span class="ident">sshfp</span>) =&gt; {
                 <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::sshfp::emit</span>(<span class="ident">encoder</span>, <span class="ident">sshfp</span>))
             }
-            <span class="ident">RData::SVCB</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rdata::svcb::emit</span>(<span class="ident">encoder</span>, <span class="ident">svcb</span>),
-            <span class="ident">RData::TLSA</span>(<span class="kw-2">ref</span> <span class="ident">tlsa</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RData::SVCB</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) =&gt; <span class="ident">rdata::svcb::emit</span>(<span class="ident">encoder</span>, <span class="ident">svcb</span>),
+            <span class="ident">RData::TLSA</span>(<span class="kw-2">ref</span> <span class="ident">tlsa</span>) =&gt; {
                 <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::tlsa::emit</span>(<span class="ident">encoder</span>, <span class="ident">tlsa</span>))
             }
-            <span class="ident">RData::TXT</span>(<span class="kw-2">ref</span> <span class="ident">txt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rdata::txt::emit</span>(<span class="ident">encoder</span>, <span class="ident">txt</span>),
+            <span class="ident">RData::TXT</span>(<span class="kw-2">ref</span> <span class="ident">txt</span>) =&gt; <span class="ident">rdata::txt::emit</span>(<span class="ident">encoder</span>, <span class="ident">txt</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)),
-            <span class="ident">RData::Unknown</span> { <span class="kw-2">ref</span> <span class="ident">rdata</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rdata::null::emit</span>(<span class="ident">encoder</span>, <span class="ident">rdata</span>),
+            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) =&gt; <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)),
+            <span class="ident">RData::Unknown</span> { <span class="kw-2">ref</span> <span class="ident">rdata</span>, .. } =&gt; <span class="ident">rdata::null::emit</span>(<span class="ident">encoder</span>, <span class="ident">rdata</span>),
         }
     }
 
     <span class="doccomment">/// Converts this to a Recordtype</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_record_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RecordType</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_record_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RecordType</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RData::A</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::A</span>,
-            <span class="ident">RData::AAAA</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::AAAA</span>,
-            <span class="ident">RData::ANAME</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::ANAME</span>,
-            <span class="ident">RData::CAA</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::CAA</span>,
-            <span class="ident">RData::CNAME</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::CNAME</span>,
-            <span class="ident">RData::HINFO</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::HINFO</span>,
-            <span class="ident">RData::HTTPS</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::HTTPS</span>,
-            <span class="ident">RData::MX</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::MX</span>,
-            <span class="ident">RData::NAPTR</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::NAPTR</span>,
-            <span class="ident">RData::NS</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::NS</span>,
-            <span class="ident">RData::NULL</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::NULL</span>,
-            <span class="ident">RData::OPENPGPKEY</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::OPENPGPKEY</span>,
-            <span class="ident">RData::OPT</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::OPT</span>,
-            <span class="ident">RData::PTR</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::PTR</span>,
-            <span class="ident">RData::SOA</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::SOA</span>,
-            <span class="ident">RData::SRV</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::SRV</span>,
-            <span class="ident">RData::SSHFP</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::SSHFP</span>,
-            <span class="ident">RData::SVCB</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::SVCB</span>,
-            <span class="ident">RData::TLSA</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::TLSA</span>,
-            <span class="ident">RData::TXT</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::TXT</span>,
+            <span class="ident">RData::A</span>(..) =&gt; <span class="ident">RecordType::A</span>,
+            <span class="ident">RData::AAAA</span>(..) =&gt; <span class="ident">RecordType::AAAA</span>,
+            <span class="ident">RData::ANAME</span>(..) =&gt; <span class="ident">RecordType::ANAME</span>,
+            <span class="ident">RData::CAA</span>(..) =&gt; <span class="ident">RecordType::CAA</span>,
+            <span class="ident">RData::CNAME</span>(..) =&gt; <span class="ident">RecordType::CNAME</span>,
+            <span class="ident">RData::HINFO</span>(..) =&gt; <span class="ident">RecordType::HINFO</span>,
+            <span class="ident">RData::HTTPS</span>(..) =&gt; <span class="ident">RecordType::HTTPS</span>,
+            <span class="ident">RData::MX</span>(..) =&gt; <span class="ident">RecordType::MX</span>,
+            <span class="ident">RData::NAPTR</span>(..) =&gt; <span class="ident">RecordType::NAPTR</span>,
+            <span class="ident">RData::NS</span>(..) =&gt; <span class="ident">RecordType::NS</span>,
+            <span class="ident">RData::NULL</span>(..) =&gt; <span class="ident">RecordType::NULL</span>,
+            <span class="ident">RData::OPENPGPKEY</span>(..) =&gt; <span class="ident">RecordType::OPENPGPKEY</span>,
+            <span class="ident">RData::OPT</span>(..) =&gt; <span class="ident">RecordType::OPT</span>,
+            <span class="ident">RData::PTR</span>(..) =&gt; <span class="ident">RecordType::PTR</span>,
+            <span class="ident">RData::SOA</span>(..) =&gt; <span class="ident">RecordType::SOA</span>,
+            <span class="ident">RData::SRV</span>(..) =&gt; <span class="ident">RecordType::SRV</span>,
+            <span class="ident">RData::SSHFP</span>(..) =&gt; <span class="ident">RecordType::SSHFP</span>,
+            <span class="ident">RData::SVCB</span>(..) =&gt; <span class="ident">RecordType::SVCB</span>,
+            <span class="ident">RData::TLSA</span>(..) =&gt; <span class="ident">RecordType::TLSA</span>,
+            <span class="ident">RData::TXT</span>(..) =&gt; <span class="ident">RecordType::TXT</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::DNSSEC</span>(<span class="ident">DNSSECRData::to_record_type</span>(<span class="ident">rdata</span>)),
-            <span class="ident">RData::Unknown</span> { <span class="ident">code</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>),
-            <span class="ident">RData::ZERO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::ZERO</span>,
+            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) =&gt; <span class="ident">RecordType::DNSSEC</span>(<span class="ident">DNSSECRData::to_record_type</span>(<span class="ident">rdata</span>)),
+            <span class="ident">RData::Unknown</span> { <span class="ident">code</span>, .. } =&gt; <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>),
+            <span class="ident">RData::ZERO</span> =&gt; <span class="ident">RecordType::ZERO</span>,
         }
     }
 
     <span class="doccomment">/// If this is an A or AAAA record type, then an IpAddr will be returned</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ip_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ip_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RData::A</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">a</span>)),
-            <span class="ident">RData::AAAA</span>(<span class="ident">aaaa</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">aaaa</span>)),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RData::A</span>(<span class="ident">a</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">a</span>)),
+            <span class="ident">RData::AAAA</span>(<span class="ident">aaaa</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">aaaa</span>)),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RData</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">w</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">d</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">w</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">d</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{rdata}&quot;</span>, <span class="ident">rdata</span> <span class="op">=</span> <span class="ident">d</span>)
         }
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RData::A</span>(<span class="ident">address</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">address</span>),
-            <span class="ident">RData::AAAA</span>(<span class="kw-2">ref</span> <span class="ident">address</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">address</span>),
-            <span class="ident">RData::ANAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">name</span>),
-            <span class="ident">RData::CAA</span>(<span class="kw-2">ref</span> <span class="ident">caa</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">caa</span>),
+            <span class="ident">RData::A</span>(<span class="ident">address</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">address</span>),
+            <span class="ident">RData::AAAA</span>(<span class="kw-2">ref</span> <span class="ident">address</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">address</span>),
+            <span class="ident">RData::ANAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">name</span>),
+            <span class="ident">RData::CAA</span>(<span class="kw-2">ref</span> <span class="ident">caa</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">caa</span>),
             <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::CNAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::NS</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::PTR</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">name</span>),
-            <span class="ident">RData::HINFO</span>(<span class="kw-2">ref</span> <span class="ident">hinfo</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">hinfo</span>),
-            <span class="ident">RData::HTTPS</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">svcb</span>),
-            <span class="ident">RData::ZERO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+            <span class="ident">RData::CNAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::NS</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::PTR</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">name</span>),
+            <span class="ident">RData::HINFO</span>(<span class="kw-2">ref</span> <span class="ident">hinfo</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">hinfo</span>),
+            <span class="ident">RData::HTTPS</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">svcb</span>),
+            <span class="ident">RData::ZERO</span> =&gt; <span class="prelude-val">Ok</span>(()),
             <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::MX</span>(<span class="kw-2">ref</span> <span class="ident">mx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">mx</span>),
-            <span class="ident">RData::NAPTR</span>(<span class="kw-2">ref</span> <span class="ident">naptr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">naptr</span>),
-            <span class="ident">RData::NULL</span>(<span class="kw-2">ref</span> <span class="ident">null</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">null</span>),
-            <span class="ident">RData::OPENPGPKEY</span>(<span class="kw-2">ref</span> <span class="ident">openpgpkey</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">openpgpkey</span>),
+            <span class="ident">RData::MX</span>(<span class="kw-2">ref</span> <span class="ident">mx</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">mx</span>),
+            <span class="ident">RData::NAPTR</span>(<span class="kw-2">ref</span> <span class="ident">naptr</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">naptr</span>),
+            <span class="ident">RData::NULL</span>(<span class="kw-2">ref</span> <span class="ident">null</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">null</span>),
+            <span class="ident">RData::OPENPGPKEY</span>(<span class="kw-2">ref</span> <span class="ident">openpgpkey</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">openpgpkey</span>),
             <span class="comment">// Opt has no display representation</span>
-            <span class="ident">RData::OPT</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">fmt::Error</span>),
+            <span class="ident">RData::OPT</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">fmt::Error</span>),
             <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::SOA</span>(<span class="kw-2">ref</span> <span class="ident">soa</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">soa</span>),
+            <span class="ident">RData::SOA</span>(<span class="kw-2">ref</span> <span class="ident">soa</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">soa</span>),
             <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::SRV</span>(<span class="kw-2">ref</span> <span class="ident">srv</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">srv</span>),
-            <span class="ident">RData::SSHFP</span>(<span class="kw-2">ref</span> <span class="ident">sshfp</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">sshfp</span>),
-            <span class="ident">RData::SVCB</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">svcb</span>),
-            <span class="ident">RData::TLSA</span>(<span class="kw-2">ref</span> <span class="ident">tlsa</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">tlsa</span>),
-            <span class="ident">RData::TXT</span>(<span class="kw-2">ref</span> <span class="ident">txt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">txt</span>),
+            <span class="ident">RData::SRV</span>(<span class="kw-2">ref</span> <span class="ident">srv</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">srv</span>),
+            <span class="ident">RData::SSHFP</span>(<span class="kw-2">ref</span> <span class="ident">sshfp</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">sshfp</span>),
+            <span class="ident">RData::SVCB</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">svcb</span>),
+            <span class="ident">RData::TLSA</span>(<span class="kw-2">ref</span> <span class="ident">tlsa</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">tlsa</span>),
+            <span class="ident">RData::TXT</span>(<span class="kw-2">ref</span> <span class="ident">txt</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">txt</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">rdata</span>),
-            <span class="ident">RData::Unknown</span> { <span class="kw-2">ref</span> <span class="ident">rdata</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">rdata</span>),
+            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">rdata</span>),
+            <span class="ident">RData::Unknown</span> { <span class="kw-2">ref</span> <span class="ident">rdata</span>, .. } =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">rdata</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RData</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RData</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
     }
 }
@@ -2255,7 +2255,7 @@
     <span class="comment">//    in the spirit of the robustness principle (being liberal in what it</span>
     <span class="comment">//    accepts), it MUST remove all but one of the duplicate RR(s) for the</span>
     <span class="comment">//    purposes of calculating the canonical form of the RRset.</span>
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
         <span class="comment">// TODO: how about we just store the bytes with the decoded data?</span>
         <span class="comment">//  the decoded data is useful for queries, the encoded data is needed for transfers, signing</span>
         <span class="comment">//  and ordering.</span>
@@ -2279,7 +2279,7 @@
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">fn</span> <span class="ident">get_data</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">RData</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">RData</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="macro">vec!</span>[
             (
                 <span class="ident">RData::CNAME</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>()),
@@ -2446,32 +2446,32 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">record_type_from_rdata</span>(<span class="ident">rdata</span>: <span class="kw-2">&amp;</span><span class="ident">RData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::rr::record_type::RecordType</span> {
+    <span class="kw">fn</span> <span class="ident">record_type_from_rdata</span>(<span class="ident">rdata</span>: <span class="kw-2">&amp;</span><span class="ident">RData</span>) -&gt; <span class="ident"><span class="kw">crate</span>::rr::record_type::RecordType</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">rdata</span> {
-            <span class="ident">RData::A</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::A</span>,
-            <span class="ident">RData::AAAA</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::AAAA</span>,
-            <span class="ident">RData::ANAME</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::ANAME</span>,
-            <span class="ident">RData::CAA</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::CAA</span>,
-            <span class="ident">RData::CNAME</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::CNAME</span>,
-            <span class="ident">RData::HINFO</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::HINFO</span>,
-            <span class="ident">RData::HTTPS</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::HTTPS</span>,
-            <span class="ident">RData::MX</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::MX</span>,
-            <span class="ident">RData::NAPTR</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::NAPTR</span>,
-            <span class="ident">RData::NS</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::NS</span>,
-            <span class="ident">RData::NULL</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::NULL</span>,
-            <span class="ident">RData::OPENPGPKEY</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::OPENPGPKEY</span>,
-            <span class="ident">RData::OPT</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::OPT</span>,
-            <span class="ident">RData::PTR</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::PTR</span>,
-            <span class="ident">RData::SOA</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::SOA</span>,
-            <span class="ident">RData::SRV</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::SRV</span>,
-            <span class="ident">RData::SSHFP</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::SSHFP</span>,
-            <span class="ident">RData::SVCB</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::SVCB</span>,
-            <span class="ident">RData::TLSA</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::TLSA</span>,
-            <span class="ident">RData::TXT</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::TXT</span>,
+            <span class="ident">RData::A</span>(..) =&gt; <span class="ident">RecordType::A</span>,
+            <span class="ident">RData::AAAA</span>(..) =&gt; <span class="ident">RecordType::AAAA</span>,
+            <span class="ident">RData::ANAME</span>(..) =&gt; <span class="ident">RecordType::ANAME</span>,
+            <span class="ident">RData::CAA</span>(..) =&gt; <span class="ident">RecordType::CAA</span>,
+            <span class="ident">RData::CNAME</span>(..) =&gt; <span class="ident">RecordType::CNAME</span>,
+            <span class="ident">RData::HINFO</span>(..) =&gt; <span class="ident">RecordType::HINFO</span>,
+            <span class="ident">RData::HTTPS</span>(..) =&gt; <span class="ident">RecordType::HTTPS</span>,
+            <span class="ident">RData::MX</span>(..) =&gt; <span class="ident">RecordType::MX</span>,
+            <span class="ident">RData::NAPTR</span>(..) =&gt; <span class="ident">RecordType::NAPTR</span>,
+            <span class="ident">RData::NS</span>(..) =&gt; <span class="ident">RecordType::NS</span>,
+            <span class="ident">RData::NULL</span>(..) =&gt; <span class="ident">RecordType::NULL</span>,
+            <span class="ident">RData::OPENPGPKEY</span>(..) =&gt; <span class="ident">RecordType::OPENPGPKEY</span>,
+            <span class="ident">RData::OPT</span>(..) =&gt; <span class="ident">RecordType::OPT</span>,
+            <span class="ident">RData::PTR</span>(..) =&gt; <span class="ident">RecordType::PTR</span>,
+            <span class="ident">RData::SOA</span>(..) =&gt; <span class="ident">RecordType::SOA</span>,
+            <span class="ident">RData::SRV</span>(..) =&gt; <span class="ident">RecordType::SRV</span>,
+            <span class="ident">RData::SSHFP</span>(..) =&gt; <span class="ident">RecordType::SSHFP</span>,
+            <span class="ident">RData::SVCB</span>(..) =&gt; <span class="ident">RecordType::SVCB</span>,
+            <span class="ident">RData::TLSA</span>(..) =&gt; <span class="ident">RecordType::TLSA</span>,
+            <span class="ident">RData::TXT</span>(..) =&gt; <span class="ident">RecordType::TXT</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::DNSSEC</span>(<span class="ident">rdata</span>.<span class="ident">to_record_type</span>()),
-            <span class="ident">RData::Unknown</span> { <span class="ident">code</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>),
-            <span class="ident">RData::ZERO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::ZERO</span>,
+            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) =&gt; <span class="ident">RecordType::DNSSEC</span>(<span class="ident">rdata</span>.<span class="ident">to_record_type</span>()),
+            <span class="ident">RData::Unknown</span> { <span class="ident">code</span>, .. } =&gt; <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>),
+            <span class="ident">RData::ZERO</span> =&gt; <span class="ident">RecordType::ZERO</span>,
         }
     }
 

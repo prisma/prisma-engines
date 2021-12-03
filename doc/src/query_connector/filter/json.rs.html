@@ -214,7 +214,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">JsonCompare</span> <span class="kw">for</span> <span class="ident">ScalarFieldRef</span> {
-    <span class="kw">fn</span> <span class="ident">json_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">json_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -229,7 +229,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">json_not_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">json_not_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -244,7 +244,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">json_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">json_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -259,7 +259,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">json_not_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">json_not_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -274,7 +274,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">json_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">json_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -289,7 +289,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">json_not_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">json_not_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>, <span class="ident">target_type</span>: <span class="ident">JsonTargetType</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -304,7 +304,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">json_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">json_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -319,7 +319,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">json_not_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">json_not_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -334,7 +334,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">json_less_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">json_less_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -349,7 +349,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">json_less_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">json_less_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -364,7 +364,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">json_greater_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">json_greater_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -379,7 +379,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">json_greater_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">json_greater_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {

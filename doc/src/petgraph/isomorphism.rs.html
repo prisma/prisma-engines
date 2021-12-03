@@ -494,7 +494,7 @@
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">c0</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">node_count</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Vf2State</span> {
             <span class="ident">mapping</span>: <span class="ident">Vec::with_capacity</span>(<span class="ident">c0</span>),
@@ -517,8 +517,8 @@
     }
 
     <span class="doccomment">/// Return **true** if we have a complete mapping</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_complete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">generation</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">mapping</span>.<span class="ident">len</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_complete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">generation</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">mapping</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// Add mapping **from** &lt;-&gt; **to** to the state.</span>
@@ -532,14 +532,14 @@
         <span class="comment">// T0out: Node in G0 not in M0 but successor of a node in M0.</span>
         <span class="comment">// st.out[0]: Node either in M0 or successor of M0</span>
         <span class="kw">for</span> <span class="ident">ix</span> <span class="kw">in</span> <span class="ident">g</span>.<span class="ident">neighbors</span>(<span class="ident">from</span>) {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">out</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">out</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">==</span> <span class="number">0</span> {
                 <span class="self">self</span>.<span class="ident">out</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">=</span> <span class="ident">s</span>;
                 <span class="self">self</span>.<span class="ident">out_size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             }
         }
         <span class="kw">if</span> <span class="ident">g</span>.<span class="ident">is_directed</span>() {
             <span class="kw">for</span> <span class="ident">ix</span> <span class="kw">in</span> <span class="ident">g</span>.<span class="ident">neighbors_directed</span>(<span class="ident">from</span>, <span class="ident">Incoming</span>) {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ins</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ins</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">==</span> <span class="number">0</span> {
                     <span class="self">self</span>.<span class="ident">ins</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">=</span> <span class="ident">s</span>;
                     <span class="self">self</span>.<span class="ident">ins_size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 }
@@ -559,14 +559,14 @@
 
         <span class="comment">// unmark in ins and outs</span>
         <span class="kw">for</span> <span class="ident">ix</span> <span class="kw">in</span> <span class="ident">g</span>.<span class="ident">neighbors</span>(<span class="ident">from</span>) {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">out</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">=</span><span class="op">=</span> <span class="ident">s</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">out</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">==</span> <span class="ident">s</span> {
                 <span class="self">self</span>.<span class="ident">out</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">=</span> <span class="number">0</span>;
                 <span class="self">self</span>.<span class="ident">out_size</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
             }
         }
         <span class="kw">if</span> <span class="ident">g</span>.<span class="ident">is_directed</span>() {
             <span class="kw">for</span> <span class="ident">ix</span> <span class="kw">in</span> <span class="ident">g</span>.<span class="ident">neighbors_directed</span>(<span class="ident">from</span>, <span class="ident">Incoming</span>) {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ins</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">=</span><span class="op">=</span> <span class="ident">s</span> {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ins</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">==</span> <span class="ident">s</span> {
                     <span class="self">self</span>.<span class="ident">ins</span>[<span class="ident">ix</span>.<span class="ident">index</span>()] <span class="op">=</span> <span class="number">0</span>;
                     <span class="self">self</span>.<span class="ident">ins_size</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
                 }
@@ -575,17 +575,17 @@
     }
 
     <span class="doccomment">/// Find the next (least) node in the Tout set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_out_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_out_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from_index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">out</span>[<span class="ident">from_index</span>..].<span class="ident">iter</span>()
                     .<span class="ident">enumerate</span>()
                     .<span class="ident">find</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">index</span>, <span class="ident">elt</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span>
-                          <span class="self">self</span>.<span class="ident">mapping</span>[<span class="ident">from_index</span> <span class="op">+</span> <span class="ident">index</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">NodeIndex::end</span>())
+                          <span class="self">self</span>.<span class="ident">mapping</span>[<span class="ident">from_index</span> <span class="op">+</span> <span class="ident">index</span>] <span class="op">==</span> <span class="ident">NodeIndex::end</span>())
                     .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">index</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">index</span>)
     }
 
     <span class="doccomment">/// Find the next (least) node in the Tin set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_in_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_in_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from_index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
     {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">Ty::is_directed</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>
@@ -593,16 +593,16 @@
         <span class="self">self</span>.<span class="ident">ins</span>[<span class="ident">from_index</span>..].<span class="ident">iter</span>()
                     .<span class="ident">enumerate</span>()
                     .<span class="ident">find</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">index</span>, <span class="ident">elt</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">&gt;</span> <span class="number">0</span>
-                          <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">mapping</span>[<span class="ident">from_index</span> <span class="op">+</span> <span class="ident">index</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">NodeIndex::end</span>())
+                          <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">mapping</span>[<span class="ident">from_index</span> <span class="op">+</span> <span class="ident">index</span>] <span class="op">==</span> <span class="ident">NodeIndex::end</span>())
                     .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">index</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">index</span>)
     }
 
     <span class="doccomment">/// Find the next (least) node in the N - M set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_rest_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_rest_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from_index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">mapping</span>[<span class="ident">from_index</span>..].<span class="ident">iter</span>()
                .<span class="ident">enumerate</span>()
-               .<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">elt</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">=</span><span class="op">=</span> <span class="ident">NodeIndex::end</span>())
+               .<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">elt</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">==</span> <span class="ident">NodeIndex::end</span>())
                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">index</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">index</span>)
     }
 }
@@ -620,7 +620,7 @@
 <span class="doccomment">/// * Luigi P. Cordella, Pasquale Foggia, Carlo Sansone, Mario Vento;</span>
 <span class="doccomment">///   *A (Sub)Graph Isomorphism Algorithm for Matching Large Graphs*</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_isomorphic</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>(<span class="ident">g0</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>,
-                                   <span class="ident">g1</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+                                   <span class="ident">g1</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
@@ -641,11 +641,11 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_isomorphic_matching</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span>, <span class="ident">F</span>, <span class="ident">G</span><span class="op">&gt;</span>(<span class="ident">g0</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>,
                                                   <span class="ident">g1</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>,
                                                   <span class="kw-2">mut</span> <span class="ident">node_match</span>: <span class="ident">F</span>,
-                                                  <span class="kw-2">mut</span> <span class="ident">edge_match</span>: <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+                                                  <span class="kw-2">mut</span> <span class="ident">edge_match</span>: <span class="ident">G</span>) -&gt; <span class="ident">bool</span>
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
-          <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
-          <span class="ident">G</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">E</span>, <span class="kw-2">&amp;</span><span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+          <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="ident">N</span>) -&gt; <span class="ident">bool</span>,
+          <span class="ident">G</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">E</span>, <span class="kw-2">&amp;</span><span class="ident">E</span>) -&gt; <span class="ident">bool</span>,
 {
     <span class="kw">if</span> <span class="ident">g0</span>.<span class="ident">node_count</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">g1</span>.<span class="ident">node_count</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">g0</span>.<span class="ident">edge_count</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">g1</span>.<span class="ident">edge_count</span>() {
         <span class="kw">return</span> <span class="bool-val">false</span>
@@ -656,24 +656,24 @@
 }
 
 <span class="kw">trait</span> <span class="ident">SemanticMatcher</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">enabled</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">enabled</span>() -&gt; <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span>;
 }
 
 <span class="kw">struct</span> <span class="ident">NoSemanticMatch</span>;
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SemanticMatcher</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NoSemanticMatch</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">false</span> }
+    <span class="kw">fn</span> <span class="ident">enabled</span>() -&gt; <span class="ident">bool</span> { <span class="bool-val">false</span> }
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">true</span> }
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">SemanticMatcher</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span> <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">SemanticMatcher</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span> <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">true</span> }
+    <span class="kw">fn</span> <span class="ident">enabled</span>() -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="self">self</span>(<span class="ident">a</span>, <span class="ident">b</span>) }
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> { <span class="self">self</span>(<span class="ident">a</span>, <span class="ident">b</span>) }
 }
 
 <span class="doccomment">/// Return Some(bool) if isomorphism is decided, else None.</span>
@@ -682,7 +682,7 @@
                                  <span class="ident">g1</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>,
                                  <span class="ident">node_match</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">F</span>,
                                  <span class="ident">edge_match</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>)
-    <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+    -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
           <span class="ident">F</span>: <span class="ident">SemanticMatcher</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
@@ -740,9 +740,9 @@
     }
 
     <span class="kw">let</span> (<span class="ident">cand0</span>, <span class="ident">cand1</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">from_index</span>, <span class="ident">to_index</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">n</span>), <span class="prelude-val">Some</span>(<span class="ident">m</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">n</span>, <span class="ident">m</span>),
+        (<span class="prelude-val">Some</span>(<span class="ident">n</span>), <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; (<span class="ident">n</span>, <span class="ident">m</span>),
         <span class="comment">// No more candidates</span>
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
+        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
     };
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nx</span> <span class="op">=</span> <span class="ident">NodeIndex::new</span>(<span class="ident">cand0</span>);
@@ -755,13 +755,13 @@
             <span class="comment">// Find the next node index to try on the `from` side of the mapping</span>
             <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">nx</span>.<span class="ident">index</span>() <span class="op">+</span> <span class="number">1</span>;
             <span class="kw">let</span> <span class="ident">cand0</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">open_list</span> {
-                <span class="ident">OpenList::Out</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">next_out_index</span>(<span class="ident">start</span>),
-                <span class="ident">OpenList::In</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">next_in_index</span>(<span class="ident">start</span>),
-                <span class="ident">OpenList::Other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">next_rest_index</span>(<span class="ident">start</span>),
+                <span class="ident">OpenList::Out</span> =&gt; <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">next_out_index</span>(<span class="ident">start</span>),
+                <span class="ident">OpenList::In</span> =&gt; <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">next_in_index</span>(<span class="ident">start</span>),
+                <span class="ident">OpenList::Other</span> =&gt; <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">next_rest_index</span>(<span class="ident">start</span>),
             }.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">+</span> <span class="ident">start</span>); <span class="comment">// compensate for start offset.</span>
             <span class="ident">nx</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cand0</span> {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>, <span class="comment">// no more candidates</span>
-                <span class="prelude-val">Some</span>(<span class="ident">ix</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">NodeIndex::new</span>(<span class="ident">ix</span>),
+                <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>, <span class="comment">// no more candidates</span>
+                <span class="prelude-val">Some</span>(<span class="ident">ix</span>) =&gt; <span class="ident">NodeIndex::new</span>(<span class="ident">ix</span>),
             };
             <span class="macro">debug_assert!</span>(<span class="ident">nx</span>.<span class="ident">index</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">start</span>);
         }
@@ -796,7 +796,7 @@
                 } <span class="kw">else</span> {
                     <span class="ident">nodes</span>[<span class="number">1</span> <span class="op">-</span> <span class="ident">j</span>]
                 };
-                <span class="kw">if</span> <span class="ident">m_neigh</span> <span class="op">=</span><span class="op">=</span> <span class="ident">end</span> {
+                <span class="kw">if</span> <span class="ident">m_neigh</span> <span class="op">==</span> <span class="ident">end</span> {
                     <span class="kw">continue</span>;
                 }
                 <span class="kw">let</span> <span class="ident">has_edge</span> <span class="op">=</span> <span class="ident">g</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>].<span class="ident">is_adjacent</span>(<span class="kw-2">&amp;</span><span class="ident">st</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>].<span class="ident">adjacency_matrix</span>, <span class="ident">nodes</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>], <span class="ident">m_neigh</span>);
@@ -817,7 +817,7 @@
                     <span class="ident">pred_count</span>[<span class="ident">j</span>] <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="comment">// the self loop case is handled in outgoing</span>
                     <span class="kw">let</span> <span class="ident">m_neigh</span> <span class="op">=</span> <span class="ident">st</span>[<span class="ident">j</span>].<span class="ident">mapping</span>[<span class="ident">n_neigh</span>.<span class="ident">index</span>()];
-                    <span class="kw">if</span> <span class="ident">m_neigh</span> <span class="op">=</span><span class="op">=</span> <span class="ident">end</span> {
+                    <span class="kw">if</span> <span class="ident">m_neigh</span> <span class="op">==</span> <span class="ident">end</span> {
                         <span class="kw">continue</span>;
                     }
                     <span class="kw">let</span> <span class="ident">has_edge</span> <span class="op">=</span> <span class="ident">g</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>].<span class="ident">is_adjacent</span>(<span class="kw-2">&amp;</span><span class="ident">st</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>].<span class="ident">adjacency_matrix</span>, <span class="ident">m_neigh</span>, <span class="ident">nodes</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>]);
@@ -848,16 +848,16 @@
                     } <span class="kw">else</span> {
                         <span class="ident">nodes</span>[<span class="number">1</span> <span class="op">-</span> <span class="ident">j</span>]
                     };
-                    <span class="kw">if</span> <span class="ident">m_neigh</span> <span class="op">=</span><span class="op">=</span> <span class="ident">end</span> {
+                    <span class="kw">if</span> <span class="ident">m_neigh</span> <span class="op">==</span> <span class="ident">end</span> {
                         <span class="kw">continue</span>;
                     }
                     <span class="kw">match</span> <span class="ident">g</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>].<span class="ident">find_edge</span>(<span class="ident">nodes</span>[<span class="number">1</span> <span class="op">-</span> <span class="ident">j</span>], <span class="ident">m_neigh</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">m_edge</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">m_edge</span>) =&gt; {
                             <span class="kw">if</span> <span class="op">!</span><span class="ident">edge_match</span>.<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>[<span class="ident">j</span>][<span class="ident">n_edge</span>], <span class="kw-2">&amp;</span><span class="ident">g</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>][<span class="ident">m_edge</span>]) {
                                 <span class="kw">continue</span> <span class="lifetime">&#39;candidates</span>;
                             }
                         }
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>() <span class="comment">// covered by syntactic check</span>
+                        <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>() <span class="comment">// covered by syntactic check</span>
                     }
                 }
             }
@@ -869,16 +869,16 @@
                     <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">n_edge</span>, <span class="ident">n_neigh</span>)) <span class="op">=</span> <span class="ident">edges</span>.<span class="ident">next</span>(<span class="ident">g</span>[<span class="ident">j</span>]) {
                         <span class="comment">// the self loop case is handled in outgoing</span>
                         <span class="kw">let</span> <span class="ident">m_neigh</span> <span class="op">=</span> <span class="ident">st</span>[<span class="ident">j</span>].<span class="ident">mapping</span>[<span class="ident">n_neigh</span>.<span class="ident">index</span>()];
-                        <span class="kw">if</span> <span class="ident">m_neigh</span> <span class="op">=</span><span class="op">=</span> <span class="ident">end</span> {
+                        <span class="kw">if</span> <span class="ident">m_neigh</span> <span class="op">==</span> <span class="ident">end</span> {
                             <span class="kw">continue</span>;
                         }
                         <span class="kw">match</span> <span class="ident">g</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>].<span class="ident">find_edge</span>(<span class="ident">m_neigh</span>, <span class="ident">nodes</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>]) {
-                            <span class="prelude-val">Some</span>(<span class="ident">m_edge</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">m_edge</span>) =&gt; {
                                 <span class="kw">if</span> <span class="op">!</span><span class="ident">edge_match</span>.<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>[<span class="ident">j</span>][<span class="ident">n_edge</span>], <span class="kw-2">&amp;</span><span class="ident">g</span>[<span class="number">1</span><span class="op">-</span><span class="ident">j</span>][<span class="ident">m_edge</span>]) {
                                     <span class="kw">continue</span> <span class="lifetime">&#39;candidates</span>;
                                 }
                             }
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>() <span class="comment">// covered by syntactic check</span>
+                            <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>() <span class="comment">// covered by syntactic check</span>
                         }
                     }
                 }
@@ -891,14 +891,14 @@
         }
 
         <span class="comment">// Check cardinalities of Tin, Tout sets</span>
-        <span class="kw">if</span> <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">out_size</span> <span class="op">=</span><span class="op">=</span> <span class="ident">st</span>[<span class="number">1</span>].<span class="ident">out_size</span> <span class="op">&amp;&amp;</span>
-           <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">ins_size</span> <span class="op">=</span><span class="op">=</span> <span class="ident">st</span>[<span class="number">1</span>].<span class="ident">ins_size</span>
+        <span class="kw">if</span> <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">out_size</span> <span class="op">==</span> <span class="ident">st</span>[<span class="number">1</span>].<span class="ident">out_size</span> <span class="op">&amp;&amp;</span>
+           <span class="ident">st</span>[<span class="number">0</span>].<span class="ident">ins_size</span> <span class="op">==</span> <span class="ident">st</span>[<span class="number">1</span>].<span class="ident">ins_size</span>
         {
 
             <span class="comment">// Recurse</span>
             <span class="kw">match</span> <span class="ident">try_match</span>(<span class="ident">st</span>, <span class="ident">g0</span>, <span class="ident">g1</span>, <span class="ident">node_match</span>, <span class="ident">edge_match</span>) {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
-                <span class="ident">result</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">result</span>,
+                <span class="prelude-val">None</span> =&gt; {}
+                <span class="ident">result</span> =&gt; <span class="kw">return</span> <span class="ident">result</span>,
             }
         }
 

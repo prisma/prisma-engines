@@ -746,7 +746,7 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Input</span>, <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span><span class="op">&gt;</span>(
   <span class="ident">tag</span>: <span class="ident">T</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">InputTake</span> <span class="op">+</span> <span class="ident">InputLength</span> <span class="op">+</span> <span class="ident">Compare</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
   <span class="ident">T</span>: <span class="ident">InputLength</span> <span class="op">+</span> <span class="ident">Clone</span>,
@@ -756,9 +756,9 @@
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">tag</span>.<span class="ident">clone</span>();
 
     <span class="kw">let</span> <span class="ident">res</span>: <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">Error</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">i</span>.<span class="ident">compare</span>(<span class="ident">t</span>) {
-      <span class="ident">CompareResult::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>.<span class="ident">take_split</span>(<span class="ident">tag_len</span>)),
-      <span class="ident">CompareResult::Incomplete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::new</span>(<span class="ident">tag_len</span> <span class="op">-</span> <span class="ident">i</span>.<span class="ident">input_len</span>()))),
-      <span class="ident">CompareResult::Error</span> <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="ident">CompareResult::Ok</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">i</span>.<span class="ident">take_split</span>(<span class="ident">tag_len</span>)),
+      <span class="ident">CompareResult::Incomplete</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::new</span>(<span class="ident">tag_len</span> <span class="op">-</span> <span class="ident">i</span>.<span class="ident">input_len</span>()))),
+      <span class="ident">CompareResult::Error</span> =&gt; {
         <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">ErrorKind</span> <span class="op">=</span> <span class="ident">ErrorKind::Tag</span>;
         <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">Error::from_error_kind</span>(<span class="ident">i</span>, <span class="ident">e</span>)))
       }
@@ -789,7 +789,7 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag_no_case</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Input</span>, <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span><span class="op">&gt;</span>(
   <span class="ident">tag</span>: <span class="ident">T</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">InputTake</span> <span class="op">+</span> <span class="ident">InputLength</span> <span class="op">+</span> <span class="ident">Compare</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
   <span class="ident">T</span>: <span class="ident">InputLength</span> <span class="op">+</span> <span class="ident">Clone</span>,
@@ -799,9 +799,9 @@
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">tag</span>.<span class="ident">clone</span>();
 
     <span class="kw">let</span> <span class="ident">res</span>: <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">Error</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">i</span>).<span class="ident">compare_no_case</span>(<span class="ident">t</span>) {
-      <span class="ident">CompareResult::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>.<span class="ident">take_split</span>(<span class="ident">tag_len</span>)),
-      <span class="ident">CompareResult::Incomplete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::new</span>(<span class="ident">tag_len</span> <span class="op">-</span> <span class="ident">i</span>.<span class="ident">input_len</span>()))),
-      <span class="ident">CompareResult::Error</span> <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="ident">CompareResult::Ok</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">i</span>.<span class="ident">take_split</span>(<span class="ident">tag_len</span>)),
+      <span class="ident">CompareResult::Incomplete</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::new</span>(<span class="ident">tag_len</span> <span class="op">-</span> <span class="ident">i</span>.<span class="ident">input_len</span>()))),
+      <span class="ident">CompareResult::Error</span> =&gt; {
         <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">ErrorKind</span> <span class="op">=</span> <span class="ident">ErrorKind::Tag</span>;
         <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">Error::from_error_kind</span>(<span class="ident">i</span>, <span class="ident">e</span>)))
       }
@@ -834,7 +834,7 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_not</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Input</span>, <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span><span class="op">&gt;</span>(
   <span class="ident">arr</span>: <span class="ident">T</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">InputTakeAtPosition</span>,
   <span class="ident">T</span>: <span class="ident">FindToken</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputTakeAtPosition</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>,
@@ -871,7 +871,7 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_a</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Input</span>, <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span><span class="op">&gt;</span>(
   <span class="ident">arr</span>: <span class="ident">T</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">InputTakeAtPosition</span>,
   <span class="ident">T</span>: <span class="ident">FindToken</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputTakeAtPosition</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>,
@@ -907,10 +907,10 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_while</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Input</span>, <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span><span class="op">&gt;</span>(
   <span class="ident">cond</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">InputTakeAtPosition</span>,
-  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputTakeAtPosition</span><span class="op">&gt;</span><span class="ident">::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputTakeAtPosition</span><span class="op">&gt;</span><span class="ident">::Item</span>) -&gt; <span class="ident">bool</span>,
 {
   <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="ident">Input</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">split_at_position</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="op">!</span><span class="ident">cond</span>(<span class="ident">c</span>))
 }
@@ -942,10 +942,10 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_while1</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Input</span>, <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span><span class="op">&gt;</span>(
   <span class="ident">cond</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">InputTakeAtPosition</span>,
-  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputTakeAtPosition</span><span class="op">&gt;</span><span class="ident">::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputTakeAtPosition</span><span class="op">&gt;</span><span class="ident">::Item</span>) -&gt; <span class="ident">bool</span>,
 {
   <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="ident">Input</span><span class="op">|</span> {
     <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">ErrorKind</span> <span class="op">=</span> <span class="ident">ErrorKind::TakeWhile1</span>;
@@ -983,16 +983,16 @@
   <span class="ident">m</span>: <span class="ident">usize</span>,
   <span class="ident">n</span>: <span class="ident">usize</span>,
   <span class="ident">cond</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">InputTake</span> <span class="op">+</span> <span class="ident">InputIter</span> <span class="op">+</span> <span class="ident">InputLength</span>,
-  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputIter</span><span class="op">&gt;</span><span class="ident">::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputIter</span><span class="op">&gt;</span><span class="ident">::Item</span>) -&gt; <span class="ident">bool</span>,
 {
   <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="ident">Input</span><span class="op">|</span> {
     <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">i</span>;
 
     <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">position</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="op">!</span><span class="ident">cond</span>(<span class="ident">c</span>)) {
-      <span class="prelude-val">Some</span>(<span class="ident">idx</span>) <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="prelude-val">Some</span>(<span class="ident">idx</span>) =&gt; {
         <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">m</span> {
           <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">n</span> {
             <span class="kw">let</span> <span class="ident">res</span>: <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">Error</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">slice_index</span>(<span class="ident">idx</span>) {
@@ -1020,12 +1020,12 @@
           <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">Error::from_error_kind</span>(<span class="ident">input</span>, <span class="ident">e</span>)))
         }
       }
-      <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+      <span class="prelude-val">None</span> =&gt; {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">input_len</span>();
         <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">n</span> {
           <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">slice_index</span>(<span class="ident">n</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>.<span class="ident">take_split</span>(<span class="ident">index</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">_needed</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">Error::from_error_kind</span>(
+            <span class="prelude-val">Ok</span>(<span class="ident">index</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">input</span>.<span class="ident">take_split</span>(<span class="ident">index</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">_needed</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">Error::from_error_kind</span>(
               <span class="ident">input</span>,
               <span class="ident">ErrorKind::TakeWhileMN</span>,
             ))),
@@ -1065,10 +1065,10 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_till</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Input</span>, <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span><span class="op">&gt;</span>(
   <span class="ident">cond</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">InputTakeAtPosition</span>,
-  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputTakeAtPosition</span><span class="op">&gt;</span><span class="ident">::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputTakeAtPosition</span><span class="op">&gt;</span><span class="ident">::Item</span>) -&gt; <span class="ident">bool</span>,
 {
   <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="ident">Input</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">split_at_position</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">cond</span>(<span class="ident">c</span>))
 }
@@ -1098,10 +1098,10 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_till1</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Input</span>, <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span><span class="op">&gt;</span>(
   <span class="ident">cond</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">InputTakeAtPosition</span>,
-  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputTakeAtPosition</span><span class="op">&gt;</span><span class="ident">::Item</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputTakeAtPosition</span><span class="op">&gt;</span><span class="ident">::Item</span>) -&gt; <span class="ident">bool</span>,
 {
   <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="ident">Input</span><span class="op">|</span> {
     <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">ErrorKind</span> <span class="op">=</span> <span class="ident">ErrorKind::TakeTill1</span>;
@@ -1135,15 +1135,15 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">Input</span>, <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span><span class="op">&gt;</span>(
   <span class="ident">count</span>: <span class="ident">C</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">InputIter</span> <span class="op">+</span> <span class="ident">InputTake</span> <span class="op">+</span> <span class="ident">InputLength</span>,
   <span class="ident">C</span>: <span class="ident">ToUsize</span>,
 {
   <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">count</span>.<span class="ident">to_usize</span>();
   <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="ident">Input</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">i</span>.<span class="ident">slice_index</span>(<span class="ident">c</span>) {
-    <span class="prelude-val">Err</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">i</span>)),
-    <span class="prelude-val">Ok</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>.<span class="ident">take_split</span>(<span class="ident">index</span>)),
+    <span class="prelude-val">Err</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">i</span>)),
+    <span class="prelude-val">Ok</span>(<span class="ident">index</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">i</span>.<span class="ident">take_split</span>(<span class="ident">index</span>)),
   }
 }
 
@@ -1171,7 +1171,7 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_until</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Input</span>, <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span><span class="op">&gt;</span>(
   <span class="ident">tag</span>: <span class="ident">T</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">InputTake</span> <span class="op">+</span> <span class="ident">InputLength</span> <span class="op">+</span> <span class="ident">FindSubstring</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
   <span class="ident">T</span>: <span class="ident">Clone</span>,
@@ -1180,8 +1180,8 @@
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">tag</span>.<span class="ident">clone</span>();
 
     <span class="kw">let</span> <span class="ident">res</span>: <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">Error</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">i</span>.<span class="ident">find_substring</span>(<span class="ident">t</span>) {
-      <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::Unknown</span>)),
-      <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>.<span class="ident">take_split</span>(<span class="ident">index</span>)),
+      <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::Unknown</span>)),
+      <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">i</span>.<span class="ident">take_split</span>(<span class="ident">index</span>)),
     };
     <span class="ident">res</span>
   }
@@ -1212,7 +1212,7 @@
   <span class="kw-2">mut</span> <span class="ident">normal</span>: <span class="ident">F</span>,
   <span class="ident">control_char</span>: <span class="ident">char</span>,
   <span class="kw-2">mut</span> <span class="ident">escapable</span>: <span class="ident">G</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">Clone</span>
     <span class="op">+</span> <span class="ident"><span class="kw">crate</span>::traits::Offset</span>
@@ -1233,29 +1233,29 @@
 
     <span class="kw">while</span> <span class="ident">i</span>.<span class="ident">input_len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
       <span class="kw">match</span> <span class="ident">normal</span>.<span class="ident">parse</span>(<span class="ident">i</span>.<span class="ident">clone</span>()) {
-        <span class="prelude-val">Ok</span>((<span class="ident">i2</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-          <span class="kw">if</span> <span class="ident">i2</span>.<span class="ident">input_len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="prelude-val">Ok</span>((<span class="ident">i2</span>, <span class="kw">_</span>)) =&gt; {
+          <span class="kw">if</span> <span class="ident">i2</span>.<span class="ident">input_len</span>() <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::Unknown</span>));
           } <span class="kw">else</span> {
             <span class="ident">i</span> <span class="op">=</span> <span class="ident">i2</span>;
           }
         }
-        <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="kw">_</span>)) =&gt; {
           <span class="comment">// unwrap() should be safe here since index &lt; $i.input_len()</span>
-          <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">iter_elements</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">as_char</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">control_char</span> {
+          <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">iter_elements</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">as_char</span>() <span class="op">==</span> <span class="ident">control_char</span> {
             <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">control_char</span>.<span class="ident">len_utf8</span>();
             <span class="kw">if</span> <span class="ident">next</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">i</span>.<span class="ident">input_len</span>() {
               <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::new</span>(<span class="number">1</span>)));
             } <span class="kw">else</span> {
               <span class="kw">match</span> <span class="ident">escapable</span>.<span class="ident">parse</span>(<span class="ident">i</span>.<span class="ident">slice</span>(<span class="ident">next</span>..)) {
-                <span class="prelude-val">Ok</span>((<span class="ident">i2</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                  <span class="kw">if</span> <span class="ident">i2</span>.<span class="ident">input_len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="prelude-val">Ok</span>((<span class="ident">i2</span>, <span class="kw">_</span>)) =&gt; {
+                  <span class="kw">if</span> <span class="ident">i2</span>.<span class="ident">input_len</span>() <span class="op">==</span> <span class="number">0</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::Unknown</span>));
                   } <span class="kw">else</span> {
                     <span class="ident">i</span> <span class="op">=</span> <span class="ident">i2</span>;
                   }
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
               }
             }
           } <span class="kw">else</span> {
@@ -1263,7 +1263,7 @@
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>.<span class="ident">take_split</span>(<span class="ident">index</span>));
           }
         }
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
           <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>);
         }
       }
@@ -1279,7 +1279,7 @@
   <span class="ident">normal</span>: <span class="ident">F</span>,
   <span class="ident">control_char</span>: <span class="ident">char</span>,
   <span class="ident">escapable</span>: <span class="ident">G</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">Clone</span>
     <span class="op">+</span> <span class="ident"><span class="kw">crate</span>::traits::Offset</span>
@@ -1289,8 +1289,8 @@
     <span class="op">+</span> <span class="ident">Slice</span><span class="op">&lt;</span><span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="op">+</span> <span class="ident">InputIter</span>,
   <span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputIter</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident"><span class="kw">crate</span>::traits::AsChar</span>,
-  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">O1</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
-  <span class="ident">G</span>: <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">O2</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
+  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">O1</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
+  <span class="ident">G</span>: <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">O2</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
   <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span>,
 {
   <span class="ident">escaped</span>(<span class="ident">normal</span>, <span class="ident">control_char</span>, <span class="ident">escapable</span>)(<span class="ident">i</span>)
@@ -1333,7 +1333,7 @@
   <span class="kw-2">mut</span> <span class="ident">normal</span>: <span class="ident">F</span>,
   <span class="ident">control_char</span>: <span class="ident">char</span>,
   <span class="kw-2">mut</span> <span class="ident">transform</span>: <span class="ident">G</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Output</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Output</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">Clone</span>
     <span class="op">+</span> <span class="ident"><span class="kw">crate</span>::traits::Offset</span>
@@ -1361,17 +1361,17 @@
     <span class="kw">while</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">i</span>.<span class="ident">input_len</span>() {
       <span class="kw">let</span> <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">slice</span>(<span class="ident">index</span>..);
       <span class="kw">match</span> <span class="ident">normal</span>.<span class="ident">parse</span>(<span class="ident">remainder</span>.<span class="ident">clone</span>()) {
-        <span class="prelude-val">Ok</span>((<span class="ident">i2</span>, <span class="ident">o</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>((<span class="ident">i2</span>, <span class="ident">o</span>)) =&gt; {
           <span class="ident">o</span>.<span class="ident">extend_into</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">res</span>);
-          <span class="kw">if</span> <span class="ident">i2</span>.<span class="ident">input_len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+          <span class="kw">if</span> <span class="ident">i2</span>.<span class="ident">input_len</span>() <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::Unknown</span>));
           } <span class="kw">else</span> {
             <span class="ident">index</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="ident">i2</span>);
           }
         }
-        <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="kw">_</span>)) =&gt; {
           <span class="comment">// unwrap() should be safe here since index &lt; $i.input_len()</span>
-          <span class="kw">if</span> <span class="ident">remainder</span>.<span class="ident">iter_elements</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">as_char</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">control_char</span> {
+          <span class="kw">if</span> <span class="ident">remainder</span>.<span class="ident">iter_elements</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">as_char</span>() <span class="op">==</span> <span class="ident">control_char</span> {
             <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">+</span> <span class="ident">control_char</span>.<span class="ident">len_utf8</span>();
             <span class="kw">let</span> <span class="ident">input_len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">input_len</span>();
 
@@ -1379,22 +1379,22 @@
               <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::Unknown</span>));
             } <span class="kw">else</span> {
               <span class="kw">match</span> <span class="ident">transform</span>.<span class="ident">parse</span>(<span class="ident">i</span>.<span class="ident">slice</span>(<span class="ident">next</span>..)) {
-                <span class="prelude-val">Ok</span>((<span class="ident">i2</span>, <span class="ident">o</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>((<span class="ident">i2</span>, <span class="ident">o</span>)) =&gt; {
                   <span class="ident">o</span>.<span class="ident">extend_into</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">res</span>);
-                  <span class="kw">if</span> <span class="ident">i2</span>.<span class="ident">input_len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                  <span class="kw">if</span> <span class="ident">i2</span>.<span class="ident">input_len</span>() <span class="op">==</span> <span class="number">0</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::Unknown</span>));
                   } <span class="kw">else</span> {
                     <span class="ident">index</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="ident">i2</span>);
                   }
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
               }
             }
           } <span class="kw">else</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">remainder</span>, <span class="ident">res</span>));
           }
         }
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
       }
     }
     <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::Unknown</span>))
@@ -1409,7 +1409,7 @@
   <span class="ident">normal</span>: <span class="ident">F</span>,
   <span class="ident">control_char</span>: <span class="ident">char</span>,
   <span class="ident">transform</span>: <span class="ident">G</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Output</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Output</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
   <span class="ident">Input</span>: <span class="ident">Clone</span>
     <span class="op">+</span> <span class="ident"><span class="kw">crate</span>::traits::Offset</span>
@@ -1422,8 +1422,8 @@
   <span class="ident">O1</span>: <span class="ident"><span class="kw">crate</span>::traits::ExtendInto</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ExtendItem</span>, <span class="ident">Extender</span> <span class="op">=</span> <span class="ident">Output</span><span class="op">&gt;</span>,
   <span class="ident">O2</span>: <span class="ident"><span class="kw">crate</span>::traits::ExtendInto</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ExtendItem</span>, <span class="ident">Extender</span> <span class="op">=</span> <span class="ident">Output</span><span class="op">&gt;</span>,
   <span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputIter</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident"><span class="kw">crate</span>::traits::AsChar</span>,
-  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">O1</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
-  <span class="ident">G</span>: <span class="ident">Fn</span>(<span class="ident">Input</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">O2</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
+  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">O1</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
+  <span class="ident">G</span>: <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">O2</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
   <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span>,
 {
   <span class="ident">escaped_transform</span>(<span class="ident">normal</span>, <span class="ident">control_char</span>, <span class="ident">transform</span>)(<span class="ident">i</span>)

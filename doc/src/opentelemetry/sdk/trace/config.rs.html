@@ -137,7 +137,7 @@
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="doccomment">/// Default trace configuration</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">config</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Config</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">config</span>() -&gt; <span class="ident">Config</span> {
     <span class="ident">Config::default</span>()
 }
 
@@ -156,55 +156,55 @@
 
 <span class="kw">impl</span> <span class="ident">Config</span> {
     <span class="doccomment">/// Specify the sampler to be used.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_sampler</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">sdk::trace::ShouldSample</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sampler</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_sampler</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">sdk::trace::ShouldSample</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sampler</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">sampler</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">sampler</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify the id generator to be used.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_id_generator</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IdGenerator</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id_generator</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_id_generator</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IdGenerator</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id_generator</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">id_generator</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">id_generator</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify the number of events to be recorded per span.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_events_per_span</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_events</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_events_per_span</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_events</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">span_limits</span>.<span class="ident">max_events_per_span</span> <span class="op">=</span> <span class="ident">max_events</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify the number of attributes to be recorded per span.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_attributes_per_span</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_attributes</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_attributes_per_span</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_attributes</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">span_limits</span>.<span class="ident">max_attributes_per_span</span> <span class="op">=</span> <span class="ident">max_attributes</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify the number of events to be recorded per span.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_links_per_span</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_links</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_links_per_span</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_links</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">span_limits</span>.<span class="ident">max_links_per_span</span> <span class="op">=</span> <span class="ident">max_links</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify the number of attributes one event can have.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_attributes_per_event</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_attributes</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_attributes_per_event</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_attributes</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">span_limits</span>.<span class="ident">max_attributes_per_event</span> <span class="op">=</span> <span class="ident">max_attributes</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify the number of attributes one link can have.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_attributes_per_link</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_attributes</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_attributes_per_link</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_attributes</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">span_limits</span>.<span class="ident">max_attributes_per_link</span> <span class="op">=</span> <span class="ident">max_attributes</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify all limit via the span_limits</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_span_limits</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">span_limits</span>: <span class="ident">SpanLimits</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_span_limits</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">span_limits</span>: <span class="ident">SpanLimits</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">span_limits</span> <span class="op">=</span> <span class="ident">span_limits</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify the attributes representing the entity that produces telemetry</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_resource</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">resource</span>: <span class="ident">sdk::Resource</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_resource</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">resource</span>: <span class="ident">sdk::Resource</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">resource</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">resource</span>));
         <span class="self">self</span>
     }
@@ -215,14 +215,14 @@
     <span class="doccomment">/// to the `TracerProvider`, which could impact the performance. Performance</span>
     <span class="doccomment">/// sensitive application can use function to disable such behavior and assign</span>
     <span class="doccomment">/// no resource to `TracerProvider`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_no_resource</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_no_resource</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">with_resource</span>(<span class="ident">sdk::Resource::empty</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span> {
     <span class="doccomment">/// Create default global sdk configuration.</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Config</span> {
             <span class="ident">sampler</span>: <span class="ident">Box::new</span>(<span class="ident">Sampler::ParentBased</span>(<span class="ident">Box::new</span>(<span class="ident">Sampler::AlwaysOn</span>))),
             <span class="ident">id_generator</span>: <span class="ident">Box::new</span>(<span class="ident">sdk::trace::IdGenerator::default</span>()),

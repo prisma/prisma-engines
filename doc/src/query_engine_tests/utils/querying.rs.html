@@ -85,7 +85,7 @@
 <span id="85">85</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">assert_query</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">expr</span>) =&gt; {
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>.<span class="ident">query</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">to_string</span>(), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>);
     };
@@ -93,7 +93,7 @@
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">match_connector_result</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>, $([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">connector_opt</span>:<span class="ident">ident</span>),<span class="kw-2">*</span>] <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>, $([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">connector_opt</span>:<span class="ident">ident</span>),<span class="kw-2">*</span>] =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) =&gt; {
         <span class="kw">use</span> <span class="ident">query_tests_setup::ConnectorTag</span>::<span class="kw-2">*</span>;
         <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>.<span class="ident">connector</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
@@ -107,7 +107,7 @@
 
         <span class="kw">let</span> <span class="ident">query_result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>.<span class="ident">query</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">to_string</span>();
 
-        <span class="kw">if</span> <span class="ident">results</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">results</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
             <span class="macro">panic!</span>(<span class="macro">format!</span>(<span class="string">&quot;No results defined for connector {}. Query result: {}&quot;</span>, <span class="ident">connector</span>, <span class="ident">query_result</span>));
         }
 
@@ -124,7 +124,7 @@
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">is_one_of</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">potential_results</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">potential_results</span>:<span class="ident">expr</span>) =&gt; {
         <span class="macro">assert_eq!</span>(
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">potential_results</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>.<span class="ident">as_str</span>()),
             <span class="bool-val">true</span>,
@@ -137,7 +137,7 @@
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">run_query</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>) =&gt; {{
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>.<span class="ident">query</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="ident">res</span>.<span class="ident">assert_success</span>();
         <span class="ident">res</span>.<span class="ident">to_string</span>()
@@ -146,10 +146,10 @@
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">run_query_json</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>) =&gt; {
         <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>.<span class="ident">query</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">to_string</span>().<span class="ident">as_str</span>()).<span class="ident">unwrap</span>()
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>: <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>: <span class="ident">expr</span>) =&gt; {
         <span class="ident">query_tests_setup::walk_json</span>(
             <span class="kw-2">&amp;</span><span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>.<span class="ident">query</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">to_string</span>().<span class="ident">as_str</span>()).<span class="ident">unwrap</span>(),
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>,
@@ -161,10 +161,10 @@
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">assert_error</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>:<span class="ident">expr</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>.<span class="ident">query</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">assert_failure</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>, <span class="prelude-val">None</span>);
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">runner</span>.<span class="ident">query</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">q</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">assert_failure</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>, <span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>.<span class="ident">to_string</span>()));
     };
 }

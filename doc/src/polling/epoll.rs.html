@@ -309,7 +309,7 @@
 
 <span class="kw">impl</span> <span class="ident">Poller</span> {
     <span class="doccomment">/// Creates a new poller.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Poller</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Poller</span><span class="op">&gt;</span> {
         <span class="comment">// Create an epoll instance.</span>
         <span class="comment">//</span>
         <span class="comment">// Use `epoll_create1` with `EPOLL_CLOEXEC`.</span>
@@ -320,7 +320,7 @@
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fd</span><span class="op">|</span> <span class="ident">fd</span> <span class="kw">as</span> <span class="ident">libc::c_int</span>)
         .<span class="ident">or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
             <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">raw_os_error</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">libc::ENOSYS</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">libc::ENOSYS</span>) =&gt; {
                     <span class="comment">// If `epoll_create1` is not implemented, use `epoll_create`</span>
                     <span class="comment">// and manually set `FD_CLOEXEC`.</span>
                     <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="macro">syscall!</span>(<span class="ident">epoll_create</span>(<span class="number">1024</span>))<span class="question-mark">?</span>;
@@ -331,7 +331,7 @@
 
                     <span class="prelude-val">Ok</span>(<span class="ident">fd</span>)
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
             }
         })<span class="question-mark">?</span>;
 
@@ -374,25 +374,25 @@
     }
 
     <span class="doccomment">/// Adds a new file descriptor.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fd</span>: <span class="ident">RawFd</span>, <span class="ident">ev</span>: <span class="ident">Event</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fd</span>: <span class="ident">RawFd</span>, <span class="ident">ev</span>: <span class="ident">Event</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">log::trace!</span>(<span class="string">&quot;add: epoll_fd={}, fd={}, ev={:?}&quot;</span>, <span class="self">self</span>.<span class="ident">epoll_fd</span>, <span class="ident">fd</span>, <span class="ident">ev</span>);
         <span class="self">self</span>.<span class="ident">ctl</span>(<span class="ident">libc::EPOLL_CTL_ADD</span>, <span class="ident">fd</span>, <span class="prelude-val">Some</span>(<span class="ident">ev</span>))
     }
 
     <span class="doccomment">/// Modifies an existing file descriptor.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fd</span>: <span class="ident">RawFd</span>, <span class="ident">ev</span>: <span class="ident">Event</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fd</span>: <span class="ident">RawFd</span>, <span class="ident">ev</span>: <span class="ident">Event</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">log::trace!</span>(<span class="string">&quot;modify: epoll_fd={}, fd={}, ev={:?}&quot;</span>, <span class="self">self</span>.<span class="ident">epoll_fd</span>, <span class="ident">fd</span>, <span class="ident">ev</span>);
         <span class="self">self</span>.<span class="ident">ctl</span>(<span class="ident">libc::EPOLL_CTL_MOD</span>, <span class="ident">fd</span>, <span class="prelude-val">Some</span>(<span class="ident">ev</span>))
     }
 
     <span class="doccomment">/// Deletes a file descriptor.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fd</span>: <span class="ident">RawFd</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fd</span>: <span class="ident">RawFd</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">log::trace!</span>(<span class="string">&quot;remove: epoll_fd={}, fd={}&quot;</span>, <span class="self">self</span>.<span class="ident">epoll_fd</span>, <span class="ident">fd</span>);
         <span class="self">self</span>.<span class="ident">ctl</span>(<span class="ident">libc::EPOLL_CTL_DEL</span>, <span class="ident">fd</span>, <span class="prelude-val">None</span>)
     }
 
     <span class="doccomment">/// Waits for I/O events with an optional timeout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">events</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Events</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">events</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Events</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">log::trace!</span>(<span class="string">&quot;wait: epoll_fd={}, timeout={:?}&quot;</span>, <span class="self">self</span>.<span class="ident">epoll_fd</span>, <span class="ident">timeout</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">timer_fd</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">timer_fd</span> {
@@ -400,8 +400,8 @@
             <span class="kw">let</span> <span class="ident">new_val</span> <span class="op">=</span> <span class="ident">libc::itimerspec</span> {
                 <span class="ident">it_interval</span>: <span class="ident">TS_ZERO</span>,
                 <span class="ident">it_value</span>: <span class="kw">match</span> <span class="ident">timeout</span> {
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TS_ZERO</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">libc::timespec</span> {
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">TS_ZERO</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">libc::timespec</span> {
                         <span class="ident">tv_sec</span>: <span class="ident">t</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">libc::time_t</span>,
                         <span class="ident">tv_nsec</span>: (<span class="ident">t</span>.<span class="ident">subsec_nanos</span>() <span class="kw">as</span> <span class="ident">libc::c_long</span>).<span class="ident">into</span>(),
                     },
@@ -429,8 +429,8 @@
 
         <span class="comment">// Timeout in milliseconds for epoll.</span>
         <span class="kw">let</span> <span class="ident">timeout_ms</span> <span class="op">=</span> <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">timer_fd</span>, <span class="ident">timeout</span>) {
-            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">t</span>)) <span class="kw">if</span> <span class="ident">t</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">t</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">t</span>)) <span class="kw">if</span> <span class="ident">t</span> <span class="op">==</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>) =&gt; <span class="number">0</span>,
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">t</span>)) =&gt; {
                 <span class="comment">// Round up to a whole millisecond.</span>
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ms</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">as_millis</span>().<span class="ident">try_into</span>().<span class="ident">unwrap_or</span>(<span class="ident">std::i32::MAX</span>);
                 <span class="kw">if</span> <span class="ident">Duration::from_millis</span>(<span class="ident">ms</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span> <span class="ident">t</span> {
@@ -438,7 +438,7 @@
                 }
                 <span class="ident">ms</span>
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="op">-</span><span class="number">1</span>,
+            <span class="kw">_</span> =&gt; <span class="op">-</span><span class="number">1</span>,
         };
 
         <span class="comment">// Wait for I/O events.</span>
@@ -470,7 +470,7 @@
     }
 
     <span class="doccomment">/// Sends a notification to wake up the current or next `wait()` call.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">notify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">notify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">log::trace!</span>(
             <span class="string">&quot;notify: epoll_fd={}, event_fd={}&quot;</span>,
             <span class="self">self</span>.<span class="ident">epoll_fd</span>,
@@ -487,7 +487,7 @@
     }
 
     <span class="doccomment">/// Passes arguments to `epoll_ctl`.</span>
-    <span class="kw">fn</span> <span class="ident">ctl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">op</span>: <span class="ident">libc::c_int</span>, <span class="ident">fd</span>: <span class="ident">RawFd</span>, <span class="ident">ev</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">ctl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">op</span>: <span class="ident">libc::c_int</span>, <span class="ident">fd</span>: <span class="ident">RawFd</span>, <span class="ident">ev</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ev</span> <span class="op">=</span> <span class="ident">ev</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ev</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">libc::EPOLLONESHOT</span>;
             <span class="kw">if</span> <span class="ident">ev</span>.<span class="ident">readable</span> {
@@ -539,12 +539,12 @@
 };
 
 <span class="doccomment">/// Epoll flags for all possible readability events.</span>
-<span class="kw">fn</span> <span class="ident">read_flags</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">libc::c_int</span> {
+<span class="kw">fn</span> <span class="ident">read_flags</span>() -&gt; <span class="ident">libc::c_int</span> {
     <span class="ident">libc::EPOLLIN</span> <span class="op">|</span> <span class="ident">libc::EPOLLRDHUP</span> <span class="op">|</span> <span class="ident">libc::EPOLLHUP</span> <span class="op">|</span> <span class="ident">libc::EPOLLERR</span> <span class="op">|</span> <span class="ident">libc::EPOLLPRI</span>
 }
 
 <span class="doccomment">/// Epoll flags for all possible writability events.</span>
-<span class="kw">fn</span> <span class="ident">write_flags</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">libc::c_int</span> {
+<span class="kw">fn</span> <span class="ident">write_flags</span>() -&gt; <span class="ident">libc::c_int</span> {
     <span class="ident">libc::EPOLLOUT</span> <span class="op">|</span> <span class="ident">libc::EPOLLHUP</span> <span class="op">|</span> <span class="ident">libc::EPOLLERR</span>
 }
 
@@ -558,7 +558,7 @@
 
 <span class="kw">impl</span> <span class="ident">Events</span> {
     <span class="doccomment">/// Creates an empty list.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Events</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Events</span> {
         <span class="kw">let</span> <span class="ident">ev</span> <span class="op">=</span> <span class="ident">libc::epoll_event</span> { <span class="ident">events</span>: <span class="number">0</span>, <span class="ident">u64</span>: <span class="number">0</span> };
         <span class="kw">let</span> <span class="ident">list</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">ev</span>; <span class="number">1000</span>].<span class="ident">into_boxed_slice</span>();
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
@@ -566,7 +566,7 @@
     }
 
     <span class="doccomment">/// Iterates over I/O events.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Event</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Event</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">list</span>[..<span class="self">self</span>.<span class="ident">len</span>].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ev</span><span class="op">|</span> <span class="ident">Event</span> {
             <span class="ident">key</span>: <span class="ident">ev</span>.<span class="ident">u64</span> <span class="kw">as</span> <span class="ident">usize</span>,
             <span class="ident">readable</span>: (<span class="ident">ev</span>.<span class="ident">events</span> <span class="kw">as</span> <span class="ident">libc::c_int</span> <span class="op">&amp;</span> <span class="ident">read_flags</span>()) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,

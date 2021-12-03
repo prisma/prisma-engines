@@ -120,7 +120,7 @@
 <span class="doccomment">/// `_ftsx` fields, replacing them with the actual fields used to build the full-text index.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Be aware these text fields might not come back in the same order used when initialized.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">mongodb::Client</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">mongodb::error::Result</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">mongodb::Client</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">mongodb::error::Result</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">MongoSchema::default</span>();
     <span class="kw">let</span> <span class="ident">database</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">database</span>(<span class="ident">db_name</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">list_collections</span>(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -137,12 +137,12 @@
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">name</span>.<span class="ident">unwrap</span>();
 
             <span class="kw">let</span> <span class="ident">r#type</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">options</span>.<span class="ident">unique</span>, <span class="ident">options</span>.<span class="ident">text_index_version</span>.<span class="ident">as_ref</span>()) {
-                (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Unique</span>,
-                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Fulltext</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Normal</span>,
+                (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="ident">IndexType::Unique</span>,
+                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="ident">IndexType::Fulltext</span>,
+                <span class="kw">_</span> =&gt; <span class="ident">IndexType::Normal</span>,
             };
 
-            <span class="kw">if</span> <span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_id_&quot;</span> {
+            <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;_id_&quot;</span> {
                 <span class="kw">continue</span>; <span class="comment">// do not introspect or diff these</span>
             }
 
@@ -152,8 +152,8 @@
 
             <span class="kw">let</span> <span class="ident">as_field</span> <span class="op">=</span> <span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>): (<span class="kw-2">&amp;</span><span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="ident">Bson</span>)<span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">as_i32</span>() {
-                    <span class="prelude-val">Some</span>(<span class="op">-</span><span class="number">1</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexFieldProperty::Descending</span>,
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexFieldProperty::Ascending</span>,
+                    <span class="prelude-val">Some</span>(<span class="op">-</span><span class="number">1</span>) =&gt; <span class="ident">IndexFieldProperty::Descending</span>,
+                    <span class="kw">_</span> =&gt; <span class="ident">IndexFieldProperty::Ascending</span>,
                 };
 
                 <span class="ident">IndexField</span> {
@@ -163,7 +163,7 @@
             };
 
             <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">r#type</span>.<span class="ident">is_fulltext</span>() {
-                <span class="kw">let</span> <span class="ident">is_fts</span> <span class="op">=</span> <span class="op">|</span><span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="ident">k</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_fts&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">k</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;_ftsx&quot;</span>;
+                <span class="kw">let</span> <span class="ident">is_fts</span> <span class="op">=</span> <span class="op">|</span><span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="ident">k</span> <span class="op">==</span> <span class="string">&quot;_fts&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">k</span> <span class="op">==</span> <span class="string">&quot;_ftsx&quot;</span>;
 
                 <span class="comment">// First we take all items that are not using the special fulltext keys,</span>
                 <span class="comment">// stopping when we find the first one.</span>

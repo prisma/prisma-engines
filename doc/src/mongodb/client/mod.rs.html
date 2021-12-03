@@ -488,14 +488,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// See the documentation on</span>
     <span class="doccomment">/// [`ClientOptions::parse`](options/struct.ClientOptions.html#method.parse) for more details.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_uri_str</span>(<span class="ident">uri</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_uri_str</span>(<span class="ident">uri</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">ClientOptions::parse_uri</span>(<span class="ident">uri</span>.<span class="ident">as_ref</span>(), <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="ident">Client::with_options</span>(<span class="ident">options</span>)
     }
 
     <span class="doccomment">/// Creates a new `Client` connected to the cluster specified by `options`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_options</span>(<span class="ident">options</span>: <span class="ident">ClientOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_options</span>(<span class="ident">options</span>: <span class="ident">ClientOptions</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">options</span>.<span class="ident">validate</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">ClientInner</span> {
@@ -514,17 +514,17 @@
     }
 
     <span class="doccomment">/// Gets the default selection criteria the `Client` uses for operations..</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">selection_criteria</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">selection_criteria</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">selection_criteria</span>.<span class="ident">as_ref</span>()
     }
 
     <span class="doccomment">/// Gets the default read concern the `Client` uses for operations.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReadConcern</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReadConcern</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">read_concern</span>.<span class="ident">as_ref</span>()
     }
 
     <span class="doccomment">/// Gets the default write concern the `Client` uses for operations.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">write_concern</span>.<span class="ident">as_ref</span>()
     }
 
@@ -534,7 +534,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method does not send or receive anything across the wire to the database, so it can be</span>
     <span class="doccomment">/// used repeatedly without incurring any costs from I/O.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Database</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Database</span> {
         <span class="ident">Database::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">name</span>, <span class="prelude-val">None</span>)
     }
 
@@ -544,7 +544,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method does not send or receive anything across the wire to the database, so it can be</span>
     <span class="doccomment">/// used repeatedly without incurring any costs from I/O.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_with_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">options</span>: <span class="ident">DatabaseOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Database</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_with_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">options</span>: <span class="ident">DatabaseOptions</span>) -&gt; <span class="ident">Database</span> {
         <span class="ident">Database::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">name</span>, <span class="prelude-val">Some</span>(<span class="ident">options</span>))
     }
 
@@ -552,7 +552,7 @@
     <span class="doccomment">/// string used to construct this `Client`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If no default database was specified, `None` will be returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Database</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Database</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>
             .<span class="ident">options</span>
             .<span class="ident">default_database</span>
@@ -565,7 +565,7 @@
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ListDatabasesOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatabaseSpecification</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatabaseSpecification</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">ListDatabases::new</span>(<span class="ident">filter</span>.<span class="ident">into</span>(), <span class="bool-val">false</span>, <span class="ident">options</span>.<span class="ident">into</span>());
         <span class="self">self</span>.<span class="ident">execute_operation</span>(<span class="ident">op</span>, <span class="ident">session</span>).<span class="kw">await</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">dbs</span><span class="op">|</span> {
             <span class="ident">dbs</span>.<span class="ident">into_iter</span>()
@@ -579,7 +579,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ListDatabasesOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatabaseSpecification</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatabaseSpecification</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">list_databases_common</span>(<span class="ident">filter</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
@@ -590,7 +590,7 @@
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ListDatabasesOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ClientSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatabaseSpecification</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatabaseSpecification</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">list_databases_common</span>(<span class="ident">filter</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="ident">session</span>))
             .<span class="kw">await</span>
     }
@@ -600,10 +600,10 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ListDatabasesOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">ListDatabases::new</span>(<span class="ident">filter</span>.<span class="ident">into</span>(), <span class="bool-val">true</span>, <span class="ident">options</span>.<span class="ident">into</span>());
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">execute_operation</span>(<span class="ident">op</span>, <span class="prelude-val">None</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">databases</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">databases</span>
+            <span class="prelude-val">Ok</span>(<span class="ident">databases</span>) =&gt; <span class="ident">databases</span>
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">doc</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">and_then</span>(<span class="ident">Bson::as_str</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
@@ -616,19 +616,19 @@
                     <span class="prelude-val">Ok</span>(<span class="ident">name</span>.<span class="ident">to_string</span>())
                 })
                 .<span class="ident">collect</span>(),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
         }
     }
 
     <span class="doccomment">/// Starts a new `ClientSession`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SessionOptions</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SessionOptions</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_session_support_status</span>().<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="ident">SessionSupportStatus::Supported</span> {
                 <span class="ident">logical_session_timeout</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>
+            } =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>
                 .<span class="ident">start_session_with_timeout</span>(<span class="ident">logical_session_timeout</span>, <span class="ident">options</span>, <span class="bool-val">false</span>)
                 .<span class="kw">await</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::SessionsNotSupported</span>.<span class="ident">into</span>()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::SessionsNotSupported</span>.<span class="ident">into</span>()),
         }
     }
 
@@ -658,7 +658,7 @@
         <span class="ident">logical_session_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
         <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SessionOptions</span><span class="op">&gt;</span>,
         <span class="ident">is_implicit</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ClientSession</span> {
+    ) -&gt; <span class="ident">ClientSession</span> {
         <span class="ident">ClientSession::new</span>(
             <span class="self">self</span>.<span class="ident">inner</span>
                 .<span class="ident">session_pool</span>
@@ -676,7 +676,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_session_checked_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_session_checked_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">session_pool</span>.<span class="ident">contains</span>(<span class="ident">id</span>).<span class="kw">await</span>
     }
 
@@ -686,14 +686,14 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_select_server</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">select_server</span>(<span class="ident">criteria</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">server</span>.<span class="ident">address</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Select a server using the provided criteria. If none is provided, a primary read preference</span>
     <span class="doccomment">/// will be used instead.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">select_server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SelectedServer</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">select_server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SelectedServer</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">criteria</span> <span class="op">=</span>
             <span class="ident">criteria</span>.<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">SelectionCriteria::ReadPreference</span>(<span class="ident">ReadPreference::Primary</span>));
 
@@ -745,7 +745,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_hosts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_hosts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">servers</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">servers</span>().<span class="kw">await</span>;
         <span class="ident">servers</span>
             .<span class="ident">iter</span>()

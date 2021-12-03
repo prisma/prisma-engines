@@ -58,7 +58,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">bitness</span>, <span class="ident">Info</span>, <span class="ident">Type</span>};
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_platform</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Info</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_platform</span>() -&gt; <span class="ident">Info</span> {
     <span class="macro">trace!</span>(<span class="string">&quot;linux::current_platform is called&quot;</span>);
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">lsb_release::get</span>()
@@ -97,8 +97,8 @@
             <span class="op">|</span> <span class="ident">Type::Solus</span>
             <span class="op">|</span> <span class="ident">Type::SUSE</span>
             <span class="op">|</span> <span class="ident">Type::Ubuntu</span>
-            <span class="op">|</span> <span class="ident">Type::Mint</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">os_type</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="op">|</span> <span class="ident">Type::Mint</span> =&gt; (),
+            <span class="ident">os_type</span> =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;Unexpected OS type: {}&quot;</span>, <span class="ident">os_type</span>);
             }
         }

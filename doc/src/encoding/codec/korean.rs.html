@@ -305,10 +305,10 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Windows949Encoding</span>;
 
 <span class="kw">impl</span> <span class="ident">Encoding</span> <span class="kw">for</span> <span class="ident">Windows949Encoding</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;windows-949&quot;</span> }
-    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="string">&quot;euc-kr&quot;</span>) } <span class="comment">// WHATWG compatibility</span>
-    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Windows949Encoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">Windows949Decoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;windows-949&quot;</span> }
+    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="string">&quot;euc-kr&quot;</span>) } <span class="comment">// WHATWG compatibility</span>
+    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Windows949Encoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">Windows949Decoder::new</span>() }
 }
 
 <span class="doccomment">/// An encoder for Windows code page 949.</span>
@@ -316,14 +316,14 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Windows949Encoder</span>;
 
 <span class="kw">impl</span> <span class="ident">Windows949Encoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Box::new</span>(<span class="ident">Windows949Encoder</span>) }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Box::new</span>(<span class="ident">Windows949Encoder</span>) }
 }
 
 <span class="kw">impl</span> <span class="ident">RawEncoder</span> <span class="kw">for</span> <span class="ident">Windows949Encoder</span> {
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Windows949Encoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">true</span> }
+    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Windows949Encoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
 
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
         <span class="ident">output</span>.<span class="ident">writer_hint</span>(<span class="ident">input</span>.<span class="ident">len</span>());
 
         <span class="kw">for</span> ((<span class="ident">i</span>,<span class="ident">j</span>), <span class="ident">ch</span>) <span class="kw">in</span> <span class="ident">input</span>.<span class="ident">index_iter</span>() {
@@ -331,7 +331,7 @@
                 <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u8</span>);
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">index::euc_kr::backward</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>);
-                <span class="kw">if</span> <span class="ident">ptr</span> <span class="op">=</span><span class="op">=</span> <span class="number">0xffff</span> {
+                <span class="kw">if</span> <span class="ident">ptr</span> <span class="op">==</span> <span class="number">0xffff</span> {
                     <span class="kw">return</span> (<span class="ident">i</span>, <span class="prelude-val">Some</span>(<span class="ident">CodecError</span> {
                         <span class="ident">upto</span>: <span class="ident">j</span> <span class="kw">as</span> <span class="ident">isize</span>, <span class="ident">cause</span>: <span class="string">&quot;unrepresentable character&quot;</span>.<span class="ident">into</span>()
                     }));
@@ -344,7 +344,7 @@
         (<span class="ident">input</span>.<span class="ident">len</span>(), <span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 }
@@ -356,22 +356,22 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Windows949Decoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> {
         <span class="ident">Box::new</span>(<span class="ident">Windows949Decoder</span> { <span class="ident">st</span>: <span class="ident">Default::default</span>() })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">RawDecoder</span> <span class="kw">for</span> <span class="ident">Windows949Decoder</span> {
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">Windows949Decoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">true</span> }
+    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">Windows949Decoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
 
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">st</span>, <span class="ident">processed</span>, <span class="ident">err</span>) <span class="op">=</span> <span class="ident">windows949::raw_feed</span>(<span class="self">self</span>.<span class="ident">st</span>, <span class="ident">input</span>, <span class="ident">output</span>, <span class="kw-2">&amp;</span>());
         <span class="self">self</span>.<span class="ident">st</span> <span class="op">=</span> <span class="ident">st</span>;
         (<span class="ident">processed</span>, <span class="ident">err</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">st</span>, <span class="ident">err</span>) <span class="op">=</span> <span class="ident">windows949::raw_finish</span>(<span class="self">self</span>.<span class="ident">st</span>, <span class="ident">output</span>, <span class="kw-2">&amp;</span>());
         <span class="self">self</span>.<span class="ident">st</span> <span class="op">=</span> <span class="ident">st</span>;
         <span class="ident">err</span>
@@ -381,14 +381,14 @@
 <span class="macro">stateful_decoder!</span> {
     <span class="ident">module</span> <span class="ident">windows949</span>;
 
-    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">use</span> <span class="ident">index_korean</span> <span class="kw">as</span> <span class="ident">index</span>;
 
         <span class="kw">let</span> <span class="ident">lead</span> <span class="op">=</span> <span class="ident">lead</span> <span class="kw">as</span> <span class="ident">u16</span>;
         <span class="kw">let</span> <span class="ident">trail</span> <span class="op">=</span> <span class="ident">trail</span> <span class="kw">as</span> <span class="ident">u16</span>;
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">lead</span>, <span class="ident">trail</span>) {
-            (<span class="number">0x81</span>...<span class="number">0xfe</span>, <span class="number">0x41</span>...<span class="number">0xfe</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">lead</span> <span class="op">-</span> <span class="number">0x81</span>) <span class="op">*</span> <span class="number">190</span> <span class="op">+</span> (<span class="ident">trail</span> <span class="op">-</span> <span class="number">0x41</span>),
-            (<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">0xffff</span>,
+            (<span class="number">0x81</span>...<span class="number">0xfe</span>, <span class="number">0x41</span>...<span class="number">0xfe</span>) =&gt; (<span class="ident">lead</span> <span class="op">-</span> <span class="number">0x81</span>) <span class="op">*</span> <span class="number">190</span> <span class="op">+</span> (<span class="ident">trail</span> <span class="op">-</span> <span class="number">0x41</span>),
+            (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="number">0xffff</span>,
         };
         <span class="ident">index::euc_kr::forward</span>(<span class="ident">index</span>)
     }
@@ -396,20 +396,20 @@
 <span class="ident">initial</span>:
     <span class="comment">// euc-kr lead = 0x00</span>
     <span class="ident">state</span> <span class="ident">S0</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x00</span>...<span class="number">0x7f</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span>);
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x81</span>...<span class="number">0xfe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">S1</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>);
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x00</span>...<span class="number">0x7f</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span>);
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x81</span>...<span class="number">0xfe</span> =&gt; <span class="ident">S1</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>);
     }
 
 <span class="ident">transient</span>:
     <span class="comment">// euc-kr lead != 0x00</span>
     <span class="ident">state</span> <span class="ident">S1</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">lead</span>: <span class="ident">u8</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">map_two_bytes</span>(<span class="ident">lead</span>, <span class="ident">b</span>) {
-            <span class="number">0xffff</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">case</span> <span class="ident">b</span> =&gt; <span class="kw">match</span> <span class="ident">map_two_bytes</span>(<span class="ident">lead</span>, <span class="ident">b</span>) {
+            <span class="number">0xffff</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">backup</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="number">0x80</span> {<span class="number">1</span>} <span class="kw">else</span> {<span class="number">0</span>};
                 <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="ident">backup</span>, <span class="string">&quot;invalid sequence&quot;</span>)
             },
-            <span class="ident">ch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>)
+            <span class="ident">ch</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>)
         };
     }
 }

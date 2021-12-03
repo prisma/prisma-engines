@@ -659,7 +659,7 @@
 
     <span class="doccomment">/// Returns a span with an invalid `SpanContext`. Used by functions that</span>
     <span class="doccomment">/// need to return a default span like `get_active_span` if no span is present.</span>
-    <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Span</span>;
+    <span class="kw">fn</span> <span class="ident">invalid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span>;
 
     <span class="doccomment">/// Starts a new `Span`.</span>
     <span class="doccomment">///</span>
@@ -684,7 +684,7 @@
     <span class="doccomment">/// created in another process. Each propagators&#39; deserialization must set</span>
     <span class="doccomment">/// `is_remote` to true on a parent `SpanContext` so `Span` creation knows if the</span>
     <span class="doccomment">/// parent is remote.</span>
-    <span class="kw">fn</span> <span class="ident">start</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Span</span>
+    <span class="kw">fn</span> <span class="ident">start</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -714,19 +714,19 @@
     <span class="doccomment">/// created in another process. Each propagators&#39; deserialization must set</span>
     <span class="doccomment">/// `is_remote` to true on a parent `SpanContext` so `Span` creation knows if the</span>
     <span class="doccomment">/// parent is remote.</span>
-    <span class="kw">fn</span> <span class="ident">start_with_context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">context</span>: <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Span</span>
+    <span class="kw">fn</span> <span class="ident">start_with_context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">context</span>: <span class="ident">Context</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Creates a span builder</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// An ergonomic way for attributes to be configured before the `Span` is started.</span>
-    <span class="kw">fn</span> <span class="ident">span_builder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SpanBuilder</span>
+    <span class="kw">fn</span> <span class="ident">span_builder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="ident">SpanBuilder</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Create a span from a `SpanBuilder`</span>
-    <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">builder</span>: <span class="ident">SpanBuilder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Span</span>;
+    <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">builder</span>: <span class="ident">SpanBuilder</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span>;
 
     <span class="doccomment">/// Start a new span and execute the given closure with reference to the span&#39;s</span>
     <span class="doccomment">/// context.</span>
@@ -755,9 +755,9 @@
     <span class="doccomment">///     })</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">in_span</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+    <span class="kw">fn</span> <span class="ident">in_span</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Context</span>) -&gt; <span class="ident">T</span>,
         <span class="ident"><span class="self">Self</span>::Span</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
     {
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">start</span>(<span class="ident">name</span>);
@@ -796,9 +796,9 @@
     <span class="doccomment">///     })</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">with_span</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="ident"><span class="self">Self</span>::Span</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+    <span class="kw">fn</span> <span class="ident">with_span</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="ident"><span class="self">Self</span>::Span</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Context</span>) -&gt; <span class="ident">T</span>,
         <span class="ident"><span class="self">Self</span>::Span</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
     {
         <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Context::current_with_span</span>(<span class="ident">span</span>);
@@ -864,7 +864,7 @@
 <span class="doccomment">/// SpanBuilder methods</span>
 <span class="kw">impl</span> <span class="ident">SpanBuilder</span> {
     <span class="doccomment">/// Create a new span builder from a span name</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_name</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_name</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_name_with_context</span>(<span class="ident">name</span>, <span class="ident">Context::current</span>())
     }
 
@@ -872,7 +872,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_name_with_context</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">name</span>: <span class="ident">T</span>,
         <span class="ident">parent_context</span>: <span class="ident">Context</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanBuilder</span> {
             <span class="ident">parent_context</span>,
             <span class="ident">trace_id</span>: <span class="prelude-val">None</span>,
@@ -891,7 +891,7 @@
     }
 
     <span class="doccomment">/// Assign parent context</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_parent_context</span>(<span class="self">self</span>, <span class="ident">parent_context</span>: <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_parent_context</span>(<span class="self">self</span>, <span class="ident">parent_context</span>: <span class="ident">Context</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanBuilder</span> {
             <span class="ident">parent_context</span>,
             ..<span class="self">self</span>
@@ -899,7 +899,7 @@
     }
 
     <span class="doccomment">/// Specify trace id to use if no parent context exists</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_trace_id</span>(<span class="self">self</span>, <span class="ident">trace_id</span>: <span class="ident">TraceId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_trace_id</span>(<span class="self">self</span>, <span class="ident">trace_id</span>: <span class="ident">TraceId</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanBuilder</span> {
             <span class="ident">trace_id</span>: <span class="prelude-val">Some</span>(<span class="ident">trace_id</span>),
             ..<span class="self">self</span>
@@ -907,7 +907,7 @@
     }
 
     <span class="doccomment">/// Assign span id</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_span_id</span>(<span class="self">self</span>, <span class="ident">span_id</span>: <span class="ident">SpanId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_span_id</span>(<span class="self">self</span>, <span class="ident">span_id</span>: <span class="ident">SpanId</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanBuilder</span> {
             <span class="ident">span_id</span>: <span class="prelude-val">Some</span>(<span class="ident">span_id</span>),
             ..<span class="self">self</span>
@@ -915,7 +915,7 @@
     }
 
     <span class="doccomment">/// Assign span kind</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_kind</span>(<span class="self">self</span>, <span class="ident">span_kind</span>: <span class="ident">SpanKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_kind</span>(<span class="self">self</span>, <span class="ident">span_kind</span>: <span class="ident">SpanKind</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanBuilder</span> {
             <span class="ident">span_kind</span>: <span class="prelude-val">Some</span>(<span class="ident">span_kind</span>),
             ..<span class="self">self</span>
@@ -923,7 +923,7 @@
     }
 
     <span class="doccomment">/// Assign span start time</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_start_time</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">start_time</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_start_time</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">start_time</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanBuilder</span> {
             <span class="ident">start_time</span>: <span class="prelude-val">Some</span>(<span class="ident">start_time</span>.<span class="ident">into</span>()),
             ..<span class="self">self</span>
@@ -931,7 +931,7 @@
     }
 
     <span class="doccomment">/// Assign span end time</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_end_time</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">end_time</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_end_time</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">end_time</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanBuilder</span> {
             <span class="ident">end_time</span>: <span class="prelude-val">Some</span>(<span class="ident">end_time</span>.<span class="ident">into</span>()),
             ..<span class="self">self</span>
@@ -939,7 +939,7 @@
     }
 
     <span class="doccomment">/// Assign span attributes</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_attributes</span>(<span class="self">self</span>, <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_attributes</span>(<span class="self">self</span>, <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanBuilder</span> {
             <span class="ident">attributes</span>: <span class="prelude-val">Some</span>(<span class="ident">attributes</span>),
             ..<span class="self">self</span>
@@ -947,7 +947,7 @@
     }
 
     <span class="doccomment">/// Assign events</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_events</span>(<span class="self">self</span>, <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_events</span>(<span class="self">self</span>, <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanBuilder</span> {
             <span class="ident">events</span>: <span class="prelude-val">Some</span>(<span class="ident">events</span>),
             ..<span class="self">self</span>
@@ -955,7 +955,7 @@
     }
 
     <span class="doccomment">/// Assign links</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_links</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">links</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_links</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">links</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">links</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">span_context</span>().<span class="ident">is_valid</span>());
         <span class="ident">SpanBuilder</span> {
             <span class="ident">links</span>: <span class="prelude-val">Some</span>(<span class="ident">links</span>),
@@ -964,7 +964,7 @@
     }
 
     <span class="doccomment">/// Assign status code</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_status_code</span>(<span class="self">self</span>, <span class="ident">code</span>: <span class="ident">StatusCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_status_code</span>(<span class="self">self</span>, <span class="ident">code</span>: <span class="ident">StatusCode</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanBuilder</span> {
             <span class="ident">status_code</span>: <span class="prelude-val">Some</span>(<span class="ident">code</span>),
             ..<span class="self">self</span>
@@ -972,7 +972,7 @@
     }
 
     <span class="doccomment">/// Assign status message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_status_message</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_status_message</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanBuilder</span> {
             <span class="ident">status_message</span>: <span class="prelude-val">Some</span>(<span class="ident">message</span>.<span class="ident">into</span>()),
             ..<span class="self">self</span>
@@ -980,7 +980,7 @@
     }
 
     <span class="doccomment">/// Assign sampling result</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_sampling_result</span>(<span class="self">self</span>, <span class="ident">sampling_result</span>: <span class="ident">sdk::trace::SamplingResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_sampling_result</span>(<span class="self">self</span>, <span class="ident">sampling_result</span>: <span class="ident">sdk::trace::SamplingResult</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SpanBuilder</span> {
             <span class="ident">sampling_result</span>: <span class="prelude-val">Some</span>(<span class="ident">sampling_result</span>),
             ..<span class="self">self</span>
@@ -988,7 +988,7 @@
     }
 
     <span class="doccomment">/// Builds a span with the given tracer from this configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Tracer</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">tracer</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T::Span</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Tracer</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">tracer</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">T::Span</span> {
         <span class="ident">tracer</span>.<span class="ident">build</span>(<span class="self">self</span>)
     }
 }

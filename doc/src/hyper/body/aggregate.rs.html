@@ -44,7 +44,7 @@
 <span class="doccomment">/// Care needs to be taken if the remote is untrusted. The function doesn&#39;t implement any length</span>
 <span class="doccomment">/// checks and an malicious peer might make it consume arbitrary amounts of memory. Checking the</span>
 <span class="doccomment">/// `Content-Length` is a possibility, but it is not strictly mandated to be present.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">aggregate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">body</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Buf</span>, <span class="ident">T::Error</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">aggregate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">body</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Buf</span>, <span class="ident">T::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">HttpBody</span>,
 {

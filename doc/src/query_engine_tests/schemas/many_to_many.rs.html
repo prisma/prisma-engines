@@ -41,7 +41,7 @@
 <span id="41">41</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">indoc::indoc</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_m2m</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_m2m</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">r#&quot;
         model ModelA {
@@ -60,7 +60,7 @@
 }
 
 <span class="doccomment">/// User &lt;-m---n-&gt; posts</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">posts_categories</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">posts_categories</span>() -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">indoc!</span> {
         <span class="string">r#&quot;
         model Post {

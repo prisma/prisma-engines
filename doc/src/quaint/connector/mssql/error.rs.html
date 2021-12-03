@@ -231,15 +231,15 @@
 <span class="kw">use</span> <span class="ident">tiberius::error::IoErrorKind</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tiberius::error::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">tiberius::error::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">tiberius::error::Error</span>) -&gt; <span class="ident">Error</span> {
         <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">tiberius::error::Error::Io</span> { <span class="ident">kind</span>, <span class="ident">message</span> } <span class="kw">if</span> <span class="ident">kind</span> <span class="op">=</span><span class="op">=</span> <span class="ident">IoErrorKind::UnexpectedEof</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Io</span> { <span class="ident">kind</span>, <span class="ident">message</span> } <span class="kw">if</span> <span class="ident">kind</span> <span class="op">==</span> <span class="ident">IoErrorKind::UnexpectedEof</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ConnectionClosed</span>);
                 <span class="ident">builder</span>.<span class="ident">set_original_message</span>(<span class="ident">message</span>);
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">e</span> @ <span class="ident">tiberius::error::Error::Io</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ConnectionError</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
-            <span class="ident">tiberius::error::Error::Tls</span>(<span class="ident">message</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">e</span> @ <span class="ident">tiberius::error::Error::Io</span> { .. } =&gt; <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::ConnectionError</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
+            <span class="ident">tiberius::error::Error::Tls</span>(<span class="ident">message</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
                     <span class="string">&quot;The TLS settings didn&#39;t allow the connection to be established. Please review your connection string. (error: {})&quot;</span>,
                     <span class="ident">message</span>
@@ -247,7 +247,7 @@
 
                 <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::TlsError</span> { <span class="ident">message</span> }).<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">3971</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">3971</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::TransactionAlreadyClosed</span>(<span class="ident">e</span>.<span class="ident">message</span>().<span class="ident">to_string</span>());
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
@@ -257,7 +257,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">8169</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">8169</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::conversion</span>(<span class="ident">e</span>.<span class="ident">message</span>().<span class="ident">to_string</span>());
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
@@ -267,7 +267,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">18456</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">18456</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">message</span>().<span class="ident">split</span>(<span class="string">&#39;\&#39;&#39;</span>).<span class="ident">nth</span>(<span class="number">1</span>).<span class="ident">into</span>();
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::AuthenticationFailed</span> { <span class="ident">user</span> };
 
@@ -278,7 +278,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">4060</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">4060</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">message</span>().<span class="ident">split</span>(<span class="string">&#39;&quot;&#39;</span>).<span class="ident">nth</span>(<span class="number">1</span>).<span class="ident">into</span>();
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::DatabaseDoesNotExist</span> { <span class="ident">db_name</span> };
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
@@ -288,7 +288,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">515</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">515</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">e</span>
                     .<span class="ident">message</span>()
                     .<span class="ident">split_whitespace</span>()
@@ -305,7 +305,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1801</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">1801</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">message</span>().<span class="ident">split</span>(<span class="string">&#39;\&#39;&#39;</span>).<span class="ident">nth</span>(<span class="number">1</span>).<span class="ident">into</span>();
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::DatabaseAlreadyExists</span> { <span class="ident">db_name</span> };
 
@@ -316,7 +316,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2627</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">2627</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">e</span>
                     .<span class="ident">message</span>()
                     .<span class="ident">split</span>(<span class="string">&quot;. &quot;</span>)
@@ -335,7 +335,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">547</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">547</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">e</span>
                     .<span class="ident">message</span>()
                     .<span class="ident">split</span>(<span class="string">&#39;.&#39;</span>)
@@ -354,7 +354,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1505</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">1505</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">e</span>
                     .<span class="ident">message</span>()
                     .<span class="ident">split</span>(<span class="string">&#39;\&#39;&#39;</span>)
@@ -371,7 +371,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2601</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">2601</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">e</span>
                     .<span class="ident">message</span>()
                     .<span class="ident">split_whitespace</span>()
@@ -389,7 +389,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1801</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">1801</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">message</span>().<span class="ident">split</span>(<span class="string">&#39;\&#39;&#39;</span>).<span class="ident">nth</span>(<span class="number">1</span>).<span class="ident">into</span>();
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::DatabaseAlreadyExists</span> { <span class="ident">db_name</span> };
 
@@ -400,7 +400,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2628</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">2628</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">message</span>().<span class="ident">split</span>(<span class="string">&#39;\&#39;&#39;</span>).<span class="ident">nth</span>(<span class="number">3</span>).<span class="ident">into</span>();
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::LengthMismatch</span> { <span class="ident">column</span> };
 
@@ -411,7 +411,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">208</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">208</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">e</span>
                     .<span class="ident">message</span>()
                     .<span class="ident">split_whitespace</span>()
@@ -427,7 +427,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">=</span><span class="op">=</span> <span class="number">207</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span>() <span class="op">==</span> <span class="number">207</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">e</span>
                     .<span class="ident">message</span>()
                     .<span class="ident">split_whitespace</span>()
@@ -443,7 +443,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">tiberius::error::Error::Server</span>(<span class="ident">e</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">clone</span>().<span class="ident">into</span>());
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Error::builder</span>(<span class="ident">kind</span>);
@@ -452,7 +452,7 @@
 
                 <span class="ident">builder</span>.<span class="ident">build</span>()
             }
-            <span class="ident">e</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
+            <span class="ident">e</span> =&gt; <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">e</span>.<span class="ident">into</span>())).<span class="ident">build</span>(),
         }
     }
 }

@@ -266,7 +266,7 @@
     <span class="doccomment">/// If `will_log` returns true then `log` will be called with the secret.</span>
     <span class="doccomment">/// Otherwise, `log` will not be called for the secret. This is a</span>
     <span class="doccomment">/// performance optimization.</span>
-    <span class="kw">fn</span> <span class="ident">will_log</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">will_log</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 }
@@ -277,7 +277,7 @@
 <span class="kw">impl</span> <span class="ident">KeyLog</span> <span class="kw">for</span> <span class="ident">NoKeyLog</span> {
     <span class="kw">fn</span> <span class="ident">log</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {}
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">will_log</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">will_log</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
 }
@@ -289,11 +289,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">KeyLogFileInner</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">var</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">env::VarError</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">var</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">env::VarError</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">var</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Path::new</span>(<span class="ident">s</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">env::VarError::NotUnicode</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Path::new</span>(<span class="ident">s</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">env::VarError::NotPresent</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="ident">Path::new</span>(<span class="ident">s</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">env::VarError::NotUnicode</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) =&gt; <span class="ident">Path::new</span>(<span class="ident">s</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">env::VarError::NotPresent</span>) =&gt; {
                 <span class="kw">return</span> <span class="ident">KeyLogFileInner</span> {
                     <span class="ident">file</span>: <span class="prelude-val">None</span>,
                     <span class="ident">buf</span>: <span class="ident">Vec::new</span>(),
@@ -307,8 +307,8 @@
             .<span class="ident">create</span>(<span class="bool-val">true</span>)
             .<span class="ident">open</span>(<span class="ident">path</span>)
         {
-            <span class="prelude-val">Ok</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">f</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">f</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                 <span class="macro">warn!</span>(<span class="string">&quot;unable to create key log file {:?}: {}&quot;</span>, <span class="ident">path</span>, <span class="ident">e</span>);
                 <span class="prelude-val">None</span>
             }
@@ -320,12 +320,12 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">try_write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">client_random</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">client_random</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">file</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>,
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">f</span>) =&gt; <span class="ident">f</span>,
         };
 
         <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">truncate</span>(<span class="number">0</span>);
@@ -355,7 +355,7 @@
 <span class="kw">impl</span> <span class="ident">KeyLogFile</span> {
     <span class="doccomment">/// Makes a new `KeyLogFile`.  The environment variable is</span>
     <span class="doccomment">/// inspected and the named file is opened during this call.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">var</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="string">&quot;SSLKEYLOGFILE&quot;</span>);
         <span class="ident">KeyLogFile</span>(<span class="ident">Mutex::new</span>(<span class="ident">KeyLogFileInner::new</span>(<span class="ident">var</span>)))
     }
@@ -370,8 +370,8 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">try_write</span>(<span class="ident">label</span>, <span class="ident">client_random</span>, <span class="ident">secret</span>)
         {
-            <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(()) =&gt; {}
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                 <span class="macro">warn!</span>(<span class="string">&quot;error writing to key log file: {}&quot;</span>, <span class="ident">e</span>);
             }
         }

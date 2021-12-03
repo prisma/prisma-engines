@@ -170,21 +170,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SqlVariant</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">run_for</span>(<span class="self">self</span>, <span class="ident">_migr</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">run_for</span>(<span class="self">self</span>, <span class="ident">_migr</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite3&quot;</span>)]</span>
-            <span class="ident">SqlVariant::Sqlite</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">_migr</span>.<span class="ident">make</span>::<span class="op">&lt;</span><span class="ident">Sqlite</span><span class="op">&gt;</span>(),
+            <span class="ident">SqlVariant::Sqlite</span> =&gt; <span class="ident">_migr</span>.<span class="ident">make</span>::<span class="op">&lt;</span><span class="ident">Sqlite</span><span class="op">&gt;</span>(),
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pg&quot;</span>)]</span>
-            <span class="ident">SqlVariant::Pg</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">_migr</span>.<span class="ident">make</span>::<span class="op">&lt;</span><span class="ident">Pg</span><span class="op">&gt;</span>(),
+            <span class="ident">SqlVariant::Pg</span> =&gt; <span class="ident">_migr</span>.<span class="ident">make</span>::<span class="op">&lt;</span><span class="ident">Pg</span><span class="op">&gt;</span>(),
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
-            <span class="ident">SqlVariant::Mysql</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">_migr</span>.<span class="ident">make</span>::<span class="op">&lt;</span><span class="ident">MySql</span><span class="op">&gt;</span>(),
+            <span class="ident">SqlVariant::Mysql</span> =&gt; <span class="ident">_migr</span>.<span class="ident">make</span>::<span class="op">&lt;</span><span class="ident">MySql</span><span class="op">&gt;</span>(),
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-            <span class="ident">SqlVariant::Mssql</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">_migr</span>.<span class="ident">make</span>::<span class="op">&lt;</span><span class="ident">MsSql</span><span class="op">&gt;</span>(),
+            <span class="ident">SqlVariant::Mssql</span> =&gt; <span class="ident">_migr</span>.<span class="ident">make</span>::<span class="op">&lt;</span><span class="ident">MsSql</span><span class="op">&gt;</span>(),
 
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;You need to select an Sql variant!&quot;</span>),
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;You need to select an Sql variant!&quot;</span>),
         }
     }
 }
@@ -192,37 +192,37 @@
 <span class="doccomment">/// A generic SQL generator trait</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SqlGenerator</span> {
     <span class="doccomment">/// Create a new table with a name</span>
-    <span class="kw">fn</span> <span class="ident">create_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">create_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Create a new table with a name, only if it doesn&#39;t exist</span>
-    <span class="kw">fn</span> <span class="ident">create_table_if_not_exists</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">create_table_if_not_exists</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Drop a table with a name</span>
-    <span class="kw">fn</span> <span class="ident">drop_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">drop_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Drop a table with a name, only if it exists</span>
-    <span class="kw">fn</span> <span class="ident">drop_table_if_exists</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">drop_table_if_exists</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Rename a table from &lt;old&gt; to &lt;new&gt;</span>
-    <span class="kw">fn</span> <span class="ident">rename_table</span>(<span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">rename_table</span>(<span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Modify a table in some other way</span>
-    <span class="kw">fn</span> <span class="ident">alter_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">alter_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Create a new column with a type</span>
-    <span class="kw">fn</span> <span class="ident">add_column</span>(<span class="ident">ex</span>: <span class="ident">bool</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">add_column</span>(<span class="ident">ex</span>: <span class="ident">bool</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Drop an existing column from the table</span>
-    <span class="kw">fn</span> <span class="ident">drop_column</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">drop_column</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Rename an existing column</span>
-    <span class="kw">fn</span> <span class="ident">rename_column</span>(<span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">rename_column</span>(<span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Create a multi-column index</span>
-    <span class="kw">fn</span> <span class="ident">create_index</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">create_index</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Create a constraint</span>
-    <span class="kw">fn</span> <span class="ident">create_constraint</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">create_constraint</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Create a multi-column index</span>
     <span class="kw">fn</span> <span class="ident">create_partial_index</span>(
@@ -231,7 +231,7 @@
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>,
         <span class="ident">conditions</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    ) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(
             <span class="string">&quot;{} WHERE {}&quot;</span>,
             <span class="ident"><span class="self">Self</span>::create_index</span>(<span class="ident">table</span>, <span class="ident">schema</span>, <span class="ident">name</span>, <span class="ident">_type</span>),
@@ -240,7 +240,7 @@
     }
 
     <span class="doccomment">/// Drop a multi-column index</span>
-    <span class="kw">fn</span> <span class="ident">drop_index</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">drop_index</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span>;
 
     <span class="doccomment">/// Add a foreign key</span>
     <span class="kw">fn</span> <span class="ident">add_foreign_key</span>(
@@ -248,9 +248,9 @@
         <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">relation_columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
         <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    ) -&gt; <span class="ident">String</span>;
 
-    <span class="kw">fn</span> <span class="ident">add_primary_key</span>(<span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">add_primary_key</span>(<span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) -&gt; <span class="ident">String</span>;
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="barrel" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

@@ -204,16 +204,16 @@
     <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>,
     <span class="ident">features</span>: <span class="kw-2">&amp;</span>[<span class="ident">PreviewFeature</span>],
     <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">source</span>.<span class="ident">active_provider</span>.<span class="ident">as_str</span>() {
-        <span class="ident">SQLITE_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sqlite</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
-        <span class="ident">MYSQL_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">mysql</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
-        <span class="ident">POSTGRES_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">postgres</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
-        <span class="ident">MSSQL_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">mssql</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
-        <span class="ident">COCKROACHDB_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">postgres</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
+        <span class="ident">SQLITE_SOURCE_NAME</span> =&gt; <span class="ident">sqlite</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
+        <span class="ident">MYSQL_SOURCE_NAME</span> =&gt; <span class="ident">mysql</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
+        <span class="ident">POSTGRES_SOURCE_NAME</span> =&gt; <span class="ident">postgres</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
+        <span class="ident">MSSQL_SOURCE_NAME</span> =&gt; <span class="ident">mssql</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
+        <span class="ident">COCKROACHDB_SOURCE_NAME</span> =&gt; <span class="ident">postgres</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>,
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
-        <span class="ident">MONGODB_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">MONGODB_SOURCE_NAME</span> =&gt; {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">features</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">PreviewFeature::MongoDb</span>) {
                 <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">CoreError::UnsupportedFeatureError</span>(
                     <span class="string">&quot;MongoDB query connector (experimental feature, needs to be enabled)&quot;</span>.<span class="ident">into</span>(),
@@ -225,17 +225,17 @@
             <span class="ident">mongodb</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span>
         }
 
-        <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">CoreError::ConfigurationError</span>(<span class="macro">format!</span>(
+        <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">CoreError::ConfigurationError</span>(<span class="macro">format!</span>(
             <span class="string">&quot;Unsupported connector type: {}&quot;</span>,
             <span class="ident">x</span>
         ))),
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">source</span>.<span class="ident">active_provider</span>.<span class="ident">as_str</span>() {
-        <span class="ident">SQLITE_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEFAULT_SQLITE_DB_NAME</span>.<span class="ident">to_string</span>()),
-        <span class="ident">MYSQL_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">SQLITE_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">DEFAULT_SQLITE_DB_NAME</span>.<span class="ident">to_string</span>()),
+        <span class="ident">MYSQL_SOURCE_NAME</span> =&gt; {
             <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">err_str</span> <span class="op">=</span> <span class="string">&quot;No database found in connection string&quot;</span>;
 
@@ -247,7 +247,7 @@
 
             <span class="prelude-val">Ok</span>(<span class="ident">db_name</span>)
         }
-        <span class="ident">POSTGRES_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">POSTGRES_SOURCE_NAME</span> =&gt; {
             <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">query_pairs</span>().<span class="ident">into_owned</span>().<span class="ident">collect</span>();
 
@@ -258,7 +258,7 @@
 
             <span class="prelude-val">Ok</span>(<span class="ident">db_name</span>)
         }
-        <span class="ident">MSSQL_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">MSSQL_SOURCE_NAME</span> =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">JdbcString::from_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;jdbc:{}&quot;</span>, <span class="ident">url</span>))<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">conn</span>
                 .<span class="ident">properties_mut</span>()
@@ -268,20 +268,20 @@
             <span class="prelude-val">Ok</span>(<span class="ident">db_name</span>)
         }
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
-        <span class="ident">MONGODB_SOURCE_NAME</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">MONGODB_SOURCE_NAME</span> =&gt; {
             <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">database</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">path</span>().<span class="ident">trim_start_matches</span>(<span class="string">&#39;/&#39;</span>).<span class="ident">to_string</span>();
 
             <span class="prelude-val">Ok</span>(<span class="ident">database</span>)
         }
-        <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">CoreError::ConfigurationError</span>(<span class="macro">format!</span>(
+        <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">CoreError::ConfigurationError</span>(<span class="macro">format!</span>(
             <span class="string">&quot;Unsupported connector type: {}&quot;</span>,
             <span class="ident">x</span>
         ))),
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sqlite</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sqlite</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="macro">trace!</span>(<span class="string">&quot;Loading SQLite query connector...&quot;</span>);
 
     <span class="kw">let</span> <span class="ident">sqlite</span> <span class="op">=</span> <span class="ident">Sqlite::from_source</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -291,7 +291,7 @@
     <span class="prelude-val">Ok</span>((<span class="ident">db_name</span>, <span class="ident">sql_executor</span>(<span class="ident">sqlite</span>, <span class="bool-val">false</span>)))
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">postgres</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">postgres</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="macro">trace!</span>(<span class="string">&quot;Loading Postgres query connector...&quot;</span>);
 
     <span class="kw">let</span> <span class="ident">database_str</span> <span class="op">=</span> <span class="ident">url</span>;
@@ -311,7 +311,7 @@
     <span class="prelude-val">Ok</span>((<span class="ident">db_name</span>, <span class="ident">sql_executor</span>(<span class="ident">psql</span>, <span class="ident">force_transactions</span>)))
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mysql</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mysql</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="macro">trace!</span>(<span class="string">&quot;Loading MySQL query connector...&quot;</span>);
 
     <span class="kw">let</span> <span class="ident">mysql</span> <span class="op">=</span> <span class="ident">Mysql::from_source</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -321,7 +321,7 @@
     <span class="prelude-val">Ok</span>((<span class="ident">db_name</span>, <span class="ident">sql_executor</span>(<span class="ident">mysql</span>, <span class="bool-val">false</span>)))
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mssql</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mssql</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="macro">trace!</span>(<span class="string">&quot;Loading SQL Server query connector...&quot;</span>);
 
     <span class="kw">let</span> <span class="ident">mssql</span> <span class="op">=</span> <span class="ident">Mssql::from_source</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -331,7 +331,7 @@
     <span class="prelude-val">Ok</span>((<span class="ident">db_name</span>, <span class="ident">sql_executor</span>(<span class="ident">mssql</span>, <span class="bool-val">false</span>)))
 }
 
-<span class="kw">fn</span> <span class="ident">sql_executor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">connector</span>: <span class="ident">T</span>, <span class="ident">force_transactions</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">sql_executor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">connector</span>: <span class="ident">T</span>, <span class="ident">force_transactions</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Connector</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
@@ -339,7 +339,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mongodb</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mongodb</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">QueryExecutor</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="macro">trace!</span>(<span class="string">&quot;Loading MongoDB query connector...&quot;</span>);
 
     <span class="kw">let</span> <span class="ident">mongo</span> <span class="op">=</span> <span class="ident">MongoDb::new</span>(<span class="ident">source</span>, <span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;

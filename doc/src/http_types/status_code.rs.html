@@ -1146,7 +1146,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If this returns `true` it indicates that the request was received,</span>
     <span class="doccomment">/// continuing process.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_informational</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_informational</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">num</span>: <span class="ident">u16</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into</span>();
         (<span class="number">100</span>..<span class="number">200</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">num</span>)
     }
@@ -1155,7 +1155,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If this returns `true` it indicates that the request was successfully</span>
     <span class="doccomment">/// received, understood, and accepted.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_success</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_success</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">num</span>: <span class="ident">u16</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into</span>();
         (<span class="number">200</span>..<span class="number">300</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">num</span>)
     }
@@ -1164,7 +1164,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If this returns `true` it indicates that further action needs to be</span>
     <span class="doccomment">/// taken in order to complete the request.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_redirection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_redirection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">num</span>: <span class="ident">u16</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into</span>();
         (<span class="number">300</span>..<span class="number">400</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">num</span>)
     }
@@ -1173,7 +1173,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If this returns `true` it indicates that the request contains bad syntax</span>
     <span class="doccomment">/// or cannot be fulfilled.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_client_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_client_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">num</span>: <span class="ident">u16</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into</span>();
         (<span class="number">400</span>..<span class="number">500</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">num</span>)
     }
@@ -1182,79 +1182,79 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If this returns `true` it indicates that the server failed to fulfill an</span>
     <span class="doccomment">/// apparently valid request.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_server_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_server_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">num</span>: <span class="ident">u16</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into</span>();
         (<span class="number">500</span>..<span class="number">600</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">num</span>)
     }
 
     <span class="doccomment">/// The canonical reason for a given status code</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">canonical_reason</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">canonical_reason</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">StatusCode::Continue</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Continue&quot;</span>,
-            <span class="ident">StatusCode::SwitchingProtocols</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Switching Protocols&quot;</span>,
-            <span class="ident">StatusCode::EarlyHints</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Early Hints&quot;</span>,
-            <span class="ident">StatusCode::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;OK&quot;</span>,
-            <span class="ident">StatusCode::Created</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Created&quot;</span>,
-            <span class="ident">StatusCode::Accepted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Accepted&quot;</span>,
-            <span class="ident">StatusCode::NonAuthoritativeInformation</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Non Authoritative Information&quot;</span>,
-            <span class="ident">StatusCode::NoContent</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;No Content&quot;</span>,
-            <span class="ident">StatusCode::ResetContent</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Reset Content&quot;</span>,
-            <span class="ident">StatusCode::PartialContent</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Partial Content&quot;</span>,
-            <span class="ident">StatusCode::MultiStatus</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Multi-Status&quot;</span>,
-            <span class="ident">StatusCode::ImUsed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Im Used&quot;</span>,
-            <span class="ident">StatusCode::MultipleChoice</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Multiple Choice&quot;</span>,
-            <span class="ident">StatusCode::MovedPermanently</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Moved Permanently&quot;</span>,
-            <span class="ident">StatusCode::Found</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Found&quot;</span>,
-            <span class="ident">StatusCode::SeeOther</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;See Other&quot;</span>,
-            <span class="ident">StatusCode::NotModified</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Modified&quot;</span>,
-            <span class="ident">StatusCode::TemporaryRedirect</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Temporary Redirect&quot;</span>,
-            <span class="ident">StatusCode::PermanentRedirect</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Permanent Redirect&quot;</span>,
-            <span class="ident">StatusCode::BadRequest</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Bad Request&quot;</span>,
-            <span class="ident">StatusCode::Unauthorized</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Unauthorized&quot;</span>,
-            <span class="ident">StatusCode::PaymentRequired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Payment Required&quot;</span>,
-            <span class="ident">StatusCode::Forbidden</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Forbidden&quot;</span>,
-            <span class="ident">StatusCode::NotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Not Found&quot;</span>,
-            <span class="ident">StatusCode::MethodNotAllowed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Method Not Allowed&quot;</span>,
-            <span class="ident">StatusCode::NotAcceptable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Not Acceptable&quot;</span>,
-            <span class="ident">StatusCode::ProxyAuthenticationRequired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Proxy Authentication Required&quot;</span>,
-            <span class="ident">StatusCode::RequestTimeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Request Timeout&quot;</span>,
-            <span class="ident">StatusCode::Conflict</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Conflict&quot;</span>,
-            <span class="ident">StatusCode::Gone</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Gone&quot;</span>,
-            <span class="ident">StatusCode::LengthRequired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Length Required&quot;</span>,
-            <span class="ident">StatusCode::PreconditionFailed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Precondition Failed&quot;</span>,
-            <span class="ident">StatusCode::PayloadTooLarge</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Payload Too Large&quot;</span>,
-            <span class="ident">StatusCode::UriTooLong</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;URI Too Long&quot;</span>,
-            <span class="ident">StatusCode::UnsupportedMediaType</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Unsupported Media Type&quot;</span>,
-            <span class="ident">StatusCode::RequestedRangeNotSatisfiable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Requested Range Not Satisfiable&quot;</span>,
-            <span class="ident">StatusCode::ExpectationFailed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Expectation Failed&quot;</span>,
-            <span class="ident">StatusCode::ImATeapot</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;I&#39;m a teapot&quot;</span>,
-            <span class="ident">StatusCode::MisdirectedRequest</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Misdirected Request&quot;</span>,
-            <span class="ident">StatusCode::UnprocessableEntity</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Unprocessable Entity&quot;</span>,
-            <span class="ident">StatusCode::Locked</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Locked&quot;</span>,
-            <span class="ident">StatusCode::FailedDependency</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Failed Dependency&quot;</span>,
-            <span class="ident">StatusCode::TooEarly</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Too Early&quot;</span>,
-            <span class="ident">StatusCode::UpgradeRequired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Upgrade Required&quot;</span>,
-            <span class="ident">StatusCode::PreconditionRequired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Precondition Required&quot;</span>,
-            <span class="ident">StatusCode::TooManyRequests</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Too Many Requests&quot;</span>,
-            <span class="ident">StatusCode::RequestHeaderFieldsTooLarge</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Request Header Fields Too Large&quot;</span>,
-            <span class="ident">StatusCode::UnavailableForLegalReasons</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Unavailable For Legal Reasons&quot;</span>,
-            <span class="ident">StatusCode::InternalServerError</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Internal Server Error&quot;</span>,
-            <span class="ident">StatusCode::NotImplemented</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Not Implemented&quot;</span>,
-            <span class="ident">StatusCode::BadGateway</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Bad Gateway&quot;</span>,
-            <span class="ident">StatusCode::ServiceUnavailable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Service Unavailable&quot;</span>,
-            <span class="ident">StatusCode::GatewayTimeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Gateway Timeout&quot;</span>,
-            <span class="ident">StatusCode::HttpVersionNotSupported</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;HTTP Version Not Supported&quot;</span>,
-            <span class="ident">StatusCode::VariantAlsoNegotiates</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Variant Also Negotiates&quot;</span>,
-            <span class="ident">StatusCode::InsufficientStorage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Insufficient Storage&quot;</span>,
-            <span class="ident">StatusCode::LoopDetected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Loop Detected&quot;</span>,
-            <span class="ident">StatusCode::NotExtended</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Not Extended&quot;</span>,
-            <span class="ident">StatusCode::NetworkAuthenticationRequired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Network Authentication Required&quot;</span>,
+            <span class="ident">StatusCode::Continue</span> =&gt; <span class="string">&quot;Continue&quot;</span>,
+            <span class="ident">StatusCode::SwitchingProtocols</span> =&gt; <span class="string">&quot;Switching Protocols&quot;</span>,
+            <span class="ident">StatusCode::EarlyHints</span> =&gt; <span class="string">&quot;Early Hints&quot;</span>,
+            <span class="ident">StatusCode::Ok</span> =&gt; <span class="string">&quot;OK&quot;</span>,
+            <span class="ident">StatusCode::Created</span> =&gt; <span class="string">&quot;Created&quot;</span>,
+            <span class="ident">StatusCode::Accepted</span> =&gt; <span class="string">&quot;Accepted&quot;</span>,
+            <span class="ident">StatusCode::NonAuthoritativeInformation</span> =&gt; <span class="string">&quot;Non Authoritative Information&quot;</span>,
+            <span class="ident">StatusCode::NoContent</span> =&gt; <span class="string">&quot;No Content&quot;</span>,
+            <span class="ident">StatusCode::ResetContent</span> =&gt; <span class="string">&quot;Reset Content&quot;</span>,
+            <span class="ident">StatusCode::PartialContent</span> =&gt; <span class="string">&quot;Partial Content&quot;</span>,
+            <span class="ident">StatusCode::MultiStatus</span> =&gt; <span class="string">&quot;Multi-Status&quot;</span>,
+            <span class="ident">StatusCode::ImUsed</span> =&gt; <span class="string">&quot;Im Used&quot;</span>,
+            <span class="ident">StatusCode::MultipleChoice</span> =&gt; <span class="string">&quot;Multiple Choice&quot;</span>,
+            <span class="ident">StatusCode::MovedPermanently</span> =&gt; <span class="string">&quot;Moved Permanently&quot;</span>,
+            <span class="ident">StatusCode::Found</span> =&gt; <span class="string">&quot;Found&quot;</span>,
+            <span class="ident">StatusCode::SeeOther</span> =&gt; <span class="string">&quot;See Other&quot;</span>,
+            <span class="ident">StatusCode::NotModified</span> =&gt; <span class="string">&quot;Modified&quot;</span>,
+            <span class="ident">StatusCode::TemporaryRedirect</span> =&gt; <span class="string">&quot;Temporary Redirect&quot;</span>,
+            <span class="ident">StatusCode::PermanentRedirect</span> =&gt; <span class="string">&quot;Permanent Redirect&quot;</span>,
+            <span class="ident">StatusCode::BadRequest</span> =&gt; <span class="string">&quot;Bad Request&quot;</span>,
+            <span class="ident">StatusCode::Unauthorized</span> =&gt; <span class="string">&quot;Unauthorized&quot;</span>,
+            <span class="ident">StatusCode::PaymentRequired</span> =&gt; <span class="string">&quot;Payment Required&quot;</span>,
+            <span class="ident">StatusCode::Forbidden</span> =&gt; <span class="string">&quot;Forbidden&quot;</span>,
+            <span class="ident">StatusCode::NotFound</span> =&gt; <span class="string">&quot;Not Found&quot;</span>,
+            <span class="ident">StatusCode::MethodNotAllowed</span> =&gt; <span class="string">&quot;Method Not Allowed&quot;</span>,
+            <span class="ident">StatusCode::NotAcceptable</span> =&gt; <span class="string">&quot;Not Acceptable&quot;</span>,
+            <span class="ident">StatusCode::ProxyAuthenticationRequired</span> =&gt; <span class="string">&quot;Proxy Authentication Required&quot;</span>,
+            <span class="ident">StatusCode::RequestTimeout</span> =&gt; <span class="string">&quot;Request Timeout&quot;</span>,
+            <span class="ident">StatusCode::Conflict</span> =&gt; <span class="string">&quot;Conflict&quot;</span>,
+            <span class="ident">StatusCode::Gone</span> =&gt; <span class="string">&quot;Gone&quot;</span>,
+            <span class="ident">StatusCode::LengthRequired</span> =&gt; <span class="string">&quot;Length Required&quot;</span>,
+            <span class="ident">StatusCode::PreconditionFailed</span> =&gt; <span class="string">&quot;Precondition Failed&quot;</span>,
+            <span class="ident">StatusCode::PayloadTooLarge</span> =&gt; <span class="string">&quot;Payload Too Large&quot;</span>,
+            <span class="ident">StatusCode::UriTooLong</span> =&gt; <span class="string">&quot;URI Too Long&quot;</span>,
+            <span class="ident">StatusCode::UnsupportedMediaType</span> =&gt; <span class="string">&quot;Unsupported Media Type&quot;</span>,
+            <span class="ident">StatusCode::RequestedRangeNotSatisfiable</span> =&gt; <span class="string">&quot;Requested Range Not Satisfiable&quot;</span>,
+            <span class="ident">StatusCode::ExpectationFailed</span> =&gt; <span class="string">&quot;Expectation Failed&quot;</span>,
+            <span class="ident">StatusCode::ImATeapot</span> =&gt; <span class="string">&quot;I&#39;m a teapot&quot;</span>,
+            <span class="ident">StatusCode::MisdirectedRequest</span> =&gt; <span class="string">&quot;Misdirected Request&quot;</span>,
+            <span class="ident">StatusCode::UnprocessableEntity</span> =&gt; <span class="string">&quot;Unprocessable Entity&quot;</span>,
+            <span class="ident">StatusCode::Locked</span> =&gt; <span class="string">&quot;Locked&quot;</span>,
+            <span class="ident">StatusCode::FailedDependency</span> =&gt; <span class="string">&quot;Failed Dependency&quot;</span>,
+            <span class="ident">StatusCode::TooEarly</span> =&gt; <span class="string">&quot;Too Early&quot;</span>,
+            <span class="ident">StatusCode::UpgradeRequired</span> =&gt; <span class="string">&quot;Upgrade Required&quot;</span>,
+            <span class="ident">StatusCode::PreconditionRequired</span> =&gt; <span class="string">&quot;Precondition Required&quot;</span>,
+            <span class="ident">StatusCode::TooManyRequests</span> =&gt; <span class="string">&quot;Too Many Requests&quot;</span>,
+            <span class="ident">StatusCode::RequestHeaderFieldsTooLarge</span> =&gt; <span class="string">&quot;Request Header Fields Too Large&quot;</span>,
+            <span class="ident">StatusCode::UnavailableForLegalReasons</span> =&gt; <span class="string">&quot;Unavailable For Legal Reasons&quot;</span>,
+            <span class="ident">StatusCode::InternalServerError</span> =&gt; <span class="string">&quot;Internal Server Error&quot;</span>,
+            <span class="ident">StatusCode::NotImplemented</span> =&gt; <span class="string">&quot;Not Implemented&quot;</span>,
+            <span class="ident">StatusCode::BadGateway</span> =&gt; <span class="string">&quot;Bad Gateway&quot;</span>,
+            <span class="ident">StatusCode::ServiceUnavailable</span> =&gt; <span class="string">&quot;Service Unavailable&quot;</span>,
+            <span class="ident">StatusCode::GatewayTimeout</span> =&gt; <span class="string">&quot;Gateway Timeout&quot;</span>,
+            <span class="ident">StatusCode::HttpVersionNotSupported</span> =&gt; <span class="string">&quot;HTTP Version Not Supported&quot;</span>,
+            <span class="ident">StatusCode::VariantAlsoNegotiates</span> =&gt; <span class="string">&quot;Variant Also Negotiates&quot;</span>,
+            <span class="ident">StatusCode::InsufficientStorage</span> =&gt; <span class="string">&quot;Insufficient Storage&quot;</span>,
+            <span class="ident">StatusCode::LoopDetected</span> =&gt; <span class="string">&quot;Loop Detected&quot;</span>,
+            <span class="ident">StatusCode::NotExtended</span> =&gt; <span class="string">&quot;Not Extended&quot;</span>,
+            <span class="ident">StatusCode::NetworkAuthenticationRequired</span> =&gt; <span class="string">&quot;Network Authentication Required&quot;</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Serializer</span>,
     {
@@ -1268,53 +1268,53 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StatusCodeU16Visitor</span> {
     <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">StatusCode</span>;
 
-    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;a u16 representing the status code&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_i16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_i16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">DeError</span>,
     {
         <span class="self">self</span>.<span class="ident">visit_u16</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u16</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_i32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_i32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">DeError</span>,
     {
         <span class="self">self</span>.<span class="ident">visit_u16</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u16</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_i64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_i64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">DeError</span>,
     {
         <span class="self">self</span>.<span class="ident">visit_u16</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u16</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_u16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_u16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">DeError</span>,
     {
         <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
         <span class="kw">match</span> <span class="ident">StatusCode::try_from</span>(<span class="ident">v</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">status_code</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">status_code</span>),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::invalid_value</span>(
+            <span class="prelude-val">Ok</span>(<span class="ident">status_code</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">status_code</span>),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">DeError::invalid_value</span>(
                 <span class="ident">Unexpected::Unsigned</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u64</span>),
                 <span class="kw-2">&amp;</span><span class="self">self</span>,
             )),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_u32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_u32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">DeError</span>,
     {
         <span class="self">self</span>.<span class="ident">visit_u16</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u16</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">DeError</span>,
     {
@@ -1323,7 +1323,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1332,7 +1332,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">code</span>: <span class="ident">StatusCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">code</span>: <span class="ident">StatusCode</span>) -&gt; <span class="ident">u16</span> {
         <span class="ident">code</span> <span class="kw">as</span> <span class="ident">u16</span>
     }
 }
@@ -1340,86 +1340,86 @@
 <span class="kw">impl</span> <span class="ident">std::convert::TryFrom</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">num</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">num</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">num</span> {
-            <span class="number">100</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Continue</span>),
-            <span class="number">101</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::SwitchingProtocols</span>),
-            <span class="number">103</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::EarlyHints</span>),
-            <span class="number">200</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Ok</span>),
-            <span class="number">201</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Created</span>),
-            <span class="number">202</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Accepted</span>),
-            <span class="number">203</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NonAuthoritativeInformation</span>),
-            <span class="number">204</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NoContent</span>),
-            <span class="number">205</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::ResetContent</span>),
-            <span class="number">206</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::PartialContent</span>),
-            <span class="number">207</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::MultiStatus</span>),
-            <span class="number">226</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::ImUsed</span>),
-            <span class="number">300</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::MultipleChoice</span>),
-            <span class="number">301</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::MovedPermanently</span>),
-            <span class="number">302</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Found</span>),
-            <span class="number">303</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::SeeOther</span>),
-            <span class="number">304</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NotModified</span>),
-            <span class="number">307</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::TemporaryRedirect</span>),
-            <span class="number">308</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::PermanentRedirect</span>),
-            <span class="number">400</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::BadRequest</span>),
-            <span class="number">401</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Unauthorized</span>),
-            <span class="number">402</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::PaymentRequired</span>),
-            <span class="number">403</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Forbidden</span>),
-            <span class="number">404</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NotFound</span>),
-            <span class="number">405</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::MethodNotAllowed</span>),
-            <span class="number">406</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NotAcceptable</span>),
-            <span class="number">407</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::ProxyAuthenticationRequired</span>),
-            <span class="number">408</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::RequestTimeout</span>),
-            <span class="number">409</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Conflict</span>),
-            <span class="number">410</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Gone</span>),
-            <span class="number">411</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::LengthRequired</span>),
-            <span class="number">412</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::PreconditionFailed</span>),
-            <span class="number">413</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::PayloadTooLarge</span>),
-            <span class="number">414</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::UriTooLong</span>),
-            <span class="number">415</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::UnsupportedMediaType</span>),
-            <span class="number">416</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::RequestedRangeNotSatisfiable</span>),
-            <span class="number">417</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::ExpectationFailed</span>),
-            <span class="number">418</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::ImATeapot</span>),
-            <span class="number">421</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::MisdirectedRequest</span>),
-            <span class="number">422</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::UnprocessableEntity</span>),
-            <span class="number">423</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Locked</span>),
-            <span class="number">424</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::FailedDependency</span>),
-            <span class="number">425</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::TooEarly</span>),
-            <span class="number">426</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::UpgradeRequired</span>),
-            <span class="number">428</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::PreconditionRequired</span>),
-            <span class="number">429</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::TooManyRequests</span>),
-            <span class="number">431</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::RequestHeaderFieldsTooLarge</span>),
-            <span class="number">451</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::UnavailableForLegalReasons</span>),
-            <span class="number">500</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::InternalServerError</span>),
-            <span class="number">501</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NotImplemented</span>),
-            <span class="number">502</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::BadGateway</span>),
-            <span class="number">503</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::ServiceUnavailable</span>),
-            <span class="number">504</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::GatewayTimeout</span>),
-            <span class="number">505</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::HttpVersionNotSupported</span>),
-            <span class="number">506</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::VariantAlsoNegotiates</span>),
-            <span class="number">507</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::InsufficientStorage</span>),
-            <span class="number">508</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::LoopDetected</span>),
-            <span class="number">510</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NotExtended</span>),
-            <span class="number">511</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NetworkAuthenticationRequired</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">crate::bail!</span>(<span class="string">&quot;Invalid status code&quot;</span>),
+            <span class="number">100</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Continue</span>),
+            <span class="number">101</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::SwitchingProtocols</span>),
+            <span class="number">103</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::EarlyHints</span>),
+            <span class="number">200</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Ok</span>),
+            <span class="number">201</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Created</span>),
+            <span class="number">202</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Accepted</span>),
+            <span class="number">203</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NonAuthoritativeInformation</span>),
+            <span class="number">204</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NoContent</span>),
+            <span class="number">205</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::ResetContent</span>),
+            <span class="number">206</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::PartialContent</span>),
+            <span class="number">207</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::MultiStatus</span>),
+            <span class="number">226</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::ImUsed</span>),
+            <span class="number">300</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::MultipleChoice</span>),
+            <span class="number">301</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::MovedPermanently</span>),
+            <span class="number">302</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Found</span>),
+            <span class="number">303</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::SeeOther</span>),
+            <span class="number">304</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NotModified</span>),
+            <span class="number">307</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::TemporaryRedirect</span>),
+            <span class="number">308</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::PermanentRedirect</span>),
+            <span class="number">400</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::BadRequest</span>),
+            <span class="number">401</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Unauthorized</span>),
+            <span class="number">402</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::PaymentRequired</span>),
+            <span class="number">403</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Forbidden</span>),
+            <span class="number">404</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NotFound</span>),
+            <span class="number">405</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::MethodNotAllowed</span>),
+            <span class="number">406</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NotAcceptable</span>),
+            <span class="number">407</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::ProxyAuthenticationRequired</span>),
+            <span class="number">408</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::RequestTimeout</span>),
+            <span class="number">409</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Conflict</span>),
+            <span class="number">410</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Gone</span>),
+            <span class="number">411</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::LengthRequired</span>),
+            <span class="number">412</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::PreconditionFailed</span>),
+            <span class="number">413</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::PayloadTooLarge</span>),
+            <span class="number">414</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::UriTooLong</span>),
+            <span class="number">415</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::UnsupportedMediaType</span>),
+            <span class="number">416</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::RequestedRangeNotSatisfiable</span>),
+            <span class="number">417</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::ExpectationFailed</span>),
+            <span class="number">418</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::ImATeapot</span>),
+            <span class="number">421</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::MisdirectedRequest</span>),
+            <span class="number">422</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::UnprocessableEntity</span>),
+            <span class="number">423</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::Locked</span>),
+            <span class="number">424</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::FailedDependency</span>),
+            <span class="number">425</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::TooEarly</span>),
+            <span class="number">426</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::UpgradeRequired</span>),
+            <span class="number">428</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::PreconditionRequired</span>),
+            <span class="number">429</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::TooManyRequests</span>),
+            <span class="number">431</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::RequestHeaderFieldsTooLarge</span>),
+            <span class="number">451</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::UnavailableForLegalReasons</span>),
+            <span class="number">500</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::InternalServerError</span>),
+            <span class="number">501</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NotImplemented</span>),
+            <span class="number">502</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::BadGateway</span>),
+            <span class="number">503</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::ServiceUnavailable</span>),
+            <span class="number">504</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::GatewayTimeout</span>),
+            <span class="number">505</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::HttpVersionNotSupported</span>),
+            <span class="number">506</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::VariantAlsoNegotiates</span>),
+            <span class="number">507</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::InsufficientStorage</span>),
+            <span class="number">508</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::LoopDetected</span>),
+            <span class="number">510</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NotExtended</span>),
+            <span class="number">511</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusCode::NetworkAuthenticationRequired</span>),
+            <span class="kw">_</span> =&gt; <span class="macro">crate::bail!</span>(<span class="string">&quot;Invalid status code&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">StatusCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">other</span> <span class="kw">as</span> <span class="ident">u16</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">StatusCode</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span> <span class="kw">as</span> <span class="ident">u16</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u16</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">other</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">u16</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u16</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u16</span>)
     }
 }
@@ -1428,7 +1428,7 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::StatusCode</span>;
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">serde_as_u16</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">serde_json::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">serde_as_u16</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">serde_json::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">status_code</span>: <span class="ident">StatusCode</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="string">&quot;202&quot;</span>)<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(<span class="ident">StatusCode::Accepted</span>, <span class="ident">status_code</span>);
         <span class="macro">assert_eq!</span>(

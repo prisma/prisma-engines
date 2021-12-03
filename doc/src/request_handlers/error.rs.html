@@ -53,11 +53,13 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
+<span id="56">56</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">graphql_parser::query::ParseError</span>;
 <span class="kw">use</span> <span class="ident">query_core::CoreError</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HandlerError</span> {
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">_0</span>)]</span>
     <span class="ident">Core</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">CoreError</span>),
@@ -76,15 +78,15 @@
 }
 
 <span class="kw">impl</span> <span class="ident">HandlerError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configuration</span>(<span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configuration</span>(<span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Configuration</span>(<span class="ident">message</span>.<span class="ident">to_string</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_conversion</span>(<span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_conversion</span>(<span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Configuration</span>(<span class="ident">message</span>.<span class="ident">to_string</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unsupported_feature</span>(<span class="ident">feature_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unsupported_feature</span>(<span class="ident">feature_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">message</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">to_string</span>();
 
         <span class="ident"><span class="self">Self</span>::UnsupportedFeature</span> { <span class="ident">feature_name</span>, <span class="ident">message</span> }
@@ -92,19 +94,19 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">url::ParseError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HandlerError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">url::ParseError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">url::ParseError</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::configuration</span>(<span class="macro">format!</span>(<span class="string">&quot;Error parsing connection string: {}&quot;</span>, <span class="ident">e</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">connection_string::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HandlerError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">connection_string::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">connection_string::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::configuration</span>(<span class="macro">format!</span>(<span class="string">&quot;Error parsing connection string: {}&quot;</span>, <span class="ident">e</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ParseError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HandlerError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ParseError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ParseError</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::configuration</span>(<span class="macro">format!</span>(<span class="string">&quot;Error parsing GraphQL query: {}&quot;</span>, <span class="ident">e</span>))
     }
 }

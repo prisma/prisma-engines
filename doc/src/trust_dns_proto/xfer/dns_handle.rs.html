@@ -135,7 +135,7 @@
 
 <span class="kw">impl</span> <span class="ident">StreamHandle</span> {
     <span class="doccomment">/// Constructs a new StreamHandle for wrapping the sender</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">sender</span>: <span class="ident">mpsc::UnboundedSender</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">sender</span>: <span class="ident">mpsc::UnboundedSender</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">StreamHandle</span> { <span class="ident">sender</span> }
     }
 }
@@ -143,11 +143,11 @@
 <span class="doccomment">/// Implementations of Sinks for sending DNS messages</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DnsStreamHandle</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> {
     <span class="doccomment">/// Sends a message to the Handle for delivery to the server.</span>
-    <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buffer</span>: <span class="ident">SerialMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ProtoError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buffer</span>: <span class="ident">SerialMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ProtoError</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">DnsStreamHandle</span> <span class="kw">for</span> <span class="ident">StreamHandle</span> {
-    <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buffer</span>: <span class="ident">SerialMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ProtoError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buffer</span>: <span class="ident">SerialMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ProtoError</span><span class="op">&gt;</span> {
         <span class="ident">mpsc::UnboundedSender::unbounded_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sender</span>, <span class="ident">buffer</span>.<span class="ident">into_parts</span>().<span class="number">0</span>)
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="macro">format!</span>(<span class="string">&quot;mpsc::SendError {}&quot;</span>, <span class="ident">e</span>)))
     }
@@ -163,7 +163,7 @@
     <span class="doccomment">/// Only returns true if and only if this DNS handle is validating DNSSec.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the DnsHandle impl is wrapping other clients, then the correct option is to delegate the question to the wrapped client.</span>
-    <span class="kw">fn</span> <span class="ident">is_verifying_dnssec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_verifying_dnssec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
 
@@ -174,7 +174,7 @@
     <span class="doccomment">/// * `request` - the fully constructed Message to send, note that most implementations of</span>
     <span class="doccomment">///               will most likely be required to rewrite the QueryId, do no rely on that as</span>
     <span class="doccomment">///               being stable.</span>
-    <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Response</span>;
+    <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span>;
 
     <span class="doccomment">/// A *classic* DNS query</span>
     <span class="doccomment">///</span>
@@ -183,7 +183,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `query` - the query to lookup</span>
-    <span class="kw">fn</span> <span class="ident">lookup</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Query</span>, <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Response</span> {
+    <span class="kw">fn</span> <span class="ident">lookup</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Query</span>, <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
         <span class="macro">debug!</span>(<span class="string">&quot;querying: {} {:?}&quot;</span>, <span class="ident">query</span>.<span class="ident">name</span>(), <span class="ident">query</span>.<span class="ident">query_type</span>());
 
         <span class="comment">// build the message</span>

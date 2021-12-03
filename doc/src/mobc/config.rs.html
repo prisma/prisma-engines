@@ -278,7 +278,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Config</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">ShareConfig</span>, <span class="ident">InternalConfig</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) -&gt; (<span class="ident">ShareConfig</span>, <span class="ident">InternalConfig</span>) {
         <span class="kw">let</span> <span class="ident">share</span> <span class="op">=</span> <span class="ident">ShareConfig</span> {
             <span class="ident">clean_rate</span>: <span class="self">self</span>.<span class="ident">clean_rate</span>,
             <span class="ident">max_bad_conn_retries</span>: <span class="self">self</span>.<span class="ident">max_bad_conn_retries</span>,
@@ -328,7 +328,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">max_open</span>: <span class="ident">DEFAULT_MAX_OPEN_CONNS</span>,
             <span class="ident">max_idle</span>: <span class="prelude-val">None</span>,
@@ -348,7 +348,7 @@
     <span class="doccomment">/// Constructs a new `Builder`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Parameters are initialized with their default values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Default::default</span>()
     }
 
@@ -356,7 +356,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// - 0 means unlimited.</span>
     <span class="doccomment">/// - Defaults to 10.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_open</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_open</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_open</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_open</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">max_open</span> <span class="op">=</span> <span class="ident">max_open</span>;
         <span class="self">self</span>
     }
@@ -367,7 +367,7 @@
     <span class="doccomment">/// at all times, while respecting the value of `max_open`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// - Defaults to 2.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_idle</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_idle</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_idle</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_idle</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">max_idle</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max_idle</span>);
         <span class="self">self</span>
     }
@@ -376,7 +376,7 @@
     <span class="doccomment">/// `Manager::check` before it is checked out of the pool.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// - Defaults to true.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_on_check_out</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">health_check</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_on_check_out</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">health_check</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">health_check</span> <span class="op">=</span> <span class="ident">health_check</span>;
         <span class="self">self</span>
     }
@@ -391,7 +391,7 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if `max_lifetime` is the zero `Duration`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_lifetime</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_lifetime</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_ne!</span>(
             <span class="ident">max_lifetime</span>,
             <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">0</span>)),
@@ -412,7 +412,7 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if `max_idle_lifetime` is the zero `Duration`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_idle_lifetime</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_idle_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_idle_lifetime</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_idle_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_ne!</span>(
             <span class="ident">max_idle_lifetime</span>,
             <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">0</span>)),
@@ -433,7 +433,7 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if `connection_timeout` is the zero duration</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">get_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">get_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_ne!</span>(
             <span class="ident">get_timeout</span>,
             <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">0</span>)),
@@ -458,7 +458,7 @@
     <span class="doccomment">/// Panics if `connection_timeout` is the zero duration</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`test_on_check_out`]: #method.test_on_check_out</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">health_check_interval</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">health_check_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">health_check_interval</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">health_check_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_ne!</span>(
             <span class="ident">health_check_interval</span>,
             <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">0</span>)),
@@ -472,7 +472,7 @@
     <span class="comment">// used by tests</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_rate</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">clean_rate</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_rate</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">clean_rate</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="macro">assert!</span>(
             <span class="ident">clean_rate</span> <span class="op">&gt;</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>),
             <span class="string">&quot;connection_timeout must be positive&quot;</span>
@@ -490,7 +490,7 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if `max_idle` is greater than `max_size`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>, <span class="ident">manager</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>, <span class="ident">manager</span>: <span class="ident">M</span>) -&gt; <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">std::cmp</span>;
         <span class="kw">let</span> <span class="ident">max_idle</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">max_idle</span>

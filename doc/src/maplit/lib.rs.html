@@ -368,11 +368,11 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="macro">macro_rules!</span> <span class="ident">hashmap</span> {
-    (@<span class="ident">single</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> (());
-    (@<span class="ident">count</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="op">&lt;</span>[()]<span class="op">&gt;</span><span class="ident">::len</span>(<span class="kw-2">&amp;</span>[$(<span class="macro">hashmap!</span>(@<span class="ident">single</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)),<span class="kw-2">*</span>]));
+    (@<span class="ident">single</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; (());
+    (@<span class="ident">count</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) =&gt; (<span class="op">&lt;</span>[()]<span class="op">&gt;</span><span class="ident">::len</span>(<span class="kw-2">&amp;</span>[$(<span class="macro">hashmap!</span>(@<span class="ident">single</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)),<span class="kw-2">*</span>]));
 
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>,)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro">hashmap!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>),<span class="op">+</span>) };
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>,)<span class="op">+</span>) =&gt; { <span class="macro">hashmap!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>),<span class="op">+</span>) };
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) =&gt; {
         {
             <span class="kw">let</span> <span class="ident">_cap</span> <span class="op">=</span> <span class="macro">hashmap!</span>(@<span class="ident">count</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>),<span class="kw-2">*</span>);
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">_map</span> <span class="op">=</span> <span class="ident">::std::collections::HashMap::with_capacity</span>(<span class="ident">_cap</span>);
@@ -400,11 +400,11 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">hashset</span> {
-    (@<span class="ident">single</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> (());
-    (@<span class="ident">count</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="op">&lt;</span>[()]<span class="op">&gt;</span><span class="ident">::len</span>(<span class="kw-2">&amp;</span>[$(<span class="macro">hashset!</span>(@<span class="ident">single</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)),<span class="kw-2">*</span>]));
+    (@<span class="ident">single</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; (());
+    (@<span class="ident">count</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) =&gt; (<span class="op">&lt;</span>[()]<span class="op">&gt;</span><span class="ident">::len</span>(<span class="kw-2">&amp;</span>[$(<span class="macro">hashset!</span>(@<span class="ident">single</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)),<span class="kw-2">*</span>]));
 
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>,)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro">hashset!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>),<span class="op">+</span>) };
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>,)<span class="op">+</span>) =&gt; { <span class="macro">hashset!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>),<span class="op">+</span>) };
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) =&gt; {
         {
             <span class="kw">let</span> <span class="ident">_cap</span> <span class="op">=</span> <span class="macro">hashset!</span>(@<span class="ident">count</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>),<span class="kw-2">*</span>);
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">_set</span> <span class="op">=</span> <span class="ident">::std::collections::HashSet::with_capacity</span>(<span class="ident">_cap</span>);
@@ -436,9 +436,9 @@
 <span class="doccomment">/// ```</span>
 <span class="macro">macro_rules!</span> <span class="ident">btreemap</span> {
     <span class="comment">// trailing comma case</span>
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>,)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="macro">btreemap!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>),<span class="op">+</span>));
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>,)<span class="op">+</span>) =&gt; (<span class="macro">btreemap!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>),<span class="op">+</span>));
 
-    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>),<span class="op">*</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>),<span class="op">*</span> ) =&gt; {
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">_map</span> <span class="op">=</span> <span class="ident">::std::collections::BTreeMap::new</span>();
             $(
@@ -465,9 +465,9 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="macro">macro_rules!</span> <span class="ident">btreeset</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>,)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="macro">btreeset!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>),<span class="op">+</span>));
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>,)<span class="op">+</span>) =&gt; (<span class="macro">btreeset!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>),<span class="op">+</span>));
 
-    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>),<span class="op">*</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">expr</span>),<span class="op">*</span> ) =&gt; {
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">_set</span> <span class="op">=</span> <span class="ident">::std::collections::BTreeSet::new</span>();
             $(
@@ -480,7 +480,7 @@
 
 <span class="doccomment">/// Identity function. Used as the fallback for conversion.</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__id</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> { <span class="ident">t</span> }
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__id</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">t</span>: <span class="ident">T</span>) -&gt; <span class="ident">T</span> { <span class="ident">t</span> }
 
 <span class="doccomment">/// Macro that converts the keys or key-value pairs passed to another maplit</span>
 <span class="doccomment">/// macro. The default conversion is to use the [`Into`] trait, if no</span>
@@ -542,16 +542,16 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">convert_args</span> {
-    (<span class="ident">keys</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span> <span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="kw-2">*</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">keys</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span> <span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="kw-2">*</span>)) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span> { $((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>)),<span class="op">*</span> }
     };
-    (<span class="ident">keys</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>:<span class="ident">expr</span>, <span class="ident">values</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">vf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span> <span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="kw-2">*</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">keys</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>:<span class="ident">expr</span>, <span class="ident">values</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">vf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span> <span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="kw-2">*</span>)) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span> { $((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>)),<span class="op">*</span> }
     };
-    (<span class="ident">keys</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>:<span class="ident">expr</span>, <span class="ident">values</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">vf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span> <span class="op">!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="kw-2">*</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span> { $((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">vf</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>)),<span class="op">*</span> }
+    (<span class="ident">keys</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>:<span class="ident">expr</span>, <span class="ident">values</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">vf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span> <span class="op">!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="kw-2">*</span>)) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">macro_name!</span> { $((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">k</span>) =&gt; (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">vf</span>)(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>)),<span class="op">*</span> }
     };
-    (<span class="ident">keys</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span> <span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">keys</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span> <span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)) =&gt; {
         <span class="macro">convert_args!</span> {
             <span class="ident">keys</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kf</span>, <span class="ident">values</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::__id</span>,
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span> <span class="op">!</span>(
@@ -559,7 +559,7 @@
             )
         }
     };
-    (<span class="ident">values</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">vf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span> <span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="ident">values</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">vf</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span> <span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)) =&gt; {
         <span class="macro">convert_args!</span> {
             <span class="ident">keys</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::__id</span>, <span class="ident">values</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">vf</span>,
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span> <span class="op">!</span>(
@@ -567,7 +567,7 @@
             )
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span> <span class="op">!</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span>:<span class="ident">ident</span> <span class="op">!</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">convert_args!</span> {
             <span class="ident">keys</span><span class="op">=</span><span class="ident">::std::convert::Into::into</span>, <span class="ident">values</span><span class="op">=</span><span class="ident">::std::convert::Into::into</span>,
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">macro_name</span> <span class="op">!</span>
@@ -581,8 +581,8 @@
     <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
     <span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
     <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="macro">hashmap!</span>{
-        <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;one&quot;</span>,
-        <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;two&quot;</span>,
+        <span class="number">1</span> =&gt; <span class="string">&quot;one&quot;</span>,
+        <span class="number">2</span> =&gt; <span class="string">&quot;two&quot;</span>,
     };
     <span class="macro">assert_eq!</span>(<span class="ident">names</span>.<span class="ident">len</span>(), <span class="number">2</span>);
     <span class="macro">assert_eq!</span>(<span class="ident">names</span>[<span class="kw-2">&amp;</span><span class="number">1</span>], <span class="string">&quot;one&quot;</span>);
@@ -593,18 +593,18 @@
     <span class="macro">assert_eq!</span>(<span class="ident">empty</span>.<span class="ident">len</span>(), <span class="number">0</span>);
 
     <span class="kw">let</span> <span class="ident">_nested_compiles</span> <span class="op">=</span> <span class="macro">hashmap!</span>{
-        <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">hashmap!</span>{<span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span> <span class="op">+</span> <span class="number">2</span>,},
-        <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">hashmap!</span>{<span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,},
+        <span class="number">1</span> =&gt; <span class="macro">hashmap!</span>{<span class="number">0</span> =&gt; <span class="number">1</span> <span class="op">+</span> <span class="number">2</span>,},
+        <span class="number">2</span> =&gt; <span class="macro">hashmap!</span>{<span class="number">1</span> =&gt; <span class="number">1</span>,},
     };
 
     <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">convert_args!</span>(<span class="ident">keys</span><span class="op">=</span><span class="ident">String::from</span>, <span class="macro">hashmap!</span>(
-        <span class="string">&quot;one&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-        <span class="string">&quot;two&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+        <span class="string">&quot;one&quot;</span> =&gt; <span class="number">1</span>,
+        <span class="string">&quot;two&quot;</span> =&gt; <span class="number">2</span>,
     ));
 
     <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">convert_args!</span>(<span class="ident">keys</span><span class="op">=</span><span class="ident">String::from</span>, <span class="ident">values</span><span class="op">=</span><span class="ident">__id</span>, <span class="macro">hashmap!</span>(
-        <span class="string">&quot;one&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-        <span class="string">&quot;two&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+        <span class="string">&quot;one&quot;</span> =&gt; <span class="number">1</span>,
+        <span class="string">&quot;two&quot;</span> =&gt; <span class="number">2</span>,
     ));
 
     <span class="kw">let</span> <span class="ident">names</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">convert_args!</span>(<span class="macro">hashset!</span>(
@@ -630,8 +630,8 @@
 <span class="kw">fn</span> <span class="ident">test_btreemap</span>() {
     <span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
     <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="macro">btreemap!</span>{
-        <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;one&quot;</span>,
-        <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;two&quot;</span>,
+        <span class="number">1</span> =&gt; <span class="string">&quot;one&quot;</span>,
+        <span class="number">2</span> =&gt; <span class="string">&quot;two&quot;</span>,
     };
     <span class="macro">assert_eq!</span>(<span class="ident">names</span>.<span class="ident">len</span>(), <span class="number">2</span>);
     <span class="macro">assert_eq!</span>(<span class="ident">names</span>[<span class="kw-2">&amp;</span><span class="number">1</span>], <span class="string">&quot;one&quot;</span>);
@@ -642,8 +642,8 @@
     <span class="macro">assert_eq!</span>(<span class="ident">empty</span>.<span class="ident">len</span>(), <span class="number">0</span>);
 
     <span class="kw">let</span> <span class="ident">_nested_compiles</span> <span class="op">=</span> <span class="macro">btreemap!</span>{
-        <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">btreemap!</span>{<span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span> <span class="op">+</span> <span class="number">2</span>,},
-        <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">btreemap!</span>{<span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,},
+        <span class="number">1</span> =&gt; <span class="macro">btreemap!</span>{<span class="number">0</span> =&gt; <span class="number">1</span> <span class="op">+</span> <span class="number">2</span>,},
+        <span class="number">2</span> =&gt; <span class="macro">btreemap!</span>{<span class="number">1</span> =&gt; <span class="number">1</span>,},
     };
 }
 </code></pre></div>

@@ -1373,10 +1373,10 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EUCJPEncoding</span>;
 
 <span class="kw">impl</span> <span class="ident">Encoding</span> <span class="kw">for</span> <span class="ident">EUCJPEncoding</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;euc-jp&quot;</span> }
-    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="string">&quot;euc-jp&quot;</span>) }
-    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">EUCJPEncoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">EUCJP0212Decoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;euc-jp&quot;</span> }
+    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="string">&quot;euc-jp&quot;</span>) }
+    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">EUCJPEncoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">EUCJP0212Decoder::new</span>() }
 }
 
 <span class="doccomment">/// An encoder for EUC-JP with unused G3 character set.</span>
@@ -1384,28 +1384,28 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EUCJPEncoder</span>;
 
 <span class="kw">impl</span> <span class="ident">EUCJPEncoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Box::new</span>(<span class="ident">EUCJPEncoder</span>) }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Box::new</span>(<span class="ident">EUCJPEncoder</span>) }
 }
 
 <span class="kw">impl</span> <span class="ident">RawEncoder</span> <span class="kw">for</span> <span class="ident">EUCJPEncoder</span> {
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">EUCJPEncoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">true</span> }
+    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">EUCJPEncoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
 
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
         <span class="ident">output</span>.<span class="ident">writer_hint</span>(<span class="ident">input</span>.<span class="ident">len</span>());
 
         <span class="kw">for</span> ((<span class="ident">i</span>,<span class="ident">j</span>), <span class="ident">ch</span>) <span class="kw">in</span> <span class="ident">input</span>.<span class="ident">index_iter</span>() {
             <span class="kw">match</span> <span class="ident">ch</span> {
-                <span class="string">&#39;\u{0}&#39;</span>...<span class="string">&#39;\u{7f}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u8</span>); }
-                <span class="string">&#39;\u{a5}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x5c</span>); }
-                <span class="string">&#39;\u{203e}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x7e</span>); }
-                <span class="string">&#39;\u{ff61}&#39;</span>...<span class="string">&#39;\u{ff9f}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&#39;\u{0}&#39;</span>...<span class="string">&#39;\u{7f}&#39;</span> =&gt; { <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u8</span>); }
+                <span class="string">&#39;\u{a5}&#39;</span> =&gt; { <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x5c</span>); }
+                <span class="string">&#39;\u{203e}&#39;</span> =&gt; { <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x7e</span>); }
+                <span class="string">&#39;\u{ff61}&#39;</span>...<span class="string">&#39;\u{ff9f}&#39;</span> =&gt; {
                     <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x8e</span>);
                     <span class="ident">output</span>.<span class="ident">write_byte</span>((<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">0xff61</span> <span class="op">+</span> <span class="number">0xa1</span>) <span class="kw">as</span> <span class="ident">u8</span>);
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">index::jis0208::backward</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>);
-                    <span class="kw">if</span> <span class="ident">ptr</span> <span class="op">=</span><span class="op">=</span> <span class="number">0xffff</span> {
+                    <span class="kw">if</span> <span class="ident">ptr</span> <span class="op">==</span> <span class="number">0xffff</span> {
                         <span class="kw">return</span> (<span class="ident">i</span>, <span class="prelude-val">Some</span>(<span class="ident">CodecError</span> {
                             <span class="ident">upto</span>: <span class="ident">j</span> <span class="kw">as</span> <span class="ident">isize</span>, <span class="ident">cause</span>: <span class="string">&quot;unrepresentable character&quot;</span>.<span class="ident">into</span>()
                         }));
@@ -1421,7 +1421,7 @@
         (<span class="ident">input</span>.<span class="ident">len</span>(), <span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 }
@@ -1433,22 +1433,22 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EUCJP0212Decoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> {
         <span class="ident">Box::new</span>(<span class="ident">EUCJP0212Decoder</span> { <span class="ident">st</span>: <span class="ident">Default::default</span>() })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">RawDecoder</span> <span class="kw">for</span> <span class="ident">EUCJP0212Decoder</span> {
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">EUCJP0212Decoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">true</span> }
+    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">EUCJP0212Decoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
 
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">st</span>, <span class="ident">processed</span>, <span class="ident">err</span>) <span class="op">=</span> <span class="ident">eucjp::raw_feed</span>(<span class="self">self</span>.<span class="ident">st</span>, <span class="ident">input</span>, <span class="ident">output</span>, <span class="kw-2">&amp;</span>());
         <span class="self">self</span>.<span class="ident">st</span> <span class="op">=</span> <span class="ident">st</span>;
         (<span class="ident">processed</span>, <span class="ident">err</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">st</span>, <span class="ident">err</span>) <span class="op">=</span> <span class="ident">eucjp::raw_finish</span>(<span class="self">self</span>.<span class="ident">st</span>, <span class="ident">output</span>, <span class="kw-2">&amp;</span>());
         <span class="self">self</span>.<span class="ident">st</span> <span class="op">=</span> <span class="ident">st</span>;
         <span class="ident">err</span>
@@ -1458,26 +1458,26 @@
 <span class="macro">stateful_decoder!</span> {
     <span class="ident">module</span> <span class="ident">eucjp</span>;
 
-    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_0208_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_0208_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">use</span> <span class="ident">index_japanese</span> <span class="kw">as</span> <span class="ident">index</span>;
 
         <span class="kw">let</span> <span class="ident">lead</span> <span class="op">=</span> <span class="ident">lead</span> <span class="kw">as</span> <span class="ident">u16</span>;
         <span class="kw">let</span> <span class="ident">trail</span> <span class="op">=</span> <span class="ident">trail</span> <span class="kw">as</span> <span class="ident">u16</span>;
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">lead</span>, <span class="ident">trail</span>) {
-            (<span class="number">0xa1</span>...<span class="number">0xfe</span>, <span class="number">0xa1</span>...<span class="number">0xfe</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">lead</span> <span class="op">-</span> <span class="number">0xa1</span>) <span class="op">*</span> <span class="number">94</span> <span class="op">+</span> <span class="ident">trail</span> <span class="op">-</span> <span class="number">0xa1</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0xffff</span>,
+            (<span class="number">0xa1</span>...<span class="number">0xfe</span>, <span class="number">0xa1</span>...<span class="number">0xfe</span>) =&gt; (<span class="ident">lead</span> <span class="op">-</span> <span class="number">0xa1</span>) <span class="op">*</span> <span class="number">94</span> <span class="op">+</span> <span class="ident">trail</span> <span class="op">-</span> <span class="number">0xa1</span>,
+            <span class="kw">_</span> =&gt; <span class="number">0xffff</span>,
         };
         <span class="ident">index::jis0208::forward</span>(<span class="ident">index</span>)
     }
 
-    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_0212_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_0212_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">use</span> <span class="ident">index_japanese</span> <span class="kw">as</span> <span class="ident">index</span>;
 
         <span class="kw">let</span> <span class="ident">lead</span> <span class="op">=</span> <span class="ident">lead</span> <span class="kw">as</span> <span class="ident">u16</span>;
         <span class="kw">let</span> <span class="ident">trail</span> <span class="op">=</span> <span class="ident">trail</span> <span class="kw">as</span> <span class="ident">u16</span>;
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">lead</span>, <span class="ident">trail</span>) {
-            (<span class="number">0xa1</span>...<span class="number">0xfe</span>, <span class="number">0xa1</span>...<span class="number">0xfe</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">lead</span> <span class="op">-</span> <span class="number">0xa1</span>) <span class="op">*</span> <span class="number">94</span> <span class="op">+</span> <span class="ident">trail</span> <span class="op">-</span> <span class="number">0xa1</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0xffff</span>,
+            (<span class="number">0xa1</span>...<span class="number">0xfe</span>, <span class="number">0xa1</span>...<span class="number">0xfe</span>) =&gt; (<span class="ident">lead</span> <span class="op">-</span> <span class="number">0xa1</span>) <span class="op">*</span> <span class="number">94</span> <span class="op">+</span> <span class="ident">trail</span> <span class="op">-</span> <span class="number">0xa1</span>,
+            <span class="kw">_</span> =&gt; <span class="number">0xffff</span>,
         };
         <span class="ident">index::jis0212::forward</span>(<span class="ident">index</span>)
     }
@@ -1485,48 +1485,48 @@
 <span class="ident">initial</span>:
     <span class="comment">// euc-jp lead = 0x00</span>
     <span class="ident">state</span> <span class="ident">S0</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x00</span>...<span class="number">0x7f</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span>);
-        <span class="ident">case</span> <span class="number">0x8e</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">S1</span>(<span class="ident">ctx</span>);
-        <span class="ident">case</span> <span class="number">0x8f</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">S2</span>(<span class="ident">ctx</span>);
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0xa1</span>...<span class="number">0xfe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">S3</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>);
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x00</span>...<span class="number">0x7f</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span>);
+        <span class="ident">case</span> <span class="number">0x8e</span> =&gt; <span class="ident">S1</span>(<span class="ident">ctx</span>);
+        <span class="ident">case</span> <span class="number">0x8f</span> =&gt; <span class="ident">S2</span>(<span class="ident">ctx</span>);
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0xa1</span>...<span class="number">0xfe</span> =&gt; <span class="ident">S3</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>);
     }
 
 <span class="ident">transient</span>:
     <span class="comment">// euc-jp lead = 0x8e</span>
     <span class="ident">state</span> <span class="ident">S1</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0xa1</span>...<span class="number">0xdf</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="number">0xff61</span> <span class="op">+</span> <span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">0xa1</span>);
-        <span class="ident">case</span> <span class="number">0xa1</span>...<span class="number">0xfe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>);
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;invalid sequence&quot;</span>);
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0xa1</span>...<span class="number">0xdf</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="number">0xff61</span> <span class="op">+</span> <span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">0xa1</span>);
+        <span class="ident">case</span> <span class="number">0xa1</span>...<span class="number">0xfe</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>);
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;invalid sequence&quot;</span>);
     }
 
     <span class="comment">// euc-jp lead = 0x8f</span>
     <span class="comment">// JIS X 0201 half-width katakana</span>
     <span class="ident">state</span> <span class="ident">S2</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0xa1</span>...<span class="number">0xfe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">S4</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;invalid sequence&quot;</span>);
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0xa1</span>...<span class="number">0xfe</span> =&gt; <span class="ident">S4</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;invalid sequence&quot;</span>);
     }
 
     <span class="comment">// euc-jp lead != 0x00, euc-jp jis0212 flag = unset</span>
     <span class="comment">// JIS X 0208 two-byte sequence</span>
     <span class="ident">state</span> <span class="ident">S3</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">lead</span>: <span class="ident">u8</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0xa1</span>...<span class="number">0xfe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">map_two_0208_bytes</span>(<span class="ident">lead</span>, <span class="ident">b</span>) {
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0xa1</span>...<span class="number">0xfe</span> =&gt; <span class="kw">match</span> <span class="ident">map_two_0208_bytes</span>(<span class="ident">lead</span>, <span class="ident">b</span>) {
             <span class="comment">// do NOT backup, we only backup for out-of-range trails.</span>
-            <span class="number">0xffff</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>),
-            <span class="ident">ch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>)
+            <span class="number">0xffff</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>),
+            <span class="ident">ch</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>)
         };
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;invalid sequence&quot;</span>);
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;invalid sequence&quot;</span>);
     }
 
     <span class="comment">// euc-jp lead != 0x00, euc-jp jis0212 flag = set</span>
     <span class="comment">// JIS X 0212 three-byte sequence</span>
     <span class="ident">state</span> <span class="ident">S4</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">lead</span>: <span class="ident">u8</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0xa1</span>...<span class="number">0xfe</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">map_two_0212_bytes</span>(<span class="ident">lead</span>, <span class="ident">b</span>) {
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0xa1</span>...<span class="number">0xfe</span> =&gt; <span class="kw">match</span> <span class="ident">map_two_0212_bytes</span>(<span class="ident">lead</span>, <span class="ident">b</span>) {
             <span class="comment">// do NOT backup, we only backup for out-of-range trails.</span>
-            <span class="number">0xffff</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>),
-            <span class="ident">ch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>)
+            <span class="number">0xffff</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>),
+            <span class="ident">ch</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>)
         };
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;invalid sequence&quot;</span>);
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;invalid sequence&quot;</span>);
     }
 }
 
@@ -1793,10 +1793,10 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Windows31JEncoding</span>;
 
 <span class="kw">impl</span> <span class="ident">Encoding</span> <span class="kw">for</span> <span class="ident">Windows31JEncoding</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;windows-31j&quot;</span> }
-    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="string">&quot;shift_jis&quot;</span>) } <span class="comment">// WHATWG compatibility</span>
-    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Windows31JEncoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">Windows31JDecoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;windows-31j&quot;</span> }
+    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="string">&quot;shift_jis&quot;</span>) } <span class="comment">// WHATWG compatibility</span>
+    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Windows31JEncoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">Windows31JDecoder::new</span>() }
 }
 
 <span class="doccomment">/// An encoder for Shift_JIS with IBM/NEC extensions.</span>
@@ -1804,28 +1804,28 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Windows31JEncoder</span>;
 
 <span class="kw">impl</span> <span class="ident">Windows31JEncoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Box::new</span>(<span class="ident">Windows31JEncoder</span>) }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Box::new</span>(<span class="ident">Windows31JEncoder</span>) }
 }
 
 <span class="kw">impl</span> <span class="ident">RawEncoder</span> <span class="kw">for</span> <span class="ident">Windows31JEncoder</span> {
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Windows31JEncoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">true</span> }
+    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Windows31JEncoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
 
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
         <span class="ident">output</span>.<span class="ident">writer_hint</span>(<span class="ident">input</span>.<span class="ident">len</span>());
 
         <span class="kw">for</span> ((<span class="ident">i</span>,<span class="ident">j</span>), <span class="ident">ch</span>) <span class="kw">in</span> <span class="ident">input</span>.<span class="ident">index_iter</span>() {
             <span class="kw">match</span> <span class="ident">ch</span> {
-                <span class="string">&#39;\u{0}&#39;</span>...<span class="string">&#39;\u{80}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u8</span>); }
-                <span class="string">&#39;\u{a5}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x5c</span>); }
-                <span class="string">&#39;\u{203e}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x7e</span>); }
-                <span class="string">&#39;\u{ff61}&#39;</span>...<span class="string">&#39;\u{ff9f}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&#39;\u{0}&#39;</span>...<span class="string">&#39;\u{80}&#39;</span> =&gt; { <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u8</span>); }
+                <span class="string">&#39;\u{a5}&#39;</span> =&gt; { <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x5c</span>); }
+                <span class="string">&#39;\u{203e}&#39;</span> =&gt; { <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x7e</span>); }
+                <span class="string">&#39;\u{ff61}&#39;</span>...<span class="string">&#39;\u{ff9f}&#39;</span> =&gt; {
                     <span class="ident">output</span>.<span class="ident">write_byte</span>((<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">0xff61</span> <span class="op">+</span> <span class="number">0xa1</span>) <span class="kw">as</span> <span class="ident">u8</span>);
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">_</span> =&gt; {
                     <span class="comment">// corresponds to the &quot;index shift_jis pointer&quot; in the WHATWG spec</span>
                     <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">index::jis0208::backward_remapped</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>);
-                    <span class="kw">if</span> <span class="ident">ptr</span> <span class="op">=</span><span class="op">=</span> <span class="number">0xffff</span> {
+                    <span class="kw">if</span> <span class="ident">ptr</span> <span class="op">==</span> <span class="number">0xffff</span> {
                         <span class="kw">return</span> (<span class="ident">i</span>, <span class="prelude-val">Some</span>(<span class="ident">CodecError</span> {
                             <span class="ident">upto</span>: <span class="ident">j</span> <span class="kw">as</span> <span class="ident">isize</span>, <span class="ident">cause</span>: <span class="string">&quot;unrepresentable character&quot;</span>.<span class="ident">into</span>(),
                         }));
@@ -1843,7 +1843,7 @@
         (<span class="ident">input</span>.<span class="ident">len</span>(), <span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 }
@@ -1855,22 +1855,22 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Windows31JDecoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> {
         <span class="ident">Box::new</span>(<span class="ident">Windows31JDecoder</span> { <span class="ident">st</span>: <span class="ident">Default::default</span>() })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">RawDecoder</span> <span class="kw">for</span> <span class="ident">Windows31JDecoder</span> {
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">Windows31JDecoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">true</span> }
+    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">Windows31JDecoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
 
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">st</span>, <span class="ident">processed</span>, <span class="ident">err</span>) <span class="op">=</span> <span class="ident">windows31j::raw_feed</span>(<span class="self">self</span>.<span class="ident">st</span>, <span class="ident">input</span>, <span class="ident">output</span>, <span class="kw-2">&amp;</span>());
         <span class="self">self</span>.<span class="ident">st</span> <span class="op">=</span> <span class="ident">st</span>;
         (<span class="ident">processed</span>, <span class="ident">err</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">st</span>, <span class="ident">err</span>) <span class="op">=</span> <span class="ident">windows31j::raw_finish</span>(<span class="self">self</span>.<span class="ident">st</span>, <span class="ident">output</span>, <span class="kw-2">&amp;</span>());
         <span class="self">self</span>.<span class="ident">st</span> <span class="op">=</span> <span class="ident">st</span>;
         <span class="ident">err</span>
@@ -1880,7 +1880,7 @@
 <span class="macro">stateful_decoder!</span> {
     <span class="ident">module</span> <span class="ident">windows31j</span>;
 
-    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_0208_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_0208_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">use</span> <span class="ident">index_japanese</span> <span class="kw">as</span> <span class="ident">index</span>;
 
         <span class="kw">let</span> <span class="ident">lead</span> <span class="op">=</span> <span class="ident">lead</span> <span class="kw">as</span> <span class="ident">u16</span>;
@@ -1888,12 +1888,12 @@
         <span class="kw">let</span> <span class="ident">leadoffset</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">lead</span> <span class="op">&lt;</span> <span class="number">0xa0</span> {<span class="number">0x81</span>} <span class="kw">else</span> {<span class="number">0xc1</span>};
         <span class="kw">let</span> <span class="ident">trailoffset</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">trail</span> <span class="op">&lt;</span> <span class="number">0x7f</span> {<span class="number">0x40</span>} <span class="kw">else</span> {<span class="number">0x41</span>};
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">lead</span>, <span class="ident">trail</span>) {
-            (<span class="number">0xf0</span>...<span class="number">0xf9</span>, <span class="number">0x40</span>...<span class="number">0x7e</span>) <span class="op">|</span> (<span class="number">0xf0</span>...<span class="number">0xf9</span>, <span class="number">0x80</span>...<span class="number">0xfc</span>) <span class="op">=</span><span class="op">&gt;</span>
+            (<span class="number">0xf0</span>...<span class="number">0xf9</span>, <span class="number">0x40</span>...<span class="number">0x7e</span>) <span class="op">|</span> (<span class="number">0xf0</span>...<span class="number">0xf9</span>, <span class="number">0x80</span>...<span class="number">0xfc</span>) =&gt;
                 <span class="kw">return</span> (<span class="number">0xe000</span> <span class="op">+</span> (<span class="ident">lead</span> <span class="op">-</span> <span class="number">0xf0</span>) <span class="op">*</span> <span class="number">188</span> <span class="op">+</span> <span class="ident">trail</span> <span class="op">-</span> <span class="ident">trailoffset</span>) <span class="kw">as</span> <span class="ident">u32</span>,
             (<span class="number">0x81</span>...<span class="number">0x9f</span>, <span class="number">0x40</span>...<span class="number">0x7e</span>) <span class="op">|</span> (<span class="number">0x81</span>...<span class="number">0x9f</span>, <span class="number">0x80</span>...<span class="number">0xfc</span>) <span class="op">|</span>
-            (<span class="number">0xe0</span>...<span class="number">0xfc</span>, <span class="number">0x40</span>...<span class="number">0x7e</span>) <span class="op">|</span> (<span class="number">0xe0</span>...<span class="number">0xfc</span>, <span class="number">0x80</span>...<span class="number">0xfc</span>) <span class="op">=</span><span class="op">&gt;</span>
+            (<span class="number">0xe0</span>...<span class="number">0xfc</span>, <span class="number">0x40</span>...<span class="number">0x7e</span>) <span class="op">|</span> (<span class="number">0xe0</span>...<span class="number">0xfc</span>, <span class="number">0x80</span>...<span class="number">0xfc</span>) =&gt;
                 (<span class="ident">lead</span> <span class="op">-</span> <span class="ident">leadoffset</span>) <span class="op">*</span> <span class="number">188</span> <span class="op">+</span> <span class="ident">trail</span> <span class="op">-</span> <span class="ident">trailoffset</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0xffff</span>,
+            <span class="kw">_</span> =&gt; <span class="number">0xffff</span>,
         };
         <span class="ident">index::jis0208::forward</span>(<span class="ident">index</span>)
     }
@@ -1901,18 +1901,18 @@
 <span class="ident">initial</span>:
     <span class="comment">// shift_jis lead = 0x00</span>
     <span class="ident">state</span> <span class="ident">S0</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x00</span>...<span class="number">0x80</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span>);
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0xa1</span>...<span class="number">0xdf</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="number">0xff61</span> <span class="op">+</span> <span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">0xa1</span>);
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x81</span>...<span class="number">0x9f</span>, <span class="ident">b</span> @ <span class="number">0xe0</span>...<span class="number">0xfc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">S1</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>);
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x00</span>...<span class="number">0x80</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span>);
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0xa1</span>...<span class="number">0xdf</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="number">0xff61</span> <span class="op">+</span> <span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">0xa1</span>);
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x81</span>...<span class="number">0x9f</span>, <span class="ident">b</span> @ <span class="number">0xe0</span>...<span class="number">0xfc</span> =&gt; <span class="ident">S1</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>);
     }
 
 <span class="ident">transient</span>:
     <span class="comment">// shift_jis lead != 0x00</span>
     <span class="ident">state</span> <span class="ident">S1</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">lead</span>: <span class="ident">u8</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">map_two_0208_bytes</span>(<span class="ident">lead</span>, <span class="ident">b</span>) {
-            <span class="number">0xffff</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;invalid sequence&quot;</span>), <span class="comment">// unconditional</span>
-            <span class="ident">ch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span>)
+        <span class="ident">case</span> <span class="ident">b</span> =&gt; <span class="kw">match</span> <span class="ident">map_two_0208_bytes</span>(<span class="ident">lead</span>, <span class="ident">b</span>) {
+            <span class="number">0xffff</span> =&gt; <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;invalid sequence&quot;</span>), <span class="comment">// unconditional</span>
+            <span class="ident">ch</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span>)
         };
     }
 }
@@ -2115,10 +2115,10 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ISO2022JPEncoding</span>;
 
 <span class="kw">impl</span> <span class="ident">Encoding</span> <span class="kw">for</span> <span class="ident">ISO2022JPEncoding</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;iso-2022-jp&quot;</span> }
-    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="string">&quot;iso-2022-jp&quot;</span>) }
-    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">ISO2022JPEncoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">ISO2022JPDecoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;iso-2022-jp&quot;</span> }
+    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="string">&quot;iso-2022-jp&quot;</span>) }
+    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">ISO2022JPEncoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">ISO2022JPDecoder::new</span>() }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>,<span class="ident">Clone</span>,<span class="ident">Copy</span>)]</span>
@@ -2135,39 +2135,39 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ISO2022JPEncoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Box::new</span>(<span class="ident">ISO2022JPEncoder</span> { <span class="ident">st</span>: <span class="ident">ASCII</span> }) }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Box::new</span>(<span class="ident">ISO2022JPEncoder</span> { <span class="ident">st</span>: <span class="ident">ASCII</span> }) }
 }
 
 <span class="kw">impl</span> <span class="ident">RawEncoder</span> <span class="kw">for</span> <span class="ident">ISO2022JPEncoder</span> {
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">ISO2022JPEncoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">true</span> }
+    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">ISO2022JPEncoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
 
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
         <span class="ident">output</span>.<span class="ident">writer_hint</span>(<span class="ident">input</span>.<span class="ident">len</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">st</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">st</span>;
         <span class="macro">macro_rules!</span> <span class="ident">ensure_ASCII</span>(
-            () <span class="op">=</span><span class="op">&gt;</span> (<span class="kw">if</span> <span class="ident">st</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ASCII</span> { <span class="ident">output</span>.<span class="ident">write_bytes</span>(<span class="string">b&quot;\x1b(B&quot;</span>); <span class="ident">st</span> <span class="op">=</span> <span class="ident">ASCII</span>; })
+            () =&gt; (<span class="kw">if</span> <span class="ident">st</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ASCII</span> { <span class="ident">output</span>.<span class="ident">write_bytes</span>(<span class="string">b&quot;\x1b(B&quot;</span>); <span class="ident">st</span> <span class="op">=</span> <span class="ident">ASCII</span>; })
         );
         <span class="macro">macro_rules!</span> <span class="ident">ensure_Katakana</span>(
-            () <span class="op">=</span><span class="op">&gt;</span> (<span class="kw">if</span> <span class="ident">st</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Katakana</span> { <span class="ident">output</span>.<span class="ident">write_bytes</span>(<span class="string">b&quot;\x1b(I&quot;</span>); <span class="ident">st</span> <span class="op">=</span> <span class="ident">Katakana</span>; })
+            () =&gt; (<span class="kw">if</span> <span class="ident">st</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Katakana</span> { <span class="ident">output</span>.<span class="ident">write_bytes</span>(<span class="string">b&quot;\x1b(I&quot;</span>); <span class="ident">st</span> <span class="op">=</span> <span class="ident">Katakana</span>; })
         );
         <span class="macro">macro_rules!</span> <span class="ident">ensure_Lead</span>(
-            () <span class="op">=</span><span class="op">&gt;</span> (<span class="kw">if</span> <span class="ident">st</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Lead</span> { <span class="ident">output</span>.<span class="ident">write_bytes</span>(<span class="string">b&quot;\x1b$B&quot;</span>); <span class="ident">st</span> <span class="op">=</span> <span class="ident">Lead</span>; })
+            () =&gt; (<span class="kw">if</span> <span class="ident">st</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Lead</span> { <span class="ident">output</span>.<span class="ident">write_bytes</span>(<span class="string">b&quot;\x1b$B&quot;</span>); <span class="ident">st</span> <span class="op">=</span> <span class="ident">Lead</span>; })
         );
 
         <span class="kw">for</span> ((<span class="ident">i</span>,<span class="ident">j</span>), <span class="ident">ch</span>) <span class="kw">in</span> <span class="ident">input</span>.<span class="ident">index_iter</span>() {
             <span class="kw">match</span> <span class="ident">ch</span> {
-                <span class="string">&#39;\u{0}&#39;</span>...<span class="string">&#39;\u{7f}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="macro">ensure_ASCII!</span>(); <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u8</span>); }
-                <span class="string">&#39;\u{a5}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="macro">ensure_ASCII!</span>(); <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x5c</span>); }
-                <span class="string">&#39;\u{203e}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="macro">ensure_ASCII!</span>(); <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x7e</span>); }
-                <span class="string">&#39;\u{ff61}&#39;</span>...<span class="string">&#39;\u{ff9f}&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&#39;\u{0}&#39;</span>...<span class="string">&#39;\u{7f}&#39;</span> =&gt; { <span class="macro">ensure_ASCII!</span>(); <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u8</span>); }
+                <span class="string">&#39;\u{a5}&#39;</span> =&gt; { <span class="macro">ensure_ASCII!</span>(); <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x5c</span>); }
+                <span class="string">&#39;\u{203e}&#39;</span> =&gt; { <span class="macro">ensure_ASCII!</span>(); <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="number">0x7e</span>); }
+                <span class="string">&#39;\u{ff61}&#39;</span>...<span class="string">&#39;\u{ff9f}&#39;</span> =&gt; {
                     <span class="macro">ensure_Katakana!</span>();
                     <span class="ident">output</span>.<span class="ident">write_byte</span>((<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">0xff61</span> <span class="op">+</span> <span class="number">0x21</span>) <span class="kw">as</span> <span class="ident">u8</span>);
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">index::jis0208::backward</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>);
-                    <span class="kw">if</span> <span class="ident">ptr</span> <span class="op">=</span><span class="op">=</span> <span class="number">0xffff</span> {
+                    <span class="kw">if</span> <span class="ident">ptr</span> <span class="op">==</span> <span class="number">0xffff</span> {
                         <span class="self">self</span>.<span class="ident">st</span> <span class="op">=</span> <span class="ident">st</span>; <span class="comment">// do NOT reset the state!</span>
                         <span class="kw">return</span> (<span class="ident">i</span>, <span class="prelude-val">Some</span>(<span class="ident">CodecError</span> {
                             <span class="ident">upto</span>: <span class="ident">j</span> <span class="kw">as</span> <span class="ident">isize</span>, <span class="ident">cause</span>: <span class="string">&quot;unrepresentable character&quot;</span>.<span class="ident">into</span>()
@@ -2187,7 +2187,7 @@
         (<span class="ident">input</span>.<span class="ident">len</span>(), <span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ByteWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 }
@@ -2199,22 +2199,22 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ISO2022JPDecoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> {
         <span class="ident">Box::new</span>(<span class="ident">ISO2022JPDecoder</span> { <span class="ident">st</span>: <span class="ident">Default::default</span>() })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">RawDecoder</span> <span class="kw">for</span> <span class="ident">ISO2022JPDecoder</span> {
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">ISO2022JPDecoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">false</span> }
+    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">ISO2022JPDecoder::new</span>() }
+    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">false</span> }
 
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">st</span>, <span class="ident">processed</span>, <span class="ident">err</span>) <span class="op">=</span> <span class="ident">iso2022jp::raw_feed</span>(<span class="self">self</span>.<span class="ident">st</span>, <span class="ident">input</span>, <span class="ident">output</span>, <span class="kw-2">&amp;</span>());
         <span class="self">self</span>.<span class="ident">st</span> <span class="op">=</span> <span class="ident">st</span>;
         (<span class="ident">processed</span>, <span class="ident">err</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StringWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">st</span>, <span class="ident">err</span>) <span class="op">=</span> <span class="ident">iso2022jp::raw_finish</span>(<span class="self">self</span>.<span class="ident">st</span>, <span class="ident">output</span>, <span class="kw-2">&amp;</span>());
         <span class="self">self</span>.<span class="ident">st</span> <span class="op">=</span> <span class="ident">st</span>;
         <span class="ident">err</span>
@@ -2224,26 +2224,26 @@
 <span class="macro">stateful_decoder!</span> {
     <span class="ident">module</span> <span class="ident">iso2022jp</span>;
 
-    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_0208_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_0208_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">use</span> <span class="ident">index_japanese</span> <span class="kw">as</span> <span class="ident">index</span>;
 
         <span class="kw">let</span> <span class="ident">lead</span> <span class="op">=</span> <span class="ident">lead</span> <span class="kw">as</span> <span class="ident">u16</span>;
         <span class="kw">let</span> <span class="ident">trail</span> <span class="op">=</span> <span class="ident">trail</span> <span class="kw">as</span> <span class="ident">u16</span>;
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">lead</span>, <span class="ident">trail</span>) {
-            (<span class="number">0x21</span>...<span class="number">0x7e</span>, <span class="number">0x21</span>...<span class="number">0x7e</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">lead</span> <span class="op">-</span> <span class="number">0x21</span>) <span class="op">*</span> <span class="number">94</span> <span class="op">+</span> <span class="ident">trail</span> <span class="op">-</span> <span class="number">0x21</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0xffff</span>,
+            (<span class="number">0x21</span>...<span class="number">0x7e</span>, <span class="number">0x21</span>...<span class="number">0x7e</span>) =&gt; (<span class="ident">lead</span> <span class="op">-</span> <span class="number">0x21</span>) <span class="op">*</span> <span class="number">94</span> <span class="op">+</span> <span class="ident">trail</span> <span class="op">-</span> <span class="number">0x21</span>,
+            <span class="kw">_</span> =&gt; <span class="number">0xffff</span>,
         };
         <span class="ident">index::jis0208::forward</span>(<span class="ident">index</span>)
     }
 
-    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_0212_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_0212_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">use</span> <span class="ident">index_japanese</span> <span class="kw">as</span> <span class="ident">index</span>;
 
         <span class="kw">let</span> <span class="ident">lead</span> <span class="op">=</span> <span class="ident">lead</span> <span class="kw">as</span> <span class="ident">u16</span>;
         <span class="kw">let</span> <span class="ident">trail</span> <span class="op">=</span> <span class="ident">trail</span> <span class="kw">as</span> <span class="ident">u16</span>;
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">lead</span>, <span class="ident">trail</span>) {
-            (<span class="number">0x21</span>...<span class="number">0x7e</span>, <span class="number">0x21</span>...<span class="number">0x7e</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">lead</span> <span class="op">-</span> <span class="number">0x21</span>) <span class="op">*</span> <span class="number">94</span> <span class="op">+</span> <span class="ident">trail</span> <span class="op">-</span> <span class="number">0x21</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0xffff</span>,
+            (<span class="number">0x21</span>...<span class="number">0x7e</span>, <span class="number">0x21</span>...<span class="number">0x7e</span>) =&gt; (<span class="ident">lead</span> <span class="op">-</span> <span class="number">0x21</span>) <span class="op">*</span> <span class="number">94</span> <span class="op">+</span> <span class="ident">trail</span> <span class="op">-</span> <span class="number">0x21</span>,
+            <span class="kw">_</span> =&gt; <span class="number">0xffff</span>,
         };
         <span class="ident">index::jis0212::forward</span>(<span class="ident">index</span>)
     }
@@ -2251,93 +2251,93 @@
 <span class="ident">initial</span>:
     <span class="comment">// iso-2022-jp state = ASCII, iso-2022-jp jis0212 flag = unset, iso-2022-jp lead = 0x00</span>
     <span class="ident">state</span> <span class="ident">ASCII</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="number">0x1b</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EscapeStart</span>(<span class="ident">ctx</span>);
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x00</span>...<span class="number">0x7f</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span>), <span class="ident">ASCII</span>(<span class="ident">ctx</span>);
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>), <span class="ident">ASCII</span>(<span class="ident">ctx</span>);
-        <span class="kw">final</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">reset</span>();
+        <span class="ident">case</span> <span class="number">0x1b</span> =&gt; <span class="ident">EscapeStart</span>(<span class="ident">ctx</span>);
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x00</span>...<span class="number">0x7f</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span>), <span class="ident">ASCII</span>(<span class="ident">ctx</span>);
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>), <span class="ident">ASCII</span>(<span class="ident">ctx</span>);
+        <span class="kw">final</span> =&gt; <span class="ident">ctx</span>.<span class="ident">reset</span>();
     }
 
 <span class="ident">checkpoint</span>:
     <span class="comment">// iso-2022-jp state = Lead, iso-2022-jp jis0212 flag = unset</span>
     <span class="ident">state</span> <span class="ident">Lead0208</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="number">0x0a</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="number">0x000a</span>); <span class="comment">// return to ASCII</span>
-        <span class="ident">case</span> <span class="number">0x1b</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EscapeStart</span>(<span class="ident">ctx</span>);
-        <span class="ident">case</span> <span class="ident">b</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trail0208</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
-        <span class="kw">final</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">reset</span>();
+        <span class="ident">case</span> <span class="number">0x0a</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="number">0x000a</span>); <span class="comment">// return to ASCII</span>
+        <span class="ident">case</span> <span class="number">0x1b</span> =&gt; <span class="ident">EscapeStart</span>(<span class="ident">ctx</span>);
+        <span class="ident">case</span> <span class="ident">b</span> =&gt; <span class="ident">Trail0208</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
+        <span class="kw">final</span> =&gt; <span class="ident">ctx</span>.<span class="ident">reset</span>();
     }
 
     <span class="comment">// iso-2022-jp state = Lead, iso-2022-jp jis0212 flag = set</span>
     <span class="ident">state</span> <span class="ident">Lead0212</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="number">0x0a</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="number">0x000a</span>); <span class="comment">// return to ASCII</span>
-        <span class="ident">case</span> <span class="number">0x1b</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EscapeStart</span>(<span class="ident">ctx</span>);
-        <span class="ident">case</span> <span class="ident">b</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Trail0212</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
-        <span class="kw">final</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">reset</span>();
+        <span class="ident">case</span> <span class="number">0x0a</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="number">0x000a</span>); <span class="comment">// return to ASCII</span>
+        <span class="ident">case</span> <span class="number">0x1b</span> =&gt; <span class="ident">EscapeStart</span>(<span class="ident">ctx</span>);
+        <span class="ident">case</span> <span class="ident">b</span> =&gt; <span class="ident">Trail0212</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
+        <span class="kw">final</span> =&gt; <span class="ident">ctx</span>.<span class="ident">reset</span>();
     }
 
     <span class="comment">// iso-2022-jp state = Katakana</span>
     <span class="ident">state</span> <span class="ident">Katakana</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="number">0x1b</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EscapeStart</span>(<span class="ident">ctx</span>);
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x21</span>...<span class="number">0x5f</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="number">0xff61</span> <span class="op">+</span> <span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">0x21</span>), <span class="ident">Katakana</span>(<span class="ident">ctx</span>);
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>), <span class="ident">Katakana</span>(<span class="ident">ctx</span>);
-        <span class="kw">final</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">reset</span>();
+        <span class="ident">case</span> <span class="number">0x1b</span> =&gt; <span class="ident">EscapeStart</span>(<span class="ident">ctx</span>);
+        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x21</span>...<span class="number">0x5f</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="number">0xff61</span> <span class="op">+</span> <span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">0x21</span>), <span class="ident">Katakana</span>(<span class="ident">ctx</span>);
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>), <span class="ident">Katakana</span>(<span class="ident">ctx</span>);
+        <span class="kw">final</span> =&gt; <span class="ident">ctx</span>.<span class="ident">reset</span>();
     }
 
 <span class="ident">transient</span>:
     <span class="comment">// iso-2022-jp state = EscapeStart</span>
     <span class="comment">// ESC</span>
     <span class="ident">state</span> <span class="ident">EscapeStart</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="number">0x24</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EscapeMiddle24</span>(<span class="ident">ctx</span>); <span class="comment">// ESC $</span>
-        <span class="ident">case</span> <span class="number">0x28</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EscapeMiddle28</span>(<span class="ident">ctx</span>); <span class="comment">// ESC (</span>
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;invalid sequence&quot;</span>);
-        <span class="kw">final</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;incomplete sequence&quot;</span>);
+        <span class="ident">case</span> <span class="number">0x24</span> =&gt; <span class="ident">EscapeMiddle24</span>(<span class="ident">ctx</span>); <span class="comment">// ESC $</span>
+        <span class="ident">case</span> <span class="number">0x28</span> =&gt; <span class="ident">EscapeMiddle28</span>(<span class="ident">ctx</span>); <span class="comment">// ESC (</span>
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;invalid sequence&quot;</span>);
+        <span class="kw">final</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;incomplete sequence&quot;</span>);
     }
 
     <span class="comment">// iso-2022-jp state = EscapeMiddle, iso-2022-jp lead = 0x24</span>
     <span class="comment">// ESC $</span>
     <span class="ident">state</span> <span class="ident">EscapeMiddle24</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="number">0x40</span>, <span class="number">0x42</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Lead0208</span>(<span class="ident">ctx</span>); <span class="comment">// ESC $ @ (JIS X 0208-1978) or ESC $ B (-1983)</span>
-        <span class="ident">case</span> <span class="number">0x28</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EscapeFinal</span>(<span class="ident">ctx</span>); <span class="comment">// ESC $ (</span>
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">2</span>, <span class="string">&quot;invalid sequence&quot;</span>);
-        <span class="kw">final</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;incomplete sequence&quot;</span>);
+        <span class="ident">case</span> <span class="number">0x40</span>, <span class="number">0x42</span> =&gt; <span class="ident">Lead0208</span>(<span class="ident">ctx</span>); <span class="comment">// ESC $ @ (JIS X 0208-1978) or ESC $ B (-1983)</span>
+        <span class="ident">case</span> <span class="number">0x28</span> =&gt; <span class="ident">EscapeFinal</span>(<span class="ident">ctx</span>); <span class="comment">// ESC $ (</span>
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">2</span>, <span class="string">&quot;invalid sequence&quot;</span>);
+        <span class="kw">final</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;incomplete sequence&quot;</span>);
     }
 
     <span class="comment">// iso-2022-jp state = EscapeMiddle, iso-2022-jp lead = 0x28</span>
     <span class="comment">// ESC (</span>
     <span class="ident">state</span> <span class="ident">EscapeMiddle28</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="number">0x42</span>, <span class="number">0x4a</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">reset</span>(); <span class="comment">// ESC ( B (ASCII) or ESC ( J (JIS X 0201-1976 roman)</span>
-        <span class="ident">case</span> <span class="number">0x49</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Katakana</span>(<span class="ident">ctx</span>); <span class="comment">// ESC ( I (JIS X 0201-1976 kana)</span>
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">2</span>, <span class="string">&quot;invalid sequence&quot;</span>);
-        <span class="kw">final</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;incomplete sequence&quot;</span>);
+        <span class="ident">case</span> <span class="number">0x42</span>, <span class="number">0x4a</span> =&gt; <span class="ident">ctx</span>.<span class="ident">reset</span>(); <span class="comment">// ESC ( B (ASCII) or ESC ( J (JIS X 0201-1976 roman)</span>
+        <span class="ident">case</span> <span class="number">0x49</span> =&gt; <span class="ident">Katakana</span>(<span class="ident">ctx</span>); <span class="comment">// ESC ( I (JIS X 0201-1976 kana)</span>
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">2</span>, <span class="string">&quot;invalid sequence&quot;</span>);
+        <span class="kw">final</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;incomplete sequence&quot;</span>);
     }
 
     <span class="comment">// iso-2022-jp state = EscapeFinal</span>
     <span class="comment">// ESC $ (</span>
     <span class="ident">state</span> <span class="ident">EscapeFinal</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="number">0x44</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Lead0212</span>(<span class="ident">ctx</span>); <span class="comment">// ESC $ ( D (JIS X 0212-1990)</span>
-        <span class="ident">case</span> <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">3</span>, <span class="string">&quot;invalid sequence&quot;</span>);
-        <span class="kw">final</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;incomplete sequence&quot;</span>);
+        <span class="ident">case</span> <span class="number">0x44</span> =&gt; <span class="ident">Lead0212</span>(<span class="ident">ctx</span>); <span class="comment">// ESC $ ( D (JIS X 0212-1990)</span>
+        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">3</span>, <span class="string">&quot;invalid sequence&quot;</span>);
+        <span class="kw">final</span> =&gt; <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="number">1</span>, <span class="string">&quot;incomplete sequence&quot;</span>);
     }
 
     <span class="comment">// iso-2022-jp state = Trail, iso-2022-jp jis0212 flag = unset</span>
     <span class="ident">state</span> <span class="ident">Trail0208</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">lead</span>: <span class="ident">u8</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> <span class="op">=</span><span class="op">&gt;</span>
+        <span class="ident">case</span> <span class="ident">b</span> =&gt;
             <span class="kw">match</span> <span class="ident">map_two_0208_bytes</span>(<span class="ident">lead</span>, <span class="ident">b</span>) {
-                <span class="number">0xffff</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>),
-                <span class="ident">ch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>)
+                <span class="number">0xffff</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>),
+                <span class="ident">ch</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>)
             },
             <span class="ident">Lead0208</span>(<span class="ident">ctx</span>);
-        <span class="kw">final</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;incomplete sequence&quot;</span>);
+        <span class="kw">final</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;incomplete sequence&quot;</span>);
     }
 
     <span class="comment">// iso-2022-jp state = Trail, iso-2022-jp jis0212 flag = set</span>
     <span class="ident">state</span> <span class="ident">Trail0212</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">lead</span>: <span class="ident">u8</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> <span class="op">=</span><span class="op">&gt;</span>
+        <span class="ident">case</span> <span class="ident">b</span> =&gt;
             <span class="kw">match</span> <span class="ident">map_two_0212_bytes</span>(<span class="ident">lead</span>, <span class="ident">b</span>) {
-                <span class="number">0xffff</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>),
-                <span class="ident">ch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>)
+                <span class="number">0xffff</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>),
+                <span class="ident">ch</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>)
             },
             <span class="ident">Lead0212</span>(<span class="ident">ctx</span>);
-        <span class="kw">final</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;incomplete sequence&quot;</span>);
+        <span class="kw">final</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;incomplete sequence&quot;</span>);
     }
 }
 
@@ -2555,7 +2555,7 @@
     <span class="kw">fn</span> <span class="ident">test_decoder_invalid_escape</span>() {
         <span class="comment">// also tests allowed but never used escape codes in ISO 2022</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">ISO2022JPEncoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">macro_rules!</span> <span class="ident">reset</span>(() <span class="op">=</span><span class="op">&gt;</span> (
+        <span class="macro">macro_rules!</span> <span class="ident">reset</span>(() =&gt; (
             <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x41</span>, <span class="number">0x42</span>, <span class="number">0x43</span>, <span class="number">0x1b</span>, <span class="number">0x24</span>, <span class="number">0x42</span>, <span class="number">0x21</span>, <span class="number">0x21</span>], [],
                             <span class="string">&quot;ABC\u{3000}&quot;</span>)
         ));

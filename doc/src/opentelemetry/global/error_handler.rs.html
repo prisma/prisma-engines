@@ -99,7 +99,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PoisonError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">PoisonError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">PoisonError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Error::Other</span>(<span class="ident">err</span>.<span class="ident">to_string</span>())
     }
 }
@@ -111,21 +111,21 @@
 <span class="doccomment">/// Writes to stderr if unset.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_error</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">err</span>: <span class="ident">T</span>) {
     <span class="kw">match</span> <span class="ident">GLOBAL_ERROR_HANDLER</span>.<span class="ident">read</span>() {
-        <span class="prelude-val">Ok</span>(<span class="ident">handler</span>) <span class="kw">if</span> <span class="ident">handler</span>.<span class="ident">is_some</span>() <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">handler</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="number">0</span>)(<span class="ident">err</span>.<span class="ident">into</span>()),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">into</span>() {
+        <span class="prelude-val">Ok</span>(<span class="ident">handler</span>) <span class="kw">if</span> <span class="ident">handler</span>.<span class="ident">is_some</span>() =&gt; (<span class="ident">handler</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="number">0</span>)(<span class="ident">err</span>.<span class="ident">into</span>()),
+        <span class="kw">_</span> =&gt; <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">into</span>() {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)]</span>
             <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)))]</span>
-            <span class="ident">Error::Metric</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">eprintln!</span>(<span class="string">&quot;OpenTelemetry metrics error occurred. {}&quot;</span>, <span class="ident">err</span>),
+            <span class="ident">Error::Metric</span>(<span class="ident">err</span>) =&gt; <span class="macro">eprintln!</span>(<span class="string">&quot;OpenTelemetry metrics error occurred. {}&quot;</span>, <span class="ident">err</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;trace&quot;</span>)]</span>
             <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;trace&quot;</span>)))]</span>
-            <span class="ident">Error::Trace</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">eprintln!</span>(<span class="string">&quot;OpenTelemetry trace error occurred. {}&quot;</span>, <span class="ident">err</span>),
-            <span class="ident">Error::Other</span>(<span class="ident">err_msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">eprintln!</span>(<span class="string">&quot;OpenTelemetry error occurred. {}&quot;</span>, <span class="ident">err_msg</span>),
+            <span class="ident">Error::Trace</span>(<span class="ident">err</span>) =&gt; <span class="macro">eprintln!</span>(<span class="string">&quot;OpenTelemetry trace error occurred. {}&quot;</span>, <span class="ident">err</span>),
+            <span class="ident">Error::Other</span>(<span class="ident">err_msg</span>) =&gt; <span class="macro">eprintln!</span>(<span class="string">&quot;OpenTelemetry error occurred. {}&quot;</span>, <span class="ident">err_msg</span>),
         },
     }
 }
 
 <span class="doccomment">/// Set global error handler.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_error_handler</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_error_handler</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Error</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {

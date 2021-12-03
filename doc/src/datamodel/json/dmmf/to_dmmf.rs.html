@@ -209,25 +209,23 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Datamodel</span>, <span class="ident">Enum</span>, <span class="ident">EnumValue</span>, <span class="ident">Field</span>, <span class="ident">Function</span>, <span class="ident">Model</span>, <span class="ident">UniqueIndex</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::dmmf::PrimaryKey</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">dml</span>, <span class="ident">FieldType</span>, <span class="ident">Ignorable</span>, <span class="ident">ScalarType</span>};
 <span class="kw">use</span> <span class="ident">bigdecimal::ToPrimitive</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_to_dmmf</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_to_dmmf</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">dmmf</span> <span class="op">=</span> <span class="ident">schema_to_dmmf</span>(<span class="ident">schema</span>);
     <span class="ident">serde_json::to_string_pretty</span>(<span class="kw-2">&amp;</span><span class="ident">dmmf</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to render JSON&quot;</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_to_dmmf_value</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">serde_json::Value</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_to_dmmf_value</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>) -&gt; <span class="ident">serde_json::Value</span> {
     <span class="kw">let</span> <span class="ident">dmmf</span> <span class="op">=</span> <span class="ident">schema_to_dmmf</span>(<span class="ident">schema</span>);
     <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">dmmf</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to render JSON&quot;</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">schema_to_dmmf</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Datamodel</span> {
+<span class="kw">fn</span> <span class="ident">schema_to_dmmf</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>) -&gt; <span class="ident">Datamodel</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">Datamodel</span> {
         <span class="ident">models</span>: <span class="macro">vec!</span>[],
         <span class="ident">enums</span>: <span class="macro">vec!</span>[],
@@ -244,7 +242,7 @@
     <span class="ident">datamodel</span>
 }
 
-<span class="kw">fn</span> <span class="ident">enum_to_dmmf</span>(<span class="ident">en</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Enum</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Enum</span> {
+<span class="kw">fn</span> <span class="ident">enum_to_dmmf</span>(<span class="ident">en</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Enum</span>) -&gt; <span class="ident">Enum</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enm</span> <span class="op">=</span> <span class="ident">Enum</span> {
         <span class="ident">name</span>: <span class="ident">en</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
         <span class="ident">values</span>: <span class="macro">vec!</span>[],
@@ -259,14 +257,14 @@
     <span class="ident">enm</span>
 }
 
-<span class="kw">fn</span> <span class="ident">enum_value_to_dmmf</span>(<span class="ident">en</span>: <span class="kw-2">&amp;</span><span class="ident">dml::EnumValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EnumValue</span> {
+<span class="kw">fn</span> <span class="ident">enum_value_to_dmmf</span>(<span class="ident">en</span>: <span class="kw-2">&amp;</span><span class="ident">dml::EnumValue</span>) -&gt; <span class="ident">EnumValue</span> {
     <span class="ident">EnumValue</span> {
         <span class="ident">name</span>: <span class="ident">en</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
         <span class="ident">db_name</span>: <span class="ident">en</span>.<span class="ident">database_name</span>.<span class="ident">clone</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">model_to_dmmf</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Model</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Model</span> {
+<span class="kw">fn</span> <span class="ident">model_to_dmmf</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Model</span>) -&gt; <span class="ident">Model</span> {
     <span class="kw">let</span> <span class="ident">primary_key</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">primary_key</span> {
         (<span class="op">!</span><span class="ident">pk</span>.<span class="ident">defined_on_field</span>).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">PrimaryKey</span> {
             <span class="ident">name</span>: <span class="ident">pk</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
@@ -309,16 +307,16 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">field_to_dmmf</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Model</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Field</span> {
+<span class="kw">fn</span> <span class="ident">field_to_dmmf</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Model</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) -&gt; <span class="ident">Field</span> {
     <span class="kw">let</span> <span class="ident">a_relation_field_is_based_on_this_field</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">model</span>
         .<span class="ident">relation_fields</span>()
-        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span> <span class="op">=</span><span class="op">=</span> <span class="ident">field</span>.<span class="ident">name</span>()));
+        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span> <span class="op">==</span> <span class="ident">field</span>.<span class="ident">name</span>()));
 
     <span class="ident">Field</span> {
         <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(),
         <span class="ident">kind</span>: <span class="ident">get_field_kind</span>(<span class="ident">field</span>),
-        <span class="ident">is_required</span>: <span class="kw-2">*</span><span class="ident">field</span>.<span class="ident">arity</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">dml::FieldArity::Required</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">field</span>.<span class="ident">arity</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">dml::FieldArity::List</span>,
-        <span class="ident">is_list</span>: <span class="kw-2">*</span><span class="ident">field</span>.<span class="ident">arity</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">dml::FieldArity::List</span>,
+        <span class="ident">is_required</span>: <span class="kw-2">*</span><span class="ident">field</span>.<span class="ident">arity</span>() <span class="op">==</span> <span class="ident">dml::FieldArity::Required</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">field</span>.<span class="ident">arity</span>() <span class="op">==</span> <span class="ident">dml::FieldArity::List</span>,
+        <span class="ident">is_list</span>: <span class="kw-2">*</span><span class="ident">field</span>.<span class="ident">arity</span>() <span class="op">==</span> <span class="ident">dml::FieldArity::List</span>,
         <span class="ident">is_id</span>: <span class="ident">model</span>.<span class="ident">field_is_primary</span>(<span class="ident">field</span>.<span class="ident">name</span>()),
         <span class="ident">is_read_only</span>: <span class="ident">a_relation_field_is_based_on_this_field</span>,
         <span class="ident">has_default_value</span>: <span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">is_some</span>(),
@@ -335,93 +333,91 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_field_kind</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">get_field_kind</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">field_type</span>() {
-        <span class="ident">dml::FieldType::CompositeType</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;object&quot;</span>),
-        <span class="ident">dml::FieldType::Relation</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;object&quot;</span>),
-        <span class="ident">dml::FieldType::Enum</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;enum&quot;</span>),
-        <span class="ident">dml::FieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;scalar&quot;</span>),
-        <span class="ident">dml::FieldType::Unsupported</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;unsupported&quot;</span>),
+        <span class="ident">dml::FieldType::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;object&quot;</span>),
+        <span class="ident">dml::FieldType::Relation</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;object&quot;</span>),
+        <span class="ident">dml::FieldType::Enum</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;enum&quot;</span>),
+        <span class="ident">dml::FieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;scalar&quot;</span>),
+        <span class="ident">dml::FieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">String::from</span>(<span class="string">&quot;unsupported&quot;</span>),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">default_value_to_serde</span>(<span class="ident">dv_opt</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::DefaultValue</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">default_value_to_serde</span>(<span class="ident">dv_opt</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::DefaultValue</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
     <span class="ident">dv_opt</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">dv</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">dv</span>.<span class="ident">kind</span>() {
-        <span class="ident">dml::DefaultKind::Single</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">prisma_value_to_serde</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">clone</span>()),
-        <span class="ident">dml::DefaultKind::Expression</span>(<span class="ident">vg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">function_to_serde</span>(<span class="ident">vg</span>.<span class="ident">name</span>(), <span class="ident">vg</span>.<span class="ident">args</span>()),
+        <span class="ident">dml::DefaultKind::Single</span>(<span class="ident">value</span>) =&gt; <span class="ident">prisma_value_to_serde</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">clone</span>()),
+        <span class="ident">dml::DefaultKind::Expression</span>(<span class="ident">vg</span>) =&gt; <span class="ident">function_to_serde</span>(<span class="ident">vg</span>.<span class="ident">name</span>(), <span class="ident">vg</span>.<span class="ident">args</span>()),
     })
 }
 
-<span class="kw">fn</span> <span class="ident">prisma_value_to_serde</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">PrismaValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">serde_json::Value</span> {
+<span class="kw">fn</span> <span class="ident">prisma_value_to_serde</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">PrismaValue</span>) -&gt; <span class="ident">serde_json::Value</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">PrismaValue::Boolean</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::Value::Bool</span>(<span class="kw-2">*</span><span class="ident">val</span>),
-        <span class="ident">PrismaValue::String</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">clone</span>()),
-        <span class="ident">PrismaValue::Enum</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">clone</span>()),
-        <span class="ident">PrismaValue::Float</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">PrismaValue::Boolean</span>(<span class="ident">val</span>) =&gt; <span class="ident">serde_json::Value::Bool</span>(<span class="kw-2">*</span><span class="ident">val</span>),
+        <span class="ident">PrismaValue::String</span>(<span class="ident">val</span>) =&gt; <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">clone</span>()),
+        <span class="ident">PrismaValue::Enum</span>(<span class="ident">val</span>) =&gt; <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">clone</span>()),
+        <span class="ident">PrismaValue::Float</span>(<span class="ident">val</span>) =&gt; {
             <span class="ident">serde_json::Value::Number</span>(<span class="ident">serde_json::Number::from_f64</span>(<span class="ident">val</span>.<span class="ident">to_f64</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>())
         }
-        <span class="ident">PrismaValue::Int</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::Value::Number</span>(<span class="ident">serde_json::Number::from_f64</span>(<span class="kw-2">*</span><span class="ident">val</span> <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">unwrap</span>()),
-        <span class="ident">PrismaValue::BigInt</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">to_string</span>()),
-        <span class="ident">PrismaValue::DateTime</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">to_rfc3339</span>()),
-        <span class="ident">PrismaValue::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::Value::Null</span>,
-        <span class="ident">PrismaValue::Uuid</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">to_string</span>()),
-        <span class="ident">PrismaValue::Json</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">to_string</span>()),
-        <span class="ident">PrismaValue::Xml</span>(<span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">to_string</span>()),
-        <span class="ident">PrismaValue::List</span>(<span class="ident">value_vec</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">serde_json::Value::Array</span>(<span class="ident">value_vec</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pv</span><span class="op">|</span> <span class="ident">prisma_value_to_serde</span>(<span class="ident">pv</span>)).<span class="ident">collect</span>())
-        }
-        <span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::Value::String</span>(<span class="ident">prisma_value::encode_bytes</span>(<span class="ident">b</span>)),
+        <span class="ident">PrismaValue::Int</span>(<span class="ident">val</span>) =&gt; <span class="ident">serde_json::Value::Number</span>(<span class="ident">serde_json::Number::from_f64</span>(<span class="kw-2">*</span><span class="ident">val</span> <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">unwrap</span>()),
+        <span class="ident">PrismaValue::BigInt</span>(<span class="ident">val</span>) =&gt; <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">to_string</span>()),
+        <span class="ident">PrismaValue::DateTime</span>(<span class="ident">val</span>) =&gt; <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">to_rfc3339</span>()),
+        <span class="ident">PrismaValue::Null</span> =&gt; <span class="ident">serde_json::Value::Null</span>,
+        <span class="ident">PrismaValue::Uuid</span>(<span class="ident">val</span>) =&gt; <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">to_string</span>()),
+        <span class="ident">PrismaValue::Json</span>(<span class="ident">val</span>) =&gt; <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">to_string</span>()),
+        <span class="ident">PrismaValue::Xml</span>(<span class="ident">val</span>) =&gt; <span class="ident">serde_json::Value::String</span>(<span class="ident">val</span>.<span class="ident">to_string</span>()),
+        <span class="ident">PrismaValue::List</span>(<span class="ident">value_vec</span>) =&gt; <span class="ident">serde_json::Value::Array</span>(<span class="ident">value_vec</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">prisma_value_to_serde</span>).<span class="ident">collect</span>()),
+        <span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>) =&gt; <span class="ident">serde_json::Value::String</span>(<span class="ident">prisma_value::encode_bytes</span>(<span class="ident">b</span>)),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">function_to_serde</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">PrismaValue</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">serde_json::Value</span> {
+<span class="kw">fn</span> <span class="ident">function_to_serde</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">PrismaValue</span>]) -&gt; <span class="ident">serde_json::Value</span> {
     <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function</span> {
         <span class="ident">name</span>: <span class="ident">String::from</span>(<span class="ident">name</span>),
-        <span class="ident">args</span>: <span class="ident">args</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">prisma_value_to_serde</span>(<span class="ident">arg</span>)).<span class="ident">collect</span>(),
+        <span class="ident">args</span>: <span class="ident">args</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">prisma_value_to_serde</span>).<span class="ident">collect</span>(),
     };
 
     <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">func</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to render function JSON&quot;</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">get_field_type</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">get_field_type</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">field_type</span>() {
-        <span class="ident">dml::FieldType::CompositeType</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>.<span class="ident">clone</span>(),
-        <span class="ident">dml::FieldType::Relation</span>(<span class="ident">relation_info</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">relation_info</span>.<span class="ident">to</span>.<span class="ident">clone</span>(),
-        <span class="ident">dml::FieldType::Enum</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>.<span class="ident">clone</span>(),
-        <span class="ident">dml::FieldType::Unsupported</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>.<span class="ident">clone</span>(),
-        <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">t</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">type_to_string</span>(<span class="ident">t</span>),
+        <span class="ident">dml::FieldType::CompositeType</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">clone</span>(),
+        <span class="ident">dml::FieldType::Relation</span>(<span class="ident">relation_info</span>) =&gt; <span class="ident">relation_info</span>.<span class="ident">to</span>.<span class="ident">clone</span>(),
+        <span class="ident">dml::FieldType::Enum</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">clone</span>(),
+        <span class="ident">dml::FieldType::Unsupported</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">clone</span>(),
+        <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">t</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">type_to_string</span>(<span class="ident">t</span>),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">type_to_string</span>(<span class="ident">scalar</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">type_to_string</span>(<span class="ident">scalar</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">String</span> {
     <span class="ident">scalar</span>.<span class="ident">to_string</span>()
 }
 
-<span class="kw">fn</span> <span class="ident">get_relation_name</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">get_relation_name</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span> {
-        <span class="ident">dml::Field::RelationField</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">name</span>.<span class="ident">clone</span>()),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="ident">dml::Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">name</span>.<span class="ident">clone</span>()),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_relation_from_fields</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">get_relation_from_fields</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span> {
-        <span class="ident">dml::Field::RelationField</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">clone</span>()),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="ident">dml::Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">clone</span>()),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_relation_to_fields</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">get_relation_to_fields</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span> {
-        <span class="ident">dml::Field::RelationField</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">references</span>.<span class="ident">clone</span>()),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="ident">dml::Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">references</span>.<span class="ident">clone</span>()),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_relation_delete_strategy</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">get_relation_delete_strategy</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Field</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span> {
-        <span class="ident">dml::Field::RelationField</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ri</span><span class="op">|</span> <span class="ident">ri</span>.<span class="ident">to_string</span>()),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="ident">dml::Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ri</span><span class="op">|</span> <span class="ident">ri</span>.<span class="ident">to_string</span>()),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 </code></pre></div>

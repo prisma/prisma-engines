@@ -243,7 +243,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CursorBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cursor</span>: <span class="ident">RecordProjection</span>, <span class="ident">order</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cursor</span>: <span class="ident">RecordProjection</span>, <span class="ident">order</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">order_data</span> <span class="op">=</span> <span class="ident">OrderByData::from_list</span>(<span class="ident">order</span>);
 
         <span class="self">Self</span> {
@@ -254,7 +254,7 @@
     }
 
     <span class="doccomment">/// Returns a filter document for the cursor and a filter document for the cursor condition.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">CursorData</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">CursorData</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cursor</span>;
 
         <span class="comment">// First, we need to pin the record specified by the cursor to find the order by values for the comparator.</span>
@@ -286,11 +286,11 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">cursor_conditions</span>(<span class="kw-2">mut</span> <span class="ident">order_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByData</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Document</span> {
+<span class="kw">fn</span> <span class="ident">cursor_conditions</span>(<span class="kw-2">mut</span> <span class="ident">order_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByData</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Document</span> {
     <span class="comment">// let mut conditions = vec![];</span>
     <span class="kw">let</span> <span class="ident">num_orderings</span> <span class="op">=</span> <span class="ident">order_data</span>.<span class="ident">len</span>();
 
-    <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">num_orderings</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+    <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">num_orderings</span> <span class="op">==</span> <span class="number">1</span> {
         <span class="kw">let</span> <span class="ident">order_data</span> <span class="op">=</span> <span class="ident">order_data</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
         <span class="ident">map_orderby_condition</span>(<span class="kw-2">&amp;</span><span class="ident">order_data</span>, <span class="ident">reverse</span>, <span class="bool-val">true</span>)
     } <span class="kw">else</span> {
@@ -306,7 +306,7 @@
 
             <span class="kw">let</span> <span class="ident">order_data</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>();
 
-            <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">num_orderings</span> <span class="op">-</span> <span class="number">1</span> {
+            <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">num_orderings</span> <span class="op">-</span> <span class="number">1</span> {
                 <span class="ident">and_conditions</span>.<span class="ident">push</span>(<span class="ident">map_orderby_condition</span>(<span class="ident">order_data</span>, <span class="ident">reverse</span>, <span class="bool-val">true</span>));
             } <span class="kw">else</span> {
                 <span class="ident">and_conditions</span>.<span class="ident">push</span>(<span class="ident">map_orderby_condition</span>(<span class="ident">order_data</span>, <span class="ident">reverse</span>, <span class="bool-val">false</span>));
@@ -321,13 +321,13 @@
     <span class="ident">doc</span>
 }
 
-<span class="kw">fn</span> <span class="ident">map_orderby_condition</span>(<span class="ident">order_data</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByData</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>, <span class="ident">include_eq</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Document</span> {
+<span class="kw">fn</span> <span class="ident">map_orderby_condition</span>(<span class="ident">order_data</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByData</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>, <span class="ident">include_eq</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Document</span> {
     <span class="kw">let</span> <span class="ident">bound_order_field_reference</span> <span class="op">=</span> <span class="ident">order_data</span>.<span class="ident">full_reference_path</span>(<span class="bool-val">true</span>);
     <span class="kw">let</span> <span class="ident">unbound_order_field_reference</span> <span class="op">=</span> <span class="ident">order_data</span>.<span class="ident">full_reference_path</span>(<span class="bool-val">false</span>);
 
     <span class="kw">let</span> <span class="ident">order_doc</span>: <span class="ident">Document</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_data</span>.<span class="ident">sort_order</span>() {
         <span class="comment">// If it&#39;s ASC but we want to take from the back, the ORDER BY will be DESC, meaning that comparisons done need to be lt(e).</span>
-        <span class="ident">SortOrder::Ascending</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">SortOrder::Ascending</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
             <span class="kw">if</span> <span class="ident">include_eq</span> {
                 <span class="macro">doc!</span> { <span class="string">&quot;$lte&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">unbound_order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bound_order_field_reference</span>)] }
             } <span class="kw">else</span> {
@@ -336,7 +336,7 @@
         }
 
         <span class="comment">// If it&#39;s DESC but we want to take from the back, the ORDER BY will be ASC, meaning that comparisons done need to be gt(e).</span>
-        <span class="ident">SortOrder::Descending</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">SortOrder::Descending</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
             <span class="kw">if</span> <span class="ident">include_eq</span> {
                 <span class="macro">doc!</span> { <span class="string">&quot;$gte&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">unbound_order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bound_order_field_reference</span>)] }
             } <span class="kw">else</span> {
@@ -344,7 +344,7 @@
             }
         }
 
-        <span class="ident">SortOrder::Ascending</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">SortOrder::Ascending</span> =&gt; {
             <span class="kw">if</span> <span class="ident">include_eq</span> {
                 <span class="macro">doc!</span> { <span class="string">&quot;$gte&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">unbound_order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bound_order_field_reference</span>)] }
             } <span class="kw">else</span> {
@@ -352,7 +352,7 @@
             }
         }
 
-        <span class="ident">SortOrder::Descending</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">SortOrder::Descending</span> =&gt; {
             <span class="kw">if</span> <span class="ident">include_eq</span> {
                 <span class="macro">doc!</span> { <span class="string">&quot;$lte&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">unbound_order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bound_order_field_reference</span>)] }
             } <span class="kw">else</span> {
@@ -396,7 +396,7 @@
     <span class="macro">doc!</span> { <span class="string">&quot;$expr&quot;</span>: <span class="ident">order_doc</span> }
 }
 
-<span class="kw">fn</span> <span class="ident">map_equality_condition</span>(<span class="ident">order_data</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Document</span> {
+<span class="kw">fn</span> <span class="ident">map_equality_condition</span>(<span class="ident">order_data</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByData</span>) -&gt; <span class="ident">Document</span> {
     <span class="kw">let</span> <span class="ident">order_field_reference</span> <span class="op">=</span> <span class="ident">order_data</span>.<span class="ident">full_reference_path</span>(<span class="bool-val">true</span>);
 
     <span class="comment">// // If we have null values in the ordering or comparison row, those are automatically</span>

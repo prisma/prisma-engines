@@ -258,8 +258,8 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">model_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">model_id</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">field_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">field_id</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">model_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">model_id</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">field_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">field_id</span>
     }
 }
 
@@ -273,28 +273,28 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_id</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ast::FieldId</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_id</span>(<span class="self">self</span>) -&gt; <span class="ident">ast::FieldId</span> {
         <span class="self">self</span>.<span class="ident">field_id</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">name</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ast_field</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Field</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ast_field</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Field</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="self">self</span>.<span class="ident">field_id</span>]
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">attributes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">attributes</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">relation_field</span>
     }
 
     <span class="doccomment">/// The relation name explicitly written in the schema source.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">explicit_relation_name</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">explicit_relation_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">name</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="ident">ModelWalker</span> {
             <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
             <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
@@ -302,11 +302,11 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">references_model</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">ast::ModelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">referenced_model</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">references_model</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">ast::ModelId</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">referenced_model</span> <span class="op">==</span> <span class="ident">other</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">related_model</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">related_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>;
 
         <span class="ident">ModelWalker</span> {
@@ -316,7 +316,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">references</span><span class="op">|</span> {
             <span class="ident">references</span>
                 .<span class="ident">iter</span>()
@@ -325,7 +325,7 @@
     }
 
     <span class="doccomment">/// This will be None for virtual relation fields (when no `fields` argument is passed).</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">final_foreign_key_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">final_foreign_key_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">fk_name</span>.<span class="ident">map</span>(<span class="ident">Cow::Borrowed</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">fields</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="self">self</span>.<span class="ident">model_id</span>);
@@ -338,13 +338,13 @@
 
     <span class="doccomment">/// The name of the relation. Either uses the `name` (or default) argument,</span>
     <span class="doccomment">/// or generates an implicit name.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">explicit_relation_name</span>()
             .<span class="ident">map</span>(<span class="ident">RelationName::Explicit</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">RelationName::generated</span>(<span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="self">self</span>.<span class="ident">related_model</span>().<span class="ident">name</span>()))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referential_arity</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldArity</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referential_arity</span>(<span class="self">self</span>) -&gt; <span class="ident">FieldArity</span> {
         <span class="kw">let</span> <span class="ident">some_required</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">fields</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_required</span>()))
@@ -358,17 +358,17 @@
     }
 
     <span class="doccomment">/// Used for validation.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">references_singular_id_field</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">references_singular_id_field</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">singular_referenced_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_deref</span>() {
-            <span class="prelude-val">Some</span>([<span class="ident">field_id</span>]) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">field_id</span>,
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="bool-val">false</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="bool-val">true</span>, <span class="comment">// implicitly, these are referencing the singular id</span>
+            <span class="prelude-val">Some</span>([<span class="ident">field_id</span>]) =&gt; <span class="ident">field_id</span>,
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="bool-val">true</span>, <span class="comment">// implicitly, these are referencing the singular id</span>
         };
 
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">related_model</span>().<span class="ident">primary_key</span>(), <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">contains_exactly_fields_by_id</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">*</span><span class="ident">singular_referenced_id</span>]))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model_id</span>;
         <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">attributes</span>();
         <span class="ident">attributes</span>.<span class="ident">fields</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">fields</span><span class="op">|</span> {
@@ -389,12 +389,12 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">r0</span>,
-            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">r0</span>,
-            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">r0</span>,
-            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">r0</span>,
+            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span> <span class="op">==</span> <span class="ident">r0</span>,
+            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span> <span class="op">==</span> <span class="ident">r0</span>,
+            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span> <span class="op">==</span> <span class="ident">r0</span>,
+            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span> <span class="op">==</span> <span class="ident">r0</span>,
         }
     }
 }
@@ -402,23 +402,23 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::cmp::Ordering</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::cmp::Ordering</span><span class="op">&gt;</span> {
         <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l0</span>.<span class="ident">partial_cmp</span>(<span class="ident">r0</span>),
-            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l0</span>.<span class="ident">partial_cmp</span>(<span class="ident">r0</span>),
-            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l0</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">r0</span>.<span class="ident">as_str</span>()),
-            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l0</span>.<span class="ident">as_str</span>().<span class="ident">partial_cmp</span>(<span class="kw-2">*</span><span class="ident">r0</span>),
+            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">partial_cmp</span>(<span class="ident">r0</span>),
+            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">partial_cmp</span>(<span class="ident">r0</span>),
+            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">r0</span>.<span class="ident">as_str</span>()),
+            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">as_str</span>().<span class="ident">partial_cmp</span>(<span class="kw-2">*</span><span class="ident">r0</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::cmp::Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">std::cmp::Ordering</span> {
         <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l0</span>.<span class="ident">cmp</span>(<span class="ident">r0</span>),
-            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l0</span>.<span class="ident">cmp</span>(<span class="ident">r0</span>),
-            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l0</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">r0</span>.<span class="ident">as_str</span>()),
-            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l0</span>.<span class="ident">as_str</span>().<span class="ident">cmp</span>(<span class="kw-2">*</span><span class="ident">r0</span>),
+            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">cmp</span>(<span class="ident">r0</span>),
+            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">cmp</span>(<span class="ident">r0</span>),
+            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">r0</span>.<span class="ident">as_str</span>()),
+            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">as_str</span>().<span class="ident">cmp</span>(<span class="kw-2">*</span><span class="ident">r0</span>),
         }
     }
 }
@@ -426,14 +426,14 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">std::hash::Hash</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">H</span>) {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelationName::Explicit</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">hash</span>(<span class="ident">state</span>),
-            <span class="ident">RelationName::Generated</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">hash</span>(<span class="ident">state</span>),
+            <span class="ident">RelationName::Explicit</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">hash</span>(<span class="ident">state</span>),
+            <span class="ident">RelationName::Generated</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">hash</span>(<span class="ident">state</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">generated</span>(<span class="ident">model_a</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">model_b</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">generated</span>(<span class="ident">model_a</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">model_b</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="ident">model_a</span> <span class="op">&lt;</span> <span class="ident">model_b</span> {
             <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="macro">format!</span>(<span class="string">&quot;{}To{}&quot;</span>, <span class="ident">model_a</span>, <span class="ident">model_b</span>))
         } <span class="kw">else</span> {
@@ -443,28 +443,28 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelationName::Explicit</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>),
-            <span class="ident">RelationName::Generated</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>),
+            <span class="ident">RelationName::Explicit</span>(<span class="ident">s</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>),
+            <span class="ident">RelationName::Generated</span>(<span class="ident">s</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelationName::Explicit</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="ident">RelationName::Generated</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="ident">RelationName::Explicit</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+            <span class="ident">RelationName::Generated</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">name</span>: <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">name</span>: <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="ident">RelationName::Explicit</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="ident">name</span>),
-            <span class="ident">RelationName::Generated</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="ident">name</span>),
+            <span class="ident">RelationName::Explicit</span>(<span class="ident">name</span>) =&gt; <span class="ident">Cow::from</span>(<span class="ident">name</span>),
+            <span class="ident">RelationName::Generated</span>(<span class="ident">name</span>) =&gt; <span class="ident">Cow::from</span>(<span class="ident">name</span>),
         }
     }
 }

@@ -209,12 +209,12 @@
 <span class="doccomment">///   assert_eq!(true, true);</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_link_test_impl</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_link_test_impl</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">attributes_meta</span>: <span class="ident">syn::AttributeArgs</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">attr</span> <span class="kw">as</span> <span class="ident">AttributeArgs</span>);
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">RelationLinkTestArgs::from_list</span>(<span class="kw-2">&amp;</span><span class="ident">attributes_meta</span>);
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">args</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">args</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">err</span>.<span class="ident">write_errors</span>().<span class="ident">into</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">args</span>) =&gt; <span class="ident">args</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">err</span>.<span class="ident">write_errors</span>().<span class="ident">into</span>(),
     };
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">validate</span>(<span class="bool-val">false</span>) {
@@ -249,7 +249,7 @@
     <span class="kw">let</span> <span class="ident">test_fn_ident</span> <span class="op">=</span> <span class="ident">test_function</span>.<span class="ident">sig</span>.<span class="ident">ident</span>.<span class="ident">clone</span>();
 
     <span class="comment">// Rename original test function to run_&lt;orig_name&gt;.</span>
-    <span class="kw">let</span> <span class="ident">runner_fn_ident</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;run_{}&quot;</span>, <span class="ident">test_fn_ident</span>.<span class="ident">to_string</span>()), <span class="ident">Span::call_site</span>());
+    <span class="kw">let</span> <span class="ident">runner_fn_ident</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;run_{}&quot;</span>, <span class="ident">test_fn_ident</span>), <span class="ident">Span::call_site</span>());
     <span class="ident">test_function</span>.<span class="ident">sig</span>.<span class="ident">ident</span> <span class="op">=</span> <span class="ident">runner_fn_ident</span>.<span class="ident">clone</span>();
 
     <span class="comment">// The test database name is the name used as the database for data source rendering.</span>
@@ -280,7 +280,7 @@
 
     <span class="kw">let</span> <span class="ident">test_shells</span> <span class="op">=</span> <span class="ident">datamodels</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">dm</span>)<span class="op">|</span> {
         <span class="comment">// The shell function retains the name of the original test definition.</span>
-        <span class="kw">let</span> <span class="ident">test_fn_ident</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">test_fn_ident</span>.<span class="ident">to_string</span>(), <span class="ident">i</span>), <span class="ident">Span::call_site</span>());
+        <span class="kw">let</span> <span class="ident">test_fn_ident</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">test_fn_ident</span>, <span class="ident">i</span>), <span class="ident">Span::call_site</span>());
         <span class="kw">let</span> <span class="ident">datamodel</span>: <span class="ident">proc_macro2::TokenStream</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, <span class="ident">dm</span>.<span class="ident">datamodel</span>())
             .<span class="ident">parse</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;Could not parse the datamodel&quot;</span>);

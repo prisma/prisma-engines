@@ -283,7 +283,7 @@
     <span class="doccomment">/// // Or if the current span has been created elsewhere:</span>
     <span class="doccomment">/// make_request(Span::current().context())</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Context</span>;
+    <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Context</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">OpenTelemetrySpanExt</span> <span class="kw">for</span> <span class="ident">tracing::Span</span> {
@@ -325,7 +325,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Context</span> {
+    <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Context</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cx</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="self">self</span>.<span class="ident">with_subscriber</span>(<span class="op">|</span>(<span class="ident">id</span>, <span class="ident">subscriber</span>)<span class="op">|</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">get_context</span>) <span class="op">=</span> <span class="ident">subscriber</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">WithContext</span><span class="op">&gt;</span>() {

@@ -499,21 +499,21 @@
     <span class="ident">T</span>: <span class="ident">Future</span>,
     <span class="ident">S</span>: <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Harness</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>) -&gt; <span class="ident">Harness</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
         <span class="ident">Harness</span> {
             <span class="ident">cell</span>: <span class="ident">ptr</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Header</span> {
+    <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Header</span> {
         <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cell</span>.<span class="ident">as_ref</span>().<span class="ident">header</span> }
     }
 
-    <span class="kw">fn</span> <span class="ident">trailer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Trailer</span> {
+    <span class="kw">fn</span> <span class="ident">trailer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Trailer</span> {
         <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cell</span>.<span class="ident">as_ref</span>().<span class="ident">trailer</span> }
     }
 
-    <span class="kw">fn</span> <span class="ident">core</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Core</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">core</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Core</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cell</span>.<span class="ident">as_ref</span>().<span class="ident">core</span> }
     }
 }
@@ -530,7 +530,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>) {
         <span class="comment">// We pass our ref-count to `poll_inner`.</span>
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">poll_inner</span>() {
-            <span class="ident">PollFuture::Notified</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PollFuture::Notified</span> =&gt; {
                 <span class="comment">// The `poll_inner` call has given us two ref-counts back.</span>
                 <span class="comment">// We give one of them to a new task and call `yield_now`.</span>
                 <span class="self">self</span>.<span class="ident">core</span>()
@@ -543,13 +543,13 @@
                 <span class="comment">// before after `yield_now` returns.</span>
                 <span class="self">self</span>.<span class="ident">drop_reference</span>();
             }
-            <span class="ident">PollFuture::Complete</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PollFuture::Complete</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">complete</span>();
             }
-            <span class="ident">PollFuture::Dealloc</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">PollFuture::Dealloc</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">dealloc</span>();
             }
-            <span class="ident">PollFuture::Done</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="ident">PollFuture::Done</span> =&gt; (),
         }
     }
 
@@ -567,25 +567,25 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Otherwise the ref-count is consumed and the caller should not access</span>
     <span class="doccomment">/// `self` again.</span>
-    <span class="kw">fn</span> <span class="ident">poll_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PollFuture</span> {
+    <span class="kw">fn</span> <span class="ident">poll_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PollFuture</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::state</span>::{<span class="ident">TransitionToIdle</span>, <span class="ident">TransitionToRunning</span>};
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">transition_to_running</span>() {
-            <span class="ident">TransitionToRunning::Success</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TransitionToRunning::Success</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">waker_ref</span> <span class="op">=</span> <span class="ident">waker_ref</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">header</span>());
                 <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Context::from_waker</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">waker_ref</span>);
                 <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">poll_future</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">core</span>().<span class="ident">stage</span>, <span class="ident">cx</span>);
 
-                <span class="kw">if</span> <span class="ident">res</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Poll::Ready</span>(()) {
+                <span class="kw">if</span> <span class="ident">res</span> <span class="op">==</span> <span class="ident">Poll::Ready</span>(()) {
                     <span class="comment">// The future completed. Move on to complete the task.</span>
                     <span class="kw">return</span> <span class="ident">PollFuture::Complete</span>;
                 }
 
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">transition_to_idle</span>() {
-                    <span class="ident">TransitionToIdle::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PollFuture::Done</span>,
-                    <span class="ident">TransitionToIdle::OkNotified</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PollFuture::Notified</span>,
-                    <span class="ident">TransitionToIdle::OkDealloc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PollFuture::Dealloc</span>,
-                    <span class="ident">TransitionToIdle::Cancelled</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">TransitionToIdle::Ok</span> =&gt; <span class="ident">PollFuture::Done</span>,
+                    <span class="ident">TransitionToIdle::OkNotified</span> =&gt; <span class="ident">PollFuture::Notified</span>,
+                    <span class="ident">TransitionToIdle::OkDealloc</span> =&gt; <span class="ident">PollFuture::Dealloc</span>,
+                    <span class="ident">TransitionToIdle::Cancelled</span> =&gt; {
                         <span class="comment">// The transition to idle failed because the task was</span>
                         <span class="comment">// cancelled during the poll.</span>
 
@@ -594,12 +594,12 @@
                     }
                 }
             }
-            <span class="ident">TransitionToRunning::Cancelled</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TransitionToRunning::Cancelled</span> =&gt; {
                 <span class="ident">cancel_task</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">core</span>().<span class="ident">stage</span>);
                 <span class="ident">PollFuture::Complete</span>
             }
-            <span class="ident">TransitionToRunning::Failed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PollFuture::Done</span>,
-            <span class="ident">TransitionToRunning::Dealloc</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PollFuture::Dealloc</span>,
+            <span class="ident">TransitionToRunning::Failed</span> =&gt; <span class="ident">PollFuture::Done</span>,
+            <span class="ident">TransitionToRunning::Dealloc</span> =&gt; <span class="ident">PollFuture::Dealloc</span>,
         }
     }
 
@@ -703,7 +703,7 @@
         <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::state::TransitionToNotifiedByVal</span>;
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">transition_to_notified_by_val</span>() {
-            <span class="ident">TransitionToNotifiedByVal::Submit</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TransitionToNotifiedByVal::Submit</span> =&gt; {
                 <span class="comment">// The caller has given us a ref-count, and the transition has</span>
                 <span class="comment">// created a new ref-count, so we now hold two. We turn the new</span>
                 <span class="comment">// ref-count Notified and pass it to the call to `schedule`.</span>
@@ -719,10 +719,10 @@
                 <span class="comment">// release our ref-count.</span>
                 <span class="self">self</span>.<span class="ident">drop_reference</span>();
             }
-            <span class="ident">TransitionToNotifiedByVal::Dealloc</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TransitionToNotifiedByVal::Dealloc</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">dealloc</span>();
             }
-            <span class="ident">TransitionToNotifiedByVal::DoNothing</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="ident">TransitionToNotifiedByVal::DoNothing</span> =&gt; {}
         }
     }
 
@@ -733,7 +733,7 @@
         <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::state::TransitionToNotifiedByRef</span>;
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">transition_to_notified_by_ref</span>() {
-            <span class="ident">TransitionToNotifiedByRef::Submit</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TransitionToNotifiedByRef::Submit</span> =&gt; {
                 <span class="comment">// The transition above incremented the ref-count for a new task</span>
                 <span class="comment">// and the caller also holds a ref-count. The caller&#39;s ref-count</span>
                 <span class="comment">// ensures that the task is not destroyed even if the new task</span>
@@ -742,7 +742,7 @@
                     .<span class="ident">scheduler</span>
                     .<span class="ident">schedule</span>(<span class="ident">Notified</span>(<span class="self">self</span>.<span class="ident">get_new_task</span>()));
             }
-            <span class="ident">TransitionToNotifiedByRef::DoNothing</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="ident">TransitionToNotifiedByRef::DoNothing</span> =&gt; {}
         }
     }
 
@@ -753,7 +753,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">tracing::Id</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">tracing::Id</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">id</span>.<span class="ident">as_ref</span>()
     }
 
@@ -791,7 +791,7 @@
 
     <span class="doccomment">/// Release the task from the scheduler. Returns the number of ref-counts</span>
     <span class="doccomment">/// that should be decremented.</span>
-    <span class="kw">fn</span> <span class="ident">release</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">release</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="comment">// We don&#39;t actually increment the ref-count here, but the new task is</span>
         <span class="comment">// never destroyed, so that&#39;s ok.</span>
         <span class="kw">let</span> <span class="ident">me</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="self">self</span>.<span class="ident">get_new_task</span>());
@@ -812,14 +812,14 @@
     <span class="doccomment">/// task holds the task alive until after the use of `self`. Passing the</span>
     <span class="doccomment">/// returned Task to any method on `self` is unsound if dropping the Task</span>
     <span class="doccomment">/// could drop `self` before the call on `self` returned.</span>
-    <span class="kw">fn</span> <span class="ident">get_new_task</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_new_task</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
         <span class="comment">// safety: The header is at the beginning of the cell, so this cast is</span>
         <span class="comment">// safe.</span>
         <span class="kw">unsafe</span> { <span class="ident">Task::from_raw</span>(<span class="self">self</span>.<span class="ident">cell</span>.<span class="ident">cast</span>()) }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">can_read_output</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">Header</span>, <span class="ident">trailer</span>: <span class="kw-2">&amp;</span><span class="ident">Trailer</span>, <span class="ident">waker</span>: <span class="kw-2">&amp;</span><span class="ident">Waker</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">can_read_output</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">Header</span>, <span class="ident">trailer</span>: <span class="kw-2">&amp;</span><span class="ident">Trailer</span>, <span class="ident">waker</span>: <span class="kw-2">&amp;</span><span class="ident">Waker</span>) -&gt; <span class="ident">bool</span> {
     <span class="comment">// Load a snapshot of the current task state</span>
     <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">state</span>.<span class="ident">load</span>();
 
@@ -860,8 +860,8 @@
         };
 
         <span class="kw">match</span> <span class="ident">res</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="bool-val">false</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">snapshot</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">snapshot</span>) =&gt; {
                 <span class="macro">assert!</span>(<span class="ident">snapshot</span>.<span class="ident">is_complete</span>());
             }
         }
@@ -874,7 +874,7 @@
     <span class="ident">trailer</span>: <span class="kw-2">&amp;</span><span class="ident">Trailer</span>,
     <span class="ident">waker</span>: <span class="ident">Waker</span>,
     <span class="ident">snapshot</span>: <span class="ident">Snapshot</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Snapshot</span>, <span class="ident">Snapshot</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Snapshot</span>, <span class="ident">Snapshot</span><span class="op">&gt;</span> {
     <span class="macro">assert!</span>(<span class="ident">snapshot</span>.<span class="ident">is_join_interested</span>());
     <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">snapshot</span>.<span class="ident">has_join_waker</span>());
 
@@ -912,10 +912,10 @@
     }));
 
     <span class="kw">match</span> <span class="ident">res</span> {
-        <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(()) =&gt; {
             <span class="ident">stage</span>.<span class="ident">store_output</span>(<span class="prelude-val">Err</span>(<span class="ident">JoinError::cancelled</span>()));
         }
-        <span class="prelude-val">Err</span>(<span class="ident">panic</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">panic</span>) =&gt; {
             <span class="ident">stage</span>.<span class="ident">store_output</span>(<span class="prelude-val">Err</span>(<span class="ident">JoinError::panic</span>(<span class="ident">panic</span>)));
         }
     }
@@ -923,7 +923,7 @@
 
 <span class="doccomment">/// Poll the future. If the future completes, the output is written to the</span>
 <span class="doccomment">/// stage field.</span>
-<span class="kw">fn</span> <span class="ident">poll_future</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Future</span><span class="op">&gt;</span>(<span class="ident">core</span>: <span class="kw-2">&amp;</span><span class="ident">CoreStage</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">poll_future</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Future</span><span class="op">&gt;</span>(<span class="ident">core</span>: <span class="kw-2">&amp;</span><span class="ident">CoreStage</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="comment">// Poll the future.</span>
     <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> {
         <span class="kw">struct</span> <span class="ident">Guard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Future</span><span class="op">&gt;</span> {
@@ -944,9 +944,9 @@
 
     <span class="comment">// Prepare output for being placed in the core stage.</span>
     <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">output</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Poll::Pending</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
-        <span class="prelude-val">Ok</span>(<span class="ident">Poll::Ready</span>(<span class="ident">output</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">output</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">panic</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">JoinError::panic</span>(<span class="ident">panic</span>)),
+        <span class="prelude-val">Ok</span>(<span class="ident">Poll::Pending</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
+        <span class="prelude-val">Ok</span>(<span class="ident">Poll::Ready</span>(<span class="ident">output</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">output</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">panic</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">JoinError::panic</span>(<span class="ident">panic</span>)),
     };
 
     <span class="comment">// Catch and ignore panics if the future panics on drop.</span>

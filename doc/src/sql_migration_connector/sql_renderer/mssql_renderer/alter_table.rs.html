@@ -312,7 +312,7 @@
     <span class="ident">renderer</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlFlavour</span>,
     <span class="ident">tables</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">changes</span>: <span class="kw-2">&amp;</span>[<span class="ident">TableChange</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">constructor</span> <span class="op">=</span> <span class="ident">AlterTableConstructor</span> {
         <span class="ident">renderer</span>,
         <span class="ident">tables</span>,
@@ -341,32 +341,32 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AlterTableConstructor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_statements</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_statements</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">changes</span> {
             <span class="kw">match</span> <span class="ident">change</span> {
-                <span class="ident">TableChange::DropPrimaryKey</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">TableChange::DropPrimaryKey</span> =&gt; {
                     <span class="self">self</span>.<span class="ident">drop_primary_key</span>();
                 }
-                <span class="ident">TableChange::RenamePrimaryKey</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">TableChange::RenamePrimaryKey</span> =&gt; {
                     <span class="self">self</span>.<span class="ident">rename_primary_key</span> <span class="op">=</span> <span class="bool-val">true</span>;
                 }
-                <span class="ident">TableChange::AddPrimaryKey</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">TableChange::AddPrimaryKey</span> =&gt; {
                     <span class="self">self</span>.<span class="ident">add_primary_key</span>();
                 }
-                <span class="ident">TableChange::AddColumn</span> { <span class="ident">column_id</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">TableChange::AddColumn</span> { <span class="ident">column_id</span> } =&gt; {
                     <span class="self">self</span>.<span class="ident">add_column</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
                 }
-                <span class="ident">TableChange::DropColumn</span> { <span class="ident">column_id</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">TableChange::DropColumn</span> { <span class="ident">column_id</span> } =&gt; {
                     <span class="self">self</span>.<span class="ident">drop_column</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
                 }
-                <span class="ident">TableChange::DropAndRecreateColumn</span> { <span class="ident">column_id</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">TableChange::DropAndRecreateColumn</span> { <span class="ident">column_id</span>, .. } =&gt; {
                     <span class="self">self</span>.<span class="ident">drop_and_recreate_column</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
                 }
                 <span class="ident">TableChange::AlterColumn</span>(<span class="ident">AlterColumn</span> {
                     <span class="ident">column_id</span>,
                     <span class="ident">changes</span>,
                     <span class="ident">type_change</span>: <span class="kw">_</span>,
-                }) <span class="op">=</span><span class="op">&gt;</span> {
+                }) =&gt; {
                     <span class="self">self</span>.<span class="ident">alter_column</span>(<span class="kw-2">*</span><span class="ident">column_id</span>, <span class="ident">changes</span>);
                 }
             };
@@ -509,11 +509,11 @@
 
         <span class="kw">for</span> <span class="ident">alter</span> <span class="kw">in</span> <span class="ident">expanded</span>.<span class="ident">into_iter</span>() {
             <span class="kw">match</span> <span class="ident">alter</span> {
-                <span class="ident">MsSqlAlterColumn::DropDefault</span> { <span class="ident">constraint_name</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">MsSqlAlterColumn::DropDefault</span> { <span class="ident">constraint_name</span> } =&gt; {
                     <span class="kw">let</span> <span class="ident">escaped</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote</span>(<span class="kw-2">&amp;</span><span class="ident">constraint_name</span>));
                     <span class="self">self</span>.<span class="ident">drop_constraints</span>.<span class="ident">insert</span>(<span class="ident">escaped</span>);
                 }
-                <span class="ident">MsSqlAlterColumn::SetDefault</span>(<span class="ident">default</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">MsSqlAlterColumn::SetDefault</span>(<span class="ident">default</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">default</span>.<span class="ident">constraint_name</span>().<span class="ident">map</span>(<span class="ident">Cow::from</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                         <span class="kw">let</span> <span class="ident">old_default</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;DF__{}__{}&quot;</span>, <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">name</span>(), <span class="ident">columns</span>.<span class="ident">next</span>().<span class="ident">name</span>());
                         <span class="ident">Cow::from</span>(<span class="ident">old_default</span>)
@@ -528,7 +528,7 @@
                         <span class="ident">default</span> <span class="op">=</span> <span class="ident">default</span>,
                     ));
                 }
-                <span class="ident">MsSqlAlterColumn::Modify</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">MsSqlAlterColumn::Modify</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">nullability</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">next</span>().<span class="ident">arity</span>().<span class="ident">is_required</span>() {
                         <span class="string">&quot;NOT NULL&quot;</span>
                     } <span class="kw">else</span> {
@@ -555,7 +555,7 @@
     <span class="ident">Modify</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">expand_alter_column</span>(<span class="ident">columns</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">column_changes</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnChanges</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MsSqlAlterColumn</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">expand_alter_column</span>(<span class="ident">columns</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">column_changes</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnChanges</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MsSqlAlterColumn</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
     <span class="comment">// Default value changes require us to re-create the constraint, which we</span>

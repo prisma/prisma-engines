@@ -114,12 +114,12 @@
 </pre><pre class="rust"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">UserFacingError</span>, <span class="ident">attributes</span>(<span class="ident">user_facing</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_user_facing_error</span>(<span class="ident">input</span>: <span class="ident">proc_macro::TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro::TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_user_facing_error</span>(<span class="ident">input</span>: <span class="ident">proc_macro::TokenStream</span>) -&gt; <span class="ident">proc_macro::TokenStream</span> {
     <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">syn::DeriveInput</span>);
 
     <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">data</span> {
-        <span class="ident">syn::Data::Struct</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">data</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">syn::Data::Struct</span>(<span class="ident">data</span>) =&gt; <span class="ident">data</span>,
+        <span class="kw">_</span> =&gt; {
             <span class="kw">return</span> <span class="ident">syn::Error::new_spanned</span>(<span class="ident">input</span>, <span class="string">&quot;derive works only on structs&quot;</span>)
                 .<span class="ident">to_compile_error</span>()
                 .<span class="ident">into</span>()
@@ -127,14 +127,14 @@
     };
 
     <span class="kw">let</span> <span class="ident">UserErrorDeriveInput</span> { <span class="ident">ident</span>, <span class="ident">code</span>, <span class="ident">message</span> } <span class="op">=</span> <span class="kw">match</span> <span class="ident">UserErrorDeriveInput::new</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">input</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">input</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">err</span>.<span class="ident">into_compile_error</span>().<span class="ident">into</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">input</span>) =&gt; <span class="ident">input</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">err</span>.<span class="ident">into_compile_error</span>().<span class="ident">into</span>(),
     };
 
     <span class="kw">let</span> <span class="ident">template_variables</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">fields</span> {
-        <span class="ident">syn::Fields::Named</span>(<span class="ident">named</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::new</span>(<span class="ident">named</span>.<span class="ident">named</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">ident</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())),
-        <span class="ident">syn::Fields::Unit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::new</span>(<span class="ident">std::iter::empty</span>()),
-        <span class="ident">syn::Fields::Unnamed</span>(<span class="ident">unnamed</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">syn::Fields::Named</span>(<span class="ident">named</span>) =&gt; <span class="ident">Box::new</span>(<span class="ident">named</span>.<span class="ident">named</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">ident</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())),
+        <span class="ident">syn::Fields::Unit</span> =&gt; <span class="ident">Box::new</span>(<span class="ident">std::iter::empty</span>()),
+        <span class="ident">syn::Fields::Unnamed</span>(<span class="ident">unnamed</span>) =&gt; {
             <span class="kw">return</span> <span class="ident">syn::Error::new_spanned</span>(<span class="ident">unnamed</span>, <span class="string">&quot;The error fields must be named&quot;</span>)
                 .<span class="ident">to_compile_error</span>()
                 .<span class="ident">into</span>()
@@ -145,7 +145,7 @@
         <span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::UserFacingError</span> <span class="kw">for</span> #<span class="ident">ident</span> {
             <span class="kw">const</span> <span class="ident">ERROR_CODE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> #<span class="ident">code</span>;
 
-            <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+            <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
                 <span class="macro">format!</span>(
                     #<span class="ident">message</span>,
                     #(
@@ -167,7 +167,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">UserErrorDeriveInput</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">syn::DeriveInput</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">syn::DeriveInput</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">code</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
@@ -175,7 +175,7 @@
             <span class="kw">if</span> <span class="op">!</span><span class="ident">attr</span>
                 .<span class="ident">path</span>
                 .<span class="ident">get_ident</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ident</span><span class="op">|</span> <span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;user_facing&quot;</span>)
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ident</span><span class="op">|</span> <span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;user_facing&quot;</span>)
                 .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
             {
                 <span class="kw">continue</span>;
@@ -185,8 +185,8 @@
                 <span class="ident">syn::punctuated::Punctuated</span>::<span class="op">&lt;</span><span class="ident">syn::MetaNameValue</span>, <span class="macro">syn::Token!</span>[,]<span class="op">&gt;</span><span class="ident">::parse_terminated</span>(<span class="ident">stream</span>)
             })<span class="question-mark">?</span> {
                 <span class="kw">let</span> <span class="ident">litstr</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">namevalue</span>.<span class="ident">lit</span> {
-                    <span class="ident">syn::Lit::Str</span>(<span class="ident">litstr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">litstr</span>,
-                    <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">syn::Lit::Str</span>(<span class="ident">litstr</span>) =&gt; <span class="ident">litstr</span>,
+                    <span class="ident">other</span> =&gt; {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
                             <span class="ident">other</span>,
                             <span class="string">&quot;Expected attribute of the form `#[user_facing(code = \&quot;...\&quot;, message = \&quot;...\&quot;)]`&quot;</span>,
@@ -195,13 +195,13 @@
                 };
 
                 <span class="kw">match</span> <span class="ident">namevalue</span>.<span class="ident">path</span>.<span class="ident">get_ident</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="kw">if</span> <span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;code&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="kw">if</span> <span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;code&quot;</span> =&gt; {
                         <span class="ident">code</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">litstr</span>);
                     }
-                    <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="kw">if</span> <span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;message&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="kw">if</span> <span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;message&quot;</span> =&gt; {
                         <span class="ident">message</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">litstr</span>);
                     }
-                    <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">other</span> =&gt; {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
                             <span class="ident">other</span>,
                             <span class="string">&quot;Expected attribute of the form `#[user_facing(code = \&quot;...\&quot;, message = \&quot;...\&quot;)]`&quot;</span>,
@@ -212,12 +212,12 @@
         }
 
         <span class="kw">match</span> (<span class="ident">message</span>, <span class="ident">code</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">message</span>), <span class="prelude-val">Some</span>(<span class="ident">code</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">UserErrorDeriveInput</span> {
+            (<span class="prelude-val">Some</span>(<span class="ident">message</span>), <span class="prelude-val">Some</span>(<span class="ident">code</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">UserErrorDeriveInput</span> {
                 <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">ident</span>,
                 <span class="ident">message</span>,
                 <span class="ident">code</span>,
             }),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
                 <span class="ident">input</span>,
                 <span class="string">&quot;Expected attribute of the form `#[user_facing(code = \&quot;...\&quot;, message = \&quot;...\&quot;)]`&quot;</span>,
             )),

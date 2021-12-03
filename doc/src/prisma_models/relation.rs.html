@@ -210,23 +210,23 @@
 
     <span class="doccomment">/// Returns `true` only if the `Relation` is just a link between two</span>
     <span class="doccomment">/// `RelationField`s.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_inline_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_inline_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">manifestation</span>, <span class="ident">RelationLinkManifestation::Inline</span>(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns `true` if the `Relation` is a table linking two models.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_relation_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_relation_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">is_inline_relation</span>()
     }
 
     <span class="doccomment">/// A model that relates to itself. For example a `Person` that is a parent</span>
     <span class="doccomment">/// can relate to people that are children.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_self_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">model_a_name</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">model_b_name</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_self_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">model_a_name</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">model_b_name</span>
     }
 
     <span class="doccomment">/// A pointer to the first `Model` in the `Relation`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_a</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_a</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelRef</span> {
         <span class="self">self</span>.<span class="ident">model_a</span>
             .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">internal_data_model</span>().<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_a_name</span>).<span class="ident">unwrap</span>();
@@ -237,7 +237,7 @@
     }
 
     <span class="doccomment">/// A pointer to the second `Model` in the `Relation`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_b</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_b</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelRef</span> {
         <span class="self">self</span>.<span class="ident">model_b</span>
             .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">internal_data_model</span>().<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_b_name</span>).<span class="ident">unwrap</span>();
@@ -248,7 +248,7 @@
     }
 
     <span class="doccomment">/// A pointer to the `RelationField` in the first `Model` in the `Relation`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_a</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationFieldRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_a</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationFieldRef</span> {
         <span class="self">self</span>.<span class="ident">field_a</span>
             .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>
@@ -264,7 +264,7 @@
     }
 
     <span class="doccomment">/// A pointer to the `RelationField` in the second `Model` in the `Relation`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_b</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationFieldRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_b</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationFieldRef</span> {
         <span class="self">self</span>.<span class="ident">field_b</span>
             .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>
@@ -280,26 +280,26 @@
     }
 
     <span class="doccomment">/// Practically deprecated with Prisma 2.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_many_to_many</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_many_to_many</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">field_a</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">field_b</span>().<span class="ident">is_list</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_one_to_one</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_one_to_one</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">field_a</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">field_b</span>().<span class="ident">is_list</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_one_to_many</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_one_to_many</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">is_many_to_many</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_one_to_one</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_data_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InternalDataModelRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_data_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InternalDataModelRef</span> {
         <span class="self">self</span>.<span class="ident">internal_data_model</span>
             .<span class="ident">upgrade</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.&quot;</span>)
     }
 
     <span class="doccomment">/// Retrieves the onDelete policy for this relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReferentialAction</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialAction</span> {
         <span class="self">self</span>.<span class="ident">field_a</span>()
             .<span class="ident">on_delete</span>()
             .<span class="ident">cloned</span>()
@@ -308,7 +308,7 @@
     }
 
     <span class="doccomment">/// Retrieves the onUpdate policy for this relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReferentialAction</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialAction</span> {
         <span class="self">self</span>.<span class="ident">field_a</span>()
             .<span class="ident">on_update</span>()
             .<span class="ident">cloned</span>()
@@ -318,7 +318,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Relation</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Relation&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
             .<span class="ident">field</span>(<span class="string">&quot;model_a_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_a_name</span>)

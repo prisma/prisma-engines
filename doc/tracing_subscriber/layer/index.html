@@ -15,7 +15,7 @@ and exit, and so on, provided that there is a single authoritative source of
 span IDs. The <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> trait represents this composable subset of the
 <a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> behavior; it can <em>observe</em> events and spans, but does not
 assign IDs.</p>
-<h2 id="composing-layers" class="section-header"><a href="#composing-layers">Composing Layers</a></h2>
+<h3 id="composing-layers" class="section-header"><a href="#composing-layers">Composing Layers</a></h3>
 <p>Since a <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> does not implement a complete strategy for collecting
 traces, it must be composed with a <code>Subscriber</code> in order to be used. The
 <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> trait is generic over a type parameter (called <code>S</code> in the trait
@@ -83,14 +83,14 @@ returns a <a href="struct.Layered.html" title="Layered"><code>Layered</code></a>
 general, it is more idiomatic to use <a href="trait.SubscriberExt.html#method.with" title="SubscriberExt::with"><code>SubscriberExt::with</code></a>, and treat
 <a href="trait.Layer.html#method.with_subscriber" title="Layer::with_subscriber"><code>Layer::with_subscriber</code></a> as an implementation detail, as <code>with_subscriber</code>
 calls must be nested, leading to less clear code for the reader.</p>
-<h2 id="recording-traces" class="section-header"><a href="#recording-traces">Recording Traces</a></h2>
+<h3 id="recording-traces" class="section-header"><a href="#recording-traces">Recording Traces</a></h3>
 <p>The <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> trait defines a set of methods for consuming notifications from
 tracing instrumentation, which are generally equivalent to the similarly
 named methods on <a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a>. Unlike <a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a>, the methods on
 <code>Layer</code> are additionally passed a <a href="struct.Context.html" title="Context"><code>Context</code></a> type, which exposes additional
 information provided by the wrapped subscriber (such as <a href="struct.Context.html#method.current_span">the current span</a>)
 to the layer.</p>
-<h2 id="filtering-with-layers" class="section-header"><a href="#filtering-with-layers">Filtering with <code>Layer</code>s</a></h2>
+<h3 id="filtering-with-layers" class="section-header"><a href="#filtering-with-layers">Filtering with <code>Layer</code>s</a></h3>
 <p>As well as strategies for handling trace events, the <code>Layer</code> trait may also
 be used to represent composable <em>filters</em>. This allows the determination of
 what spans and events should be recorded to be decoupled from <em>how</em> they are
@@ -100,7 +100,7 @@ subscribers. <code>Layer</code>s can be used to implement <em>global filtering</
 Additionally, individual recording <code>Layer</code>s or sets of <code>Layer</code>s may be
 combined with <em>per-layer filters</em> that control what spans and events are
 recorded by those layers.</p>
-<h3 id="global-filtering" class="section-header"><a href="#global-filtering">Global Filtering</a></h3>
+<h4 id="global-filtering" class="section-header"><a href="#global-filtering">Global Filtering</a></h4>
 <p>A <code>Layer</code> that implements a filtering strategy should override the
 <a href="trait.Layer.html#method.register_callsite"><code>register_callsite</code></a> and/or <a href="trait.Layer.html#method.enabled"><code>enabled</code></a> methods. It may also choose to implement
 methods such as <a href="trait.Layer.html#method.on_enter"><code>on_enter</code></a>, if it wishes to filter trace events based on
@@ -117,7 +117,7 @@ order, starting with the outermost <code>Layer</code> and ending with the wrappe
 <a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a>. If any layer returns <code>false</code> from its <a href="trait.Layer.html#method.enabled"><code>enabled</code></a> method, or
 <a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/struct.Interest.html#method.never"><code>Interest::never()</code></a> from its <a href="trait.Layer.html#method.register_callsite"><code>register_callsite</code></a> method, filter
 evaluation will short-circuit and the span or event will be disabled.</p>
-<h3 id="per-layer-filtering" class="section-header"><a href="#per-layer-filtering">Per-Layer Filtering</a></h3>
+<h4 id="per-layer-filtering" class="section-header"><a href="#per-layer-filtering">Per-Layer Filtering</a></h4>
 <p><strong>Note</strong>: per-layer filtering APIs currently require the <a href="../index.html#feature-flags"><code>&quot;registry&quot;</code> crate
 feature flag</a> to be enabled.</p>
 <p>Sometimes, it may be desirable for one <code>Layer</code> to record a particular subset
@@ -165,7 +165,7 @@ standard out, a <a href="../filter/index.html"><code>Filter</code></a> can be ad
 <span class="kw">let</span> <span class="ident">access_log</span> <span class="op">=</span> <span class="ident">access_log</span>.<span class="ident">with_filter</span>(<span class="ident">filter::filter_fn</span>(<span class="op">|</span><span class="ident">metadata</span><span class="op">|</span> {
     <span class="comment">// Returns `true` if and only if the span or event&#39;s target is</span>
     <span class="comment">// &quot;http_access&quot;.</span>
-    <span class="ident">metadata</span>.<span class="ident">target</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;http_access&quot;</span>
+    <span class="ident">metadata</span>.<span class="ident">target</span>() <span class="op">==</span> <span class="string">&quot;http_access&quot;</span>
 }));
 
 <span class="comment">// A general-purpose logging layer.</span>
@@ -191,7 +191,7 @@ the previous example:</p>
     <span class="comment">// Add the filter for the &quot;http_access&quot; target to the access</span>
     <span class="comment">// log layer, like before.</span>
     .<span class="ident">with</span>(<span class="ident">access_log</span>.<span class="ident">with_filter</span>(<span class="ident">filter_fn</span>(<span class="op">|</span><span class="ident">metadata</span><span class="op">|</span> {
-        <span class="ident">metadata</span>.<span class="ident">target</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;http_access&quot;</span>
+        <span class="ident">metadata</span>.<span class="ident">target</span>() <span class="op">==</span> <span class="string">&quot;http_access&quot;</span>
     })))
     <span class="comment">// Add a filter for spans and events with the INFO level</span>
     <span class="comment">// and below to the logging layer.</span>
@@ -306,7 +306,7 @@ to the stdout log:</p>
 <span class="comment">// This event will be seen by both the stdout log layer *and*</span>
 <span class="comment">// the debug log file layer, but not by the metrics layer.</span>
 <span class="macro">tracing::warn!</span>(<span class="string">&quot;the message is a warning about danger!&quot;</span>);</code></pre></div>
-<h2 id="runtime-configuration-with-layers" class="section-header"><a href="#runtime-configuration-with-layers">Runtime Configuration With Layers</a></h2>
+<h3 id="runtime-configuration-with-layers" class="section-header"><a href="#runtime-configuration-with-layers">Runtime Configuration With Layers</a></h3>
 <p>In some cases, a particular <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> may be enabled or disabled based on
 runtime configuration. This can introduce challenges, because the type of a
 layered <a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> depends on which layers are added to it: if an <code>if</code>
@@ -334,7 +334,7 @@ different types. For example, the following <em>will not</em> work:</p>
 
 <span class="ident">tracing::subscriber::set_global_default</span>(<span class="ident">subscriber</span>)
     .<span class="ident">expect</span>(<span class="string">&quot;Unable to set global subscriber&quot;</span>);</code></pre></div>
-<p>However, a <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> wrapped in an <a href="https://doc.rust-lang.org/1.56.1/core/option/enum.Option.html" title="Option"><code>Option</code></a> <a href="trait.Layer.html#impl-Layer%3CS%3E-for-Option%3CL%3E">also implements the <code>Layer</code>
+<p>However, a <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> wrapped in an <a href="https://doc.rust-lang.org/1.57.0/core/option/enum.Option.html" title="Option"><code>Option</code></a> <a href="trait.Layer.html#impl-Layer%3CS%3E-for-Option%3CL%3E">also implements the <code>Layer</code>
 trait</a>. This allows individual layers to be enabled or disabled at
 runtime while always producing a <a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> of the same type. For
 example:</p>
@@ -364,16 +364,16 @@ example:</p>
 <span class="ident">tracing::subscriber::set_global_default</span>(<span class="ident">subscriber</span>)
    .<span class="ident">expect</span>(<span class="string">&quot;Unable to set global subscriber&quot;</span>);</code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Context.html" title="tracing_subscriber::layer::Context struct">Context</a></div><div class="item-right docblock-short"><p>Represents information about the current context provided to <a href="../layer/trait.Layer.html"><code>Layer</code></a>s by the
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Context.html" title="tracing_subscriber::layer::Context struct">Context</a></div><div class="item-right docblock-short"><p>Represents information about the current context provided to <a href="../layer/trait.Layer.html"><code>Layer</code></a>s by the
 wrapped <a href="https://docs.rs/tracing-core/latest/tracing_core/trait.Subscriber.html"><code>Subscriber</code></a>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Identity.html" title="tracing_subscriber::layer::Identity struct">Identity</a></div><div class="item-right docblock-short"><p>A layer that does nothing.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Layered.html" title="tracing_subscriber::layer::Layered struct">Layered</a></div><div class="item-right docblock-short"><p>A <a href="https://docs.rs/tracing-core/latest/tracing_core/trait.Subscriber.html"><code>Subscriber</code></a> composed of a <code>Subscriber</code> wrapped by one or more
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Identity.html" title="tracing_subscriber::layer::Identity struct">Identity</a></div><div class="item-right docblock-short"><p>A layer that does nothing.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Layered.html" title="tracing_subscriber::layer::Layered struct">Layered</a></div><div class="item-right docblock-short"><p>A <a href="https://docs.rs/tracing-core/latest/tracing_core/trait.Subscriber.html"><code>Subscriber</code></a> composed of a <code>Subscriber</code> wrapped by one or more
 <a href="trait.Layer.html"><code>Layer</code></a>s.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Filter.html" title="tracing_subscriber::layer::Filter trait">Filter</a></div><div class="item-right docblock-short"><p>A per-<a href="trait.Layer.html" title="Layer"><code>Layer</code></a> filter that determines whether a span or event is enabled
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Filter.html" title="tracing_subscriber::layer::Filter trait">Filter</a></div><div class="item-right docblock-short"><p>A per-<a href="trait.Layer.html" title="Layer"><code>Layer</code></a> filter that determines whether a span or event is enabled
 for an individual layer.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Layer.html" title="tracing_subscriber::layer::Layer trait">Layer</a></div><div class="item-right docblock-short"><p>A composable handler for <code>tracing</code> events.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.SubscriberExt.html" title="tracing_subscriber::layer::SubscriberExt trait">SubscriberExt</a></div><div class="item-right docblock-short"><p>Extension trait adding a <code>with(Layer)</code> combinator to <code>Subscriber</code>s.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Layer.html" title="tracing_subscriber::layer::Layer trait">Layer</a></div><div class="item-right docblock-short"><p>A composable handler for <code>tracing</code> events.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.SubscriberExt.html" title="tracing_subscriber::layer::SubscriberExt trait">SubscriberExt</a></div><div class="item-right docblock-short"><p>Extension trait adding a <code>with(Layer)</code> combinator to <code>Subscriber</code>s.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

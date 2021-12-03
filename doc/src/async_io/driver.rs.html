@@ -277,7 +277,7 @@
     <span class="kw">loop</span> {
         <span class="kw">let</span> <span class="ident">tick</span> <span class="op">=</span> <span class="ident">Reactor::get</span>().<span class="ident">ticker</span>();
 
-        <span class="kw">if</span> <span class="ident">last_tick</span> <span class="op">=</span><span class="op">=</span> <span class="ident">tick</span> {
+        <span class="kw">if</span> <span class="ident">last_tick</span> <span class="op">==</span> <span class="ident">tick</span> {
             <span class="kw">let</span> <span class="ident">reactor_lock</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">sleeps</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">10</span> {
                 <span class="comment">// If no new ticks have occurred for a while, stop sleeping and spinning in</span>
                 <span class="comment">// this loop and just block on the reactor lock.</span>
@@ -330,7 +330,7 @@
 <span class="doccomment">///     Timer::after(Duration::from_millis(1)).await;</span>
 <span class="doccomment">/// });</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">future</span>: <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">future</span>: <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">T</span> {
     <span class="macro">log::trace!</span>(<span class="string">&quot;block_on()&quot;</span>);
 
     <span class="comment">// Increment `BLOCK_ON_COUNT` so that the &quot;async-io&quot; thread becomes less aggressive.</span>

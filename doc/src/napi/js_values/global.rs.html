@@ -66,7 +66,7 @@
 
 <span class="kw">impl</span> <span class="ident">JsGlobal</span> {
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">JsFunction</span>, <span class="ident">interval</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsTimeout</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">JsFunction</span>, <span class="ident">interval</span>: <span class="ident">f64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsTimeout</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">func</span>: <span class="ident">JsFunction</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_named_property</span>(<span class="string">&quot;setInterval&quot;</span>)<span class="question-mark">?</span>;
     <span class="ident">func</span>
       .<span class="ident">call</span>(
@@ -81,7 +81,7 @@
       .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">ret</span><span class="op">|</span> <span class="ident">ret</span>.<span class="ident">try_into</span>())
   }
 
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timer</span>: <span class="ident">JsTimeout</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsUndefined</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timer</span>: <span class="ident">JsTimeout</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsUndefined</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">func</span>: <span class="ident">JsFunction</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_named_property</span>(<span class="string">&quot;clearInterval&quot;</span>)<span class="question-mark">?</span>;
     <span class="ident">func</span>
       .<span class="ident">call</span>(<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>[<span class="ident">timer</span>.<span class="ident">into_unknown</span>()])
@@ -89,7 +89,7 @@
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">JsFunction</span>, <span class="ident">interval</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsTimeout</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">JsFunction</span>, <span class="ident">interval</span>: <span class="ident">f64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsTimeout</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">func</span>: <span class="ident">JsFunction</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_named_property</span>(<span class="string">&quot;setTimeout&quot;</span>)<span class="question-mark">?</span>;
     <span class="ident">func</span>
       .<span class="ident">call</span>(
@@ -105,7 +105,7 @@
   }
 
   <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timer</span>: <span class="ident">JsTimeout</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsUndefined</span><span class="op">&gt;</span> {
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timer</span>: <span class="ident">JsTimeout</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">JsUndefined</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">func</span>: <span class="ident">JsFunction</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_named_property</span>(<span class="string">&quot;clearTimeout&quot;</span>)<span class="question-mark">?</span>;
     <span class="ident">func</span>
       .<span class="ident">call</span>(<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>[<span class="ident">timer</span>.<span class="ident">into_unknown</span>()])

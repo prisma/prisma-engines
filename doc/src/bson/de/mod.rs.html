@@ -519,9 +519,9 @@
     <span class="ident">length</span>: <span class="ident">usize</span>,
     <span class="ident">error_message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">func</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::io::Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::io::Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
     <span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">length</span>];
@@ -536,7 +536,7 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_string</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">utf8_lossy</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_string</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">utf8_lossy</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
 
     <span class="comment">// UTF-8 String must have at least 1 byte (the last 0x00).</span>
@@ -568,7 +568,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">s</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_bool</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_bool</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="ident">val</span> <span class="op">&gt;</span> <span class="number">1</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_value</span>(
@@ -580,12 +580,12 @@
     <span class="prelude-val">Ok</span>(<span class="ident">val</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">read_cstring</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">read_cstring</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
     <span class="kw">loop</span> {
         <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">break</span>;
         }
         <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">c</span>);
@@ -595,28 +595,28 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_u8</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_u8</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">1</span>];
     <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">u8::from_le_bytes</span>(<span class="ident">buf</span>))
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_i32</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_i32</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
     <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">i32::from_le_bytes</span>(<span class="ident">buf</span>))
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_i64</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_i64</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
     <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">i64::from_le_bytes</span>(<span class="ident">buf</span>))
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">read_f64</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">read_f64</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
     <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">f64::from_le_bytes</span>(<span class="ident">buf</span>))
@@ -625,13 +625,13 @@
 <span class="doccomment">/// Placeholder decoder for `Decimal128`. Reads 128 bits and just stores them, does no validation or</span>
 <span class="doccomment">/// parsing.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">read_f128</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal128</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">read_f128</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal128</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">128</span> <span class="op">/</span> <span class="number">8</span>];
     <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">Decimal128</span> { <span class="ident">bytes</span>: <span class="ident">buf</span> })
 }
 
-<span class="kw">fn</span> <span class="ident">deserialize_array</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">utf8_lossy</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Array</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">deserialize_array</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">utf8_lossy</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Array</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arr</span> <span class="op">=</span> <span class="ident">Array::new</span>();
     <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
 
@@ -653,7 +653,7 @@
         <span class="op">|</span><span class="ident">cursor</span><span class="op">|</span> {
             <span class="kw">loop</span> {
                 <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="ident">cursor</span>)<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">tag</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">tag</span> <span class="op">==</span> <span class="number">0</span> {
                     <span class="kw">break</span>;
                 }
 
@@ -671,49 +671,49 @@
     <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>,
     <span class="ident">tag</span>: <span class="ident">u8</span>,
     <span class="ident">utf8_lossy</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Bson</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Bson</span>)<span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">spec::ElementType</span>;
     <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">read_cstring</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ElementType::from</span>(<span class="ident">tag</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Double</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Double</span>(<span class="ident">read_f64</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::String</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">read_string</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>).<span class="ident">map</span>(<span class="ident">Bson::String</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::EmbeddedDocument</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Document::from_reader</span>(<span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Bson::Document</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Array</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">deserialize_array</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>).<span class="ident">map</span>(<span class="ident">Bson::Array</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Binary</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Binary</span>(<span class="ident">Binary::from_reader</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::ObjectId</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Double</span>) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">read_f64</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::String</span>) =&gt; <span class="ident">read_string</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>).<span class="ident">map</span>(<span class="ident">Bson::String</span>)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::EmbeddedDocument</span>) =&gt; <span class="ident">Document::from_reader</span>(<span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Bson::Document</span>)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Array</span>) =&gt; <span class="ident">deserialize_array</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>).<span class="ident">map</span>(<span class="ident">Bson::Array</span>)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Binary</span>) =&gt; <span class="ident">Bson::Binary</span>(<span class="ident">Binary::from_reader</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::ObjectId</span>) =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">objid</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">12</span>];
             <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">objid</span> {
                 <span class="kw-2">*</span><span class="ident">x</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
             }
             <span class="ident">Bson::ObjectId</span>(<span class="ident">oid::ObjectId::from_bytes</span>(<span class="ident">objid</span>))
         }
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Boolean</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Boolean</span>(<span class="ident">read_bool</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Null</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Null</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::RegularExpression</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Boolean</span>) =&gt; <span class="ident">Bson::Boolean</span>(<span class="ident">read_bool</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Null</span>) =&gt; <span class="ident">Bson::Null</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::RegularExpression</span>) =&gt; {
             <span class="ident">Bson::RegularExpression</span>(<span class="ident">Regex::from_reader</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>)
         }
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::JavaScriptCode</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::JavaScriptCode</span>) =&gt; {
             <span class="ident">read_string</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>).<span class="ident">map</span>(<span class="ident">Bson::JavaScriptCode</span>)<span class="question-mark">?</span>
         }
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::JavaScriptCodeWithScope</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::JavaScriptCodeWithScope</span>) =&gt; {
             <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="ident">JavaScriptCodeWithScope::from_reader</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>)<span class="question-mark">?</span>)
         }
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Int32</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">read_i32</span>(<span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Bson::Int32</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Int64</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">read_i64</span>(<span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Bson::Int64</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Timestamp</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Timestamp</span>(<span class="ident">Timestamp::from_reader</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::DateTime</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Int32</span>) =&gt; <span class="ident">read_i32</span>(<span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Bson::Int32</span>)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Int64</span>) =&gt; <span class="ident">read_i64</span>(<span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Bson::Int64</span>)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Timestamp</span>) =&gt; <span class="ident">Bson::Timestamp</span>(<span class="ident">Timestamp::from_reader</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::DateTime</span>) =&gt; {
             <span class="comment">// The int64 is UTC milliseconds since the Unix epoch.</span>
             <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">read_i64</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
             <span class="ident">Bson::DateTime</span>(<span class="ident"><span class="kw">crate</span>::DateTime::from_millis</span>(<span class="ident">time</span>))
         }
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Symbol</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">read_string</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>).<span class="ident">map</span>(<span class="ident">Bson::Symbol</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Decimal128</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">read_f128</span>(<span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Bson::Decimal128</span>)<span class="question-mark">?</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Undefined</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Undefined</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::DbPointer</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::DbPointer</span>(<span class="ident">DbPointer::from_reader</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::MaxKey</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::MaxKey</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">ElementType::MinKey</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::MinKey</span>,
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Symbol</span>) =&gt; <span class="ident">read_string</span>(<span class="ident">reader</span>, <span class="ident">utf8_lossy</span>).<span class="ident">map</span>(<span class="ident">Bson::Symbol</span>)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Decimal128</span>) =&gt; <span class="ident">read_f128</span>(<span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Bson::Decimal128</span>)<span class="question-mark">?</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::Undefined</span>) =&gt; <span class="ident">Bson::Undefined</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::DbPointer</span>) =&gt; <span class="ident">Bson::DbPointer</span>(<span class="ident">DbPointer::from_reader</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::MaxKey</span>) =&gt; <span class="ident">Bson::MaxKey</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">ElementType::MinKey</span>) =&gt; <span class="ident">Bson::MinKey</span>,
+        <span class="prelude-val">None</span> =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnrecognizedDocumentElementType</span> {
                 <span class="ident">key</span>,
                 <span class="ident">element_type</span>: <span class="ident">tag</span>,
@@ -725,7 +725,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Binary</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="op">!</span>(<span class="number">0</span>..<span class="op">=</span><span class="ident">MAX_BSON_SIZE</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
@@ -741,7 +741,7 @@
         <span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>,
         <span class="kw-2">mut</span> <span class="ident">len</span>: <span class="ident">i32</span>,
         <span class="ident">subtype</span>: <span class="ident">BinarySubtype</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span>(<span class="number">0</span>..<span class="op">=</span><span class="ident">MAX_BSON_SIZE</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>) {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
                 <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>,
@@ -778,7 +778,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DbPointer</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ns</span> <span class="op">=</span> <span class="ident">read_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="ident">ObjectId::from_reader</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">DbPointer</span> {
@@ -789,7 +789,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Regex</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">pattern</span> <span class="op">=</span> <span class="ident">read_cstring</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">read_cstring</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
 
@@ -798,13 +798,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Timestamp</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">read_i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">Timestamp::from_le_i64</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ObjectId</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">12</span>];
         <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_bytes</span>(<span class="ident">buf</span>))
@@ -812,7 +812,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">JavaScriptCodeWithScope</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>, <span class="ident">utf8_lossy</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>, <span class="ident">utf8_lossy</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">length</span> <span class="op">&lt;</span> <span class="ident">MIN_CODE_WITH_SCOPE_SIZE</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
@@ -841,7 +841,7 @@
 }
 
 <span class="doccomment">/// Decode a BSON `Value` into a `T` Deserializable.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bson</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">bson</span>: <span class="ident">Bson</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bson</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">bson</span>: <span class="ident">Bson</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">DeserializeOwned</span>,
 {
@@ -850,14 +850,14 @@
 }
 
 <span class="doccomment">/// Decode a BSON `Document` into a `T` Deserializable.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_document</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">doc</span>: <span class="ident">Document</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_document</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">doc</span>: <span class="ident">Document</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">DeserializeOwned</span>,
 {
     <span class="ident">from_bson</span>(<span class="ident">Bson::Document</span>(<span class="ident">doc</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">reader_to_vec</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">reader_to_vec</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
 
     <span class="kw">if</span> <span class="ident">length</span> <span class="op">&lt;</span> <span class="ident">MIN_BSON_DOCUMENT_SIZE</span> {
@@ -872,7 +872,7 @@
 }
 
 <span class="doccomment">/// Deserialize an instance of type `T` from an I/O stream of BSON.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_reader</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">DeserializeOwned</span>,
     <span class="ident">R</span>: <span class="ident">Read</span>,
@@ -887,7 +887,7 @@
 <span class="doccomment">/// This is mainly useful when reading raw BSON returned from a MongoDB server, which</span>
 <span class="doccomment">/// in rare cases can contain invalidly truncated strings (&lt;https://jira.mongodb.org/browse/SERVER-24007&gt;).</span>
 <span class="doccomment">/// For most use cases, [`crate::from_reader`] can be used instead.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_reader_utf8_lossy</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_reader_utf8_lossy</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">DeserializeOwned</span>,
     <span class="ident">R</span>: <span class="ident">Read</span>,
@@ -897,7 +897,7 @@
 }
 
 <span class="doccomment">/// Deserialize an instance of type `T` from a slice of BSON bytes.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
 {
@@ -911,7 +911,7 @@
 <span class="doccomment">/// This is mainly useful when reading raw BSON returned from a MongoDB server, which</span>
 <span class="doccomment">/// in rare cases can contain invalidly truncated strings (&lt;https://jira.mongodb.org/browse/SERVER-24007&gt;).</span>
 <span class="doccomment">/// For most use cases, [`crate::from_slice`] can be used instead.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice_utf8_lossy</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice_utf8_lossy</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
 {

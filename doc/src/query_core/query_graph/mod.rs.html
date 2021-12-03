@@ -855,6 +855,7 @@
 <span id="855">855</span>
 <span id="856">856</span>
 <span id="857">857</span>
+<span id="858">858</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">mod</span> <span class="ident">formatters</span>;
 <span class="kw">mod</span> <span class="ident">guard</span>;
@@ -875,6 +876,7 @@
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">QueryGraphResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">QueryGraphError</span><span class="op">&gt;</span>;
 
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Node</span> {
     <span class="doccomment">/// Nodes representing actual queries to the underlying connector.</span>
     <span class="ident">Query</span>(<span class="ident">Query</span>),
@@ -892,13 +894,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Node</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">q</span>: <span class="ident">Query</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Node</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">q</span>: <span class="ident">Query</span>) -&gt; <span class="ident">Node</span> {
         <span class="ident">Node::Query</span>(<span class="ident">q</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Flow</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Node</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">Flow</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Node</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">Flow</span>) -&gt; <span class="ident">Node</span> {
         <span class="ident">Node::Flow</span>(<span class="ident">f</span>)
     }
 }
@@ -906,14 +908,14 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Flow</span> {
     <span class="doccomment">/// Expresses a conditional control flow in the graph.</span>
     <span class="doccomment">/// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.</span>
-    <span class="ident">If</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>),
+    <span class="ident">If</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">bool</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>),
 
     <span class="doccomment">/// Returns a fixed set of record projections.</span>
     <span class="ident">Return</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Flow</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_if</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_if</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::If</span>(<span class="ident">Box::new</span>(<span class="op">|</span><span class="op">|</span> <span class="bool-val">true</span>))
     }
 }
@@ -924,7 +926,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Computation</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_diff</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_diff</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Diff</span>(<span class="ident">DiffNode</span> {
             <span class="ident">left</span>: <span class="ident">HashSet::new</span>(),
             <span class="ident">right</span>: <span class="ident">HashSet::new</span>(),
@@ -944,7 +946,7 @@
 
 <span class="kw">impl</span> <span class="ident">NodeRef</span> {
     <span class="doccomment">/// Returns the unique identifier of the Node.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">node_ix</span>.<span class="ident">index</span>().<span class="ident">to_string</span>()
     }
 }
@@ -956,16 +958,16 @@
 
 <span class="kw">impl</span> <span class="ident">EdgeRef</span> {
     <span class="doccomment">/// Returns the unique identifier of the Edge.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">edge_ix</span>.<span class="ident">index</span>().<span class="ident">to_string</span>()
     }
 }
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ParentProjectionFn</span> <span class="op">=</span>
-    <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>(<span class="ident">Node</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+    <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>(<span class="ident">Node</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ParentResultFn</span> <span class="op">=</span>
-    <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>(<span class="ident">Node</span>, <span class="kw-2">&amp;</span><span class="ident">ExpressionResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+    <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>(<span class="ident">Node</span>, <span class="kw-2">&amp;</span><span class="ident">ExpressionResult</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,</span>
 <span class="doccomment">/// expressing for example the need for additional information from the parent to be able to execute at runtime.</span>
@@ -1040,7 +1042,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">QueryGraph</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;QueryGraph&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;graph&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;InnerGraph&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;result_nodes&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">result_nodes</span>)
@@ -1056,16 +1058,16 @@
 <span class="kw">type</span> <span class="ident">InnerGraph</span> <span class="op">=</span> <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">Guard</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span>, <span class="ident">Guard</span><span class="op">&lt;</span><span class="ident">QueryGraphDependency</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="kw">impl</span> <span class="ident">QueryGraph</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">graph</span>: <span class="ident">InnerGraph::new</span>(),
             ..<span class="ident">Default::default</span>()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">QueryGraph</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">QueryGraph</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">QueryGraph</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">QueryGraph</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">graph</span> <span class="op">=</span> <span class="ident">QueryGraph::new</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">graph</span>)<span class="question-mark">?</span>;
@@ -1073,7 +1075,7 @@
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">finalized</span> {
             <span class="self">self</span>.<span class="ident">swap_marked</span>()<span class="question-mark">?</span>;
             <span class="self">self</span>.<span class="ident">ensure_return_nodes_have_parent_dependency</span>()<span class="question-mark">?</span>;
@@ -1087,7 +1089,7 @@
 
     <span class="doccomment">/// Returns a NodeRef to the result node that occurs in the subtree, if it exists.</span>
     <span class="doccomment">/// Returns None if no such node is found.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_result_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">starting_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_result_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">starting_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_result_node</span>(<span class="ident">starting_node</span>) {
             <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">starting_node</span>)
         } <span class="kw">else</span> {
@@ -1095,7 +1097,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">result_nodes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">result_nodes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">result_nodes</span>
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">node_ix</span><span class="op">|</span> <span class="ident">NodeRef</span> { <span class="ident">node_ix</span>: <span class="kw-2">*</span><span class="ident">node_ix</span> })
@@ -1115,12 +1117,12 @@
     }
 
     <span class="doccomment">/// Checks if the given node is marked as one of the result nodes in the graph.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_result_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">result_nodes</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">rn</span><span class="op">|</span> <span class="ident">rn</span>.<span class="ident">index</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">node</span>.<span class="ident">node_ix</span>.<span class="ident">index</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_result_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">result_nodes</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">rn</span><span class="op">|</span> <span class="ident">rn</span>.<span class="ident">index</span>() <span class="op">==</span> <span class="ident">node</span>.<span class="ident">node_ix</span>.<span class="ident">index</span>())
     }
 
     <span class="doccomment">/// Checks if the subgraph starting at the given node contains the node designated as the overall result.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subgraph_contains_result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subgraph_contains_result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_result_node</span>(<span class="ident">node</span>) {
             <span class="bool-val">true</span>
         } <span class="kw">else</span> {
@@ -1133,7 +1135,7 @@
 
     <span class="doccomment">/// Returns all root nodes of the graph.</span>
     <span class="doccomment">/// A root node is defined by having no incoming edges.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root_nodes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root_nodes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">graph</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">borrow</span>();
 
         <span class="ident">graph</span>
@@ -1150,7 +1152,7 @@
 
     <span class="doccomment">/// Creates a node with content `t` and adds it to the graph.</span>
     <span class="doccomment">/// Returns a `NodeRef` to the newly added node.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NodeRef</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) -&gt; <span class="ident">NodeRef</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span>,
     {
@@ -1168,7 +1170,7 @@
         <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
         <span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
         <span class="ident">content</span>: <span class="ident">QueryGraphDependency</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphResult</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">edge_ix</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">add_edge</span>(<span class="ident">from</span>.<span class="ident">node_ix</span>, <span class="ident">to</span>.<span class="ident">node_ix</span>, <span class="ident">Guard::new</span>(<span class="ident">content</span>));
         <span class="kw">let</span> <span class="ident">edge</span> <span class="op">=</span> <span class="ident">EdgeRef</span> { <span class="ident">edge_ix</span> };
 
@@ -1181,57 +1183,57 @@
     }
 
     <span class="doccomment">/// If true, the graph should be executed inside of a transaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">needs_transaction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">needs_transaction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">needs_transaction</span>
     }
 
     <span class="doccomment">/// Returns a reference to the content of `node`, if the content is still present.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Node</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Node</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">node_weight</span>(<span class="ident">node</span>.<span class="ident">node_ix</span>).<span class="ident">unwrap</span>().<span class="ident">borrow</span>()
     }
 
     <span class="doccomment">/// Returns a reference to the content of `edge`, if the content is still present.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">QueryGraphDependency</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">QueryGraphDependency</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">edge_weight</span>(<span class="ident">edge</span>.<span class="ident">edge_ix</span>).<span class="ident">unwrap</span>().<span class="ident">borrow</span>()
     }
 
     <span class="doccomment">/// Returns the node from where `edge` originates (e.g. source).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NodeRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) -&gt; <span class="ident">NodeRef</span> {
         <span class="kw">let</span> (<span class="ident">node_ix</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">edge_endpoints</span>(<span class="ident">edge</span>.<span class="ident">edge_ix</span>).<span class="ident">unwrap</span>();
         <span class="ident">NodeRef</span> { <span class="ident">node_ix</span> }
     }
 
     <span class="doccomment">/// Returns the node to which `edge` points (e.g. target).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NodeRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) -&gt; <span class="ident">NodeRef</span> {
         <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">node_ix</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">edge_endpoints</span>(<span class="ident">edge</span>.<span class="ident">edge_ix</span>).<span class="ident">unwrap</span>();
         <span class="ident">NodeRef</span> { <span class="ident">node_ix</span> }
     }
 
     <span class="doccomment">/// Returns all edges originating from= `node` (e.g. outgoing edges).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">outgoing_edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">outgoing_edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">collect_edges</span>(<span class="ident">node</span>, <span class="ident">Direction::Outgoing</span>)
     }
 
     <span class="doccomment">/// Returns all edges pointing to `node` (e.g. incoming edges).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">collect_edges</span>(<span class="ident">node</span>, <span class="ident">Direction::Incoming</span>)
     }
 
     <span class="doccomment">/// Removes the edge from the graph but leaves the graph intact by keeping the empty</span>
     <span class="doccomment">/// edge in the graph by plucking the content of the edge, but not the edge itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pluck_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphDependency</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pluck_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) -&gt; <span class="ident">QueryGraphDependency</span> {
         <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">edge_weight_mut</span>(<span class="ident">edge</span>.<span class="ident">edge_ix</span>).<span class="ident">unwrap</span>().<span class="ident">unset</span>()
     }
 
     <span class="doccomment">/// Removes the node from the graph but leaves the graph intact by keeping the empty</span>
     <span class="doccomment">/// node in the graph by plucking the content of the node, but not the node itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pluck_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Node</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pluck_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">Node</span> {
         <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">node_weight_mut</span>(<span class="ident">node</span>.<span class="ident">node_ix</span>).<span class="ident">unwrap</span>().<span class="ident">unset</span>()
     }
 
     <span class="doccomment">/// Completely removes the edge from the graph, returning it&#39;s content.</span>
     <span class="doccomment">/// This operation is destructive on the underlying graph and invalidates references.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">EdgeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QueryGraphDependency</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">EdgeRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QueryGraphDependency</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">remove_edge</span>(<span class="ident">edge</span>.<span class="ident">edge_ix</span>).<span class="ident">unwrap</span>().<span class="ident">into_inner</span>()
     }
 
@@ -1240,7 +1242,7 @@
     <span class="doccomment">/// Criteria for a direct child (either):</span>
     <span class="doccomment">/// - Every node that only has `parent` as their parent.</span>
     <span class="doccomment">/// - In case of multiple parents, _all_ parents have already been visited before.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_direct_child</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">parent</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>, <span class="ident">child</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_direct_child</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">parent</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>, <span class="ident">child</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">incoming_edges</span>(<span class="ident">child</span>).<span class="ident">into_iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">other_parent</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_source</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>);
 
@@ -1254,7 +1256,7 @@
 
     <span class="doccomment">/// Returns a list of child nodes, together with their child edge for the given `node`.</span>
     <span class="doccomment">/// The list contains all children reachable by outgoing edges of `node`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">child_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">child_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">outgoing_edges</span>(<span class="ident">node</span>)
             .<span class="ident">into_iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
@@ -1266,7 +1268,7 @@
 
     <span class="doccomment">/// Returns all direct child pairs of `node`.</span>
     <span class="doccomment">/// See `is_direct_child` for exact definition of what a direct child encompasses.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_child_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_child_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">outgoing_edges</span>(<span class="ident">node</span>)
             .<span class="ident">into_iter</span>()
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
@@ -1282,7 +1284,7 @@
     }
 
     <span class="doccomment">/// Resolves and adds all source `NodeRef`s to the respective `EdgeRef`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zip_source_nodes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zip_source_nodes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span> {
         <span class="ident">edges</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
@@ -1293,7 +1295,7 @@
     }
 
     <span class="doccomment">/// Internal utility function to collect all edges of defined direction directed to, or originating from, `node`.</span>
-    <span class="kw">fn</span> <span class="ident">collect_edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>, <span class="ident">direction</span>: <span class="ident">Direction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">collect_edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>, <span class="ident">direction</span>: <span class="ident">Direction</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edges</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">graph</span>
             .<span class="ident">edges_directed</span>(<span class="ident">node</span>.<span class="ident">node_ix</span>, <span class="ident">direction</span>)
@@ -1376,7 +1378,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// [DTODO] put if flow exception illustration here.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">swap_marked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">swap_marked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">marked_node_pairs</span>.<span class="ident">is_empty</span>() {
             <span class="macro">trace!</span>(<span class="string">&quot;[Graph][Swap] Before shape: {}&quot;</span>, <span class="self">self</span>);
         }
@@ -1395,7 +1397,7 @@
                     .<span class="ident">expect</span>(<span class="string">&quot;Expected marked nodes to be non-empty.&quot;</span>)
                 {
                     <span class="comment">// Exception rule: Only swap `Then` and `Else` edges.</span>
-                    <span class="ident">Node::Flow</span>(<span class="ident">Flow::If</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">Node::Flow</span>(<span class="ident">Flow::If</span>(<span class="kw">_</span>)) =&gt; {
                         <span class="kw">if</span> <span class="macro">matches!</span>(
                             <span class="self">self</span>.<span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="ident">parent_edge</span>),
                             <span class="prelude-val">Some</span>(<span class="ident">QueryGraphDependency::Then</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">QueryGraphDependency::Else</span>)
@@ -1408,7 +1410,7 @@
                         }
                     }
 
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; {
                         <span class="macro">trace!</span>(
                             <span class="string">&quot;[Graph][Swap] Connecting parent of parent {} with child {}&quot;</span>,
                             <span class="ident">parent_of_parent_node</span>.<span class="ident">id</span>(),
@@ -1473,7 +1475,7 @@
     <span class="doccomment">///      └ ─ ─ ─ ─ ─ ─</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">normalize_if_nodes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">normalize_if_nodes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">node_ix</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">node_indices</span>() {
             <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">NodeRef</span> { <span class="ident">node_ix</span> };
 
@@ -1516,7 +1518,7 @@
     <span class="doccomment">/// In case the parent nodes of return nodes do not have a field selection that fullfils the new dependency,</span>
     <span class="doccomment">/// a reload node will be inserted in between the parent and the return node by the `insert_reloads` method.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">ensure_return_nodes_have_parent_dependency</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">ensure_return_nodes_have_parent_dependency</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">return_nodes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">graph</span>
             .<span class="ident">node_indices</span>()
@@ -1524,8 +1526,8 @@
                 <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">NodeRef</span> { <span class="ident">node_ix</span>: <span class="ident">ix</span> };
 
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">node_content</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>).<span class="ident">unwrap</span>() {
-                    <span class="ident">Node::Flow</span>(<span class="ident">Flow::Return</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="ident">Node::Flow</span>(<span class="ident">Flow::Return</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">node</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 }
             })
             .<span class="ident">collect</span>();
@@ -1535,10 +1537,10 @@
             <span class="kw">let</span> <span class="ident">dependencies</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelProjection</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">out_edges</span>
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>).<span class="ident">unwrap</span>() {
-                    <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="kw-2">ref</span> <span class="ident">requested_projection</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="kw-2">ref</span> <span class="ident">requested_projection</span>, <span class="kw">_</span>) =&gt; {
                         <span class="prelude-val">Some</span>(<span class="ident">requested_projection</span>.<span class="ident">clone</span>())
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 })
                 .<span class="ident">collect</span>();
             <span class="kw">let</span> <span class="ident">dependencies</span> <span class="op">=</span> <span class="ident">ModelProjection::union</span>(<span class="ident">dependencies</span>);
@@ -1628,7 +1630,7 @@
     <span class="doccomment">/// The `Reload` node is always a find many query.</span>
     <span class="doccomment">/// Unwraps are safe because we&#39;re operating on the unprocessed state of the graph (`Expressionista` changes that).</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">insert_reloads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">insert_reloads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">reloads</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">NodeRef</span>, <span class="ident">ModelRef</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelProjection</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">graph</span>
             .<span class="ident">node_indices</span>()
@@ -1642,7 +1644,7 @@
                         .<span class="ident">into_iter</span>()
                         .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>).<span class="ident">unwrap</span>() {
                             <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="kw-2">ref</span> <span class="ident">requested_projection</span>, <span class="kw">_</span>)
-                                <span class="kw">if</span> <span class="op">!</span><span class="ident">q</span>.<span class="ident">returns</span>(<span class="ident">requested_projection</span>) <span class="op">=</span><span class="op">&gt;</span>
+                                <span class="kw">if</span> <span class="op">!</span><span class="ident">q</span>.<span class="ident">returns</span>(<span class="ident">requested_projection</span>) =&gt;
                             {
                                 <span class="macro">trace!</span>(
                                     <span class="string">&quot;Query {:?} does not return requested projection {:?} and will be reloaded.&quot;</span>,
@@ -1651,7 +1653,7 @@
                                 );
                                 <span class="prelude-val">Some</span>(<span class="ident">requested_projection</span>.<span class="ident">clone</span>())
                             }
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                         })
                         .<span class="ident">collect</span>();
 

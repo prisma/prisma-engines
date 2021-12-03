@@ -109,12 +109,12 @@
 <span class="doccomment">/// `registry` feature is disabled.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
 <span class="kw">mod</span> <span class="ident">has_plf_stubs</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_plf_downcast_marker</span>(<span class="kw">_</span>: <span class="ident">core::any::TypeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_plf_downcast_marker</span>(<span class="kw">_</span>: <span class="ident">core::any::TypeId</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
 
     <span class="doccomment">/// Does a type implementing `Subscriber` contain any per-layer filters?</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">subscriber_has_plf</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">subscriber_has_plf</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) -&gt; <span class="ident">bool</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">tracing_core::Subscriber</span>,
     {
@@ -122,7 +122,7 @@
     }
 
     <span class="doccomment">/// Does a type implementing `Layer` contain any per-layer filters?</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">layer_has_plf</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">L</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">layer_has_plf</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">L</span>) -&gt; <span class="ident">bool</span>
     <span class="kw">where</span>
         <span class="ident">L</span>: <span class="ident"><span class="kw">crate</span>::Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
         <span class="ident">S</span>: <span class="ident">tracing_core::Subscriber</span>,

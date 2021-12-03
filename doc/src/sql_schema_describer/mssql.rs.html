@@ -870,18 +870,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">SqlSchemaDescriber</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">SqlSchemaDescriber</span><span class="op">&gt;</span>()).<span class="ident">finish</span>()
     }
 }
 
 <span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDescriberBackend</span> <span class="kw">for</span> <span class="ident">SqlSchemaDescriber</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_databases</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_databases</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">get_databases</span>().<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">SqlMetadata</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">SqlMetadata</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">table_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_table_names</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">size_in_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_size</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -892,7 +892,7 @@
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_all_columns</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indexes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_all_indices</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">foreign_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_foreign_keys</span>(<span class="ident">schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -920,7 +920,7 @@
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">version</span>().<span class="kw">await</span><span class="question-mark">?</span>)
     }
 }
@@ -928,12 +928,12 @@
 <span class="kw">impl</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">SqlSchemaDescriber</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SqlSchemaDescriber</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">Queryable</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">Queryable</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">conn</span> }
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_databases</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_databases</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;SELECT name FROM sys.schemas&quot;</span>;
         <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -945,7 +945,7 @@
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_procedures</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Procedure</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_procedures</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Procedure</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">r#&quot;
             SELECT name, OBJECT_DEFINITION(object_id) AS definition
             FROM sys.objects
@@ -968,7 +968,7 @@
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_table_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_table_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="string">r#&quot;
             SELECT t.name AS table_name
             FROM sys.tables t
@@ -991,7 +991,7 @@
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">r#&quot;
             SELECT
                 SUM(a.total_pages) * 8000 AS size
@@ -1027,7 +1027,7 @@
         <span class="ident">columns</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">indexes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, (<span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Index</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKey</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
         <span class="ident">foreign_keys</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ForeignKey</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Table</span> {
+    ) -&gt; <span class="ident">Table</span> {
         <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">remove</span>(<span class="ident">name</span>).<span class="ident">unwrap_or_default</span>();
         <span class="kw">let</span> (<span class="ident">indices</span>, <span class="ident">primary_key</span>) <span class="op">=</span> <span class="ident">indexes</span>.<span class="ident">remove</span>(<span class="ident">name</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> (<span class="ident">BTreeMap::new</span>(), <span class="prelude-val">None</span>));
 
@@ -1042,7 +1042,7 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_all_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_all_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">r#&quot;
             SELECT c.name                                                       AS column_name,
                 CASE typ.is_assembly_type
@@ -1103,12 +1103,12 @@
             <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">entry</span>(<span class="ident">table_name</span>).<span class="ident">or_insert_with</span>(<span class="ident">Vec::new</span>);
 
             <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">col</span>.<span class="ident">get</span>(<span class="string">&quot;column_default&quot;</span>) {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">param_value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">param_value</span>.<span class="ident">to_string</span>() {
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;(NULL)&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">DEFAULT_SHARED_CONSTRAINT</span>.<span class="ident">is_match</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">default_string</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">param_value</span>) =&gt; <span class="kw">match</span> <span class="ident">param_value</span>.<span class="ident">to_string</span>() {
+                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">&quot;(NULL)&quot;</span> =&gt; <span class="prelude-val">None</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">DEFAULT_SHARED_CONSTRAINT</span>.<span class="ident">is_match</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>) =&gt; <span class="prelude-val">None</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">default_string</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">default_string</span> <span class="op">=</span> <span class="ident">DEFAULT_NON_STRING</span>
                             .<span class="ident">captures_iter</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>)
                             .<span class="ident">next</span>()
@@ -1119,38 +1119,38 @@
                             .<span class="ident">unwrap</span>();
 
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">default</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tpe</span>.<span class="ident">family</span> {
-                            <span class="ident">ColumnTypeFamily::Int</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_int</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
-                                <span class="prelude-val">Some</span>(<span class="ident">int_value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::value</span>(<span class="ident">int_value</span>),
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                            <span class="ident">ColumnTypeFamily::Int</span> =&gt; <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_int</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
+                                <span class="prelude-val">Some</span>(<span class="ident">int_value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">int_value</span>),
+                                <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
                             },
-                            <span class="ident">ColumnTypeFamily::BigInt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_big_int</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
-                                <span class="prelude-val">Some</span>(<span class="ident">int_value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::value</span>(<span class="ident">int_value</span>),
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                            <span class="ident">ColumnTypeFamily::BigInt</span> =&gt; <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_big_int</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
+                                <span class="prelude-val">Some</span>(<span class="ident">int_value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">int_value</span>),
+                                <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
                             },
-                            <span class="ident">ColumnTypeFamily::Float</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_float</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
-                                <span class="prelude-val">Some</span>(<span class="ident">float_value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::value</span>(<span class="ident">float_value</span>),
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                            <span class="ident">ColumnTypeFamily::Float</span> =&gt; <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_float</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
+                                <span class="prelude-val">Some</span>(<span class="ident">float_value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">float_value</span>),
+                                <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
                             },
-                            <span class="ident">ColumnTypeFamily::Decimal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_float</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
-                                <span class="prelude-val">Some</span>(<span class="ident">float_value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::value</span>(<span class="ident">float_value</span>),
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                            <span class="ident">ColumnTypeFamily::Decimal</span> =&gt; <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_float</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
+                                <span class="prelude-val">Some</span>(<span class="ident">float_value</span>) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">float_value</span>),
+                                <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
                             },
-                            <span class="ident">ColumnTypeFamily::Boolean</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_int</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
-                                <span class="prelude-val">Some</span>(<span class="ident">PrismaValue::Int</span>(<span class="number">1</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::value</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="bool-val">true</span>)),
-                                <span class="prelude-val">Some</span>(<span class="ident">PrismaValue::Int</span>(<span class="number">0</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::value</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="bool-val">false</span>)),
-                                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                            <span class="ident">ColumnTypeFamily::Boolean</span> =&gt; <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_int</span>(<span class="kw-2">&amp;</span><span class="ident">default_string</span>) {
+                                <span class="prelude-val">Some</span>(<span class="ident">PrismaValue::Int</span>(<span class="number">1</span>)) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="bool-val">true</span>)),
+                                <span class="prelude-val">Some</span>(<span class="ident">PrismaValue::Int</span>(<span class="number">0</span>)) =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="bool-val">false</span>)),
+                                <span class="kw">_</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
                             },
-                            <span class="ident">ColumnTypeFamily::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::value</span>(<span class="ident">default_string</span>.<span class="ident">replace</span>(<span class="string">&quot;&#39;&#39;&quot;</span>, <span class="string">&quot;&#39;&quot;</span>)),
+                            <span class="ident">ColumnTypeFamily::String</span> =&gt; <span class="ident">DefaultValue::value</span>(<span class="ident">default_string</span>.<span class="ident">replace</span>(<span class="string">&quot;&#39;&#39;&quot;</span>, <span class="string">&quot;&#39;&quot;</span>)),
                             <span class="comment">//todo check other now() definitions</span>
-                            <span class="ident">ColumnTypeFamily::DateTime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">default_string</span>.<span class="ident">as_str</span>() {
-                                <span class="string">&quot;getdate()&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::now</span>(),
-                                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                            <span class="ident">ColumnTypeFamily::DateTime</span> =&gt; <span class="kw">match</span> <span class="ident">default_string</span>.<span class="ident">as_str</span>() {
+                                <span class="string">&quot;getdate()&quot;</span> =&gt; <span class="ident">DefaultValue::now</span>(),
+                                <span class="kw">_</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
                             },
-                            <span class="ident">ColumnTypeFamily::Binary</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
-                            <span class="ident">ColumnTypeFamily::Json</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
-                            <span class="ident">ColumnTypeFamily::Uuid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
-                            <span class="ident">ColumnTypeFamily::Unsupported</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
-                            <span class="ident">ColumnTypeFamily::Enum</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;No enums in MSSQL&quot;</span>),
+                            <span class="ident">ColumnTypeFamily::Binary</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                            <span class="ident">ColumnTypeFamily::Json</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                            <span class="ident">ColumnTypeFamily::Uuid</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                            <span class="ident">ColumnTypeFamily::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>),
+                            <span class="ident">ColumnTypeFamily::Enum</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No enums in MSSQL&quot;</span>),
                         };
 
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">col</span>.<span class="ident">get_string</span>(<span class="string">&quot;constraint_name&quot;</span>) {
@@ -1176,7 +1176,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_all_indices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, (<span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Index</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKey</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, (<span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Index</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKey</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indexes_with_expressions</span>: <span class="ident">HashSet</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
 
@@ -1219,12 +1219,12 @@
             <span class="kw">let</span> <span class="ident">index_name</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_string</span>(<span class="string">&quot;index_name&quot;</span>);
 
             <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;is_descending&quot;</span>) {
-                <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SQLSortOrder::Desc</span>,
-                <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SQLSortOrder::Asc</span>,
+                <span class="bool-val">true</span> =&gt; <span class="ident">SQLSortOrder::Desc</span>,
+                <span class="bool-val">false</span> =&gt; <span class="ident">SQLSortOrder::Asc</span>,
             };
 
             <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;column_name&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_string</span>()) {
-                <span class="prelude-val">Some</span>(<span class="ident">column_name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">column_name</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">seq_in_index</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;seq_in_index&quot;</span>);
                     <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">seq_in_index</span> <span class="op">-</span> <span class="number">1</span>;
                     <span class="kw">let</span> <span class="ident">is_unique</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_expect_bool</span>(<span class="string">&quot;is_unique&quot;</span>);
@@ -1241,7 +1241,7 @@
                         <span class="macro">debug!</span>(<span class="string">&quot;Column &#39;{}&#39; is part of the primary key&quot;</span>, <span class="ident">column_name</span>);
 
                         <span class="kw">match</span> <span class="ident">primary_key</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">pk</span>) =&gt; {
                                 <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">&lt;</span> (<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span> {
                                     <span class="ident">pk</span>.<span class="ident">columns</span>.<span class="ident">resize</span>((<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">PrimaryKeyColumn::default</span>());
                                 }
@@ -1254,7 +1254,7 @@
                                     <span class="ident">pk</span>.<span class="ident">columns</span>
                                 );
                             }
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">None</span> =&gt; {
                                 <span class="macro">debug!</span>(<span class="string">&quot;Instantiating primary key&quot;</span>);
 
                                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">PrimaryKeyColumn::new</span>(<span class="ident">column_name</span>);
@@ -1284,15 +1284,15 @@
                                 <span class="ident">name</span>: <span class="ident">index_name</span>,
                                 <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">column</span>],
                                 <span class="ident">tpe</span>: <span class="kw">match</span> <span class="ident">is_unique</span> {
-                                    <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Unique</span>,
-                                    <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">IndexType::Normal</span>,
+                                    <span class="bool-val">true</span> =&gt; <span class="ident">IndexType::Unique</span>,
+                                    <span class="bool-val">false</span> =&gt; <span class="ident">IndexType::Normal</span>,
                                 },
                                 <span class="ident">algorithm</span>: <span class="prelude-val">None</span>,
                             },
                         );
                     }
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="ident">indexes_with_expressions</span>.<span class="ident">insert</span>((<span class="ident">table_name</span>, <span class="ident">index_name</span>));
                 }
             }
@@ -1300,7 +1300,7 @@
 
         <span class="kw">for</span> (<span class="ident">table</span>, (<span class="ident">index_map</span>, <span class="kw">_</span>)) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">map</span> {
             <span class="kw">for</span> (<span class="ident">tble</span>, <span class="ident">index_name</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">indexes_with_expressions</span> {
-                <span class="kw">if</span> <span class="ident">tble</span> <span class="op">=</span><span class="op">=</span> <span class="ident">table</span> {
+                <span class="kw">if</span> <span class="ident">tble</span> <span class="op">==</span> <span class="ident">table</span> {
                     <span class="ident">index_map</span>.<span class="ident">remove</span>(<span class="ident">index_name</span>);
                 }
             }
@@ -1310,7 +1310,7 @@
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_views</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">View</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_views</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">View</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">r#&quot;
             SELECT name AS view_name, OBJECT_DEFINITION(object_id) AS view_sql
             FROM sys.views
@@ -1331,7 +1331,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">views</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_defined_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UserDefinedType</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_defined_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UserDefinedType</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">r#&quot;
             SELECT
                 udt.name AS user_type_name,
@@ -1378,10 +1378,10 @@
                 <span class="kw">let</span> <span class="ident">definition</span> <span class="op">=</span> <span class="ident">row</span>
                     .<span class="ident">get_string</span>(<span class="string">&quot;system_type_name&quot;</span>)
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="kw">match</span> (<span class="ident">max_length</span>, <span class="ident">precision</span>, <span class="ident">scale</span>) {
-                        (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}(max)&quot;</span>, <span class="ident">name</span>),
-                        (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}({})&quot;</span>, <span class="ident">name</span>, <span class="ident">len</span>),
-                        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">p</span>), <span class="prelude-val">Some</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}({},{})&quot;</span>, <span class="ident">name</span>, <span class="ident">p</span>, <span class="ident">s</span>),
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">name</span>,
+                        (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}(max)&quot;</span>, <span class="ident">name</span>),
+                        (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}({})&quot;</span>, <span class="ident">name</span>, <span class="ident">len</span>),
+                        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">p</span>), <span class="prelude-val">Some</span>(<span class="ident">s</span>)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}({},{})&quot;</span>, <span class="ident">name</span>, <span class="ident">p</span>, <span class="ident">s</span>),
+                        <span class="kw">_</span> =&gt; <span class="ident">name</span>,
                     });
 
                 <span class="ident">UserDefinedType</span> { <span class="ident">name</span>, <span class="ident">definition</span> }
@@ -1391,7 +1391,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">types</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ForeignKey</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">DescriberResult</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ForeignKey</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Foreign keys covering multiple columns will return multiple rows, which we need to</span>
         <span class="comment">// merge.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ForeignKey</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
@@ -1448,25 +1448,25 @@
             }
 
             <span class="kw">let</span> <span class="ident">on_delete_action</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;delete_referential_action&quot;</span>) {
-                <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ForeignKeyAction::NoAction</span>,
-                <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ForeignKeyAction::Cascade</span>,
-                <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ForeignKeyAction::SetNull</span>,
-                <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ForeignKeyAction::SetDefault</span>,
-                <span class="ident">s</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unrecognized on delete action &#39;{}&#39;&quot;</span>, <span class="ident">s</span>),
+                <span class="number">0</span> =&gt; <span class="ident">ForeignKeyAction::NoAction</span>,
+                <span class="number">1</span> =&gt; <span class="ident">ForeignKeyAction::Cascade</span>,
+                <span class="number">2</span> =&gt; <span class="ident">ForeignKeyAction::SetNull</span>,
+                <span class="number">3</span> =&gt; <span class="ident">ForeignKeyAction::SetDefault</span>,
+                <span class="ident">s</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unrecognized on delete action &#39;{}&#39;&quot;</span>, <span class="ident">s</span>),
             };
 
             <span class="kw">let</span> <span class="ident">on_update_action</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get_expect_i64</span>(<span class="string">&quot;update_referential_action&quot;</span>) {
-                <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ForeignKeyAction::NoAction</span>,
-                <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ForeignKeyAction::Cascade</span>,
-                <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ForeignKeyAction::SetNull</span>,
-                <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ForeignKeyAction::SetDefault</span>,
-                <span class="ident">s</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unrecognized on delete action &#39;{}&#39;&quot;</span>, <span class="ident">s</span>),
+                <span class="number">0</span> =&gt; <span class="ident">ForeignKeyAction::NoAction</span>,
+                <span class="number">1</span> =&gt; <span class="ident">ForeignKeyAction::Cascade</span>,
+                <span class="number">2</span> =&gt; <span class="ident">ForeignKeyAction::SetNull</span>,
+                <span class="number">3</span> =&gt; <span class="ident">ForeignKeyAction::SetDefault</span>,
+                <span class="ident">s</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unrecognized on delete action &#39;{}&#39;&quot;</span>, <span class="ident">s</span>),
             };
 
             <span class="kw">let</span> <span class="ident">intermediate_fks</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">entry</span>(<span class="ident">table_name</span>).<span class="ident">or_default</span>();
 
             <span class="kw">match</span> <span class="ident">intermediate_fks</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">constraint_name</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">fk</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">fk</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">ord_pos</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>;
 
                     <span class="kw">if</span> <span class="ident">fk</span>.<span class="ident">columns</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">pos</span> {
@@ -1481,7 +1481,7 @@
 
                     <span class="ident">fk</span>.<span class="ident">referenced_columns</span>[<span class="ident">pos</span>] <span class="op">=</span> <span class="ident">referenced_column</span>;
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">fk</span> <span class="op">=</span> <span class="ident">ForeignKey</span> {
                         <span class="ident">constraint_name</span>: <span class="prelude-val">Some</span>(<span class="ident">constraint_name</span>.<span class="ident">clone</span>()),
                         <span class="ident">columns</span>: <span class="macro">vec!</span>[<span class="ident">column</span>],
@@ -1517,31 +1517,31 @@
         <span class="ident">numeric_precision</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
         <span class="ident">numeric_scale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
         <span class="ident">arity</span>: <span class="ident">ColumnArity</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnType</span> {
+    ) -&gt; <span class="ident">ColumnType</span> {
         <span class="kw">use</span> <span class="ident">ColumnTypeFamily</span>::<span class="kw-2">*</span>;
 
         <span class="comment">// TODO: can we achieve this more elegantly?</span>
         <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">data_type</span> {
-            <span class="string">&quot;numeric&quot;</span> <span class="op">|</span> <span class="string">&quot;decimal&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> (<span class="ident">numeric_precision</span>, <span class="ident">numeric_scale</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">p</span>), <span class="prelude-val">Some</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;({},{})&quot;</span>, <span class="ident">p</span>, <span class="ident">s</span>)),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;Unexpected params for a decimal field.&quot;</span>),
+            <span class="string">&quot;numeric&quot;</span> <span class="op">|</span> <span class="string">&quot;decimal&quot;</span> =&gt; <span class="kw">match</span> (<span class="ident">numeric_precision</span>, <span class="ident">numeric_scale</span>) {
+                (<span class="prelude-val">Some</span>(<span class="ident">p</span>), <span class="prelude-val">Some</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;({},{})&quot;</span>, <span class="ident">p</span>, <span class="ident">s</span>)),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unexpected params for a decimal field.&quot;</span>),
             },
-            <span class="string">&quot;float&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">numeric_precision</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, <span class="ident">p</span>)),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+            <span class="string">&quot;float&quot;</span> =&gt; <span class="kw">match</span> <span class="ident">numeric_precision</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, <span class="ident">p</span>)),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
             },
-            <span class="string">&quot;varchar&quot;</span> <span class="op">|</span> <span class="string">&quot;nvarchar&quot;</span> <span class="op">|</span> <span class="string">&quot;varbinary&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">character_maximum_length</span> {
-                <span class="prelude-val">Some</span>(<span class="op">-</span><span class="number">1</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="string">&quot;(max)&quot;</span>),
-                <span class="prelude-val">Some</span>(<span class="ident">length</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, <span class="ident">length</span>)),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+            <span class="string">&quot;varchar&quot;</span> <span class="op">|</span> <span class="string">&quot;nvarchar&quot;</span> <span class="op">|</span> <span class="string">&quot;varbinary&quot;</span> =&gt; <span class="kw">match</span> <span class="ident">character_maximum_length</span> {
+                <span class="prelude-val">Some</span>(<span class="op">-</span><span class="number">1</span>) =&gt; <span class="ident">Cow::from</span>(<span class="string">&quot;(max)&quot;</span>),
+                <span class="prelude-val">Some</span>(<span class="ident">length</span>) =&gt; <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, <span class="ident">length</span>)),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
             },
-            <span class="string">&quot;char&quot;</span> <span class="op">|</span> <span class="string">&quot;nchar&quot;</span> <span class="op">|</span> <span class="string">&quot;binary&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">character_maximum_length</span> {
-                <span class="prelude-val">Some</span>(<span class="op">-</span><span class="number">1</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;Cannot have a `max` variant for type `{}`&quot;</span>, <span class="ident">data_type</span>),
-                <span class="prelude-val">Some</span>(<span class="ident">length</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, <span class="ident">length</span>)),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+            <span class="string">&quot;char&quot;</span> <span class="op">|</span> <span class="string">&quot;nchar&quot;</span> <span class="op">|</span> <span class="string">&quot;binary&quot;</span> =&gt; <span class="kw">match</span> <span class="ident">character_maximum_length</span> {
+                <span class="prelude-val">Some</span>(<span class="op">-</span><span class="number">1</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Cannot have a `max` variant for type `{}`&quot;</span>, <span class="ident">data_type</span>),
+                <span class="prelude-val">Some</span>(<span class="ident">length</span>) =&gt; <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, <span class="ident">length</span>)),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
         };
 
         <span class="kw">let</span> <span class="ident">full_data_type</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">data_type</span>, <span class="ident">params</span>);
@@ -1551,43 +1551,43 @@
         <span class="kw">let</span> <span class="ident">unsupported_type</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">Unsupported</span>(<span class="ident">full_data_type</span>.<span class="ident">clone</span>()), <span class="prelude-val">None</span>);
 
         <span class="kw">let</span> (<span class="ident">family</span>, <span class="ident">native_type</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">data_type</span> {
-            <span class="string">&quot;tinyint&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::TinyInt</span>)),
-            <span class="string">&quot;smallint&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::SmallInt</span>)),
-            <span class="string">&quot;int&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Int</span>)),
-            <span class="string">&quot;bigint&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">BigInt</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::BigInt</span>)),
-            <span class="string">&quot;numeric&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> (<span class="ident">numeric_precision</span>, <span class="ident">numeric_scale</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">p</span>), <span class="prelude-val">Some</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Decimal</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>))))),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Decimal</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="number">18</span>, <span class="number">0</span>))))),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;Unexpected params for a numeric field.&quot;</span>),
+            <span class="string">&quot;tinyint&quot;</span> =&gt; (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::TinyInt</span>)),
+            <span class="string">&quot;smallint&quot;</span> =&gt; (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::SmallInt</span>)),
+            <span class="string">&quot;int&quot;</span> =&gt; (<span class="ident">Int</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Int</span>)),
+            <span class="string">&quot;bigint&quot;</span> =&gt; (<span class="ident">BigInt</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::BigInt</span>)),
+            <span class="string">&quot;numeric&quot;</span> =&gt; <span class="kw">match</span> (<span class="ident">numeric_precision</span>, <span class="ident">numeric_scale</span>) {
+                (<span class="prelude-val">Some</span>(<span class="ident">p</span>), <span class="prelude-val">Some</span>(<span class="ident">s</span>)) =&gt; (<span class="ident">Decimal</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>))))),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; (<span class="ident">Decimal</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="number">18</span>, <span class="number">0</span>))))),
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unexpected params for a numeric field.&quot;</span>),
             },
-            <span class="string">&quot;decimal&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> (<span class="ident">numeric_precision</span>, <span class="ident">numeric_scale</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">p</span>), <span class="prelude-val">Some</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Decimal</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>))))),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Decimal</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="number">18</span>, <span class="number">0</span>))))),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;Unexpected params for a decimal field.&quot;</span>),
+            <span class="string">&quot;decimal&quot;</span> =&gt; <span class="kw">match</span> (<span class="ident">numeric_precision</span>, <span class="ident">numeric_scale</span>) {
+                (<span class="prelude-val">Some</span>(<span class="ident">p</span>), <span class="prelude-val">Some</span>(<span class="ident">s</span>)) =&gt; (<span class="ident">Decimal</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>))))),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; (<span class="ident">Decimal</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="number">18</span>, <span class="number">0</span>))))),
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unexpected params for a decimal field.&quot;</span>),
             },
-            <span class="string">&quot;money&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Float</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Money</span>)),
-            <span class="string">&quot;smallmoney&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Float</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::SmallMoney</span>)),
-            <span class="string">&quot;bit&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Boolean</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Bit</span>)),
-            <span class="string">&quot;float&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Float</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Float</span>(<span class="ident">numeric_precision</span>))),
-            <span class="string">&quot;real&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Float</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Real</span>)),
-            <span class="string">&quot;date&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Date</span>)),
-            <span class="string">&quot;time&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Time</span>)),
-            <span class="string">&quot;datetime&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::DateTime</span>)),
-            <span class="string">&quot;datetime2&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::DateTime2</span>)),
-            <span class="string">&quot;datetimeoffset&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::DateTimeOffset</span>)),
-            <span class="string">&quot;smalldatetime&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::SmallDateTime</span>)),
-            <span class="string">&quot;char&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Char</span>(<span class="ident">casted_character_maximum_length</span>))),
-            <span class="string">&quot;nchar&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::NChar</span>(<span class="ident">casted_character_maximum_length</span>))),
-            <span class="string">&quot;varchar&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::VarChar</span>(<span class="ident">type_parameter</span>))),
-            <span class="string">&quot;text&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Text</span>)),
-            <span class="string">&quot;nvarchar&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::NVarChar</span>(<span class="ident">type_parameter</span>))),
-            <span class="string">&quot;ntext&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::NText</span>)),
-            <span class="string">&quot;binary&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Binary</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Binary</span>(<span class="ident">casted_character_maximum_length</span>))),
-            <span class="string">&quot;varbinary&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Binary</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::VarBinary</span>(<span class="ident">type_parameter</span>))),
-            <span class="string">&quot;image&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Binary</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Image</span>)),
-            <span class="string">&quot;xml&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Xml</span>)),
-            <span class="string">&quot;uniqueidentifier&quot;</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Uuid</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::UniqueIdentifier</span>)),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">unsupported_type</span>(),
+            <span class="string">&quot;money&quot;</span> =&gt; (<span class="ident">Float</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Money</span>)),
+            <span class="string">&quot;smallmoney&quot;</span> =&gt; (<span class="ident">Float</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::SmallMoney</span>)),
+            <span class="string">&quot;bit&quot;</span> =&gt; (<span class="ident">Boolean</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Bit</span>)),
+            <span class="string">&quot;float&quot;</span> =&gt; (<span class="ident">Float</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Float</span>(<span class="ident">numeric_precision</span>))),
+            <span class="string">&quot;real&quot;</span> =&gt; (<span class="ident">Float</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Real</span>)),
+            <span class="string">&quot;date&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Date</span>)),
+            <span class="string">&quot;time&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Time</span>)),
+            <span class="string">&quot;datetime&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::DateTime</span>)),
+            <span class="string">&quot;datetime2&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::DateTime2</span>)),
+            <span class="string">&quot;datetimeoffset&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::DateTimeOffset</span>)),
+            <span class="string">&quot;smalldatetime&quot;</span> =&gt; (<span class="ident">DateTime</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::SmallDateTime</span>)),
+            <span class="string">&quot;char&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Char</span>(<span class="ident">casted_character_maximum_length</span>))),
+            <span class="string">&quot;nchar&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::NChar</span>(<span class="ident">casted_character_maximum_length</span>))),
+            <span class="string">&quot;varchar&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::VarChar</span>(<span class="ident">type_parameter</span>))),
+            <span class="string">&quot;text&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Text</span>)),
+            <span class="string">&quot;nvarchar&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::NVarChar</span>(<span class="ident">type_parameter</span>))),
+            <span class="string">&quot;ntext&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::NText</span>)),
+            <span class="string">&quot;binary&quot;</span> =&gt; (<span class="ident">Binary</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Binary</span>(<span class="ident">casted_character_maximum_length</span>))),
+            <span class="string">&quot;varbinary&quot;</span> =&gt; (<span class="ident">Binary</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::VarBinary</span>(<span class="ident">type_parameter</span>))),
+            <span class="string">&quot;image&quot;</span> =&gt; (<span class="ident">Binary</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Image</span>)),
+            <span class="string">&quot;xml&quot;</span> =&gt; (<span class="ident">String</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::Xml</span>)),
+            <span class="string">&quot;uniqueidentifier&quot;</span> =&gt; (<span class="ident">Uuid</span>, <span class="prelude-val">Some</span>(<span class="ident">MsSqlType::UniqueIdentifier</span>)),
+            <span class="kw">_</span> =&gt; <span class="ident">unsupported_type</span>(),
         };
 
         <span class="ident">ColumnType</span> {
@@ -1599,11 +1599,11 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_type_parameter</span>(<span class="ident">character_maximum_length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MsSqlTypeParameter</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_type_parameter</span>(<span class="ident">character_maximum_length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MsSqlTypeParameter</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">character_maximum_length</span> {
-        <span class="prelude-val">Some</span>(<span class="op">-</span><span class="number">1</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MsSqlTypeParameter::Max</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">MsSqlTypeParameter::Number</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u16</span>)),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">Some</span>(<span class="op">-</span><span class="number">1</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">MsSqlTypeParameter::Max</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">MsSqlTypeParameter::Number</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u16</span>)),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 </code></pre></div>

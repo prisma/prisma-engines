@@ -190,7 +190,7 @@
 <span class="doccomment">/// Create module with CPUID bool code.</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">new</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">mod_name</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>:<span class="ident">tt</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">mod_name</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>:<span class="ident">tt</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span> ) =&gt; {
         <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">mod_name</span> {
             <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicU8</span>, <span class="ident">Ordering::Relaxed</span>};
 
@@ -204,10 +204,10 @@
             <span class="kw">impl</span> <span class="ident">InitToken</span> {
                 <span class="doccomment">/// Get initialized value</span>
                 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
                     <span class="comment">// CPUID is not available on SGX targets</span>
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_env</span> <span class="op">=</span> <span class="string">&quot;sgx&quot;</span>), <span class="ident">not</span>(<span class="ident">all</span>($(<span class="ident">target_feature</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>, )<span class="kw-2">*</span>))))]</span>
-                    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">STORAGE</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>) <span class="op">=</span><span class="op">=</span> <span class="number">1</span>;
+                    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">STORAGE</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>) <span class="op">==</span> <span class="number">1</span>;
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">target_env</span> <span class="op">=</span> <span class="string">&quot;sgx&quot;</span>, <span class="ident">not</span>(<span class="ident">all</span>($(<span class="ident">target_feature</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>, )<span class="kw-2">*</span>))))]</span>
                     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="bool-val">false</span>;
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>($(<span class="ident">target_feature</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>, )<span class="kw-2">*</span>))]</span>
@@ -219,7 +219,7 @@
             <span class="doccomment">/// Initialize underlying storage if needed and get</span>
             <span class="doccomment">/// stored value and initialization token.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_get</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">InitToken</span>, <span class="ident">bool</span>) {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_get</span>() -&gt; (<span class="ident">InitToken</span>, <span class="ident">bool</span>) {
                 <span class="comment">// CPUID is not available on SGX targets</span>
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_env</span> <span class="op">=</span> <span class="string">&quot;sgx&quot;</span>), <span class="ident">not</span>(<span class="ident">all</span>($(<span class="ident">target_feature</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>, )<span class="kw-2">*</span>))))]</span>
                 <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> {
@@ -230,7 +230,7 @@
 
                     <span class="comment">// Relaxed ordering is fine, as we only have a single atomic variable.</span>
                     <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">STORAGE</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>);
-                    <span class="kw">if</span> <span class="ident">val</span> <span class="op">=</span><span class="op">=</span> <span class="ident">UNINIT</span> {
+                    <span class="kw">if</span> <span class="ident">val</span> <span class="op">==</span> <span class="ident">UNINIT</span> {
                         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
                         <span class="kw">let</span> <span class="ident">cr</span> <span class="op">=</span> <span class="kw">unsafe</span> {
                             [<span class="ident">__cpuid</span>(<span class="number">1</span>), <span class="ident">__cpuid_count</span>(<span class="number">7</span>, <span class="number">0</span>)]
@@ -239,7 +239,7 @@
                         <span class="ident">STORAGE</span>.<span class="ident">store</span>(<span class="ident">res</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">Relaxed</span>);
                         <span class="ident">res</span>
                     } <span class="kw">else</span> {
-                        <span class="ident">val</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span>
+                        <span class="ident">val</span> <span class="op">==</span> <span class="number">1</span>
                     }
                 };
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">target_env</span> <span class="op">=</span> <span class="string">&quot;sgx&quot;</span>, <span class="ident">not</span>(<span class="ident">all</span>($(<span class="ident">target_feature</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">tf</span>, )<span class="kw-2">*</span>))))]</span>
@@ -253,14 +253,14 @@
             <span class="doccomment">/// Initialize underlying storage if needed and get</span>
             <span class="doccomment">/// initialization token.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InitToken</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() -&gt; <span class="ident">InitToken</span> {
                 <span class="ident">init_get</span>().<span class="number">0</span>
             }
 
             <span class="doccomment">/// Initialize underlying storage if needed and get</span>
             <span class="doccomment">/// stored value.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() -&gt; <span class="ident">bool</span> {
                 <span class="ident">init_get</span>().<span class="number">1</span>
             }
         }
@@ -269,12 +269,12 @@
 
 <span class="comment">// TODO: find how to define private macro usable inside a public one</span>
 <span class="macro">macro_rules!</span> <span class="ident">expand_check_macro</span> {
-    ($((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">reg</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>:<span class="ident">expr</span>)),<span class="op">*</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">reg</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>:<span class="ident">expr</span>)),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="attribute">#[<span class="ident">macro_export</span>]</span>
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
         <span class="macro">macro_rules!</span> <span class="ident">check</span> {
             $(
-                (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cr</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">=</span><span class="op">&gt;</span> { (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cr</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>].<span class="macro-nonterminal">$</span><span class="macro-nonterminal">reg</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) };
+                (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cr</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) =&gt; { (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cr</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>].<span class="macro-nonterminal">$</span><span class="macro-nonterminal">reg</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) };
             )<span class="op">*</span>
         }
     };

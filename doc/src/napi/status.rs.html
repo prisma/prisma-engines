@@ -133,68 +133,68 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Status</span> {
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span> {
+  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span> {
     <span class="kw">let</span> <span class="ident">status_string</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>);
     <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">status_string</span>)
   }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Status</span> {
-  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">code</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">code</span>: <span class="ident">i32</span>) -&gt; <span class="self">Self</span> {
     <span class="kw">match</span> <span class="ident">code</span> {
-      <span class="ident">sys::Status::napi_ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::Ok</span>,
-      <span class="ident">sys::Status::napi_invalid_arg</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::InvalidArg</span>,
-      <span class="ident">sys::Status::napi_object_expected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ObjectExpected</span>,
-      <span class="ident">sys::Status::napi_string_expected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::StringExpected</span>,
-      <span class="ident">sys::Status::napi_name_expected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::NameExpected</span>,
-      <span class="ident">sys::Status::napi_function_expected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::FunctionExpected</span>,
-      <span class="ident">sys::Status::napi_number_expected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::NumberExpected</span>,
-      <span class="ident">sys::Status::napi_boolean_expected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::BooleanExpected</span>,
-      <span class="ident">sys::Status::napi_array_expected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ArrayExpected</span>,
-      <span class="ident">sys::Status::napi_generic_failure</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::GenericFailure</span>,
-      <span class="ident">sys::Status::napi_pending_exception</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::PendingException</span>,
-      <span class="ident">sys::Status::napi_cancelled</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::Cancelled</span>,
-      <span class="ident">sys::Status::napi_escape_called_twice</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::EscapeCalledTwice</span>,
-      <span class="ident">sys::Status::napi_handle_scope_mismatch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::HandleScopeMismatch</span>,
-      <span class="ident">sys::Status::napi_callback_scope_mismatch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::CallbackScopeMismatch</span>,
-      <span class="ident">sys::Status::napi_queue_full</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::QueueFull</span>,
-      <span class="ident">sys::Status::napi_closing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::Closing</span>,
-      <span class="ident">sys::Status::napi_bigint_expected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::BigintExpected</span>,
-      <span class="ident">sys::Status::napi_date_expected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::DateExpected</span>,
-      <span class="ident">sys::Status::napi_arraybuffer_expected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::ArrayBufferExpected</span>,
-      <span class="ident">sys::Status::napi_detachable_arraybuffer_expected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::DetachableArraybufferExpected</span>,
-      <span class="ident">sys::Status::napi_would_deadlock</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::WouldDeadlock</span>,
-      <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Status::Unknown</span>,
+      <span class="ident">sys::Status::napi_ok</span> =&gt; <span class="ident">Status::Ok</span>,
+      <span class="ident">sys::Status::napi_invalid_arg</span> =&gt; <span class="ident">Status::InvalidArg</span>,
+      <span class="ident">sys::Status::napi_object_expected</span> =&gt; <span class="ident">Status::ObjectExpected</span>,
+      <span class="ident">sys::Status::napi_string_expected</span> =&gt; <span class="ident">Status::StringExpected</span>,
+      <span class="ident">sys::Status::napi_name_expected</span> =&gt; <span class="ident">Status::NameExpected</span>,
+      <span class="ident">sys::Status::napi_function_expected</span> =&gt; <span class="ident">Status::FunctionExpected</span>,
+      <span class="ident">sys::Status::napi_number_expected</span> =&gt; <span class="ident">Status::NumberExpected</span>,
+      <span class="ident">sys::Status::napi_boolean_expected</span> =&gt; <span class="ident">Status::BooleanExpected</span>,
+      <span class="ident">sys::Status::napi_array_expected</span> =&gt; <span class="ident">Status::ArrayExpected</span>,
+      <span class="ident">sys::Status::napi_generic_failure</span> =&gt; <span class="ident">Status::GenericFailure</span>,
+      <span class="ident">sys::Status::napi_pending_exception</span> =&gt; <span class="ident">Status::PendingException</span>,
+      <span class="ident">sys::Status::napi_cancelled</span> =&gt; <span class="ident">Status::Cancelled</span>,
+      <span class="ident">sys::Status::napi_escape_called_twice</span> =&gt; <span class="ident">Status::EscapeCalledTwice</span>,
+      <span class="ident">sys::Status::napi_handle_scope_mismatch</span> =&gt; <span class="ident">Status::HandleScopeMismatch</span>,
+      <span class="ident">sys::Status::napi_callback_scope_mismatch</span> =&gt; <span class="ident">Status::CallbackScopeMismatch</span>,
+      <span class="ident">sys::Status::napi_queue_full</span> =&gt; <span class="ident">Status::QueueFull</span>,
+      <span class="ident">sys::Status::napi_closing</span> =&gt; <span class="ident">Status::Closing</span>,
+      <span class="ident">sys::Status::napi_bigint_expected</span> =&gt; <span class="ident">Status::BigintExpected</span>,
+      <span class="ident">sys::Status::napi_date_expected</span> =&gt; <span class="ident">Status::DateExpected</span>,
+      <span class="ident">sys::Status::napi_arraybuffer_expected</span> =&gt; <span class="ident">Status::ArrayBufferExpected</span>,
+      <span class="ident">sys::Status::napi_detachable_arraybuffer_expected</span> =&gt; <span class="ident">Status::DetachableArraybufferExpected</span>,
+      <span class="ident">sys::Status::napi_would_deadlock</span> =&gt; <span class="ident">Status::WouldDeadlock</span>,
+      <span class="kw">_</span> =&gt; <span class="ident">Status::Unknown</span>,
     }
   }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Status</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">i32</span> {
-  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">code</span>: <span class="ident">Status</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">code</span>: <span class="ident">Status</span>) -&gt; <span class="self">Self</span> {
     <span class="kw">match</span> <span class="ident">code</span> {
-      <span class="ident">Status::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_ok</span>,
-      <span class="ident">Status::InvalidArg</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_invalid_arg</span>,
-      <span class="ident">Status::ObjectExpected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_object_expected</span>,
-      <span class="ident">Status::StringExpected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_string_expected</span>,
-      <span class="ident">Status::NameExpected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_name_expected</span>,
-      <span class="ident">Status::FunctionExpected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_function_expected</span>,
-      <span class="ident">Status::NumberExpected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_number_expected</span>,
-      <span class="ident">Status::BooleanExpected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_boolean_expected</span>,
-      <span class="ident">Status::ArrayExpected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_array_expected</span>,
-      <span class="ident">Status::GenericFailure</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_generic_failure</span>,
-      <span class="ident">Status::PendingException</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_pending_exception</span>,
-      <span class="ident">Status::Cancelled</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_cancelled</span>,
-      <span class="ident">Status::EscapeCalledTwice</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_escape_called_twice</span>,
-      <span class="ident">Status::HandleScopeMismatch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_handle_scope_mismatch</span>,
-      <span class="ident">Status::CallbackScopeMismatch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_callback_scope_mismatch</span>,
-      <span class="ident">Status::QueueFull</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_queue_full</span>,
-      <span class="ident">Status::Closing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_closing</span>,
-      <span class="ident">Status::BigintExpected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_bigint_expected</span>,
-      <span class="ident">Status::DateExpected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_date_expected</span>,
-      <span class="ident">Status::ArrayBufferExpected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_arraybuffer_expected</span>,
-      <span class="ident">Status::DetachableArraybufferExpected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_detachable_arraybuffer_expected</span>,
-      <span class="ident">Status::WouldDeadlock</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_would_deadlock</span>,
-      <span class="ident">Status::Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys::Status::napi_generic_failure</span>,
+      <span class="ident">Status::Ok</span> =&gt; <span class="ident">sys::Status::napi_ok</span>,
+      <span class="ident">Status::InvalidArg</span> =&gt; <span class="ident">sys::Status::napi_invalid_arg</span>,
+      <span class="ident">Status::ObjectExpected</span> =&gt; <span class="ident">sys::Status::napi_object_expected</span>,
+      <span class="ident">Status::StringExpected</span> =&gt; <span class="ident">sys::Status::napi_string_expected</span>,
+      <span class="ident">Status::NameExpected</span> =&gt; <span class="ident">sys::Status::napi_name_expected</span>,
+      <span class="ident">Status::FunctionExpected</span> =&gt; <span class="ident">sys::Status::napi_function_expected</span>,
+      <span class="ident">Status::NumberExpected</span> =&gt; <span class="ident">sys::Status::napi_number_expected</span>,
+      <span class="ident">Status::BooleanExpected</span> =&gt; <span class="ident">sys::Status::napi_boolean_expected</span>,
+      <span class="ident">Status::ArrayExpected</span> =&gt; <span class="ident">sys::Status::napi_array_expected</span>,
+      <span class="ident">Status::GenericFailure</span> =&gt; <span class="ident">sys::Status::napi_generic_failure</span>,
+      <span class="ident">Status::PendingException</span> =&gt; <span class="ident">sys::Status::napi_pending_exception</span>,
+      <span class="ident">Status::Cancelled</span> =&gt; <span class="ident">sys::Status::napi_cancelled</span>,
+      <span class="ident">Status::EscapeCalledTwice</span> =&gt; <span class="ident">sys::Status::napi_escape_called_twice</span>,
+      <span class="ident">Status::HandleScopeMismatch</span> =&gt; <span class="ident">sys::Status::napi_handle_scope_mismatch</span>,
+      <span class="ident">Status::CallbackScopeMismatch</span> =&gt; <span class="ident">sys::Status::napi_callback_scope_mismatch</span>,
+      <span class="ident">Status::QueueFull</span> =&gt; <span class="ident">sys::Status::napi_queue_full</span>,
+      <span class="ident">Status::Closing</span> =&gt; <span class="ident">sys::Status::napi_closing</span>,
+      <span class="ident">Status::BigintExpected</span> =&gt; <span class="ident">sys::Status::napi_bigint_expected</span>,
+      <span class="ident">Status::DateExpected</span> =&gt; <span class="ident">sys::Status::napi_date_expected</span>,
+      <span class="ident">Status::ArrayBufferExpected</span> =&gt; <span class="ident">sys::Status::napi_arraybuffer_expected</span>,
+      <span class="ident">Status::DetachableArraybufferExpected</span> =&gt; <span class="ident">sys::Status::napi_detachable_arraybuffer_expected</span>,
+      <span class="ident">Status::WouldDeadlock</span> =&gt; <span class="ident">sys::Status::napi_would_deadlock</span>,
+      <span class="ident">Status::Unknown</span> =&gt; <span class="ident">sys::Status::napi_generic_failure</span>,
     }
   }
 }

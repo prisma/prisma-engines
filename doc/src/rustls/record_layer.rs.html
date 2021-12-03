@@ -170,7 +170,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RecordLayer</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RecordLayer</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">RecordLayer</span> {
         <span class="ident">RecordLayer</span> {
             <span class="ident">message_encrypter</span>: <span class="ident">MessageEncrypter::invalid</span>(),
             <span class="ident">message_decrypter</span>: <span class="ident">MessageDecrypter::invalid</span>(),
@@ -181,12 +181,12 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_encrypting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">encrypt_state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DirectionState::Active</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_encrypting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">encrypt_state</span> <span class="op">==</span> <span class="ident">DirectionState::Active</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_decrypting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">decrypt_state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DirectionState::Active</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_decrypting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">decrypt_state</span> <span class="op">==</span> <span class="ident">DirectionState::Active</span>
     }
 
     <span class="doccomment">/// Prepare to use the given `MessageEncrypter` for future message encryption.</span>
@@ -208,14 +208,14 @@
     <span class="doccomment">/// Start using the `MessageEncrypter` previously provided to the previous</span>
     <span class="doccomment">/// call to `prepare_message_encrypter`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_encrypting</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">encrypt_state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DirectionState::Prepared</span>);
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">encrypt_state</span> <span class="op">==</span> <span class="ident">DirectionState::Prepared</span>);
         <span class="self">self</span>.<span class="ident">encrypt_state</span> <span class="op">=</span> <span class="ident">DirectionState::Active</span>;
     }
 
     <span class="doccomment">/// Start using the `MessageDecrypter` previously provided to the previous</span>
     <span class="doccomment">/// call to `prepare_message_decrypter`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_decrypting</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">decrypt_state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DirectionState::Prepared</span>);
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">decrypt_state</span> <span class="op">==</span> <span class="ident">DirectionState::Prepared</span>);
         <span class="self">self</span>.<span class="ident">decrypt_state</span> <span class="op">=</span> <span class="ident">DirectionState::Active</span>;
     }
 
@@ -241,19 +241,19 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that there&#39;s no reason to refuse to decrypt: the security</span>
     <span class="doccomment">/// failure has already happened.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wants_close_before_decrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">read_seq</span> <span class="op">=</span><span class="op">=</span> <span class="ident">SEQ_SOFT_LIMIT</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wants_close_before_decrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">read_seq</span> <span class="op">==</span> <span class="ident">SEQ_SOFT_LIMIT</span>
     }
 
     <span class="doccomment">/// Return true if we are getting close to encrypting too many</span>
     <span class="doccomment">/// messages with our encryption key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wants_close_before_encrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">write_seq</span> <span class="op">=</span><span class="op">=</span> <span class="ident">SEQ_SOFT_LIMIT</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wants_close_before_encrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">write_seq</span> <span class="op">==</span> <span class="ident">SEQ_SOFT_LIMIT</span>
     }
 
     <span class="doccomment">/// Return true if we outright refuse to do anything with the</span>
     <span class="doccomment">/// encryption key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt_exhausted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt_exhausted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">write_seq</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">SEQ_HARD_LIMIT</span>
     }
 
@@ -262,8 +262,8 @@
     <span class="doccomment">/// `encr` is a decoded message allegedly received from the peer.</span>
     <span class="doccomment">/// If it can be decrypted, its decryption is returned.  Otherwise,</span>
     <span class="doccomment">/// an error is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt_incoming</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">encr</span>: <span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">decrypt_state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DirectionState::Active</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt_incoming</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">encr</span>: <span class="ident">Message</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">decrypt_state</span> <span class="op">==</span> <span class="ident">DirectionState::Active</span>);
         <span class="kw">let</span> <span class="ident">seq</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_seq</span>;
         <span class="self">self</span>.<span class="ident">read_seq</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="self">self</span>.<span class="ident">message_decrypter</span>
@@ -274,8 +274,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// `plain` is a TLS message we&#39;d like to send.  This function</span>
     <span class="doccomment">/// panics if the requisite keying material hasn&#39;t been established yet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt_outgoing</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">plain</span>: <span class="ident">BorrowMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Message</span> {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">encrypt_state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DirectionState::Active</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt_outgoing</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">plain</span>: <span class="ident">BorrowMessage</span>) -&gt; <span class="ident">Message</span> {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">encrypt_state</span> <span class="op">==</span> <span class="ident">DirectionState::Active</span>);
         <span class="macro">assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">encrypt_exhausted</span>());
         <span class="kw">let</span> <span class="ident">seq</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_seq</span>;
         <span class="self">self</span>.<span class="ident">write_seq</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;

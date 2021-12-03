@@ -3,7 +3,7 @@
 interface</a> by recording log records as <code>tracing</code> <code>Event</code>s. This is intended for
 use in conjunction with a <code>tracing</code> <code>Subscriber</code> to consume events from
 dependencies that emit <a href="../../log/index.html" title="log"><code>log</code></a> records within a trace context.</p>
-<h1 id="usage" class="section-header"><a href="#usage">Usage</a></h1>
+<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
 <p>To create and initialize a <code>LogTracer</code> with the default configurations, use:</p>
 <ul>
 <li><a href="LogTracer.html#method.init"><code>init</code></a> if you want to convert all logs, regardless of log level,
@@ -16,9 +16,9 @@ log records</a> emitted by particular crates. This is useful in cases
 such as when a crate emits both <code>tracing</code> diagnostics <em>and</em> log records by
 default.</p>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Builder.html" title="tracing_log::log_tracer::Builder struct">Builder</a></div><div class="item-right docblock-short"><p>Configures a new <code>LogTracer</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.LogTracer.html" title="tracing_log::log_tracer::LogTracer struct">LogTracer</a></div><div class="item-right docblock-short"><p>A simple “logger” that converts all log records into <code>tracing</code> <code>Event</code>s.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SetLoggerError.html" title="tracing_log::log_tracer::SetLoggerError struct">SetLoggerError</a></div><div class="item-right docblock-short"><p>The type returned by <a href="fn.set_logger.html"><code>set_logger</code></a> if <a href="fn.set_logger.html"><code>set_logger</code></a> has already been called.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_log" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Builder.html" title="tracing_log::log_tracer::Builder struct">Builder</a></div><div class="item-right docblock-short"><p>Configures a new <code>LogTracer</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.LogTracer.html" title="tracing_log::log_tracer::LogTracer struct">LogTracer</a></div><div class="item-right docblock-short"><p>A simple “logger” that converts all log records into <code>tracing</code> <code>Event</code>s.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SetLoggerError.html" title="tracing_log::log_tracer::SetLoggerError struct">SetLoggerError</a></div><div class="item-right docblock-short"><p>The type returned by <a href="fn.set_logger.html"><code>set_logger</code></a> if <a href="fn.set_logger.html"><code>set_logger</code></a> has already been called.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_log" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

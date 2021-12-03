@@ -83,9 +83,9 @@
 <span class="doccomment">/// The usual raise, just the safe wrapper around it.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is async-signal-safe.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raise</span>(<span class="ident">sig</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raise</span>(<span class="ident">sig</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">libc::raise</span>(<span class="ident">sig</span>) };
-    <span class="kw">if</span> <span class="ident">result</span> <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span> {
+    <span class="kw">if</span> <span class="ident">result</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> {
         <span class="prelude-val">Err</span>(<span class="ident">Error::last_os_error</span>())
     } <span class="kw">else</span> {
         <span class="prelude-val">Ok</span>(())
@@ -97,7 +97,7 @@
 <span class="doccomment">/// Unlike the [std::process::abort], this one is guaranteed to contain no additions or wrappers</span>
 <span class="doccomment">/// and therefore is async-signal-safe. You can use this to terminate the application from within a</span>
 <span class="doccomment">/// signal handler.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abort</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="op">!</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abort</span>() -&gt; <span class="op">!</span> {
     <span class="kw">unsafe</span> {
         <span class="ident">libc::abort</span>();
     }
@@ -110,7 +110,7 @@
 <span class="doccomment">/// signal handler.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Also, see [`register_conditional_shutdown`][crate::flag::register_conditional_shutdown].</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exit</span>(<span class="ident">status</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">!</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exit</span>(<span class="ident">status</span>: <span class="ident">c_int</span>) -&gt; <span class="op">!</span> {
     <span class="kw">unsafe</span> {
         <span class="comment">// Yes, the one with underscore. That one doesn&#39;t call the at-exit hooks.</span>
         <span class="ident">libc::_exit</span>(<span class="ident">status</span>);

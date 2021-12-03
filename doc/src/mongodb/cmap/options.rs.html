@@ -303,7 +303,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectionPoolOptions</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_client_options</span>(<span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ClientOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_client_options</span>(<span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ClientOptions</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">app_name</span>: <span class="ident">options</span>.<span class="ident">app_name</span>.<span class="ident">clone</span>(),
             <span class="ident">connect_timeout</span>: <span class="ident">options</span>.<span class="ident">connect_timeout</span>,
@@ -329,7 +329,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_event_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EventOptions</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_event_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">EventOptions</span> {
         <span class="ident">EventOptions</span> {
             <span class="ident">max_idle_time</span>: <span class="self">self</span>.<span class="ident">max_idle_time</span>,
             <span class="ident">min_pool_size</span>: <span class="self">self</span>.<span class="ident">min_pool_size</span>,
@@ -347,15 +347,15 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BackgroundThreadInterval</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">millis</span> <span class="op">=</span> <span class="ident">i64::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">millis</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) {
-            <span class="ident">Ordering::Less</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">BackgroundThreadInterval::Never</span>,
-            <span class="ident">Ordering::Equal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">D::Error::custom</span>(<span class="string">&quot;zero is not allowed&quot;</span>)),
-            <span class="ident">Ordering::Greater</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Ordering::Less</span> =&gt; <span class="ident">BackgroundThreadInterval::Never</span>,
+            <span class="ident">Ordering::Equal</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">D::Error::custom</span>(<span class="string">&quot;zero is not allowed&quot;</span>)),
+            <span class="ident">Ordering::Greater</span> =&gt; {
                 <span class="ident">BackgroundThreadInterval::Every</span>(<span class="ident">Duration::from_millis</span>(<span class="ident">millis</span> <span class="kw">as</span> <span class="ident">u64</span>))
             }
         })
@@ -376,7 +376,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ConnectionPoolOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConnectionOptions</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pool_options</span>: <span class="ident">ConnectionPoolOptions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pool_options</span>: <span class="ident">ConnectionPoolOptions</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">connect_timeout</span>: <span class="ident">pool_options</span>.<span class="ident">connect_timeout</span>,
             <span class="ident">tls_options</span>: <span class="ident">pool_options</span>.<span class="ident">tls_options</span>,

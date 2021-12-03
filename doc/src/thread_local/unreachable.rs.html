@@ -67,7 +67,7 @@
 <span class="doccomment">/// An extension trait for `Option&lt;T&gt;` providing unchecked unwrapping methods.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">UncheckedOptionExt</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Get the value out of this Option without checking for None.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>;
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>;
 
     <span class="doccomment">/// Assert that this Option is a None to the optimizer.</span>
     <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap_none</span>(<span class="self">self</span>);
@@ -76,17 +76,17 @@
 <span class="doccomment">/// An extension trait for `Result&lt;T, E&gt;` providing unchecked unwrapping methods.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">UncheckedResultExt</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Get the value out of this Result without checking for Err.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap_ok</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>;
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap_ok</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>;
 
     <span class="doccomment">/// Get the error out of this Result without checking for Ok.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap_err</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">E</span>;
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap_err</span>(<span class="self">self</span>) -&gt; <span class="ident">E</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">UncheckedOptionExt</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">unreachable_unchecked</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">unreachable_unchecked</span>(),
         }
     }
 
@@ -98,17 +98,17 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">UncheckedResultExt</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap_ok</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap_ok</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">unreachable_unchecked</span>(),
+            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">unreachable_unchecked</span>(),
         }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap_err</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">E</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unchecked_unwrap_err</span>(<span class="self">self</span>) -&gt; <span class="ident">E</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">unreachable_unchecked</span>(),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>,
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="ident">unreachable_unchecked</span>(),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>,
         }
     }
 }

@@ -66,27 +66,27 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ValueType</span> {
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span> {
+  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span> {
     <span class="kw">let</span> <span class="ident">status_string</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>);
     <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">status_string</span>)
   }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ValueType</span> {
-  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueType</span> {
+  <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">i32</span>) -&gt; <span class="ident">ValueType</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
       <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi6&quot;</span>)]</span>
-      <span class="ident">sys::ValueType::napi_bigint</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ValueType::Bigint</span>,
-      <span class="ident">sys::ValueType::napi_boolean</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ValueType::Boolean</span>,
-      <span class="ident">sys::ValueType::napi_external</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ValueType::External</span>,
-      <span class="ident">sys::ValueType::napi_function</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ValueType::Function</span>,
-      <span class="ident">sys::ValueType::napi_null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ValueType::Null</span>,
-      <span class="ident">sys::ValueType::napi_number</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ValueType::Number</span>,
-      <span class="ident">sys::ValueType::napi_object</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ValueType::Object</span>,
-      <span class="ident">sys::ValueType::napi_string</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ValueType::String</span>,
-      <span class="ident">sys::ValueType::napi_symbol</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ValueType::Symbol</span>,
-      <span class="ident">sys::ValueType::napi_undefined</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ValueType::Undefined</span>,
-      <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ValueType::Unknown</span>,
+      <span class="ident">sys::ValueType::napi_bigint</span> =&gt; <span class="ident">ValueType::Bigint</span>,
+      <span class="ident">sys::ValueType::napi_boolean</span> =&gt; <span class="ident">ValueType::Boolean</span>,
+      <span class="ident">sys::ValueType::napi_external</span> =&gt; <span class="ident">ValueType::External</span>,
+      <span class="ident">sys::ValueType::napi_function</span> =&gt; <span class="ident">ValueType::Function</span>,
+      <span class="ident">sys::ValueType::napi_null</span> =&gt; <span class="ident">ValueType::Null</span>,
+      <span class="ident">sys::ValueType::napi_number</span> =&gt; <span class="ident">ValueType::Number</span>,
+      <span class="ident">sys::ValueType::napi_object</span> =&gt; <span class="ident">ValueType::Object</span>,
+      <span class="ident">sys::ValueType::napi_string</span> =&gt; <span class="ident">ValueType::String</span>,
+      <span class="ident">sys::ValueType::napi_symbol</span> =&gt; <span class="ident">ValueType::Symbol</span>,
+      <span class="ident">sys::ValueType::napi_undefined</span> =&gt; <span class="ident">ValueType::Undefined</span>,
+      <span class="kw">_</span> =&gt; <span class="ident">ValueType::Unknown</span>,
     }
   }
 }

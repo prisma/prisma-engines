@@ -168,14 +168,14 @@
 <span class="doccomment">/// assert_eq!(0, var);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">OpCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">OpCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">OpCode</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">rt</span> {
-            <span class="ident">OpCode::Query</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
+            <span class="ident">OpCode::Query</span> =&gt; <span class="number">0</span>,
             <span class="comment">// 1	IQuery (Inverse Query, OBSOLETE)	[RFC3425]</span>
-            <span class="ident">OpCode::Status</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+            <span class="ident">OpCode::Status</span> =&gt; <span class="number">2</span>,
             <span class="comment">// 3	Unassigned</span>
-            <span class="ident">OpCode::Notify</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-            <span class="ident">OpCode::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
+            <span class="ident">OpCode::Notify</span> =&gt; <span class="number">4</span>,
+            <span class="ident">OpCode::Update</span> =&gt; <span class="number">5</span>,
             <span class="comment">// 6-15	Unassigned</span>
         }
     }
@@ -192,13 +192,13 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">impl</span> <span class="ident">OpCode</span> {
     <span class="doccomment">/// Decodes the binary value of the OpCode</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">value</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Query</span>),
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Status</span>),
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Notify</span>),
-            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Update</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;unknown OpCode: {}&quot;</span>, <span class="ident">value</span>).<span class="ident">into</span>()),
+            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Query</span>),
+            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Status</span>),
+            <span class="number">4</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Notify</span>),
+            <span class="number">5</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OpCode::Update</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;unknown OpCode: {}&quot;</span>, <span class="ident">value</span>).<span class="ident">into</span>()),
         }
     }
 }

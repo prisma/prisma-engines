@@ -6,7 +6,7 @@ methods without explicitly wrapping them into <code>tonic::Request</code>s. The 
 is to make client calls slightly more convenient to write.</p>
 <p>Tonic’s code generation and blanket implementations handle this for you,
 so it is not necessary to implement this trait directly.</p>
-<h1 id="example" class="section-header"><a href="#example">Example</a></h1>
+<h2 id="example" class="section-header"><a href="#example">Example</a></h2>
 <p>Given the following gRPC method definition:</p>
 <div class="example-wrap"><pre class="language-proto"><code>rpc GetFeature(Point) returns (Feature) {}</code></pre></div>
 <p>we can call <code>get_feature</code> in two equivalent ways:</p>

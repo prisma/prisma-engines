@@ -40,24 +40,24 @@
     <span class="ident">min</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">sec</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">millis</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+) -&gt; <span class="ident">String</span> {
     <span class="ident">Utc</span>.<span class="ident">ymd</span>(<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>)
         .<span class="ident">and_hms_milli</span>(<span class="ident">or_zero</span>(<span class="ident">hour</span>), <span class="ident">or_zero</span>(<span class="ident">min</span>), <span class="ident">or_zero</span>(<span class="ident">sec</span>), <span class="ident">or_zero</span>(<span class="ident">millis</span>))
         .<span class="ident">to_rfc3339</span>()
 }
 
 <span class="doccomment">/// Convenience date string (UTC, RFC 3339) constructor so you don&#39;t have to remember the format.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">date_iso_string</span>(<span class="ident">year</span>: <span class="ident">i32</span>, <span class="ident">month</span>: <span class="ident">u32</span>, <span class="ident">day</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">date_iso_string</span>(<span class="ident">year</span>: <span class="ident">i32</span>, <span class="ident">month</span>: <span class="ident">u32</span>, <span class="ident">day</span>: <span class="ident">u32</span>) -&gt; <span class="ident">String</span> {
     <span class="ident">Utc</span>.<span class="ident">ymd</span>(<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>).<span class="ident">and_hms_milli</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>).<span class="ident">to_rfc3339</span>()
 }
 
 <span class="doccomment">/// Convenience date string (UTC, RFC 3339) constructor for the datetime right now,</span>
 <span class="doccomment">/// for cases you don&#39;t care about the concrete DateTime in the tests.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="ident">String</span> {
     <span class="ident">Utc::now</span>().<span class="ident">to_rfc3339</span>()
 }
 
-<span class="kw">fn</span> <span class="ident">or_zero</span>(<span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">fn</span> <span class="ident">or_zero</span>(<span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="ident">u32</span> {
     <span class="ident">opt</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>)
 }
 </code></pre></div>

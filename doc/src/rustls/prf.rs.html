@@ -96,19 +96,19 @@
 
 <span class="kw">use</span> <span class="ident">std::io::Write</span>;
 
-<span class="kw">fn</span> <span class="ident">convert_digest_to_hmac_alg</span>(<span class="ident">hash</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hmac::Algorithm</span> {
-    <span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span> {
+<span class="kw">fn</span> <span class="ident">convert_digest_to_hmac_alg</span>(<span class="ident">hash</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>) -&gt; <span class="ident">hmac::Algorithm</span> {
+    <span class="kw">if</span> <span class="ident">hash</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span> {
         <span class="ident">hmac::HMAC_SHA256</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span> {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hash</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span> {
         <span class="ident">hmac::HMAC_SHA384</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hash</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">digest::SHA512</span> {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hash</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">digest::SHA512</span> {
         <span class="ident">hmac::HMAC_SHA512</span>
     } <span class="kw">else</span> {
         <span class="macro">panic!</span>(<span class="string">&quot;bad digest for prf&quot;</span>);
     }
 }
 
-<span class="kw">fn</span> <span class="ident">concat_sign</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">hmac::Key</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">hmac::Tag</span> {
+<span class="kw">fn</span> <span class="ident">concat_sign</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">hmac::Key</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">hmac::Tag</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">hmac::Context::with_key</span>(<span class="ident">key</span>);
     <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">a</span>);
     <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">b</span>);
@@ -136,7 +136,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">concat</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">concat</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="ident">ret</span>.<span class="ident">extend_from_slice</span>(<span class="ident">a</span>);
     <span class="ident">ret</span>.<span class="ident">extend_from_slice</span>(<span class="ident">b</span>);

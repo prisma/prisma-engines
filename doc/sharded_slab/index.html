@@ -5,7 +5,7 @@ this can be more efficient than allocating each item individually. Since the
 allocated items are the same size, memory fragmentation is reduced, and
 creating and removing new items can be very cheap.</p>
 <p>This crate implements a lock-free concurrent slab, indexed by <code>usize</code>s.</p>
-<h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
+<h3 id="usage" class="section-header"><a href="#usage">Usage</a></h3>
 <p>First, add this to your <code>Cargo.toml</code>:</p>
 <div class="example-wrap"><pre class="language-toml"><code>sharded-slab = &quot;0.1.1&quot;</code></pre></div>
 <p>This crate provides two  types, <a href="struct.Slab.html"><code>Slab</code></a> and <a href="struct.Pool.html"><code>Pool</code></a>, which provide
@@ -25,7 +25,7 @@ which own a heap allocation can be cleared by dropping any <em>data</em> they
 store, but retaining any previously-allocated capacity. This means that a
 <a href="struct.Pool.html"><code>Pool</code></a> may be used to reuse a set of existing heap allocations, reducing
 allocator load.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>Inserting an item into the slab, returning an index:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">slab</span> <span class="op">=</span> <span class="ident">Slab::new</span>();
@@ -72,12 +72,12 @@ each item, providing granular locking of items rather than of the slab:</p>
 <span class="kw">let</span> <span class="ident">hello</span> <span class="op">=</span> <span class="ident">slab</span>.<span class="ident">get</span>(<span class="ident">key</span>).<span class="ident">expect</span>(<span class="string">&quot;item missing&quot;</span>);
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hello</span> <span class="op">=</span> <span class="ident">hello</span>.<span class="ident">lock</span>().<span class="ident">expect</span>(<span class="string">&quot;mutex poisoned&quot;</span>);
 <span class="macro">assert_eq!</span>(<span class="ident">hello</span>.<span class="ident">as_str</span>(), <span class="string">&quot;hello everyone!&quot;</span>);</code></pre></div>
-<h1 id="configuration" class="section-header"><a href="#configuration">Configuration</a></h1>
+<h2 id="configuration" class="section-header"><a href="#configuration">Configuration</a></h2>
 <p>For performance reasons, several values used by the slab are calculated as
 constants. In order to allow users to tune the slab’s parameters, we provide
 a <a href="trait.Config.html"><code>Config</code></a> trait which defines these parameters as associated <code>consts</code>.
 The <code>Slab</code> type is generic over a <code>C: Config</code> parameter.</p>
-<h1 id="comparison-with-similar-crates" class="section-header"><a href="#comparison-with-similar-crates">Comparison with Similar Crates</a></h1>
+<h2 id="comparison-with-similar-crates" class="section-header"><a href="#comparison-with-similar-crates">Comparison with Similar Crates</a></h2>
 <ul>
 <li>
 <p><a href="struct.Slab.html"><code>slab</code></a>: Carl Lerche’s <code>slab</code> crate provides a slab implementation with a
@@ -101,7 +101,7 @@ concurrent use-cases, while <code>slab</code> should be preferred in single-thre
 use-cases.</p>
 </li>
 </ul>
-<h1 id="safety-and-correctness" class="section-header"><a href="#safety-and-correctness">Safety and Correctness</a></h1>
+<h2 id="safety-and-correctness" class="section-header"><a href="#safety-and-correctness">Safety and Correctness</a></h2>
 <p>Most implementations of lock-free data structures in Rust require some
 amount of unsafe code, and this crate is not an exception. In order to catch
 potential bugs in this unsafe code, we make use of <a href="https://crates.io/crates/loom"><code>loom</code></a>, a
@@ -123,7 +123,7 @@ counter, the counter will wrap  around after being incremented a number of
 times. To avoid situations where a returned index lives long enough to see the
 generation counter wrap around to the same value, it is good to be fairly
 generous when configuring the allocation of index bits.</p>
-<h1 id="performance" class="section-header"><a href="#performance">Performance</a></h1>
+<h2 id="performance" class="section-header"><a href="#performance">Performance</a></h2>
 <p>These graphs were produced by <a href="https://github.com/hawkw/sharded-slab/blob/master/benches/bench.rs">benchmarks</a> of the sharded slab implementation,
 using the <a href="https://crates.io/crates/criterion"><code>criterion</code></a> crate.</p>
 <p>The first shows the results of a benchmark where an increasing number of
@@ -139,23 +139,23 @@ compares the performance of the sharded slab implementation with an
 <p>These benchmarks demonstrate that, while the sharded approach introduces
 a small constant-factor overhead, it offers significantly better
 performance across concurrent accesses.</p>
-<h1 id="implementation-notes" class="section-header"><a href="#implementation-notes">Implementation Notes</a></h1>
+<h2 id="implementation-notes" class="section-header"><a href="#implementation-notes">Implementation Notes</a></h2>
 <p>See <a href="implementation/index.html">this page</a> for details on this crate’s design
 and implementation.</p>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="implementation/index.html" title="sharded_slab::implementation mod">implementation</a></div><div class="item-right docblock-short"><p>Notes on <code>sharded-slab</code>’s implementation and design.</p>
-</div><div class="item-left module-item"><a class="mod" href="pool/index.html" title="sharded_slab::pool mod">pool</a></div><div class="item-right docblock-short"><p>A lock-free concurrent object pool.</p>
-</div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.DefaultConfig.html" title="sharded_slab::DefaultConfig struct">DefaultConfig</a></div><div class="item-right docblock-short"><p>Default slab configuration values.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Entry.html" title="sharded_slab::Entry struct">Entry</a></div><div class="item-right docblock-short"><p>A handle that allows access to an object in a slab.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.OwnedEntry.html" title="sharded_slab::OwnedEntry struct">OwnedEntry</a></div><div class="item-right docblock-short"><p>An owned guard that allows access to an object in a <code>S.ab</code>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Pool.html" title="sharded_slab::Pool struct">Pool</a></div><div class="item-right docblock-short"><p>A lock-free concurrent object pool.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Slab.html" title="sharded_slab::Slab struct">Slab</a></div><div class="item-right docblock-short"><p>A sharded slab.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.VacantEntry.html" title="sharded_slab::VacantEntry struct">VacantEntry</a></div><div class="item-right docblock-short"><p>A handle to a vacant entry in a <code>Slab</code>.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Clear.html" title="sharded_slab::Clear trait">Clear</a></div><div class="item-right docblock-short"><p>Trait implemented by types which can be cleared in place, retaining any
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="implementation/index.html" title="sharded_slab::implementation mod">implementation</a></div><div class="item-right docblock-short"><p>Notes on <code>sharded-slab</code>’s implementation and design.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="pool/index.html" title="sharded_slab::pool mod">pool</a></div><div class="item-right docblock-short"><p>A lock-free concurrent object pool.</p>
+</div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.DefaultConfig.html" title="sharded_slab::DefaultConfig struct">DefaultConfig</a></div><div class="item-right docblock-short"><p>Default slab configuration values.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Entry.html" title="sharded_slab::Entry struct">Entry</a></div><div class="item-right docblock-short"><p>A handle that allows access to an object in a slab.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OwnedEntry.html" title="sharded_slab::OwnedEntry struct">OwnedEntry</a></div><div class="item-right docblock-short"><p>An owned guard that allows access to an object in a <code>S.ab</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Pool.html" title="sharded_slab::Pool struct">Pool</a></div><div class="item-right docblock-short"><p>A lock-free concurrent object pool.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Slab.html" title="sharded_slab::Slab struct">Slab</a></div><div class="item-right docblock-short"><p>A sharded slab.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.VacantEntry.html" title="sharded_slab::VacantEntry struct">VacantEntry</a></div><div class="item-right docblock-short"><p>A handle to a vacant entry in a <code>Slab</code>.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Clear.html" title="sharded_slab::Clear trait">Clear</a></div><div class="item-right docblock-short"><p>Trait implemented by types which can be cleared in place, retaining any
 allocated memory.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Config.html" title="sharded_slab::Config trait">Config</a></div><div class="item-right docblock-short"><p>Configuration parameters which can be overridden to tune the behavior of a slab.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="sharded_slab" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Config.html" title="sharded_slab::Config trait">Config</a></div><div class="item-right docblock-short"><p>Configuration parameters which can be overridden to tune the behavior of a slab.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="sharded_slab" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

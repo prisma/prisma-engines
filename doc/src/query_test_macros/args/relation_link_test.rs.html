@@ -145,14 +145,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RelationLinkTestArgs</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">on_module</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">darling::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">on_module</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">darling::Error</span><span class="op">&gt;</span> {
         <span class="ident">validate_suite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">suite</span>, <span class="ident">on_module</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Returns all the connectors that the test is valid for.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connectors_to_test</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorTag</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connectors_to_test</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorTag</span><span class="op">&gt;</span> {
         <span class="ident">connectors_to_test</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">only</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">exclude</span>)
     }
 }
@@ -163,7 +163,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">OnChild</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">RelationField</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">RelationField</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_field</span>
     }
 }
@@ -174,23 +174,23 @@
 }
 
 <span class="kw">impl</span> <span class="ident">OnParent</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">RelationField</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">RelationField</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_field</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">darling::FromMeta</span> <span class="kw">for</span> <span class="ident">OnChild</span> {
-    <span class="kw">fn</span> <span class="ident">from_meta</span>(<span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">darling::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_meta</span>(<span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) -&gt; <span class="ident">darling::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         (<span class="kw">match</span> <span class="kw-2">*</span><span class="ident">item</span> {
-            <span class="ident">Meta::NameValue</span>(<span class="kw-2">ref</span> <span class="ident">nv</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">nv</span>.<span class="ident">lit</span> {
-                <span class="ident">syn::Lit::Str</span>(<span class="kw-2">ref</span> <span class="ident">lit_str</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OnChild</span> {
+            <span class="ident">Meta::NameValue</span>(<span class="kw-2">ref</span> <span class="ident">nv</span>) =&gt; <span class="kw">match</span> <span class="ident">nv</span>.<span class="ident">lit</span> {
+                <span class="ident">syn::Lit::Str</span>(<span class="kw-2">ref</span> <span class="ident">lit_str</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OnChild</span> {
                     <span class="ident">relation_field</span>: <span class="ident">parse_relation_field</span>(<span class="ident">lit_str</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>,
                 }),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::custom</span>(
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">darling::Error::custom</span>(
                     <span class="string">&quot;Expected `on_child` to be a String. eg: on_child = \&quot;ToOneOpt\&quot;&quot;</span>,
                 )),
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::custom</span>(
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">darling::Error::custom</span>(
                 <span class="string">&quot;Expected `on_child` to be a String. eg: on_child = \&quot;ToOneOpt\&quot;&quot;</span>,
             )),
         })
@@ -199,17 +199,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">darling::FromMeta</span> <span class="kw">for</span> <span class="ident">OnParent</span> {
-    <span class="kw">fn</span> <span class="ident">from_meta</span>(<span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">darling::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_meta</span>(<span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">Meta</span>) -&gt; <span class="ident">darling::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         (<span class="kw">match</span> <span class="kw-2">*</span><span class="ident">item</span> {
-            <span class="ident">Meta::NameValue</span>(<span class="kw-2">ref</span> <span class="ident">nv</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">nv</span>.<span class="ident">lit</span> {
-                <span class="ident">syn::Lit::Str</span>(<span class="kw-2">ref</span> <span class="ident">lit_str</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OnParent</span> {
+            <span class="ident">Meta::NameValue</span>(<span class="kw-2">ref</span> <span class="ident">nv</span>) =&gt; <span class="kw">match</span> <span class="ident">nv</span>.<span class="ident">lit</span> {
+                <span class="ident">syn::Lit::Str</span>(<span class="kw-2">ref</span> <span class="ident">lit_str</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OnParent</span> {
                     <span class="ident">relation_field</span>: <span class="ident">parse_relation_field</span>(<span class="ident">lit_str</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
                 }),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::custom</span>(
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">darling::Error::custom</span>(
                     <span class="string">&quot;Expected `on_parent` to be a String. eg: on_parent = \&quot;ToOneOpt\&quot;&quot;</span>,
                 )),
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">darling::Error::custom</span>(
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">darling::Error::custom</span>(
                 <span class="string">&quot;Expected `on_parent` to be a String. eg: on_parent = \&quot;ToOneOpt\&quot;&quot;</span>,
             )),
         })
@@ -217,7 +217,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_relation_field</span>(<span class="ident">lit_str</span>: <span class="kw-2">&amp;</span><span class="ident">syn::LitStr</span>, <span class="ident">child</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RelationField</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_relation_field</span>(<span class="ident">lit_str</span>: <span class="kw-2">&amp;</span><span class="ident">syn::LitStr</span>, <span class="ident">child</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RelationField</span>, <span class="ident">darling::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">path</span>: <span class="ident">Path</span> <span class="op">=</span> <span class="ident">lit_str</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="op">=</span> <span class="ident">path</span>.<span class="ident">get_ident</span>() {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">ident</span>.<span class="ident">to_string</span>();

@@ -427,18 +427,18 @@
 <span class="doccomment">///     transformed into the field type using the expression `expr`. The transormation is performed</span>
 <span class="doccomment">///     when the setter is called.</span>
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">TypedBuilder</span>, <span class="ident">attributes</span>(<span class="ident">builder</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_typed_builder</span>(<span class="ident">input</span>: <span class="ident">proc_macro::TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">proc_macro::TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_typed_builder</span>(<span class="ident">input</span>: <span class="ident">proc_macro::TokenStream</span>) -&gt; <span class="ident">proc_macro::TokenStream</span> {
     <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">DeriveInput</span>);
     <span class="kw">match</span> <span class="ident">impl_my_derive</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">output</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">output</span>.<span class="ident">into</span>(),
-        <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">error</span>.<span class="ident">to_compile_error</span>().<span class="ident">into</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">output</span>) =&gt; <span class="ident">output</span>.<span class="ident">into</span>(),
+        <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; <span class="ident">error</span>.<span class="ident">to_compile_error</span>().<span class="ident">into</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">impl_my_derive</span>(<span class="ident">ast</span>: <span class="kw-2">&amp;</span><span class="ident">syn::DeriveInput</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">impl_my_derive</span>(<span class="ident">ast</span>: <span class="kw-2">&amp;</span><span class="ident">syn::DeriveInput</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">ast</span>.<span class="ident">data</span> {
-        <span class="ident">syn::Data::Struct</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">fields</span> {
-            <span class="ident">syn::Fields::Named</span>(<span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">syn::Data::Struct</span>(<span class="ident">data</span>) =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">fields</span> {
+            <span class="ident">syn::Fields::Named</span>(<span class="ident">fields</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">struct_info</span> <span class="op">=</span> <span class="ident">struct_info::StructInfo::new</span>(<span class="kw-2">&amp;</span><span class="ident">ast</span>, <span class="ident">fields</span>.<span class="ident">named</span>.<span class="ident">iter</span>())<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">builder_creation</span> <span class="op">=</span> <span class="ident">struct_info</span>.<span class="ident">builder_creation_impl</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">conversion_helper</span> <span class="op">=</span> <span class="ident">struct_info</span>.<span class="ident">conversion_helper_impl</span>()<span class="question-mark">?</span>;
@@ -462,11 +462,11 @@
                     #<span class="ident">build_method</span>
                 }
             }
-            <span class="ident">syn::Fields::Unnamed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">ast</span>.<span class="ident">span</span>(), <span class="string">&quot;TypedBuilder is not supported for tuple structs&quot;</span>)),
-            <span class="ident">syn::Fields::Unit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">ast</span>.<span class="ident">span</span>(), <span class="string">&quot;TypedBuilder is not supported for unit structs&quot;</span>)),
+            <span class="ident">syn::Fields::Unnamed</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">ast</span>.<span class="ident">span</span>(), <span class="string">&quot;TypedBuilder is not supported for tuple structs&quot;</span>)),
+            <span class="ident">syn::Fields::Unit</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">ast</span>.<span class="ident">span</span>(), <span class="string">&quot;TypedBuilder is not supported for unit structs&quot;</span>)),
         },
-        <span class="ident">syn::Data::Enum</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">ast</span>.<span class="ident">span</span>(), <span class="string">&quot;TypedBuilder is not supported for enums&quot;</span>)),
-        <span class="ident">syn::Data::Union</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">ast</span>.<span class="ident">span</span>(), <span class="string">&quot;TypedBuilder is not supported for unions&quot;</span>)),
+        <span class="ident">syn::Data::Enum</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">ast</span>.<span class="ident">span</span>(), <span class="string">&quot;TypedBuilder is not supported for enums&quot;</span>)),
+        <span class="ident">syn::Data::Union</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">ast</span>.<span class="ident">span</span>(), <span class="string">&quot;TypedBuilder is not supported for unions&quot;</span>)),
     };
     <span class="prelude-val">Ok</span>(<span class="ident">data</span>)
 }

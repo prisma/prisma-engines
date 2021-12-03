@@ -104,7 +104,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">sources</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">configuration::Datasource</span>],
         <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValidationPipeline</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ValidationPipeline</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="ident">sources</span>.<span class="ident">first</span>();
 
         <span class="ident">ValidationPipeline</span> {
@@ -126,7 +126,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">ast_schema</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span>,
         <span class="ident">relation_transformation_enabled</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValidatedDatamodel</span>, <span class="ident">Diagnostics</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValidatedDatamodel</span>, <span class="ident">Diagnostics</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">Diagnostics::new</span>();
         <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">source</span>

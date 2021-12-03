@@ -92,13 +92,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ParamsInScope</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Generics</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Generics</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ParamsInScope</span> {
             <span class="ident">names</span>: <span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">param</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">param</span>.<span class="ident">ident</span>).<span class="ident">collect</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersects</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersects</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">found</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="ident">crawl</span>(<span class="self">self</span>, <span class="ident">ty</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">found</span>);
         <span class="ident">found</span>
@@ -132,7 +132,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">InferredBounds</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">InferredBounds</span> {
             <span class="ident">bounds</span>: <span class="ident">Map::new</span>(),
             <span class="ident">order</span>: <span class="ident">Vec::new</span>(),
@@ -152,7 +152,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">augment_where_clause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">Generics</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">WhereClause</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">augment_where_clause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">Generics</span>) -&gt; <span class="ident">WhereClause</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">generics</span> <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">where_clause</span> <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">make_where_clause</span>();
         <span class="kw">for</span> <span class="ident">ty</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">order</span> {

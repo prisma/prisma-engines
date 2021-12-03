@@ -5,7 +5,7 @@ and needed to perform an operation on the elements of said collection,
 you’ll quickly run into ‘streams’. Streams are heavily used in idiomatic
 asynchronous Rust code, so it’s worth becoming familiar with them.</p>
 <p>Before explaining more, let’s talk about how this module is structured:</p>
-<h1 id="organization" class="section-header"><a href="#organization">Organization</a></h1>
+<h2 id="organization" class="section-header"><a href="#organization">Organization</a></h2>
 <p>This module is largely organized by type:</p>
 <ul>
 <li><a href="#traits">Traits</a> are the core portion: these traits define what kind of streams
@@ -18,13 +18,13 @@ the <code>struct</code>, rather than the <code>struct</code> itself. For more de
 see ‘<a href="#implementing-stream">Implementing Stream</a>’.</li>
 </ul>
 <p>That’s it! Let’s dig into streams.</p>
-<h1 id="stream" class="section-header"><a href="#stream">Stream</a></h1>
+<h2 id="stream" class="section-header"><a href="#stream">Stream</a></h2>
 <p>The heart and soul of this module is the <a href="trait.Stream.html"><code>Stream</code></a> trait. The core of
 <a href="trait.Stream.html"><code>Stream</code></a> looks like this:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">trait</span> <span class="ident">Stream</span> {
     <span class="kw">type</span> <span class="ident">Item</span>;
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 }</code></pre></div>
 <p>A stream has a method, <a href="trait.Stream.html#tymethod.next"><code>next</code></a>, which when called, returns an
 <a href="../task/enum.Poll.html"><code>Poll</code></a>&lt;<a href="../../std/option/enum.Option.html"><code>Option</code></a><code>&lt;Item&gt;&gt;</code>. <a href="trait.Stream.html#tymethod.next"><code>next</code></a> will return <code>Ready(Some(Item))</code>
@@ -40,7 +40,7 @@ them for free.</p>
 <p>Streams are also composable, and it’s common to chain them together to do
 more complex forms of processing. See the <a href="#adapters">Adapters</a> section
 below for more details.</p>
-<h1 id="the-three-forms-of-streaming" class="section-header"><a href="#the-three-forms-of-streaming">The three forms of streaming</a></h1>
+<h2 id="the-three-forms-of-streaming" class="section-header"><a href="#the-three-forms-of-streaming">The three forms of streaming</a></h2>
 <p>There are three common methods which can create streams from a collection:</p>
 <ul>
 <li><code>stream()</code>, which iterates over <code>&amp;T</code>.</li>
@@ -49,7 +49,7 @@ below for more details.</p>
 </ul>
 <p>Various things in async-std may implement one or more of the
 three, where appropriate.</p>
-<h1 id="implementing-stream" class="section-header"><a href="#implementing-stream">Implementing Stream</a></h1>
+<h2 id="implementing-stream" class="section-header"><a href="#implementing-stream">Implementing Stream</a></h2>
 <p>Creating a stream of your own involves two steps: creating a <code>struct</code> to
 hold the stream’s state, and then <code>impl</code>ementing <a href="trait.Stream.html"><code>Stream</code></a> for that
 <code>struct</code>. This is why there are so many <code>struct</code>s in this module: there is
@@ -67,7 +67,7 @@ one for each stream and iterator adapter.</p>
 <span class="comment">// This isn&#39;t strictly necessary, but is convenient. Note that we start</span>
 <span class="comment">// `count` at zero, we&#39;ll see why in `next()`&#39;s implementation below.</span>
 <span class="kw">impl</span> <span class="ident">Counter</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Counter</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Counter</span> {
         <span class="ident">Counter</span> { <span class="ident">count</span>: <span class="number">0</span> }
     }
 }
@@ -79,7 +79,7 @@ one for each stream and iterator adapter.</p>
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span>;
 
     <span class="comment">// poll_next() is the only required method</span>
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Increment our count. This is why we started at zero.</span>
         <span class="self">self</span>.<span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 
@@ -113,7 +113,7 @@ one for each stream and iterator adapter.</p>
 <p>Calling <code>next().await</code> this way gets repetitive. Rust has a construct which
 can call <code>next()</code> on your stream, until it reaches <code>None</code>. Let’s go over
 that next.</p>
-<h1 id="while-let-loops-and-intostream" class="section-header"><a href="#while-let-loops-and-intostream">while let Loops and IntoStream</a></h1>
+<h2 id="while-let-loops-and-intostream" class="section-header"><a href="#while-let-loops-and-intostream">while let Loops and IntoStream</a></h2>
 <p>Rust’s <code>while let</code> loop syntax is an idiomatic way to iterate over streams. Here’s a basic
 example of <code>while let</code>:</p>
 
@@ -131,13 +131,13 @@ which converts the thing implementing <a href="trait.IntoStream.html"><code>Into
 <p>Unlike <code>std::iter::IntoIterator</code>, <code>IntoStream</code> does not have compiler
 support yet. This means that automatic conversions like with <code>for</code> loops
 doesn’t occur yet, and <code>into_stream</code> will always have to be called manually.</p>
-<h1 id="adapters" class="section-header"><a href="#adapters">Adapters</a></h1>
+<h2 id="adapters" class="section-header"><a href="#adapters">Adapters</a></h2>
 <p>Functions which take an <a href="trait.Stream.html"><code>Stream</code></a> and return another <a href="trait.Stream.html"><code>Stream</code></a> are
 often called ‘stream adapters’, as they are a form of the ‘adapter
 pattern’.</p>
 <p>Common stream adapters include <a href="trait.Stream.html#method.map"><code>map</code></a>, <a href="trait.Stream.html#method.take"><code>take</code></a>, and <a href="trait.Stream.html#method.filter"><code>filter</code></a>.
 For more, see their documentation.</p>
-<h1 id="laziness" class="section-header"><a href="#laziness">Laziness</a></h1>
+<h2 id="laziness" class="section-header"><a href="#laziness">Laziness</a></h2>
 <p>Streams (and stream <a href="#adapters">adapters</a>) are <em>lazy</em>. This means that
 just creating a stream doesn’t <em>do</em> a whole lot. Nothing really happens
 until you call <a href="trait.Stream.html#tymethod.next"><code>next</code></a>. This is sometimes a source of confusion when
@@ -160,7 +160,7 @@ do nothing unless consumed</code></pre></div>
 }</code></pre></div>
 <p>The two most common ways to evaluate a stream are to use a <code>while let</code> loop
 like this, or using the <a href="trait.Stream.html#method.collect"><code>collect</code></a> method to produce a new collection.</p>
-<h1 id="infinity" class="section-header"><a href="#infinity">Infinity</a></h1>
+<h2 id="infinity" class="section-header"><a href="#infinity">Infinity</a></h2>
 <p>Streams do not have to be finite. As an example, a repeat stream is
 an infinite stream:</p>
 
@@ -186,60 +186,60 @@ successfully for any infinite streams.</p>
 <span class="comment">// `ones.min()` causes an infinite loop, so we won&#39;t reach this point!</span>
 <span class="macro">println!</span>(<span class="string">&quot;The smallest number one is {}.&quot;</span>, <span class="ident">least</span>);</code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Chain.html" title="async_std::stream::Chain struct">Chain</a></div><div class="item-right docblock-short"><p>A stream that chains two streams one after another.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Cloned.html" title="async_std::stream::Cloned struct">Cloned</a></div><div class="item-right docblock-short"><p>A stream that clones the elements of an underlying stream.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Copied.html" title="async_std::stream::Copied struct">Copied</a></div><div class="item-right docblock-short"><p>A stream that copies the elements of an underlying stream.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Empty.html" title="async_std::stream::Empty struct">Empty</a></div><div class="item-right docblock-short"><p>A stream that doesn’t yield any items.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Filter.html" title="async_std::stream::Filter struct">Filter</a></div><div class="item-right docblock-short"><p>A stream to filter elements of another stream with a predicate.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.FlatMap.html" title="async_std::stream::FlatMap struct">FlatMap</a></div><div class="item-right docblock-short"><p>A stream that maps each element to a stream, and yields the elements of the produced
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Chain.html" title="async_std::stream::Chain struct">Chain</a></div><div class="item-right docblock-short"><p>A stream that chains two streams one after another.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Cloned.html" title="async_std::stream::Cloned struct">Cloned</a></div><div class="item-right docblock-short"><p>A stream that clones the elements of an underlying stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Copied.html" title="async_std::stream::Copied struct">Copied</a></div><div class="item-right docblock-short"><p>A stream that copies the elements of an underlying stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Empty.html" title="async_std::stream::Empty struct">Empty</a></div><div class="item-right docblock-short"><p>A stream that doesn’t yield any items.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Filter.html" title="async_std::stream::Filter struct">Filter</a></div><div class="item-right docblock-short"><p>A stream to filter elements of another stream with a predicate.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.FlatMap.html" title="async_std::stream::FlatMap struct">FlatMap</a></div><div class="item-right docblock-short"><p>A stream that maps each element to a stream, and yields the elements of the produced
 streams.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Flatten.html" title="async_std::stream::Flatten struct">Flatten</a></div><div class="item-right docblock-short"><p>A stream that flattens one level of nesting in an stream of things that can be turned into
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Flatten.html" title="async_std::stream::Flatten struct">Flatten</a></div><div class="item-right docblock-short"><p>A stream that flattens one level of nesting in an stream of things that can be turned into
 streams.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.FromFn.html" title="async_std::stream::FromFn struct">FromFn</a></div><div class="item-right docblock-short"><p>A stream that yields elements by calling a closure.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.FromIter.html" title="async_std::stream::FromIter struct">FromIter</a></div><div class="item-right docblock-short"><p>A stream that was created from iterator.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Fuse.html" title="async_std::stream::Fuse struct">Fuse</a></div><div class="item-right docblock-short"><p>A stream that yields <code>None</code> forever after the underlying stream yields <code>None</code> once.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Inspect.html" title="async_std::stream::Inspect struct">Inspect</a></div><div class="item-right docblock-short"><p>A stream that does something with each element of another stream.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Interval.html" title="async_std::stream::Interval struct">Interval</a></div><div class="item-right docblock-short"><p>A stream representing notifications at fixed interval</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Map.html" title="async_std::stream::Map struct">Map</a></div><div class="item-right docblock-short"><p>A stream that maps value of another stream with a function.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Merge.html" title="async_std::stream::Merge struct">Merge</a></div><div class="item-right docblock-short"><p>A stream that merges two other streams into a single stream.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Once.html" title="async_std::stream::Once struct">Once</a></div><div class="item-right docblock-short"><p>A stream that yields a single item.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Pending.html" title="async_std::stream::Pending struct">Pending</a></div><div class="item-right docblock-short"><p>A stream that never returns any items.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Repeat.html" title="async_std::stream::Repeat struct">Repeat</a></div><div class="item-right docblock-short"><p>A stream that yields the same item repeatedly.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.RepeatWith.html" title="async_std::stream::RepeatWith struct">RepeatWith</a></div><div class="item-right docblock-short"><p>A stream that repeats elements of type <code>T</code> endlessly by applying a provided closure.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Scan.html" title="async_std::stream::Scan struct">Scan</a></div><div class="item-right docblock-short"><p>A stream to maintain state while polling another stream.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Skip.html" title="async_std::stream::Skip struct">Skip</a></div><div class="item-right docblock-short"><p>A stream to skip first n elements of another stream.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.SkipWhile.html" title="async_std::stream::SkipWhile struct">SkipWhile</a></div><div class="item-right docblock-short"><p>A stream to skip elements of another stream based on a predicate.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.StepBy.html" title="async_std::stream::StepBy struct">StepBy</a></div><div class="item-right docblock-short"><p>A stream that steps a given amount of elements of another stream.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Successors.html" title="async_std::stream::Successors struct">Successors</a></div><div class="item-right docblock-short"><p>A stream that yields elements by calling an async closure with the previous value as an
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.FromFn.html" title="async_std::stream::FromFn struct">FromFn</a></div><div class="item-right docblock-short"><p>A stream that yields elements by calling a closure.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.FromIter.html" title="async_std::stream::FromIter struct">FromIter</a></div><div class="item-right docblock-short"><p>A stream that was created from iterator.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Fuse.html" title="async_std::stream::Fuse struct">Fuse</a></div><div class="item-right docblock-short"><p>A stream that yields <code>None</code> forever after the underlying stream yields <code>None</code> once.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Inspect.html" title="async_std::stream::Inspect struct">Inspect</a></div><div class="item-right docblock-short"><p>A stream that does something with each element of another stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Interval.html" title="async_std::stream::Interval struct">Interval</a></div><div class="item-right docblock-short"><p>A stream representing notifications at fixed interval</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Map.html" title="async_std::stream::Map struct">Map</a></div><div class="item-right docblock-short"><p>A stream that maps value of another stream with a function.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Merge.html" title="async_std::stream::Merge struct">Merge</a></div><div class="item-right docblock-short"><p>A stream that merges two other streams into a single stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Once.html" title="async_std::stream::Once struct">Once</a></div><div class="item-right docblock-short"><p>A stream that yields a single item.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Pending.html" title="async_std::stream::Pending struct">Pending</a></div><div class="item-right docblock-short"><p>A stream that never returns any items.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Repeat.html" title="async_std::stream::Repeat struct">Repeat</a></div><div class="item-right docblock-short"><p>A stream that yields the same item repeatedly.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.RepeatWith.html" title="async_std::stream::RepeatWith struct">RepeatWith</a></div><div class="item-right docblock-short"><p>A stream that repeats elements of type <code>T</code> endlessly by applying a provided closure.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Scan.html" title="async_std::stream::Scan struct">Scan</a></div><div class="item-right docblock-short"><p>A stream to maintain state while polling another stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Skip.html" title="async_std::stream::Skip struct">Skip</a></div><div class="item-right docblock-short"><p>A stream to skip first n elements of another stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.SkipWhile.html" title="async_std::stream::SkipWhile struct">SkipWhile</a></div><div class="item-right docblock-short"><p>A stream to skip elements of another stream based on a predicate.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.StepBy.html" title="async_std::stream::StepBy struct">StepBy</a></div><div class="item-right docblock-short"><p>A stream that steps a given amount of elements of another stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Successors.html" title="async_std::stream::Successors struct">Successors</a></div><div class="item-right docblock-short"><p>A stream that yields elements by calling an async closure with the previous value as an
 argument</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Take.html" title="async_std::stream::Take struct">Take</a></div><div class="item-right docblock-short"><p>A stream that yields the first <code>n</code> items of another stream.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.TakeWhile.html" title="async_std::stream::TakeWhile struct">TakeWhile</a></div><div class="item-right docblock-short"><p>A stream that yields elements based on a predicate.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Timeout.html" title="async_std::stream::Timeout struct">Timeout</a></div><div class="item-right docblock-short"><p>A stream with timeout time set</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.TimeoutError.html" title="async_std::stream::TimeoutError struct">TimeoutError</a></div><div class="item-right docblock-short"><p>An error returned when a stream times out.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Zip.html" title="async_std::stream::Zip struct">Zip</a></div><div class="item-right docblock-short"><p>A stream that takes items from two other streams simultaneously.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.DoubleEndedStream.html" title="async_std::stream::DoubleEndedStream trait">DoubleEndedStream</a></div><div class="item-right docblock-short"><p>A stream able to yield elements from both ends.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.ExactSizeStream.html" title="async_std::stream::ExactSizeStream trait">ExactSizeStream</a></div><div class="item-right docblock-short"><p>A stream that knows its exact length.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Extend.html" title="async_std::stream::Extend trait">Extend</a></div><div class="item-right docblock-short"><p>Extends a collection with the contents of a stream.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.FromStream.html" title="async_std::stream::FromStream trait">FromStream</a></div><div class="item-right docblock-short"><p>Conversion from a <code>Stream</code>.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.FusedStream.html" title="async_std::stream::FusedStream trait">FusedStream</a></div><div class="item-right docblock-short"><p>A stream that always continues to yield <code>None</code> when exhausted.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.IntoStream.html" title="async_std::stream::IntoStream trait">IntoStream</a></div><div class="item-right docblock-short"><p>Conversion into a <code>Stream</code>.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Product.html" title="async_std::stream::Product trait">Product</a></div><div class="item-right docblock-short"><p>Trait to represent types that can be created by multiplying the elements of a stream.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Stream.html" title="async_std::stream::Stream trait">Stream</a></div><div class="item-right docblock-short"><p>A stream of values produced asynchronously.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.StreamExt.html" title="async_std::stream::StreamExt trait">StreamExt</a></div><div class="item-right docblock-short"><p>Extension methods for <a href="../stream/trait.Stream.html"><code>Stream</code></a>.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Sum.html" title="async_std::stream::Sum trait">Sum</a></div><div class="item-right docblock-short"><p>Trait to represent types that can be created by summing up a stream.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.empty.html" title="async_std::stream::empty fn">empty</a></div><div class="item-right docblock-short"><p>Creates a stream that doesn’t yield any items.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.extend.html" title="async_std::stream::extend fn">extend</a></div><div class="item-right docblock-short"><p>Extends a collection with the contents of a stream.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.from_fn.html" title="async_std::stream::from_fn fn">from_fn</a></div><div class="item-right docblock-short"><p>Creates a new stream where to produce each new element a provided closure is called.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.from_iter.html" title="async_std::stream::from_iter fn">from_iter</a></div><div class="item-right docblock-short"><p>Converts an iterator into a stream.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.interval.html" title="async_std::stream::interval fn">interval</a></div><div class="item-right docblock-short"><p>Creates a new stream that yields at a set interval.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.once.html" title="async_std::stream::once fn">once</a></div><div class="item-right docblock-short"><p>Creates a stream that yields a single item.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.pending.html" title="async_std::stream::pending fn">pending</a></div><div class="item-right docblock-short"><p>Creates a stream that never returns any items.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.repeat.html" title="async_std::stream::repeat fn">repeat</a></div><div class="item-right docblock-short"><p>Creates a stream that yields the same item repeatedly.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.repeat_with.html" title="async_std::stream::repeat_with fn">repeat_with</a></div><div class="item-right docblock-short"><p>Creates a new stream that repeats elements of type <code>A</code> endlessly by applying the provided closure.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.successors.html" title="async_std::stream::successors fn">successors</a></div><div class="item-right docblock-short"><p>Creates a new stream where to produce each new element a closure is called with the previous
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Take.html" title="async_std::stream::Take struct">Take</a></div><div class="item-right docblock-short"><p>A stream that yields the first <code>n</code> items of another stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.TakeWhile.html" title="async_std::stream::TakeWhile struct">TakeWhile</a></div><div class="item-right docblock-short"><p>A stream that yields elements based on a predicate.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Timeout.html" title="async_std::stream::Timeout struct">Timeout</a></div><div class="item-right docblock-short"><p>A stream with timeout time set</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.TimeoutError.html" title="async_std::stream::TimeoutError struct">TimeoutError</a></div><div class="item-right docblock-short"><p>An error returned when a stream times out.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Zip.html" title="async_std::stream::Zip struct">Zip</a></div><div class="item-right docblock-short"><p>A stream that takes items from two other streams simultaneously.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.DoubleEndedStream.html" title="async_std::stream::DoubleEndedStream trait">DoubleEndedStream</a></div><div class="item-right docblock-short"><p>A stream able to yield elements from both ends.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ExactSizeStream.html" title="async_std::stream::ExactSizeStream trait">ExactSizeStream</a></div><div class="item-right docblock-short"><p>A stream that knows its exact length.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Extend.html" title="async_std::stream::Extend trait">Extend</a></div><div class="item-right docblock-short"><p>Extends a collection with the contents of a stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.FromStream.html" title="async_std::stream::FromStream trait">FromStream</a></div><div class="item-right docblock-short"><p>Conversion from a <code>Stream</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.FusedStream.html" title="async_std::stream::FusedStream trait">FusedStream</a></div><div class="item-right docblock-short"><p>A stream that always continues to yield <code>None</code> when exhausted.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IntoStream.html" title="async_std::stream::IntoStream trait">IntoStream</a></div><div class="item-right docblock-short"><p>Conversion into a <code>Stream</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Product.html" title="async_std::stream::Product trait">Product</a></div><div class="item-right docblock-short"><p>Trait to represent types that can be created by multiplying the elements of a stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Stream.html" title="async_std::stream::Stream trait">Stream</a></div><div class="item-right docblock-short"><p>A stream of values produced asynchronously.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.StreamExt.html" title="async_std::stream::StreamExt trait">StreamExt</a></div><div class="item-right docblock-short"><p>Extension methods for <a href="../stream/trait.Stream.html"><code>Stream</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Sum.html" title="async_std::stream::Sum trait">Sum</a></div><div class="item-right docblock-short"><p>Trait to represent types that can be created by summing up a stream.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.empty.html" title="async_std::stream::empty fn">empty</a></div><div class="item-right docblock-short"><p>Creates a stream that doesn’t yield any items.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.extend.html" title="async_std::stream::extend fn">extend</a></div><div class="item-right docblock-short"><p>Extends a collection with the contents of a stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.from_fn.html" title="async_std::stream::from_fn fn">from_fn</a></div><div class="item-right docblock-short"><p>Creates a new stream where to produce each new element a provided closure is called.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.from_iter.html" title="async_std::stream::from_iter fn">from_iter</a></div><div class="item-right docblock-short"><p>Converts an iterator into a stream.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.interval.html" title="async_std::stream::interval fn">interval</a></div><div class="item-right docblock-short"><p>Creates a new stream that yields at a set interval.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.once.html" title="async_std::stream::once fn">once</a></div><div class="item-right docblock-short"><p>Creates a stream that yields a single item.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.pending.html" title="async_std::stream::pending fn">pending</a></div><div class="item-right docblock-short"><p>Creates a stream that never returns any items.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.repeat.html" title="async_std::stream::repeat fn">repeat</a></div><div class="item-right docblock-short"><p>Creates a stream that yields the same item repeatedly.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.repeat_with.html" title="async_std::stream::repeat_with fn">repeat_with</a></div><div class="item-right docblock-short"><p>Creates a new stream that repeats elements of type <code>A</code> endlessly by applying the provided closure.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.successors.html" title="async_std::stream::successors fn">successors</a></div><div class="item-right docblock-short"><p>Creates a new stream where to produce each new element a closure is called with the previous
 value.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="async_std" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="async_std" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

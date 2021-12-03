@@ -101,7 +101,7 @@
 <span class="kw">impl</span> <span class="ident">Scalar</span> {
     <span class="comment">// Constructs a `Scalar` from `bytes`, failing if `bytes` encodes a scalar</span>
     <span class="comment">// that not in the range [0, n).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes_checked</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="ident">SCALAR_LEN</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes_checked</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="ident">SCALAR_LEN</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">const</span> <span class="ident">ORDER</span>: [<span class="ident">limb::Limb</span>; <span class="ident">SCALAR_LEN</span> <span class="op">/</span> <span class="ident">limb::LIMB_BYTES</span>] <span class="op">=</span>
             <span class="macro">limbs!</span>[<span class="number">0x5cf5d3ed</span>, <span class="number">0x5812631a</span>, <span class="number">0xa2f79cd6</span>, <span class="number">0x14def9de</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0x10000000</span>];
 
@@ -121,7 +121,7 @@
     }
 
     <span class="comment">// Constructs a `Scalar` from `digest` reduced modulo n.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_sha512_digest_reduced</span>(<span class="ident">digest</span>: <span class="ident">digest::Digest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_sha512_digest_reduced</span>(<span class="ident">digest</span>: <span class="ident">digest::Digest</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
             <span class="kw">fn</span> <span class="ident">GFp_x25519_sc_reduce</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UnreducedScalar</span>);
         }
@@ -136,7 +136,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MaskedScalar</span>([<span class="ident">u8</span>; <span class="ident">SCALAR_LEN</span>]);
 
 <span class="kw">impl</span> <span class="ident">MaskedScalar</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes_masked</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="ident">SCALAR_LEN</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes_masked</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="ident">SCALAR_LEN</span>]) -&gt; <span class="self">Self</span> {
         <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
             <span class="kw">fn</span> <span class="ident">GFp_x25519_sc_mask</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>; <span class="ident">SCALAR_LEN</span>]);
         }
@@ -147,7 +147,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MaskedScalar</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Scalar</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">MaskedScalar</span>(<span class="ident">scalar</span>): <span class="ident">MaskedScalar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">MaskedScalar</span>(<span class="ident">scalar</span>): <span class="ident">MaskedScalar</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">scalar</span>)
     }
 }

@@ -72,7 +72,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Inner</span>, <span class="ident">Outer</span><span class="op">&gt;</span> <span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">Inner</span>, <span class="ident">Outer</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new `Stack`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">Inner</span>, <span class="ident">outer</span>: <span class="ident">Outer</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">Inner</span>, <span class="ident">outer</span>: <span class="ident">Outer</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Stack</span> { <span class="ident">inner</span>, <span class="ident">outer</span> }
     }
 }
@@ -84,7 +84,7 @@
 {
     <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">Outer::Service</span>;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Service</span> {
+    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">layer</span>(<span class="ident">service</span>);
 
         <span class="self">self</span>.<span class="ident">outer</span>.<span class="ident">layer</span>(<span class="ident">inner</span>)
@@ -96,7 +96,7 @@
     <span class="ident">Inner</span>: <span class="ident">fmt::Debug</span>,
     <span class="ident">Outer</span>: <span class="ident">fmt::Debug</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="comment">// The generated output of nested `Stack`s is very noisy and makes</span>
         <span class="comment">// it harder to understand what is in a `ServiceBuilder`.</span>
         <span class="comment">//</span>

@@ -155,7 +155,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Join</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">syn::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">join</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
 
         <span class="kw">while</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_empty</span>() {
@@ -170,7 +170,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">bind_futures</span>(<span class="ident">fut_exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TokenStream2</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>) {
+<span class="kw">fn</span> <span class="ident">bind_futures</span>(<span class="ident">fut_exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TokenStream2</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">future_let_bindings</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">fut_exprs</span>.<span class="ident">len</span>());
     <span class="kw">let</span> <span class="ident">future_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fut_exprs</span>
         .<span class="ident">into_iter</span>()
@@ -190,7 +190,7 @@
 }
 
 <span class="doccomment">/// The `join!` macro.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">join</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">join</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">Join</span>);
 
     <span class="comment">// should be def_site, but that&#39;s unstable</span>
@@ -228,7 +228,7 @@
 }
 
 <span class="doccomment">/// The `try_join!` macro.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_join</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_join</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">Join</span>);
 
     <span class="comment">// should be def_site, but that&#39;s unstable</span>

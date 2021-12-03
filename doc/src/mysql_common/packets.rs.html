@@ -1855,7 +1855,7 @@
 };
 
 <span class="macro">macro_rules!</span> <span class="ident">get_offset_and_len</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buffer</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">slice</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buffer</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">slice</span>:<span class="ident">expr</span>) =&gt; {{
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">slice</span>;
         (<span class="ident">val</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">buffer</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">val</span>.<span class="ident">len</span>())
     }};
@@ -1884,13 +1884,13 @@
 }
 
 <span class="doccomment">/// Converts column-packet payload to an instance of `Column` structure.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_from_payload</span>(<span class="ident">payload</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_from_payload</span>(<span class="ident">payload</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span> {
     <span class="ident">Column::from_payload</span>(<span class="ident">payload</span>)
 }
 
 <span class="kw">impl</span> <span class="ident">Column</span> {
     <span class="doccomment">/// Converts column-packet payload to an instance of `Column` structure.</span>
-    <span class="kw">fn</span> <span class="ident">from_payload</span>(<span class="ident">payload</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_payload</span>(<span class="ident">payload</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">schema</span>;
         <span class="kw">let</span> <span class="ident">table</span>;
         <span class="kw">let</span> <span class="ident">org_table</span>;
@@ -1934,81 +1934,81 @@
     }
 
     <span class="doccomment">/// Returns value of the column_length field of a column packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">column_length</span>
     }
 
     <span class="doccomment">/// Returns value of the column_type field of a column packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnType</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnType</span> {
         <span class="self">self</span>.<span class="ident">column_type</span>
     }
 
     <span class="doccomment">/// Returns value of the character_set field of a column packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">character_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">character_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
         <span class="self">self</span>.<span class="ident">character_set</span>
     }
 
     <span class="doccomment">/// Returns value of the flags field of a column packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnFlags</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnFlags</span> {
         <span class="self">self</span>.<span class="ident">flags</span>
     }
 
     <span class="doccomment">/// Returns value of the decimals field of a column packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decimals</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decimals</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">decimals</span>
     }
 
     <span class="doccomment">/// Returns value of the schema field of a column packet as a byte slice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">payload</span>[<span class="self">self</span>.<span class="ident">schema</span>.<span class="number">0</span>..<span class="self">self</span>.<span class="ident">schema</span>.<span class="number">0</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">schema</span>.<span class="number">1</span>]
     }
 
     <span class="doccomment">/// Returns value of the schema field of a column packet as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">String::from_utf8_lossy</span>(<span class="self">self</span>.<span class="ident">schema_ref</span>())
     }
 
     <span class="doccomment">/// Returns value of the table field of a column packet as a byte slice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">payload</span>[<span class="self">self</span>.<span class="ident">table</span>.<span class="number">0</span>..<span class="self">self</span>.<span class="ident">table</span>.<span class="number">0</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="number">1</span>]
     }
 
     <span class="doccomment">/// Returns value of the table field of a column packet as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">String::from_utf8_lossy</span>(<span class="self">self</span>.<span class="ident">table_ref</span>())
     }
 
     <span class="doccomment">/// Returns value of the org_table field of a column packet as a byte slice.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// &quot;org_table&quot; is for original table name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">org_table_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">org_table_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">payload</span>[<span class="self">self</span>.<span class="ident">org_table</span>.<span class="number">0</span>..<span class="self">self</span>.<span class="ident">org_table</span>.<span class="number">0</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">org_table</span>.<span class="number">1</span>]
     }
 
     <span class="doccomment">/// Returns value of the org_table field of a column packet as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">org_table_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">org_table_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">String::from_utf8_lossy</span>(<span class="self">self</span>.<span class="ident">org_table_ref</span>())
     }
 
     <span class="doccomment">/// Returns value of the name field of a column packet as a byte slice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">payload</span>[<span class="self">self</span>.<span class="ident">name</span>.<span class="number">0</span>..<span class="self">self</span>.<span class="ident">name</span>.<span class="number">0</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="number">1</span>]
     }
 
     <span class="doccomment">/// Returns value of the name field of a column packet as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">String::from_utf8_lossy</span>(<span class="self">self</span>.<span class="ident">name_ref</span>())
     }
 
     <span class="doccomment">/// Returns value of the org_name field of a column packet as a byte slice.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// &quot;org_name&quot; is for original column name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">org_name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">org_name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">payload</span>[<span class="self">self</span>.<span class="ident">org_name</span>.<span class="number">0</span>..<span class="self">self</span>.<span class="ident">org_name</span>.<span class="number">0</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">org_name</span>.<span class="number">1</span>]
     }
 
     <span class="doccomment">/// Returns value of the org_name field of a column packet as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">org_name_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">org_name_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">String::from_utf8_lossy</span>(<span class="self">self</span>.<span class="ident">org_name_ref</span>())
     }
 }
@@ -2023,17 +2023,17 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SessionStateChange</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionStateChange</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">SessionStateChange</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SessionStateChange::SystemVariable</span>(<span class="ident">name</span>, <span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SessionStateChange::SystemVariable</span>(
+            <span class="ident">SessionStateChange::SystemVariable</span>(<span class="ident">name</span>, <span class="ident">value</span>) =&gt; <span class="ident">SessionStateChange::SystemVariable</span>(
                 <span class="ident">name</span>.<span class="ident">into_owned</span>().<span class="ident">into</span>(),
                 <span class="ident">value</span>.<span class="ident">into_owned</span>().<span class="ident">into</span>(),
             ),
-            <span class="ident">SessionStateChange::Schema</span>(<span class="ident">schema</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SessionStateChange::Schema</span>(<span class="ident">schema</span>) =&gt; {
                 <span class="ident">SessionStateChange::Schema</span>(<span class="ident">schema</span>.<span class="ident">into_owned</span>().<span class="ident">into</span>())
             }
-            <span class="ident">SessionStateChange::IsTracked</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SessionStateChange::IsTracked</span>(<span class="ident">x</span>),
-            <span class="ident">SessionStateChange::UnknownLayout</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SessionStateChange::IsTracked</span>(<span class="ident">x</span>) =&gt; <span class="ident">SessionStateChange::IsTracked</span>(<span class="ident">x</span>),
+            <span class="ident">SessionStateChange::UnknownLayout</span>(<span class="ident">data</span>) =&gt; {
                 <span class="ident">SessionStateChange::UnknownLayout</span>(<span class="ident">data</span>.<span class="ident">into_owned</span>().<span class="ident">into</span>())
             }
         }
@@ -2048,7 +2048,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SessionStateInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SessionStateInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SessionStateInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">data_type</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">SessionStateInfo</span> {
             <span class="ident">data_type</span>: <span class="ident">data_type</span>.<span class="ident">into</span>(),
@@ -2056,7 +2056,7 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionStateInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">SessionStateInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">SessionStateInfo</span> { <span class="ident">data_type</span>, <span class="ident">data</span> } <span class="op">=</span> <span class="self">self</span>;
         <span class="ident">SessionStateInfo</span> {
             <span class="ident">data_type</span>,
@@ -2064,14 +2064,14 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SessionStateType</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SessionStateType</span> {
         <span class="self">self</span>.<span class="ident">data_type</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SessionStateChange</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SessionStateChange</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_ref</span>();
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data_type</span> {
-            <span class="ident">SessionStateType::SESSION_TRACK_SYSTEM_VARIABLES</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SessionStateType::SESSION_TRACK_SYSTEM_VARIABLES</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">SessionStateChange::SystemVariable</span>(
@@ -2079,18 +2079,18 @@
                     <span class="ident">value</span>.<span class="ident">into</span>(),
                 ))
             }
-            <span class="ident">SessionStateType::SESSION_TRACK_SCHEMA</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SessionStateType::SESSION_TRACK_SCHEMA</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">SessionStateChange::Schema</span>(<span class="ident">schema</span>.<span class="ident">into</span>()))
             }
-            <span class="ident">SessionStateType::SESSION_TRACK_STATE_CHANGE</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SessionStateType::SESSION_TRACK_STATE_CHANGE</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">is_tracked</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">SessionStateChange::IsTracked</span>(<span class="ident">is_tracked</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&quot;1&quot;</span>))
+                <span class="prelude-val">Ok</span>(<span class="ident">SessionStateChange::IsTracked</span>(<span class="ident">is_tracked</span> <span class="op">==</span> <span class="string">b&quot;1&quot;</span>))
             }
             <span class="comment">// Layout not specified in documentation</span>
             <span class="ident">SessionStateType::SESSION_TRACK_GTIDS</span>
             <span class="op">|</span> <span class="ident">SessionStateType::SESSION_TRACK_TRANSACTION_CHARACTERISTICS</span>
-            <span class="op">|</span> <span class="ident">SessionStateType::SESSION_TRACK_TRANSACTION_STATE</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="op">|</span> <span class="ident">SessionStateType::SESSION_TRACK_TRANSACTION_STATE</span> =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">SessionStateChange::UnknownLayout</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">clone</span>()))
             }
         }
@@ -2125,7 +2125,7 @@
     <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     <span class="ident">capabilities</span>: <span class="ident">CapabilityFlags</span>,
     <span class="ident">kind</span>: <span class="ident">OkPacketKind</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">OkPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">OkPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">OkPacket::parse</span>(<span class="ident">payload</span>, <span class="ident">capabilities</span>, <span class="ident">kind</span>)
 }
 
@@ -2135,10 +2135,10 @@
         <span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">capabilities</span>: <span class="ident">CapabilityFlags</span>,
         <span class="ident">kind</span>: <span class="ident">OkPacketKind</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">OkPacket</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">OkPacket</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> (<span class="ident">affected_rows</span>, <span class="ident">last_insert_id</span>, <span class="ident">status_flags</span>, <span class="ident">warnings</span>, <span class="ident">info</span>, <span class="ident">session_state_info</span>) <span class="op">=</span>
-            <span class="kw">if</span> <span class="ident">kind</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OkPacketKind::Other</span> <span class="op">&amp;&amp;</span> <span class="ident">header</span> <span class="op">=</span><span class="op">=</span> <span class="number">0x00</span> {
+            <span class="kw">if</span> <span class="ident">kind</span> <span class="op">==</span> <span class="ident">OkPacketKind::Other</span> <span class="op">&amp;&amp;</span> <span class="ident">header</span> <span class="op">==</span> <span class="number">0x00</span> {
                 <span class="kw">let</span> <span class="ident">affected_rows</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">read_lenenc_int</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">last_insert_id</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">read_lenenc_int</span>()<span class="question-mark">?</span>;
                 <span class="comment">// We assume that CLIENT_PROTOCOL_41 was set</span>
@@ -2172,8 +2172,8 @@
                     <span class="ident">info</span>,
                     <span class="ident">session_state_info</span>,
                 )
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kind</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OkPacketKind::ResultSetTerminator</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">header</span> <span class="op">=</span><span class="op">=</span> <span class="number">0xFE</span>
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">kind</span> <span class="op">==</span> <span class="ident">OkPacketKind::ResultSetTerminator</span>
+                <span class="op">&amp;&amp;</span> <span class="ident">header</span> <span class="op">==</span> <span class="number">0xFE</span>
                 <span class="op">&amp;&amp;</span> <span class="ident">payload</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">8</span>
             {
                 <span class="comment">// We assume that CLIENT_PROTOCOL_41 was set</span>
@@ -2189,7 +2189,7 @@
 
         <span class="prelude-val">Ok</span>(<span class="ident">OkPacket</span> {
             <span class="ident">affected_rows</span>,
-            <span class="ident">last_insert_id</span>: <span class="kw">if</span> <span class="ident">last_insert_id</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="ident">last_insert_id</span>: <span class="kw">if</span> <span class="ident">last_insert_id</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="prelude-val">None</span>
             } <span class="kw">else</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">last_insert_id</span>)
@@ -2209,7 +2209,7 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OkPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">OkPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">OkPacket</span> {
             <span class="ident">affected_rows</span>,
             <span class="ident">last_insert_id</span>,
@@ -2229,38 +2229,38 @@
     }
 
     <span class="doccomment">/// Value of the affected_rows field of an Ok packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">affected_rows</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">affected_rows</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">affected_rows</span>
     }
 
     <span class="doccomment">/// Value of the last_insert_id field of an Ok packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_insert_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_insert_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">last_insert_id</span>
     }
 
     <span class="doccomment">/// Value of the status_flags field of an Ok packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StatusFlags</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StatusFlags</span> {
         <span class="self">self</span>.<span class="ident">status_flags</span>
     }
 
     <span class="doccomment">/// Value of the warnings field of an Ok packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warnings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warnings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
         <span class="self">self</span>.<span class="ident">warnings</span>
     }
 
     <span class="doccomment">/// Value of the info field of an Ok packet as a byte slice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">info_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">info_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">info</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_ref</span>())
     }
 
     <span class="doccomment">/// Value of the info field of an Ok packet as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">info_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">info_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">info</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">String::from_utf8_lossy</span>(<span class="ident">x</span>.<span class="ident">as_ref</span>()))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session_state_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SessionStateInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session_state_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SessionStateInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">session_state_info</span>.<span class="ident">as_ref</span>()
     }
 }
@@ -2275,7 +2275,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ProgressReport</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stage</span>: <span class="ident">u8</span>, <span class="ident">max_stage</span>: <span class="ident">u8</span>, <span class="ident">progress</span>: <span class="ident">u32</span>, <span class="ident">stage_info</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProgressReport</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stage</span>: <span class="ident">u8</span>, <span class="ident">max_stage</span>: <span class="ident">u8</span>, <span class="ident">progress</span>: <span class="ident">u32</span>, <span class="ident">stage_info</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">ProgressReport</span> {
         <span class="ident">ProgressReport</span> {
             <span class="ident">stage</span>,
             <span class="ident">max_stage</span>,
@@ -2285,30 +2285,30 @@
     }
 
     <span class="doccomment">/// 1 to max_stage</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">stage</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_stage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_stage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">max_stage</span>
     }
 
     <span class="doccomment">/// Progress as &#39;% * 1000&#39;</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">progress</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">progress</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">progress</span>
     }
 
     <span class="doccomment">/// Status or state name as a byte slice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_info_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_info_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stage_info</span>.<span class="ident">as_ref</span>()
     }
 
     <span class="doccomment">/// Status or state name as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_info_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_info_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">String::from_utf8_lossy</span>(<span class="self">self</span>.<span class="ident">stage_info</span>.<span class="ident">as_ref</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProgressReport</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">ProgressReport</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ProgressReport</span> {
             <span class="ident">stage</span>,
             <span class="ident">max_stage</span>,
@@ -2325,7 +2325,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ProgressReport</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;Stage: {} of {} &#39;{}&#39;  {:.2}% of stage done&quot;</span>,
@@ -2351,13 +2351,13 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_err_packet</span>(
     <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     <span class="ident">capabilities</span>: <span class="ident">CapabilityFlags</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ErrPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ErrPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">ErrPacket::parse</span>(<span class="ident">payload</span>, <span class="ident">capabilities</span>)
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ErrPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Parses error packet from `payload` assuming passed client-server `capabilities`.</span>
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">capabilities</span>: <span class="ident">CapabilityFlags</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ErrPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">capabilities</span>: <span class="ident">CapabilityFlags</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ErrPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0xFF</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                 <span class="ident">io::ErrorKind::InvalidData</span>,
@@ -2367,7 +2367,7 @@
 
         <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
         <span class="comment">// We assume that CLIENT_PROTOCOL_41 was set</span>
-        <span class="kw">if</span> <span class="ident">code</span> <span class="op">=</span><span class="op">=</span> <span class="number">0xFFFF</span> <span class="op">&amp;&amp;</span> <span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">CapabilityFlags::CLIENT_PROGRESS_OBSOLETE</span>) {
+        <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">0xFFFF</span> <span class="op">&amp;&amp;</span> <span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">CapabilityFlags::CLIENT_PROGRESS_OBSOLETE</span>) {
             <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>; <span class="comment">// Ignore number of strings.</span>
             <span class="kw">let</span> <span class="ident">stage</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">max_stage</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
@@ -2381,7 +2381,7 @@
             )))
         } <span class="kw">else</span> {
             <span class="kw">match</span> <span class="ident">payload</span>.<span class="ident">get</span>(<span class="number">0</span>) {
-                <span class="prelude-val">Some</span>(<span class="string">b&#39;#&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="string">b&#39;#&#39;</span>) =&gt; {
                     <span class="kw">let</span> (<span class="ident">state</span>, <span class="ident">msg</span>) <span class="op">=</span>
                         <span class="macro">split_at_or_err!</span>(<span class="ident">payload</span>, <span class="number">6</span>, <span class="string">&quot;EOF while reading error state&quot;</span>)<span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(<span class="ident">ErrPacket::Error</span>(
@@ -2390,7 +2390,7 @@
                         <span class="ident">msg</span>.<span class="ident">into</span>(),
                     ))
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ErrPacket::Error</span>(
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ErrPacket::Error</span>(
                     <span class="ident">code</span>,
                     [<span class="string">b&#39;H&#39;</span>, <span class="string">b&#39;Y&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;0&#39;</span>],
                     <span class="ident">payload</span>.<span class="ident">into</span>(),
@@ -2400,69 +2400,69 @@
     }
 
     <span class="doccomment">/// Returns false if this error packet contains progress report.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">ErrPacket::Error</span>(..))
     }
 
     <span class="doccomment">/// Returns true if this error packet contains progress report.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_progress_report</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_progress_report</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">is_error</span>()
     }
 
     <span class="doccomment">/// Will panic if ErrPacket does not contains progress report</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">progress_report</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ProgressReport</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">progress_report</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ProgressReport</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ErrPacket::Progress</span>(<span class="kw-2">ref</span> <span class="ident">progress_report</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">progress_report</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;This ErrPacket does not contains progress report&quot;</span>),
+            <span class="ident">ErrPacket::Progress</span>(<span class="kw-2">ref</span> <span class="ident">progress_report</span>) =&gt; <span class="ident">progress_report</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;This ErrPacket does not contains progress report&quot;</span>),
         }
     }
 
     <span class="doccomment">/// Will panic if ErrPacket contains progress report</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ErrPacket::Error</span>(<span class="ident">code</span>, ..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">code</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;This ErrPacket contains progress report&quot;</span>),
+            <span class="ident">ErrPacket::Error</span>(<span class="ident">code</span>, ..) =&gt; <span class="ident">code</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;This ErrPacket contains progress report&quot;</span>),
         }
     }
 
     <span class="doccomment">/// Will panic if ErrPacket contains progress report</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sql_state_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">5</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sql_state_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">5</span>] {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ErrPacket::Error</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">state</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;This ErrPacket contains progress report&quot;</span>),
+            <span class="ident">ErrPacket::Error</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">state</span>, <span class="kw">_</span>) =&gt; <span class="ident">state</span>,
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;This ErrPacket contains progress report&quot;</span>),
         }
     }
 
     <span class="doccomment">/// Will panic if ErrPacket contains progress report</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sql_state_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sql_state_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ErrPacket::Error</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">state</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>[..]),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;This ErrPacket contains progress report&quot;</span>),
+            <span class="ident">ErrPacket::Error</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">state</span>, <span class="kw">_</span>) =&gt; <span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">state</span>[..]),
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;This ErrPacket contains progress report&quot;</span>),
         }
     }
 
     <span class="doccomment">/// Will panic if ErrPacket contains progress report</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ErrPacket::Error</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">message</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">message</span>.<span class="ident">as_ref</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;This ErrPacket contains progress report&quot;</span>),
+            <span class="ident">ErrPacket::Error</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">message</span>) =&gt; <span class="ident">message</span>.<span class="ident">as_ref</span>(),
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;This ErrPacket contains progress report&quot;</span>),
         }
     }
 
     <span class="doccomment">/// Will panic if ErrPacket contains progress report</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ErrPacket::Error</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">message</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from_utf8_lossy</span>(<span class="ident">message</span>.<span class="ident">as_ref</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;This ErrPacket contains progress report&quot;</span>),
+            <span class="ident">ErrPacket::Error</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">message</span>) =&gt; <span class="ident">String::from_utf8_lossy</span>(<span class="ident">message</span>.<span class="ident">as_ref</span>()),
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;This ErrPacket contains progress report&quot;</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ErrPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">ErrPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ErrPacket::Error</span>(<span class="ident">code</span>, <span class="ident">state</span>, <span class="ident">message</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ErrPacket::Error</span>(<span class="ident">code</span>, <span class="ident">state</span>, <span class="ident">message</span>) =&gt; {
                 <span class="ident">ErrPacket::Error</span>(<span class="ident">code</span>, <span class="ident">state</span>, <span class="ident">message</span>.<span class="ident">into_owned</span>().<span class="ident">into</span>())
             }
-            <span class="ident">ErrPacket::Progress</span>(<span class="ident">progress_report</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ErrPacket::Progress</span>(<span class="ident">progress_report</span>) =&gt; {
                 <span class="ident">ErrPacket::Progress</span>(<span class="ident">progress_report</span>.<span class="ident">into_owned</span>())
             }
         }
@@ -2470,16 +2470,16 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ErrPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ErrPacket::Error</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+            <span class="ident">ErrPacket::Error</span>(..) =&gt; <span class="macro">write!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;ERROR {} ({}): {}&quot;</span>,
                 <span class="self">self</span>.<span class="ident">error_code</span>(),
                 <span class="self">self</span>.<span class="ident">sql_state_str</span>(),
                 <span class="self">self</span>.<span class="ident">message_str</span>()
             ),
-            <span class="ident">ErrPacket::Progress</span>(<span class="kw-2">ref</span> <span class="ident">progress_report</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">progress_report</span>),
+            <span class="ident">ErrPacket::Progress</span>(<span class="kw-2">ref</span> <span class="ident">progress_report</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">progress_report</span>),
         }
     }
 }
@@ -2491,13 +2491,13 @@
 }
 
 <span class="doccomment">/// Will parse payload as a local infile packet.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_local_infile_packet</span>(<span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">LocalInfilePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_local_infile_packet</span>(<span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">LocalInfilePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">LocalInfilePacket::parse</span>(<span class="ident">payload</span>)
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LocalInfilePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Will parse payload as a local infile packet.</span>
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">LocalInfilePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">LocalInfilePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0xfb</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                 <span class="ident">io::ErrorKind::InvalidData</span>,
@@ -2511,16 +2511,16 @@
     }
 
     <span class="doccomment">/// Value of the file_name field of a local infile packet as a byte slice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="ident">file_name</span>.<span class="ident">as_ref</span>()
     }
 
     <span class="doccomment">/// Value of the file_name field of a local infile packet as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_name_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file_name_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">String::from_utf8_lossy</span>(<span class="self">self</span>.<span class="ident">file_name</span>.<span class="ident">as_ref</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LocalInfilePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">LocalInfilePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="ident">LocalInfilePacket</span> {
             <span class="ident">file_name</span>: <span class="self">self</span>.<span class="ident">file_name</span>.<span class="ident">into_owned</span>().<span class="ident">into</span>(),
         }
@@ -2541,47 +2541,47 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AuthPlugin</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AuthPlugin</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">AuthPlugin</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="ident">CACHING_SHA2_PASSWORD_PLUGIN_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AuthPlugin::CachingSha2Password</span>,
-            <span class="ident">MYSQL_NATIVE_PASSWORD_PLUGIN_NAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AuthPlugin::MysqlNativePassword</span>,
-            <span class="ident">name</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AuthPlugin::Other</span>(<span class="ident">name</span>.<span class="ident">into</span>()),
+            <span class="ident">CACHING_SHA2_PASSWORD_PLUGIN_NAME</span> =&gt; <span class="ident">AuthPlugin::CachingSha2Password</span>,
+            <span class="ident">MYSQL_NATIVE_PASSWORD_PLUGIN_NAME</span> =&gt; <span class="ident">AuthPlugin::MysqlNativePassword</span>,
+            <span class="ident">name</span> =&gt; <span class="ident">AuthPlugin::Other</span>(<span class="ident">name</span>.<span class="ident">into</span>()),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AuthPlugin::MysqlNativePassword</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MYSQL_NATIVE_PASSWORD_PLUGIN_NAME</span>,
-            <span class="ident">AuthPlugin::CachingSha2Password</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CACHING_SHA2_PASSWORD_PLUGIN_NAME</span>,
-            <span class="ident">AuthPlugin::Other</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">name</span>,
+            <span class="ident">AuthPlugin::MysqlNativePassword</span> =&gt; <span class="ident">MYSQL_NATIVE_PASSWORD_PLUGIN_NAME</span>,
+            <span class="ident">AuthPlugin::CachingSha2Password</span> =&gt; <span class="ident">CACHING_SHA2_PASSWORD_PLUGIN_NAME</span>,
+            <span class="ident">AuthPlugin::Other</span>(<span class="ident">name</span>) =&gt; <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">name</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AuthPlugin</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">AuthPlugin</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AuthPlugin::CachingSha2Password</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AuthPlugin::CachingSha2Password</span>,
-            <span class="ident">AuthPlugin::MysqlNativePassword</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AuthPlugin::MysqlNativePassword</span>,
-            <span class="ident">AuthPlugin::Other</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AuthPlugin::Other</span>(<span class="ident">name</span>.<span class="ident">into_owned</span>().<span class="ident">into</span>()),
+            <span class="ident">AuthPlugin::CachingSha2Password</span> =&gt; <span class="ident">AuthPlugin::CachingSha2Password</span>,
+            <span class="ident">AuthPlugin::MysqlNativePassword</span> =&gt; <span class="ident">AuthPlugin::MysqlNativePassword</span>,
+            <span class="ident">AuthPlugin::Other</span>(<span class="ident">name</span>) =&gt; <span class="ident">AuthPlugin::Other</span>(<span class="ident">name</span>.<span class="ident">into_owned</span>().<span class="ident">into</span>()),
         }
     }
 
     <span class="doccomment">/// Generates auth plugin data for this plugin.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// It&#39;ll generate `None` if password is `None` or empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gen_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pass</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gen_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pass</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::scramble</span>::{<span class="ident">scramble_native</span>, <span class="ident">scramble_sha256</span>};
 
         <span class="kw">match</span> <span class="ident">pass</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">pass</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span> {
-                <span class="ident">AuthPlugin::CachingSha2Password</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">pass</span>) =&gt; <span class="kw">match</span> <span class="self">self</span> {
+                <span class="ident">AuthPlugin::CachingSha2Password</span> =&gt; {
                     <span class="ident">scramble_sha256</span>(<span class="ident">nonce</span>, <span class="ident">pass</span>.<span class="ident">as_bytes</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Vec::from</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>[..]))
                 }
-                <span class="ident">AuthPlugin::MysqlNativePassword</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">AuthPlugin::MysqlNativePassword</span> =&gt; {
                     <span class="ident">scramble_native</span>(<span class="ident">nonce</span>, <span class="ident">pass</span>.<span class="ident">as_bytes</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Vec::from</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>[..]))
                 }
-                <span class="ident">AuthPlugin::Other</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">AuthPlugin::Other</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
@@ -2593,23 +2593,23 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AuthMoreData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> {
-            <span class="number">0x01</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AuthMoreData</span> {
+            <span class="number">0x01</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMoreData</span> {
                 <span class="ident">data</span>: <span class="ident">payload</span>.<span class="ident">into</span>(),
             }),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                 <span class="ident">io::ErrorKind::InvalidData</span>,
                 <span class="string">&quot;Invalid AuthMoreData header&quot;</span>,
             )),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AuthMoreData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">AuthMoreData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="ident">AuthMoreData</span> {
             <span class="ident">data</span>: <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">into_owned</span>().<span class="ident">into</span>(),
         }
@@ -2617,7 +2617,7 @@
 }
 
 <span class="doccomment">/// Parses payload as an auth more data packet.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_auth_more_data</span>(<span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">AuthMoreData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_auth_more_data</span>(<span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">AuthMoreData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">AuthMoreData::parse</span>(<span class="ident">payload</span>)
 }
 
@@ -2632,12 +2632,12 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AuthSwitchRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> {
-            <span class="number">0xfe</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">0xfe</span> =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">null_offset</span> <span class="op">=</span> <span class="number">0</span>;
                 <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">payload</span>.<span class="ident">iter</span>() {
-                    <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">byte</span> <span class="op">=</span><span class="op">=</span> <span class="number">0x00</span> {
+                    <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">byte</span> <span class="op">==</span> <span class="number">0x00</span> {
                         <span class="kw">break</span>;
                     }
                     <span class="ident">null_offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -2645,7 +2645,7 @@
                 <span class="kw">let</span> (<span class="ident">auth_plugin</span>, <span class="kw-2">mut</span> <span class="ident">payload</span>) <span class="op">=</span>
                     <span class="macro">split_at_or_err!</span>(<span class="ident">payload</span>, <span class="ident">null_offset</span>, <span class="string">&quot;Invalid AuthSwitchRequest packet&quot;</span>)<span class="question-mark">?</span>;
                 <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">plugin_data</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">payload</span>[<span class="ident">payload</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">let</span> <span class="ident">plugin_data</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">payload</span>[<span class="ident">payload</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>] <span class="op">==</span> <span class="number">0</span> {
                     <span class="kw-2">&amp;</span><span class="ident">payload</span>[..<span class="ident">payload</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>]
                 } <span class="kw">else</span> {
                     <span class="ident">payload</span>
@@ -2655,22 +2655,22 @@
                     <span class="ident">plugin_data</span>: <span class="ident">plugin_data</span>.<span class="ident">into</span>(),
                 })
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                 <span class="ident">io::ErrorKind::InvalidData</span>,
                 <span class="string">&quot;Invalid AuthSwitchRequest header&quot;</span>,
             )),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auth_plugin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AuthPlugin</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auth_plugin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">AuthPlugin</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">auth_plugin</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">plugin_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">plugin_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">plugin_data</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AuthSwitchRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">AuthSwitchRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="ident">AuthSwitchRequest</span> {
             <span class="ident">auth_plugin</span>: <span class="self">self</span>.<span class="ident">auth_plugin</span>.<span class="ident">into_owned</span>(),
             <span class="ident">plugin_data</span>: <span class="self">self</span>.<span class="ident">plugin_data</span>.<span class="ident">into_owned</span>().<span class="ident">into</span>(),
@@ -2679,7 +2679,7 @@
 }
 
 <span class="doccomment">/// Parses payload as an auth switch request packet.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_auth_switch_request</span>(<span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">AuthSwitchRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_auth_switch_request</span>(<span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">AuthSwitchRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">AuthSwitchRequest::parse</span>(<span class="ident">payload</span>)
 }
 
@@ -2698,17 +2698,17 @@
 }
 
 <span class="doccomment">/// Parses payload as an initial handshake packet.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_handshake_packet</span>(<span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">HandshakePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_handshake_packet</span>(<span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">HandshakePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">HandshakePacket::parse</span>(<span class="ident">payload</span>)
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">HandshakePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Parses payload as an initial handshake packet.</span>
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">HandshakePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">HandshakePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">protocol_version</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nul_byte_pos</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">byte</span>) <span class="kw">in</span> <span class="ident">payload</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">byte</span> <span class="op">=</span><span class="op">=</span> <span class="number">0x00</span> {
+            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">byte</span> <span class="op">==</span> <span class="number">0x00</span> {
                 <span class="ident">nul_byte_pos</span> <span class="op">=</span> <span class="ident">i</span>;
                 <span class="kw">break</span>;
             }
@@ -2741,7 +2741,7 @@
                 (<span class="prelude-val">None</span>, <span class="ident">payload</span>)
             };
         <span class="kw">let</span> <span class="ident">auth_plugin_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">CapabilityFlags::CLIENT_PLUGIN_AUTH</span>) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="number">0x00</span>) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0x00</span>) {
                 <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">payload</span>[..<span class="ident">pos</span>])
             } <span class="kw">else</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">payload</span>)
@@ -2762,7 +2762,7 @@
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandshakePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">HandshakePacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="ident">HandshakePacket</span> {
             <span class="ident">protocol_version</span>: <span class="self">self</span>.<span class="ident">protocol_version</span>,
             <span class="ident">server_version</span>: <span class="self">self</span>.<span class="ident">server_version</span>.<span class="ident">into_owned</span>().<span class="ident">into</span>(),
@@ -2777,25 +2777,25 @@
     }
 
     <span class="doccomment">/// Value of the protocol_version field of an initial handshake packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">protocol_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">protocol_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">protocol_version</span>
     }
 
     <span class="doccomment">/// Value of the server_version field of an initial handshake packet as a byte slice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_version_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_version_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="ident">server_version</span>.<span class="ident">as_ref</span>()
     }
 
     <span class="doccomment">/// Value of the server_version field of an initial handshake packet as a string</span>
     <span class="doccomment">/// (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_version_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_version_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">String::from_utf8_lossy</span>(<span class="self">self</span>.<span class="ident">server_version_ref</span>())
     }
 
     <span class="doccomment">/// Parsed server version.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will parse first \d+.\d+.\d+ of a server version string (if any).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_version_parsed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u16</span>, <span class="ident">u16</span>, <span class="ident">u16</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_version_parsed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u16</span>, <span class="ident">u16</span>, <span class="ident">u16</span>)<span class="op">&gt;</span> {
         <span class="ident">VERSION_RE</span>
             .<span class="ident">captures</span>(<span class="self">self</span>.<span class="ident">server_version_ref</span>())
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">captures</span><span class="op">|</span> {
@@ -2809,7 +2809,7 @@
     }
 
     <span class="doccomment">/// Parsed mariadb server version.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">maria_db_server_version_parsed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u16</span>, <span class="ident">u16</span>, <span class="ident">u16</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">maria_db_server_version_parsed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u16</span>, <span class="ident">u16</span>, <span class="ident">u16</span>)<span class="op">&gt;</span> {
         <span class="ident">MARIADB_VERSION_RE</span>
             .<span class="ident">captures</span>(<span class="self">self</span>.<span class="ident">server_version_ref</span>())
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">captures</span><span class="op">|</span> {
@@ -2823,50 +2823,50 @@
     }
 
     <span class="doccomment">/// Value of the connection_id field of an initial handshake packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">connection_id</span>
     }
 
     <span class="doccomment">/// Value of the scramble_1 field of an initial handshake packet as a byte slice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scramble_1_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scramble_1_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="ident">scramble_1</span>.<span class="ident">as_ref</span>()
     }
 
     <span class="doccomment">/// Value of the scramble_2 field of an initial handshake packet as a byte slice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scramble_2_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scramble_2_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">scramble_2</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Cow::as_ref</span>)
     }
 
     <span class="doccomment">/// Returns concatenated auth plugin nonce.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nonce</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nonce</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Vec::from</span>(<span class="self">self</span>.<span class="ident">scramble_1_ref</span>());
         <span class="ident">out</span>.<span class="ident">extend_from_slice</span>(<span class="self">self</span>.<span class="ident">scramble_2_ref</span>().<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[][..]));
         <span class="ident">out</span>
     }
 
     <span class="doccomment">/// Value of a server capabilities.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CapabilityFlags</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CapabilityFlags</span> {
         <span class="self">self</span>.<span class="ident">capabilities</span>
     }
 
     <span class="doccomment">/// Value of the default_collation field of an initial handshake packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_collation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_collation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="self">self</span>.<span class="ident">default_collation</span>
     }
 
     <span class="doccomment">/// Value of a status flags.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StatusFlags</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StatusFlags</span> {
         <span class="self">self</span>.<span class="ident">status_flags</span>
     }
 
     <span class="doccomment">/// Value of the auth_plugin_name field of an initial handshake packet as a byte slice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auth_plugin_name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auth_plugin_name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">auth_plugin</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">AuthPlugin::as_bytes</span>)
     }
 
     <span class="doccomment">/// Value of the auth_plugin_name field of an initial handshake packet as a string</span>
     <span class="doccomment">/// (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auth_plugin_name_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auth_plugin_name_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">auth_plugin</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map</span>(<span class="ident">AuthPlugin::as_bytes</span>)
@@ -2874,7 +2874,7 @@
     }
 
     <span class="doccomment">/// Auth plugin of a handshake packet</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auth_plugin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AuthPlugin</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auth_plugin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AuthPlugin</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">auth_plugin</span>.<span class="ident">as_ref</span>()
     }
 }
@@ -2896,7 +2896,7 @@
         <span class="ident">auth_plugin</span>: <span class="kw-2">&amp;</span><span class="ident">AuthPlugin</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="kw-2">mut</span> <span class="ident">client_flags</span>: <span class="ident">CapabilityFlags</span>,
         <span class="ident">connect_attributes</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandshakeResponse</span> {
+    ) -&gt; <span class="ident">HandshakeResponse</span> {
         <span class="kw">let</span> <span class="ident">scramble</span> <span class="op">=</span> <span class="ident">scramble_buf</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_ref</span>()).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[]);
 
         <span class="kw">let</span> <span class="ident">collation</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">server_version</span> <span class="op">&gt;</span><span class="op">=</span> (<span class="number">5</span>, <span class="number">5</span>, <span class="number">3</span>) {
@@ -2958,13 +2958,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HandshakeResponse</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[..]
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HandshakeResponse</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">data</span>
     }
 }
@@ -2975,7 +2975,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SslRequest</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">capabilities</span>: <span class="ident">CapabilityFlags</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SslRequest</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">capabilities</span>: <span class="ident">CapabilityFlags</span>) -&gt; <span class="ident">SslRequest</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="number">4</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">23</span>];
         <span class="ident">LE::write_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>[<span class="number">0</span>..], <span class="ident">capabilities</span>.<span class="ident">bits</span>());
         <span class="ident">LE::write_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>[<span class="number">4</span>..], <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>);
@@ -2985,13 +2985,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SslRequest</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[..]
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SslRequest</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">data</span>
     }
 }
@@ -3006,13 +3006,13 @@
 }
 
 <span class="doccomment">/// Parses payload as a statement packet.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_stmt_packet</span>(<span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">StmtPacket</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_stmt_packet</span>(<span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">StmtPacket</span><span class="op">&gt;</span> {
     <span class="ident">StmtPacket::parse</span>(<span class="ident">payload</span>)
 }
 
 <span class="kw">impl</span> <span class="ident">StmtPacket</span> {
     <span class="doccomment">/// Parses payload as a statement packet.</span>
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">StmtPacket</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">StmtPacket</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0x00</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                 <span class="ident">io::ErrorKind::InvalidData</span>,
@@ -3035,22 +3035,22 @@
     }
 
     <span class="doccomment">/// Value of the statement_id field of a statement packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">statement_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">statement_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">statement_id</span>
     }
 
     <span class="doccomment">/// Value of the num_columns field of a statement packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
         <span class="self">self</span>.<span class="ident">num_columns</span>
     }
 
     <span class="doccomment">/// Value of the num_params field of a statement packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
         <span class="self">self</span>.<span class="ident">num_params</span>
     }
 
     <span class="doccomment">/// Value of the warning_count field of a statement packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warning_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
         <span class="self">self</span>.<span class="ident">warning_count</span>
     }
 }
@@ -3063,12 +3063,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SerializationSide</span><span class="op">&gt;</span> <span class="ident">NullBitmap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates new null-bitmap for a given number of columns.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">num_columns</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">num_columns</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_bytes</span>(<span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident"><span class="self">Self</span>::bitmap_len</span>(<span class="ident">num_columns</span>)])
     }
 
     <span class="doccomment">/// Will read null-bitmap for a given number of columns from `input`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">num_columns</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">num_columns</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">bitmap_len</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::bitmap_len</span>(<span class="ident">num_columns</span>);
         <span class="macro">assert!</span>(<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">bitmap_len</span>);
 
@@ -3080,11 +3080,11 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SerializationSide</span>, <span class="ident">U</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">NullBitmap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bitmap_len</span>(<span class="ident">num_columns</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bitmap_len</span>(<span class="ident">num_columns</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
         (<span class="ident">num_columns</span> <span class="op">+</span> <span class="number">7</span> <span class="op">+</span> <span class="ident">T::BIT_OFFSET</span>) <span class="op">/</span> <span class="number">8</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">byte_and_bit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="ident">u8</span>) {
+    <span class="kw">fn</span> <span class="ident">byte_and_bit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">usize</span>, <span class="ident">u8</span>) {
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">column_index</span> <span class="op">+</span> <span class="ident">T::BIT_OFFSET</span>;
         <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">offset</span> <span class="op">/</span> <span class="number">8</span>;
         <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">offset</span> <span class="op">%</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>;
@@ -3095,12 +3095,12 @@
     }
 
     <span class="doccomment">/// Creates new null-bitmap from given bytes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: <span class="ident">U</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">bytes</span>, <span class="ident">PhantomData</span>)
     }
 
     <span class="doccomment">/// Returns `true` if given column is `NULL` in this `NullBitmap`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> (<span class="ident">byte</span>, <span class="ident">bit</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">byte_and_bit</span>(<span class="ident">column_index</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()[<span class="ident">byte</span>] <span class="op">&amp;</span> <span class="ident">bit</span> <span class="op">&gt;</span> <span class="number">0</span>
     }
@@ -3119,7 +3119,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NullBitmap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
     }
 }
@@ -3134,7 +3134,7 @@
 <span class="kw">impl</span> <span class="ident">ComStmtExecuteRequestBuilder</span> {
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NULL_BITMAP_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stmt_id</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stmt_id</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">1024</span>);
         <span class="ident">body</span>.<span class="ident">resize</span>(<span class="number">10</span>, <span class="number">0</span>);
         <span class="comment">// command</span>
@@ -3151,7 +3151,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span>]) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">bool</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span>]) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">bool</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">params</span>.<span class="ident">is_empty</span>() {
             <span class="self">self</span>.<span class="ident">bitmap_len</span> <span class="op">=</span> <span class="ident">NullBitmap</span>::<span class="op">&lt;</span><span class="ident">ClientSide</span><span class="op">&gt;</span><span class="ident">::bitmap_len</span>(<span class="ident">params</span>.<span class="ident">len</span>());
             <span class="kw">let</span> <span class="ident">meta_len</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
@@ -3174,39 +3174,39 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>, <span class="ident">as_long_data</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>, <span class="ident">as_long_data</span>: <span class="ident">bool</span>) -&gt; <span class="ident">u64</span> {
         <span class="kw">let</span> <span class="ident">param_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">params_added</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="self">self</span>.<span class="ident">params_added</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">write</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
         <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">Value::NULL</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::NULL</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">set_null_flag</span>(<span class="ident">param_index</span>);
                 <span class="self">self</span>.<span class="ident">set_type</span>(<span class="ident">param_index</span>, <span class="ident">ColumnType::MYSQL_TYPE_NULL</span>);
                 <span class="ident">write</span> <span class="op">=</span> <span class="bool-val">false</span>;
             }
-            <span class="ident">Value::Bytes</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Bytes</span>(<span class="kw">_</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">set_type</span>(<span class="ident">param_index</span>, <span class="ident">ColumnType::MYSQL_TYPE_VAR_STRING</span>);
                 <span class="ident">write</span> <span class="op">=</span> <span class="op">!</span><span class="ident">as_long_data</span>;
             }
-            <span class="ident">Value::Int</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Int</span>(<span class="kw">_</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">set_type</span>(<span class="ident">param_index</span>, <span class="ident">ColumnType::MYSQL_TYPE_LONGLONG</span>);
             }
-            <span class="ident">Value::UInt</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::UInt</span>(<span class="kw">_</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">set_type</span>(<span class="ident">param_index</span>, <span class="ident">ColumnType::MYSQL_TYPE_LONGLONG</span>);
                 <span class="self">self</span>.<span class="ident">set_unsigned</span>(<span class="ident">param_index</span>);
             }
-            <span class="ident">Value::Double</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Double</span>(<span class="kw">_</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">set_type</span>(<span class="ident">param_index</span>, <span class="ident">ColumnType::MYSQL_TYPE_DOUBLE</span>);
             }
-            <span class="ident">Value::Float</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Float</span>(<span class="kw">_</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">set_type</span>(<span class="ident">param_index</span>, <span class="ident">ColumnType::MYSQL_TYPE_FLOAT</span>);
             }
-            <span class="ident">Value::Date</span>(..) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Date</span>(..) =&gt; {
                 <span class="self">self</span>.<span class="ident">set_type</span>(<span class="ident">param_index</span>, <span class="ident">ColumnType::MYSQL_TYPE_DATETIME</span>);
             }
-            <span class="ident">Value::Time</span>(..) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Value::Time</span>(..) =&gt; {
                 <span class="self">self</span>.<span class="ident">set_type</span>(<span class="ident">param_index</span>, <span class="ident">ColumnType::MYSQL_TYPE_TIME</span>);
             }
         }
@@ -3235,7 +3235,7 @@
         <span class="ident">NullBitmap</span>::<span class="op">&lt;</span><span class="ident">ClientSide</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="ident">::from_bytes</span>(<span class="ident">bitmap_bytes</span>).<span class="ident">set</span>(<span class="ident">param_index</span>, <span class="bool-val">true</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">param_meta_index_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">param_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">param_meta_index_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">param_index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident"><span class="self">Self</span>::NULL_BITMAP_OFFSET</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">bitmap_len</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">param_index</span>
     }
 }
@@ -3246,7 +3246,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ComStmtSendLongData</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stmt_id</span>: <span class="ident">u32</span>, <span class="ident">param_index</span>: <span class="ident">usize</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stmt_id</span>: <span class="ident">u32</span>, <span class="ident">param_index</span>: <span class="ident">usize</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">1</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">2</span> <span class="op">+</span> <span class="ident">data</span>.<span class="ident">len</span>());
 
         <span class="ident">body</span>.<span class="ident">push</span>(<span class="ident">Command::COM_STMT_SEND_LONG_DATA</span> <span class="kw">as</span> <span class="ident">u8</span>);
@@ -3260,13 +3260,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ComStmtSendLongData</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">body</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ComStmtSendLongData</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">body</span>
     }
 }
@@ -3277,7 +3277,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ComStmtClose</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stmt_id</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stmt_id</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">1</span> <span class="op">+</span> <span class="number">4</span>);
         <span class="ident">body</span>.<span class="ident">push</span>(<span class="ident">Command::COM_STMT_CLOSE</span> <span class="kw">as</span> <span class="ident">u8</span>);
         <span class="ident">body</span>.<span class="ident">write_u32</span>::<span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>(<span class="ident">stmt_id</span>).<span class="ident">expect</span>(<span class="string">&quot;unreachable&quot;</span>);
@@ -3290,13 +3290,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ComStmtClose</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">body</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ComStmtClose</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">body</span>
     }
 }

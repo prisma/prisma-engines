@@ -338,7 +338,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">host</span>: <span class="prelude-val">None</span>,
             <span class="ident">port</span>: <span class="prelude-val">None</span>,
@@ -354,7 +354,7 @@
 
 <span class="kw">impl</span> <span class="ident">Config</span> {
     <span class="doccomment">/// Create a new `Config` with the default settings.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::default</span>()
     }
 
@@ -424,27 +424,27 @@
         <span class="self">self</span>.<span class="ident">auth</span> <span class="op">=</span> <span class="ident">auth</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">host</span>
             .<span class="ident">as_deref</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="string">&quot;.&quot;</span>)
             .<span class="ident">unwrap_or</span>(<span class="string">&quot;localhost&quot;</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
         <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">port</span>, <span class="self">self</span>.<span class="ident">instance_name</span>.<span class="ident">as_ref</span>()) {
             <span class="comment">// A user-defined port, we must use that.</span>
-            (<span class="prelude-val">Some</span>(<span class="ident">port</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">port</span>,
+            (<span class="prelude-val">Some</span>(<span class="ident">port</span>), <span class="kw">_</span>) =&gt; <span class="ident">port</span>,
             <span class="comment">// If using a named instance, we&#39;ll give the default port of SQL</span>
             <span class="comment">// Browser.</span>
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="number">1434</span>,
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="number">1434</span>,
             <span class="comment">// Otherwise the defaulting to the default SQL Server port.</span>
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">1433</span>,
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="number">1433</span>,
         }
     }
 
     <span class="doccomment">/// Get the host address including port</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="self">self</span>.<span class="ident">get_host</span>(), <span class="self">self</span>.<span class="ident">get_port</span>())
     }
 
@@ -466,7 +466,7 @@
     <span class="doccomment">/// |`Application Name`, `ApplicationName`|`&lt;string&gt;`|Sets the application name for the connection.|</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [ADO.NET connection string]: https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-strings</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ado_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ado_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetConfig</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="ident"><span class="self">Self</span>::from_config_string</span>(<span class="ident">ado</span>)
     }
@@ -477,12 +477,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [JDBC connection string]: https://docs.microsoft.com/en-us/sql/connect/jdbc/building-the-connection-url?view=sql-server-ver15</span>
     <span class="doccomment">/// [`from_ado_string`]: #method.from_ado_string</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_jdbc_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_jdbc_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">jdbc</span>: <span class="ident">JdbcConfig</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="ident"><span class="self">Self</span>::from_config_string</span>(<span class="ident">jdbc</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">from_config_string</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">ConfigString</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_config_string</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">ConfigString</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
 
         <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">server</span>()<span class="question-mark">?</span>;
@@ -526,11 +526,11 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">ConfigString</span> {
-    <span class="kw">fn</span> <span class="ident">dict</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">dict</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ServerDefinition</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ServerDefinition</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">authentication</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">AuthMethod</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">authentication</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">AuthMethod</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">dict</span>()
             .<span class="ident">get</span>(<span class="string">&quot;uid&quot;</span>)
@@ -551,20 +551,20 @@
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">dict</span>().<span class="ident">get</span>(<span class="string">&quot;integrated security&quot;</span>))
         {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-            <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="kw">if</span> <span class="ident">val</span>.<span class="ident">to_lowercase</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;sspi&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::parse_bool</span>(<span class="ident">val</span>)<span class="question-mark">?</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> (<span class="ident">user</span>, <span class="ident">pw</span>)
+            <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="kw">if</span> <span class="ident">val</span>.<span class="ident">to_lowercase</span>() <span class="op">==</span> <span class="string">&quot;sspi&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::parse_bool</span>(<span class="ident">val</span>)<span class="question-mark">?</span> =&gt; <span class="kw">match</span> (<span class="ident">user</span>, <span class="ident">pw</span>)
             {
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AuthMethod::Integrated</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AuthMethod::windows</span>(<span class="ident">user</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>), <span class="ident">pw</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>))),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMethod::Integrated</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMethod::windows</span>(<span class="ident">user</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>), <span class="ident">pw</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>))),
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>)]</span>
-            <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="kw">if</span> <span class="ident">val</span>.<span class="ident">to_lowercase</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;sspi&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::parse_bool</span>(<span class="ident">val</span>)<span class="question-mark">?</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="kw">if</span> <span class="ident">val</span>.<span class="ident">to_lowercase</span>() <span class="op">==</span> <span class="string">&quot;sspi&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::parse_bool</span>(<span class="ident">val</span>)<span class="question-mark">?</span> =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">AuthMethod::Integrated</span>)
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AuthMethod::sql_server</span>(<span class="ident">user</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>), <span class="ident">pw</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>))),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMethod::sql_server</span>(<span class="ident">user</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>), <span class="ident">pw</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>))),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">dict</span>()
             .<span class="ident">get</span>(<span class="string">&quot;database&quot;</span>)
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">dict</span>().<span class="ident">get</span>(<span class="string">&quot;initial catalog&quot;</span>))
@@ -572,37 +572,37 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">db</span><span class="op">|</span> <span class="ident">db</span>.<span class="ident">to_string</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">application_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">application_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">dict</span>()
             .<span class="ident">get</span>(<span class="string">&quot;application name&quot;</span>)
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">dict</span>().<span class="ident">get</span>(<span class="string">&quot;applicationname&quot;</span>))
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span>.<span class="ident">to_string</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">trust_cert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">trust_cert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">dict</span>()
             .<span class="ident">get</span>(<span class="string">&quot;trustservercertificate&quot;</span>)
             .<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::parse_bool</span>)
             .<span class="ident">unwrap_or</span>(<span class="prelude-val">Ok</span>(<span class="bool-val">false</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">EncryptionLevel</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">EncryptionLevel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">dict</span>()
             .<span class="ident">get</span>(<span class="string">&quot;encrypt&quot;</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_bool</span>(<span class="ident">val</span>) {
-                <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">EncryptionLevel::Required</span>),
-                <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">EncryptionLevel::Off</span>),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">val</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;DANGER_PLAINTEXT&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">EncryptionLevel::NotSupported</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">EncryptionLevel::Required</span>),
+                <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">EncryptionLevel::Off</span>),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">val</span> <span class="op">==</span> <span class="string">&quot;DANGER_PLAINTEXT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">EncryptionLevel::NotSupported</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
             })
             .<span class="ident">unwrap_or</span>(<span class="prelude-val">Ok</span>(<span class="ident">EncryptionLevel::Off</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_bool</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_bool</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="ident">T</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">as_ref</span>().<span class="ident">trim</span>().<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
-            <span class="string">&quot;true&quot;</span> <span class="op">|</span> <span class="string">&quot;yes&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
-            <span class="string">&quot;false&quot;</span> <span class="op">|</span> <span class="string">&quot;no&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::Conversion</span>(
+            <span class="string">&quot;true&quot;</span> <span class="op">|</span> <span class="string">&quot;yes&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+            <span class="string">&quot;false&quot;</span> <span class="op">|</span> <span class="string">&quot;no&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::Conversion</span>(
                 <span class="string">&quot;Connection string: Not a valid boolean&quot;</span>.<span class="ident">into</span>(),
             )),
         }

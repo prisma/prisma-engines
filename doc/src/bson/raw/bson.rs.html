@@ -423,182 +423,182 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RawBson</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Get the [`ElementType`] of this value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">element_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ElementType</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">element_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ElementType</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RawBson::Double</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::Double</span>,
-            <span class="ident">RawBson::String</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::String</span>,
-            <span class="ident">RawBson::Array</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::Array</span>,
-            <span class="ident">RawBson::Document</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::EmbeddedDocument</span>,
-            <span class="ident">RawBson::Boolean</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::Boolean</span>,
-            <span class="ident">RawBson::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::Null</span>,
-            <span class="ident">RawBson::RegularExpression</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::RegularExpression</span>,
-            <span class="ident">RawBson::JavaScriptCode</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::JavaScriptCode</span>,
-            <span class="ident">RawBson::JavaScriptCodeWithScope</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::JavaScriptCodeWithScope</span>,
-            <span class="ident">RawBson::Int32</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::Int32</span>,
-            <span class="ident">RawBson::Int64</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::Int64</span>,
-            <span class="ident">RawBson::Timestamp</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::Timestamp</span>,
-            <span class="ident">RawBson::Binary</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::Binary</span>,
-            <span class="ident">RawBson::ObjectId</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::ObjectId</span>,
-            <span class="ident">RawBson::DateTime</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::DateTime</span>,
-            <span class="ident">RawBson::Symbol</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::Symbol</span>,
-            <span class="ident">RawBson::Decimal128</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::Decimal128</span>,
-            <span class="ident">RawBson::Undefined</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::Undefined</span>,
-            <span class="ident">RawBson::MaxKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::MaxKey</span>,
-            <span class="ident">RawBson::MinKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::MinKey</span>,
-            <span class="ident">RawBson::DbPointer</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ElementType::DbPointer</span>,
+            <span class="ident">RawBson::Double</span>(..) =&gt; <span class="ident">ElementType::Double</span>,
+            <span class="ident">RawBson::String</span>(..) =&gt; <span class="ident">ElementType::String</span>,
+            <span class="ident">RawBson::Array</span>(..) =&gt; <span class="ident">ElementType::Array</span>,
+            <span class="ident">RawBson::Document</span>(..) =&gt; <span class="ident">ElementType::EmbeddedDocument</span>,
+            <span class="ident">RawBson::Boolean</span>(..) =&gt; <span class="ident">ElementType::Boolean</span>,
+            <span class="ident">RawBson::Null</span> =&gt; <span class="ident">ElementType::Null</span>,
+            <span class="ident">RawBson::RegularExpression</span>(..) =&gt; <span class="ident">ElementType::RegularExpression</span>,
+            <span class="ident">RawBson::JavaScriptCode</span>(..) =&gt; <span class="ident">ElementType::JavaScriptCode</span>,
+            <span class="ident">RawBson::JavaScriptCodeWithScope</span>(..) =&gt; <span class="ident">ElementType::JavaScriptCodeWithScope</span>,
+            <span class="ident">RawBson::Int32</span>(..) =&gt; <span class="ident">ElementType::Int32</span>,
+            <span class="ident">RawBson::Int64</span>(..) =&gt; <span class="ident">ElementType::Int64</span>,
+            <span class="ident">RawBson::Timestamp</span>(..) =&gt; <span class="ident">ElementType::Timestamp</span>,
+            <span class="ident">RawBson::Binary</span>(..) =&gt; <span class="ident">ElementType::Binary</span>,
+            <span class="ident">RawBson::ObjectId</span>(..) =&gt; <span class="ident">ElementType::ObjectId</span>,
+            <span class="ident">RawBson::DateTime</span>(..) =&gt; <span class="ident">ElementType::DateTime</span>,
+            <span class="ident">RawBson::Symbol</span>(..) =&gt; <span class="ident">ElementType::Symbol</span>,
+            <span class="ident">RawBson::Decimal128</span>(..) =&gt; <span class="ident">ElementType::Decimal128</span>,
+            <span class="ident">RawBson::Undefined</span> =&gt; <span class="ident">ElementType::Undefined</span>,
+            <span class="ident">RawBson::MaxKey</span> =&gt; <span class="ident">ElementType::MaxKey</span>,
+            <span class="ident">RawBson::MinKey</span> =&gt; <span class="ident">ElementType::MinKey</span>,
+            <span class="ident">RawBson::DbPointer</span>(..) =&gt; <span class="ident">ElementType::DbPointer</span>,
         }
     }
 
     <span class="doccomment">/// Gets the `f64` that&#39;s referenced or returns `None` if the referenced value isn&#39;t a BSON</span>
     <span class="doccomment">/// double.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Double</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">d</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::Double</span>(<span class="ident">d</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">d</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the `&amp;str` that&#39;s referenced or returns `None` if the referenced value isn&#39;t a BSON</span>
     <span class="doccomment">/// String.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::String</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::String</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">s</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the [`RawArray`] that&#39;s referenced or returns `None` if the referenced value</span>
     <span class="doccomment">/// isn&#39;t a BSON array.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_array</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawArray</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_array</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawArray</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Array</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::Array</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the [`RawDocument`] that&#39;s referenced or returns `None` if the referenced value</span>
     <span class="doccomment">/// isn&#39;t a BSON document.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_document</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_document</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Document</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::Document</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the `bool` that&#39;s referenced or returns `None` if the referenced value isn&#39;t a BSON</span>
     <span class="doccomment">/// boolean.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bool</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bool</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Boolean</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::Boolean</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the `i32` that&#39;s referenced or returns `None` if the referenced value isn&#39;t a BSON</span>
     <span class="doccomment">/// Int32.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_i32</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_i32</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Int32</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::Int32</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the `i64` that&#39;s referenced or returns `None` if the referenced value isn&#39;t a BSON</span>
     <span class="doccomment">/// Int64.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Int64</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::Int64</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the [`crate::oid::ObjectId`] that&#39;s referenced or returns `None` if the referenced</span>
     <span class="doccomment">/// value isn&#39;t a BSON ObjectID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_object_id</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">oid::ObjectId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_object_id</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">oid::ObjectId</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::ObjectId</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::ObjectId</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the [`RawBinary`] that&#39;s referenced or returns `None` if the referenced value isn&#39;t a</span>
     <span class="doccomment">/// BSON binary.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_binary</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawBinary</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_binary</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawBinary</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Binary</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::Binary</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the [`RawRegex`] that&#39;s referenced or returns `None` if the referenced value isn&#39;t a</span>
     <span class="doccomment">/// BSON regular expression.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_regex</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawRegex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_regex</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawRegex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::RegularExpression</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::RegularExpression</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the [`crate::DateTime`] that&#39;s referenced or returns `None` if the referenced value</span>
     <span class="doccomment">/// isn&#39;t a BSON datetime.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_datetime</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_datetime</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::DateTime</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::DateTime</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the symbol that&#39;s referenced or returns `None` if the referenced value isn&#39;t a BSON</span>
     <span class="doccomment">/// symbol.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_symbol</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_symbol</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Symbol</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::Symbol</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the [`crate::Timestamp`] that&#39;s referenced or returns `None` if the referenced value</span>
     <span class="doccomment">/// isn&#39;t a BSON timestamp.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_timestamp</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_timestamp</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Timestamp</span>(<span class="ident">timestamp</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::Timestamp</span>(<span class="ident">timestamp</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the null value that&#39;s referenced or returns `None` if the referenced value isn&#39;t a BSON</span>
     <span class="doccomment">/// null.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_null</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_null</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::Null</span> =&gt; <span class="prelude-val">Some</span>(()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the [`RawDbPointer`] that&#39;s referenced or returns `None` if the referenced value isn&#39;t</span>
     <span class="doccomment">/// a BSON DB pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_db_pointer</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawDbPointer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_db_pointer</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawDbPointer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::DbPointer</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">d</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::DbPointer</span>(<span class="ident">d</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">d</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the code that&#39;s referenced or returns `None` if the referenced value isn&#39;t a BSON</span>
     <span class="doccomment">/// JavaScript.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_javascript</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_javascript</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::JavaScriptCode</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::JavaScriptCode</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">s</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Gets the [`RawJavaScriptCodeWithScope`] that&#39;s referenced or returns `None` if the</span>
     <span class="doccomment">/// referenced value isn&#39;t a BSON JavaScript with scope.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_javascript_with_scope</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawJavaScriptCodeWithScope</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_javascript_with_scope</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawJavaScriptCodeWithScope</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RawBson::JavaScriptCodeWithScope</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">RawBson::JavaScriptCodeWithScope</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">s</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
@@ -606,15 +606,15 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">RawBson</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">rawbson</span>: <span class="ident">RawBson</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">rawbson</span>: <span class="ident">RawBson</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">rawbson</span> {
-            <span class="ident">RawBson::Double</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Double</span>(<span class="ident">d</span>),
-            <span class="ident">RawBson::String</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::String</span>(<span class="ident">s</span>.<span class="ident">to_string</span>()),
-            <span class="ident">RawBson::Document</span>(<span class="ident">rawdoc</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RawBson::Double</span>(<span class="ident">d</span>) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">d</span>),
+            <span class="ident">RawBson::String</span>(<span class="ident">s</span>) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>.<span class="ident">to_string</span>()),
+            <span class="ident">RawBson::Document</span>(<span class="ident">rawdoc</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">rawdoc</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
                 <span class="ident">Bson::Document</span>(<span class="ident">doc</span>)
             }
-            <span class="ident">RawBson::Array</span>(<span class="ident">rawarray</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RawBson::Array</span>(<span class="ident">rawarray</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                 <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">rawarray</span> {
                     <span class="kw">let</span> <span class="ident">bson</span>: <span class="ident">Bson</span> <span class="op">=</span> <span class="ident">v</span><span class="question-mark">?</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
@@ -622,7 +622,7 @@
                 }
                 <span class="ident">Bson::Array</span>(<span class="ident">items</span>)
             }
-            <span class="ident">RawBson::Binary</span>(<span class="ident">rawbson</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RawBson::Binary</span>(<span class="ident">rawbson</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">RawBinary</span> {
                     <span class="ident">subtype</span>,
                     <span class="ident">bytes</span>: <span class="ident">data</span>,
@@ -632,33 +632,33 @@
                     <span class="ident">bytes</span>: <span class="ident">data</span>.<span class="ident">to_vec</span>(),
                 })
             }
-            <span class="ident">RawBson::ObjectId</span>(<span class="ident">rawbson</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::ObjectId</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::Boolean</span>(<span class="ident">rawbson</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Boolean</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::DateTime</span>(<span class="ident">rawbson</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::DateTime</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Null</span>,
-            <span class="ident">RawBson::RegularExpression</span>(<span class="ident">rawregex</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::RegularExpression</span>(<span class="ident"><span class="kw">crate</span>::Regex::new</span>(
+            <span class="ident">RawBson::ObjectId</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::ObjectId</span>(<span class="ident">rawbson</span>),
+            <span class="ident">RawBson::Boolean</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Boolean</span>(<span class="ident">rawbson</span>),
+            <span class="ident">RawBson::DateTime</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::DateTime</span>(<span class="ident">rawbson</span>),
+            <span class="ident">RawBson::Null</span> =&gt; <span class="ident">Bson::Null</span>,
+            <span class="ident">RawBson::RegularExpression</span>(<span class="ident">rawregex</span>) =&gt; <span class="ident">Bson::RegularExpression</span>(<span class="ident"><span class="kw">crate</span>::Regex::new</span>(
                 <span class="ident">rawregex</span>.<span class="ident">pattern</span>.<span class="ident">to_string</span>(),
                 <span class="ident">rawregex</span>.<span class="ident">options</span>.<span class="ident">to_string</span>(),
             )),
-            <span class="ident">RawBson::JavaScriptCode</span>(<span class="ident">rawbson</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::JavaScriptCode</span>(<span class="ident">rawbson</span>.<span class="ident">to_string</span>()),
-            <span class="ident">RawBson::Int32</span>(<span class="ident">rawbson</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int32</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::Timestamp</span>(<span class="ident">rawbson</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Timestamp</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::Int64</span>(<span class="ident">rawbson</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int64</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::Undefined</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Undefined</span>,
-            <span class="ident">RawBson::DbPointer</span>(<span class="ident">rawbson</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::DbPointer</span>(<span class="ident">DbPointer</span> {
+            <span class="ident">RawBson::JavaScriptCode</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::JavaScriptCode</span>(<span class="ident">rawbson</span>.<span class="ident">to_string</span>()),
+            <span class="ident">RawBson::Int32</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Int32</span>(<span class="ident">rawbson</span>),
+            <span class="ident">RawBson::Timestamp</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Timestamp</span>(<span class="ident">rawbson</span>),
+            <span class="ident">RawBson::Int64</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">rawbson</span>),
+            <span class="ident">RawBson::Undefined</span> =&gt; <span class="ident">Bson::Undefined</span>,
+            <span class="ident">RawBson::DbPointer</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::DbPointer</span>(<span class="ident">DbPointer</span> {
                 <span class="ident">namespace</span>: <span class="ident">rawbson</span>.<span class="ident">namespace</span>.<span class="ident">to_string</span>(),
                 <span class="ident">id</span>: <span class="ident">rawbson</span>.<span class="ident">id</span>,
             }),
-            <span class="ident">RawBson::Symbol</span>(<span class="ident">rawbson</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Symbol</span>(<span class="ident">rawbson</span>.<span class="ident">to_string</span>()),
-            <span class="ident">RawBson::JavaScriptCodeWithScope</span>(<span class="ident">rawbson</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RawBson::Symbol</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Symbol</span>(<span class="ident">rawbson</span>.<span class="ident">to_string</span>()),
+            <span class="ident">RawBson::JavaScriptCodeWithScope</span>(<span class="ident">rawbson</span>) =&gt; {
                 <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="ident"><span class="kw">crate</span>::JavaScriptCodeWithScope</span> {
                     <span class="ident">code</span>: <span class="ident">rawbson</span>.<span class="ident">code</span>.<span class="ident">to_string</span>(),
                     <span class="ident">scope</span>: <span class="ident">rawbson</span>.<span class="ident">scope</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
                 })
             }
-            <span class="ident">RawBson::Decimal128</span>(<span class="ident">rawbson</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Decimal128</span>(<span class="ident">rawbson</span>),
-            <span class="ident">RawBson::MaxKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::MaxKey</span>,
-            <span class="ident">RawBson::MinKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::MinKey</span>,
+            <span class="ident">RawBson::Decimal128</span>(<span class="ident">rawbson</span>) =&gt; <span class="ident">Bson::Decimal128</span>(<span class="ident">rawbson</span>),
+            <span class="ident">RawBson::MaxKey</span> =&gt; <span class="ident">Bson::MaxKey</span>,
+            <span class="ident">RawBson::MinKey</span> =&gt; <span class="ident">Bson::MinKey</span>,
         })
     }
 }
@@ -672,12 +672,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RawBinary</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Gets the subtype of the binary value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subtype</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BinarySubtype</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subtype</span>(<span class="self">self</span>) -&gt; <span class="ident">BinarySubtype</span> {
         <span class="self">self</span>.<span class="ident">subtype</span>
     }
 
     <span class="doccomment">/// Gets the contained bytes of the binary value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="ident">bytes</span>
     }
 }
@@ -691,12 +691,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RawRegex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Gets the pattern portion of the regex.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pattern</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pattern</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">pattern</span>
     }
 
     <span class="doccomment">/// Gets the options portion of the regex.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">options</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">options</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">options</span>
     }
 }
@@ -710,12 +710,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RawJavaScriptCodeWithScope</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Gets the code in the value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">code</span>
     }
 
     <span class="doccomment">/// Gets the scope in the value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scope</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scope</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span> {
         <span class="self">self</span>.<span class="ident">scope</span>
     }
 }

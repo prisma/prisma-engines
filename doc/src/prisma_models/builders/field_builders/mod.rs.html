@@ -42,11 +42,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FieldBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>, <span class="ident">container</span>: <span class="ident">ParentContainer</span>, <span class="ident">composite_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">CompositeTypeRef</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Field</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>, <span class="ident">container</span>: <span class="ident">ParentContainer</span>, <span class="ident">composite_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">CompositeTypeRef</span>]) -&gt; <span class="ident">Field</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldBuilder::Scalar</span>(<span class="ident">st</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Field::Scalar</span>(<span class="ident">st</span>.<span class="ident">build</span>(<span class="ident">container</span>)),
-            <span class="ident">FieldBuilder::Relation</span>(<span class="ident">rt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Field::Relation</span>(<span class="ident">rt</span>.<span class="ident">build</span>(<span class="ident">container</span>.<span class="ident">as_model_weak</span>().<span class="ident">unwrap</span>())), <span class="comment">// Relations are only possible between models.</span>
-            <span class="ident">FieldBuilder::Composite</span>(<span class="ident">ct</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Field::Composite</span>(<span class="ident">ct</span>.<span class="ident">build</span>(<span class="ident">container</span>, <span class="ident">composite_types</span>)),
+            <span class="ident">FieldBuilder::Scalar</span>(<span class="ident">st</span>) =&gt; <span class="ident">Field::Scalar</span>(<span class="ident">st</span>.<span class="ident">build</span>(<span class="ident">container</span>)),
+            <span class="ident">FieldBuilder::Relation</span>(<span class="ident">rt</span>) =&gt; <span class="ident">Field::Relation</span>(<span class="ident">rt</span>.<span class="ident">build</span>(<span class="ident">container</span>.<span class="ident">as_model_weak</span>().<span class="ident">unwrap</span>())), <span class="comment">// Relations are only possible between models.</span>
+            <span class="ident">FieldBuilder::Composite</span>(<span class="ident">ct</span>) =&gt; <span class="ident">Field::Composite</span>(<span class="ident">ct</span>.<span class="ident">build</span>(<span class="ident">container</span>, <span class="ident">composite_types</span>)),
         }
     }
 }

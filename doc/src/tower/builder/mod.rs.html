@@ -936,14 +936,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Identity</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Identity</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new [`ServiceBuilder`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ServiceBuilder</span> {
             <span class="ident">layer</span>: <span class="ident">Identity::new</span>(),
         }
@@ -957,7 +957,7 @@
     <span class="doccomment">/// [`Layer`]. The provided layer must implement the [`Layer`] trait.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Layer`]: crate::Layer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">layer</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">layer</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">layer</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">layer</span>: <span class="ident">T</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">ServiceBuilder</span> {
             <span class="ident">layer</span>: <span class="ident">Stack::new</span>(<span class="ident">layer</span>, <span class="self">self</span>.<span class="ident">layer</span>),
         }
@@ -984,7 +984,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">option_layer</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
         <span class="ident">layer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::Either</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Identity</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::Either</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Identity</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::option_layer</span>(<span class="ident">layer</span>))
     }
 
@@ -993,7 +993,7 @@
     <span class="doccomment">/// See the documentation for [`layer_fn`] for more details.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`layer_fn`]: crate::layer::layer_fn</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">layer_fn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::layer::LayerFn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">layer_fn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::layer::LayerFn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::layer::layer_fn</span>(<span class="ident">f</span>))
     }
 
@@ -1008,7 +1008,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">buffer</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
         <span class="ident">bound</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::buffer::BufferLayer</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::buffer::BufferLayer</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::buffer::BufferLayer::new</span>(<span class="ident">bound</span>))
     }
 
@@ -1027,7 +1027,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">concurrency_limit</span>(
         <span class="self">self</span>,
         <span class="ident">max</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::limit::ConcurrencyLimitLayer</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::limit::ConcurrencyLimitLayer</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::limit::ConcurrencyLimitLayer::new</span>(<span class="ident">max</span>))
     }
 
@@ -1048,7 +1048,7 @@
     <span class="doccomment">/// [`Pending`]: std::task::Poll::Pending</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load-shed&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load-shed&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_shed</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::load_shed::LoadShedLayer</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_shed</span>(<span class="self">self</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::load_shed::LoadShedLayer</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::load_shed::LoadShedLayer::new</span>())
     }
 
@@ -1064,7 +1064,7 @@
         <span class="self">self</span>,
         <span class="ident">num</span>: <span class="ident">u64</span>,
         <span class="ident">per</span>: <span class="ident">std::time::Duration</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::limit::RateLimitLayer</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::limit::RateLimitLayer</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::limit::RateLimitLayer::new</span>(<span class="ident">num</span>, <span class="ident">per</span>))
     }
 
@@ -1080,7 +1080,7 @@
     <span class="doccomment">/// [policy]: crate::retry::Policy</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;retry&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;retry&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retry</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">policy</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::retry::RetryLayer</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retry</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">policy</span>: <span class="ident">P</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::retry::RetryLayer</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::retry::RetryLayer::new</span>(<span class="ident">policy</span>))
     }
 
@@ -1098,7 +1098,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(
         <span class="self">self</span>,
         <span class="ident">timeout</span>: <span class="ident">std::time::Duration</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::timeout::TimeoutLayer</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::timeout::TimeoutLayer</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::timeout::TimeoutLayer::new</span>(<span class="ident">timeout</span>))
     }
 
@@ -1116,7 +1116,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
         <span class="ident">predicate</span>: <span class="ident">P</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::filter::FilterLayer</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::filter::FilterLayer</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::filter::FilterLayer::new</span>(<span class="ident">predicate</span>))
     }
 
@@ -1134,7 +1134,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_async</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
         <span class="ident">predicate</span>: <span class="ident">P</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::filter::AsyncFilterLayer</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::filter::AsyncFilterLayer</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::filter::AsyncFilterLayer::new</span>(<span class="ident">predicate</span>))
     }
 
@@ -1203,9 +1203,9 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_request</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R1</span>, <span class="ident">R2</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapRequestLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapRequestLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">R1</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R2</span> <span class="op">+</span> <span class="ident">Clone</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">R1</span>) -&gt; <span class="ident">R2</span> <span class="op">+</span> <span class="ident">Clone</span>,
     {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::MapRequestLayer::new</span>(<span class="ident">f</span>))
     }
@@ -1224,7 +1224,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_response</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapResponseLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapResponseLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::MapResponseLayer::new</span>(<span class="ident">f</span>))
     }
 
@@ -1239,7 +1239,7 @@
     <span class="doccomment">/// [`map_err` combinator]: crate::util::ServiceExt::map_err</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_err</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapErrLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_err</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapErrLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::MapErrLayer::new</span>(<span class="ident">f</span>))
     }
 
@@ -1253,7 +1253,7 @@
     <span class="doccomment">/// [`map_future`]: crate::util::ServiceExt::map_future</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_future</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapFutureLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_future</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapFutureLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::MapFutureLayer::new</span>(<span class="ident">f</span>))
     }
 
@@ -1277,7 +1277,7 @@
     <span class="doccomment">/// [`map_err`]: ServiceBuilder::map_err</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">then</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::ThenLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">then</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::ThenLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::ThenLayer::new</span>(<span class="ident">f</span>))
     }
 
@@ -1299,7 +1299,7 @@
     <span class="doccomment">/// [`AndThen`]: crate::util::AndThen</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_then</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::AndThenLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_then</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::AndThenLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::AndThenLayer::new</span>(<span class="ident">f</span>))
     }
 
@@ -1316,12 +1316,12 @@
     <span class="doccomment">/// [`MapResult`]: crate::util::MapResult</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_result</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapResultLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_result</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapResultLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::MapResultLayer::new</span>(<span class="ident">f</span>))
     }
 
     <span class="doccomment">/// Returns the underlying `Layer` implementation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">L</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">L</span> {
         <span class="self">self</span>.<span class="ident">layer</span>
     }
 
@@ -1330,7 +1330,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Layer`]: crate::Layer</span>
     <span class="doccomment">/// [`Service`]: crate::Service</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">service</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">L::Service</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">service</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident">L::Service</span>
     <span class="kw">where</span>
         <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
     {
@@ -1382,7 +1382,7 @@
     <span class="doccomment">/// [`service_fn`]: crate::service_fn</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">service_fn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">L::Service</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">service_fn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">L::Service</span>
     <span class="kw">where</span>
         <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::ServiceFn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -1415,7 +1415,7 @@
     <span class="doccomment">///     });</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_clone</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_clone</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Clone</span>,
     {
@@ -1452,7 +1452,7 @@
     <span class="doccomment">///     });</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_service_clone</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_service_clone</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
         <span class="ident">L::Service</span>: <span class="ident">Clone</span>,
@@ -1509,7 +1509,7 @@
     <span class="doccomment">///     .check_service::&lt;MyService, _, WrappedResponse, _&gt;();</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_service</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_service</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
         <span class="ident">L::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">U</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span>,
@@ -1551,12 +1551,12 @@
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boxed</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">R</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span>
+    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span>
         <span class="ident">Stack</span><span class="op">&lt;</span>
             <span class="ident">tower_layer::LayerFn</span><span class="op">&lt;</span>
                 <span class="kw">fn</span>(
                     <span class="ident">L::Service</span>,
-                ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::util::BoxService</span><span class="op">&lt;</span>
+                ) -&gt; <span class="ident"><span class="kw">crate</span>::util::BoxService</span><span class="op">&lt;</span>
                     <span class="ident">R</span>,
                     <span class="op">&lt;</span><span class="ident">L::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Response</span>,
                     <span class="op">&lt;</span><span class="ident">L::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>,
@@ -1615,12 +1615,12 @@
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boxed_clone</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">R</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span>
+    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span>
         <span class="ident">Stack</span><span class="op">&lt;</span>
             <span class="ident">tower_layer::LayerFn</span><span class="op">&lt;</span>
                 <span class="kw">fn</span>(
                     <span class="ident">L::Service</span>,
-                ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::util::BoxCloneService</span><span class="op">&lt;</span>
+                ) -&gt; <span class="ident"><span class="kw">crate</span>::util::BoxCloneService</span><span class="op">&lt;</span>
                     <span class="ident">R</span>,
                     <span class="op">&lt;</span><span class="ident">L::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Response</span>,
                     <span class="op">&lt;</span><span class="ident">L::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>,
@@ -1639,7 +1639,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;ServiceBuilder&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">layer</span>).<span class="ident">finish</span>()
     }
 }
@@ -1650,7 +1650,7 @@
 {
     <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L::Service</span>;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inner</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Service</span> {
+    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inner</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
         <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">layer</span>(<span class="ident">inner</span>)
     }
 }

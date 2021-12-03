@@ -51,13 +51,13 @@
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast::Comment</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_comment_block</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_comment_block</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">comments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="kw">for</span> <span class="ident">comment</span> <span class="kw">in</span> <span class="ident">token</span>.<span class="ident">clone</span>().<span class="ident">into_inner</span>() {
         <span class="kw">match</span> <span class="ident">comment</span>.<span class="ident">as_rule</span>() {
-            <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::doc_comment_and_new_line</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">comments</span>.<span class="ident">push</span>(<span class="ident">parse_doc_comment</span>(<span class="kw-2">&amp;</span><span class="ident">comment</span>)),
-            <span class="ident">Rule::comment</span> <span class="op">|</span> <span class="ident">Rule::comment_and_new_line</span> <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">comment</span>, <span class="string">&quot;comment block&quot;</span>),
+            <span class="ident">Rule::doc_comment</span> <span class="op">|</span> <span class="ident">Rule::doc_comment_and_new_line</span> =&gt; <span class="ident">comments</span>.<span class="ident">push</span>(<span class="ident">parse_doc_comment</span>(<span class="kw-2">&amp;</span><span class="ident">comment</span>)),
+            <span class="ident">Rule::comment</span> <span class="op">|</span> <span class="ident">Rule::comment_and_new_line</span> =&gt; {}
+            <span class="kw">_</span> =&gt; <span class="ident">parsing_catch_all</span>(<span class="kw-2">&amp;</span><span class="ident">comment</span>, <span class="string">&quot;comment block&quot;</span>),
         }
     }
 
@@ -70,12 +70,12 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_doc_comment</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_doc_comment</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">child</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">first_relevant_child</span>();
     <span class="kw">match</span> <span class="ident">child</span>.<span class="ident">as_rule</span>() {
-        <span class="ident">Rule::doc_content</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="ident">child</span>.<span class="ident">as_str</span>().<span class="ident">trim</span>()),
-        <span class="ident">Rule::doc_comment</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_doc_comment</span>(<span class="kw-2">&amp;</span><span class="ident">child</span>),
-        <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(
+        <span class="ident">Rule::doc_content</span> =&gt; <span class="ident">String::from</span>(<span class="ident">child</span>.<span class="ident">as_str</span>().<span class="ident">trim</span>()),
+        <span class="ident">Rule::doc_comment</span> =&gt; <span class="ident">parse_doc_comment</span>(<span class="kw-2">&amp;</span><span class="ident">child</span>),
+        <span class="ident">x</span> =&gt; <span class="macro">unreachable!</span>(
             <span class="string">&quot;Encountered impossible doc comment during parsing: {:?}, {:?}&quot;</span>,
             <span class="ident">x</span>,
             <span class="ident">child</span>.<span class="ident">tokens</span>()
@@ -83,7 +83,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">doc_comments_to_string</span>(<span class="ident">comments</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">doc_comments_to_string</span>(<span class="ident">comments</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">comments</span>.<span class="ident">is_empty</span>() {
         <span class="prelude-val">None</span>
     } <span class="kw">else</span> {

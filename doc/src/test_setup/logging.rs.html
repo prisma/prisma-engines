@@ -55,7 +55,7 @@
     <span class="ident">FmtSubscriber</span><span class="op">&lt;</span><span class="ident">DefaultFields</span>, <span class="ident">Format</span>, <span class="ident">EnvFilter</span>, <span class="ident">TestWriter</span><span class="op">&gt;</span>,
 <span class="op">&gt;</span>;
 
-<span class="kw">fn</span> <span class="ident">test_tracing_subscriber</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sub</span> {
+<span class="kw">fn</span> <span class="ident">test_tracing_subscriber</span>() -&gt; <span class="ident">Sub</span> {
     <span class="ident">FmtSubscriber::builder</span>()
         .<span class="ident">with_env_filter</span>(<span class="ident">EnvFilter::from_default_env</span>())
         .<span class="ident">with_test_writer</span>()

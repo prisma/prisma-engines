@@ -262,7 +262,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SrvResolver</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResolverConfig</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResolverConfig</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">resolver</span> <span class="op">=</span> <span class="ident">AsyncResolver::new</span>(<span class="ident">config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">resolver</span> })
@@ -271,7 +271,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">resolve_client_options</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">hostname</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ResolvedConfig</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ResolvedConfig</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">lookup_result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_srv_hosts</span>(<span class="ident">hostname</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ResolvedConfig</span> {
             <span class="ident">hosts</span>: <span class="ident">lookup_result</span>
@@ -289,7 +289,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">config</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_srv_hosts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">original_hostname</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LookupHosts</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_srv_hosts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">original_hostname</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LookupHosts</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">hostname_parts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">original_hostname</span>.<span class="ident">split</span>(<span class="string">&#39;.&#39;</span>).<span class="ident">collect</span>();
 
         <span class="kw">if</span> <span class="ident">hostname_parts</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">3</span> {
@@ -308,8 +308,8 @@
 
         <span class="kw">for</span> <span class="ident">record</span> <span class="kw">in</span> <span class="ident">srv_lookup</span>.<span class="ident">as_lookup</span>().<span class="ident">record_iter</span>() {
             <span class="kw">let</span> <span class="ident">srv</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">record</span>.<span class="ident">rdata</span>() {
-                <span class="ident">RData::SRV</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
+                <span class="ident">RData::SRV</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+                <span class="kw">_</span> =&gt; <span class="kw">continue</span>,
             };
 
             <span class="kw">let</span> <span class="ident">hostname</span> <span class="op">=</span> <span class="ident">srv</span>.<span class="ident">target</span>().<span class="ident">to_utf8</span>();
@@ -368,16 +368,16 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">original_hostname</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ResolvedConfig</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">txt_records_response</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">resolver</span>.<span class="ident">txt_lookup</span>(<span class="ident">original_hostname</span>).<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">response</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">response</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">Some</span>(<span class="ident">response</span>) =&gt; <span class="ident">response</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
         };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">txt_records</span> <span class="op">=</span> <span class="ident">txt_records_response</span>.<span class="ident">iter</span>();
 
         <span class="kw">let</span> <span class="ident">txt_record</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">txt_records</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">record</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">record</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">Some</span>(<span class="ident">record</span>) =&gt; <span class="ident">record</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
         };
 
         <span class="kw">if</span> <span class="ident">txt_records</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
@@ -413,17 +413,17 @@
             }
 
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">parts</span>[<span class="number">0</span>].<span class="ident">to_lowercase</span>()[..] {
-                <span class="string">&quot;authsource&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&quot;authsource&quot;</span> =&gt; {
                     <span class="ident">config</span>.<span class="ident">auth_source</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parts</span>[<span class="number">1</span>].<span class="ident">to_string</span>());
                 }
-                <span class="string">&quot;replicaset&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&quot;replicaset&quot;</span> =&gt; {
                     <span class="ident">config</span>.<span class="ident">replica_set</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parts</span>[<span class="number">1</span>].<span class="ident">into</span>());
                 }
-                <span class="string">&quot;loadbalanced&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&quot;loadbalanced&quot;</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parts</span>[<span class="number">1</span>] {
-                        <span class="string">&quot;true&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-                        <span class="string">&quot;false&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="string">&quot;true&quot;</span> =&gt; <span class="bool-val">true</span>,
+                        <span class="string">&quot;false&quot;</span> =&gt; <span class="bool-val">false</span>,
+                        <span class="kw">_</span> =&gt; {
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::DnsResolve</span> {
                                 <span class="ident">message</span>: <span class="macro">format!</span>(
                                     <span class="string">&quot;TXT record option &#39;loadbalanced={}&#39; was returned, only \
@@ -436,7 +436,7 @@
                     };
                     <span class="ident">config</span>.<span class="ident">load_balanced</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
                 }
-                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">other</span> =&gt; {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::DnsResolve</span> {
                         <span class="ident">message</span>: <span class="macro">format!</span>(
                             <span class="string">&quot;TXT record option &#39;{}&#39; was returned, but only &#39;authSource&#39;, \

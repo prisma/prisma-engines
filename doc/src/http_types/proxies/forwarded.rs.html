@@ -765,7 +765,7 @@
     <span class="doccomment">/// # Ok(()) }</span>
     <span class="doccomment">/// ```</span>
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_headers</span>(<span class="ident">headers</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_headers</span>(<span class="ident">headers</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">forwarded</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_forwarded_header</span>(<span class="ident">headers</span>)<span class="question-mark">?</span> {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">forwarded</span>))
         } <span class="kw">else</span> {
@@ -799,7 +799,7 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_forwarded_header</span>(
         <span class="ident">headers</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">headers</span>) <span class="op">=</span> <span class="ident">headers</span>.<span class="ident">as_ref</span>().<span class="ident">get</span>(<span class="ident">FORWARDED</span>) {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::parse</span>(<span class="ident">headers</span>.<span class="ident">as_ref</span>().<span class="ident">as_str</span>())<span class="question-mark">?</span>))
         } <span class="kw">else</span> {
@@ -832,7 +832,7 @@
     <span class="doccomment">/// assert!(Forwarded::from_x_headers(&amp;request)?.is_none());</span>
     <span class="doccomment">/// # Ok(()) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_x_headers</span>(<span class="ident">headers</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_x_headers</span>(<span class="ident">headers</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">headers</span>.<span class="ident">as_ref</span>();
 
         <span class="kw">let</span> <span class="ident">forwarded_for</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">headers</span>
@@ -843,8 +843,8 @@
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> {
                         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">trim</span>();
                         <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span>().<span class="ident">ok</span>() {
-                            <span class="prelude-val">Some</span>(<span class="ident">IpAddr::V6</span>(<span class="ident">v6</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">r#&quot;[{}]&quot;#</span>, <span class="ident">v6</span>)),
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Cow::Borrowed</span>(<span class="ident">v</span>),
+                            <span class="prelude-val">Some</span>(<span class="ident">IpAddr::V6</span>(<span class="ident">v6</span>)) =&gt; <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">r#&quot;[{}]&quot;#</span>, <span class="ident">v6</span>)),
+                            <span class="kw">_</span> =&gt; <span class="ident">Cow::Borrowed</span>(<span class="ident">v</span>),
                         }
                     })
                     .<span class="ident">collect</span>()
@@ -887,7 +887,7 @@
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// # Ok(()) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">input</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">forwarded</span> <span class="op">=</span> <span class="ident">Forwarded::new</span>();
 
@@ -902,54 +902,54 @@
         <span class="prelude-val">Ok</span>(<span class="ident">forwarded</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_forwarded_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_forwarded_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">key</span>, <span class="ident">value</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">parse_token</span>(<span class="ident">input</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">key</span>), <span class="ident">rest</span>) <span class="kw">if</span> <span class="ident">rest</span>.<span class="ident">starts_with</span>(<span class="string">&#39;=&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">parse_value</span>(<span class="kw-2">&amp;</span><span class="ident">rest</span>[<span class="number">1</span>..]) {
-                (<span class="prelude-val">Some</span>(<span class="ident">value</span>), <span class="ident">rest</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">key</span>, <span class="ident">value</span>, <span class="ident">rest</span>)),
-                (<span class="prelude-val">None</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            (<span class="prelude-val">Some</span>(<span class="ident">key</span>), <span class="ident">rest</span>) <span class="kw">if</span> <span class="ident">rest</span>.<span class="ident">starts_with</span>(<span class="string">&#39;=&#39;</span>) =&gt; <span class="kw">match</span> <span class="ident">parse_value</span>(<span class="kw-2">&amp;</span><span class="ident">rest</span>[<span class="number">1</span>..]) {
+                (<span class="prelude-val">Some</span>(<span class="ident">value</span>), <span class="ident">rest</span>) =&gt; <span class="prelude-val">Some</span>((<span class="ident">key</span>, <span class="ident">value</span>, <span class="ident">rest</span>)),
+                (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
         .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ParseError::new</span>(<span class="string">&quot;parse error in forwarded-pair&quot;</span>))<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">key</span> {
-            <span class="string">&quot;by&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;by&quot;</span> =&gt; {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">by</span>.<span class="ident">is_some</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ParseError::new</span>(<span class="string">&quot;parse error, duplicate `by` key&quot;</span>));
                 }
                 <span class="self">self</span>.<span class="ident">by</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
             }
 
-            <span class="string">&quot;host&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;host&quot;</span> =&gt; {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">host</span>.<span class="ident">is_some</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ParseError::new</span>(<span class="string">&quot;parse error, duplicate `host` key&quot;</span>));
                 }
                 <span class="self">self</span>.<span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
             }
 
-            <span class="string">&quot;proto&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;proto&quot;</span> =&gt; {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">proto</span>.<span class="ident">is_some</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ParseError::new</span>(<span class="string">&quot;parse error, duplicate `proto` key&quot;</span>));
                 }
                 <span class="self">self</span>.<span class="ident">proto</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
             }
 
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="comment">/* extensions are allowed in the spec */</span> }
+            <span class="kw">_</span> =&gt; { <span class="comment">/* extensions are allowed in the spec */</span> }
         }
 
         <span class="kw">match</span> <span class="ident">rest</span>.<span class="ident">strip_prefix</span>(<span class="string">&#39;;&#39;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">rest</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">rest</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">rest</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">rest</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">rest</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">rest</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_for</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_for</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rest</span> <span class="op">=</span> <span class="ident">input</span>;
 
         <span class="kw">loop</span> {
             <span class="ident">rest</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">match_ignore_case</span>(<span class="string">&quot;for=&quot;</span>, <span class="ident">rest</span>) {
-                (<span class="bool-val">true</span>, <span class="ident">rest</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rest</span>,
-                (<span class="bool-val">false</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ParseError::new</span>(<span class="string">&quot;http list must start with for=&quot;</span>)),
+                (<span class="bool-val">true</span>, <span class="ident">rest</span>) =&gt; <span class="ident">rest</span>,
+                (<span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ParseError::new</span>(<span class="string">&quot;http list must start with for=&quot;</span>)),
             };
 
             <span class="kw">let</span> (<span class="ident">value</span>, <span class="ident">rest_</span>) <span class="op">=</span> <span class="ident">parse_value</span>(<span class="ident">rest</span>);
@@ -964,25 +964,25 @@
 
             <span class="kw">match</span> <span class="ident">rest</span>.<span class="ident">chars</span>().<span class="ident">next</span>() {
                 <span class="comment">// we have another for=</span>
-                <span class="prelude-val">Some</span>(<span class="string">&#39;,&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="string">&#39;,&#39;</span>) =&gt; {
                     <span class="ident">rest</span> <span class="op">=</span> <span class="ident">rest</span>[<span class="number">1</span>..].<span class="ident">trim_start</span>();
                 }
 
                 <span class="comment">// we have reached the end of the for= section</span>
-                <span class="prelude-val">Some</span>(<span class="string">&#39;;&#39;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">rest</span>[<span class="number">1</span>..]),
+                <span class="prelude-val">Some</span>(<span class="string">&#39;;&#39;</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">rest</span>[<span class="number">1</span>..]),
 
                 <span class="comment">// reached the end of the input</span>
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">rest</span>),
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">rest</span>),
 
                 <span class="comment">// bail</span>
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ParseError::new</span>(<span class="string">&quot;unexpected character after for= section&quot;</span>)),
+                <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ParseError::new</span>(<span class="string">&quot;unexpected character after for= section&quot;</span>)),
             }
         }
     }
 
     <span class="doccomment">/// Transform a borrowed Forwarded into an owned</span>
     <span class="doccomment">/// Forwarded. This is a noop if the Forwarded is already owned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Forwarded</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">Forwarded</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="ident">Forwarded</span> {
             <span class="ident">by</span>: <span class="self">self</span>.<span class="ident">by</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">by</span><span class="op">|</span> <span class="ident">Cow::Owned</span>(<span class="ident">by</span>.<span class="ident">into_owned</span>())),
             <span class="ident">forwarded_for</span>: <span class="self">self</span>
@@ -1025,7 +1025,7 @@
     <span class="doccomment">/// assert_eq!(forwarded.value()?, r#&quot;for=_haproxy, for=&quot;[2001:db8:cafe::17]&quot;;proto=https&quot;#);</span>
     <span class="doccomment">/// # Ok(()) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">std::fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">std::fmt::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">String::new</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">by</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">by</span>() {
             <span class="macro">write!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="string">&quot;by={};&quot;</span>, <span class="ident">by</span>)<span class="question-mark">?</span>;
@@ -1057,7 +1057,7 @@
     }
 
     <span class="doccomment">/// Builds a new empty Forwarded</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::default</span>()
     }
 
@@ -1067,7 +1067,7 @@
     }
 
     <span class="doccomment">/// Returns the `for` field of this header</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forwarded_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forwarded_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">forwarded_for</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_ref</span>()).<span class="ident">collect</span>()
     }
 
@@ -1077,7 +1077,7 @@
     }
 
     <span class="doccomment">/// Returns the `host` field of this header</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">host</span>.<span class="ident">as_deref</span>()
     }
 
@@ -1087,7 +1087,7 @@
     }
 
     <span class="doccomment">/// Returns the `proto` field of this header</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">proto</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">proto</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">proto</span>.<span class="ident">as_deref</span>()
     }
 
@@ -1097,22 +1097,22 @@
     }
 
     <span class="doccomment">/// Returns the `by` field of this header</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">by</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">by</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">by</span>.<span class="ident">as_deref</span>()
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_value</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+<span class="kw">fn</span> <span class="ident">parse_value</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) {
     <span class="kw">match</span> <span class="ident">parse_token</span>(<span class="ident">input</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">token</span>), <span class="ident">rest</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="prelude-val">Some</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">token</span>)), <span class="ident">rest</span>),
-        (<span class="prelude-val">None</span>, <span class="ident">rest</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_quoted_string</span>(<span class="ident">rest</span>),
+        (<span class="prelude-val">Some</span>(<span class="ident">token</span>), <span class="ident">rest</span>) =&gt; (<span class="prelude-val">Some</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">token</span>)), <span class="ident">rest</span>),
+        (<span class="prelude-val">None</span>, <span class="ident">rest</span>) =&gt; <span class="ident">parse_quoted_string</span>(<span class="ident">rest</span>),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">format_value</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">format_value</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">parse_token</span>(<span class="ident">input</span>) {
-        (<span class="kw">_</span>, <span class="string">&quot;&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">input</span>.<span class="ident">into</span>(),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="kw">_</span>, <span class="string">&quot;&quot;</span>) =&gt; <span class="ident">input</span>.<span class="ident">into</span>(),
+        <span class="kw">_</span> =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;\&quot;&quot;</span>);
             <span class="kw">for</span> <span class="ident">ch</span> <span class="kw">in</span> <span class="ident">input</span>.<span class="ident">chars</span>() {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="string">&#39;\\&#39;</span> <span class="op">|</span> <span class="string">&#39;&quot;&#39;</span> <span class="op">=</span> <span class="ident">ch</span> {
@@ -1126,7 +1126,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">match_ignore_case</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">start</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">bool</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
+<span class="kw">fn</span> <span class="ident">match_ignore_case</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">start</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; (<span class="ident">bool</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">start</span>.<span class="ident">len</span>();
     <span class="kw">if</span> <span class="ident">input</span>[..<span class="ident">len</span>].<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">start</span>) {
         (<span class="bool-val">true</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">len</span>..])
@@ -1135,7 +1135,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">starts_with_ignore_case</span>(<span class="ident">start</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">starts_with_ignore_case</span>(<span class="ident">start</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">if</span> <span class="ident">start</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>() {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">start</span>.<span class="ident">len</span>();
         <span class="ident">input</span>[..<span class="ident">len</span>].<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">start</span>)
@@ -1145,21 +1145,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Forwarded</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>()<span class="question-mark">?</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ToHeaderValues</span> <span class="kw">for</span> <span class="ident">Forwarded</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">std::option::IntoIter</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">to_header_values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_header_values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">value</span>()<span class="question-mark">?</span>.<span class="ident">to_header_values</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ToHeaderValues</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">Forwarded</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">std::option::IntoIter</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">to_header_values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_header_values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Iter</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">value</span>()<span class="question-mark">?</span>.<span class="ident">to_header_values</span>()
     }
 }
@@ -1167,21 +1167,21 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParseError</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>);
 <span class="kw">impl</span> <span class="ident">ParseError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">msg</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">ParseError</span> {}
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">ParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unable to parse forwarded header: {}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Forwarded</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ParseError</span>;
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::parse</span>(<span class="ident">value</span>)
     }
 }
@@ -1198,7 +1198,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parsing_for</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parsing_for</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">assert_eq!</span>(
             <span class="ident">Forwarded::parse</span>(<span class="string">r#&quot;for=&quot;_gazonk&quot;&quot;#</span>)<span class="question-mark">?</span>.<span class="ident">forwarded_for</span>(),
             <span class="macro">vec!</span>[<span class="string">&quot;_gazonk&quot;</span>]
@@ -1241,7 +1241,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">basic_parse</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">basic_parse</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">forwarded</span> <span class="op">=</span> <span class="ident">Forwarded::parse</span>(<span class="string">&quot;for=client.com;by=proxy.com;host=host.com;proto=https&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="macro">assert_eq!</span>(<span class="ident">forwarded</span>.<span class="ident">by</span>(), <span class="prelude-val">Some</span>(<span class="string">&quot;proxy.com&quot;</span>));
@@ -1286,7 +1286,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bad_parse_from_headers</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">bad_parse_from_headers</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Response::new</span>(<span class="number">200</span>);
         <span class="ident">response</span>.<span class="ident">append_header</span>(<span class="string">&quot;forwarded&quot;</span>, <span class="string">&quot;uh oh&quot;</span>);
         <span class="macro">assert_eq!</span>(
@@ -1300,7 +1300,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_x_headers</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_x_headers</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">Request::new</span>(<span class="ident">Get</span>, <span class="ident">Url::parse</span>(<span class="string">&quot;http://_/&quot;</span>)<span class="question-mark">?</span>);
         <span class="ident">request</span>.<span class="ident">append_header</span>(<span class="ident">X_FORWARDED_FOR</span>, <span class="string">&quot;192.0.2.43, 2001:db8:cafe::17&quot;</span>);
         <span class="ident">request</span>.<span class="ident">append_header</span>(<span class="ident">X_FORWARDED_PROTO</span>, <span class="string">&quot;gopher&quot;</span>);
@@ -1324,7 +1324,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_edge_cases</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_edge_cases</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">forwarded</span> <span class="op">=</span>
             <span class="ident">Forwarded::parse</span>(<span class="string">r#&quot;for=&quot;;&quot;, for=&quot;,&quot;, for=&quot;\&quot;&quot;, for=unquoted;by=&quot;;proto=https&quot;&quot;#</span>)<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(<span class="ident">forwarded</span>.<span class="ident">forwarded_for</span>(), <span class="macro">vec!</span>[<span class="string">&quot;;&quot;</span>, <span class="string">&quot;,&quot;</span>, <span class="string">&quot;\&quot;&quot;</span>, <span class="string">&quot;unquoted&quot;</span>]);
@@ -1337,7 +1337,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">owned_parse</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">owned_parse</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">forwarded</span> <span class="op">=</span>
             <span class="ident">Forwarded::parse</span>(<span class="string">&quot;for=client;by=proxy.com;host=example.com;proto=https&quot;</span>)<span class="question-mark">?</span>.<span class="ident">into_owned</span>();
 
@@ -1350,7 +1350,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_request</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_request</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">Request::new</span>(<span class="ident">Get</span>, <span class="ident">Url::parse</span>(<span class="string">&quot;http://_/&quot;</span>)<span class="question-mark">?</span>);
         <span class="ident">request</span>.<span class="ident">append_header</span>(<span class="string">&quot;Forwarded&quot;</span>, <span class="string">&quot;for=for&quot;</span>);
 
@@ -1361,7 +1361,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">owned_can_outlive_request</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">owned_can_outlive_request</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">forwarded</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">Request::new</span>(<span class="ident">Get</span>, <span class="ident">Url::parse</span>(<span class="string">&quot;http://_/&quot;</span>)<span class="question-mark">?</span>);
             <span class="ident">request</span>.<span class="ident">append_header</span>(<span class="string">&quot;Forwarded&quot;</span>, <span class="string">&quot;for=for;by=by;host=host;proto=proto&quot;</span>);
@@ -1372,7 +1372,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">round_trip</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">round_trip</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inputs</span> <span class="op">=</span> [
             <span class="string">&quot;for=client,for=b,for=c;by=proxy.com;host=example.com;proto=https&quot;</span>,
             <span class="string">&quot;by=proxy.com;proto=https;host=example.com;for=a,for=b&quot;</span>,

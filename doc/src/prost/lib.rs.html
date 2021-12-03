@@ -127,7 +127,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// An error will be returned if the buffer does not have sufficient capacity to encode the</span>
 <span class="doccomment">/// delimiter.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_length_delimiter</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">length</span>: <span class="ident">usize</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">EncodeError</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_length_delimiter</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">length</span>: <span class="ident">usize</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">EncodeError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">B</span>: <span class="ident">BufMut</span>,
 {
@@ -145,7 +145,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Applications may use this method to ensure sufficient buffer capacity before calling</span>
 <span class="doccomment">/// `encode_length_delimiter`. The returned size will be between 1 and 10, inclusive.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length_delimiter_len</span>(<span class="ident">length</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length_delimiter_len</span>(<span class="ident">length</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
     <span class="ident">encoded_len_varint</span>(<span class="ident">length</span> <span class="kw">as</span> <span class="ident">u64</span>)
 }
 
@@ -160,7 +160,7 @@
 <span class="doccomment">///    input is required to decode the full delimiter.</span>
 <span class="doccomment">///  * If the supplied buffer contains more than 10 bytes, then the buffer contains an invalid</span>
 <span class="doccomment">///    delimiter, and typically the buffer should be considered corrupt.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_length_delimiter</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">B</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_length_delimiter</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">B</span>: <span class="ident">Buf</span>,
 {

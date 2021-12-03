@@ -668,27 +668,27 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CertUsage</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">usage</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">usage</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">usage</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CertUsage::CA</span>,
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CertUsage::Service</span>,
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CertUsage::TrustAnchor</span>,
-            <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CertUsage::DomainIssued</span>,
-            <span class="number">4</span>..<span class="op">=</span><span class="number">254</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CertUsage::Unassigned</span>(<span class="ident">usage</span>),
-            <span class="number">255</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CertUsage::Private</span>,
+            <span class="number">0</span> =&gt; <span class="ident">CertUsage::CA</span>,
+            <span class="number">1</span> =&gt; <span class="ident">CertUsage::Service</span>,
+            <span class="number">2</span> =&gt; <span class="ident">CertUsage::TrustAnchor</span>,
+            <span class="number">3</span> =&gt; <span class="ident">CertUsage::DomainIssued</span>,
+            <span class="number">4</span>..<span class="op">=</span><span class="number">254</span> =&gt; <span class="ident">CertUsage::Unassigned</span>(<span class="ident">usage</span>),
+            <span class="number">255</span> =&gt; <span class="ident">CertUsage::Private</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CertUsage</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">usage</span>: <span class="ident">CertUsage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">usage</span>: <span class="ident">CertUsage</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="ident">usage</span> {
-            <span class="ident">CertUsage::CA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">CertUsage::Service</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">CertUsage::TrustAnchor</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">CertUsage::DomainIssued</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-            <span class="ident">CertUsage::Unassigned</span>(<span class="ident">usage</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">usage</span>,
-            <span class="ident">CertUsage::Private</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">255</span>,
+            <span class="ident">CertUsage::CA</span> =&gt; <span class="number">0</span>,
+            <span class="ident">CertUsage::Service</span> =&gt; <span class="number">1</span>,
+            <span class="ident">CertUsage::TrustAnchor</span> =&gt; <span class="number">2</span>,
+            <span class="ident">CertUsage::DomainIssued</span> =&gt; <span class="number">3</span>,
+            <span class="ident">CertUsage::Unassigned</span>(<span class="ident">usage</span>) =&gt; <span class="ident">usage</span>,
+            <span class="ident">CertUsage::Private</span> =&gt; <span class="number">255</span>,
         }
     }
 }
@@ -727,23 +727,23 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Selector</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selector</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selector</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">selector</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Selector::Full</span>,
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Selector::Spki</span>,
-            <span class="number">2</span>..<span class="op">=</span><span class="number">254</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Selector::Unassigned</span>(<span class="ident">selector</span>),
-            <span class="number">255</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Selector::Private</span>,
+            <span class="number">0</span> =&gt; <span class="ident">Selector::Full</span>,
+            <span class="number">1</span> =&gt; <span class="ident">Selector::Spki</span>,
+            <span class="number">2</span>..<span class="op">=</span><span class="number">254</span> =&gt; <span class="ident">Selector::Unassigned</span>(<span class="ident">selector</span>),
+            <span class="number">255</span> =&gt; <span class="ident">Selector::Private</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Selector</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selector</span>: <span class="ident">Selector</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selector</span>: <span class="ident">Selector</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="ident">selector</span> {
-            <span class="ident">Selector::Full</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">Selector::Spki</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">Selector::Unassigned</span>(<span class="ident">selector</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">selector</span>,
-            <span class="ident">Selector::Private</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">255</span>,
+            <span class="ident">Selector::Full</span> =&gt; <span class="number">0</span>,
+            <span class="ident">Selector::Spki</span> =&gt; <span class="number">1</span>,
+            <span class="ident">Selector::Unassigned</span>(<span class="ident">selector</span>) =&gt; <span class="ident">selector</span>,
+            <span class="ident">Selector::Private</span> =&gt; <span class="number">255</span>,
         }
     }
 }
@@ -788,25 +788,25 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Matching</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">matching</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">matching</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">matching</span> {
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Matching::Raw</span>,
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Matching::Sha256</span>,
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Matching::Sha512</span>,
-            <span class="number">3</span>..<span class="op">=</span><span class="number">254</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Matching::Unassigned</span>(<span class="ident">matching</span>),
-            <span class="number">255</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Matching::Private</span>,
+            <span class="number">0</span> =&gt; <span class="ident">Matching::Raw</span>,
+            <span class="number">1</span> =&gt; <span class="ident">Matching::Sha256</span>,
+            <span class="number">2</span> =&gt; <span class="ident">Matching::Sha512</span>,
+            <span class="number">3</span>..<span class="op">=</span><span class="number">254</span> =&gt; <span class="ident">Matching::Unassigned</span>(<span class="ident">matching</span>),
+            <span class="number">255</span> =&gt; <span class="ident">Matching::Private</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Matching</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">matching</span>: <span class="ident">Matching</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">matching</span>: <span class="ident">Matching</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="ident">matching</span> {
-            <span class="ident">Matching::Raw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">Matching::Sha256</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">Matching::Sha512</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">Matching::Unassigned</span>(<span class="ident">matching</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">matching</span>,
-            <span class="ident">Matching::Private</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">255</span>,
+            <span class="ident">Matching::Raw</span> =&gt; <span class="number">0</span>,
+            <span class="ident">Matching::Sha256</span> =&gt; <span class="number">1</span>,
+            <span class="ident">Matching::Sha512</span> =&gt; <span class="number">2</span>,
+            <span class="ident">Matching::Unassigned</span>(<span class="ident">matching</span>) =&gt; <span class="ident">matching</span>,
+            <span class="ident">Matching::Private</span> =&gt; <span class="number">255</span>,
         }
     }
 }
@@ -835,7 +835,7 @@
         <span class="ident">selector</span>: <span class="ident">Selector</span>,
         <span class="ident">matching</span>: <span class="ident">Matching</span>,
         <span class="ident">cert_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="ident">TLSA</span> {
             <span class="ident">cert_usage</span>,
             <span class="ident">selector</span>,
@@ -845,22 +845,22 @@
     }
 
     <span class="doccomment">/// Specifies the provided association that will be used to match the certificate presented in the TLS handshake</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cert_usage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CertUsage</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cert_usage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CertUsage</span> {
         <span class="self">self</span>.<span class="ident">cert_usage</span>
     }
 
     <span class="doccomment">/// Specifies which part of the TLS certificate presented by the server will be matched against the association data</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">selector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Selector</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">selector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Selector</span> {
         <span class="self">self</span>.<span class="ident">selector</span>
     }
 
     <span class="doccomment">/// Specifies how the certificate association is presented</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">matching</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Matching</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">matching</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Matching</span> {
         <span class="self">self</span>.<span class="ident">matching</span>
     }
 
     <span class="doccomment">/// Binary data for validating the cert, see other members to understand format</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cert_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cert_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cert_data</span>
     }
 }
@@ -878,7 +878,7 @@
 <span class="doccomment">///    /                                                               /</span>
 <span class="doccomment">///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">rdata_length</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">TLSA</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">rdata_length</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">TLSA</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">cert_usage</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*CertUsage is verified*/</span>).<span class="ident">into</span>();
     <span class="kw">let</span> <span class="ident">selector</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*Selector is verified*/</span>).<span class="ident">into</span>();
     <span class="kw">let</span> <span class="ident">matching</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*Matching is verified*/</span>).<span class="ident">into</span>();
@@ -900,7 +900,7 @@
 }
 
 <span class="doccomment">/// Write the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">tlsa</span>: <span class="kw-2">&amp;</span><span class="ident">TLSA</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">tlsa</span>: <span class="kw-2">&amp;</span><span class="ident">TLSA</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">encoder</span>.<span class="ident">emit_u8</span>(<span class="ident">tlsa</span>.<span class="ident">cert_usage</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
     <span class="ident">encoder</span>.<span class="ident">emit_u8</span>(<span class="ident">tlsa</span>.<span class="ident">selector</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
     <span class="ident">encoder</span>.<span class="ident">emit_u8</span>(<span class="ident">tlsa</span>.<span class="ident">matching</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
@@ -957,7 +957,7 @@
 <span class="doccomment">///       3 0 0 30820307308201efa003020102020... )</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TLSA</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;{usage} {selector} {matching} {cert}&quot;</span>,

@@ -274,7 +274,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">ip_v4_netw</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Network</span>, <span class="ident">AddrParseError</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">ip_v4_netw</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Network</span>, <span class="ident">AddrParseError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pair</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&#39;/&#39;</span>);
     <span class="kw">let</span> <span class="ident">ip</span>: <span class="ident">Ipv4Addr</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">parse</span>()<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="ident">ip</span>.<span class="ident">is_unspecified</span>() {
@@ -284,7 +284,7 @@
         <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="ident">mask</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="comment">// make sure this is a valid mask</span>
         <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">ip</span>.<span class="ident">octets</span>().<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">acc</span> <span class="op">+</span> <span class="ident">u32::from</span>(<span class="ident">x</span>));
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">value</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">value</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
+        <span class="kw">if</span> <span class="ident">value</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">value</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">value</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
             <span class="prelude-val">Err</span>(<span class="ident">AddrParseError</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">Network::V4</span>(<span class="ident">ip</span>, <span class="ident">mask</span>))
@@ -301,9 +301,9 @@
         <span class="comment">//</span>
         <span class="comment">// My only source on topic is the &quot;DNS and Bind&quot; book which suggests using bytes, not bits.</span>
         <span class="kw">let</span> <span class="ident">octets</span> <span class="op">=</span> <span class="ident">ip</span>.<span class="ident">octets</span>();
-        <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">octets</span>[<span class="number">3</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="ident">octets</span>[<span class="number">2</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">if</span> <span class="ident">octets</span>[<span class="number">1</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">octets</span>[<span class="number">3</span>] <span class="op">==</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">octets</span>[<span class="number">2</span>] <span class="op">==</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">octets</span>[<span class="number">1</span>] <span class="op">==</span> <span class="number">0</span> {
                     <span class="ident">Ipv4Addr::new</span>(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
                 } <span class="kw">else</span> {
                     <span class="ident">Ipv4Addr::new</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)
@@ -318,7 +318,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">ip_v6_netw</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Network</span>, <span class="ident">AddrParseError</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">ip_v6_netw</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Network</span>, <span class="ident">AddrParseError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pair</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&#39;/&#39;</span>);
     <span class="kw">let</span> <span class="ident">ip</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">parse</span>()<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">msk</span>) <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">next</span>() {
@@ -342,13 +342,13 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Config</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Config</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ParseError</span>::<span class="kw-2">*</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="ident">Config::new</span>();
-    <span class="lifetime">&#39;lines</span>: <span class="kw">for</span> (<span class="ident">lineno</span>, <span class="ident">line</span>) <span class="kw">in</span> <span class="ident">bytes</span>.<span class="ident">split</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;\n&#39;</span>).<span class="ident">enumerate</span>() {
+    <span class="lifetime">&#39;lines</span>: <span class="kw">for</span> (<span class="ident">lineno</span>, <span class="ident">line</span>) <span class="kw">in</span> <span class="ident">bytes</span>.<span class="ident">split</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">b&#39;\n&#39;</span>).<span class="ident">enumerate</span>() {
         <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">c</span> <span class="kw">in</span> <span class="ident">line</span>.<span class="ident">iter</span>() {
             <span class="kw">if</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;\t&#39;</span> <span class="op">&amp;&amp;</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39; &#39;</span> {
-                <span class="kw">if</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;;&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;#&#39;</span> {
+                <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">b&#39;#&#39;</span> {
                     <span class="kw">continue</span> <span class="lifetime">&#39;lines</span>;
                 } <span class="kw">else</span> {
                     <span class="kw">break</span>;
@@ -359,16 +359,16 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">words</span> <span class="op">=</span> <span class="ident">from_utf8</span>(<span class="ident">line</span>)
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">InvalidUtf8</span>(<span class="ident">lineno</span>, <span class="ident">e</span>))<span class="question-mark">?</span>
             <span class="comment">// ignore everything after &#39;;&#39; or &#39;#&#39;</span>
-            .<span class="ident">split</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;;&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;#&#39;</span>)
+            .<span class="ident">split</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;;&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;#&#39;</span>)
             .<span class="ident">next</span>()
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">InvalidValue</span>(<span class="ident">lineno</span>))<span class="question-mark">?</span>
             .<span class="ident">split_whitespace</span>();
         <span class="kw">let</span> <span class="ident">keyword</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">words</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>,
         };
         <span class="kw">match</span> <span class="ident">keyword</span> {
-            <span class="string">&quot;nameserver&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;nameserver&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">srv</span> <span class="op">=</span> <span class="ident">words</span>
                     .<span class="ident">next</span>()
                     .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">InvalidValue</span>(<span class="ident">lineno</span>))
@@ -378,7 +378,7 @@
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ExtraData</span>(<span class="ident">lineno</span>));
                 }
             }
-            <span class="string">&quot;domain&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;domain&quot;</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">dom</span> <span class="op">=</span> <span class="ident">words</span>
                     .<span class="ident">next</span>()
                     .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">parse</span>().<span class="ident">ok</span>())
@@ -388,10 +388,10 @@
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ExtraData</span>(<span class="ident">lineno</span>));
                 }
             }
-            <span class="string">&quot;search&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;search&quot;</span> =&gt; {
                 <span class="ident">cfg</span>.<span class="ident">set_search</span>(<span class="ident">words</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>());
             }
-            <span class="string">&quot;sortlist&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;sortlist&quot;</span> =&gt; {
                 <span class="ident">cfg</span>.<span class="ident">sortlist</span>.<span class="ident">clear</span>();
                 <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">words</span> {
                     <span class="kw">let</span> <span class="ident">netw</span> <span class="op">=</span> <span class="ident">ip_v4_netw</span>(<span class="ident">pair</span>)
@@ -400,7 +400,7 @@
                     <span class="ident">cfg</span>.<span class="ident">sortlist</span>.<span class="ident">push</span>(<span class="ident">netw</span>);
                 }
             }
-            <span class="string">&quot;options&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;options&quot;</span> =&gt; {
                 <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">words</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&#39;:&#39;</span>);
                     <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
@@ -410,52 +410,52 @@
                     }
                     <span class="kw">match</span> (<span class="ident">key</span>, <span class="ident">value</span>) {
                         <span class="comment">// TODO(tailhook) ensure that values are None?</span>
-                        (<span class="string">&quot;debug&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">debug</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;ndots&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">x</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                        (<span class="string">&quot;debug&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">debug</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        (<span class="string">&quot;ndots&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">x</span>)) =&gt; {
                             <span class="ident">cfg</span>.<span class="ident">ndots</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidOptionValue</span>(<span class="ident">lineno</span>))<span class="question-mark">?</span>
                         }
-                        (<span class="string">&quot;timeout&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">x</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                        (<span class="string">&quot;timeout&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">x</span>)) =&gt; {
                             <span class="ident">cfg</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidOptionValue</span>(<span class="ident">lineno</span>))<span class="question-mark">?</span>
                         }
-                        (<span class="string">&quot;attempts&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">x</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                        (<span class="string">&quot;attempts&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">x</span>)) =&gt; {
                             <span class="ident">cfg</span>.<span class="ident">attempts</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidOptionValue</span>(<span class="ident">lineno</span>))<span class="question-mark">?</span>
                         }
-                        (<span class="string">&quot;rotate&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">rotate</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;no-check-names&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">no_check_names</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;inet6&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">inet6</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;ip6-bytestring&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">ip6_bytestring</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;ip6-dotint&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">ip6_dotint</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;no-ip6-dotint&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">ip6_dotint</span> <span class="op">=</span> <span class="bool-val">false</span>,
-                        (<span class="string">&quot;edns0&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">edns0</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;single-request&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">single_request</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;single-request-reopen&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">single_request_reopen</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;no-reload&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">no_reload</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;trust-ad&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">trust_ad</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;no-tld-query&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">no_tld_query</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        (<span class="string">&quot;use-vc&quot;</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">use_vc</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidOption</span>(<span class="ident">lineno</span>)),
+                        (<span class="string">&quot;rotate&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">rotate</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        (<span class="string">&quot;no-check-names&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">no_check_names</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        (<span class="string">&quot;inet6&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">inet6</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        (<span class="string">&quot;ip6-bytestring&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">ip6_bytestring</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        (<span class="string">&quot;ip6-dotint&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">ip6_dotint</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        (<span class="string">&quot;no-ip6-dotint&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">ip6_dotint</span> <span class="op">=</span> <span class="bool-val">false</span>,
+                        (<span class="string">&quot;edns0&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">edns0</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        (<span class="string">&quot;single-request&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">single_request</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        (<span class="string">&quot;single-request-reopen&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">single_request_reopen</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        (<span class="string">&quot;no-reload&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">no_reload</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        (<span class="string">&quot;trust-ad&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">trust_ad</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        (<span class="string">&quot;no-tld-query&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">no_tld_query</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        (<span class="string">&quot;use-vc&quot;</span>, <span class="kw">_</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">use_vc</span> <span class="op">=</span> <span class="bool-val">true</span>,
+                        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidOption</span>(<span class="ident">lineno</span>)),
                     }
                 }
             }
-            <span class="string">&quot;lookup&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;lookup&quot;</span> =&gt; {
                 <span class="kw">for</span> <span class="ident">word</span> <span class="kw">in</span> <span class="ident">words</span> {
                     <span class="kw">match</span> <span class="ident">word</span> {
-                        <span class="string">&quot;file&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">lookup</span>.<span class="ident">push</span>(<span class="ident">Lookup::File</span>),
-                        <span class="string">&quot;bind&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">lookup</span>.<span class="ident">push</span>(<span class="ident">Lookup::Bind</span>),
-                        <span class="ident">extra</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">lookup</span>.<span class="ident">push</span>(<span class="ident">Lookup::Extra</span>(<span class="ident">extra</span>.<span class="ident">to_string</span>())),
+                        <span class="string">&quot;file&quot;</span> =&gt; <span class="ident">cfg</span>.<span class="ident">lookup</span>.<span class="ident">push</span>(<span class="ident">Lookup::File</span>),
+                        <span class="string">&quot;bind&quot;</span> =&gt; <span class="ident">cfg</span>.<span class="ident">lookup</span>.<span class="ident">push</span>(<span class="ident">Lookup::Bind</span>),
+                        <span class="ident">extra</span> =&gt; <span class="ident">cfg</span>.<span class="ident">lookup</span>.<span class="ident">push</span>(<span class="ident">Lookup::Extra</span>(<span class="ident">extra</span>.<span class="ident">to_string</span>())),
                     }
                 }
             }
-            <span class="string">&quot;family&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;family&quot;</span> =&gt; {
                 <span class="kw">for</span> <span class="ident">word</span> <span class="kw">in</span> <span class="ident">words</span> {
                     <span class="kw">match</span> <span class="ident">word</span> {
-                        <span class="string">&quot;inet4&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">family</span>.<span class="ident">push</span>(<span class="ident">Family::Inet4</span>),
-                        <span class="string">&quot;inet6&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cfg</span>.<span class="ident">family</span>.<span class="ident">push</span>(<span class="ident">Family::Inet6</span>),
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidValue</span>(<span class="ident">lineno</span>)),
+                        <span class="string">&quot;inet4&quot;</span> =&gt; <span class="ident">cfg</span>.<span class="ident">family</span>.<span class="ident">push</span>(<span class="ident">Family::Inet4</span>),
+                        <span class="string">&quot;inet6&quot;</span> =&gt; <span class="ident">cfg</span>.<span class="ident">family</span>.<span class="ident">push</span>(<span class="ident">Family::Inet6</span>),
+                        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidValue</span>(<span class="ident">lineno</span>)),
                     }
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidDirective</span>(<span class="ident">lineno</span>)),
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidDirective</span>(<span class="ident">lineno</span>)),
         }
     }
     <span class="prelude-val">Ok</span>(<span class="ident">cfg</span>)

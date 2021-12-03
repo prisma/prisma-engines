@@ -7,7 +7,7 @@ inner type does.</li>
 inner type does.</li>
 </ul>
 <p>Wrap an async I/O handle in <a href="struct.Arc.html" title="Arc"><code>Arc</code></a> or <a href="struct.Mutex.html" title="Mutex"><code>Mutex</code></a> to clone it or share among tasks.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>Clone an async I/O handle:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">async_dup::Arc</span>;
@@ -31,14 +31,14 @@ inner type does.</li>
 <span class="kw">use</span> <span class="ident">futures::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="comment">// Reads data from a stream and echoes it back.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">echo</span>(<span class="ident">stream</span>: <span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">echo</span>(<span class="ident">stream</span>: <span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">stream</span>);
     <span class="ident">io::copy</span>(<span class="kw-2">&amp;</span><span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">stream</span>).<span class="kw">await</span>
 }</code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Arc.html" title="async_dup::Arc struct">Arc</a></div><div class="item-right docblock-short"><p>A reference-counted pointer that implements async I/O traits.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Mutex.html" title="async_dup::Mutex struct">Mutex</a></div><div class="item-right docblock-short"><p>A mutex that implements async I/O traits.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.MutexGuard.html" title="async_dup::MutexGuard struct">MutexGuard</a></div><div class="item-right docblock-short"><p>A guard that releases the mutex when dropped.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="async_dup" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Arc.html" title="async_dup::Arc struct">Arc</a></div><div class="item-right docblock-short"><p>A reference-counted pointer that implements async I/O traits.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Mutex.html" title="async_dup::Mutex struct">Mutex</a></div><div class="item-right docblock-short"><p>A mutex that implements async I/O traits.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.MutexGuard.html" title="async_dup::MutexGuard struct">MutexGuard</a></div><div class="item-right docblock-short"><p>A guard that releases the mutex when dropped.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="async_dup" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

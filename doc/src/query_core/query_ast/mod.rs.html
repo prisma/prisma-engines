@@ -91,6 +91,7 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
+<span id="94">94</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">read</span>;
 <span class="kw">mod</span> <span class="ident">write</span>;
 
@@ -101,39 +102,40 @@
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelProjection</span>, <span class="ident">ModelRef</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Query</span> {
     <span class="ident">Read</span>(<span class="ident">ReadQuery</span>),
     <span class="ident">Write</span>(<span class="ident">WriteQuery</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Query</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">returns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">projection</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">returns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">projection</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">rq</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rq</span>.<span class="ident">returns</span>(<span class="ident">projection</span>),
-            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">wq</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">wq</span>.<span class="ident">returns</span>(<span class="ident">projection</span>),
+            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">rq</span>) =&gt; <span class="ident">rq</span>.<span class="ident">returns</span>(<span class="ident">projection</span>),
+            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">wq</span>) =&gt; <span class="ident">wq</span>.<span class="ident">returns</span>(<span class="ident">projection</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelRef</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">rq</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rq</span>.<span class="ident">model</span>(),
-            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">wq</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">wq</span>.<span class="ident">model</span>(),
+            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">rq</span>) =&gt; <span class="ident">rq</span>.<span class="ident">model</span>(),
+            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">wq</span>) =&gt; <span class="ident">wq</span>.<span class="ident">model</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FilteredQuery</span> <span class="kw">for</span> <span class="ident">Query</span> {
-    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">rq</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rq</span>.<span class="ident">get_filter</span>(),
-            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">wq</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">wq</span>.<span class="ident">get_filter</span>(),
+            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">rq</span>) =&gt; <span class="ident">rq</span>.<span class="ident">get_filter</span>(),
+            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">wq</span>) =&gt; <span class="ident">wq</span>.<span class="ident">get_filter</span>(),
         }
     }
 
     <span class="kw">fn</span> <span class="ident">set_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">Filter</span>) {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">rq</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rq</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
-            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">wq</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">wq</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
+            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">rq</span>) =&gt; <span class="ident">rq</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
+            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">wq</span>) =&gt; <span class="ident">wq</span>.<span class="ident">set_filter</span>(<span class="ident">filter</span>),
         }
     }
 }
@@ -146,21 +148,21 @@
         <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">existing_filter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_filter</span>();
         <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">existing_filter</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">Filter::And</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">Filter::And</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>)) =&gt; {
                 <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">filter</span>);
                 <span class="prelude-val">None</span>
             }
-            <span class="prelude-val">Some</span>(<span class="ident">Filter::Or</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">Filter::Or</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>)) =&gt; {
                 <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">filter</span>);
                 <span class="prelude-val">None</span>
             }
-            <span class="prelude-val">Some</span>(<span class="ident">Filter::Not</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">Filter::Not</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>)) =&gt; {
                 <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">filter</span>);
                 <span class="prelude-val">None</span>
             }
-            <span class="prelude-val">Some</span>(<span class="ident">Filter::Empty</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">other</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::default_filter_behaviour</span>(<span class="macro">vec!</span>[<span class="ident">other</span>.<span class="ident">clone</span>(), <span class="ident">filter</span>])),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">Filter::Empty</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">filter</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">other</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::default_filter_behaviour</span>(<span class="macro">vec!</span>[<span class="ident">other</span>.<span class="ident">clone</span>(), <span class="ident">filter</span>])),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">filter</span>),
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span> <span class="ident">filter</span> {
@@ -168,19 +170,19 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Filter</span><span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">set_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">Filter</span>);
 
-    <span class="kw">fn</span> <span class="ident">default_filter_behaviour</span>(<span class="ident">inner_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span> {
+    <span class="kw">fn</span> <span class="ident">default_filter_behaviour</span>(<span class="ident">inner_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span> {
         <span class="ident">Filter::Or</span>(<span class="ident">inner_filters</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Query</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">q</span>),
-            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">q</span>),
+            <span class="ident"><span class="self">Self</span>::Read</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">q</span>),
+            <span class="ident"><span class="self">Self</span>::Write</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">q</span>),
         }
     }
 }

@@ -539,18 +539,18 @@
     <span class="doccomment">/// Create a new IPv4 TCP socket.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This calls `socket(2)`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_v4</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpSocket</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_v4</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpSocket</span><span class="op">&gt;</span> {
         <span class="ident">sys::tcp::new_v4_socket</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sys</span><span class="op">|</span> <span class="ident">TcpSocket</span> { <span class="ident">sys</span> })
     }
 
     <span class="doccomment">/// Create a new IPv6 TCP socket.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This calls `socket(2)`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_v6</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpSocket</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_v6</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpSocket</span><span class="op">&gt;</span> {
         <span class="ident">sys::tcp::new_v6_socket</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sys</span><span class="op">|</span> <span class="ident">TcpSocket</span> { <span class="ident">sys</span> })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_for_addr</span>(<span class="ident">addr</span>: <span class="ident">SocketAddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpSocket</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_for_addr</span>(<span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpSocket</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">addr</span>.<span class="ident">is_ipv4</span>() {
             <span class="ident">TcpSocket::new_v4</span>()
         } <span class="kw">else</span> {
@@ -559,7 +559,7 @@
     }
 
     <span class="doccomment">/// Bind `addr` to the TCP socket.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">SocketAddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">sys::tcp::bind</span>(<span class="self">self</span>.<span class="ident">sys</span>, <span class="ident">addr</span>)
     }
 
@@ -568,7 +568,7 @@
     <span class="doccomment">/// This consumes the socket and performs the connect operation. Once the</span>
     <span class="doccomment">/// connection completes, the socket is now a non-blocking `TcpStream` and</span>
     <span class="doccomment">/// can be used as such.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">SocketAddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">sys::tcp::connect</span>(<span class="self">self</span>.<span class="ident">sys</span>, <span class="ident">addr</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// Don&#39;t close the socket</span>
@@ -578,7 +578,7 @@
 
     <span class="doccomment">/// Listen for inbound connections, converting the socket to a</span>
     <span class="doccomment">/// `TcpListener`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">listen</span>(<span class="self">self</span>, <span class="ident">backlog</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpListener</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">listen</span>(<span class="self">self</span>, <span class="ident">backlog</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpListener</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">sys::tcp::listen</span>(<span class="self">self</span>.<span class="ident">sys</span>, <span class="ident">backlog</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// Don&#39;t close the socket</span>
@@ -587,41 +587,41 @@
     }
 
     <span class="doccomment">/// Sets the value of `SO_REUSEADDR` on this socket.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reuseaddr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reuseaddr</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reuseaddr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reuseaddr</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">sys::tcp::set_reuseaddr</span>(<span class="self">self</span>.<span class="ident">sys</span>, <span class="ident">reuseaddr</span>)
     }
 
     <span class="doccomment">/// Get the value of `SO_REUSEADDR` set on this socket.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_reuseaddr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_reuseaddr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="ident">sys::tcp::get_reuseaddr</span>(<span class="self">self</span>.<span class="ident">sys</span>)
     }
 
     <span class="doccomment">/// Sets the value of `SO_REUSEPORT` on this socket.</span>
     <span class="doccomment">/// Only supported available in unix</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reuseport</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reuseport</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reuseport</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reuseport</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">sys::tcp::set_reuseport</span>(<span class="self">self</span>.<span class="ident">sys</span>, <span class="ident">reuseport</span>)
     }
 
     <span class="doccomment">/// Get the value of `SO_REUSEPORT` set on this socket.</span>
     <span class="doccomment">/// Only supported available in unix</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_reuseport</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_reuseport</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="ident">sys::tcp::get_reuseport</span>(<span class="self">self</span>.<span class="ident">sys</span>)
     }
 
     <span class="doccomment">/// Sets the value of `SO_LINGER` on this socket.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_linger</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dur</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_linger</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dur</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">sys::tcp::set_linger</span>(<span class="self">self</span>.<span class="ident">sys</span>, <span class="ident">dur</span>)
     }
 
     <span class="doccomment">/// Gets the value of `SO_LINGER` on this socket</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_linger</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_linger</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">sys::tcp::get_linger</span>(<span class="self">self</span>.<span class="ident">sys</span>)
     }
 
     <span class="doccomment">/// Sets the value of `SO_RCVBUF` on this socket.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_recv_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">size</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_recv_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">size</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">sys::tcp::set_recv_buffer_size</span>(<span class="self">self</span>.<span class="ident">sys</span>, <span class="ident">size</span>)
     }
 
@@ -645,12 +645,12 @@
     <span class="doccomment">///   &gt; value is returned by `getsockopt(2)`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`set_recv_buffer_size`]: #method.set_recv_buffer_size</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_recv_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_recv_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="ident">sys::tcp::get_recv_buffer_size</span>(<span class="self">self</span>.<span class="ident">sys</span>)
     }
 
     <span class="doccomment">/// Sets the value of `SO_SNDBUF` on this socket.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_send_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">size</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_send_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">size</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">sys::tcp::set_send_buffer_size</span>(<span class="self">self</span>.<span class="ident">sys</span>, <span class="ident">size</span>)
     }
 
@@ -674,19 +674,19 @@
     <span class="doccomment">///   &gt; value is returned by `getsockopt(2)`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`set_send_buffer_size`]: #method.set_send_buffer_size</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_send_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_send_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="ident">sys::tcp::get_send_buffer_size</span>(<span class="self">self</span>.<span class="ident">sys</span>)
     }
 
     <span class="doccomment">/// Sets whether keepalive messages are enabled to be sent on this socket.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will set the `SO_KEEPALIVE` option on this socket.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_keepalive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">keepalive</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_keepalive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">keepalive</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">sys::tcp::set_keepalive</span>(<span class="self">self</span>.<span class="ident">sys</span>, <span class="ident">keepalive</span>)
     }
 
     <span class="doccomment">/// Returns whether or not TCP keepalive probes will be sent by this socket.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_keepalive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_keepalive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="ident">sys::tcp::get_keepalive</span>(<span class="self">self</span>.<span class="ident">sys</span>)
     }
 
@@ -727,7 +727,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`TcpKeepalive`]: ../struct.TcpKeepalive.html</span>
     <span class="doccomment">/// [keepalive time]: ../struct.TcpKeepalive.html#method.with_time</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_keepalive_params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">keepalive</span>: <span class="ident">TcpKeepalive</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_keepalive_params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">keepalive</span>: <span class="ident">TcpKeepalive</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">set_keepalive</span>(<span class="bool-val">true</span>)<span class="question-mark">?</span>;
         <span class="ident">sys::tcp::set_keepalive_params</span>(<span class="self">self</span>.<span class="ident">sys</span>, <span class="ident">keepalive</span>)
     }
@@ -746,7 +746,7 @@
     <span class="doccomment">/// specifications may be omitted.</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))))]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_keepalive_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_keepalive_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">sys::tcp::get_keepalive_time</span>(<span class="self">self</span>.<span class="ident">sys</span>)
     }
 
@@ -778,7 +778,7 @@
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
     ))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_keepalive_interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_keepalive_interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">sys::tcp::get_keepalive_interval</span>(<span class="self">self</span>.<span class="ident">sys</span>)
     }
 
@@ -807,14 +807,14 @@
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
     ))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_keepalive_retries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_keepalive_retries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">sys::tcp::get_keepalive_retries</span>(<span class="self">self</span>.<span class="ident">sys</span>)
     }
 
     <span class="doccomment">/// Returns the local address of this socket</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` result in windows if called before calling `bind`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_localaddr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_localaddr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
         <span class="ident">sys::tcp::get_localaddr</span>(<span class="self">self</span>.<span class="ident">sys</span>)
     }
 }
@@ -827,7 +827,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
 <span class="kw">impl</span> <span class="ident">IntoRawFd</span> <span class="kw">for</span> <span class="ident">TcpSocket</span> {
-    <span class="kw">fn</span> <span class="ident">into_raw_fd</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawFd</span> {
+    <span class="kw">fn</span> <span class="ident">into_raw_fd</span>(<span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sys</span>;
         <span class="comment">// Avoid closing the socket</span>
         <span class="ident">mem::forget</span>(<span class="self">self</span>);
@@ -837,7 +837,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
 <span class="kw">impl</span> <span class="ident">AsRawFd</span> <span class="kw">for</span> <span class="ident">TcpSocket</span> {
-    <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawFd</span> {
+    <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
         <span class="self">self</span>.<span class="ident">sys</span>
     }
 }
@@ -850,14 +850,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The caller is responsible for ensuring that the socket is in</span>
     <span class="doccomment">/// non-blocking mode.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_fd</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TcpSocket</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_fd</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>) -&gt; <span class="ident">TcpSocket</span> {
         <span class="ident">TcpSocket</span> { <span class="ident">sys</span>: <span class="ident">fd</span> }
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
 <span class="kw">impl</span> <span class="ident">IntoRawSocket</span> <span class="kw">for</span> <span class="ident">TcpSocket</span> {
-    <span class="kw">fn</span> <span class="ident">into_raw_socket</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawSocket</span> {
+    <span class="kw">fn</span> <span class="ident">into_raw_socket</span>(<span class="self">self</span>) -&gt; <span class="ident">RawSocket</span> {
         <span class="comment">// The winapi crate defines `SOCKET` as `usize`. The Rust std</span>
         <span class="comment">// conditionally defines `RawSocket` as a fixed size unsigned integer</span>
         <span class="comment">// matching the pointer width. These end up being the same type but we</span>
@@ -873,7 +873,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
 <span class="kw">impl</span> <span class="ident">AsRawSocket</span> <span class="kw">for</span> <span class="ident">TcpSocket</span> {
-    <span class="kw">fn</span> <span class="ident">as_raw_socket</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawSocket</span> {
+    <span class="kw">fn</span> <span class="ident">as_raw_socket</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawSocket</span> {
         <span class="self">self</span>.<span class="ident">sys</span> <span class="kw">as</span> <span class="ident">RawSocket</span>
     }
 }
@@ -886,7 +886,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The caller is responsible for ensuring that the socket is in</span>
     <span class="doccomment">/// non-blocking mode.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_socket</span>(<span class="ident">socket</span>: <span class="ident">RawSocket</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TcpSocket</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_socket</span>(<span class="ident">socket</span>: <span class="ident">RawSocket</span>) -&gt; <span class="ident">TcpSocket</span> {
         <span class="ident">TcpSocket</span> {
             <span class="ident">sys</span>: <span class="ident">socket</span> <span class="kw">as</span> <span class="ident">sys::tcp::TcpSocket</span>,
         }
@@ -904,7 +904,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Some platforms specify this value in seconds, so sub-second</span>
     <span class="doccomment">/// specifications may be omitted.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_time</span>(<span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_time</span>(<span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">time</span>: <span class="prelude-val">Some</span>(<span class="ident">time</span>),
             ..<span class="self">self</span>
@@ -937,7 +937,7 @@
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>
     ))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_interval</span>(<span class="self">self</span>, <span class="ident">interval</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_interval</span>(<span class="self">self</span>, <span class="ident">interval</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">interval</span>: <span class="prelude-val">Some</span>(<span class="ident">interval</span>),
             ..<span class="self">self</span>
@@ -966,7 +966,7 @@
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>,
         <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
     ))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_retries</span>(<span class="self">self</span>, <span class="ident">retries</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_retries</span>(<span class="self">self</span>, <span class="ident">retries</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">retries</span>: <span class="prelude-val">Some</span>(<span class="ident">retries</span>),
             ..<span class="self">self</span>
@@ -974,7 +974,7 @@
     }
 
     <span class="doccomment">/// Returns a new, empty set of TCP keepalive parameters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::default</span>()
     }
 }

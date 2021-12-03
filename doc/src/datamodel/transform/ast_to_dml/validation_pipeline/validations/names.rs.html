@@ -170,7 +170,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relation_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RelationIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ModelId</span>, <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unique_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ModelId</span>, <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
@@ -211,7 +211,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">name_taken</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ModelId</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NameTaken</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">name_taken</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ModelId</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NameTaken</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">if</span> <span class="self">self</span>
@@ -235,7 +235,7 @@
         <span class="kw">if</span> <span class="self">self</span>
             .<span class="ident">primary_key_names</span>
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">model_id</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">pk</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">pk</span> <span class="op">==</span> <span class="ident">name</span>)
             .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
         {
             <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">NameTaken::PrimaryKey</span>);
@@ -247,36 +247,36 @@
 
 <span class="doccomment">/// Generate namespaces per database requirements, and add the names to it from the constraints</span>
 <span class="doccomment">/// part of the namespace.</span>
-<span class="kw">fn</span> <span class="ident">infer_namespaces</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConstraintNamespace</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">infer_namespaces</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">ConstraintNamespace</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">datamodel_connector::ConstraintScope</span>;
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="ident">ConstraintNamespace::default</span>();
 
     <span class="kw">for</span> <span class="ident">scope</span> <span class="kw">in</span> <span class="ident">connector</span>.<span class="ident">constraint_violation_scopes</span>() {
         <span class="kw">match</span> <span class="ident">scope</span> {
-            <span class="ident">ConstraintScope::GlobalKeyIndex</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ConstraintScope::GlobalKeyIndex</span> =&gt; {
                 <span class="ident">namespaces</span>.<span class="ident">add_global_indexes</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
             }
-            <span class="ident">ConstraintScope::GlobalForeignKey</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ConstraintScope::GlobalForeignKey</span> =&gt; {
                 <span class="ident">namespaces</span>.<span class="ident">add_global_relations</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
             }
-            <span class="ident">ConstraintScope::GlobalPrimaryKeyKeyIndex</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ConstraintScope::GlobalPrimaryKeyKeyIndex</span> =&gt; {
                 <span class="ident">namespaces</span>.<span class="ident">add_global_primary_keys</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
                 <span class="ident">namespaces</span>.<span class="ident">add_global_indexes</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
             }
-            <span class="ident">ConstraintScope::GlobalPrimaryKeyForeignKeyDefault</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ConstraintScope::GlobalPrimaryKeyForeignKeyDefault</span> =&gt; {
                 <span class="ident">namespaces</span>.<span class="ident">add_global_primary_keys</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
                 <span class="ident">namespaces</span>.<span class="ident">add_global_relations</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
                 <span class="ident">namespaces</span>.<span class="ident">add_global_default_constraints</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
             }
-            <span class="ident">ConstraintScope::ModelKeyIndex</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ConstraintScope::ModelKeyIndex</span> =&gt; {
                 <span class="ident">namespaces</span>.<span class="ident">add_local_indexes</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
             }
-            <span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndex</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndex</span> =&gt; {
                 <span class="ident">namespaces</span>.<span class="ident">add_local_primary_keys</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
                 <span class="ident">namespaces</span>.<span class="ident">add_local_indexes</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
             }
-            <span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey</span> =&gt; {
                 <span class="ident">namespaces</span>.<span class="ident">add_local_primary_keys</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
                 <span class="ident">namespaces</span>.<span class="ident">add_local_indexes</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);
                 <span class="ident">namespaces</span>.<span class="ident">add_local_relations</span>(<span class="ident">db</span>, <span class="ident">connector</span>, <span class="kw-2">*</span><span class="ident">scope</span>);

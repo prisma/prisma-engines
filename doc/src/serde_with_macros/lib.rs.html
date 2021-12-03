@@ -1081,25 +1081,25 @@
 <span class="kw">fn</span> <span class="ident">apply_function_to_struct_and_enum_fields</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
     <span class="ident">input</span>: <span class="ident">TokenStream</span>,
     <span class="ident">function</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream2</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream2</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Copy</span>,
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Field</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Field</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Handle a single struct or a single enum variant</span>
-    <span class="kw">fn</span> <span class="ident">apply_on_fields</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Fields</span>, <span class="ident">function</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">apply_on_fields</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Fields</span>, <span class="ident">function</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Field</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Field</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span>,
     {
         <span class="kw">match</span> <span class="ident">fields</span> {
             <span class="comment">// simple, no fields, do nothing</span>
-            <span class="ident">Fields::Unit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-            <span class="ident">Fields::Named</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fields</span>
+            <span class="ident">Fields::Unit</span> =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="ident">Fields::Named</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>) =&gt; <span class="ident">fields</span>
                 .<span class="ident">named</span>
                 .<span class="ident">iter_mut</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">function</span>(<span class="ident">field</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">Error::new</span>(<span class="ident">field</span>.<span class="ident">span</span>(), <span class="ident">err</span>)))
                 .<span class="ident">collect_error</span>(),
-            <span class="ident">Fields::Unnamed</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fields</span>
+            <span class="ident">Fields::Unnamed</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>) =&gt; <span class="ident">fields</span>
                 .<span class="ident">unnamed</span>
                 .<span class="ident">iter_mut</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">function</span>(<span class="ident">field</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">Error::new</span>(<span class="ident">field</span>.<span class="ident">span</span>(), <span class="ident">err</span>)))
@@ -1132,28 +1132,28 @@
     <span class="ident">input</span>: <span class="ident">TokenStream</span>,
     <span class="ident">serde_with_crate_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
     <span class="ident">function</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream2</span>, <span class="ident">DarlingError</span><span class="op">&gt;</span>
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream2</span>, <span class="ident">DarlingError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Copy</span>,
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Field</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DarlingError</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Field</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DarlingError</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Handle a single struct or a single enum variant</span>
-    <span class="kw">fn</span> <span class="ident">apply_on_fields</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Fields</span>, <span class="ident">function</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DarlingError</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">apply_on_fields</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Fields</span>, <span class="ident">function</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DarlingError</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Field</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DarlingError</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Field</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DarlingError</span><span class="op">&gt;</span>,
     {
         <span class="kw">match</span> <span class="ident">fields</span> {
             <span class="comment">// simple, no fields, do nothing</span>
-            <span class="ident">Fields::Unit</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
-            <span class="ident">Fields::Named</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Fields::Unit</span> =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="ident">Fields::Named</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DarlingError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>
                     .<span class="ident">named</span>
                     .<span class="ident">iter_mut</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">function</span>(<span class="ident">field</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">with_span</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>)))
                     <span class="comment">// turn the Err variant into the Some, such that we only collect errors</span>
                     .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">res</span> {
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-                        <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+                        <span class="prelude-val">Ok</span>(()) =&gt; <span class="prelude-val">None</span>,
                     })
                     .<span class="ident">collect</span>();
                 <span class="kw">if</span> <span class="ident">errors</span>.<span class="ident">is_empty</span>() {
@@ -1162,15 +1162,15 @@
                     <span class="prelude-val">Err</span>(<span class="ident">DarlingError::multiple</span>(<span class="ident">errors</span>))
                 }
             }
-            <span class="ident">Fields::Unnamed</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Fields::Unnamed</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DarlingError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>
                     .<span class="ident">unnamed</span>
                     .<span class="ident">iter_mut</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">function</span>(<span class="ident">field</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">with_span</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>)))
                     <span class="comment">// turn the Err variant into the Some, such that we only collect errors</span>
                     .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">res</span> {
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-                        <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+                        <span class="prelude-val">Ok</span>(()) =&gt; <span class="prelude-val">None</span>,
                     })
                     .<span class="ident">collect</span>();
                 <span class="kw">if</span> <span class="ident">errors</span>.<span class="ident">is_empty</span>() {
@@ -1200,8 +1200,8 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> <span class="ident">apply_on_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">variant</span>.<span class="ident">fields</span>, <span class="ident">function</span>))
             <span class="comment">// turn the Err variant into the Some, such that we only collect errors</span>
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">res</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-                <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+                <span class="prelude-val">Ok</span>(()) =&gt; <span class="prelude-val">None</span>,
             })
             .<span class="ident">collect</span>();
         <span class="kw">if</span> <span class="ident">errors</span>.<span class="ident">is_empty</span>() {
@@ -1304,19 +1304,19 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip_serializing_none</span>(<span class="ident">_args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip_serializing_none</span>(<span class="ident">_args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">apply_function_to_struct_and_enum_fields</span>(
         <span class="ident">input</span>,
         <span class="ident">skip_serializing_none_add_attr_to_field</span>,
     ) {
-        <span class="prelude-val">Ok</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">res</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">to_compile_error</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">res</span>) =&gt; <span class="ident">res</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">to_compile_error</span>(),
     };
     <span class="ident">TokenStream::from</span>(<span class="ident">res</span>)
 }
 
 <span class="doccomment">/// Add the skip_serializing_if annotation to each field of the struct</span>
-<span class="kw">fn</span> <span class="ident">skip_serializing_none_add_attr_to_field</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Field</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">skip_serializing_none_add_attr_to_field</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Field</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Type::Path</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ty</span> {
         <span class="kw">if</span> <span class="ident">is_std_option</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">path</span>) {
             <span class="kw">let</span> <span class="ident">has_skip_serializing_if</span> <span class="op">=</span>
@@ -1375,12 +1375,12 @@
 <span class="doccomment">/// * `Option`</span>
 <span class="doccomment">/// * `std::option::Option`, with or without leading `::`</span>
 <span class="doccomment">/// * `core::option::Option`, with or without leading `::`</span>
-<span class="kw">fn</span> <span class="ident">is_std_option</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    (<span class="ident">path</span>.<span class="ident">leading_colon</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">0</span>].<span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;Option&quot;</span>)
-        <span class="op">|</span><span class="op">|</span> (<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">3</span>
-            <span class="op">&amp;&amp;</span> (<span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">0</span>].<span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;std&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">0</span>].<span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;core&quot;</span>)
-            <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">1</span>].<span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;option&quot;</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">2</span>].<span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;Option&quot;</span>)
+<span class="kw">fn</span> <span class="ident">is_std_option</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="ident">bool</span> {
+    (<span class="ident">path</span>.<span class="ident">leading_colon</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">0</span>].<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;Option&quot;</span>)
+        <span class="op">|</span><span class="op">|</span> (<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">3</span>
+            <span class="op">&amp;&amp;</span> (<span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">0</span>].<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;std&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">0</span>].<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;core&quot;</span>)
+            <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">1</span>].<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;option&quot;</span>
+            <span class="op">&amp;&amp;</span> <span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">2</span>].<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;Option&quot;</span>)
 }
 
 <span class="doccomment">/// Determine if the `field` has an attribute with given `namespace` and `name`</span>
@@ -1392,7 +1392,7 @@
 <span class="doccomment">/// * it contains a Meta::List</span>
 <span class="doccomment">/// * which contains in another Meta a Meta::NameValue</span>
 <span class="doccomment">/// * with the name being `skip_serializing_if`</span>
-<span class="kw">fn</span> <span class="ident">field_has_attribute</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">namespace</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">field_has_attribute</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">namespace</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">attrs</span> {
         <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="ident">namespace</span>) {
             <span class="comment">// Ignore non parsable attributes, as these are not important for us</span>
@@ -1400,7 +1400,7 @@
                 <span class="kw">for</span> <span class="ident">expr</span> <span class="kw">in</span> <span class="ident">expr</span>.<span class="ident">nested</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::NameValue</span>(<span class="ident">expr</span>)) <span class="op">=</span> <span class="ident">expr</span> {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="op">=</span> <span class="ident">expr</span>.<span class="ident">path</span>.<span class="ident">get_ident</span>() {
-                            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span> {
+                            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">ident</span> <span class="op">==</span> <span class="ident">name</span> {
                                 <span class="kw">return</span> <span class="bool-val">true</span>;
                             }
                         }
@@ -1501,7 +1501,7 @@
 <span class="doccomment">/// [`serde_as`]: https://docs.rs/serde_with/1.10.0/serde_with/guide/index.html</span>
 <span class="doccomment">/// [re-exporting `serde_as`]: https://docs.rs/serde_with/1.10.0/serde_with/guide/serde_as/index.html#re-exporting-serde_as</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serde_as</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serde_as</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">FromMeta</span>, <span class="ident">Debug</span>)]</span>
     <span class="kw">struct</span> <span class="ident">SerdeContainerOptions</span> {
         <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;crate&quot;</span>, <span class="ident">default</span>)]</span>
@@ -1510,8 +1510,8 @@
 
     <span class="kw">let</span> <span class="ident">args</span>: <span class="ident">AttributeArgs</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">args</span>);
     <span class="kw">let</span> <span class="ident">container_options</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">SerdeContainerOptions::from_list</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
             <span class="kw">return</span> <span class="ident">TokenStream::from</span>(<span class="ident">e</span>.<span class="ident">write_errors</span>());
         }
     };
@@ -1521,8 +1521,8 @@
         .<span class="ident">as_deref</span>()
         .<span class="ident">unwrap_or</span>(<span class="string">&quot;::serde_with&quot;</span>);
     <span class="kw">let</span> <span class="ident">serde_with_crate_path</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">syn::parse_str</span>(<span class="ident">serde_with_crate_path</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">path</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">TokenStream::from</span>(<span class="ident">DarlingError::from</span>(<span class="ident">err</span>).<span class="ident">write_errors</span>()),
+        <span class="prelude-val">Ok</span>(<span class="ident">path</span>) =&gt; <span class="ident">path</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">TokenStream::from</span>(<span class="ident">DarlingError::from</span>(<span class="ident">err</span>).<span class="ident">write_errors</span>()),
     };
 
     <span class="comment">// Convert any error message into a nice compiler error</span>
@@ -1531,8 +1531,8 @@
         <span class="kw-2">&amp;</span><span class="ident">serde_with_crate_path</span>,
         <span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">serde_as_add_attr_to_field</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">serde_with_crate_path</span>),
     ) {
-        <span class="prelude-val">Ok</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">res</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">write_errors</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">res</span>) =&gt; <span class="ident">res</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">write_errors</span>(),
     };
     <span class="ident">TokenStream::from</span>(<span class="ident">res</span>)
 }
@@ -1541,7 +1541,7 @@
 <span class="kw">fn</span> <span class="ident">serde_as_add_attr_to_field</span>(
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Field</span>,
     <span class="ident">serde_with_crate_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DarlingError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DarlingError</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">FromField</span>, <span class="ident">Debug</span>)]</span>
     <span class="attribute">#[<span class="ident">darling</span>(<span class="ident">attributes</span>(<span class="ident">serde_as</span>))]</span>
     <span class="kw">struct</span> <span class="ident">SerdeAsOptions</span> {
@@ -1554,7 +1554,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">SerdeAsOptions</span> {
-        <span class="kw">fn</span> <span class="ident">has_any_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">fn</span> <span class="ident">has_any_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
             <span class="self">self</span>.<span class="ident">r#as</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_as</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">serialize_as</span>.<span class="ident">is_some</span>()
         }
     }
@@ -1574,7 +1574,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">SerdeOptions</span> {
-        <span class="kw">fn</span> <span class="ident">has_any_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">fn</span> <span class="ident">has_any_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
             <span class="self">self</span>.<span class="ident">with</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_with</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">serialize_with</span>.<span class="ident">is_some</span>()
         }
     }
@@ -1653,7 +1653,7 @@
 <span class="comment">// Return type is required by the darling struct fields</span>
 <span class="comment">// It needs to be an Option, such that is represents an optional field</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_wraps</span>)]</span>
-<span class="kw">fn</span> <span class="ident">parse_type_from_string</span>(<span class="ident">s</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Type</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_type_from_string</span>(<span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Type</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="prelude-val">Some</span>(<span class="ident">syn::parse_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">s</span>))
 }
 
@@ -1661,162 +1661,162 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The [serde_as][macro@serde_as] macro allows to use the infer type, i.e., `_`, as shortcut for `serde_with::As`.</span>
 <span class="doccomment">/// This function replaces all occurrences of the infer type with another type.</span>
-<span class="kw">fn</span> <span class="ident">replace_infer_type_with_type</span>(<span class="ident">to_replace</span>: <span class="ident">Type</span>, <span class="ident">replacement</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Type</span> {
+<span class="kw">fn</span> <span class="ident">replace_infer_type_with_type</span>(<span class="ident">to_replace</span>: <span class="ident">Type</span>, <span class="ident">replacement</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">Type</span> {
     <span class="kw">match</span> <span class="ident">to_replace</span> {
         <span class="comment">// Base case</span>
         <span class="comment">// Replace the infer type with the actual replacement type</span>
-        <span class="ident">Type::Infer</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">replacement</span>.<span class="ident">clone</span>(),
+        <span class="ident">Type::Infer</span>(<span class="kw">_</span>) =&gt; <span class="ident">replacement</span>.<span class="ident">clone</span>(),
 
         <span class="comment">// Recursive cases</span>
         <span class="comment">// Iterate through all positions where a type could occur and recursively call this function</span>
-        <span class="ident">Type::Array</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Type::Array</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
             <span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">replacement</span>);
             <span class="ident">Type::Array</span>(<span class="ident">inner</span>)
         }
-        <span class="ident">Type::Group</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Type::Group</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
             <span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">replacement</span>);
             <span class="ident">Type::Group</span>(<span class="ident">inner</span>)
         }
-        <span class="ident">Type::Never</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Type::Never</span>(<span class="ident">inner</span>),
-        <span class="ident">Type::Paren</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Type::Never</span>(<span class="ident">inner</span>) =&gt; <span class="ident">Type::Never</span>(<span class="ident">inner</span>),
+        <span class="ident">Type::Paren</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
             <span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">replacement</span>);
             <span class="ident">Type::Paren</span>(<span class="ident">inner</span>)
         }
-        <span class="ident">Type::Path</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Type::Path</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
             <span class="kw">match</span> <span class="ident">inner</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">pop</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">Pair::End</span>(<span class="kw-2">mut</span> <span class="ident">t</span>)) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Pair::Punctuated</span>(<span class="kw-2">mut</span> <span class="ident">t</span>, <span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">Pair::End</span>(<span class="kw-2">mut</span> <span class="ident">t</span>)) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Pair::Punctuated</span>(<span class="kw-2">mut</span> <span class="ident">t</span>, <span class="kw">_</span>)) =&gt; {
                     <span class="ident">t</span>.<span class="ident">arguments</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">t</span>.<span class="ident">arguments</span> {
-                        <span class="ident">PathArguments::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PathArguments::None</span>,
-                        <span class="ident">PathArguments::AngleBracketed</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">PathArguments::None</span> =&gt; <span class="ident">PathArguments::None</span>,
+                        <span class="ident">PathArguments::AngleBracketed</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
                             <span class="comment">// Iterate over the args between the angle brackets</span>
                             <span class="ident">inner</span>.<span class="ident">args</span> <span class="op">=</span> <span class="ident">inner</span>
                                 .<span class="ident">args</span>
                                 .<span class="ident">into_iter</span>()
                                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">generic_argument</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">generic_argument</span> {
                                     <span class="comment">// replace types within the generics list, but leave other stuff like lifetimes untouched</span>
-                                    <span class="ident">GenericArgument::Type</span>(<span class="ident">type_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">GenericArgument::Type</span>(
+                                    <span class="ident">GenericArgument::Type</span>(<span class="ident">type_</span>) =&gt; <span class="ident">GenericArgument::Type</span>(
                                         <span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">replacement</span>),
                                     ),
-                                    <span class="ident">ga</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ga</span>,
+                                    <span class="ident">ga</span> =&gt; <span class="ident">ga</span>,
                                 })
                                 .<span class="ident">collect</span>();
                             <span class="ident">PathArguments::AngleBracketed</span>(<span class="ident">inner</span>)
                         }
-                        <span class="ident">PathArguments::Parenthesized</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">PathArguments::Parenthesized</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
                             <span class="ident">inner</span>.<span class="ident">inputs</span> <span class="op">=</span> <span class="ident">inner</span>
                                 .<span class="ident">inputs</span>
                                 .<span class="ident">into_iter</span>()
                                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">type_</span><span class="op">|</span> <span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">replacement</span>))
                                 .<span class="ident">collect</span>();
                             <span class="ident">inner</span>.<span class="ident">output</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">inner</span>.<span class="ident">output</span> {
-                                <span class="ident">ReturnType::Type</span>(<span class="ident">arrow</span>, <span class="kw-2">mut</span> <span class="ident">type_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="ident">ReturnType::Type</span>(<span class="ident">arrow</span>, <span class="kw-2">mut</span> <span class="ident">type_</span>) =&gt; {
                                     <span class="kw-2">*</span><span class="ident">type_</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">type_</span>, <span class="ident">replacement</span>);
                                     <span class="ident">ReturnType::Type</span>(<span class="ident">arrow</span>, <span class="ident">type_</span>)
                                 }
-                                <span class="ident">default</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">default</span>,
+                                <span class="ident">default</span> =&gt; <span class="ident">default</span>,
                             };
                             <span class="ident">PathArguments::Parenthesized</span>(<span class="ident">inner</span>)
                         }
                     };
                     <span class="ident">inner</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">push</span>(<span class="ident">t</span>);
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                <span class="prelude-val">None</span> =&gt; {}
             }
             <span class="ident">Type::Path</span>(<span class="ident">inner</span>)
         }
-        <span class="ident">Type::Ptr</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Type::Ptr</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
             <span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">replacement</span>);
             <span class="ident">Type::Ptr</span>(<span class="ident">inner</span>)
         }
-        <span class="ident">Type::Reference</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Type::Reference</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
             <span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">replacement</span>);
             <span class="ident">Type::Reference</span>(<span class="ident">inner</span>)
         }
-        <span class="ident">Type::Slice</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Type::Slice</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
             <span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span> <span class="op">=</span> <span class="ident">replace_infer_type_with_type</span>(<span class="kw-2">*</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">replacement</span>);
             <span class="ident">Type::Slice</span>(<span class="ident">inner</span>)
         }
-        <span class="ident">Type::Tuple</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Type::Tuple</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) =&gt; {
             <span class="ident">inner</span>.<span class="ident">elems</span> <span class="op">=</span> <span class="ident">inner</span>
                 .<span class="ident">elems</span>
                 .<span class="ident">into_pairs</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">pair</span> {
-                    <span class="ident">Pair::Punctuated</span>(<span class="ident">type_</span>, <span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">Pair::Punctuated</span>(<span class="ident">type_</span>, <span class="ident">p</span>) =&gt; {
                         <span class="ident">Pair::Punctuated</span>(<span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">replacement</span>), <span class="ident">p</span>)
                     }
-                    <span class="ident">Pair::End</span>(<span class="ident">type_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Pair::End</span>(<span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">replacement</span>)),
+                    <span class="ident">Pair::End</span>(<span class="ident">type_</span>) =&gt; <span class="ident">Pair::End</span>(<span class="ident">replace_infer_type_with_type</span>(<span class="ident">type_</span>, <span class="ident">replacement</span>)),
                 })
                 .<span class="ident">collect</span>();
             <span class="ident">Type::Tuple</span>(<span class="ident">inner</span>)
         }
 
         <span class="comment">// Pass unknown types or non-handleable types (e.g., bare Fn) without performing any replacements</span>
-        <span class="ident">type_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">type_</span>,
+        <span class="ident">type_</span> =&gt; <span class="ident">type_</span>,
     }
 }
 
 <span class="doccomment">/// Check if a type ending in the `syn::Ident` `embedded_type` is contained in `type_`.</span>
-<span class="kw">fn</span> <span class="ident">has_type_embedded</span>(<span class="ident">type_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">embedded_type</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">has_type_embedded</span>(<span class="ident">type_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">embedded_type</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">match</span> <span class="ident">type_</span> {
         <span class="comment">// Base cases</span>
-        <span class="ident">Type::Infer</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-        <span class="ident">Type::Never</span>(<span class="ident">_inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        <span class="ident">Type::Infer</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+        <span class="ident">Type::Never</span>(<span class="ident">_inner</span>) =&gt; <span class="bool-val">false</span>,
 
         <span class="comment">// Recursive cases</span>
         <span class="comment">// Iterate through all positions where a type could occur and recursively call this function</span>
-        <span class="ident">Type::Array</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
-        <span class="ident">Type::Group</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
-        <span class="ident">Type::Paren</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
-        <span class="ident">Type::Path</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Type::Array</span>(<span class="ident">inner</span>) =&gt; <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
+        <span class="ident">Type::Group</span>(<span class="ident">inner</span>) =&gt; <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
+        <span class="ident">Type::Paren</span>(<span class="ident">inner</span>) =&gt; <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
+        <span class="ident">Type::Path</span>(<span class="ident">inner</span>) =&gt; {
             <span class="kw">match</span> <span class="ident">inner</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">last</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">ident</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">embedded_type</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; {
+                    <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">embedded_type</span> {
                         <span class="kw">return</span> <span class="bool-val">true</span>;
                     }
 
                     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">arguments</span> {
-                        <span class="ident">PathArguments::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-                        <span class="ident">PathArguments::AngleBracketed</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">PathArguments::None</span> =&gt; <span class="bool-val">false</span>,
+                        <span class="ident">PathArguments::AngleBracketed</span>(<span class="ident">inner</span>) =&gt; {
                             <span class="comment">// Iterate over the args between the angle brackets</span>
                             <span class="ident">inner</span>
                                 .<span class="ident">args</span>
                                 .<span class="ident">iter</span>()
                                 .<span class="ident">any</span>(<span class="op">|</span><span class="ident">generic_argument</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">generic_argument</span> {
                                     <span class="comment">// replace types within the generics list, but leave other stuff like lifetimes untouched</span>
-                                    <span class="ident">GenericArgument::Type</span>(<span class="ident">type_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="ident">GenericArgument::Type</span>(<span class="ident">type_</span>) =&gt; {
                                         <span class="ident">has_type_embedded</span>(<span class="ident">type_</span>, <span class="ident">embedded_type</span>)
                                     }
-                                    <span class="ident">_ga</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+                                    <span class="ident">_ga</span> =&gt; <span class="bool-val">false</span>,
                                 })
                         }
-                        <span class="ident">PathArguments::Parenthesized</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">PathArguments::Parenthesized</span>(<span class="ident">inner</span>) =&gt; {
                             <span class="ident">inner</span>
                                 .<span class="ident">inputs</span>
                                 .<span class="ident">iter</span>()
                                 .<span class="ident">any</span>(<span class="op">|</span><span class="ident">type_</span><span class="op">|</span> <span class="ident">has_type_embedded</span>(<span class="ident">type_</span>, <span class="ident">embedded_type</span>))
                                 <span class="op">|</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">output</span> {
-                                    <span class="ident">ReturnType::Type</span>(<span class="ident">_arrow</span>, <span class="ident">type_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="ident">ReturnType::Type</span>(<span class="ident">_arrow</span>, <span class="ident">type_</span>) =&gt; {
                                         <span class="ident">has_type_embedded</span>(<span class="ident">type_</span>, <span class="ident">embedded_type</span>)
                                     }
-                                    <span class="ident">_default</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+                                    <span class="ident">_default</span> =&gt; <span class="bool-val">false</span>,
                                 }
                         }
                     }
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
             }
         }
-        <span class="ident">Type::Ptr</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
-        <span class="ident">Type::Reference</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
-        <span class="ident">Type::Slice</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
-        <span class="ident">Type::Tuple</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inner</span>.<span class="ident">elems</span>.<span class="ident">pairs</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">pair</span> {
-            <span class="ident">Pair::Punctuated</span>(<span class="ident">type_</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">Pair::End</span>(<span class="ident">type_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Type::Ptr</span>(<span class="ident">inner</span>) =&gt; <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
+        <span class="ident">Type::Reference</span>(<span class="ident">inner</span>) =&gt; <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
+        <span class="ident">Type::Slice</span>(<span class="ident">inner</span>) =&gt; <span class="ident">has_type_embedded</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">elem</span>, <span class="ident">embedded_type</span>),
+        <span class="ident">Type::Tuple</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">elems</span>.<span class="ident">pairs</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">pair</span> {
+            <span class="ident">Pair::Punctuated</span>(<span class="ident">type_</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">Pair::End</span>(<span class="ident">type_</span>) =&gt; {
                 <span class="ident">has_type_embedded</span>(<span class="ident">type_</span>, <span class="ident">embedded_type</span>)
             }
         }),
 
         <span class="comment">// Pass unknown types or non-handleable types (e.g., bare Fn) without performing any replacements</span>
-        <span class="ident">_type_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        <span class="ident">_type_</span> =&gt; <span class="bool-val">false</span>,
     }
 }
 
@@ -1883,11 +1883,11 @@
 <span class="doccomment">/// [serde-as-crate]: https://docs.rs/serde_with/1.10.0/serde_with/guide/serde_as/index.html#re-exporting-serde_as</span>
 <span class="doccomment">/// [serde-crate]: https://serde.rs/container-attrs.html#crate</span>
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">DeserializeFromStr</span>, <span class="ident">attributes</span>(<span class="ident">serde_with</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_deserialize_fromstr</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_deserialize_fromstr</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">DeriveInput</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">item</span>);
     <span class="kw">let</span> <span class="ident">derive_options</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">DeriveOptions::from_derive_input</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">opt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">opt</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">opt</span>) =&gt; <span class="ident">opt</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
             <span class="kw">return</span> <span class="ident">err</span>;
         }
     };
@@ -1897,7 +1897,7 @@
     ))
 }
 
-<span class="kw">fn</span> <span class="ident">deserialize_fromstr</span>(<span class="ident">input</span>: <span class="ident">DeriveInput</span>, <span class="ident">serde_with_crate_path</span>: <span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream2</span> {
+<span class="kw">fn</span> <span class="ident">deserialize_fromstr</span>(<span class="ident">input</span>: <span class="ident">DeriveInput</span>, <span class="ident">serde_with_crate_path</span>: <span class="ident">Path</span>) -&gt; <span class="ident">TokenStream2</span> {
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">ident</span>;
     <span class="macro">quote!</span> {
         <span class="attribute">#[<span class="ident">automatically_derived</span>]</span>
@@ -1906,7 +1906,7 @@
             <span class="self">Self</span>: <span class="ident">::std::str::FromStr</span>,
             <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">::std::str::FromStr</span><span class="op">&gt;</span><span class="ident">::Err</span>: <span class="ident">::std::fmt::Display</span>,
         {
-            <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">D</span>: #<span class="ident">serde_with_crate_path::serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
             {
@@ -1919,18 +1919,18 @@
                 {
                     <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">S</span>;
 
-                    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::std::fmt::Result</span> {
+                    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">::std::fmt::Result</span> {
                         <span class="macro">::std::write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;string&quot;</span>)
                     }
 
-                    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+                    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
                     <span class="kw">where</span>
                         <span class="ident">E</span>: #<span class="ident">serde_with_crate_path::serde::de::Error</span>,
                     {
                         <span class="ident">value</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(#<span class="ident">serde_with_crate_path::serde::de::Error::custom</span>)
                     }
 
-                    <span class="kw">fn</span> <span class="ident">visit_bytes</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+                    <span class="kw">fn</span> <span class="ident">visit_bytes</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
                     <span class="kw">where</span>
                         <span class="ident">E</span>: #<span class="ident">serde_with_crate_path::serde::de::Error</span>,
                     {
@@ -1993,11 +1993,11 @@
 <span class="doccomment">/// [serde-as-crate]: https://docs.rs/serde_with/1.10.0/serde_with/guide/serde_as/index.html#re-exporting-serde_as</span>
 <span class="doccomment">/// [serde-crate]: https://serde.rs/container-attrs.html#crate</span>
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">SerializeDisplay</span>, <span class="ident">attributes</span>(<span class="ident">serde_with</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_serialize_display</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_serialize_display</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">DeriveInput</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">item</span>);
     <span class="kw">let</span> <span class="ident">derive_options</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">DeriveOptions::from_derive_input</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">opt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">opt</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">opt</span>) =&gt; <span class="ident">opt</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
             <span class="kw">return</span> <span class="ident">err</span>;
         }
     };
@@ -2007,7 +2007,7 @@
     ))
 }
 
-<span class="kw">fn</span> <span class="ident">serialize_display</span>(<span class="ident">input</span>: <span class="ident">DeriveInput</span>, <span class="ident">serde_with_crate_path</span>: <span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream2</span> {
+<span class="kw">fn</span> <span class="ident">serialize_display</span>(<span class="ident">input</span>: <span class="ident">DeriveInput</span>, <span class="ident">serde_with_crate_path</span>: <span class="ident">Path</span>) -&gt; <span class="ident">TokenStream2</span> {
     <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">ident</span>;
     <span class="macro">quote!</span> {
         <span class="attribute">#[<span class="ident">automatically_derived</span>]</span>
@@ -2015,7 +2015,7 @@
         <span class="kw">where</span>
             <span class="self">Self</span>: <span class="ident">::std::fmt::Display</span>,
         {
-            <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">S</span>: #<span class="ident">serde_with_crate_path::serde::Serializer</span>,
             {
@@ -2035,7 +2035,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// More details about the use-cases in the Github discussion: &lt;https://github.com/jonasbb/serde_with/discussions/260&gt;.</span>
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">__private_consume_serde_as_attributes</span>, <span class="ident">attributes</span>(<span class="ident">serde_as</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__private_consume_serde_as_attributes</span>(<span class="kw">_</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__private_consume_serde_as_attributes</span>(<span class="kw">_</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
     <span class="ident">TokenStream::new</span>()
 }
 </code></pre></div>

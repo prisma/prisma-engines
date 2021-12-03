@@ -308,7 +308,7 @@ the `Conv::conv::&lt;T&gt;` method.
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// let t = &quot;hello&quot;.conv::&lt;String&gt;();</span>
 	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">conv</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sized</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>
+	<span class="kw">fn</span> <span class="ident">conv</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sized</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>
 	<span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::into</span>(<span class="self">self</span>)
 	}
@@ -410,7 +410,7 @@ method and the `TryConv::try_conv::&lt;T&gt;` method.
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// let t = &quot;hello&quot;.try_conv::&lt;String&gt;().unwrap();</span>
 	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">try_conv</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sized</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
+	<span class="kw">fn</span> <span class="ident">try_conv</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sized</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="self">Self</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::try_into</span>(<span class="self">self</span>)
 	}

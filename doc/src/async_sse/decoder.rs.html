@@ -172,7 +172,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Lines</span>;
 
 <span class="doccomment">/// Decode a new incoming SSE connection.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Decoder</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="ident">R</span>) -&gt; <span class="ident">Decoder</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="ident">AsyncBufRead</span> <span class="op">+</span> <span class="ident">Unpin</span>,
 {
@@ -205,7 +205,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">AsyncBufRead</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Decoder</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">take_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">take_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>() {
             <span class="comment">// If the data buffer is an empty string, set the data buffer and</span>
             <span class="comment">// the event type buffer to the empty string [and return.]</span>
@@ -230,13 +230,13 @@
 
     <span class="comment">// This function uses two loops: one to get lines from the reader.</span>
     <span class="comment">// And one to parse each line delimited by `:`.</span>
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="comment">// Get the next line, if available.</span>
             <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">task::ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">lines</span>).<span class="ident">poll_next</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
-                <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">into</span>()))),
-                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">line</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">line</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">into</span>()))),
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">line</span>)) =&gt; <span class="ident">line</span>,
             };
 
             <span class="comment">// Get rid of the BOM at the start</span>
@@ -252,7 +252,7 @@
             <span class="kw">loop</span> {
                 <span class="kw">match</span> (<span class="ident">parts</span>.<span class="ident">next</span>(), <span class="ident">parts</span>.<span class="ident">next</span>()) {
                     <span class="comment">// If the field name is &quot;retry&quot;:</span>
-                    (<span class="prelude-val">Some</span>(<span class="string">&quot;retry&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">value</span>)) <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">chars</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_ascii_digit</span>()) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="prelude-val">Some</span>(<span class="string">&quot;retry&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">value</span>)) <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">chars</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_ascii_digit</span>()) =&gt; {
                         <span class="macro">log::trace!</span>(<span class="string">&quot;&gt; retry&quot;</span>);
                         <span class="comment">// If the field value consists of only ASCII digits, then interpret the field value</span>
                         <span class="comment">// as an integer in base ten, and set the event stream&#39;s reconnection time to that</span>
@@ -262,13 +262,13 @@
                         }
                     }
                     <span class="comment">// If the field name is &quot;event&quot;:</span>
-                    (<span class="prelude-val">Some</span>(<span class="string">&quot;event&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">value</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="prelude-val">Some</span>(<span class="string">&quot;event&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">value</span>)) =&gt; {
                         <span class="macro">log::trace!</span>(<span class="string">&quot;&gt; event&quot;</span>);
                         <span class="comment">// Set the event type buffer to field value.</span>
                         <span class="self">self</span>.<span class="ident">event_type</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">strip_leading_space</span>(<span class="ident">value</span>).<span class="ident">to_string</span>());
                     }
                     <span class="comment">// If the field name is &quot;data&quot;:</span>
-                    (<span class="prelude-val">Some</span>(<span class="string">&quot;data&quot;</span>), <span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="prelude-val">Some</span>(<span class="string">&quot;data&quot;</span>), <span class="ident">value</span>) =&gt; {
                         <span class="macro">log::trace!</span>(<span class="string">&quot;&gt; data: {:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">value</span>);
                         <span class="comment">// Append the field value to the data buffer,</span>
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">value</span> {
@@ -278,7 +278,7 @@
                         <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="string">b&#39;\n&#39;</span>);
                     }
                     <span class="comment">// If the field name is &quot;id&quot;:</span>
-                    (<span class="prelude-val">Some</span>(<span class="string">&quot;id&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">id_str</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">id_str</span>.<span class="ident">contains</span>(<span class="ident">char::from</span>(<span class="number">0</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="prelude-val">Some</span>(<span class="string">&quot;id&quot;</span>), <span class="prelude-val">Some</span>(<span class="ident">id_str</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">id_str</span>.<span class="ident">contains</span>(<span class="ident">char::from</span>(<span class="number">0</span>)) =&gt; {
                         <span class="macro">log::trace!</span>(<span class="string">&quot;&gt; id&quot;</span>);
                         <span class="comment">// If the field value does not contain U+0000 NULL, then set the last event ID buffer to the field value.</span>
                         <span class="comment">// Otherwise, ignore the field.</span>
@@ -286,22 +286,22 @@
                         <span class="comment">// return Poll::Ready(Ok(self.take_message()).transpose());</span>
                     }
                     <span class="comment">// Comment</span>
-                    (<span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="macro">log::trace!</span>(<span class="string">&quot;&gt; comment&quot;</span>)),
+                    (<span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; (<span class="macro">log::trace!</span>(<span class="string">&quot;&gt; comment&quot;</span>)),
                     <span class="comment">// End of frame</span>
-                    (<span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>), <span class="prelude-val">None</span>) =&gt; {
                         <span class="macro">log::trace!</span>(<span class="string">&quot;&gt; end of frame&quot;</span>);
                         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">take_message</span>() {
-                            <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">event</span>) =&gt; {
                                 <span class="macro">log::trace!</span>(<span class="string">&quot;&gt; end of frame [event]: {:?}&quot;</span>, <span class="ident">event</span>);
                                 <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">event</span>)));
                             }
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">None</span> =&gt; {
                                 <span class="macro">log::trace!</span>(<span class="string">&quot;&gt; end of frame, break&quot;</span>);
                                 <span class="kw">break</span>;
                             }
                         };
                     }
-                    (<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
                         <span class="kw">break</span>;
                     }
                 };
@@ -311,7 +311,7 @@
 }
 
 <span class="doccomment">/// Remove a leading space (code point 0x20) from a string slice.</span>
-<span class="kw">fn</span> <span class="ident">strip_leading_space</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+<span class="kw">fn</span> <span class="ident">strip_leading_space</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
     <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">starts_with</span>(<span class="string">&#39; &#39;</span>) {
         <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="number">1</span>..]
     } <span class="kw">else</span> {
@@ -319,7 +319,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">strip_leading_space_b</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+<span class="kw">fn</span> <span class="ident">strip_leading_space_b</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
     <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">starts_with</span>(<span class="kw-2">&amp;</span>[<span class="string">b&#39; &#39;</span>]) {
         <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="number">1</span>..]
     } <span class="kw">else</span> {

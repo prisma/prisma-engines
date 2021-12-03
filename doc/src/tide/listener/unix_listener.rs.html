@@ -197,7 +197,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> <span class="ident">UnixListener</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_path</span>(<span class="ident">path</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_path</span>(<span class="ident">path</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">path</span>: <span class="prelude-val">Some</span>(<span class="ident">path</span>.<span class="ident">into</span>()),
             <span class="ident">listener</span>: <span class="prelude-val">None</span>,
@@ -206,7 +206,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_listener</span>(<span class="ident">unix_listener</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">net::UnixListener</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_listener</span>(<span class="ident">unix_listener</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">net::UnixListener</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">path</span>: <span class="prelude-val">None</span>,
             <span class="ident">listener</span>: <span class="prelude-val">Some</span>(<span class="ident">unix_listener</span>.<span class="ident">into</span>()),
@@ -238,7 +238,7 @@
 <span class="kw">where</span>
     <span class="ident">State</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">server</span>: <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">server</span>: <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">server</span>.<span class="ident">is_none</span>(), <span class="string">&quot;`bind` should only be called once&quot;</span>);
         <span class="self">self</span>.<span class="ident">server</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">server</span>);
 
@@ -257,7 +257,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">server</span>
             .<span class="ident">take</span>()
@@ -271,15 +271,15 @@
 
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="ident">incoming</span>.<span class="ident">next</span>().<span class="kw">await</span> {
             <span class="kw">match</span> <span class="ident">stream</span> {
-                <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">is_transient_error</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">is_transient_error</span>(<span class="ident">e</span>) =&gt; <span class="kw">continue</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">delay</span> <span class="op">=</span> <span class="ident">std::time::Duration::from_millis</span>(<span class="number">500</span>);
                     <span class="macro">crate::log::error!</span>(<span class="string">&quot;Error: {}. Pausing for {:?}.&quot;</span>, <span class="ident">error</span>, <span class="ident">delay</span>);
                     <span class="ident">task::sleep</span>(<span class="ident">delay</span>).<span class="kw">await</span>;
                     <span class="kw">continue</span>;
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">stream</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">stream</span>) =&gt; {
                     <span class="ident">handle_unix</span>(<span class="ident">server</span>.<span class="ident">clone</span>(), <span class="ident">stream</span>);
                 }
             };
@@ -287,16 +287,16 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ListenInfo</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ListenInfo</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">info</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">info</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">info</span>.<span class="ident">clone</span>()],
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
+            <span class="prelude-val">Some</span>(<span class="ident">info</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">info</span>.<span class="ident">clone</span>()],
+            <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">UnixListener</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;UnixListener&quot;</span>)
             .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="string">&quot;listener&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">listener</span>)
             .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="string">&quot;path&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>)
@@ -313,9 +313,9 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">UnixListener</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">listener</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">listener</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">listener</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">listener</span>.<span class="ident">local_addr</span>().<span class="ident">expect</span>(<span class="string">&quot;Could not get local path dir&quot;</span>);
                 <span class="kw">let</span> <span class="ident">pathname</span> <span class="op">=</span> <span class="ident">path</span>
                     .<span class="ident">as_pathname</span>()
@@ -323,15 +323,15 @@
                     .<span class="ident">expect</span>(<span class="string">&quot;Could not canonicalize path dir&quot;</span>);
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;http+unix://{}&quot;</span>, <span class="ident">pathname</span>.<span class="ident">display</span>())
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;http+unix://{}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>()),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Not listening. Did you forget to call `Listener::bind`?&quot;</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">path</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;http+unix://{}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>()),
+                <span class="prelude-val">None</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Not listening. Did you forget to call `Listener::bind`?&quot;</span>),
             },
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">unix_socket_addr_to_string</span>(<span class="ident">result</span>: <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">unix_socket_addr_to_string</span>(<span class="ident">result</span>: <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="ident">result</span>.<span class="ident">ok</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">addr</span><span class="op">|</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pathname</span>) <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">as_pathname</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">canonicalize</span>().<span class="ident">ok</span>()) {
             <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;http+unix://{}&quot;</span>, <span class="ident">pathname</span>.<span class="ident">display</span>()))

@@ -183,7 +183,7 @@
 
 <span class="kw">impl</span> <span class="ident">BasicAuth</span> {
     <span class="doccomment">/// Create a new instance of `BasicAuth`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">username</span>: <span class="ident">U</span>, <span class="ident">password</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">username</span>: <span class="ident">U</span>, <span class="ident">password</span>: <span class="ident">P</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">U</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
@@ -194,10 +194,10 @@
     }
 
     <span class="doccomment">/// Create a new instance from headers.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_headers</span>(<span class="ident">headers</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_headers</span>(<span class="ident">headers</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">auth</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Authorization::from_headers</span>(<span class="ident">headers</span>)<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">auth</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">auth</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">auth</span>) =&gt; <span class="ident">auth</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
         <span class="kw">let</span> <span class="ident">scheme</span> <span class="op">=</span> <span class="ident">auth</span>.<span class="ident">scheme</span>();
@@ -211,7 +211,7 @@
     }
 
     <span class="doccomment">/// Create a new instance from the base64 encoded credentials.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_credentials</span>(<span class="ident">credentials</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_credentials</span>(<span class="ident">credentials</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">base64::decode</span>(<span class="ident">credentials</span>).<span class="ident">status</span>(<span class="number">400</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">credentials</span> <span class="op">=</span> <span class="ident">String::from_utf8</span>(<span class="ident">bytes</span>).<span class="ident">status</span>(<span class="number">400</span>)<span class="question-mark">?</span>;
 
@@ -220,9 +220,9 @@
         <span class="kw">let</span> <span class="ident">password</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>();
 
         <span class="kw">let</span> (<span class="ident">username</span>, <span class="ident">password</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">username</span>, <span class="ident">password</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">username</span>), <span class="prelude-val">Some</span>(<span class="ident">password</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">username</span>.<span class="ident">to_string</span>(), <span class="ident">password</span>.<span class="ident">to_string</span>()),
-            (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="number">400</span>, <span class="string">&quot;Expected basic auth to contain a password&quot;</span>),
-            (<span class="prelude-val">None</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(<span class="number">400</span>, <span class="string">&quot;Expected basic auth to contain a username&quot;</span>),
+            (<span class="prelude-val">Some</span>(<span class="ident">username</span>), <span class="prelude-val">Some</span>(<span class="ident">password</span>)) =&gt; (<span class="ident">username</span>.<span class="ident">to_string</span>(), <span class="ident">password</span>.<span class="ident">to_string</span>()),
+            (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="macro">bail!</span>(<span class="number">400</span>, <span class="string">&quot;Expected basic auth to contain a password&quot;</span>),
+            (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="macro">bail!</span>(<span class="number">400</span>, <span class="string">&quot;Expected basic auth to contain a username&quot;</span>),
         };
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">username</span>, <span class="ident">password</span> })
@@ -234,12 +234,12 @@
     }
 
     <span class="doccomment">/// Get the `HeaderName`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HeaderName</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HeaderName</span> {
         <span class="ident">AUTHORIZATION</span>
     }
 
     <span class="doccomment">/// Get the `HeaderValue`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HeaderValue</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HeaderValue</span> {
         <span class="kw">let</span> <span class="ident">scheme</span> <span class="op">=</span> <span class="ident">AuthenticationScheme::Basic</span>;
         <span class="kw">let</span> <span class="ident">credentials</span> <span class="op">=</span> <span class="ident">base64::encode</span>(<span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="self">self</span>.<span class="ident">username</span>, <span class="self">self</span>.<span class="ident">password</span>));
         <span class="kw">let</span> <span class="ident">auth</span> <span class="op">=</span> <span class="ident">Authorization::new</span>(<span class="ident">scheme</span>, <span class="ident">credentials</span>);
@@ -247,12 +247,12 @@
     }
 
     <span class="doccomment">/// Get the username.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">username</span>.<span class="ident">as_str</span>()
     }
 
     <span class="doccomment">/// Get the password.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">password</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">password</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">password</span>.<span class="ident">as_str</span>()
     }
 }
@@ -263,7 +263,7 @@
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::headers::Headers</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">smoke</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">smoke</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">username</span> <span class="op">=</span> <span class="string">&quot;nori&quot;</span>;
         <span class="kw">let</span> <span class="ident">password</span> <span class="op">=</span> <span class="string">&quot;secret_fish!!&quot;</span>;
         <span class="kw">let</span> <span class="ident">authz</span> <span class="op">=</span> <span class="ident">BasicAuth::new</span>(<span class="ident">username</span>, <span class="ident">password</span>);

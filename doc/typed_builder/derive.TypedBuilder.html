@@ -10,7 +10,7 @@ same name as the struct’s fields and call <code>.build()</code> when you are d
 setting one of the fields will also generate a compile-time error - unless that field is marked
 as <code>#[builder(default)]</code>, in which case the <code>::default()</code> value of it’s type will be picked. If
 you want to set a different default, use <code>#[builder(default=...)]</code>.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">typed_builder::TypedBuilder</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">TypedBuilder</span>)]</span>
@@ -30,24 +30,24 @@ you want to set a different default, use <code>#[builder(default=...)]</code>.</
 
 <span class="macro">assert!</span>(
     <span class="ident">Foo::builder</span>().<span class="ident">x</span>(<span class="number">1</span>).<span class="ident">y</span>(<span class="number">2</span>).<span class="ident">z</span>(<span class="number">3</span>).<span class="ident">build</span>()
-    <span class="op">=</span><span class="op">=</span> <span class="ident">Foo</span> { <span class="ident">x</span>: <span class="number">1</span>, <span class="ident">y</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="ident">z</span>: <span class="number">3</span>, });
+    <span class="op">==</span> <span class="ident">Foo</span> { <span class="ident">x</span>: <span class="number">1</span>, <span class="ident">y</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="ident">z</span>: <span class="number">3</span>, });
 
 <span class="comment">// Change the order of construction:</span>
 <span class="macro">assert!</span>(
     <span class="ident">Foo::builder</span>().<span class="ident">z</span>(<span class="number">1</span>).<span class="ident">x</span>(<span class="number">2</span>).<span class="ident">y</span>(<span class="number">3</span>).<span class="ident">build</span>()
-    <span class="op">=</span><span class="op">=</span> <span class="ident">Foo</span> { <span class="ident">x</span>: <span class="number">2</span>, <span class="ident">y</span>: <span class="prelude-val">Some</span>(<span class="number">3</span>), <span class="ident">z</span>: <span class="number">1</span>, });
+    <span class="op">==</span> <span class="ident">Foo</span> { <span class="ident">x</span>: <span class="number">2</span>, <span class="ident">y</span>: <span class="prelude-val">Some</span>(<span class="number">3</span>), <span class="ident">z</span>: <span class="number">1</span>, });
 
 <span class="comment">// Optional fields are optional:</span>
 <span class="macro">assert!</span>(
     <span class="ident">Foo::builder</span>().<span class="ident">x</span>(<span class="number">1</span>).<span class="ident">build</span>()
-    <span class="op">=</span><span class="op">=</span> <span class="ident">Foo</span> { <span class="ident">x</span>: <span class="number">1</span>, <span class="ident">y</span>: <span class="prelude-val">None</span>, <span class="ident">z</span>: <span class="number">20</span>, });
+    <span class="op">==</span> <span class="ident">Foo</span> { <span class="ident">x</span>: <span class="number">1</span>, <span class="ident">y</span>: <span class="prelude-val">None</span>, <span class="ident">z</span>: <span class="number">20</span>, });
 
 <span class="comment">// This will not compile - because we did not set x:</span>
 <span class="comment">// Foo::builder().build();</span>
 
 <span class="comment">// This will not compile - because we set y twice:</span>
 <span class="comment">// Foo::builder().x(1).y(2).y(3);</span></code></pre></div>
-<h1 id="customisation-with-attributes" class="section-header"><a href="#customisation-with-attributes">Customisation with attributes</a></h1>
+<h2 id="customisation-with-attributes" class="section-header"><a href="#customisation-with-attributes">Customisation with attributes</a></h2>
 <p>In addition to putting <code>#[derive(TypedBuilder)]</code> on a type, you can specify a <code>#[builder(…)]</code>
 attribute on the type, and on any fields in it.</p>
 <p>On the <strong>type</strong>, the following values are permitted:</p>

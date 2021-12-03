@@ -554,9 +554,9 @@
 <span class="doccomment">/// Calls a libc function and results in `io::Result`.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">syscall</span> {
-    (<span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+    (<span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>) =&gt; {{
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">libc</span>::<span class="macro-nonterminal">$</span><span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span> };
-        <span class="kw">if</span> <span class="ident">res</span> <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">res</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> {
             <span class="prelude-val">Err</span>(<span class="ident">std::io::Error::last_os_error</span>())
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
@@ -617,7 +617,7 @@
     <span class="doccomment">/// All kinds of events (readable and writable).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Equivalent to: `Event { key, readable: true, writable: true }`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all</span>(<span class="ident">key</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Event</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all</span>(<span class="ident">key</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Event</span> {
         <span class="ident">Event</span> {
             <span class="ident">key</span>,
             <span class="ident">readable</span>: <span class="bool-val">true</span>,
@@ -628,7 +628,7 @@
     <span class="doccomment">/// Only the readable event.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Equivalent to: `Event { key, readable: true, writable: false }`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">readable</span>(<span class="ident">key</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Event</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">readable</span>(<span class="ident">key</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Event</span> {
         <span class="ident">Event</span> {
             <span class="ident">key</span>,
             <span class="ident">readable</span>: <span class="bool-val">true</span>,
@@ -639,7 +639,7 @@
     <span class="doccomment">/// Only the writable event.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Equivalent to: `Event { key, readable: false, writable: true }`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">writable</span>(<span class="ident">key</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Event</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">writable</span>(<span class="ident">key</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Event</span> {
         <span class="ident">Event</span> {
             <span class="ident">key</span>,
             <span class="ident">readable</span>: <span class="bool-val">false</span>,
@@ -650,7 +650,7 @@
     <span class="doccomment">/// No events.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Equivalent to: `Event { key, readable: false, writable: false }`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">none</span>(<span class="ident">key</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Event</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">none</span>(<span class="ident">key</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Event</span> {
         <span class="ident">Event</span> {
             <span class="ident">key</span>,
             <span class="ident">readable</span>: <span class="bool-val">false</span>,
@@ -677,7 +677,7 @@
     <span class="doccomment">/// let poller = Poller::new()?;</span>
     <span class="doccomment">/// # std::io::Result::Ok(())</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Poller</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Poller</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">Poller</span> {
             <span class="ident">poller</span>: <span class="ident">sys::Poller::new</span>()<span class="question-mark">?</span>,
             <span class="ident">events</span>: <span class="ident">Mutex::new</span>(<span class="ident">sys::Events::new</span>()),
@@ -728,8 +728,8 @@
     <span class="doccomment">/// poller.add(&amp;source, Event::all(key))?;</span>
     <span class="doccomment">/// # std::io::Result::Ok(())</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">source</span>: <span class="kw">impl</span> <span class="ident">Source</span>, <span class="ident">interest</span>: <span class="ident">Event</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">interest</span>.<span class="ident">key</span> <span class="op">=</span><span class="op">=</span> <span class="ident">NOTIFY_KEY</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">source</span>: <span class="kw">impl</span> <span class="ident">Source</span>, <span class="ident">interest</span>: <span class="ident">Event</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">interest</span>.<span class="ident">key</span> <span class="op">==</span> <span class="ident">NOTIFY_KEY</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                 <span class="ident">io::ErrorKind::InvalidInput</span>,
                 <span class="string">&quot;the key is not allowed to be `usize::MAX`&quot;</span>,
@@ -806,8 +806,8 @@
     <span class="doccomment">/// poller.modify(&amp;source, Event::none(key))?;</span>
     <span class="doccomment">/// # std::io::Result::Ok(())</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">source</span>: <span class="kw">impl</span> <span class="ident">Source</span>, <span class="ident">interest</span>: <span class="ident">Event</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">interest</span>.<span class="ident">key</span> <span class="op">=</span><span class="op">=</span> <span class="ident">NOTIFY_KEY</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">source</span>: <span class="kw">impl</span> <span class="ident">Source</span>, <span class="ident">interest</span>: <span class="ident">Event</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">interest</span>.<span class="ident">key</span> <span class="op">==</span> <span class="ident">NOTIFY_KEY</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
                 <span class="ident">io::ErrorKind::InvalidInput</span>,
                 <span class="string">&quot;the key is not allowed to be `usize::MAX`&quot;</span>,
@@ -836,7 +836,7 @@
     <span class="doccomment">/// poller.delete(&amp;socket)?;</span>
     <span class="doccomment">/// # std::io::Result::Ok(())</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">source</span>: <span class="kw">impl</span> <span class="ident">Source</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">source</span>: <span class="kw">impl</span> <span class="ident">Source</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">poller</span>.<span class="ident">delete</span>(<span class="ident">source</span>.<span class="ident">raw</span>())
     }
 
@@ -876,7 +876,7 @@
     <span class="doccomment">/// let n = poller.wait(&amp;mut events, Some(Duration::from_secs(1)))?;</span>
     <span class="doccomment">/// # std::io::Result::Ok(())</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">events</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">events</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="macro">log::trace!</span>(<span class="string">&quot;Poller::wait(_, {:?})&quot;</span>, <span class="ident">timeout</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">lock</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">events</span>.<span class="ident">try_lock</span>() {
@@ -918,7 +918,7 @@
     <span class="doccomment">/// assert!(events.is_empty());</span>
     <span class="doccomment">/// # std::io::Result::Ok(())</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">notify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">notify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">log::trace!</span>(<span class="string">&quot;Poller::notify()&quot;</span>);
         <span class="kw">if</span> <span class="self">self</span>
             .<span class="ident">notified</span>
@@ -932,7 +932,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Poller</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">poller</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
@@ -944,17 +944,17 @@
         <span class="doccomment">/// A [`RawFd`] or a reference to a type implementing [`AsRawFd`].</span>
         <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Source</span> {
             <span class="doccomment">/// Returns the [`RawFd`] for this I/O object.</span>
-            <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawFd</span>;
+            <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span>;
         }
 
         <span class="kw">impl</span> <span class="ident">Source</span> <span class="kw">for</span> <span class="ident">RawFd</span> {
-            <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawFd</span> {
+            <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
                 <span class="kw-2">*</span><span class="self">self</span>
             }
         }
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRawFd</span><span class="op">&gt;</span> <span class="ident">Source</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">T</span> {
-            <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawFd</span> {
+            <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
                 <span class="self">self</span>.<span class="ident">as_raw_fd</span>()
             }
         }
@@ -964,17 +964,17 @@
         <span class="doccomment">/// A [`RawSocket`] or a reference to a type implementing [`AsRawSocket`].</span>
         <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Source</span> {
             <span class="doccomment">/// Returns the [`RawSocket`] for this I/O object.</span>
-            <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawSocket</span>;
+            <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawSocket</span>;
         }
 
         <span class="kw">impl</span> <span class="ident">Source</span> <span class="kw">for</span> <span class="ident">RawSocket</span> {
-            <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawSocket</span> {
+            <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawSocket</span> {
                 <span class="kw-2">*</span><span class="self">self</span>
             }
         }
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRawSocket</span><span class="op">&gt;</span> <span class="ident">Source</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">T</span> {
-            <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawSocket</span> {
+            <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawSocket</span> {
                 <span class="self">self</span>.<span class="ident">as_raw_socket</span>()
             }
         }

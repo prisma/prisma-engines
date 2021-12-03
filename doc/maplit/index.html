@@ -3,8 +3,8 @@
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">macro_use</span>]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">maplit</span>;
 
 <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">hashmap!</span>{
-    <span class="string">&quot;a&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-    <span class="string">&quot;b&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+    <span class="string">&quot;a&quot;</span> =&gt; <span class="number">1</span>,
+    <span class="string">&quot;b&quot;</span> =&gt; <span class="number">2</span>,
 };</code></pre></div>
 <p>The <strong>maplit</strong> crate uses <code>=&gt;</code> syntax to separate the key and value for the
 mapping macros. (It was not possible to use <code>:</code> as separator due to syntactic
@@ -14,13 +14,13 @@ You can use them as <code>hashmap!{}</code> or <code>hashmap![]</code> or <code>
 <p>Generic container macros already exist elsewhere, so those are not provided
 here at the moment.</p>
 </div></details><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="macro" href="macro.btreemap.html" title="maplit::btreemap macro">btreemap</a></div><div class="item-right docblock-short"><p>Create a <strong>BTreeMap</strong> from a list of key-value pairs</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.btreeset.html" title="maplit::btreeset macro">btreeset</a></div><div class="item-right docblock-short"><p>Create a <strong>BTreeSet</strong> from a list of elements.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.convert_args.html" title="maplit::convert_args macro">convert_args</a></div><div class="item-right docblock-short"><p>Macro that converts the keys or key-value pairs passed to another maplit
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.btreemap.html" title="maplit::btreemap macro">btreemap</a></div><div class="item-right docblock-short"><p>Create a <strong>BTreeMap</strong> from a list of key-value pairs</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.btreeset.html" title="maplit::btreeset macro">btreeset</a></div><div class="item-right docblock-short"><p>Create a <strong>BTreeSet</strong> from a list of elements.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.convert_args.html" title="maplit::convert_args macro">convert_args</a></div><div class="item-right docblock-short"><p>Macro that converts the keys or key-value pairs passed to another maplit
 macro. The default conversion is to use the <a href="https://doc.rust-lang.org/std/convert/trait.Into.html"><code>Into</code></a> trait, if no
 custom conversion is passed.</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.hashmap.html" title="maplit::hashmap macro">hashmap</a></div><div class="item-right docblock-short"><p>Create a <strong>HashMap</strong> from a list of key-value pairs</p>
-</div><div class="item-left module-item"><a class="macro" href="macro.hashset.html" title="maplit::hashset macro">hashset</a></div><div class="item-right docblock-short"><p>Create a <strong>HashSet</strong> from a list of elements.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="maplit" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.hashmap.html" title="maplit::hashmap macro">hashmap</a></div><div class="item-right docblock-short"><p>Create a <strong>HashMap</strong> from a list of key-value pairs</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.hashset.html" title="maplit::hashset macro">hashset</a></div><div class="item-right docblock-short"><p>Create a <strong>HashSet</strong> from a list of elements.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="maplit" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

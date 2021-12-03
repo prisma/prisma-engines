@@ -13,7 +13,7 @@ current load by tracking successful and unsuccessful calls to <a href="../trait.
 exponentially weighted moving average to add (using <a href="../make/trait.MakeService.html"><code>MakeService</code></a>) or remove (by dropping)
 services in response to increases or decreases in load. Use this if you are able to
 dynamically add more service endpoints to the system to handle added load.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tower::balance::p2c::Balance</span>;
 <span class="kw">use</span> <span class="ident">tower::load::Load</span>;
 <span class="kw">use</span> <span class="ident">tower</span>::{<span class="ident">Service</span>, <span class="ident">ServiceExt</span>};
@@ -36,9 +36,9 @@ dynamically add more service endpoints to the system to handle added load.</p>
     }
 }</code></pre></div>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="error/index.html" title="tower::balance::error mod">error</a></div><div class="item-right docblock-short"><p>Error types for the <a href="index.html"><code>tower::balance</code></a> middleware.</p>
-</div><div class="item-left module-item"><a class="mod" href="p2c/index.html" title="tower::balance::p2c mod">p2c</a></div><div class="item-right docblock-short"><p>This module implements the “<a href="http://www.eecs.harvard.edu/%7Emichaelm/postscripts/handbook2001.pdf">Power of Two Random Choices</a>” load balancing algorithm.</p>
-</div><div class="item-left module-item"><a class="mod" href="pool/index.html" title="tower::balance::pool mod">pool</a></div><div class="item-right docblock-short"><p>This module defines a load-balanced pool of services that adds new services when load is high.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tower" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="error/index.html" title="tower::balance::error mod">error</a></div><div class="item-right docblock-short"><p>Error types for the <a href="index.html"><code>tower::balance</code></a> middleware.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="p2c/index.html" title="tower::balance::p2c mod">p2c</a></div><div class="item-right docblock-short"><p>This module implements the “<a href="http://www.eecs.harvard.edu/%7Emichaelm/postscripts/handbook2001.pdf">Power of Two Random Choices</a>” load balancing algorithm.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="pool/index.html" title="tower::balance::pool mod">pool</a></div><div class="item-right docblock-short"><p>This module defines a load-balanced pool of services that adds new services when load is high.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tower" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

@@ -579,37 +579,37 @@
 <span class="kw">impl</span> <span class="ident">RecordType</span> {
     <span class="doccomment">/// Returns true if this is an ANY</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_any</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RecordType::ANY</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_any</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span> <span class="op">==</span> <span class="ident">RecordType::ANY</span>
     }
 
     <span class="doccomment">/// Returns true if this is a CNAME</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cname</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RecordType::CNAME</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cname</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span> <span class="op">==</span> <span class="ident">RecordType::CNAME</span>
     }
 
     <span class="doccomment">/// Returns true if this is an NS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ns</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RecordType::NS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ns</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span> <span class="op">==</span> <span class="ident">RecordType::NS</span>
     }
 
     <span class="doccomment">/// Returns true if this is an SOA</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_soa</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RecordType::SOA</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_soa</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span> <span class="op">==</span> <span class="ident">RecordType::SOA</span>
     }
 
     <span class="doccomment">/// Returns true if this is an SRV</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_srv</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RecordType::SRV</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_srv</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span> <span class="op">==</span> <span class="ident">RecordType::SRV</span>
     }
 
     <span class="doccomment">/// Returns true if this is an A or an AAAA record</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ip_addr</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ip_addr</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">RecordType::A</span> <span class="op">|</span> <span class="ident">RecordType::AAAA</span>)
     }
 }
@@ -626,36 +626,36 @@
     <span class="doccomment">/// let var: RecordType = RecordType::from_str(&quot;A&quot;).unwrap();</span>
     <span class="doccomment">/// assert_eq!(RecordType::A, var);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="comment">// TODO missing stuff?</span>
         <span class="macro">debug_assert!</span>(<span class="ident">str</span>.<span class="ident">chars</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">char::is_digit</span>(<span class="ident">x</span>, <span class="number">36</span>)));
         <span class="kw">match</span> <span class="ident">str</span> {
-            <span class="string">&quot;A&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::A</span>),
-            <span class="string">&quot;AAAA&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::AAAA</span>),
-            <span class="string">&quot;ANAME&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::ANAME</span>),
-            <span class="string">&quot;CAA&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::CAA</span>),
-            <span class="string">&quot;CNAME&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::CNAME</span>),
-            <span class="string">&quot;HINFO&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::HINFO</span>),
-            <span class="string">&quot;HTTPS&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::HTTPS</span>),
-            <span class="string">&quot;NULL&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::NULL</span>),
-            <span class="string">&quot;MX&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::MX</span>),
-            <span class="string">&quot;NAPTR&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::NAPTR</span>),
-            <span class="string">&quot;NS&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::NS</span>),
-            <span class="string">&quot;OPENPGPKEY&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::OPENPGPKEY</span>),
-            <span class="string">&quot;PTR&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::PTR</span>),
-            <span class="string">&quot;SOA&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::SOA</span>),
-            <span class="string">&quot;SRV&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::SRV</span>),
-            <span class="string">&quot;SSHFP&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::SSHFP</span>),
-            <span class="string">&quot;SVCB&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::SVCB</span>),
-            <span class="string">&quot;TLSA&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::TLSA</span>),
-            <span class="string">&quot;TXT&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::TXT</span>),
-            <span class="string">&quot;ANY&quot;</span> <span class="op">|</span> <span class="string">&quot;*&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::ANY</span>),
-            <span class="string">&quot;AXFR&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">RecordType::AXFR</span>),
+            <span class="string">&quot;A&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::A</span>),
+            <span class="string">&quot;AAAA&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::AAAA</span>),
+            <span class="string">&quot;ANAME&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::ANAME</span>),
+            <span class="string">&quot;CAA&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::CAA</span>),
+            <span class="string">&quot;CNAME&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::CNAME</span>),
+            <span class="string">&quot;HINFO&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::HINFO</span>),
+            <span class="string">&quot;HTTPS&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::HTTPS</span>),
+            <span class="string">&quot;NULL&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::NULL</span>),
+            <span class="string">&quot;MX&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::MX</span>),
+            <span class="string">&quot;NAPTR&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::NAPTR</span>),
+            <span class="string">&quot;NS&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::NS</span>),
+            <span class="string">&quot;OPENPGPKEY&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::OPENPGPKEY</span>),
+            <span class="string">&quot;PTR&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::PTR</span>),
+            <span class="string">&quot;SOA&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::SOA</span>),
+            <span class="string">&quot;SRV&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::SRV</span>),
+            <span class="string">&quot;SSHFP&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::SSHFP</span>),
+            <span class="string">&quot;SVCB&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::SVCB</span>),
+            <span class="string">&quot;TLSA&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::TLSA</span>),
+            <span class="string">&quot;TXT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::TXT</span>),
+            <span class="string">&quot;ANY&quot;</span> <span class="op">|</span> <span class="string">&quot;*&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::ANY</span>),
+            <span class="string">&quot;AXFR&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RecordType::AXFR</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="string">&quot;DNSKEY&quot;</span> <span class="op">|</span> <span class="string">&quot;DS&quot;</span> <span class="op">|</span> <span class="string">&quot;KEY&quot;</span> <span class="op">|</span> <span class="string">&quot;NSEC&quot;</span> <span class="op">|</span> <span class="string">&quot;NSEC3&quot;</span> <span class="op">|</span> <span class="string">&quot;NSEC3PARAM&quot;</span> <span class="op">|</span> <span class="string">&quot;RRSIG&quot;</span> <span class="op">|</span> <span class="string">&quot;SIG&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="string">&quot;DNSKEY&quot;</span> <span class="op">|</span> <span class="string">&quot;DS&quot;</span> <span class="op">|</span> <span class="string">&quot;KEY&quot;</span> <span class="op">|</span> <span class="string">&quot;NSEC&quot;</span> <span class="op">|</span> <span class="string">&quot;NSEC3&quot;</span> <span class="op">|</span> <span class="string">&quot;NSEC3PARAM&quot;</span> <span class="op">|</span> <span class="string">&quot;RRSIG&quot;</span> <span class="op">|</span> <span class="string">&quot;SIG&quot;</span> =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">RecordType::DNSSEC</span>(<span class="ident">str</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoErrorKind::UnknownRecordTypeStr</span>(<span class="ident">str</span>.<span class="ident">to_string</span>()).<span class="ident">into</span>()),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ProtoErrorKind::UnknownRecordTypeStr</span>(<span class="ident">str</span>.<span class="ident">to_string</span>()).<span class="ident">into</span>()),
         }
     }
 }
@@ -669,32 +669,32 @@
     <span class="doccomment">/// let var = RecordType::from(1);</span>
     <span class="doccomment">/// assert_eq!(RecordType::A, var);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::A</span>,
-            <span class="number">28</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::AAAA</span>,
+            <span class="number">1</span> =&gt; <span class="ident">RecordType::A</span>,
+            <span class="number">28</span> =&gt; <span class="ident">RecordType::AAAA</span>,
             <span class="comment">// TODO: wrong value here, see https://github.com/bluejekyll/trust-dns/issues/723</span>
-            <span class="number">65305</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::ANAME</span>,
-            <span class="number">255</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::ANY</span>,
-            <span class="number">252</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::AXFR</span>,
-            <span class="number">257</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::CAA</span>,
-            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::CNAME</span>,
-            <span class="number">13</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::HINFO</span>,
-            <span class="number">65</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::HTTPS</span>,
-            <span class="number">15</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::MX</span>,
-            <span class="number">35</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::NAPTR</span>,
-            <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::NS</span>,
-            <span class="number">10</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::NULL</span>,
-            <span class="number">61</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::OPENPGPKEY</span>,
-            <span class="number">41</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::OPT</span>,
-            <span class="number">12</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::PTR</span>,
-            <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::SOA</span>,
-            <span class="number">33</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::SRV</span>,
-            <span class="number">44</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::SSHFP</span>,
-            <span class="number">64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::SVCB</span>,
-            <span class="number">52</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::TLSA</span>,
-            <span class="number">16</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::TXT</span>,
-            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::ZERO</span>,
+            <span class="number">65305</span> =&gt; <span class="ident">RecordType::ANAME</span>,
+            <span class="number">255</span> =&gt; <span class="ident">RecordType::ANY</span>,
+            <span class="number">252</span> =&gt; <span class="ident">RecordType::AXFR</span>,
+            <span class="number">257</span> =&gt; <span class="ident">RecordType::CAA</span>,
+            <span class="number">5</span> =&gt; <span class="ident">RecordType::CNAME</span>,
+            <span class="number">13</span> =&gt; <span class="ident">RecordType::HINFO</span>,
+            <span class="number">65</span> =&gt; <span class="ident">RecordType::HTTPS</span>,
+            <span class="number">15</span> =&gt; <span class="ident">RecordType::MX</span>,
+            <span class="number">35</span> =&gt; <span class="ident">RecordType::NAPTR</span>,
+            <span class="number">2</span> =&gt; <span class="ident">RecordType::NS</span>,
+            <span class="number">10</span> =&gt; <span class="ident">RecordType::NULL</span>,
+            <span class="number">61</span> =&gt; <span class="ident">RecordType::OPENPGPKEY</span>,
+            <span class="number">41</span> =&gt; <span class="ident">RecordType::OPT</span>,
+            <span class="number">12</span> =&gt; <span class="ident">RecordType::PTR</span>,
+            <span class="number">6</span> =&gt; <span class="ident">RecordType::SOA</span>,
+            <span class="number">33</span> =&gt; <span class="ident">RecordType::SRV</span>,
+            <span class="number">44</span> =&gt; <span class="ident">RecordType::SSHFP</span>,
+            <span class="number">64</span> =&gt; <span class="ident">RecordType::SVCB</span>,
+            <span class="number">52</span> =&gt; <span class="ident">RecordType::TLSA</span>,
+            <span class="number">16</span> =&gt; <span class="ident">RecordType::TXT</span>,
+            <span class="number">0</span> =&gt; <span class="ident">RecordType::ZERO</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
             <span class="number">48</span><span class="comment">/*DNSKEY*/</span> <span class="op">|</span>
             <span class="number">43</span><span class="comment">/*DS*/</span> <span class="op">|</span>
@@ -703,21 +703,21 @@
             <span class="number">50</span><span class="comment">/*NSEC3*/</span><span class="op">|</span>
             <span class="number">51</span><span class="comment">/*NSEC3PARAM*/</span><span class="op">|</span>
             <span class="number">46</span><span class="comment">/*RRSIG*/</span><span class="op">|</span>
-            <span class="number">24</span><span class="comment">/*SIG*/</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::DNSSEC</span>(<span class="ident">DNSSECRecordType::from</span>(<span class="ident">value</span>)),
+            <span class="number">24</span><span class="comment">/*SIG*/</span> =&gt; <span class="ident">RecordType::DNSSEC</span>(<span class="ident">DNSSECRecordType::from</span>(<span class="ident">value</span>)),
             <span class="comment">// all unknown record types</span>
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RecordType::Unknown</span>(<span class="ident">value</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">RecordType::Unknown</span>(<span class="ident">value</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">BinEncodable</span> <span class="kw">for</span> <span class="ident">RecordType</span> {
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">encoder</span>.<span class="ident">emit_u16</span>((<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into</span>())
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="ident">BinDecodable</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecordType</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">decoder</span>
             .<span class="ident">read_u16</span>()
             .<span class="ident">map</span>(
@@ -742,35 +742,35 @@
 <span class="doccomment">/// assert_eq!(&quot;A&quot;, var);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RecordType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">RecordType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">RecordType</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="ident">rt</span> {
-            <span class="ident">RecordType::A</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;A&quot;</span>,
-            <span class="ident">RecordType::AAAA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;AAAA&quot;</span>,
-            <span class="ident">RecordType::ANAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ANAME&quot;</span>,
-            <span class="ident">RecordType::ANY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ANY&quot;</span>,
-            <span class="ident">RecordType::AXFR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;AXFR&quot;</span>,
-            <span class="ident">RecordType::CAA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;CAA&quot;</span>,
-            <span class="ident">RecordType::CNAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;CNAME&quot;</span>,
-            <span class="ident">RecordType::HINFO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;HINFO&quot;</span>,
-            <span class="ident">RecordType::HTTPS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;HTTPS&quot;</span>,
-            <span class="ident">RecordType::ZERO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;ZERO&quot;</span>,
-            <span class="ident">RecordType::IXFR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;IXFR&quot;</span>,
-            <span class="ident">RecordType::MX</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;MX&quot;</span>,
-            <span class="ident">RecordType::NAPTR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;NAPTR&quot;</span>,
-            <span class="ident">RecordType::NS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;NS&quot;</span>,
-            <span class="ident">RecordType::NULL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;NULL&quot;</span>,
-            <span class="ident">RecordType::OPENPGPKEY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;OPENPGPKEY&quot;</span>,
-            <span class="ident">RecordType::OPT</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;OPT&quot;</span>,
-            <span class="ident">RecordType::PTR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;PTR&quot;</span>,
-            <span class="ident">RecordType::SOA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SOA&quot;</span>,
-            <span class="ident">RecordType::SRV</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SRV&quot;</span>,
-            <span class="ident">RecordType::SSHFP</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SSHFP&quot;</span>,
-            <span class="ident">RecordType::SVCB</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;SVCB&quot;</span>,
-            <span class="ident">RecordType::TLSA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;TLSA&quot;</span>,
-            <span class="ident">RecordType::TXT</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;TXT&quot;</span>,
+            <span class="ident">RecordType::A</span> =&gt; <span class="string">&quot;A&quot;</span>,
+            <span class="ident">RecordType::AAAA</span> =&gt; <span class="string">&quot;AAAA&quot;</span>,
+            <span class="ident">RecordType::ANAME</span> =&gt; <span class="string">&quot;ANAME&quot;</span>,
+            <span class="ident">RecordType::ANY</span> =&gt; <span class="string">&quot;ANY&quot;</span>,
+            <span class="ident">RecordType::AXFR</span> =&gt; <span class="string">&quot;AXFR&quot;</span>,
+            <span class="ident">RecordType::CAA</span> =&gt; <span class="string">&quot;CAA&quot;</span>,
+            <span class="ident">RecordType::CNAME</span> =&gt; <span class="string">&quot;CNAME&quot;</span>,
+            <span class="ident">RecordType::HINFO</span> =&gt; <span class="string">&quot;HINFO&quot;</span>,
+            <span class="ident">RecordType::HTTPS</span> =&gt; <span class="string">&quot;HTTPS&quot;</span>,
+            <span class="ident">RecordType::ZERO</span> =&gt; <span class="string">&quot;ZERO&quot;</span>,
+            <span class="ident">RecordType::IXFR</span> =&gt; <span class="string">&quot;IXFR&quot;</span>,
+            <span class="ident">RecordType::MX</span> =&gt; <span class="string">&quot;MX&quot;</span>,
+            <span class="ident">RecordType::NAPTR</span> =&gt; <span class="string">&quot;NAPTR&quot;</span>,
+            <span class="ident">RecordType::NS</span> =&gt; <span class="string">&quot;NS&quot;</span>,
+            <span class="ident">RecordType::NULL</span> =&gt; <span class="string">&quot;NULL&quot;</span>,
+            <span class="ident">RecordType::OPENPGPKEY</span> =&gt; <span class="string">&quot;OPENPGPKEY&quot;</span>,
+            <span class="ident">RecordType::OPT</span> =&gt; <span class="string">&quot;OPT&quot;</span>,
+            <span class="ident">RecordType::PTR</span> =&gt; <span class="string">&quot;PTR&quot;</span>,
+            <span class="ident">RecordType::SOA</span> =&gt; <span class="string">&quot;SOA&quot;</span>,
+            <span class="ident">RecordType::SRV</span> =&gt; <span class="string">&quot;SRV&quot;</span>,
+            <span class="ident">RecordType::SSHFP</span> =&gt; <span class="string">&quot;SSHFP&quot;</span>,
+            <span class="ident">RecordType::SVCB</span> =&gt; <span class="string">&quot;SVCB&quot;</span>,
+            <span class="ident">RecordType::TLSA</span> =&gt; <span class="string">&quot;TLSA&quot;</span>,
+            <span class="ident">RecordType::TXT</span> =&gt; <span class="string">&quot;TXT&quot;</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RecordType::DNSSEC</span>(<span class="ident">rt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rt</span>.<span class="ident">into</span>(),
-            <span class="ident">RecordType::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Unknown&quot;</span>,
+            <span class="ident">RecordType::DNSSEC</span>(<span class="ident">rt</span>) =&gt; <span class="ident">rt</span>.<span class="ident">into</span>(),
+            <span class="ident">RecordType::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Unknown&quot;</span>,
         }
     }
 }
@@ -785,56 +785,56 @@
 <span class="doccomment">/// assert_eq!(1, var);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RecordType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">RecordType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rt</span>: <span class="ident">RecordType</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">rt</span> {
-            <span class="ident">RecordType::A</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">RecordType::AAAA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">28</span>,
+            <span class="ident">RecordType::A</span> =&gt; <span class="number">1</span>,
+            <span class="ident">RecordType::AAAA</span> =&gt; <span class="number">28</span>,
             <span class="comment">// TODO: wrong value here, see https://github.com/bluejekyll/trust-dns/issues/723</span>
-            <span class="ident">RecordType::ANAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">65305</span>,
-            <span class="ident">RecordType::ANY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">255</span>,
-            <span class="ident">RecordType::AXFR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">252</span>,
-            <span class="ident">RecordType::CAA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">257</span>,
-            <span class="ident">RecordType::CNAME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
-            <span class="ident">RecordType::HINFO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">13</span>,
-            <span class="ident">RecordType::HTTPS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">65</span>,
-            <span class="ident">RecordType::ZERO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">RecordType::IXFR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">251</span>,
-            <span class="ident">RecordType::MX</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">15</span>,
-            <span class="ident">RecordType::NAPTR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">35</span>,
-            <span class="ident">RecordType::NS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">RecordType::NULL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">10</span>,
-            <span class="ident">RecordType::OPENPGPKEY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">61</span>,
-            <span class="ident">RecordType::OPT</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">41</span>,
-            <span class="ident">RecordType::PTR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">12</span>,
-            <span class="ident">RecordType::SOA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">6</span>,
-            <span class="ident">RecordType::SRV</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">33</span>,
-            <span class="ident">RecordType::SSHFP</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">44</span>,
-            <span class="ident">RecordType::SVCB</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">64</span>,
-            <span class="ident">RecordType::TLSA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">52</span>,
-            <span class="ident">RecordType::TXT</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">16</span>,
+            <span class="ident">RecordType::ANAME</span> =&gt; <span class="number">65305</span>,
+            <span class="ident">RecordType::ANY</span> =&gt; <span class="number">255</span>,
+            <span class="ident">RecordType::AXFR</span> =&gt; <span class="number">252</span>,
+            <span class="ident">RecordType::CAA</span> =&gt; <span class="number">257</span>,
+            <span class="ident">RecordType::CNAME</span> =&gt; <span class="number">5</span>,
+            <span class="ident">RecordType::HINFO</span> =&gt; <span class="number">13</span>,
+            <span class="ident">RecordType::HTTPS</span> =&gt; <span class="number">65</span>,
+            <span class="ident">RecordType::ZERO</span> =&gt; <span class="number">0</span>,
+            <span class="ident">RecordType::IXFR</span> =&gt; <span class="number">251</span>,
+            <span class="ident">RecordType::MX</span> =&gt; <span class="number">15</span>,
+            <span class="ident">RecordType::NAPTR</span> =&gt; <span class="number">35</span>,
+            <span class="ident">RecordType::NS</span> =&gt; <span class="number">2</span>,
+            <span class="ident">RecordType::NULL</span> =&gt; <span class="number">10</span>,
+            <span class="ident">RecordType::OPENPGPKEY</span> =&gt; <span class="number">61</span>,
+            <span class="ident">RecordType::OPT</span> =&gt; <span class="number">41</span>,
+            <span class="ident">RecordType::PTR</span> =&gt; <span class="number">12</span>,
+            <span class="ident">RecordType::SOA</span> =&gt; <span class="number">6</span>,
+            <span class="ident">RecordType::SRV</span> =&gt; <span class="number">33</span>,
+            <span class="ident">RecordType::SSHFP</span> =&gt; <span class="number">44</span>,
+            <span class="ident">RecordType::SVCB</span> =&gt; <span class="number">64</span>,
+            <span class="ident">RecordType::TLSA</span> =&gt; <span class="number">52</span>,
+            <span class="ident">RecordType::TXT</span> =&gt; <span class="number">16</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RecordType::DNSSEC</span>(<span class="ident">rt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rt</span>.<span class="ident">into</span>(),
-            <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">code</span>,
+            <span class="ident">RecordType::DNSSEC</span>(<span class="ident">rt</span>) =&gt; <span class="ident">rt</span>.<span class="ident">into</span>(),
+            <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>) =&gt; <span class="ident">code</span>,
         }
     }
 }
 
 <span class="doccomment">/// [Canonical DNS Name Order](https://tools.ietf.org/html/rfc4034#section-6)</span>
 <span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">RecordType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecordType</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RecordType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">RecordType</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
     }
 }
 
 <span class="doccomment">/// [Canonical DNS Name Order](https://tools.ietf.org/html/rfc4034#section-6)</span>
 <span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">RecordType</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
         <span class="ident">u16::from</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">u16::from</span>(<span class="kw-2">*</span><span class="ident">other</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">RecordType</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">Into</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="ident">::into</span>(<span class="kw-2">*</span><span class="self">self</span>))
     }
 }

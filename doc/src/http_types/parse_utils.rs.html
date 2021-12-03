@@ -173,7 +173,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="doccomment">/// https://tools.ietf.org/html/rfc7230#section-3.2.6</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">end_of_token</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">c</span>) <span class="kw">in</span> <span class="ident">input</span>.<span class="ident">char_indices</span>() {
         <span class="kw">if</span> <span class="ident">tchar</span>(<span class="ident">c</span>) {
@@ -183,7 +183,7 @@
         }
     }
 
-    <span class="kw">if</span> <span class="ident">end_of_token</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">end_of_token</span> <span class="op">==</span> <span class="number">0</span> {
         (<span class="prelude-val">None</span>, <span class="ident">input</span>)
     } <span class="kw">else</span> {
         (<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>[..<span class="ident">end_of_token</span>]), <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">end_of_token</span>..])
@@ -191,7 +191,7 @@
 }
 
 <span class="doccomment">/// https://tools.ietf.org/html/rfc7230#section-3.2.6</span>
-<span class="kw">fn</span> <span class="ident">tchar</span>(<span class="ident">c</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">tchar</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
     <span class="macro">matches!</span>(
         <span class="ident">c</span>, <span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span>
             <span class="op">|</span> <span class="string">&#39;A&#39;</span>..<span class="op">=</span><span class="string">&#39;Z&#39;</span>
@@ -215,12 +215,12 @@
 }
 
 <span class="doccomment">/// https://tools.ietf.org/html/rfc7230#section-3.2.6</span>
-<span class="kw">fn</span> <span class="ident">vchar</span>(<span class="ident">c</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">vchar</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
     <span class="macro">matches!</span>(<span class="ident">c</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="string">b&#39;\t&#39;</span> <span class="op">|</span> <span class="number">32</span>..<span class="op">=</span><span class="number">126</span> <span class="op">|</span> <span class="number">128</span>..<span class="op">=</span><span class="number">255</span>)
 }
 
 <span class="doccomment">/// https://tools.ietf.org/html/rfc7230#section-3.2.6</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_quoted_string</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_quoted_string</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) {
     <span class="comment">// quoted-string must start with a DQUOTE</span>
     <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">starts_with</span>(<span class="string">&#39;&quot;&#39;</span>) {
         <span class="kw">return</span> (<span class="prelude-val">None</span>, <span class="ident">input</span>);
@@ -230,7 +230,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">backslashes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">c</span>) <span class="kw">in</span> <span class="ident">input</span>.<span class="ident">char_indices</span>().<span class="ident">skip</span>(<span class="number">1</span>) {
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">backslashes</span>.<span class="ident">last</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="ident">i</span> <span class="op">-</span> <span class="number">2</span>)) {
+        <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">backslashes</span>.<span class="ident">last</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="ident">i</span> <span class="op">-</span> <span class="number">2</span>)) {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">vchar</span>(<span class="ident">c</span>) {
                 <span class="comment">// only VCHARs can be escaped</span>
                 <span class="kw">return</span> (<span class="prelude-val">None</span>, <span class="ident">input</span>);
@@ -239,21 +239,21 @@
         } <span class="kw">else</span> {
             <span class="kw">match</span> <span class="ident">c</span> <span class="kw">as</span> <span class="ident">u8</span> {
                 <span class="comment">// we have reached a quoted-pair</span>
-                <span class="string">b&#39;\\&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">b&#39;\\&#39;</span> =&gt; {
                     <span class="ident">backslashes</span>.<span class="ident">push</span>(<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>);
                 }
 
                 <span class="comment">// end of the string, DQUOTE</span>
-                <span class="string">b&#39;&quot;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">b&#39;&quot;&#39;</span> =&gt; {
                     <span class="ident">end_of_string</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>);
                     <span class="kw">break</span>;
                 }
 
                 <span class="comment">// qdtext</span>
-                <span class="string">b&#39;\t&#39;</span> <span class="op">|</span> <span class="string">b&#39; &#39;</span> <span class="op">|</span> <span class="number">15</span> <span class="op">|</span> <span class="number">35</span>..<span class="op">=</span><span class="number">91</span> <span class="op">|</span> <span class="number">93</span>..<span class="op">=</span><span class="number">126</span> <span class="op">|</span> <span class="number">128</span>..<span class="op">=</span><span class="number">255</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                <span class="string">b&#39;\t&#39;</span> <span class="op">|</span> <span class="string">b&#39; &#39;</span> <span class="op">|</span> <span class="number">15</span> <span class="op">|</span> <span class="number">35</span>..<span class="op">=</span><span class="number">91</span> <span class="op">|</span> <span class="number">93</span>..<span class="op">=</span><span class="number">126</span> <span class="op">|</span> <span class="number">128</span>..<span class="op">=</span><span class="number">255</span> =&gt; {}
 
                 <span class="comment">// unexpected character, bail</span>
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> (<span class="prelude-val">None</span>, <span class="ident">input</span>),
+                <span class="kw">_</span> =&gt; <span class="kw">return</span> (<span class="prelude-val">None</span>, <span class="ident">input</span>),
             }
         }
     }
@@ -270,7 +270,7 @@
             <span class="ident">value</span>
                 .<span class="ident">char_indices</span>()
                 .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">c</span>)<span class="op">|</span> {
-                    <span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">backslashes</span>.<span class="ident">last</span>() {
+                    <span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>) <span class="op">==</span> <span class="ident">backslashes</span>.<span class="ident">last</span>() {
                         <span class="comment">// they&#39;re already sorted highest to lowest, so we only need to check the last one</span>
                         <span class="ident">backslashes</span>.<span class="ident">pop</span>();
                         <span class="prelude-val">None</span> <span class="comment">// remove the backslash from the output</span>

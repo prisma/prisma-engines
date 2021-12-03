@@ -495,7 +495,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_params</span>(<span class="ident">p</span>: <span class="ident">BigNum</span>, <span class="ident">g</span>: <span class="ident">BigNum</span>, <span class="ident">q</span>: <span class="ident">BigNum</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_params</span>(<span class="ident">p</span>: <span class="ident">BigNum</span>, <span class="ident">g</span>: <span class="ident">BigNum</span>, <span class="ident">q</span>: <span class="ident">BigNum</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::from_pqg</span>(<span class="ident">p</span>, <span class="prelude-val">Some</span>(<span class="ident">q</span>), <span class="ident">g</span>)
     }
 
@@ -509,7 +509,7 @@
         <span class="ident">prime_p</span>: <span class="ident">BigNum</span>,
         <span class="ident">prime_q</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BigNum</span><span class="op">&gt;</span>,
         <span class="ident">generator</span>: <span class="ident">BigNum</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">dh</span> <span class="op">=</span> <span class="ident">Dh::from_ptr</span>(<span class="ident">cvt_p</span>(<span class="ident">ffi::DH_new</span>())<span class="question-mark">?</span>);
             <span class="ident">cvt</span>(<span class="ident">DH_set0_pqg</span>(
@@ -524,7 +524,7 @@
     }
 
     <span class="doccomment">/// Sets the private key on the DH object and recomputes the public key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_private_key</span>(<span class="self">self</span>, <span class="ident">priv_key</span>: <span class="ident">BigNum</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_private_key</span>(<span class="self">self</span>, <span class="ident">priv_key</span>: <span class="ident">BigNum</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">dh_ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
             <span class="ident">cvt</span>(<span class="ident">DH_set0_key</span>(<span class="ident">dh_ptr</span>, <span class="ident">ptr::null_mut</span>(), <span class="ident">priv_key</span>.<span class="ident">as_ptr</span>()))<span class="question-mark">?</span>;
@@ -541,7 +541,7 @@
     <span class="doccomment">/// This corresponds to [`DH_generate_parameters_ex`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`DH_generate_parameters_ex`]: https://www.openssl.org/docs/man1.1.0/crypto/DH_generate_parameters.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_params</span>(<span class="ident">prime_len</span>: <span class="ident">u32</span>, <span class="ident">generator</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_params</span>(<span class="ident">prime_len</span>: <span class="ident">u32</span>, <span class="ident">generator</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">dh</span> <span class="op">=</span> <span class="ident">Dh::from_ptr</span>(<span class="ident">cvt_p</span>(<span class="ident">ffi::DH_new</span>())<span class="question-mark">?</span>);
             <span class="ident">cvt</span>(<span class="ident">ffi::DH_generate_parameters_ex</span>(
@@ -559,7 +559,7 @@
     <span class="doccomment">/// This corresponds to [`DH_generate_key`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`DH_generate_key`]: https://www.openssl.org/docs/man1.1.0/crypto/DH_generate_key.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_key</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_key</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Private</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">dh_ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
             <span class="ident">cvt</span>(<span class="ident">ffi::DH_generate_key</span>(<span class="ident">dh_ptr</span>))<span class="question-mark">?</span>;
@@ -594,7 +594,7 @@
 
     <span class="doccomment">/// Requires OpenSSL 1.0.2 or newer.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">ossl110</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_1024_160</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_1024_160</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">ffi::init</span>();
             <span class="ident">cvt_p</span>(<span class="ident">ffi::DH_get_1024_160</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">Dh::from_ptr</span>(<span class="ident">p</span>))
@@ -603,7 +603,7 @@
 
     <span class="doccomment">/// Requires OpenSSL 1.0.2 or newer.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">ossl110</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_2048_224</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_2048_224</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">ffi::init</span>();
             <span class="ident">cvt_p</span>(<span class="ident">ffi::DH_get_2048_224</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">Dh::from_ptr</span>(<span class="ident">p</span>))
@@ -612,7 +612,7 @@
 
     <span class="doccomment">/// Requires OpenSSL 1.0.2 or newer.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">ossl110</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_2048_256</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_2048_256</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Dh</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">ffi::init</span>();
             <span class="ident">cvt_p</span>(<span class="ident">ffi::DH_get_2048_256</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">Dh::from_ptr</span>(<span class="ident">p</span>))
@@ -629,7 +629,7 @@
     <span class="doccomment">/// This corresponds to [`DH_get0_pqg`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`DH_get0_pqg`]: https://www.openssl.org/docs/man1.1.0/crypto/DH_get0_pqg.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prime_p</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prime_p</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
         <span class="kw">unsafe</span> {
             <span class="ident">DH_get0_pqg</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">p</span>, <span class="ident">ptr::null_mut</span>(), <span class="ident">ptr::null_mut</span>());
@@ -642,7 +642,7 @@
     <span class="doccomment">/// This corresponds to [`DH_get0_pqg`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`DH_get0_pqg`]: https://www.openssl.org/docs/man1.1.0/crypto/DH_get0_pqg.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prime_q</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BigNumRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prime_q</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BigNumRef</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
         <span class="kw">unsafe</span> {
             <span class="ident">DH_get0_pqg</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr::null_mut</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">q</span>, <span class="ident">ptr::null_mut</span>());
@@ -659,7 +659,7 @@
     <span class="doccomment">/// This corresponds to [`DH_get0_pqg`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`DH_get0_pqg`]: https://www.openssl.org/docs/man1.1.0/crypto/DH_get0_pqg.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
         <span class="kw">unsafe</span> {
             <span class="ident">DH_get0_pqg</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr::null_mut</span>(), <span class="ident">ptr::null_mut</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">g</span>);
@@ -677,7 +677,7 @@
     <span class="doccomment">/// This corresponds to [`DH_get0_key`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`DH_get0_key`]: https://www.openssl.org/docs/man1.1.0/crypto/DH_get0_key.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pub_key</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
         <span class="kw">unsafe</span> {
             <span class="ident">DH_get0_key</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">pub_key</span>, <span class="ident">ptr::null_mut</span>());
@@ -695,7 +695,7 @@
     <span class="doccomment">/// This corresponds to [`DH_compute_key`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`DH_compute_key`]: https://www.openssl.org/docs/man1.1.0/crypto/DH_compute_key.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">public_key</span>: <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">public_key</span>: <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">key_len</span> <span class="op">=</span> <span class="ident">ffi::DH_size</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>());
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">key_len</span> <span class="kw">as</span> <span class="ident">usize</span>];
@@ -713,7 +713,7 @@
     <span class="doccomment">/// This corresponds to [`DH_get0_key`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`DH_get0_key`]: https://www.openssl.org/docs/man1.1.0/crypto/DH_get0_key.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BigNumRef</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">priv_key</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
         <span class="kw">unsafe</span> {
             <span class="ident">DH_get0_key</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr::null_mut</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">priv_key</span>);
@@ -732,7 +732,7 @@
             <span class="ident">p</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIGNUM</span>,
             <span class="ident">q</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIGNUM</span>,
             <span class="ident">g</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIGNUM</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::libc::c_int</span> {
+        ) -&gt; <span class="ident">::libc::c_int</span> {
             (<span class="kw-2">*</span><span class="ident">dh</span>).<span class="ident">p</span> <span class="op">=</span> <span class="ident">p</span>;
             (<span class="kw-2">*</span><span class="ident">dh</span>).<span class="ident">q</span> <span class="op">=</span> <span class="ident">q</span>;
             (<span class="kw-2">*</span><span class="ident">dh</span>).<span class="ident">g</span> <span class="op">=</span> <span class="ident">g</span>;
@@ -762,7 +762,7 @@
             <span class="ident">dh</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::DH</span>,
             <span class="ident">pub_key</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIGNUM</span>,
             <span class="ident">priv_key</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIGNUM</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::libc::c_int</span> {
+        ) -&gt; <span class="ident">::libc::c_int</span> {
             (<span class="kw-2">*</span><span class="ident">dh</span>).<span class="ident">pub_key</span> <span class="op">=</span> <span class="ident">pub_key</span>;
             (<span class="kw-2">*</span><span class="ident">dh</span>).<span class="ident">priv_key</span> <span class="op">=</span> <span class="ident">priv_key</span>;
             <span class="number">1</span>

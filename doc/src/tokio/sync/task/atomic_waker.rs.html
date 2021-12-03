@@ -457,7 +457,7 @@
 
 <span class="kw">impl</span> <span class="ident">AtomicWaker</span> {
     <span class="doccomment">/// Create an `AtomicWaker`</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AtomicWaker</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">AtomicWaker</span> {
         <span class="ident">AtomicWaker</span> {
             <span class="ident">state</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">WAITING</span>),
             <span class="ident">waker</span>: <span class="ident">UnsafeCell::new</span>(<span class="prelude-val">None</span>),
@@ -499,7 +499,7 @@
             .<span class="ident">compare_exchange</span>(<span class="ident">WAITING</span>, <span class="ident">REGISTERING</span>, <span class="ident">Acquire</span>, <span class="ident">Acquire</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>)
         {
-            <span class="ident">WAITING</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">WAITING</span> =&gt; {
                 <span class="kw">unsafe</span> {
                     <span class="comment">// Locked acquired, update the waker cell</span>
                     <span class="self">self</span>.<span class="ident">waker</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">t</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">waker</span>.<span class="ident">into_waker</span>()));
@@ -516,8 +516,8 @@
                         .<span class="ident">compare_exchange</span>(<span class="ident">REGISTERING</span>, <span class="ident">WAITING</span>, <span class="ident">AcqRel</span>, <span class="ident">Acquire</span>);
 
                     <span class="kw">match</span> <span class="ident">res</span> {
-                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                        <span class="prelude-val">Err</span>(<span class="ident">actual</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+                        <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; {
                             <span class="comment">// This branch can only be reached if a</span>
                             <span class="comment">// concurrent thread called `wake`. In this</span>
                             <span class="comment">// case, `actual` **must** be `REGISTERING |</span>
@@ -539,7 +539,7 @@
                     }
                 }
             }
-            <span class="ident">WAKING</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">WAKING</span> =&gt; {
                 <span class="comment">// Currently in the process of waking the task, i.e.,</span>
                 <span class="comment">// `wake` is currently being called on the old waker.</span>
                 <span class="comment">// So, we call wake on the new waker.</span>
@@ -550,7 +550,7 @@
                 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
                 <span class="ident">atomic::spin_loop_hint</span>();
             }
-            <span class="ident">state</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">state</span> =&gt; {
                 <span class="comment">// In this case, a concurrent thread is holding the</span>
                 <span class="comment">// &quot;registering&quot; lock. This probably indicates a bug in the</span>
                 <span class="comment">// caller&#39;s code as racing to call `register` doesn&#39;t make much</span>
@@ -558,7 +558,7 @@
                 <span class="comment">//</span>
                 <span class="comment">// We just want to maintain memory safety. It is ok to drop the</span>
                 <span class="comment">// call to `register`.</span>
-                <span class="macro">debug_assert!</span>(<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">REGISTERING</span> <span class="op">|</span><span class="op">|</span> <span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">REGISTERING</span> <span class="op">|</span> <span class="ident">WAKING</span>);
+                <span class="macro">debug_assert!</span>(<span class="ident">state</span> <span class="op">==</span> <span class="ident">REGISTERING</span> <span class="op">|</span><span class="op">|</span> <span class="ident">state</span> <span class="op">==</span> <span class="ident">REGISTERING</span> <span class="op">|</span> <span class="ident">WAKING</span>);
             }
         }
     }
@@ -574,12 +574,12 @@
 
     <span class="doccomment">/// Attempts to take the `Waker` value out of the `AtomicWaker` with the</span>
     <span class="doccomment">/// intention that the caller will wake the task later.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_waker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_waker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span> {
         <span class="comment">// AcqRel ordering is used in order to acquire the value of the `waker`</span>
         <span class="comment">// cell as well as to establish a `release` ordering with whatever</span>
         <span class="comment">// memory the `AtomicWaker` is associated with.</span>
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">fetch_or</span>(<span class="ident">WAKING</span>, <span class="ident">AcqRel</span>) {
-            <span class="ident">WAITING</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">WAITING</span> =&gt; {
                 <span class="comment">// The waking lock has been acquired.</span>
                 <span class="kw">let</span> <span class="ident">waker</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">waker</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">t</span>).<span class="ident">take</span>()) };
 
@@ -588,7 +588,7 @@
 
                 <span class="ident">waker</span>
             }
-            <span class="ident">state</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">state</span> =&gt; {
                 <span class="comment">// There is a concurrent thread currently updating the</span>
                 <span class="comment">// associated waker.</span>
                 <span class="comment">//</span>
@@ -597,7 +597,7 @@
                 <span class="comment">// not.</span>
                 <span class="comment">//</span>
                 <span class="macro">debug_assert!</span>(
-                    <span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">REGISTERING</span> <span class="op">|</span><span class="op">|</span> <span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">REGISTERING</span> <span class="op">|</span> <span class="ident">WAKING</span> <span class="op">|</span><span class="op">|</span> <span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">WAKING</span>
+                    <span class="ident">state</span> <span class="op">==</span> <span class="ident">REGISTERING</span> <span class="op">|</span><span class="op">|</span> <span class="ident">state</span> <span class="op">==</span> <span class="ident">REGISTERING</span> <span class="op">|</span> <span class="ident">WAKING</span> <span class="op">|</span><span class="op">|</span> <span class="ident">state</span> <span class="op">==</span> <span class="ident">WAKING</span>
                 );
                 <span class="prelude-val">None</span>
             }
@@ -606,13 +606,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">AtomicWaker</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">AtomicWaker::new</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">AtomicWaker</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;AtomicWaker&quot;</span>)
     }
 }
@@ -622,7 +622,7 @@
 
 <span class="kw">trait</span> <span class="ident">WakerRef</span> {
     <span class="kw">fn</span> <span class="ident">wake</span>(<span class="self">self</span>);
-    <span class="kw">fn</span> <span class="ident">into_waker</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Waker</span>;
+    <span class="kw">fn</span> <span class="ident">into_waker</span>(<span class="self">self</span>) -&gt; <span class="ident">Waker</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">WakerRef</span> <span class="kw">for</span> <span class="ident">Waker</span> {
@@ -630,7 +630,7 @@
         <span class="self">self</span>.<span class="ident">wake</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">into_waker</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Waker</span> {
+    <span class="kw">fn</span> <span class="ident">into_waker</span>(<span class="self">self</span>) -&gt; <span class="ident">Waker</span> {
         <span class="self">self</span>
     }
 }
@@ -640,7 +640,7 @@
         <span class="self">self</span>.<span class="ident">wake_by_ref</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">into_waker</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Waker</span> {
+    <span class="kw">fn</span> <span class="ident">into_waker</span>(<span class="self">self</span>) -&gt; <span class="ident">Waker</span> {
         <span class="self">self</span>.<span class="ident">clone</span>()
     }
 }

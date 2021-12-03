@@ -54,7 +54,7 @@
     <span class="ident">ty</span>: <span class="ident">VarLenType</span>,
     <span class="ident">len</span>: <span class="ident">usize</span>,
     <span class="ident">collation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Collation</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
 {
@@ -64,7 +64,7 @@
 
     <span class="kw">match</span> (<span class="ident">data</span>, <span class="ident">ty</span>) {
         <span class="comment">// Codepages other than UTF</span>
-        (<span class="prelude-val">Some</span>(<span class="ident">buf</span>), <span class="ident">BigChar</span>) <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">buf</span>), <span class="ident">BigVarChar</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">Some</span>(<span class="ident">buf</span>), <span class="ident">BigChar</span>) <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">buf</span>), <span class="ident">BigVarChar</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">collation</span> <span class="op">=</span> <span class="ident">collation</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">collation</span>.<span class="ident">encoding</span>()<span class="question-mark">?</span>;
 
@@ -75,7 +75,7 @@
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">s</span>.<span class="ident">into</span>()))
         }
         <span class="comment">// UTF-16</span>
-        (<span class="prelude-val">Some</span>(<span class="ident">buf</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="prelude-val">Some</span>(<span class="ident">buf</span>), <span class="kw">_</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="number">2</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Protocol</span>(<span class="string">&quot;nvarchar: invalid plp length&quot;</span>.<span class="ident">into</span>()));
             }
@@ -83,7 +83,7 @@
             <span class="kw">let</span> <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">chunks</span>(<span class="number">2</span>).<span class="ident">map</span>(<span class="ident">LittleEndian::read_u16</span>).<span class="ident">collect</span>();
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">String::from_utf16</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>)<span class="question-mark">?</span>.<span class="ident">into</span>()))
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
     }
 }
 </code></pre></div>

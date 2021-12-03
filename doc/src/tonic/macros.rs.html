@@ -106,7 +106,7 @@
 <span class="doccomment">/// [`OUT_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">include_proto</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">package</span>: <span class="ident">tt</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">package</span>: <span class="ident">tt</span>) =&gt; {
         <span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="macro">concat!</span>(<span class="string">&quot;/&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">package</span>, <span class="string">&quot;.rs&quot;</span>)));
     };
 }
@@ -148,7 +148,7 @@
 <span class="doccomment">/// [`OUT_DIR`]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">include_file_descriptor_set</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">package</span>: <span class="ident">tt</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">package</span>: <span class="ident">tt</span>) =&gt; {
         <span class="macro">include_bytes!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="macro">concat!</span>(<span class="string">&quot;/&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">package</span>, <span class="string">&quot;.bin&quot;</span>)))
     };
 }

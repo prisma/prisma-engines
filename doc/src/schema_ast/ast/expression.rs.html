@@ -119,21 +119,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Expression</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Expression::NumericValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
-            <span class="ident">Expression::BooleanValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
-            <span class="ident">Expression::StringValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="ident">val</span>),
-            <span class="ident">Expression::ConstantValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
-            <span class="ident">Expression::Function</span>(<span class="ident">fun</span>, <span class="ident">args</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Expression::NumericValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
+            <span class="ident">Expression::BooleanValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
+            <span class="ident">Expression::StringValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="ident">val</span>),
+            <span class="ident">Expression::ConstantValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
+            <span class="ident">Expression::Function</span>(<span class="ident">fun</span>, <span class="ident">args</span>, <span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>);
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}({})&quot;</span>, <span class="ident">fun</span>, <span class="ident">args</span>)
             }
-            <span class="ident">Expression::Array</span>(<span class="ident">vals</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Expression::Array</span>(<span class="ident">vals</span>, <span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">vals</span> <span class="op">=</span> <span class="ident">vals</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>);
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[{}]&quot;</span>, <span class="ident">vals</span>)
             }
-            <span class="ident">Expression::FieldWithArgs</span>(<span class="ident">ident</span>, <span class="ident">vals</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Expression::FieldWithArgs</span>(<span class="ident">ident</span>, <span class="ident">vals</span>, <span class="kw">_</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">vals</span> <span class="op">=</span> <span class="ident">vals</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>);
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}({})&quot;</span>, <span class="ident">ident</span>, <span class="ident">vals</span>)
             }
@@ -142,53 +142,53 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Expression</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_string_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Span</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_string_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Span</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Expression::StringValue</span>(<span class="ident">s</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">s</span>, <span class="kw-2">*</span><span class="ident">span</span>)),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Expression::StringValue</span>(<span class="ident">s</span>, <span class="ident">span</span>) =&gt; <span class="prelude-val">Some</span>((<span class="ident">s</span>, <span class="kw-2">*</span><span class="ident">span</span>)),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_constant_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Span</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_constant_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Span</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Expression::ConstantValue</span>(<span class="ident">s</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">s</span>, <span class="kw-2">*</span><span class="ident">span</span>)),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">Expression::ConstantValue</span>(<span class="ident">s</span>, <span class="ident">span</span>) =&gt; <span class="prelude-val">Some</span>((<span class="ident">s</span>, <span class="kw-2">*</span><span class="ident">span</span>)),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Span</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Span</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::NumericValue</span>(<span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
-            <span class="ident"><span class="self">Self</span>::BooleanValue</span>(<span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
-            <span class="ident"><span class="self">Self</span>::StringValue</span>(<span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
-            <span class="ident"><span class="self">Self</span>::ConstantValue</span>(<span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
-            <span class="ident"><span class="self">Self</span>::Function</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
-            <span class="ident"><span class="self">Self</span>::Array</span>(<span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
-            <span class="ident"><span class="self">Self</span>::FieldWithArgs</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">span</span>,
+            <span class="ident"><span class="self">Self</span>::NumericValue</span>(<span class="kw">_</span>, <span class="ident">span</span>) =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
+            <span class="ident"><span class="self">Self</span>::BooleanValue</span>(<span class="kw">_</span>, <span class="ident">span</span>) =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
+            <span class="ident"><span class="self">Self</span>::StringValue</span>(<span class="kw">_</span>, <span class="ident">span</span>) =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
+            <span class="ident"><span class="self">Self</span>::ConstantValue</span>(<span class="kw">_</span>, <span class="ident">span</span>) =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
+            <span class="ident"><span class="self">Self</span>::Function</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">span</span>) =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
+            <span class="ident"><span class="self">Self</span>::Array</span>(<span class="kw">_</span>, <span class="ident">span</span>) =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
+            <span class="ident"><span class="self">Self</span>::FieldWithArgs</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">span</span>) =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_env_expression</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_env_expression</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;env&quot;</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident"><span class="self">Self</span>::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;env&quot;</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 
     <span class="doccomment">/// Creates a friendly readable representation for a value&#39;s type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">describe_value_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">describe_value_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Expression::NumericValue</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;numeric&quot;</span>,
-            <span class="ident">Expression::BooleanValue</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;boolean&quot;</span>,
-            <span class="ident">Expression::StringValue</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;string&quot;</span>,
-            <span class="ident">Expression::ConstantValue</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;literal&quot;</span>,
-            <span class="ident">Expression::Function</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;functional&quot;</span>,
-            <span class="ident">Expression::Array</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;array&quot;</span>,
-            <span class="ident">Expression::FieldWithArgs</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;field with args&quot;</span>,
+            <span class="ident">Expression::NumericValue</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;numeric&quot;</span>,
+            <span class="ident">Expression::BooleanValue</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;boolean&quot;</span>,
+            <span class="ident">Expression::StringValue</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;string&quot;</span>,
+            <span class="ident">Expression::ConstantValue</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;literal&quot;</span>,
+            <span class="ident">Expression::Function</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;functional&quot;</span>,
+            <span class="ident">Expression::Array</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;array&quot;</span>,
+            <span class="ident">Expression::FieldWithArgs</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;field with args&quot;</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Expression::Array</span>(<span class="kw">_</span>, <span class="kw">_</span>))
     }
 }

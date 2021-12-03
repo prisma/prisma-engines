@@ -21,7 +21,7 @@
 <span class="comment">// modified, or distributed except according to those terms.</span>
 
 <span class="macro">macro_rules!</span> <span class="ident">const_assert</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">xs</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">xs</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="kw-2">*</span>) =&gt; {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unknown_lints</span>, <span class="ident">clippy::eq_op</span>)]</span>
         <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: [(); <span class="number">0</span> <span class="op">-</span> <span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">xs</span>)<span class="op">&amp;&amp;</span><span class="op">+</span>) <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> [];
     };

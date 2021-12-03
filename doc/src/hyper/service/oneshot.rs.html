@@ -78,7 +78,7 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">task</span>, <span class="ident">Future</span>, <span class="ident">Pin</span>, <span class="ident">Poll</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">oneshot</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span>(<span class="ident">svc</span>: <span class="ident">S</span>, <span class="ident">req</span>: <span class="ident">Req</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Oneshot</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">oneshot</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span>(<span class="ident">svc</span>: <span class="ident">S</span>, <span class="ident">req</span>: <span class="ident">Req</span>) -&gt; <span class="ident">Oneshot</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Req</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span>,
 {
@@ -120,26 +120,26 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Response</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
 
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="ident">me</span>.<span class="ident">state</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>() {
-                <span class="ident">StateProj::NotReady</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">svc</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">StateProj::NotReady</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">svc</span>, .. } =&gt; {
                     <span class="macro">ready!</span>(<span class="ident">svc</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
                     <span class="comment">// fallthrough out of the match&#39;s borrow</span>
                 }
-                <span class="ident">StateProj::Called</span> { <span class="ident">fut</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">StateProj::Called</span> { <span class="ident">fut</span> } =&gt; {
                     <span class="kw">return</span> <span class="ident">fut</span>.<span class="ident">poll</span>(<span class="ident">cx</span>);
                 }
-                <span class="ident">StateProj::Tmp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                <span class="ident">StateProj::Tmp</span> =&gt; <span class="macro">unreachable!</span>(),
             }
 
             <span class="kw">match</span> <span class="ident">me</span>.<span class="ident">state</span>.<span class="ident">as_mut</span>().<span class="ident">project_replace</span>(<span class="ident">State::Tmp</span>) {
-                <span class="ident">StateProjOwn::NotReady</span> { <span class="kw-2">mut</span> <span class="ident">svc</span>, <span class="ident">req</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">StateProjOwn::NotReady</span> { <span class="kw-2">mut</span> <span class="ident">svc</span>, <span class="ident">req</span> } =&gt; {
                     <span class="ident">me</span>.<span class="ident">state</span>.<span class="ident">set</span>(<span class="ident">State::Called</span> { <span class="ident">fut</span>: <span class="ident">svc</span>.<span class="ident">call</span>(<span class="ident">req</span>) });
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
             }
         }
     }

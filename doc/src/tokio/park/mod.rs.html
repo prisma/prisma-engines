@@ -171,7 +171,7 @@
     <span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">Debug</span>;
 
     <span class="doccomment">/// Gets a new `Unpark` handle associated with this `Park` instance.</span>
-    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Unpark</span>;
+    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Unpark</span>;
 
     <span class="doccomment">/// Blocks the current thread unless or until the token is available.</span>
     <span class="doccomment">///</span>
@@ -184,7 +184,7 @@
     <span class="doccomment">/// This function **should** not panic, but ultimately, panics are left as</span>
     <span class="doccomment">/// an implementation detail. Refer to the documentation for the specific</span>
     <span class="doccomment">/// `Park` implementation</span>
-    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Parks the current thread for at most `duration`.</span>
     <span class="doccomment">///</span>
@@ -200,7 +200,7 @@
     <span class="doccomment">/// This function **should** not panic, but ultimately, panics are left as</span>
     <span class="doccomment">/// an implementation detail. Refer to the documentation for the specific</span>
     <span class="doccomment">/// `Park` implementation</span>
-    <span class="kw">fn</span> <span class="ident">park_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">park_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Release all resources holded by the parker for proper leak-free shutdown</span>
     <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);

@@ -383,14 +383,14 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">ResolveError</span><span class="op">&gt;</span>, <span class="ident">P</span>: <span class="ident">ConnectionProvider</span><span class="op">&lt;</span><span class="ident">Conn</span> <span class="op">=</span> <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Debug</span>
     <span class="kw">for</span> <span class="ident">NameServer</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;config: {:?}, options: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">config</span>, <span class="self">self</span>.<span class="ident">options</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">NameServer</span><span class="op">&lt;</span><span class="ident">TokioConnection</span>, <span class="ident">TokioConnectionProvider</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="ident">NameServerConfig</span>, <span class="ident">options</span>: <span class="ident">ResolverOpts</span>, <span class="ident">runtime</span>: <span class="ident">TokioHandle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="ident">NameServerConfig</span>, <span class="ident">options</span>: <span class="ident">ResolverOpts</span>, <span class="ident">runtime</span>: <span class="ident">TokioHandle</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new_with_provider</span>(<span class="ident">config</span>, <span class="ident">options</span>, <span class="ident">TokioConnectionProvider::new</span>(<span class="ident">runtime</span>))
     }
 }
@@ -400,7 +400,7 @@
         <span class="ident">config</span>: <span class="ident">NameServerConfig</span>,
         <span class="ident">options</span>: <span class="ident">ResolverOpts</span>,
         <span class="ident">conn_provider</span>: <span class="ident">P</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NameServer</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">NameServer</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span> {
         <span class="self">Self</span> {
             <span class="ident">config</span>,
             <span class="ident">options</span>,
@@ -417,7 +417,7 @@
         <span class="ident">options</span>: <span class="ident">ResolverOpts</span>,
         <span class="ident">client</span>: <span class="ident">C</span>,
         <span class="ident">conn_provider</span>: <span class="ident">P</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NameServer</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">NameServer</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span> {
         <span class="self">Self</span> {
             <span class="ident">config</span>,
             <span class="ident">options</span>,
@@ -429,7 +429,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_connected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_connected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">is_failed</span>()
             <span class="op">&amp;&amp;</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">client</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">try_lock</span>() {
                 <span class="ident">client</span>.<span class="ident">is_some</span>()
@@ -442,7 +442,7 @@
     <span class="doccomment">/// This will return a mutable client to allows for sending messages.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the connection is in a failed state, then this will establish a new connection</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connected_mut_client</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connected_mut_client</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
         <span class="comment">// if this is in a failure state</span>
@@ -471,12 +471,12 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">inner_send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">request</span>: <span class="ident">R</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connected_mut_client</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>).<span class="kw">await</span>;
 
         <span class="kw">match</span> <span class="ident">response</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">response</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">response</span>) =&gt; {
                 <span class="comment">// first we&#39;ll evaluate if the message succeeded</span>
                 <span class="comment">//   see https://github.com/bluejekyll/trust-dns/issues/606</span>
                 <span class="comment">//   TODO: there are probably other return codes from the server we may want to</span>
@@ -497,7 +497,7 @@
                 <span class="self">self</span>.<span class="ident">stats</span>.<span class="ident">next_success</span>();
                 <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; {
                 <span class="macro">debug!</span>(<span class="string">&quot;name_server connection failure: {}&quot;</span>, <span class="ident">error</span>);
 
                 <span class="comment">// this transitions the state to failure</span>
@@ -512,7 +512,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trust_nx_responses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trust_nx_responses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">trust_nx_responses</span>
     }
 }
@@ -525,12 +525,12 @@
     <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ResolveError</span>;
 
-    <span class="kw">fn</span> <span class="ident">is_verifying_dnssec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_verifying_dnssec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">validate</span>
     }
 
     <span class="comment">// TODO: there needs to be some way of customizing the connection based on EDNS options from the server side...</span>
-    <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Response</span> {
+    <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
         <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="comment">// if state is failed, return future::err(), unless retry delay expired..</span>
         <span class="ident">Box::pin</span>(<span class="ident">this</span>.<span class="ident">inner_send</span>(<span class="ident">request</span>))
@@ -539,9 +539,9 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">ResolveError</span><span class="op">&gt;</span>, <span class="ident">P</span>: <span class="ident">ConnectionProvider</span><span class="op">&lt;</span><span class="ident">Conn</span> <span class="op">=</span> <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">NameServer</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Custom implementation of Ord for NameServer which incorporates the performance of the connection into it&#39;s ranking</span>
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span> {
+    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
         <span class="comment">// if they are literally equal, just return</span>
-        <span class="kw">if</span> <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span> {
+        <span class="kw">if</span> <span class="self">self</span> <span class="op">==</span> <span class="ident">other</span> {
             <span class="kw">return</span> <span class="ident">Ordering::Equal</span>;
         }
 
@@ -550,8 +550,8 @@
         <span class="comment">//   some number to make sure that all are used. This is more important for when</span>
         <span class="comment">//   latency is started to be used.</span>
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">state</span>) {
-            <span class="ident">Ordering::Equal</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">o</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Ordering::Equal</span> =&gt; (),
+            <span class="ident">o</span> =&gt; {
                 <span class="kw">return</span> <span class="ident">o</span>;
             }
         }
@@ -563,7 +563,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">ResolveError</span><span class="op">&gt;</span>, <span class="ident">P</span>: <span class="ident">ConnectionProvider</span><span class="op">&lt;</span><span class="ident">Conn</span> <span class="op">=</span> <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span>
     <span class="kw">for</span> <span class="ident">NameServer</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>
 {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
     }
 }
@@ -572,8 +572,8 @@
     <span class="kw">for</span> <span class="ident">NameServer</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>
 {
     <span class="doccomment">/// NameServers are equal if the config (connection information) are equal</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">config</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">config</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">config</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">config</span>
     }
 }
 
@@ -585,7 +585,7 @@
     <span class="ident">options</span>: <span class="ident">ResolverOpts</span>,
     <span class="ident">conn_provider</span>: <span class="ident">P</span>,
     <span class="ident">trust_nx_responses</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NameServer</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">NameServer</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">ResolveError</span><span class="op">&gt;</span>,
     <span class="ident">P</span>: <span class="ident">ConnectionProvider</span><span class="op">&lt;</span><span class="ident">Conn</span> <span class="op">=</span> <span class="ident">C</span><span class="op">&gt;</span>,

@@ -16,14 +16,14 @@ connection looks like this:</p>
 4. decode            3. encode</code></pre></div>
 <p>See also <a href="https://docs.rs/async-tls"><code>async-tls</code></a>,
 <a href="https://docs.rs/async-std"><code>async-std</code></a>.</p>
-<h1 id="example" class="section-header"><a href="#example">Example</a></h1>
+<h2 id="example" class="section-header"><a href="#example">Example</a></h2>
 <p><strong>HTTP client</strong></p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">async_std::net::TcpStream</span>;
 <span class="kw">use</span> <span class="ident">http_types</span>::{<span class="ident">Method</span>, <span class="ident">Request</span>, <span class="ident">Url</span>};
 
 <span class="attribute">#[<span class="ident">async_std::main</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">http_types::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="ident">http_types::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">TcpStream::connect</span>(<span class="string">&quot;127.0.0.1:8080&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">peer_addr</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">peer_addr</span>()<span class="question-mark">?</span>;
@@ -44,7 +44,7 @@ connection looks like this:</p>
 <span class="kw">use</span> <span class="ident">http_types</span>::{<span class="ident">Response</span>, <span class="ident">StatusCode</span>};
 
 <span class="attribute">#[<span class="ident">async_std::main</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">http_types::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="ident">http_types::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="comment">// Open up a TCP connection and create a URL.</span>
     <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">TcpListener::bind</span>((<span class="string">&quot;127.0.0.1&quot;</span>, <span class="number">8080</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;http://{}&quot;</span>, <span class="ident">listener</span>.<span class="ident">local_addr</span>()<span class="question-mark">?</span>);
@@ -64,7 +64,7 @@ connection looks like this:</p>
 }
 
 <span class="comment">// Take a TCP stream, and convert it into sequential HTTP request / response pairs.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">accept</span>(<span class="ident">stream</span>: <span class="ident">TcpStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">http_types::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">accept</span>(<span class="ident">stream</span>: <span class="ident">TcpStream</span>) -&gt; <span class="ident">http_types::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="macro">println!</span>(<span class="string">&quot;starting new connection from {}&quot;</span>, <span class="ident">stream</span>.<span class="ident">peer_addr</span>()<span class="question-mark">?</span>);
     <span class="ident">async_h1::accept</span>(<span class="ident">stream</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">_req</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::new</span>(<span class="ident">StatusCode::Ok</span>);
@@ -76,11 +76,11 @@ connection looks like this:</p>
     <span class="prelude-val">Ok</span>(())
 }</code></pre></div>
 </div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
-<div class="item-table"><div class="item-left import-item"><code>pub use client::<a class="fn" href="client/fn.connect.html" title="fn async_h1::client::connect">connect</a>;</code></div><div class="item-right docblock-short"></div><div class="item-left import-item"><code>pub use server::<a class="fn" href="server/fn.accept.html" title="fn async_h1::server::accept">accept</a>;</code></div><div class="item-right docblock-short"></div><div class="item-left import-item"><code>pub use server::<a class="fn" href="server/fn.accept_with_opts.html" title="fn async_h1::server::accept_with_opts">accept_with_opts</a>;</code></div><div class="item-right docblock-short"></div><div class="item-left import-item"><code>pub use server::<a class="struct" href="server/struct.ServerOptions.html" title="struct async_h1::server::ServerOptions">ServerOptions</a>;</code></div><div class="item-right docblock-short"></div></div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="client/index.html" title="async_h1::client mod">client</a></div><div class="item-right docblock-short"><p>Process HTTP connections on the client.</p>
-</div><div class="item-left module-item"><a class="mod" href="server/index.html" title="async_h1::server mod">server</a></div><div class="item-right docblock-short"><p>Process HTTP connections on the server.</p>
-</div></div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="macro" href="macro.read_to_end.html" title="async_h1::read_to_end macro">read_to_end</a></div><div class="item-right docblock-short"><p>like ready! but early-returns the Poll&lt;Result<usize>&gt; early in all situations other than Ready(Ok(0))</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="async_h1" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use client::<a class="fn" href="client/fn.connect.html" title="fn async_h1::client::connect">connect</a>;</code></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left import-item"><code>pub use server::<a class="fn" href="server/fn.accept.html" title="fn async_h1::server::accept">accept</a>;</code></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left import-item"><code>pub use server::<a class="fn" href="server/fn.accept_with_opts.html" title="fn async_h1::server::accept_with_opts">accept_with_opts</a>;</code></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left import-item"><code>pub use server::<a class="struct" href="server/struct.ServerOptions.html" title="struct async_h1::server::ServerOptions">ServerOptions</a>;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="client/index.html" title="async_h1::client mod">client</a></div><div class="item-right docblock-short"><p>Process HTTP connections on the client.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="server/index.html" title="async_h1::server mod">server</a></div><div class="item-right docblock-short"><p>Process HTTP connections on the server.</p>
+</div></div></div><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.read_to_end.html" title="async_h1::read_to_end macro">read_to_end</a></div><div class="item-right docblock-short"><p>like ready! but early-returns the Poll&lt;Result<usize>&gt; early in all situations other than Ready(Ok(0))</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="async_h1" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

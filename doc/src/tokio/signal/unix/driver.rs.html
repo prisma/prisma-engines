@@ -250,7 +250,7 @@
 
 <span class="kw">impl</span> <span class="ident">Driver</span> {
     <span class="doccomment">/// Creates a new signal `Driver` instance that delegates wakeups to `park`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">park</span>: <span class="ident">IoDriver</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">park</span>: <span class="ident">IoDriver</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">std::mem::ManuallyDrop</span>;
         <span class="kw">use</span> <span class="ident">std::os::unix::io</span>::{<span class="ident">AsRawFd</span>, <span class="ident">FromRawFd</span>};
 
@@ -296,7 +296,7 @@
 
     <span class="doccomment">/// Returns a handle to this event loop which can be sent across threads</span>
     <span class="doccomment">/// and can be used as a proxy to the event loop itself.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Handle</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Handle</span> {
         <span class="ident">Handle</span> {
             <span class="ident">inner</span>: <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>),
         }
@@ -311,9 +311,9 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Context::from_waker</span>(<span class="kw-2">&amp;</span><span class="ident">waker</span>);
 
         <span class="kw">let</span> <span class="ident">ev</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">registration</span>().<span class="ident">poll_read_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cx</span>) {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">ev</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ev</span>,
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;reactor gone: {}&quot;</span>, <span class="ident">e</span>),
-            <span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>, <span class="comment">// No wake has arrived, bail</span>
+            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">ev</span>)) =&gt; <span class="ident">ev</span>,
+            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;reactor gone: {}&quot;</span>, <span class="ident">e</span>),
+            <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span>, <span class="comment">// No wake has arrived, bail</span>
         };
 
         <span class="comment">// Drain the pipe completely so we can receive a new readiness event</span>
@@ -321,10 +321,10 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">128</span>];
         <span class="kw">loop</span> {
             <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">receiver</span>).<span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>) {
-                <span class="prelude-val">Ok</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;EOF on self-pipe&quot;</span>),
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>, <span class="comment">// Keep reading</span>
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">io::ErrorKind::WouldBlock</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Bad read on self-pipe: {}&quot;</span>, <span class="ident">e</span>),
+                <span class="prelude-val">Ok</span>(<span class="number">0</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;EOF on self-pipe&quot;</span>),
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>, <span class="comment">// Keep reading</span>
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io::ErrorKind::WouldBlock</span> =&gt; <span class="kw">break</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Bad read on self-pipe: {}&quot;</span>, <span class="ident">e</span>),
             }
         }
 
@@ -337,7 +337,7 @@
 
 <span class="kw">const</span> <span class="ident">NOOP_WAKER_VTABLE</span>: <span class="ident">RawWakerVTable</span> <span class="op">=</span> <span class="ident">RawWakerVTable::new</span>(<span class="ident">noop_clone</span>, <span class="ident">noop</span>, <span class="ident">noop</span>, <span class="ident">noop</span>);
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">noop_clone</span>(<span class="ident">_data</span>: <span class="kw-2">*</span><span class="kw">const</span> ()) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawWaker</span> {
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">noop_clone</span>(<span class="ident">_data</span>: <span class="kw-2">*</span><span class="kw">const</span> ()) -&gt; <span class="ident">RawWaker</span> {
     <span class="ident">RawWaker::new</span>(<span class="ident">ptr::null</span>(), <span class="kw-2">&amp;</span><span class="ident">NOOP_WAKER_VTABLE</span>)
 }
 
@@ -349,17 +349,17 @@
     <span class="kw">type</span> <span class="ident">Unpark</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">IoDriver</span> <span class="kw">as</span> <span class="ident">Park</span><span class="op">&gt;</span><span class="ident">::Unpark</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Unpark</span> {
+    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Unpark</span> {
         <span class="self">self</span>.<span class="ident">park</span>.<span class="ident">unpark</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">park</span>.<span class="ident">park</span>()<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">process</span>();
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">park_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">park_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">park</span>.<span class="ident">park_timeout</span>(<span class="ident">duration</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">process</span>();
         <span class="prelude-val">Ok</span>(())
@@ -373,7 +373,7 @@
 <span class="comment">// ===== impl Handle =====</span>
 
 <span class="kw">impl</span> <span class="ident">Handle</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">check_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">check_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">strong_count</span>() <span class="op">&gt;</span> <span class="number">0</span> {
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else</span> {
@@ -389,7 +389,7 @@
         <span class="doccomment">/// # Panics</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This function panics if there is no current signal driver set.</span>
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">current</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">current</span>() -&gt; <span class="self">Self</span> {
             <span class="ident"><span class="kw">crate</span>::runtime::context::signal_handle</span>().<span class="ident">expect</span>(
                 <span class="string">&quot;there is no signal driver running, must be called from the context of Tokio runtime&quot;</span>,
             )
@@ -404,7 +404,7 @@
         <span class="doccomment">/// # Panics</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This function panics if there is no current signal driver set.</span>
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">current</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">current</span>() -&gt; <span class="self">Self</span> {
             <span class="macro">panic!</span>(
                 <span class="string">&quot;there is no signal driver running, must be called from the context of Tokio runtime or with\
                 `rt` enabled.&quot;</span>,

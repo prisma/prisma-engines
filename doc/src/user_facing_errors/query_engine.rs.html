@@ -312,21 +312,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DatabaseConstraint</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Fields</span>(<span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Fields</span>(<span class="ident">fields</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">quoted_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">f</span>)).<span class="ident">collect</span>();
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;fields: ({})&quot;</span>, <span class="ident">quoted_fields</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>))
             }
-            <span class="ident"><span class="self">Self</span>::Index</span>(<span class="ident">index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;constraint: `{}`&quot;</span>, <span class="ident">index</span>),
-            <span class="ident"><span class="self">Self</span>::ForeignKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;foreign key&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::CannotParse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;(not available)&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Index</span>(<span class="ident">index</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;constraint: `{}`&quot;</span>, <span class="ident">index</span>),
+            <span class="ident"><span class="self">Self</span>::ForeignKey</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;foreign key&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::CannotParse</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;(not available)&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DatabaseConstraint</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Fields</span>(<span class="ident">fields</span>)
     }
 }

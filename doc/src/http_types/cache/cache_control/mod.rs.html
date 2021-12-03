@@ -73,7 +73,7 @@
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::headers</span>::{<span class="ident">Headers</span>, <span class="ident">CACHE_CONTROL</span>};
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">smoke</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">smoke</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">entries</span> <span class="op">=</span> <span class="ident">CacheControl::new</span>();
         <span class="ident">entries</span>.<span class="ident">push</span>(<span class="ident">CacheDirective::Immutable</span>);
         <span class="ident">entries</span>.<span class="ident">push</span>(<span class="ident">CacheDirective::NoStore</span>);
@@ -89,7 +89,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ignore_unkonwn_directives</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">ignore_unkonwn_directives</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers::new</span>();
         <span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">CACHE_CONTROL</span>, <span class="string">&quot;barrel_roll&quot;</span>);
         <span class="kw">let</span> <span class="ident">entries</span> <span class="op">=</span> <span class="ident">CacheControl::from_headers</span>(<span class="ident">headers</span>)<span class="question-mark">?</span>.<span class="ident">unwrap</span>();

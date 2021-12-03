@@ -167,7 +167,7 @@
     <span class="doccomment">/// fragment size that will be produced -- this does not</span>
     <span class="doccomment">/// include overhead (so a `max_fragment_len` of 5 will produce</span>
     <span class="doccomment">/// 10 byte packets).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max_fragment_len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MessageFragmenter</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max_fragment_len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">MessageFragmenter</span> {
         <span class="macro">debug_assert!</span>(<span class="ident">max_fragment_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_FRAGMENT_LEN</span>);
         <span class="ident">MessageFragmenter</span> {
             <span class="ident">max_frag</span>: <span class="ident">max_fragment_len</span>,

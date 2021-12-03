@@ -488,7 +488,7 @@
 <span class="doccomment">/// SHA1 is known to be insecure - it should not be used unless required for</span>
 <span class="doccomment">/// compatibility with existing systems.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha1</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">20</span>] {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha1</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; [<span class="ident">u8</span>; <span class="number">20</span>] {
     <span class="kw">unsafe</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">20</span>]<span class="op">&gt;</span><span class="ident">::uninit</span>();
         <span class="ident">ffi::SHA1</span>(<span class="ident">data</span>.<span class="ident">as_ptr</span>(), <span class="ident">data</span>.<span class="ident">len</span>(), <span class="ident">hash</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>);
@@ -498,7 +498,7 @@
 
 <span class="doccomment">/// Computes the SHA224 hash of some data.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha224</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">28</span>] {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha224</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; [<span class="ident">u8</span>; <span class="number">28</span>] {
     <span class="kw">unsafe</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">28</span>]<span class="op">&gt;</span><span class="ident">::uninit</span>();
         <span class="ident">ffi::SHA224</span>(<span class="ident">data</span>.<span class="ident">as_ptr</span>(), <span class="ident">data</span>.<span class="ident">len</span>(), <span class="ident">hash</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>);
@@ -508,7 +508,7 @@
 
 <span class="doccomment">/// Computes the SHA256 hash of some data.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha256</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha256</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; [<span class="ident">u8</span>; <span class="number">32</span>] {
     <span class="kw">unsafe</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::uninit</span>();
         <span class="ident">ffi::SHA256</span>(<span class="ident">data</span>.<span class="ident">as_ptr</span>(), <span class="ident">data</span>.<span class="ident">len</span>(), <span class="ident">hash</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>);
@@ -518,7 +518,7 @@
 
 <span class="doccomment">/// Computes the SHA384 hash of some data.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha384</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">48</span>] {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha384</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; [<span class="ident">u8</span>; <span class="number">48</span>] {
     <span class="kw">unsafe</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">48</span>]<span class="op">&gt;</span><span class="ident">::uninit</span>();
         <span class="ident">ffi::SHA384</span>(<span class="ident">data</span>.<span class="ident">as_ptr</span>(), <span class="ident">data</span>.<span class="ident">len</span>(), <span class="ident">hash</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>);
@@ -528,7 +528,7 @@
 
 <span class="doccomment">/// Computes the SHA512 hash of some data.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha512</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">64</span>] {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha512</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; [<span class="ident">u8</span>; <span class="number">64</span>] {
     <span class="kw">unsafe</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">64</span>]<span class="op">&gt;</span><span class="ident">::uninit</span>();
         <span class="ident">ffi::SHA512</span>(<span class="ident">data</span>.<span class="ident">as_ptr</span>(), <span class="ident">data</span>.<span class="ident">len</span>(), <span class="ident">hash</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>);
@@ -549,7 +549,7 @@
 
         <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Sha1</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sha1</span> {
+            <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Sha1</span> {
                 <span class="ident">Sha1::new</span>()
             }
         }
@@ -557,7 +557,7 @@
         <span class="kw">impl</span> <span class="ident">Sha1</span> {
             <span class="doccomment">/// Creates a new hasher.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sha1</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Sha1</span> {
                 <span class="kw">unsafe</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
                     <span class="ident">ffi::SHA1_Init</span>( <span class="ident">ctx</span>.<span class="ident">as_mut_ptr</span>());
@@ -577,7 +577,7 @@
 
             <span class="doccomment">/// Returns the hash of the data.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">20</span>] {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">20</span>] {
                 <span class="kw">unsafe</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">20</span>]<span class="op">&gt;</span><span class="ident">::uninit</span>();
                     <span class="ident">ffi::SHA1_Final</span>(<span class="ident">hash</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>);
@@ -592,7 +592,7 @@
 
         <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Sha224</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sha224</span> {
+            <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Sha224</span> {
                 <span class="ident">Sha224::new</span>()
             }
         }
@@ -600,7 +600,7 @@
         <span class="kw">impl</span> <span class="ident">Sha224</span> {
             <span class="doccomment">/// Creates a new hasher.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sha224</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Sha224</span> {
                 <span class="kw">unsafe</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
                     <span class="ident">ffi::SHA224_Init</span>(<span class="ident">ctx</span>.<span class="ident">as_mut_ptr</span>());
@@ -620,7 +620,7 @@
 
             <span class="doccomment">/// Returns the hash of the data.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">28</span>] {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">28</span>] {
                 <span class="kw">unsafe</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">28</span>]<span class="op">&gt;</span><span class="ident">::uninit</span>();
                     <span class="ident">ffi::SHA224_Final</span>(<span class="ident">hash</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>);
@@ -635,7 +635,7 @@
 
         <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Sha256</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sha256</span> {
+            <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Sha256</span> {
                 <span class="ident">Sha256::new</span>()
             }
         }
@@ -643,7 +643,7 @@
         <span class="kw">impl</span> <span class="ident">Sha256</span> {
             <span class="doccomment">/// Creates a new hasher.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sha256</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Sha256</span> {
                 <span class="kw">unsafe</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
                     <span class="ident">ffi::SHA256_Init</span>(<span class="ident">ctx</span>.<span class="ident">as_mut_ptr</span>());
@@ -663,7 +663,7 @@
 
             <span class="doccomment">/// Returns the hash of the data.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">32</span>] {
                 <span class="kw">unsafe</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="ident">::uninit</span>();
                     <span class="ident">ffi::SHA256_Final</span>(<span class="ident">hash</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>);
@@ -678,7 +678,7 @@
 
         <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Sha384</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sha384</span> {
+            <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Sha384</span> {
                 <span class="ident">Sha384::new</span>()
             }
         }
@@ -686,7 +686,7 @@
         <span class="kw">impl</span> <span class="ident">Sha384</span> {
             <span class="doccomment">/// Creates a new hasher.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sha384</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Sha384</span> {
                 <span class="kw">unsafe</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
                     <span class="ident">ffi::SHA384_Init</span>(<span class="ident">ctx</span>.<span class="ident">as_mut_ptr</span>());
@@ -706,7 +706,7 @@
 
             <span class="doccomment">/// Returns the hash of the data.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">48</span>] {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">48</span>] {
                 <span class="kw">unsafe</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">48</span>]<span class="op">&gt;</span><span class="ident">::uninit</span>();
                     <span class="ident">ffi::SHA384_Final</span>(<span class="ident">hash</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>);
@@ -721,7 +721,7 @@
 
         <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Sha512</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sha512</span> {
+            <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Sha512</span> {
                 <span class="ident">Sha512::new</span>()
             }
         }
@@ -729,7 +729,7 @@
         <span class="kw">impl</span> <span class="ident">Sha512</span> {
             <span class="doccomment">/// Creates a new hasher.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sha512</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Sha512</span> {
                 <span class="kw">unsafe</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
                     <span class="ident">ffi::SHA512_Init</span>(<span class="ident">ctx</span>.<span class="ident">as_mut_ptr</span>());
@@ -749,7 +749,7 @@
 
             <span class="doccomment">/// Returns the hash of the data.</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">64</span>] {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">64</span>] {
                 <span class="kw">unsafe</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span><span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">64</span>]<span class="op">&gt;</span><span class="ident">::uninit</span>();
                 <span class="ident">ffi::SHA512_Final</span>(<span class="ident">hash</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>);

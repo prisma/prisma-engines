@@ -128,7 +128,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The client may assume the returned string doesn&#39;t contain any</span>
 <span class="doccomment">/// special characters that would require escaping in an SQL command.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scram_sha_256</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scram_sha_256</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">salt</span>: [<span class="ident">u8</span>; <span class="ident">SCRAM_DEFAULT_SALT_LEN</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="ident">SCRAM_DEFAULT_SALT_LEN</span>];
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();
     <span class="ident">rng</span>.<span class="ident">fill_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">salt</span>);
@@ -137,7 +137,7 @@
 
 <span class="comment">// Internal implementation of scram_sha_256 with a caller-provided</span>
 <span class="comment">// salt. This is useful for testing.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">scram_sha_256_salt</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">salt</span>: [<span class="ident">u8</span>; <span class="ident">SCRAM_DEFAULT_SALT_LEN</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">scram_sha_256_salt</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">salt</span>: [<span class="ident">u8</span>; <span class="ident">SCRAM_DEFAULT_SALT_LEN</span>]) -&gt; <span class="ident">String</span> {
     <span class="comment">// Prepare the password, per [RFC</span>
     <span class="comment">// 4013](https://tools.ietf.org/html/rfc4013), if possible.</span>
     <span class="comment">//</span>
@@ -150,15 +150,15 @@
     <span class="comment">// just skip the SASLprep step and use the original byte</span>
     <span class="comment">// sequence.</span>
     <span class="kw">let</span> <span class="ident">prepared</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">std::str::from_utf8</span>(<span class="ident">password</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">password_str</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">password_str</span>) =&gt; {
             <span class="kw">match</span> <span class="ident">stringprep::saslprep</span>(<span class="ident">password_str</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">p</span>.<span class="ident">into_owned</span>().<span class="ident">into_bytes</span>(),
+                <span class="prelude-val">Ok</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>.<span class="ident">into_owned</span>().<span class="ident">into_bytes</span>(),
                 <span class="comment">// contains invalid characters; skip saslprep</span>
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Vec::from</span>(<span class="ident">password</span>),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">Vec::from</span>(<span class="ident">password</span>),
             }
         }
         <span class="comment">// not valid UTF-8; skip saslprep</span>
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Vec::from</span>(<span class="ident">password</span>),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">Vec::from</span>(<span class="ident">password</span>),
     };
 
     <span class="comment">// salt password</span>
@@ -196,7 +196,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The client may assume the returned string doesn&#39;t contain any</span>
 <span class="doccomment">/// special characters that would require escaping.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">md5</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">username</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">md5</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">username</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
     <span class="comment">// salt password with username</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">salted_password</span> <span class="op">=</span> <span class="ident">Vec::from</span>(<span class="ident">password</span>);
     <span class="ident">salted_password</span>.<span class="ident">extend_from_slice</span>(<span class="ident">username</span>.<span class="ident">as_bytes</span>());

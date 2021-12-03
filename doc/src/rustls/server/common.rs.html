@@ -73,7 +73,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">HandshakeDetails</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">extra_exts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ServerExtension</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HandshakeDetails</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">extra_exts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ServerExtension</span><span class="op">&gt;</span>) -&gt; <span class="ident">HandshakeDetails</span> {
         <span class="ident">HandshakeDetails</span> {
             <span class="ident">transcript</span>: <span class="ident">hash_hs::HandshakeHash::new</span>(),
             <span class="ident">hash_at_server_fin</span>: <span class="ident">Vec::new</span>(),
@@ -90,11 +90,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ServerKXDetails</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kx</span>: <span class="ident">suites::KeyExchange</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServerKXDetails</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kx</span>: <span class="ident">suites::KeyExchange</span>) -&gt; <span class="ident">ServerKXDetails</span> {
         <span class="ident">ServerKXDetails</span> { <span class="ident">kx</span>: <span class="prelude-val">Some</span>(<span class="ident">kx</span>) }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_kx</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">suites::KeyExchange</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_kx</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">suites::KeyExchange</span> {
         <span class="self">self</span>.<span class="ident">kx</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>()
     }
 }
@@ -104,11 +104,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ClientCertDetails</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">chain</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ClientCertDetails</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">chain</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>) -&gt; <span class="ident">ClientCertDetails</span> {
         <span class="ident">ClientCertDetails</span> { <span class="ident">cert_chain</span>: <span class="ident">chain</span> }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_chain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_chain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span> {
         <span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">cert_chain</span>, <span class="ident">Vec::new</span>())
     }
 }

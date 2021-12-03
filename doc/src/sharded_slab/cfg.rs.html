@@ -260,11 +260,11 @@
     <span class="kw">const</span> <span class="ident">MAX_SHARDS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">next_pow2</span>(<span class="ident"><span class="self">Self</span>::MAX_THREADS</span> <span class="op">-</span> <span class="number">1</span>);
     <span class="kw">const</span> <span class="ident">ADDR_INDEX_SHIFT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::INITIAL_SZ</span>.<span class="ident">trailing_zeros</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>;
 
-    <span class="kw">fn</span> <span class="ident">page_size</span>(<span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">page_size</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident"><span class="self">Self</span>::INITIAL_SZ</span> <span class="op">*</span> <span class="number">2usize</span>.<span class="ident">pow</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="kw">_</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">debug</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DebugConfig</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">debug</span>() -&gt; <span class="ident">DebugConfig</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">DebugConfig</span> { <span class="ident">_cfg</span>: <span class="ident">PhantomData</span> }
     }
 
@@ -307,22 +307,22 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">unpack</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pack</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">packed</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">A</span> {
+    <span class="kw">fn</span> <span class="ident">unpack</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pack</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">packed</span>: <span class="ident">usize</span>) -&gt; <span class="ident">A</span> {
         <span class="ident">A::from_packed</span>(<span class="ident">packed</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">unpack_addr</span>(<span class="ident">packed</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Addr</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">unpack_addr</span>(<span class="ident">packed</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Addr</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::unpack</span>(<span class="ident">packed</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">unpack_tid</span>(<span class="ident">packed</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Tid</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">unpack_tid</span>(<span class="ident">packed</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Tid</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::unpack</span>(<span class="ident">packed</span>)
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">unpack_gen</span>(<span class="ident">packed</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Generation</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">unpack_gen</span>(<span class="ident">packed</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Generation</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::unpack</span>(<span class="ident">packed</span>)
     }
 }
@@ -340,8 +340,8 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">WIDTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>() <span class="op">*</span> <span class="number">8</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">next_pow2</span>(<span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-    <span class="kw">let</span> <span class="ident">pow2</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">count_ones</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">next_pow2</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
+    <span class="kw">let</span> <span class="ident">pow2</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">count_ones</span>() <span class="op">==</span> <span class="number">1</span>;
     <span class="kw">let</span> <span class="ident">zeros</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">leading_zeros</span>();
     <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">WIDTH</span> <span class="op">-</span> <span class="ident">zeros</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">pow2</span> <span class="kw">as</span> <span class="ident">usize</span>)
 }
@@ -361,13 +361,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">DefaultConfig</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident"><span class="self">Self</span>::debug</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">DebugConfig</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>())
             .<span class="ident">field</span>(<span class="string">&quot;initial_page_size&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">C::INITIAL_SZ</span>)
             .<span class="ident">field</span>(<span class="string">&quot;max_shards&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">C::MAX_SHARDS</span>)

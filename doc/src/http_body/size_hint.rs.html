@@ -101,14 +101,14 @@
 <span class="kw">impl</span> <span class="ident">SizeHint</span> {
     <span class="doccomment">/// Returns a new `SizeHint` with default values</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SizeHint</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">SizeHint</span> {
         <span class="ident">SizeHint::default</span>()
     }
 
     <span class="doccomment">/// Returns a new `SizeHint` with both upper and lower bounds set to the</span>
     <span class="doccomment">/// given value.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_exact</span>(<span class="ident">value</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SizeHint</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_exact</span>(<span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="ident">SizeHint</span> {
         <span class="ident">SizeHint</span> {
             <span class="ident">lower</span>: <span class="ident">value</span>,
             <span class="ident">upper</span>: <span class="prelude-val">Some</span>(<span class="ident">value</span>),
@@ -118,7 +118,7 @@
     <span class="doccomment">/// Returns the lower bound of data that the `Body` will yield before</span>
     <span class="doccomment">/// completing.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lower</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lower</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">lower</span>
     }
 
@@ -136,7 +136,7 @@
     <span class="doccomment">/// Returns the upper bound of data the `Body` will yield before</span>
     <span class="doccomment">/// completing, or `None` if the value is unknown.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upper</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upper</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">upper</span>
     }
 
@@ -155,8 +155,8 @@
     <span class="doccomment">/// Returns the exact size of data that will be yielded **if** the</span>
     <span class="doccomment">/// `lower` and `upper` bounds are equal.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exact</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">lower</span>) <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">upper</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exact</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">lower</span>) <span class="op">==</span> <span class="self">self</span>.<span class="ident">upper</span> {
             <span class="self">self</span>.<span class="ident">upper</span>
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>

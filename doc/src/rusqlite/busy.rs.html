@@ -200,7 +200,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Newly created connections currently have a default busy timeout of</span>
     <span class="doccomment">/// 5000ms, but this may be subject to change.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">busy_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">busy_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ms</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">timeout</span>
             .<span class="ident">as_secs</span>()
             .<span class="ident">checked_mul</span>(<span class="number">1000</span>)
@@ -231,9 +231,9 @@
     <span class="doccomment">/// Newly created connections default to a</span>
     <span class="doccomment">/// [`busy_timeout()`](Connection::busy_timeout) handler with a timeout</span>
     <span class="doccomment">/// of 5000ms, although this is subject to change.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">busy_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">callback</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">busy_handler_callback</span>(<span class="ident">p_arg</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>, <span class="ident">count</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
-            <span class="kw">let</span> <span class="ident">handler_fn</span>: <span class="kw">fn</span>(<span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">=</span> <span class="ident">mem::transmute</span>(<span class="ident">p_arg</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">busy_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">callback</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">i32</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">busy_handler_callback</span>(<span class="ident">p_arg</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>, <span class="ident">count</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span> {
+            <span class="kw">let</span> <span class="ident">handler_fn</span>: <span class="kw">fn</span>(<span class="ident">i32</span>) -&gt; <span class="ident">bool</span> <span class="op">=</span> <span class="ident">mem::transmute</span>(<span class="ident">p_arg</span>);
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="op">=</span> <span class="ident">catch_unwind</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">handler_fn</span>(<span class="ident">count</span>)) {
                 <span class="number">1</span>
             } <span class="kw">else</span> {
@@ -242,10 +242,10 @@
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow_mut</span>();
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">callback</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">f</span>) =&gt; <span class="kw">unsafe</span> {
                 <span class="ident">ffi::sqlite3_busy_handler</span>(<span class="ident">c</span>.<span class="ident">db</span>(), <span class="prelude-val">Some</span>(<span class="ident">busy_handler_callback</span>), <span class="ident">f</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>)
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_busy_handler</span>(<span class="ident">c</span>.<span class="ident">db</span>(), <span class="prelude-val">None</span>, <span class="ident">ptr::null_mut</span>()) },
+            <span class="prelude-val">None</span> =&gt; <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_busy_handler</span>(<span class="ident">c</span>.<span class="ident">db</span>(), <span class="prelude-val">None</span>, <span class="ident">ptr::null_mut</span>()) },
         };
         <span class="ident">c</span>.<span class="ident">decode_result</span>(<span class="ident">r</span>)
     }
@@ -253,7 +253,7 @@
 
 <span class="kw">impl</span> <span class="ident">InnerConnection</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">busy_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">busy_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_busy_timeout</span>(<span class="self">self</span>.<span class="ident">db</span>, <span class="ident">timeout</span>) };
         <span class="self">self</span>.<span class="ident">decode_result</span>(<span class="ident">r</span>)
     }
@@ -269,7 +269,7 @@
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Connection</span>, <span class="ident">Error</span>, <span class="ident">ErrorCode</span>, <span class="prelude-ty">Result</span>, <span class="ident">TransactionBehavior</span>};
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_default_busy</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_default_busy</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">temp_dir</span> <span class="op">=</span> <span class="ident">tempfile::tempdir</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">temp_dir</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;test.db3&quot;</span>);
 
@@ -278,10 +278,10 @@
         <span class="kw">let</span> <span class="ident">db2</span> <span class="op">=</span> <span class="ident">Connection::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">r</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db2</span>.<span class="ident">query_row</span>(<span class="string">&quot;PRAGMA schema_version&quot;</span>, [], <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">unreachable!</span>());
         <span class="kw">match</span> <span class="ident">r</span>.<span class="ident">unwrap_err</span>() {
-            <span class="ident">Error::SqliteFailure</span>(<span class="ident">err</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::SqliteFailure</span>(<span class="ident">err</span>, <span class="kw">_</span>) =&gt; {
                 <span class="macro">assert_eq!</span>(<span class="ident">err</span>.<span class="ident">code</span>, <span class="ident">ErrorCode::DatabaseBusy</span>);
             }
-            <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
+            <span class="ident">err</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
         }
         <span class="ident">tx1</span>.<span class="ident">rollback</span>()
     }
@@ -318,7 +318,7 @@
     <span class="attribute">#[<span class="ident">ignore</span>]</span> <span class="comment">// FIXME: unstable</span>
     <span class="kw">fn</span> <span class="ident">test_busy_handler</span>() {
         <span class="kw">static</span> <span class="ident">CALLED</span>: <span class="ident">AtomicBool</span> <span class="op">=</span> <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>);
-        <span class="kw">fn</span> <span class="ident">busy_handler</span>(<span class="kw">_</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">fn</span> <span class="ident">busy_handler</span>(<span class="kw">_</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
             <span class="ident">CALLED</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::Relaxed</span>);
             <span class="ident">thread::sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>));
             <span class="bool-val">true</span>

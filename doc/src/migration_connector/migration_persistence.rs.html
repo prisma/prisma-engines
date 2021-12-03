@@ -115,7 +115,7 @@
 <span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">MigrationPersistence</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
     <span class="doccomment">/// Initialize the migration persistence without checking the database first.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">baseline_initialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">baseline_initialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// This method is responsible for checking whether the migrations</span>
     <span class="doccomment">/// persistence is initialized.</span>
@@ -123,7 +123,7 @@
     <span class="doccomment">/// If the migration persistence is not present in the target database,</span>
     <span class="doccomment">/// check whether the database schema is empty. If it is, initialize the</span>
     <span class="doccomment">/// migration persistence. If not, return a DatabaseSchemaNotEmpty error.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Implementation in the connector for the core&#39;s MarkMigrationApplied</span>
     <span class="doccomment">/// command. See the docs there. Note that the started_at and finished_at</span>
@@ -131,7 +131,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Connectors should implement mark_migration_applied_impl to avoid doing</span>
     <span class="doccomment">/// the checksuming themselves.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">mark_migration_applied_impl</span>(<span class="ident">migration_name</span>, <span class="kw-2">&amp;</span><span class="ident">checksum::render_checksum</span>(<span class="ident">script</span>))
             .<span class="kw">await</span>
     }
@@ -139,18 +139,18 @@
     <span class="doccomment">/// Implementation in the connector for the core&#39;s MarkMigrationApplied</span>
     <span class="doccomment">/// command. See the docs there. Note that the started_at and finished_at</span>
     <span class="doccomment">/// for the migration should be the same.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">checksum</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">checksum</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Mark the failed instances of the migration in the persistence as rolled</span>
     <span class="doccomment">/// back, so they will be ignored by the engine in the future.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back_by_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back_by_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Record that a migration is about to be applied. Returns the unique</span>
     <span class="doccomment">/// identifier for the migration.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is a default method that computes the checksum. Implementors should</span>
     <span class="doccomment">/// implement record_migration_started_impl.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_migration_started</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_migration_started</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">record_migration_started_impl</span>(<span class="ident">migration_name</span>, <span class="kw-2">&amp;</span><span class="ident">checksum::render_checksum</span>(<span class="ident">script</span>))
             .<span class="kw">await</span>
     }
@@ -160,23 +160,23 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is an implementation detail, consumers should use</span>
     <span class="doccomment">/// `record_migration_started()` instead.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_migration_started_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">checksum</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_migration_started_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">checksum</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Increase the applied_steps_count counter.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_successful_step</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_successful_step</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Report logs for a failed migration step. We assume the next steps in the</span>
     <span class="doccomment">/// migration will not be applied, and the error reported.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_failed_step</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">logs</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_failed_step</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">logs</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Record that the migration completed *successfully*. This means</span>
     <span class="doccomment">/// populating the `finished_at` field in the migration record.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_migration_finished</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">record_migration_finished</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// List all applied migrations, ordered by `started_at`. This should fail</span>
     <span class="doccomment">/// with a PersistenceNotInitializedError when the migration persistence is</span>
     <span class="doccomment">/// not initialized.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_migrations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MigrationRecord</span><span class="op">&gt;</span>, <span class="ident">PersistenceNotInitializedError</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_migrations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MigrationRecord</span><span class="op">&gt;</span>, <span class="ident">PersistenceNotInitializedError</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Error returned when the persistence is not initialized.</span>
@@ -185,7 +185,7 @@
 
 <span class="kw">impl</span> <span class="ident">PersistenceNotInitializedError</span> {
     <span class="doccomment">/// Explicit conversion to a ConnectorError.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_connector_error</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConnectorError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_connector_error</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;Invariant violation: migration persistence is not initialized.&quot;</span>.<span class="ident">into</span>())
     }
 }

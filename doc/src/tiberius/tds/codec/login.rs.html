@@ -340,13 +340,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">FeatureLevel</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::SqlServerN</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FeatureLevel</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">done_row_count_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">done_row_count_bytes</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">if</span> <span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">FeatureLevel::SqlServer2005</span> <span class="kw">as</span> <span class="ident">u8</span> {
             <span class="number">8</span>
         } <span class="kw">else</span> {
@@ -479,7 +479,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LoginMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LoginMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">LoginMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="self">Self</span> {
             <span class="ident">packet_size</span>: <span class="number">4096</span>,
             <span class="ident">option_flags_1</span>: <span class="ident">OptionFlag1::UseDbNotify</span> <span class="op">|</span> <span class="ident">OptionFlag1::InitDbFatal</span>,
@@ -523,7 +523,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LoginMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">Vec::with_capacity</span>(<span class="number">512</span>));
 
         <span class="comment">// Space for the length</span>
@@ -564,7 +564,7 @@
 
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">var_data</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
             <span class="comment">// write the client ID (created from the MAC address)</span>
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="number">9</span> {
+            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">9</span> {
                 <span class="ident">cursor</span>.<span class="ident">write_u32</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>(<span class="number">0</span>)<span class="question-mark">?</span>; <span class="comment">//TODO:</span>
                 <span class="ident">cursor</span>.<span class="ident">write_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>(<span class="number">42</span>)<span class="question-mark">?</span>; <span class="comment">//TODO: generate real client id</span>
                 <span class="kw">continue</span>;
@@ -573,7 +573,7 @@
             <span class="ident">cursor</span>.<span class="ident">write_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>(<span class="ident">data_offset</span> <span class="kw">as</span> <span class="ident">u16</span>)<span class="question-mark">?</span>;
 
             <span class="comment">// ibSSPI</span>
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="number">10</span> {
+            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">10</span> {
                 <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">bytes</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">integrated_security</span> {
                     <span class="kw">let</span> <span class="ident">bak</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">position</span>();
 
@@ -604,7 +604,7 @@
             <span class="kw">let</span> <span class="ident">new_position</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">position</span>() <span class="kw">as</span> <span class="ident">usize</span>;
 
             <span class="comment">// prepare the password in MS-fashion</span>
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="number">2</span> {
+            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">2</span> {
                 <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">get_mut</span>();
                 <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">buffer</span>.<span class="ident">iter_mut</span>().<span class="ident">take</span>(<span class="ident">new_position</span>).<span class="ident">skip</span>(<span class="ident">data_offset</span>) {
                     <span class="kw-2">*</span><span class="ident">byte</span> <span class="op">=</span> ((<span class="kw-2">*</span><span class="ident">byte</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>) <span class="op">&amp;</span> <span class="number">0xf0</span> <span class="op">|</span> (<span class="kw-2">*</span><span class="ident">byte</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>) <span class="op">&amp;</span> <span class="number">0x0f</span>) <span class="op">^</span> <span class="number">0xA5</span>;

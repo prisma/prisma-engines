@@ -220,9 +220,9 @@
 
 <span class="doccomment">/// Return if the expression is a break value.</span>
 <span class="macro">macro_rules!</span> <span class="ident">try_control</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; {
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> {
-            <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">should_break</span>() {
+            <span class="ident">x</span> =&gt; <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">should_break</span>() {
                 <span class="kw">return</span> <span class="ident">x</span>;
             }
         }
@@ -239,12 +239,12 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Control</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">breaking</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Control</span><span class="op">&lt;</span>()<span class="op">&gt;</span> { <span class="ident">Control::Break</span>(()) }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">breaking</span>() -&gt; <span class="ident">Control</span><span class="op">&lt;</span>()<span class="op">&gt;</span> { <span class="ident">Control::Break</span>(()) }
     <span class="doccomment">/// Get the value in `Control::Break(_)`, if present.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">break_value</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">break_value</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Control::Continue</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">Control::Break</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">b</span>),
+            <span class="ident">Control::Continue</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">Control::Break</span>(<span class="ident">b</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">b</span>),
         }
     }
 }
@@ -253,33 +253,33 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The empty return value `()` is equivalent to continue.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ControlFlow</span> {
-    <span class="kw">fn</span> <span class="ident">continuing</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">should_break</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">continuing</span>() -&gt; <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">should_break</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">ControlFlow</span> <span class="kw">for</span> () {
     <span class="kw">fn</span> <span class="ident">continuing</span>() { }
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">should_break</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> { <span class="bool-val">false</span> }
+    <span class="kw">fn</span> <span class="ident">should_break</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">false</span> }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">ControlFlow</span> <span class="kw">for</span> <span class="ident">Control</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">continuing</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="ident">Control::Continue</span> }
-    <span class="kw">fn</span> <span class="ident">should_break</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">continuing</span>() -&gt; <span class="self">Self</span> { <span class="ident">Control::Continue</span> }
+    <span class="kw">fn</span> <span class="ident">should_break</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Control::Break</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> { <span class="bool-val">true</span> } <span class="kw">else</span> { <span class="bool-val">false</span> }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">ControlFlow</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">continuing</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="prelude-val">Ok</span>(()) }
-    <span class="kw">fn</span> <span class="ident">should_break</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">continuing</span>() -&gt; <span class="self">Self</span> { <span class="prelude-val">Ok</span>(()) }
+    <span class="kw">fn</span> <span class="ident">should_break</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">is_err</span>()
     }
 }
 
 <span class="doccomment">/// The default is `Continue`.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Control</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="ident">Control::Continue</span> }
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> { <span class="ident">Control::Continue</span> }
 }
 
 <span class="doccomment">/// A recursive depth first search.</span>
@@ -340,10 +340,10 @@
 <span class="doccomment">/// path.reverse();</span>
 <span class="doccomment">/// assert_eq!(&amp;path, &amp;[n(0), n(2), n(4), n(5)]);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">depth_first_search</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">I</span>, <span class="ident">F</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">starts</span>: <span class="ident">I</span>, <span class="kw-2">mut</span> <span class="ident">visitor</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">depth_first_search</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">I</span>, <span class="ident">F</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">starts</span>: <span class="ident">I</span>, <span class="kw-2">mut</span> <span class="ident">visitor</span>: <span class="ident">F</span>) -&gt; <span class="ident">C</span>
     <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighbors</span> <span class="op">+</span> <span class="ident">Visitable</span>,
           <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">G::NodeId</span><span class="op">&gt;</span>,
-          <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">DfsEvent</span><span class="op">&lt;</span><span class="ident">G::NodeId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>,
+          <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">DfsEvent</span><span class="op">&lt;</span><span class="ident">G::NodeId</span><span class="op">&gt;</span>) -&gt; <span class="ident">C</span>,
           <span class="ident">C</span>: <span class="ident">ControlFlow</span>,
 {
     <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Time</span>(<span class="number">0</span>);
@@ -358,9 +358,9 @@
 
 <span class="kw">fn</span> <span class="ident">dfs_visitor</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">F</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">u</span>: <span class="ident">G::NodeId</span>, <span class="ident">visitor</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">F</span>,
                      <span class="ident">discovered</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G::Map</span>, <span class="ident">finished</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G::Map</span>,
-                     <span class="ident">time</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Time</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>
+                     <span class="ident">time</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Time</span>) -&gt; <span class="ident">C</span>
     <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighbors</span> <span class="op">+</span> <span class="ident">Visitable</span>,
-          <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">DfsEvent</span><span class="op">&lt;</span><span class="ident">G::NodeId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>,
+          <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">DfsEvent</span><span class="op">&lt;</span><span class="ident">G::NodeId</span><span class="op">&gt;</span>) -&gt; <span class="ident">C</span>,
           <span class="ident">C</span>: <span class="ident">ControlFlow</span>,
 {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">discovered</span>.<span class="ident">visit</span>(<span class="ident">u</span>) {
@@ -383,7 +383,7 @@
     <span class="ident">C::continuing</span>()
 }
 
-<span class="kw">fn</span> <span class="ident">time_post_inc</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Time</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Time</span> {
+<span class="kw">fn</span> <span class="ident">time_post_inc</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Time</span>) -&gt; <span class="ident">Time</span> {
     <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">x</span>;
     <span class="ident">x</span>.<span class="number">0</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
     <span class="ident">v</span>

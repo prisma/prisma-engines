@@ -172,7 +172,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_unchecked</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="ident">xs</span>: <span class="kw-2">&amp;</span>[<span class="ident">K</span>], <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">K</span>
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_unchecked</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="ident">xs</span>: <span class="kw-2">&amp;</span>[<span class="ident">K</span>], <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">K</span>
 {
     <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">xs</span>.<span class="ident">len</span>());
     <span class="ident">xs</span>.<span class="ident">get_unchecked</span>(<span class="ident">index</span>)
@@ -182,7 +182,7 @@
     <span class="kw">where</span> <span class="ident">K</span>: <span class="ident">IndexType</span>
 {
     <span class="doccomment">/// Create a new `UnionFind` of `n` disjoint sets.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span>
     {
         <span class="kw">let</span> <span class="ident">rank</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">n</span>];
         <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">n</span>).<span class="ident">map</span>(<span class="ident">K::new</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span>();
@@ -193,7 +193,7 @@
     <span class="doccomment">/// Return the representative for `x`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Panics** if `x` is out of bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">K</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">x</span>: <span class="ident">K</span>) -&gt; <span class="ident">K</span>
     {
         <span class="macro">assert!</span>(<span class="ident">x</span>.<span class="ident">index</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">parent</span>.<span class="ident">len</span>());
         <span class="kw">unsafe</span> {
@@ -201,7 +201,7 @@
             <span class="kw">loop</span> {
                 <span class="comment">// Use unchecked indexing because we can trust the internal set ids.</span>
                 <span class="kw">let</span> <span class="ident">xparent</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">get_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">parent</span>, <span class="ident">x</span>.<span class="ident">index</span>());
-                <span class="kw">if</span> <span class="ident">xparent</span> <span class="op">=</span><span class="op">=</span> <span class="ident">x</span> {
+                <span class="kw">if</span> <span class="ident">xparent</span> <span class="op">==</span> <span class="ident">x</span> {
                     <span class="kw">break</span>
                 }
                 <span class="ident">x</span> <span class="op">=</span> <span class="ident">xparent</span>;
@@ -216,7 +216,7 @@
     <span class="doccomment">/// datastructure in the process and quicken future lookups.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Panics** if `x` is out of bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">K</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">K</span>) -&gt; <span class="ident">K</span>
     {
         <span class="macro">assert!</span>(<span class="ident">x</span>.<span class="ident">index</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">parent</span>.<span class="ident">len</span>());
         <span class="kw">unsafe</span> {
@@ -224,7 +224,7 @@
         }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">find_mut_recursive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">K</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">find_mut_recursive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">K</span>) -&gt; <span class="ident">K</span>
     {
         <span class="kw">let</span> <span class="ident">xparent</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">get_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">parent</span>, <span class="ident">x</span>.<span class="ident">index</span>());
         <span class="kw">if</span> <span class="ident">xparent</span> <span class="op">!</span><span class="op">=</span> <span class="ident">x</span> {
@@ -243,15 +243,15 @@
     <span class="doccomment">/// Return `false` if the sets were already the same, `true` if they were unified.</span>
     <span class="doccomment">/// </span>
     <span class="doccomment">/// **Panics** if `x` or `y` is out of bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">union</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">K</span>, <span class="ident">y</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">union</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">K</span>, <span class="ident">y</span>: <span class="ident">K</span>) -&gt; <span class="ident">bool</span>
     {
-        <span class="kw">if</span> <span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="ident">y</span> {
+        <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">y</span> {
             <span class="kw">return</span> <span class="bool-val">false</span>
         }
         <span class="kw">let</span> <span class="ident">xrep</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_mut</span>(<span class="ident">x</span>);
         <span class="kw">let</span> <span class="ident">yrep</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_mut</span>(<span class="ident">y</span>);
 
-        <span class="kw">if</span> <span class="ident">xrep</span> <span class="op">=</span><span class="op">=</span> <span class="ident">yrep</span> {
+        <span class="kw">if</span> <span class="ident">xrep</span> <span class="op">==</span> <span class="ident">yrep</span> {
             <span class="kw">return</span> <span class="bool-val">false</span>
         }
 
@@ -275,7 +275,7 @@
     }
 
     <span class="doccomment">/// Return a vector mapping each element to its representative.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_labeling</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_labeling</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>
     {
         <span class="comment">// write in the labeling of each element</span>
         <span class="kw">unsafe</span> {

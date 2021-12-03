@@ -137,7 +137,7 @@
 
 <span class="comment">// FIPS 180-4 4.1.1</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">parity</span>(<span class="ident">x</span>: <span class="ident">W32</span>, <span class="ident">y</span>: <span class="ident">W32</span>, <span class="ident">z</span>: <span class="ident">W32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">W32</span> {
+<span class="kw">fn</span> <span class="ident">parity</span>(<span class="ident">x</span>: <span class="ident">W32</span>, <span class="ident">y</span>: <span class="ident">W32</span>, <span class="ident">z</span>: <span class="ident">W32</span>) -&gt; <span class="ident">W32</span> {
     <span class="ident">x</span> <span class="op">^</span> <span class="ident">y</span> <span class="op">^</span> <span class="ident">z</span>
 }
 
@@ -158,7 +158,7 @@
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-<span class="kw">fn</span> <span class="ident">block_data_order_</span>(<span class="kw-2">mut</span> <span class="ident">H</span>: <span class="ident">State</span>, <span class="ident">M</span>: <span class="kw-2">&amp;</span>[[<span class="op">&lt;</span><span class="ident">W32</span> <span class="kw">as</span> <span class="ident">Word</span><span class="op">&gt;</span><span class="ident">::InputBytes</span>; <span class="number">16</span>]]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span> {
+<span class="kw">fn</span> <span class="ident">block_data_order_</span>(<span class="kw-2">mut</span> <span class="ident">H</span>: <span class="ident">State</span>, <span class="ident">M</span>: <span class="kw-2">&amp;</span>[[<span class="op">&lt;</span><span class="ident">W32</span> <span class="kw">as</span> <span class="ident">Word</span><span class="op">&gt;</span><span class="ident">::InputBytes</span>; <span class="number">16</span>]]) -&gt; <span class="ident">State</span> {
     <span class="kw">for</span> <span class="ident">M</span> <span class="kw">in</span> <span class="ident">M</span> {
         <span class="comment">// FIPS 180-4 6.1.2 Step 1</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">W</span>: [<span class="ident">W32</span>; <span class="ident">ROUNDS</span>] <span class="op">=</span> [<span class="ident">W32::ZERO</span>; <span class="ident">ROUNDS</span>];
@@ -203,8 +203,8 @@
     <span class="kw-2">mut</span> <span class="ident">e</span>: <span class="ident">W32</span>,
     <span class="ident">W</span>: [<span class="ident">W32</span>; <span class="number">20</span>],
     <span class="ident">k</span>: <span class="ident">W32</span>,
-    <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">W32</span>, <span class="ident">W32</span>, <span class="ident">W32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">W32</span>,
-) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">W32</span>, <span class="ident">W32</span>, <span class="ident">W32</span>, <span class="ident">W32</span>, <span class="ident">W32</span>) {
+    <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">W32</span>, <span class="ident">W32</span>, <span class="ident">W32</span>) -&gt; <span class="ident">W32</span>,
+) -&gt; (<span class="ident">W32</span>, <span class="ident">W32</span>, <span class="ident">W32</span>, <span class="ident">W32</span>, <span class="ident">W32</span>) {
     <span class="kw">for</span> <span class="ident">W_t</span> <span class="kw">in</span> <span class="ident">W</span>.<span class="ident">iter</span>() {
         <span class="kw">let</span> <span class="ident">T</span> <span class="op">=</span> <span class="ident">rotl</span>(<span class="ident">a</span>, <span class="number">5</span>) <span class="op">+</span> <span class="ident">f</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>) <span class="op">+</span> <span class="ident">e</span> <span class="op">+</span> <span class="ident">k</span> <span class="op">+</span> <span class="ident">W_t</span>;
         <span class="ident">e</span> <span class="op">=</span> <span class="ident">d</span>;
@@ -217,7 +217,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">rotl</span>(<span class="ident">x</span>: <span class="ident">W32</span>, <span class="ident">n</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">W32</span> {
+<span class="kw">fn</span> <span class="ident">rotl</span>(<span class="ident">x</span>: <span class="ident">W32</span>, <span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="ident">W32</span> {
     <span class="ident">Wrapping</span>(<span class="ident">x</span>.<span class="number">0</span>.<span class="ident">rotate_left</span>(<span class="ident">n</span>))
 }
 </code></pre></div>

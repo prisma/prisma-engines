@@ -186,13 +186,13 @@
 <span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ColumnIterator</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">next</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ColumnIterator</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="ident">Box::new</span>(<span class="ident">v</span>.<span class="ident">into_iter</span>()),
         }
@@ -200,15 +200,15 @@
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsRow</span> {
-    <span class="kw">fn</span> <span class="ident">as_row</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">as_row</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsColumns</span> {
-    <span class="kw">fn</span> <span class="ident">as_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnIterator</span>;
+    <span class="kw">fn</span> <span class="ident">as_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnIterator</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">AsColumns</span> <span class="kw">for</span> <span class="ident">ModelProjection</span> {
-    <span class="kw">fn</span> <span class="ident">as_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnIterator</span> {
+    <span class="kw">fn</span> <span class="ident">as_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnIterator</span> {
         <span class="kw">let</span> <span class="ident">cols</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">fields</span>()
             .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_columns</span>())
@@ -220,28 +220,28 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsRow</span> <span class="kw">for</span> <span class="ident">ModelProjection</span> {
-    <span class="kw">fn</span> <span class="ident">as_row</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_row</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cols</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_columns</span>().<span class="ident">collect</span>();
         <span class="ident">Row::from</span>(<span class="ident">cols</span>)
     }
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsColumn</span> {
-    <span class="kw">fn</span> <span class="ident">as_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">as_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">AsColumns</span> <span class="kw">for</span> <span class="ident">Field</span> {
-    <span class="kw">fn</span> <span class="ident">as_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnIterator</span> {
+    <span class="kw">fn</span> <span class="ident">as_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnIterator</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">sf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ColumnIterator::from</span>(<span class="macro">vec!</span>[<span class="ident">sf</span>.<span class="ident">as_column</span>()]),
-            <span class="ident">Field::Relation</span>(<span class="kw-2">ref</span> <span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">rf</span>.<span class="ident">as_columns</span>(),
-            <span class="ident">Field::Composite</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(),
+            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">sf</span>) =&gt; <span class="ident">ColumnIterator::from</span>(<span class="macro">vec!</span>[<span class="ident">sf</span>.<span class="ident">as_column</span>()]),
+            <span class="ident">Field::Relation</span>(<span class="kw-2">ref</span> <span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">as_columns</span>(),
+            <span class="ident">Field::Composite</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">AsColumns</span> <span class="kw">for</span> <span class="ident">RelationField</span> {
-    <span class="kw">fn</span> <span class="ident">as_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnIterator</span> {
+    <span class="kw">fn</span> <span class="ident">as_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnIterator</span> {
         <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>();
         <span class="kw">let</span> <span class="ident">internal_data_model</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">internal_data_model</span>();
 
@@ -277,7 +277,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">AsColumn</span>,
 {
-    <span class="kw">fn</span> <span class="ident">as_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnIterator</span> {
+    <span class="kw">fn</span> <span class="ident">as_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnIterator</span> {
         <span class="kw">let</span> <span class="ident">inner</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_column</span>()).<span class="ident">collect</span>();
         <span class="ident">ColumnIterator::from</span>(<span class="ident">inner</span>)
     }
@@ -287,7 +287,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">AsColumn</span>,
 {
-    <span class="kw">fn</span> <span class="ident">as_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ColumnIterator</span> {
+    <span class="kw">fn</span> <span class="ident">as_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnIterator</span> {
         <span class="kw">let</span> <span class="ident">inner</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_column</span>()).<span class="ident">collect</span>();
         <span class="ident">ColumnIterator::from</span>(<span class="ident">inner</span>)
     }
@@ -297,7 +297,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ScalarField</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">as_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_ref</span>();
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">sf</span>.<span class="ident">internal_data_model</span>().<span class="ident">db_name</span>.<span class="ident">clone</span>();
 
@@ -310,17 +310,17 @@
                 .<span class="ident">as_ref</span>()
                 .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">nt</span><span class="op">|</span> <span class="ident">nt</span>.<span class="ident">args</span>.<span class="ident">first</span>())
                 .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">len</span>.<span class="ident">as_str</span>() {
-                    <span class="string">&quot;max&quot;</span> <span class="op">|</span> <span class="string">&quot;Max&quot;</span> <span class="op">|</span> <span class="string">&quot;MAX&quot;</span> <span class="op">|</span> <span class="string">&quot;MaX&quot;</span> <span class="op">|</span> <span class="string">&quot;mAx&quot;</span> <span class="op">|</span> <span class="string">&quot;maX&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Maximum</span>),
-                    <span class="ident">num</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">map</span>(<span class="ident">TypeDataLength::Constant</span>).<span class="ident">ok</span>(),
+                    <span class="string">&quot;max&quot;</span> <span class="op">|</span> <span class="string">&quot;Max&quot;</span> <span class="op">|</span> <span class="string">&quot;MAX&quot;</span> <span class="op">|</span> <span class="string">&quot;MaX&quot;</span> <span class="op">|</span> <span class="string">&quot;mAx&quot;</span> <span class="op">|</span> <span class="string">&quot;maX&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Maximum</span>),
+                    <span class="ident">num</span> =&gt; <span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">map</span>(<span class="ident">TypeDataLength::Constant</span>).<span class="ident">ok</span>(),
                 })
         };
 
         <span class="kw">let</span> <span class="ident">type_family</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">sf</span>.<span class="ident">type_identifier</span> {
-            <span class="ident">TypeIdentifier::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeFamily::Text</span>(<span class="ident">parse_len</span>(<span class="ident">sf</span>)),
-            <span class="ident">TypeIdentifier::Int</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeFamily::Int</span>,
-            <span class="ident">TypeIdentifier::BigInt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeFamily::Int</span>,
-            <span class="ident">TypeIdentifier::Float</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeFamily::Double</span>,
-            <span class="ident">TypeIdentifier::Decimal</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TypeIdentifier::String</span> =&gt; <span class="ident">TypeFamily::Text</span>(<span class="ident">parse_len</span>(<span class="ident">sf</span>)),
+            <span class="ident">TypeIdentifier::Int</span> =&gt; <span class="ident">TypeFamily::Int</span>,
+            <span class="ident">TypeIdentifier::BigInt</span> =&gt; <span class="ident">TypeFamily::Int</span>,
+            <span class="ident">TypeIdentifier::Float</span> =&gt; <span class="ident">TypeFamily::Double</span>,
+            <span class="ident">TypeIdentifier::Decimal</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">sf</span>
                     .<span class="ident">native_type</span>
                     .<span class="ident">as_ref</span>()
@@ -330,21 +330,21 @@
 
                 <span class="ident">TypeFamily::Decimal</span>(<span class="ident">params</span>)
             }
-            <span class="ident">TypeIdentifier::Boolean</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeFamily::Boolean</span>,
-            <span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeFamily::Text</span>(<span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Constant</span>(<span class="number">8000</span>))),
-            <span class="ident">TypeIdentifier::UUID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeFamily::Uuid</span>,
-            <span class="ident">TypeIdentifier::Json</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeFamily::Text</span>(<span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Maximum</span>)),
-            <span class="ident">TypeIdentifier::Xml</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeFamily::Text</span>(<span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Maximum</span>)),
-            <span class="ident">TypeIdentifier::DateTime</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeFamily::DateTime</span>,
-            <span class="ident">TypeIdentifier::Bytes</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeFamily::Text</span>(<span class="ident">parse_len</span>(<span class="ident">sf</span>)),
-            <span class="ident">TypeIdentifier::Unsupported</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),
+            <span class="ident">TypeIdentifier::Boolean</span> =&gt; <span class="ident">TypeFamily::Boolean</span>,
+            <span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>) =&gt; <span class="ident">TypeFamily::Text</span>(<span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Constant</span>(<span class="number">8000</span>))),
+            <span class="ident">TypeIdentifier::UUID</span> =&gt; <span class="ident">TypeFamily::Uuid</span>,
+            <span class="ident">TypeIdentifier::Json</span> =&gt; <span class="ident">TypeFamily::Text</span>(<span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Maximum</span>)),
+            <span class="ident">TypeIdentifier::Xml</span> =&gt; <span class="ident">TypeFamily::Text</span>(<span class="prelude-val">Some</span>(<span class="ident">TypeDataLength::Maximum</span>)),
+            <span class="ident">TypeIdentifier::DateTime</span> =&gt; <span class="ident">TypeFamily::DateTime</span>,
+            <span class="ident">TypeIdentifier::Bytes</span> =&gt; <span class="ident">TypeFamily::Text</span>(<span class="ident">parse_len</span>(<span class="ident">sf</span>)),
+            <span class="ident">TypeIdentifier::Unsupported</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),
         };
 
         <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">Column::from</span>(((<span class="ident">db</span>, <span class="ident">table</span>), <span class="ident">col</span>)).<span class="ident">type_family</span>(<span class="ident">type_family</span>);
 
         <span class="kw">match</span> <span class="ident">sf</span>.<span class="ident">default_value</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">get</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">default</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">column</span>.<span class="ident">default</span>(<span class="ident">sf</span>.<span class="ident">value</span>(<span class="ident">default</span>)),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">column</span>.<span class="ident">default</span>(<span class="ident">quaint::ast::DefaultValue::Generated</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">default</span>) =&gt; <span class="ident">column</span>.<span class="ident">default</span>(<span class="ident">sf</span>.<span class="ident">value</span>(<span class="ident">default</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">column</span>.<span class="ident">default</span>(<span class="ident">quaint::ast::DefaultValue::Generated</span>),
         }
     }
 }

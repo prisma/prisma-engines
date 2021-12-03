@@ -827,7 +827,7 @@
 
 <span class="kw">impl</span> <span class="ident">ResolverConfig</span> {
     <span class="doccomment">/// Creates a new empty configuration</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
@@ -841,7 +841,7 @@
     <span class="doccomment">/// Please see Google&#39;s [privacy statement](https://developers.google.com/speed/public-dns/privacy) for important information about what they track, many ISP&#39;s track similar information in DNS. To use the system configuration see: `Resolver::from_system_conf` and `AsyncResolver::from_system_conf`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">google</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">google</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
@@ -855,7 +855,7 @@
     <span class="doccomment">/// Please see: https://www.cloudflare.com/dns/</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
@@ -870,7 +870,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare_tls</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare_tls</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
@@ -885,7 +885,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare_https</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare_https</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
@@ -899,7 +899,7 @@
     <span class="doccomment">/// Please see: https://www.quad9.net/faq/</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
@@ -914,7 +914,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9_tls</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9_tls</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
@@ -929,7 +929,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// NameServerConfigGroups can be combined to use a set of different providers, see `NameServerConfigGroup` and `ResolverConfig::from_parts`</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9_https</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9_https</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig</span> {
             <span class="comment">// TODO: this should get the hostname and use the basename as the default</span>
             <span class="ident">domain</span>: <span class="prelude-val">None</span>,
@@ -949,7 +949,7 @@
         <span class="ident">domain</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>,
         <span class="ident">search</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>,
         <span class="ident">name_servers</span>: <span class="ident">G</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig</span> {
             <span class="ident">domain</span>,
             <span class="ident">search</span>,
@@ -960,7 +960,7 @@
     <span class="doccomment">/// Returns the local domain</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// By default any names will be appended to all non-fully-qualified-domain names, and searched for after any ndots rules</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Name</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">domain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Name</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">domain</span>.<span class="ident">as_ref</span>()
     }
 
@@ -973,7 +973,7 @@
     <span class="doccomment">/// Returns the search domains</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// These will be queried after any local domain and then in the order of the set of search domains</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">search</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">Name</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">search</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Name</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">search</span>
     }
 
@@ -989,13 +989,13 @@
     }
 
     <span class="doccomment">/// Returns a reference to the name servers</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_servers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">NameServerConfig</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_servers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">NameServerConfig</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name_servers</span>
     }
 
     <span class="doccomment">/// return the associated TlsClientConfig</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_config</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TlsClientConfig</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_config</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TlsClientConfig</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name_servers</span>.<span class="number">1</span>
     }
 
@@ -1030,7 +1030,7 @@
     <span class="doccomment">/// Creates a default configuration, using `8.8.8.8`, `8.8.4.4` and `2001:4860:4860::8888`, `2001:4860:4860::8844` (thank you, Google).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see Google&#39;s [privacy statement](https://developers.google.com/speed/public-dns/privacy) for important information about what they track, many ISP&#39;s track similar information in DNS. To use the system configuration see: `Resolver::from_system_conf` and `AsyncResolver::from_system_conf`</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverConfig::google</span>()
     }
 }
@@ -1059,16 +1059,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Protocol</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">protocol</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Protocol::Udp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;udp&quot;</span>,
-            <span class="ident">Protocol::Tcp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;tcp&quot;</span>,
+            <span class="ident">Protocol::Udp</span> =&gt; <span class="string">&quot;udp&quot;</span>,
+            <span class="ident">Protocol::Tcp</span> =&gt; <span class="string">&quot;tcp&quot;</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
-            <span class="ident">Protocol::Tls</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;tls&quot;</span>,
+            <span class="ident">Protocol::Tls</span> =&gt; <span class="string">&quot;tls&quot;</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
-            <span class="ident">Protocol::Https</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;https&quot;</span>,
+            <span class="ident">Protocol::Https</span> =&gt; <span class="string">&quot;https&quot;</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-            <span class="ident">Protocol::Mdns</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;mdns&quot;</span>,
+            <span class="ident">Protocol::Mdns</span> =&gt; <span class="string">&quot;mdns&quot;</span>,
         };
 
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">protocol</span>)
@@ -1077,42 +1077,42 @@
 
 <span class="kw">impl</span> <span class="ident">Protocol</span> {
     <span class="doccomment">/// Returns true if this is a datagram oriented protocol, e.g. UDP</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_datagram</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_datagram</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Protocol::Udp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">Protocol::Tcp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Protocol::Udp</span> =&gt; <span class="bool-val">true</span>,
+            <span class="ident">Protocol::Tcp</span> =&gt; <span class="bool-val">false</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
-            <span class="ident">Protocol::Tls</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Protocol::Tls</span> =&gt; <span class="bool-val">false</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
-            <span class="ident">Protocol::Https</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Protocol::Https</span> =&gt; <span class="bool-val">false</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-            <span class="ident">Protocol::Mdns</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">Protocol::Mdns</span> =&gt; <span class="bool-val">true</span>,
         }
     }
 
     <span class="doccomment">/// Returns true if this is a stream oriented protocol, e.g. TCP</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_stream</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_stream</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">is_datagram</span>()
     }
 
     <span class="doccomment">/// Is this an encrypted protocol, i.e. TLS or HTTPS</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_encrypted</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_encrypted</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Protocol::Udp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">Protocol::Tcp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Protocol::Udp</span> =&gt; <span class="bool-val">false</span>,
+            <span class="ident">Protocol::Tcp</span> =&gt; <span class="bool-val">false</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
-            <span class="ident">Protocol::Tls</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">Protocol::Tls</span> =&gt; <span class="bool-val">true</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
-            <span class="ident">Protocol::Https</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">Protocol::Https</span> =&gt; <span class="bool-val">true</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-            <span class="ident">Protocol::Mdns</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Protocol::Mdns</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Protocol</span> {
     <span class="doccomment">/// Default protocol should be UDP, which is supported by all DNS servers</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Protocol::Udp</span>
     }
 }
@@ -1125,7 +1125,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">std::cmp::PartialEq</span> <span class="kw">for</span> <span class="ident">TlsClientConfig</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">Arc::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="number">0</span>)
     }
 }
@@ -1135,7 +1135,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">TlsClientConfig</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;rustls client config&quot;</span>)
     }
 }
@@ -1165,7 +1165,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">NameServerConfig</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}:&quot;</span>, <span class="self">self</span>.<span class="ident">protocol</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">tls_dns_name</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">tls_dns_name</span> {
@@ -1189,7 +1189,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>))]</span>
 <span class="kw">impl</span> <span class="ident">SerializeT</span> <span class="kw">for</span> <span class="ident">NameServerConfigGroup</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Serializer</span>,
     {
@@ -1199,7 +1199,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">DeserializeT</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NameServerConfigGroup</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1209,14 +1209,14 @@
 
 <span class="kw">impl</span> <span class="ident">NameServerConfigGroup</span> {
     <span class="doccomment">/// Creates a new `NameServerConfigGroup` with a default size of 2</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="comment">// this might be a nice opportunity for SmallVec</span>
         <span class="comment">//   most name_server configs will be 2.</span>
         <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="number">2</span>)
     }
 
     <span class="doccomment">/// Creates a new `NameServiceConfigGroup` with the specified capacity</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">NameServerConfigGroup</span>(
             <span class="ident">Vec::with_capacity</span>(<span class="ident">capacity</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
@@ -1227,7 +1227,7 @@
     <span class="doccomment">/// Configure a NameServer address and port</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will create UDP and TCP connections, using the same port.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ips_clear</span>(<span class="ident">ips</span>: <span class="kw-2">&amp;</span>[<span class="ident">IpAddr</span>], <span class="ident">port</span>: <span class="ident">u16</span>, <span class="ident">trust_nx_responses</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ips_clear</span>(<span class="ident">ips</span>: <span class="kw-2">&amp;</span>[<span class="ident">IpAddr</span>], <span class="ident">port</span>: <span class="ident">u16</span>, <span class="ident">trust_nx_responses</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name_servers</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="ident">ips</span>.<span class="ident">len</span>());
 
         <span class="kw">for</span> <span class="ident">ip</span> <span class="kw">in</span> <span class="ident">ips</span> {
@@ -1262,7 +1262,7 @@
         <span class="ident">tls_dns_name</span>: <span class="ident">String</span>,
         <span class="ident">protocol</span>: <span class="ident">Protocol</span>,
         <span class="ident">trust_nx_responses</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(<span class="ident">protocol</span>.<span class="ident">is_encrypted</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name_servers</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="ident">ips</span>.<span class="ident">len</span>());
@@ -1292,7 +1292,7 @@
         <span class="ident">port</span>: <span class="ident">u16</span>,
         <span class="ident">tls_dns_name</span>: <span class="ident">String</span>,
         <span class="ident">trust_nx_responses</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_encrypted</span>(<span class="ident">ips</span>, <span class="ident">port</span>, <span class="ident">tls_dns_name</span>, <span class="ident">Protocol::Tls</span>, <span class="ident">trust_nx_responses</span>)
     }
 
@@ -1305,14 +1305,14 @@
         <span class="ident">port</span>: <span class="ident">u16</span>,
         <span class="ident">tls_dns_name</span>: <span class="ident">String</span>,
         <span class="ident">trust_nx_responses</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_encrypted</span>(<span class="ident">ips</span>, <span class="ident">port</span>, <span class="ident">tls_dns_name</span>, <span class="ident">Protocol::Https</span>, <span class="ident">trust_nx_responses</span>)
     }
 
     <span class="doccomment">/// Creates a default configuration, using `8.8.8.8`, `8.8.4.4` and `2001:4860:4860::8888`, `2001:4860:4860::8844` (thank you, Google).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see Google&#39;s [privacy statement](https://developers.google.com/speed/public-dns/privacy) for important information about what they track, many ISP&#39;s track similar information in DNS. To use the system configuration see: `Resolver::from_system_conf` and `AsyncResolver::from_system_conf`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">google</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">google</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_clear</span>(<span class="ident">GOOGLE_IPS</span>, <span class="number">53</span>, <span class="bool-val">true</span>)
     }
 
@@ -1320,14 +1320,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see Google&#39;s [privacy statement](https://developers.google.com/speed/public-dns/privacy) for important information about what they track, many ISP&#39;s track similar information in DNS. To use the system configuration see: `Resolver::from_system_conf` and `AsyncResolver::from_system_conf`</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">google_https</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">google_https</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_https</span>(<span class="ident">GOOGLE_IPS</span>, <span class="number">53</span>, <span class="string">&quot;dns.google&quot;</span>.<span class="ident">to_string</span>(), <span class="bool-val">true</span>)
     }
 
     <span class="doccomment">/// Creates a default configuration, using `1.1.1.1`, `1.0.0.1` and `2606:4700:4700::1111`, `2606:4700:4700::1001` (thank you, Cloudflare).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see: https://www.cloudflare.com/dns/</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_clear</span>(<span class="ident">CLOUDFLARE_IPS</span>, <span class="number">53</span>, <span class="bool-val">true</span>)
     }
 
@@ -1335,7 +1335,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see: https://www.cloudflare.com/dns/</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare_tls</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare_tls</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_tls</span>(<span class="ident">CLOUDFLARE_IPS</span>, <span class="number">853</span>, <span class="string">&quot;cloudflare-dns.com&quot;</span>.<span class="ident">to_string</span>(), <span class="bool-val">true</span>)
     }
 
@@ -1343,14 +1343,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see: https://www.cloudflare.com/dns/</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare_https</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cloudflare_https</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_https</span>(<span class="ident">CLOUDFLARE_IPS</span>, <span class="number">443</span>, <span class="string">&quot;cloudflare-dns.com&quot;</span>.<span class="ident">to_string</span>(), <span class="bool-val">true</span>)
     }
 
     <span class="doccomment">/// Creates a configuration, using `9.9.9.9`, `149.112.112.112` and `2620:fe::fe`, `2620:fe::fe:9`, the &quot;secure&quot; variants of the quad9 settings (thank you, Quad9).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see: https://www.quad9.net/faq/</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_clear</span>(<span class="ident">QUAD9_IPS</span>, <span class="number">53</span>, <span class="bool-val">true</span>)
     }
 
@@ -1358,7 +1358,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see: https://www.quad9.net/faq/</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-tls&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9_tls</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9_tls</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_tls</span>(<span class="ident">QUAD9_IPS</span>, <span class="number">853</span>, <span class="string">&quot;dns.quad9.net&quot;</span>.<span class="ident">to_string</span>(), <span class="bool-val">true</span>)
     }
 
@@ -1366,7 +1366,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Please see: https://www.quad9.net/faq/</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9_https</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quad9_https</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_ips_https</span>(<span class="ident">QUAD9_IPS</span>, <span class="number">443</span>, <span class="string">&quot;dns.quad9.net&quot;</span>.<span class="ident">to_string</span>(), <span class="bool-val">true</span>)
     }
 
@@ -1397,32 +1397,32 @@
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
     <span class="doccomment">/// add a [`rustls::ClientConfig`]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_client_config</span>(<span class="self">self</span>, <span class="ident">client_config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_client_config</span>(<span class="self">self</span>, <span class="ident">client_config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="ident">TlsClientConfig</span>(<span class="ident">client_config</span>)))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">NameServerConfigGroup</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">NameServerConfigGroup</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NameServerConfig</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">NameServerConfigGroup</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NameServerConfig</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NameServerConfigGroup</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">configs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NameServerConfig</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">configs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NameServerConfig</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>))]</span>
         {
             <span class="ident">NameServerConfigGroup</span>(<span class="ident">configs</span>)
@@ -1452,7 +1452,7 @@
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">LookupIpStrategy</span> {
     <span class="doccomment">/// Returns [`LookupIpStrategy::Ipv4thenIpv6`] as the default.</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">LookupIpStrategy::Ipv4thenIpv6</span>
     }
 }
@@ -1527,7 +1527,7 @@
     <span class="doccomment">/// Default values for the Resolver configuration.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This follows the resolv.conf defaults as defined in the [Linux man pages](http://man7.org/linux/man-pages/man5/resolv.conf.5.html)</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ResolverOpts</span> {
             <span class="ident">ndots</span>: <span class="number">1</span>,
             <span class="ident">timeout</span>: <span class="ident">Duration::from_secs</span>(<span class="number">5</span>),

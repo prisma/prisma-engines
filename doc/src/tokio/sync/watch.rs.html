@@ -845,7 +845,7 @@
     <span class="comment">// ===== impl SendError =====</span>
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
             <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;channel closed&quot;</span>)
         }
     }
@@ -859,7 +859,7 @@
     <span class="comment">// ===== impl RecvError =====</span>
 
     <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RecvError</span> {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
             <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;channel closed&quot;</span>)
         }
     }
@@ -892,32 +892,32 @@
 
     <span class="kw">impl</span> <span class="ident">Version</span> {
         <span class="doccomment">/// Get the initial version when creating the channel.</span>
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">initial</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">initial</span>() -&gt; <span class="self">Self</span> {
             <span class="ident">Version</span>(<span class="number">0</span>)
         }
     }
 
     <span class="kw">impl</span> <span class="ident">StateSnapshot</span> {
         <span class="doccomment">/// Extract the version from the state.</span>
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">version</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Version</span> {
+        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">version</span>(<span class="self">self</span>) -&gt; <span class="ident">Version</span> {
             <span class="ident">Version</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">CLOSED</span>)
         }
 
         <span class="doccomment">/// Is the closed bit set?</span>
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-            (<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">CLOSED</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">CLOSED</span>
+        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+            (<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">CLOSED</span>) <span class="op">==</span> <span class="ident">CLOSED</span>
         }
     }
 
     <span class="kw">impl</span> <span class="ident">AtomicState</span> {
         <span class="doccomment">/// Create a new `AtomicState` that is not closed and which has the</span>
         <span class="doccomment">/// version set to `Version::initial()`.</span>
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
             <span class="ident">AtomicState</span>(<span class="ident">AtomicUsize::new</span>(<span class="number">0</span>))
         }
 
         <span class="doccomment">/// Load the current value of the state.</span>
-        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StateSnapshot</span> {
+        <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StateSnapshot</span> {
             <span class="ident">StateSnapshot</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>))
         }
 
@@ -961,7 +961,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Sender`]: struct@Sender</span>
 <span class="doccomment">/// [`Receiver`]: struct@Receiver</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">init</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">init</span>: <span class="ident">T</span>) -&gt; (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Shared</span> {
         <span class="ident">value</span>: <span class="ident">RwLock::new</span>(<span class="ident">init</span>),
         <span class="ident">state</span>: <span class="ident">AtomicState::new</span>(),
@@ -983,7 +983,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">version</span>: <span class="ident">Version</span>, <span class="ident">shared</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">version</span>: <span class="ident">Version</span>, <span class="ident">shared</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="comment">// No synchronization necessary as this is only used as a counter and</span>
         <span class="comment">// not memory access.</span>
         <span class="ident">shared</span>.<span class="ident">ref_count_rx</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Relaxed</span>);
@@ -1011,7 +1011,7 @@
     <span class="doccomment">/// let (_, rx) = watch::channel(&quot;hello&quot;);</span>
     <span class="doccomment">/// assert_eq!(*rx.borrow(), &quot;hello&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">value</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>();
         <span class="ident">Ref</span> { <span class="ident">inner</span> }
     }
@@ -1028,7 +1028,7 @@
     <span class="doccomment">/// as short lived as possible.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`changed`]: Receiver::changed</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">borrow_and_update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">borrow_and_update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">value</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>();
         <span class="self">self</span>.<span class="ident">version</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">state</span>.<span class="ident">load</span>().<span class="ident">version</span>();
         <span class="ident">Ref</span> { <span class="ident">inner</span> }
@@ -1073,7 +1073,7 @@
     <span class="doccomment">///     assert!(rx.changed().await.is_err());</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">changed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::RecvError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">changed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::RecvError</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="comment">// In order to avoid a race condition, we first request a notification,</span>
             <span class="comment">// **then** check the current value&#39;s version. If a new version exists,</span>
@@ -1090,7 +1090,7 @@
     }
 
     <span class="macro">cfg_process_driver!</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_has_changed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::RecvError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_has_changed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::RecvError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
             <span class="ident">maybe_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">version</span>)
         }
     }
@@ -1099,7 +1099,7 @@
 <span class="kw">fn</span> <span class="ident">maybe_changed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
     <span class="ident">shared</span>: <span class="kw-2">&amp;</span><span class="ident">Shared</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">version</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Version</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::RecvError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::RecvError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="comment">// Load the version from the state</span>
     <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">shared</span>.<span class="ident">state</span>.<span class="ident">load</span>();
     <span class="kw">let</span> <span class="ident">new_version</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">version</span>();
@@ -1119,7 +1119,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">version</span>;
         <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">clone</span>();
 
@@ -1131,7 +1131,7 @@
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="comment">// No synchronization necessary as this is only used as a counter and</span>
         <span class="comment">// not memory access.</span>
-        <span class="kw">if</span> <span class="number">1</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">ref_count_rx</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Relaxed</span>) {
+        <span class="kw">if</span> <span class="number">1</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">ref_count_rx</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Relaxed</span>) {
             <span class="comment">// This is the last `Receiver` handle, tasks waiting on `Sender::closed()`</span>
             <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">notify_tx</span>.<span class="ident">notify_waiters</span>();
         }
@@ -1143,9 +1143,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method fails if the channel has been closed, which happens when</span>
     <span class="doccomment">/// every receiver has been dropped.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::SendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::SendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// This is pretty much only useful as a hint anyway, so synchronization isn&#39;t critical.</span>
-        <span class="kw">if</span> <span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">receiver_count</span>() {
+        <span class="kw">if</span> <span class="number">0</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">receiver_count</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::SendError</span>(<span class="ident">value</span>));
         }
 
@@ -1184,7 +1184,7 @@
     <span class="doccomment">/// let (tx, _) = watch::channel(&quot;hello&quot;);</span>
     <span class="doccomment">/// assert_eq!(*tx.borrow(), &quot;hello&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">value</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>();
         <span class="ident">Ref</span> { <span class="ident">inner</span> }
     }
@@ -1201,8 +1201,8 @@
     <span class="doccomment">/// drop(rx);</span>
     <span class="doccomment">/// assert!(tx.is_closed());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">receiver_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">receiver_count</span>() <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Completes when all receivers have dropped.</span>
@@ -1238,7 +1238,7 @@
         <span class="kw">while</span> <span class="self">self</span>.<span class="ident">receiver_count</span>() <span class="op">&gt;</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="ident">notified</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">notify_tx</span>.<span class="ident">notified</span>();
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">receiver_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">receiver_count</span>() <span class="op">==</span> <span class="number">0</span> {
                 <span class="kw">return</span>;
             }
 
@@ -1303,7 +1303,7 @@
     <span class="doccomment">///     assert_eq!(100, *rx.borrow());</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subscribe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subscribe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">shared</span>.<span class="ident">state</span>.<span class="ident">load</span>().<span class="ident">version</span>();
 
@@ -1330,7 +1330,7 @@
     <span class="doccomment">///     assert_eq!(2, tx.receiver_count());</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receiver_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receiver_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">ref_count_rx</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>)
     }
 }
@@ -1347,7 +1347,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ops::Deref</span> <span class="kw">for</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">deref</span>()
     }
 }

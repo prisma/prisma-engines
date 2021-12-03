@@ -450,13 +450,6 @@
 <span id="450">450</span>
 <span id="451">451</span>
 <span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module contains convenience functions to easily traverse a Datamodel tree.</span>
 <span class="doccomment">//! The most prominent functionality is the pain free navigation of relations.</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -470,18 +463,18 @@
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 
 <span class="doccomment">/// Iterator over all the models in the schema.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_models</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_models</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
     (<span class="number">0</span>..<span class="ident">datamodel</span>.<span class="ident">models</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">model_idx</span><span class="op">|</span> <span class="ident">ModelWalker</span> { <span class="ident">datamodel</span>, <span class="ident">model_idx</span> })
 }
 
 <span class="doccomment">/// Iterator to walk all the scalar fields in the schema, associating them with their parent model.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_scalar_fields</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_scalar_fields</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
     <span class="ident">walk_models</span>(<span class="ident">datamodel</span>).<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>())
 }
 
 <span class="doccomment">/// Iterator over all the relations in the schema. Each relation will only occur</span>
 <span class="doccomment">/// once.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_relations</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_relations</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">walk_models</span>(<span class="ident">datamodel</span>)
         .<span class="ident">flat_map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">relation_fields</span>())
         .<span class="ident">unique_by</span>(<span class="op">|</span><span class="ident">walker</span><span class="op">|</span> <span class="ident">walker</span>.<span class="ident">relation_name</span>())
@@ -496,12 +489,12 @@
 }
 
 <span class="doccomment">/// Find the model mapping to the passed in database name.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_model_by_db_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Datamodel</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_model_by_db_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Datamodel</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">datamodel</span>
         .<span class="ident">models</span>
         .<span class="ident">iter</span>()
         .<span class="ident">enumerate</span>()
-        .<span class="ident">find</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">model</span>)<span class="op">|</span> <span class="ident">model</span>.<span class="ident">database_name</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">db_name</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">db_name</span>)
+        .<span class="ident">find</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">model</span>)<span class="op">|</span> <span class="ident">model</span>.<span class="ident">database_name</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">db_name</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">db_name</span>)
         .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">model_idx</span>, <span class="ident">_model</span>)<span class="op">|</span> <span class="ident">ModelWalker</span> { <span class="ident">datamodel</span>, <span class="ident">model_idx</span> })
 }
 
@@ -512,24 +505,24 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">database_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get</span>().<span class="ident">name</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">final_database_name</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Model</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Model</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">datamodel</span>.<span class="ident">models</span>[<span class="self">self</span>.<span class="ident">model_idx</span>]
     }
 
     <span class="doccomment">/// Return the position of the scalar field with the provided name, if any.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_of_scalar_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">scalar_fields</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_of_scalar_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">scalar_fields</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
         <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">datamodel</span>;
         <span class="kw">let</span> <span class="ident">model_idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model_idx</span>;
 
@@ -545,7 +538,7 @@
             })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
         <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">datamodel</span>;
         <span class="kw">let</span> <span class="ident">model_idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model_idx</span>;
 
@@ -561,19 +554,19 @@
             })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_scalar_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">scalar_fields</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_scalar_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">scalar_fields</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indexes</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">IndexDefinition</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;b</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indexes</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">IndexDefinition</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;b</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">indices</span>.<span class="ident">iter</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get</span>().<span class="ident">name</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
         <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
         <span class="kw">let</span> <span class="ident">model_idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model_idx</span>;
         <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">datamodel</span>;
@@ -594,16 +587,12 @@
         <span class="ident">x</span>.<span class="ident">into_iter</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_indexes</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;b</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_indexes</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;b</span> {
         <span class="self">self</span>.<span class="ident">get</span>()
             .<span class="ident">indices</span>
             .<span class="ident">iter</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">index</span>.<span class="ident">is_unique</span>())
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">IndexWalker</span> {
-                <span class="ident">model</span>: <span class="kw-2">*</span><span class="self">self</span>,
-                <span class="ident">index</span>,
-                <span class="ident">datamodel</span>: <span class="self">self</span>.<span class="ident">datamodel</span>,
-            })
+            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">IndexWalker</span> { <span class="ident">model</span>: <span class="kw-2">*</span><span class="self">self</span>, <span class="ident">index</span> })
     }
 }
 
@@ -615,50 +604,49 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldArity</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FieldArity</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">arity</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">final_database_name</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DefaultValue</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DefaultValue</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">default_value</span>.<span class="ident">as_ref</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get</span>().<span class="ident">field_type</span> {
-            <span class="ident">FieldType::Enum</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeWalker::Enum</span>(<span class="ident">EnumWalker</span> {
-                <span class="ident">datamodel</span>: <span class="self">self</span>.<span class="ident">datamodel</span>,
+            <span class="ident">FieldType::Enum</span>(<span class="ident">name</span>) =&gt; <span class="ident">TypeWalker::Enum</span>(<span class="ident">EnumWalker</span> {
                 <span class="ident">r#enum</span>: <span class="self">self</span>.<span class="ident">datamodel</span>.<span class="ident">find_enum</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>(),
             }),
-            <span class="ident">FieldType::CompositeType</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeWalker::Base</span>(<span class="ident">ScalarType::Json</span>), <span class="comment">// only used by the ME, will be gone soon</span>
-            <span class="ident">FieldType::Scalar</span>(<span class="ident">scalar_type</span>, <span class="kw">_</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeWalker::Base</span>(<span class="kw-2">*</span><span class="ident">scalar_type</span>),
-            <span class="ident">FieldType::Scalar</span>(<span class="ident">scalar_type</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">nt</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeWalker::NativeType</span>(<span class="kw-2">*</span><span class="ident">scalar_type</span>, <span class="ident">nt</span>),
-            <span class="ident">FieldType::Unsupported</span>(<span class="ident">description</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TypeWalker::Unsupported</span>(<span class="ident">description</span>.<span class="ident">clone</span>()),
-            <span class="ident">FieldType::Relation</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;FieldType::Relation in ScalarFieldWalker&quot;</span>),
+            <span class="ident">FieldType::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="ident">TypeWalker::Base</span>(<span class="ident">ScalarType::Json</span>), <span class="comment">// only used by the ME, will be gone soon</span>
+            <span class="ident">FieldType::Scalar</span>(<span class="ident">scalar_type</span>, <span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">TypeWalker::Base</span>(<span class="kw-2">*</span><span class="ident">scalar_type</span>),
+            <span class="ident">FieldType::Scalar</span>(<span class="ident">scalar_type</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">nt</span>)) =&gt; <span class="ident">TypeWalker::NativeType</span>(<span class="kw-2">*</span><span class="ident">scalar_type</span>, <span class="ident">nt</span>),
+            <span class="ident">FieldType::Unsupported</span>(<span class="ident">description</span>) =&gt; <span class="ident">TypeWalker::Unsupported</span>(<span class="ident">description</span>.<span class="ident">clone</span>()),
+            <span class="ident">FieldType::Relation</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;FieldType::Relation in ScalarFieldWalker&quot;</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ScalarField</span> {
+    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ScalarField</span> {
         <span class="self">self</span>.<span class="ident">datamodel</span>.<span class="ident">models</span>[<span class="self">self</span>.<span class="ident">model_idx</span>].<span class="ident">fields</span>[<span class="self">self</span>.<span class="ident">field_idx</span>]
             .<span class="ident">as_scalar_field</span>()
             .<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">is_required</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">ModelWalker</span> {
             <span class="ident">model_idx</span>: <span class="self">self</span>.<span class="ident">model_idx</span>,
             <span class="ident">datamodel</span>: <span class="self">self</span>.<span class="ident">datamodel</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get</span>().<span class="ident">name</span>
     }
 }
@@ -672,18 +660,18 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TypeWalker::Enum</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">r</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">TypeWalker::Enum</span>(<span class="ident">r</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">r</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_int</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_int</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">TypeWalker::Base</span>(<span class="ident">ScalarType::Int</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">TypeWalker::Base</span>(<span class="ident">ScalarType::Json</span>))
     }
 }
@@ -696,11 +684,11 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldArity</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FieldArity</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">arity</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_arities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">FieldArity</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_arities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">FieldArity</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>
             .<span class="ident">get</span>()
             .<span class="ident">relation_info</span>
@@ -714,28 +702,28 @@
             })
     }
 
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span> {
+    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span> {
         <span class="self">self</span>.<span class="ident">datamodel</span>.<span class="ident">models</span>[<span class="self">self</span>.<span class="ident">model_idx</span>].<span class="ident">fields</span>[<span class="self">self</span>.<span class="ident">field_idx</span>]
             .<span class="ident">as_relation_field</span>()
             .<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_one_to_one</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_one_to_one</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">is_singular</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">opposite_side</span>().<span class="ident">get</span>().<span class="ident">is_singular</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_virtual</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_virtual</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">ModelWalker</span> {
             <span class="ident">datamodel</span>: <span class="self">self</span>.<span class="ident">datamodel</span>,
             <span class="ident">model_idx</span>: <span class="self">self</span>.<span class="ident">model_idx</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opposite_side</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opposite_side</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">RelationFieldWalker</span> {
             <span class="ident">datamodel</span>: <span class="self">self</span>.<span class="ident">datamodel</span>,
             <span class="ident">model_idx</span>: <span class="self">self</span>.<span class="ident">referenced_model</span>().<span class="ident">model_idx</span>,
@@ -743,7 +731,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referencing_columns</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;b</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referencing_columns</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;b</span> {
         <span class="self">self</span>
             .<span class="ident">get</span>()
             .<span class="ident">relation_info</span>
@@ -757,7 +745,7 @@
             })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_columns</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;b</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_columns</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;b</span> {
         <span class="self">self</span>
             .<span class="ident">get</span>()
             .<span class="ident">relation_info</span>
@@ -772,18 +760,18 @@
             })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">relation_info</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">ModelWalker</span> {
             <span class="ident">datamodel</span>: <span class="self">self</span>.<span class="ident">datamodel</span>,
             <span class="ident">model_idx</span>: <span class="self">self</span>
                 .<span class="ident">datamodel</span>
                 .<span class="ident">models</span>
                 .<span class="ident">iter</span>()
-                .<span class="ident">position</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">relation_info</span>.<span class="ident">to</span>)
+                .<span class="ident">position</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">relation_info</span>.<span class="ident">to</span>)
                 .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                     <span class="macro">panic!</span>(
                         <span class="string">&quot;Invariant violation: could not find model {} referenced in relation info.&quot;</span>,
@@ -792,23 +780,23 @@
                 }),
         }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">relation_info</span>.<span class="ident">fk_name</span>.<span class="ident">clone</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_update_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_update_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">relation_info</span>.<span class="ident">on_update</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_delete_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_delete_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">relation_info</span>.<span class="ident">on_delete</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_on_update_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReferentialAction</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_on_update_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialAction</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">default_on_update_action</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_on_delete_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReferentialAction</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_on_delete_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialAction</span> {
         <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">default_on_delete_action</span>()
     }
 }
@@ -816,16 +804,15 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="ident">r#enum</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Enum</span>,
-    <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Datamodel</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">r#enum</span>.<span class="ident">final_database_name</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">EnumValue</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">r#enum</span>.<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">EnumValue</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">r#enum</span>.<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
     }
 }
 
@@ -833,20 +820,19 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">IndexDefinition</span>,
     <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Datamodel</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;b</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;b</span> {
         <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
             <span class="self">self</span>.<span class="ident">model</span>
                 .<span class="ident">scalar_fields</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())
+                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())
                 .<span class="ident">expect</span>(<span class="string">&quot;index on unknown model field&quot;</span>)
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unique</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unique</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">is_unique</span>()
     }
 }
@@ -858,9 +844,9 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_m2m</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_m2m</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">field_a</span>.<span class="ident">arity</span>(), <span class="self">self</span>.<span class="ident">field_b</span>.<span class="ident">arity</span>()) {
-            (<span class="ident">FieldArity::List</span>, <span class="ident">FieldArity::List</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">FieldArity::List</span>, <span class="ident">FieldArity::List</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">field_a</span>, <span class="ident">field_b</span>) <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">field_a</span>.<span class="ident">model</span>().<span class="ident">name</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">field_b</span>.<span class="ident">model</span>().<span class="ident">name</span>() {
                     (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_a</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_b</span>)
                 } <span class="kw">else</span> {
@@ -872,7 +858,7 @@
                     <span class="ident">field_b</span>: <span class="ident">field_b</span>.<span class="ident">clone</span>(),
                 })
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
@@ -884,11 +870,11 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">model_a_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">model_a_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="string">&quot;A&quot;</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_a_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_a_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">field_a</span>
             .<span class="ident">model</span>()
             .<span class="ident">id_fields</span>()
@@ -896,11 +882,11 @@
             .<span class="ident">expect</span>(<span class="string">&quot;Missing id field on a model in a M2M relation.&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">model_b_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">model_b_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="string">&quot;B&quot;</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_b_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_b_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">field_b</span>
             .<span class="ident">model</span>()
             .<span class="ident">id_fields</span>()
@@ -908,11 +894,11 @@
             .<span class="ident">expect</span>(<span class="string">&quot;Missing id field on a model in a M2M relation.&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">field_a</span>.<span class="ident">relation_name</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="self">self</span>.<span class="ident">relation_name</span>())
     }
 }

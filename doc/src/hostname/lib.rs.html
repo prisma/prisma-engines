@@ -213,19 +213,19 @@ println!(&quot;{:?}&quot;, name);
 <span class="kw">use</span> <span class="ident">std::io</span>;
 
 <span class="macro">match_cfg!</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>))]</span> <span class="op">=</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>))]</span> =&gt; {
         <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">libc</span>;
 
         <span class="kw">mod</span> <span class="ident">nix</span>;
         <span class="kw">use</span> <span class="ident">::nix</span> <span class="kw">as</span> <span class="ident">sys</span>;
     }
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>)]</span> <span class="op">=</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>)]</span> =&gt; {
         <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">winapi</span>;
 
         <span class="kw">mod</span> <span class="ident">windows</span>;
         <span class="kw">use</span> <span class="ident">::windows</span> <span class="kw">as</span> <span class="ident">sys</span>;
     }
-    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+    <span class="kw">_</span> =&gt; {
         <span class="macro">compile_error!</span>(<span class="string">&quot;Unsupported target OS! Create an issue: https://github.com/svartalf/hostname/issues/new&quot;</span>);
     }
 }
@@ -249,7 +249,7 @@ println!(&quot;{:?}&quot;, name);
 <span class="doccomment">///</span>
 <span class="doccomment">/// If this function encounters any form of error, an error</span>
 <span class="doccomment">/// variant will be returned; in practice it is rare to be happen.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> {
     <span class="ident">sys::get</span>()
 }
 
@@ -288,7 +288,7 @@ hostname::set(&quot;potato&quot;)?;
 <span class="doccomment">/// * Will fail with a linkage error for Android API &lt; 23 (see [#9](https://github.com/svartalf/hostname/issues/9#issuecomment-563991112))</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;set&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;set&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">hostname</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">hostname</span>: <span class="ident">T</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span>,
 {

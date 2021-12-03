@@ -129,29 +129,29 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Query::Raw</span>(<span class="ident">t</span>.<span class="ident">into</span>())
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Query::Select</span>(<span class="kw">_</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_insert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_insert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Query::Insert</span>(<span class="kw">_</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Query::Update</span>(<span class="kw">_</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Query::Delete</span>(<span class="kw">_</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_union</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_union</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Query::Union</span>(<span class="kw">_</span>))
     }
 }
@@ -165,10 +165,10 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SelectQuery</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Finds all named values or columns from the selection.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">named_selection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">named_selection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Select</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">named_selection</span>(),
-            <span class="ident"><span class="self">Self</span>::Union</span>(<span class="ident">u</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u</span>.<span class="ident">named_selection</span>(),
+            <span class="ident"><span class="self">Self</span>::Select</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">named_selection</span>(),
+            <span class="ident"><span class="self">Self</span>::Union</span>(<span class="ident">u</span>) =&gt; <span class="ident">u</span>.<span class="ident">named_selection</span>(),
         }
     }
 
@@ -176,18 +176,18 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">convert_tuple_selects_to_ctes</span>(
         <span class="self">self</span>,
         <span class="ident">level</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::CommonTableExpression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    ) -&gt; (<span class="self">Self</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::CommonTableExpression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Select</span>(<span class="ident">select</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">select</span>.<span class="ident">convert_tuple_selects_to_ctes</span>(<span class="bool-val">false</span>, <span class="ident">level</span>) {
-                <span class="ident">either::Either::Left</span>(<span class="ident">select</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident"><span class="self">Self</span>::Select</span>(<span class="ident">Box::new</span>(<span class="ident">select</span>)), <span class="ident">Vec::new</span>()),
-                <span class="ident">either::Either::Right</span>((<span class="ident">select</span>, <span class="ident">ctes</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Select</span>(<span class="ident">select</span>) =&gt; <span class="kw">match</span> <span class="ident">select</span>.<span class="ident">convert_tuple_selects_to_ctes</span>(<span class="bool-val">false</span>, <span class="ident">level</span>) {
+                <span class="ident">either::Either::Left</span>(<span class="ident">select</span>) =&gt; (<span class="ident"><span class="self">Self</span>::Select</span>(<span class="ident">Box::new</span>(<span class="ident">select</span>)), <span class="ident">Vec::new</span>()),
+                <span class="ident">either::Either::Right</span>((<span class="ident">select</span>, <span class="ident">ctes</span>)) =&gt; {
                     <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Select</span>(<span class="ident">Box::new</span>(<span class="ident">select</span>));
                     (<span class="ident">select</span>, <span class="ident">ctes</span>)
                 }
             },
-            <span class="ident"><span class="self">Self</span>::Union</span>(<span class="ident">union</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">union</span>.<span class="ident">convert_tuple_selects_into_ctes</span>(<span class="bool-val">false</span>, <span class="ident">level</span>) {
-                <span class="ident">either::Either::Left</span>(<span class="ident">union</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident"><span class="self">Self</span>::Union</span>(<span class="ident">Box::new</span>(<span class="ident">union</span>)), <span class="ident">Vec::new</span>()),
-                <span class="ident">either::Either::Right</span>((<span class="ident">union</span>, <span class="ident">ctes</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Union</span>(<span class="ident">union</span>) =&gt; <span class="kw">match</span> <span class="ident">union</span>.<span class="ident">convert_tuple_selects_into_ctes</span>(<span class="bool-val">false</span>, <span class="ident">level</span>) {
+                <span class="ident">either::Either::Left</span>(<span class="ident">union</span>) =&gt; (<span class="ident"><span class="self">Self</span>::Union</span>(<span class="ident">Box::new</span>(<span class="ident">union</span>)), <span class="ident">Vec::new</span>()),
+                <span class="ident">either::Either::Right</span>((<span class="ident">union</span>, <span class="ident">ctes</span>)) =&gt; {
                     <span class="kw">let</span> <span class="ident">union</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Union</span>(<span class="ident">Box::new</span>(<span class="ident">union</span>));
                     (<span class="ident">union</span>, <span class="ident">ctes</span>)
                 }
@@ -197,22 +197,22 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SelectQuery</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Select</span>(<span class="ident">Box::new</span>(<span class="ident">s</span>))
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Union</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SelectQuery</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">u</span>: <span class="ident">Union</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">u</span>: <span class="ident">Union</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Union</span>(<span class="ident">Box::new</span>(<span class="ident">u</span>))
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SelectQuery</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sq</span>: <span class="ident">SelectQuery</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sq</span>: <span class="ident">SelectQuery</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">sq</span> {
-            <span class="ident">SelectQuery::Select</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Query::Select</span>(<span class="ident">s</span>),
-            <span class="ident">SelectQuery::Union</span>(<span class="ident">u</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Query::Union</span>(<span class="ident">u</span>),
+            <span class="ident">SelectQuery::Select</span>(<span class="ident">s</span>) =&gt; <span class="ident">Query::Select</span>(<span class="ident">s</span>),
+            <span class="ident">SelectQuery::Union</span>(<span class="ident">u</span>) =&gt; <span class="ident">Query::Union</span>(<span class="ident">u</span>),
         }
     }
 }

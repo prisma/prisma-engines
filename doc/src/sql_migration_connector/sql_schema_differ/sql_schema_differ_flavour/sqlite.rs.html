@@ -66,27 +66,27 @@
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">walkers::ColumnWalker</span>, <span class="ident">ColumnTypeFamily</span>};
 
 <span class="kw">impl</span> <span class="ident">SqlSchemaDifferFlavour</span> <span class="kw">for</span> <span class="ident">SqliteFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">can_rename_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">can_rename_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">can_redefine_tables_with_inbound_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">can_redefine_tables_with_inbound_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">can_rename_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">can_rename_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">column_type_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">differ</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">column_type_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">differ</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
         <span class="kw">match</span> (<span class="ident">differ</span>.<span class="ident">previous</span>.<span class="ident">column_type_family</span>(), <span class="ident">differ</span>.<span class="ident">next</span>.<span class="ident">column_type_family</span>()) {
-            (<span class="ident">a</span>, <span class="ident">b</span>) <span class="kw">if</span> <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="ident">b</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::String</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::SafeCast</span>),
-            (<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::RiskyCast</span>),
+            (<span class="ident">a</span>, <span class="ident">b</span>) <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> =&gt; <span class="prelude-val">None</span>,
+            (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::String</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::SafeCast</span>),
+            (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::RiskyCast</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">should_drop_indexes_from_dropped_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">should_drop_indexes_from_dropped_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 
@@ -106,15 +106,15 @@
             .<span class="ident">collect</span>();
     }
 
-    <span class="kw">fn</span> <span class="ident">should_drop_foreign_keys_from_dropped_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">should_drop_foreign_keys_from_dropped_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">should_push_foreign_keys_from_created_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">should_push_foreign_keys_from_created_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">has_unnamed_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">has_unnamed_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 }

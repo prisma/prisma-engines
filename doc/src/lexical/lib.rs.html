@@ -1308,7 +1308,7 @@
 
 <span class="doccomment">/// Get a vector as a slice, including the capacity.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">vector_as_slice</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">lib::Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">T</span>] {
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">vector_as_slice</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">lib::Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">T</span>] {
     <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>();
     <span class="ident">lib::slice::from_raw_parts_mut</span>(<span class="ident">first</span>, <span class="ident">buf</span>.<span class="ident">capacity</span>())
 }
@@ -1332,7 +1332,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">ToLexical</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">lib::String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">ToLexical</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">N</span>) -&gt; <span class="ident">lib::String</span> {
     <span class="kw">unsafe</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">lib::Vec</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="ident">::with_capacity</span>(<span class="ident">N::FORMATTED_SIZE_DECIMAL</span>);
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">lexical_core::write</span>(<span class="ident">n</span>, <span class="ident">vector_as_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>)).<span class="ident">len</span>();
@@ -1362,7 +1362,7 @@
 <span class="doccomment">/// Panics if radix is not in the range `[2, 36]`</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string_radix</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">ToLexical</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">N</span>, <span class="ident">radix</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">lib::String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string_radix</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">ToLexical</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">N</span>, <span class="ident">radix</span>: <span class="ident">u8</span>) -&gt; <span class="ident">lib::String</span> {
     <span class="kw">unsafe</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">lib::Vec</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="ident">::with_capacity</span>(<span class="ident">N::FORMATTED_SIZE</span>);
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">lexical_core::write_radix</span>(<span class="ident">n</span>, <span class="ident">radix</span>, <span class="ident">vector_as_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>)).<span class="ident">len</span>();
@@ -1407,7 +1407,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexical</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="ident">Bytes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexical</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
     <span class="ident">N::from_lexical</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>())
 }
 
@@ -1446,7 +1446,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_partial</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexical</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="ident">Bytes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_partial</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexical</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_partial</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>())
 }
 
@@ -1485,7 +1485,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`parse`]: fn.parse.html</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_lossy</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexicalLossy</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="ident">Bytes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_lossy</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexicalLossy</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_lossy</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>())
 }
 
@@ -1526,7 +1526,7 @@
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_partial_lossy</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexicalLossy</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_partial_lossy</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>())
 }
 
@@ -1575,7 +1575,7 @@
 <span class="doccomment">/// Panics if radix is not in the range `[2, 36]`</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_radix</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexical</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="ident">Bytes</span>, <span class="ident">radix</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_radix</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexical</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="ident">Bytes</span>, <span class="ident">radix</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_radix</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>(), <span class="ident">radix</span>)
 }
 
@@ -1627,7 +1627,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_partial_radix</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexical</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
     <span class="ident">radix</span>: <span class="ident">u8</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_partial_radix</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>(), <span class="ident">radix</span>)
 }
 
@@ -1677,7 +1677,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_lossy_radix</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexicalLossy</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
     <span class="ident">radix</span>: <span class="ident">u8</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_lossy_radix</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>(), <span class="ident">radix</span>)
 }
 
@@ -1729,7 +1729,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_partial_lossy_radix</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexicalLossy</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
     <span class="ident">radix</span>: <span class="ident">u8</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_partial_lossy_radix</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>(), <span class="ident">radix</span>)
 }
 
@@ -1778,7 +1778,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_format</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexicalFormat</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
     <span class="ident">format</span>: <span class="ident">NumberFormat</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_format</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>(), <span class="ident">format</span>)
 }
 
@@ -1826,7 +1826,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_partial_format</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexicalFormat</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
     <span class="ident">format</span>: <span class="ident">NumberFormat</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_partial_format</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>(), <span class="ident">format</span>)
 }
 
@@ -1874,7 +1874,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_lossy_format</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexicalLossyFormat</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
     <span class="ident">format</span>: <span class="ident">NumberFormat</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_lossy_format</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>(), <span class="ident">format</span>)
 }
 
@@ -1922,7 +1922,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_partial_lossy_format</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexicalLossyFormat</span>, <span class="ident">Bytes</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
     <span class="ident">format</span>: <span class="ident">NumberFormat</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_partial_lossy_format</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>(), <span class="ident">format</span>)
 }
 
@@ -1980,7 +1980,7 @@
     <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
     <span class="ident">radix</span>: <span class="ident">u8</span>,
     <span class="ident">format</span>: <span class="ident">NumberFormat</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_format_radix</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>(), <span class="ident">radix</span>, <span class="ident">format</span>)
 }
 
@@ -2038,7 +2038,7 @@
     <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
     <span class="ident">radix</span>: <span class="ident">u8</span>,
     <span class="ident">format</span>: <span class="ident">NumberFormat</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_partial_format_radix</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>(), <span class="ident">radix</span>, <span class="ident">format</span>)
 }
 
@@ -2094,7 +2094,7 @@
     <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
     <span class="ident">radix</span>: <span class="ident">u8</span>,
     <span class="ident">format</span>: <span class="ident">NumberFormat</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_lossy_format_radix</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>(), <span class="ident">radix</span>, <span class="ident">format</span>)
 }
 
@@ -2151,7 +2151,7 @@
     <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
     <span class="ident">radix</span>: <span class="ident">u8</span>,
     <span class="ident">format</span>: <span class="ident">NumberFormat</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
     <span class="ident">N::from_lexical_partial_lossy_format_radix</span>(<span class="ident">bytes</span>.<span class="ident">as_ref</span>(), <span class="ident">radix</span>, <span class="ident">format</span>)
 }
 </code></pre></div>

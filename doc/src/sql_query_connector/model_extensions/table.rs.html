@@ -30,11 +30,11 @@
 <span class="kw">use</span> <span class="ident">quaint::ast</span>::{<span class="ident">Column</span>, <span class="ident">Table</span>};
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsTable</span> {
-    <span class="kw">fn</span> <span class="ident">as_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">as_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">AsTable</span> <span class="kw">for</span> <span class="ident">Model</span> {
-    <span class="kw">fn</span> <span class="ident">as_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">table</span>: <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">internal_data_model</span>().<span class="ident">db_name</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">db_name</span>().<span class="ident">to_string</span>()).<span class="ident">into</span>();
 
         <span class="comment">// Todo: Check with Julius</span>

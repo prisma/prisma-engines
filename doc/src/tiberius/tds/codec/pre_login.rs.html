@@ -159,7 +159,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PreloginMessage</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PreloginMessage</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">PreloginMessage</span> {
         <span class="kw">let</span> <span class="ident">driver_version</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::get_driver_version</span>();
         <span class="ident">PreloginMessage</span> {
             <span class="ident">version</span>: <span class="ident">driver_version</span> <span class="kw">as</span> <span class="ident">u32</span>,
@@ -170,30 +170,30 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negotiated_encryption</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">expected</span>: <span class="ident">EncryptionLevel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EncryptionLevel</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negotiated_encryption</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">expected</span>: <span class="ident">EncryptionLevel</span>) -&gt; <span class="ident">EncryptionLevel</span> {
         <span class="kw">match</span> (<span class="ident">expected</span>, <span class="self">self</span>.<span class="ident">encryption</span>) {
-            (<span class="ident">EncryptionLevel::NotSupported</span>, <span class="ident">EncryptionLevel::NotSupported</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">EncryptionLevel::NotSupported</span>, <span class="ident">EncryptionLevel::NotSupported</span>) =&gt; {
                 <span class="ident">EncryptionLevel::NotSupported</span>
             }
-            (<span class="ident">EncryptionLevel::Off</span>, <span class="ident">EncryptionLevel::Off</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EncryptionLevel::Off</span>,
+            (<span class="ident">EncryptionLevel::Off</span>, <span class="ident">EncryptionLevel::Off</span>) =&gt; <span class="ident">EncryptionLevel::Off</span>,
             (<span class="ident">EncryptionLevel::On</span>, <span class="ident">EncryptionLevel::Off</span>)
-            <span class="op">|</span> (<span class="ident">EncryptionLevel::On</span>, <span class="ident">EncryptionLevel::NotSupported</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="op">|</span> (<span class="ident">EncryptionLevel::On</span>, <span class="ident">EncryptionLevel::NotSupported</span>) =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;Server does not allow the requested encryption level.&quot;</span>)
             }
-            (<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EncryptionLevel::On</span>,
+            (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="ident">EncryptionLevel::On</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PreloginMessage</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// build the packet-body</span>
         <span class="comment">// offset = PL_OPTION_TOKEN + PL_OFFSET + PL_OPTION_LENGTH = 5 bytes + the terminator (0xFF)</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data_offset</span> <span class="op">=</span> <span class="number">4</span> <span class="op">*</span> <span class="number">5</span> <span class="op">+</span> <span class="number">1</span>;
 
         <span class="comment">// write the offsets</span>
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">write_option</span> <span class="op">=</span> <span class="op">|</span><span class="ident">token</span>: <span class="ident">u8</span>, <span class="ident">length</span>: <span class="ident">u16</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">write_option</span> <span class="op">=</span> <span class="op">|</span><span class="ident">token</span>: <span class="ident">u8</span>, <span class="ident">length</span>: <span class="ident">u16</span><span class="op">|</span> -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
                 <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">token</span>);
                 <span class="ident">dst</span>.<span class="ident">put_u16</span>(<span class="ident">data_offset</span>);
                 <span class="ident">dst</span>.<span class="ident">put_u16</span>(<span class="ident">length</span>);
@@ -223,7 +223,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Decode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PreloginMessage</span> {
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
     {
@@ -235,7 +235,7 @@
             <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
 
             <span class="comment">// read until terminator</span>
-            <span class="kw">if</span> <span class="ident">token</span> <span class="op">=</span><span class="op">=</span> <span class="number">0xff</span> {
+            <span class="kw">if</span> <span class="ident">token</span> <span class="op">==</span> <span class="number">0xff</span> {
                 <span class="kw">break</span>;
             }
 
@@ -250,20 +250,20 @@
             <span class="comment">// TODO: support parsing more</span>
             <span class="kw">match</span> <span class="ident">token</span> {
                 <span class="comment">// version</span>
-                <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="number">0</span> =&gt; {
                     <span class="ident">ret</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                     <span class="ident">ret</span>.<span class="ident">sub_build</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 }
                 <span class="comment">// encryption</span>
-                <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="number">1</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">encrypt</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
                     <span class="ident">ret</span>.<span class="ident">encryption</span> <span class="op">=</span> <span class="ident">tds::EncryptionLevel::try_from</span>(<span class="ident">encrypt</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
                         <span class="ident">Error::Protocol</span>(<span class="macro">format!</span>(<span class="string">&quot;invalid encryption value: {}&quot;</span>, <span class="ident">encrypt</span>).<span class="ident">into</span>())
                     })<span class="question-mark">?</span>;
                 }
-                <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">debug_assert_eq!</span>(<span class="ident">length</span>, <span class="number">0</span>), <span class="comment">// threadid</span>
-                <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">debug_assert_eq!</span>(<span class="ident">length</span>, <span class="number">1</span>), <span class="comment">// mars</span>
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;unsupported prelogin token: {}&quot;</span>, <span class="ident">token</span>),
+                <span class="number">3</span> =&gt; <span class="macro">debug_assert_eq!</span>(<span class="ident">length</span>, <span class="number">0</span>), <span class="comment">// threadid</span>
+                <span class="number">4</span> =&gt; <span class="macro">debug_assert_eq!</span>(<span class="ident">length</span>, <span class="number">1</span>), <span class="comment">// mars</span>
+                <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unsupported prelogin token: {}&quot;</span>, <span class="ident">token</span>),
             }
 
             <span class="ident">cursor</span>.<span class="ident">set_position</span>(<span class="ident">old_pos</span>);

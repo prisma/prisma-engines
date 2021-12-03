@@ -4,7 +4,7 @@ users to declare the behavior they want from a number without committing to a
 single particular numeric type.</p>
 <p>The number types can be categorized along two axes: behavior and width. Traits
 for each axis and group on that axis are provided:</p>
-<h2 id="numeric-categories" class="section-header"><a href="#numeric-categories">Numeric Categories</a></h2>
+<h3 id="numeric-categories" class="section-header"><a href="#numeric-categories">Numeric Categories</a></h3>
 <p>The most general category is represented by the trait <a href="trait.IsNumber.html"><code>IsNumber</code></a>. It is
 implemented by all the numeric fundamentals, and includes only the traits that
 they all implement. This is an already-large amount: basic memory management,
@@ -15,33 +15,33 @@ numbers.</p>
 <p>Lastly, <a href="trait.IsInteger.html"><code>IsInteger</code></a> splits further, into <a href="trait.IsSigned.html"><code>IsSigned</code></a> and <a href="trait.IsUnsigned.html"><code>IsUnsigned</code></a>.
 These provide the last specializations unique to the differences between <code>iN</code>
 and <code>uN</code>.</p>
-<h2 id="width-categories" class="section-header"><a href="#width-categories">Width Categories</a></h2>
+<h3 id="width-categories" class="section-header"><a href="#width-categories">Width Categories</a></h3>
 <p>Every number implements the trait <code>IsN</code> for the <code>N</code> of its bit width. <code>isize</code>
 and <code>usize</code> implement the trait that matches their width on the target platform.</p>
 <p>In addition, the trait groups <code>AtLeastN</code> and <code>AtMostN</code> enable clamping the range
 of acceptable widths to lower or upper bounds. These traits are equivalent to
 <code>mem::size_of::&lt;T&gt;() &gt;= N</code> and <code>mem::size_of::&lt;T&gt;() &lt;= N</code>, respectively.</p>
 </div></details><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.AtLeast8.html" title="funty::AtLeast8 trait">AtLeast8</a></div><div class="item-right docblock-short"><p>Declare that a type is eight or more bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.AtLeast16.html" title="funty::AtLeast16 trait">AtLeast16</a></div><div class="item-right docblock-short"><p>Declare that a type is sixteen or more bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.AtLeast32.html" title="funty::AtLeast32 trait">AtLeast32</a></div><div class="item-right docblock-short"><p>Declare that a type is thirty-two or more bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.AtLeast64.html" title="funty::AtLeast64 trait">AtLeast64</a></div><div class="item-right docblock-short"><p>Declare that a type is sixty-four or more bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.AtLeast128.html" title="funty::AtLeast128 trait">AtLeast128</a></div><div class="item-right docblock-short"><p>Declare that a type is one hundred twenty-eight or more bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.AtMost8.html" title="funty::AtMost8 trait">AtMost8</a></div><div class="item-right docblock-short"><p>Declare that a type is eight or fewer bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.AtMost16.html" title="funty::AtMost16 trait">AtMost16</a></div><div class="item-right docblock-short"><p>Declare that a type is sixteen or fewer bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.AtMost32.html" title="funty::AtMost32 trait">AtMost32</a></div><div class="item-right docblock-short"><p>Declare that a type is thirty-two or fewer bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.AtMost64.html" title="funty::AtMost64 trait">AtMost64</a></div><div class="item-right docblock-short"><p>Declare that a type is sixty-four or fewer bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.AtMost128.html" title="funty::AtMost128 trait">AtMost128</a></div><div class="item-right docblock-short"><p>Declare that a type is one hundred twenty-eight or fewer bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Is8.html" title="funty::Is8 trait">Is8</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly eight bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Is16.html" title="funty::Is16 trait">Is16</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly sixteen bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Is32.html" title="funty::Is32 trait">Is32</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly thirty-two bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Is64.html" title="funty::Is64 trait">Is64</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly sixty-four bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.Is128.html" title="funty::Is128 trait">Is128</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly one hundred twenty-eight bits wide.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.IsFloat.html" title="funty::IsFloat trait">IsFloat</a></div><div class="item-right docblock-short"><p>Declare that a type is a floating-point number.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.IsInteger.html" title="funty::IsInteger trait">IsInteger</a></div><div class="item-right docblock-short"><p>Declare that a type is a fixed-point integer.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.IsNumber.html" title="funty::IsNumber trait">IsNumber</a></div><div class="item-right docblock-short"><p>Declare that a type is an abstract number.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.IsSigned.html" title="funty::IsSigned trait">IsSigned</a></div><div class="item-right docblock-short"><p>Declare that a type is a signed integer.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.IsUnsigned.html" title="funty::IsUnsigned trait">IsUnsigned</a></div><div class="item-right docblock-short"><p>Declare that a type is an unsigned integer.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="funty" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtLeast8.html" title="funty::AtLeast8 trait">AtLeast8</a></div><div class="item-right docblock-short"><p>Declare that a type is eight or more bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtLeast16.html" title="funty::AtLeast16 trait">AtLeast16</a></div><div class="item-right docblock-short"><p>Declare that a type is sixteen or more bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtLeast32.html" title="funty::AtLeast32 trait">AtLeast32</a></div><div class="item-right docblock-short"><p>Declare that a type is thirty-two or more bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtLeast64.html" title="funty::AtLeast64 trait">AtLeast64</a></div><div class="item-right docblock-short"><p>Declare that a type is sixty-four or more bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtLeast128.html" title="funty::AtLeast128 trait">AtLeast128</a></div><div class="item-right docblock-short"><p>Declare that a type is one hundred twenty-eight or more bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtMost8.html" title="funty::AtMost8 trait">AtMost8</a></div><div class="item-right docblock-short"><p>Declare that a type is eight or fewer bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtMost16.html" title="funty::AtMost16 trait">AtMost16</a></div><div class="item-right docblock-short"><p>Declare that a type is sixteen or fewer bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtMost32.html" title="funty::AtMost32 trait">AtMost32</a></div><div class="item-right docblock-short"><p>Declare that a type is thirty-two or fewer bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtMost64.html" title="funty::AtMost64 trait">AtMost64</a></div><div class="item-right docblock-short"><p>Declare that a type is sixty-four or fewer bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AtMost128.html" title="funty::AtMost128 trait">AtMost128</a></div><div class="item-right docblock-short"><p>Declare that a type is one hundred twenty-eight or fewer bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Is8.html" title="funty::Is8 trait">Is8</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly eight bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Is16.html" title="funty::Is16 trait">Is16</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly sixteen bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Is32.html" title="funty::Is32 trait">Is32</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly thirty-two bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Is64.html" title="funty::Is64 trait">Is64</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly sixty-four bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Is128.html" title="funty::Is128 trait">Is128</a></div><div class="item-right docblock-short"><p>Declare that a type is exactly one hundred twenty-eight bits wide.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IsFloat.html" title="funty::IsFloat trait">IsFloat</a></div><div class="item-right docblock-short"><p>Declare that a type is a floating-point number.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IsInteger.html" title="funty::IsInteger trait">IsInteger</a></div><div class="item-right docblock-short"><p>Declare that a type is a fixed-point integer.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IsNumber.html" title="funty::IsNumber trait">IsNumber</a></div><div class="item-right docblock-short"><p>Declare that a type is an abstract number.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IsSigned.html" title="funty::IsSigned trait">IsSigned</a></div><div class="item-right docblock-short"><p>Declare that a type is a signed integer.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.IsUnsigned.html" title="funty::IsUnsigned trait">IsUnsigned</a></div><div class="item-right docblock-short"><p>Declare that a type is an unsigned integer.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="funty" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>

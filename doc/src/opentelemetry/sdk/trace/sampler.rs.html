@@ -352,7 +352,7 @@
         <span class="ident">span_kind</span>: <span class="kw-2">&amp;</span><span class="ident">SpanKind</span>,
         <span class="ident">attributes</span>: <span class="kw-2">&amp;</span>[<span class="ident">KeyValue</span>],
         <span class="ident">links</span>: <span class="kw-2">&amp;</span>[<span class="ident">Link</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SamplingResult</span>;
+    ) -&gt; <span class="ident">SamplingResult</span>;
 }
 
 <span class="doccomment">/// The result of sampling logic for a given `Span`.</span>
@@ -402,14 +402,14 @@
         <span class="ident">span_kind</span>: <span class="kw-2">&amp;</span><span class="ident">SpanKind</span>,
         <span class="ident">attributes</span>: <span class="kw-2">&amp;</span>[<span class="ident">KeyValue</span>],
         <span class="ident">links</span>: <span class="kw-2">&amp;</span>[<span class="ident">Link</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SamplingResult</span> {
+    ) -&gt; <span class="ident">SamplingResult</span> {
         <span class="kw">let</span> <span class="ident">decision</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
             <span class="comment">// Always sample the trace</span>
-            <span class="ident">Sampler::AlwaysOn</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SamplingDecision::RecordAndSample</span>,
+            <span class="ident">Sampler::AlwaysOn</span> =&gt; <span class="ident">SamplingDecision::RecordAndSample</span>,
             <span class="comment">// Never sample the trace</span>
-            <span class="ident">Sampler::AlwaysOff</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">SamplingDecision::Drop</span>,
+            <span class="ident">Sampler::AlwaysOff</span> =&gt; <span class="ident">SamplingDecision::Drop</span>,
             <span class="comment">// The parent decision if sampled; otherwise the decision of delegate_sampler</span>
-            <span class="ident">Sampler::ParentBased</span>(<span class="ident">delegate_sampler</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Sampler::ParentBased</span>(<span class="ident">delegate_sampler</span>) =&gt; {
                 <span class="ident">parent_context</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="ident">cx</span>.<span class="ident">has_active_span</span>()).<span class="ident">map_or</span>(
                     <span class="ident">delegate_sampler</span>
                         .<span class="ident">should_sample</span>(<span class="ident">parent_context</span>, <span class="ident">trace_id</span>, <span class="ident">name</span>, <span class="ident">span_kind</span>, <span class="ident">attributes</span>, <span class="ident">links</span>)
@@ -426,7 +426,7 @@
                 )
             }
             <span class="comment">// Probabilistically sample the trace.</span>
-            <span class="ident">Sampler::TraceIdRatioBased</span>(<span class="ident">prob</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Sampler::TraceIdRatioBased</span>(<span class="ident">prob</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">prob</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1.0</span> {
                     <span class="ident">SamplingDecision::RecordAndSample</span>
                 } <span class="kw">else</span> {
@@ -449,8 +449,8 @@
             <span class="ident">attributes</span>: <span class="ident">Vec::new</span>(),
             <span class="comment">// all sampler in SDK will not modify trace state.</span>
             <span class="ident">trace_state</span>: <span class="kw">match</span> <span class="ident">parent_context</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ctx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ctx</span>.<span class="ident">span</span>().<span class="ident">span_context</span>().<span class="ident">trace_state</span>().<span class="ident">clone</span>(),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraceState::default</span>(),
+                <span class="prelude-val">Some</span>(<span class="ident">ctx</span>) =&gt; <span class="ident">ctx</span>.<span class="ident">span</span>().<span class="ident">span_context</span>().<span class="ident">trace_state</span>().<span class="ident">clone</span>(),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">TraceState::default</span>(),
             },
         }
     }
@@ -465,7 +465,7 @@
     <span class="kw">use</span> <span class="ident">rand::Rng</span>;
 
     <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sampler_data</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Sampler</span>, <span class="ident">f64</span>, <span class="ident">bool</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sampler_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Sampler</span>, <span class="ident">f64</span>, <span class="ident">bool</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
         <span class="macro">vec!</span>[
             <span class="comment">// Span w/o a parent</span>
             (<span class="string">&quot;never_sample&quot;</span>, <span class="ident">Sampler::AlwaysOff</span>, <span class="number">0.0</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>),
@@ -547,7 +547,7 @@
                         <span class="kw-2">&amp;</span>[],
                     )
                     .<span class="ident">decision</span>
-                    <span class="op">=</span><span class="op">=</span> <span class="ident">SamplingDecision::RecordAndSample</span>
+                    <span class="op">==</span> <span class="ident">SamplingDecision::RecordAndSample</span>
                 {
                     <span class="ident">sampled</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 }

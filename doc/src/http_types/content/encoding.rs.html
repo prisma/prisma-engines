@@ -77,7 +77,7 @@
 
 <span class="kw">impl</span> <span class="ident">Encoding</span> {
     <span class="doccomment">/// Parses a given string into its corresponding encoding.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Encoding</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Encoding</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">trim</span>();
 
         <span class="comment">// We&#39;re dealing with an empty string.</span>
@@ -86,30 +86,30 @@
         }
 
         <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;gzip&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Encoding::Gzip</span>),
-            <span class="string">&quot;deflate&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Encoding::Deflate</span>),
-            <span class="string">&quot;br&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Encoding::Brotli</span>),
-            <span class="string">&quot;zstd&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Encoding::Zstd</span>),
-            <span class="string">&quot;identity&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Encoding::Identity</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="string">&quot;gzip&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Encoding::Gzip</span>),
+            <span class="string">&quot;deflate&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Encoding::Deflate</span>),
+            <span class="string">&quot;br&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Encoding::Brotli</span>),
+            <span class="string">&quot;zstd&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Encoding::Zstd</span>),
+            <span class="string">&quot;identity&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Encoding::Identity</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Encoding</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Encoding::Gzip</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;gzip&quot;</span>),
-            <span class="ident">Encoding::Deflate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;deflate&quot;</span>),
-            <span class="ident">Encoding::Brotli</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;br&quot;</span>),
-            <span class="ident">Encoding::Zstd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;zstd&quot;</span>),
-            <span class="ident">Encoding::Identity</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;identity&quot;</span>),
+            <span class="ident">Encoding::Gzip</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;gzip&quot;</span>),
+            <span class="ident">Encoding::Deflate</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;deflate&quot;</span>),
+            <span class="ident">Encoding::Brotli</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;br&quot;</span>),
+            <span class="ident">Encoding::Zstd</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;zstd&quot;</span>),
+            <span class="ident">Encoding::Identity</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;identity&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Encoding</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HeaderValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">directive</span>: <span class="ident">Encoding</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">directive</span>: <span class="ident">Encoding</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">directive</span>.<span class="ident">to_string</span>();
         <span class="kw">unsafe</span> { <span class="ident">HeaderValue::from_bytes_unchecked</span>(<span class="ident">s</span>.<span class="ident">into_bytes</span>()) }
     }

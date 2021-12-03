@@ -382,7 +382,7 @@ the `&#39;static` bound altogether.
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::Primitive</span>;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_any</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_any</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;v</span> <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;v</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="comment">// When we&#39;re on `nightly`, we can use const type ids</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">value_bag_capture_const_type_id</span>)]</span>
     {
@@ -392,12 +392,12 @@ the `&#39;static` bound altogether.
             ($(
                 $(<span class="attribute">#[<span class="ident">cfg</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cfg</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)]</span>)<span class="op">*</span>
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span> : (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">const_ident</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">option_ident</span>:<span class="ident">ident</span>),
-            )<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            )<span class="kw-2">*</span>) =&gt; {
                 <span class="kw">trait</span> <span class="ident">ToPrimitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
                 <span class="kw">where</span>
                     <span class="self">Self</span>: <span class="lifetime">&#39;static</span>,
                 {
-                    <span class="kw">const</span> <span class="ident">CALL</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> {
+                    <span class="kw">const</span> <span class="ident">CALL</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> {
                         $(
                             $(<span class="attribute">#[<span class="ident">cfg</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cfg</span>)<span class="kw-2">*</span>)]</span>)<span class="op">*</span>
                             <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">const_ident</span>: <span class="ident">TypeId</span> <span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>();
@@ -411,25 +411,25 @@ the `&#39;static` bound altogether.
                         <span class="kw">match</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() {
                             $(
                                 $(<span class="attribute">#[<span class="ident">cfg</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cfg</span>)<span class="kw-2">*</span>)]</span>)<span class="op">*</span>
-                                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">const_ident</span> <span class="op">=</span><span class="op">&gt;</span> <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Primitive::from</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">v</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="self">Self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>) })),
+                                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">const_ident</span> =&gt; <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Primitive::from</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">v</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="self">Self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>) })),
 
                                 $(<span class="attribute">#[<span class="ident">cfg</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cfg</span>)<span class="kw-2">*</span>)]</span>)<span class="op">*</span>
-                                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">option_ident</span> <span class="op">=</span><span class="op">&gt;</span> <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="prelude-val">Some</span>({
+                                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">option_ident</span> =&gt; <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="prelude-val">Some</span>({
                                     <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">v</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="self">Self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>) };
                                     <span class="kw">match</span> <span class="ident">v</span> {
-                                        <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Primitive::from</span>(<span class="ident">v</span>),
-                                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Primitive::None</span>,
+                                        <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">Primitive::from</span>(<span class="ident">v</span>),
+                                        <span class="prelude-val">None</span> =&gt; <span class="ident">Primitive::None</span>,
                                     }
                                 }),
                             )<span class="op">*</span>
 
-                            <span class="ident">STR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Primitive::from</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) })),
+                            <span class="ident">STR</span> =&gt; <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Primitive::from</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) })),
 
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">None</span>,
+                            <span class="kw">_</span> =&gt; <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">None</span>,
                         }
                     };
 
-                    <span class="kw">fn</span> <span class="ident">to_primitive</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+                    <span class="kw">fn</span> <span class="ident">to_primitive</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
                         (<span class="ident"><span class="self">Self</span>::CALL</span>)(<span class="kw-2">&amp;</span><span class="self">self</span>)
                     }
                 }
@@ -488,7 +488,7 @@ the `&#39;static` bound altogether.
         <span class="comment">// works in no-std environments</span>
         <span class="kw">fn</span> <span class="ident">quicksort_helper</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">arr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">T</span>], <span class="ident">left</span>: <span class="ident">isize</span>, <span class="ident">right</span>: <span class="ident">isize</span>, <span class="ident">compare</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>)
         <span class="kw">where</span>
-            <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span>,
+            <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">Ordering</span>,
         {
             <span class="kw">if</span> <span class="ident">right</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">left</span> {
                 <span class="kw">return</span>;
@@ -502,12 +502,12 @@ the `&#39;static` bound altogether.
                 <span class="kw">let</span> <span class="ident">v</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">arr</span>[<span class="ident">right</span> <span class="kw">as</span> <span class="ident">usize</span>];
                 <span class="kw">loop</span> {
                     <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="kw">while</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="ident">arr</span>[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">Ordering::Less</span> {
+                    <span class="kw">while</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="ident">arr</span>[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>) <span class="op">==</span> <span class="ident">Ordering::Less</span> {
                         <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>
                     }
                     <span class="ident">j</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="kw">while</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>, <span class="kw-2">&amp;</span><span class="ident">arr</span>[<span class="ident">j</span> <span class="kw">as</span> <span class="ident">usize</span>]) <span class="op">=</span><span class="op">=</span> <span class="ident">Ordering::Less</span> {
-                        <span class="kw">if</span> <span class="ident">j</span> <span class="op">=</span><span class="op">=</span> <span class="ident">left</span> {
+                    <span class="kw">while</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>, <span class="kw-2">&amp;</span><span class="ident">arr</span>[<span class="ident">j</span> <span class="kw">as</span> <span class="ident">usize</span>]) <span class="op">==</span> <span class="ident">Ordering::Less</span> {
+                        <span class="kw">if</span> <span class="ident">j</span> <span class="op">==</span> <span class="ident">left</span> {
                             <span class="kw">break</span>;
                         }
                         <span class="ident">j</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
@@ -516,11 +516,11 @@ the `&#39;static` bound altogether.
                         <span class="kw">break</span>;
                     }
                     <span class="ident">arr</span>.<span class="ident">swap</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">j</span> <span class="kw">as</span> <span class="ident">usize</span>);
-                    <span class="kw">if</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="ident">arr</span>[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">Ordering::Equal</span> {
+                    <span class="kw">if</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="ident">arr</span>[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>) <span class="op">==</span> <span class="ident">Ordering::Equal</span> {
                         <span class="ident">p</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                         <span class="ident">arr</span>.<span class="ident">swap</span>(<span class="ident">p</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">i</span> <span class="kw">as</span> <span class="ident">usize</span>)
                     }
-                    <span class="kw">if</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>, <span class="kw-2">&amp;</span><span class="ident">arr</span>[<span class="ident">j</span> <span class="kw">as</span> <span class="ident">usize</span>]) <span class="op">=</span><span class="op">=</span> <span class="ident">Ordering::Equal</span> {
+                    <span class="kw">if</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">v</span>, <span class="kw-2">&amp;</span><span class="ident">arr</span>[<span class="ident">j</span> <span class="kw">as</span> <span class="ident">usize</span>]) <span class="op">==</span> <span class="ident">Ordering::Equal</span> {
                         <span class="ident">q</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
                         <span class="ident">arr</span>.<span class="ident">swap</span>(<span class="ident">j</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">q</span> <span class="kw">as</span> <span class="ident">usize</span>)
                     }
@@ -551,7 +551,7 @@ the `&#39;static` bound altogether.
 
         <span class="kw">fn</span> <span class="ident">quicksort_by</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">arr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">T</span>], <span class="ident">compare</span>: <span class="ident">F</span>)
         <span class="kw">where</span>
-            <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span>,
+            <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">Ordering</span>,
         {
             <span class="kw">if</span> <span class="ident">arr</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span> {
                 <span class="kw">return</span>;
@@ -570,7 +570,7 @@ the `&#39;static` bound altogether.
             ($(
                 $(<span class="attribute">#[<span class="ident">cfg</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cfg</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)]</span>)<span class="op">*</span>
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>,
-            )<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            )<span class="kw-2">*</span>) =&gt; {
                 [
                     (
                         <span class="ident">std::any::TypeId::of</span>::<span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>(),
@@ -579,7 +579,7 @@ the `&#39;static` bound altogether.
                             <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw-2">*</span>(<span class="ident">v</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span>);
 
                             <span class="ident">Primitive::from</span>(<span class="ident">v</span>)
-                        }) <span class="kw">as</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="ident">VoidRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+                        }) <span class="kw">as</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="ident">VoidRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
                     ),
                     $(
                         $(<span class="attribute">#[<span class="ident">cfg</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cfg</span>)<span class="kw-2">*</span>)]</span>)<span class="op">*</span>
@@ -590,7 +590,7 @@ the `&#39;static` bound altogether.
                                 <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw-2">*</span>(<span class="ident">v</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>);
 
                                 <span class="ident">Primitive::from</span>(<span class="ident">v</span>)
-                            }) <span class="kw">as</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="ident">VoidRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+                            }) <span class="kw">as</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="ident">VoidRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
                         ),
                     )<span class="op">*</span>
                     $(
@@ -606,7 +606,7 @@ the `&#39;static` bound altogether.
                                 } <span class="kw">else</span> {
                                     <span class="ident">Primitive::None</span>
                                 }
-                            }) <span class="kw">as</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="ident">VoidRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+                            }) <span class="kw">as</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="ident">VoidRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
                         ),
                     )<span class="op">*</span>
                 ]
@@ -619,7 +619,7 @@ the `&#39;static` bound altogether.
         <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">37</span>;
 
         <span class="attribute">#[<span class="ident">ctor</span>]</span>
-        <span class="kw">static</span> <span class="ident">TYPE_IDS</span>: [(<span class="ident">TypeId</span>, <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="ident">VoidRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>); <span class="ident">LEN</span>] <span class="op">=</span> {
+        <span class="kw">static</span> <span class="ident">TYPE_IDS</span>: [(<span class="ident">TypeId</span>, <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="ident">VoidRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">Primitive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>); <span class="ident">LEN</span>] <span class="op">=</span> {
             <span class="comment">// NOTE: The types here *must* match the ones used above when `const_type_id` is available</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">type_ids</span> <span class="op">=</span> <span class="macro">type_ids!</span>[
                 <span class="ident">usize</span>,
@@ -675,9 +675,9 @@ the `&#39;static` bound altogether.
             ($(
                 $(<span class="attribute">#[<span class="ident">cfg</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cfg</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)]</span>)<span class="op">*</span>
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>,
-            )<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            )<span class="kw-2">*</span>) =&gt; {
                 <span class="op">|</span><span class="ident">v</span>: <span class="ident">VoidRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> {
-                    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>() {
+                    <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>() {
                         <span class="comment">// SAFETY: We verify the value is str before casting</span>
                         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">*</span>(<span class="ident">v</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span>) };
 
@@ -686,7 +686,7 @@ the `&#39;static` bound altogether.
 
                     $(
                         $(<span class="attribute">#[<span class="ident">cfg</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cfg</span>)<span class="kw-2">*</span>)]</span>)<span class="op">*</span>
-                        <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>() {
+                        <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>() {
                             <span class="comment">// SAFETY: We verify the value is $ty before casting</span>
                             <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">*</span>(<span class="ident">v</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>) };
 
@@ -695,7 +695,7 @@ the `&#39;static` bound altogether.
                     )<span class="op">*</span>
                     $(
                         $(<span class="attribute">#[<span class="ident">cfg</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cfg</span>)<span class="kw-2">*</span>)]</span>)<span class="op">*</span>
-                        <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span><span class="op">&gt;</span>() {
+                        <span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span><span class="op">&gt;</span>() {
                             <span class="comment">// SAFETY: We verify the value is Option&lt;$ty&gt; before casting</span>
                             <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">*</span>(<span class="ident">v</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>) };
 

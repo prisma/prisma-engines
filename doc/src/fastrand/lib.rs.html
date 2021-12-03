@@ -691,7 +691,7 @@
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Rng</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Rng</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Rng</span> {
         <span class="ident">Rng::new</span>()
     }
 }
@@ -717,7 +717,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(rng1.u64(..), rng2.u64(..), &quot;the cloned generators are identical&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Rng</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Rng</span> {
         <span class="ident">Rng::with_seed</span>(<span class="self">self</span>.<span class="ident">gen_u64</span>())
     }
 }
@@ -725,13 +725,13 @@
 <span class="kw">impl</span> <span class="ident">Rng</span> {
     <span class="doccomment">/// Generates a random `u32`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">gen_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">gen_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">gen_u64</span>() <span class="kw">as</span> <span class="ident">u32</span>
     }
 
     <span class="doccomment">/// Generates a random `u64`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">gen_u64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">gen_u64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get</span>().<span class="ident">wrapping_add</span>(<span class="number">0xA0761D6478BD642F</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">set</span>(<span class="ident">s</span>);
         <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">u128::from</span>(<span class="ident">s</span>) <span class="op">*</span> <span class="ident">u128::from</span>(<span class="ident">s</span> <span class="op">^</span> <span class="number">0xE7037ED1A0B428DB</span>);
@@ -740,13 +740,13 @@
 
     <span class="doccomment">/// Generates a random `u128`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">gen_u128</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+    <span class="kw">fn</span> <span class="ident">gen_u128</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u128</span> {
         (<span class="ident">u128::from</span>(<span class="self">self</span>.<span class="ident">gen_u64</span>()) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">64</span>) <span class="op">|</span> <span class="ident">u128::from</span>(<span class="self">self</span>.<span class="ident">gen_u64</span>())
     }
 
     <span class="doccomment">/// Generates a random `u32` in `0..n`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">gen_mod_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">gen_mod_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
         <span class="comment">// Adapted from: https://lemire.me/blog/2016/06/30/fast-random-shuffling/</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gen_u32</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">mul_high_u32</span>(<span class="ident">r</span>, <span class="ident">n</span>);
@@ -764,7 +764,7 @@
 
     <span class="doccomment">/// Generates a random `u64` in `0..n`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">gen_mod_u64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">gen_mod_u64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
         <span class="comment">// Adapted from: https://lemire.me/blog/2016/06/30/fast-random-shuffling/</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gen_u64</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">mul_high_u64</span>(<span class="ident">r</span>, <span class="ident">n</span>);
@@ -782,7 +782,7 @@
 
     <span class="doccomment">/// Generates a random `u128` in `0..n`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">gen_mod_u128</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+    <span class="kw">fn</span> <span class="ident">gen_mod_u128</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u128</span>) -&gt; <span class="ident">u128</span> {
         <span class="comment">// Adapted from: https://lemire.me/blog/2016/06/30/fast-random-shuffling/</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">gen_u128</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">mul_high_u128</span>(<span class="ident">r</span>, <span class="ident">n</span>);
@@ -811,19 +811,19 @@
 
 <span class="doccomment">/// Computes `(a * b) &gt;&gt; 32`.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">mul_high_u32</span>(<span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">fn</span> <span class="ident">mul_high_u32</span>(<span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
     (((<span class="ident">a</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">*</span> (<span class="ident">b</span> <span class="kw">as</span> <span class="ident">u64</span>)) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>
 }
 
 <span class="doccomment">/// Computes `(a * b) &gt;&gt; 64`.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">mul_high_u64</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">fn</span> <span class="ident">mul_high_u64</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     (((<span class="ident">a</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">*</span> (<span class="ident">b</span> <span class="kw">as</span> <span class="ident">u128</span>)) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u64</span>
 }
 
 <span class="doccomment">/// Computes `(a * b) &gt;&gt; 128`.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">mul_high_u128</span>(<span class="ident">a</span>: <span class="ident">u128</span>, <span class="ident">b</span>: <span class="ident">u128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u128</span> {
+<span class="kw">fn</span> <span class="ident">mul_high_u128</span>(<span class="ident">a</span>: <span class="ident">u128</span>, <span class="ident">b</span>: <span class="ident">u128</span>) -&gt; <span class="ident">u128</span> {
     <span class="comment">// Adapted from: https://stackoverflow.com/a/28904636</span>
     <span class="kw">let</span> <span class="ident">a_lo</span> <span class="op">=</span> <span class="ident">a</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">u128</span>;
     <span class="kw">let</span> <span class="ident">a_hi</span> <span class="op">=</span> (<span class="ident">a</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">u128</span>;
@@ -835,12 +835,12 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">rng_integer</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">unsigned_t</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">gen</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="kw">mod</span>:<span class="macro-nonterminal">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">tt</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">unsigned_t</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">gen</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="kw">mod</span>:<span class="macro-nonterminal">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">tt</span>) =&gt; {
         <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// Panics if the range is empty.</span>
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
             <span class="kw">let</span> <span class="ident">panic_empty_range</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
                 <span class="macro">panic!</span>(
                     <span class="string">&quot;empty range: {:?}..{:?}&quot;</span>,
@@ -850,22 +850,22 @@
             };
 
             <span class="kw">let</span> <span class="ident">low</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">start_bound</span>() {
-                <span class="ident">Bound::Unbounded</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::MIN</span>,
-                <span class="ident">Bound::Included</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
-                <span class="ident">Bound::Excluded</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">unwrap_or_else</span>(<span class="ident">panic_empty_range</span>),
+                <span class="ident">Bound::Unbounded</span> =&gt; <span class="ident">std</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::MIN</span>,
+                <span class="ident">Bound::Included</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+                <span class="ident">Bound::Excluded</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">unwrap_or_else</span>(<span class="ident">panic_empty_range</span>),
             };
 
             <span class="kw">let</span> <span class="ident">high</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">end_bound</span>() {
-                <span class="ident">Bound::Unbounded</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::MAX</span>,
-                <span class="ident">Bound::Included</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
-                <span class="ident">Bound::Excluded</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">checked_sub</span>(<span class="number">1</span>).<span class="ident">unwrap_or_else</span>(<span class="ident">panic_empty_range</span>),
+                <span class="ident">Bound::Unbounded</span> =&gt; <span class="ident">std</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::MAX</span>,
+                <span class="ident">Bound::Included</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+                <span class="ident">Bound::Excluded</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">checked_sub</span>(<span class="number">1</span>).<span class="ident">unwrap_or_else</span>(<span class="ident">panic_empty_range</span>),
             };
 
             <span class="kw">if</span> <span class="ident">low</span> <span class="op">&gt;</span> <span class="ident">high</span> {
                 <span class="ident">panic_empty_range</span>();
             }
 
-            <span class="kw">if</span> <span class="ident">low</span> <span class="op">=</span><span class="op">=</span> <span class="ident">std</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::MIN</span> <span class="op">&amp;&amp;</span> <span class="ident">high</span> <span class="op">=</span><span class="op">=</span> <span class="ident">std</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::MAX</span> {
+            <span class="kw">if</span> <span class="ident">low</span> <span class="op">==</span> <span class="ident">std</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::MIN</span> <span class="op">&amp;&amp;</span> <span class="ident">high</span> <span class="op">==</span> <span class="ident">std</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::MAX</span> {
                 <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">gen</span>() <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">high</span>.<span class="ident">wrapping_sub</span>(<span class="ident">low</span>).<span class="ident">wrapping_add</span>(<span class="number">1</span>);
@@ -878,7 +878,7 @@
 <span class="kw">impl</span> <span class="ident">Rng</span> {
     <span class="doccomment">/// Creates a new random number generator.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Rng</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Rng</span> {
         <span class="ident">Rng::with_seed</span>(
             <span class="ident">RNG</span>.<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">rng</span><span class="op">|</span> <span class="ident">rng</span>.<span class="ident">u64</span>(..))
                 .<span class="ident">unwrap_or</span>(<span class="number">0x4d595df4d0f33173</span>),
@@ -887,7 +887,7 @@
 
     <span class="doccomment">/// Creates a new random number generator with the initial seed.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_seed</span>(<span class="ident">seed</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_seed</span>(<span class="ident">seed</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">Rng</span>(<span class="ident">Cell::new</span>(<span class="number">0</span>));
 
         <span class="ident">rng</span>.<span class="ident">seed</span>(<span class="ident">seed</span>);
@@ -896,7 +896,7 @@
 
     <span class="doccomment">/// Generates a random `char` in ranges a-z and A-Z.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alphabetic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alphabetic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">char</span> {
         <span class="kw">const</span> <span class="ident">CHARS</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz&quot;</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">CHARS</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>;
         <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">u8</span>(..<span class="ident">len</span>);
@@ -905,7 +905,7 @@
 
     <span class="doccomment">/// Generates a random `char` in ranges a-z, A-Z and 0-9.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alphanumeric</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alphanumeric</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">char</span> {
         <span class="kw">const</span> <span class="ident">CHARS</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&quot;</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">CHARS</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>;
         <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">u8</span>(..<span class="ident">len</span>);
@@ -914,8 +914,8 @@
 
     <span class="doccomment">/// Generates a random `bool`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">u8</span>(..) <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">u8</span>(..) <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Generates a random digit in the given `base`.</span>
@@ -924,8 +924,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if the base is zero or greater than 36.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">base</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span> {
-        <span class="kw">if</span> <span class="ident">base</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">base</span>: <span class="ident">u32</span>) -&gt; <span class="ident">char</span> {
+        <span class="kw">if</span> <span class="ident">base</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;base cannot be zero&quot;</span>);
         }
         <span class="kw">if</span> <span class="ident">base</span> <span class="op">&gt;</span> <span class="number">36</span> {
@@ -940,14 +940,14 @@
     }
 
     <span class="doccomment">/// Generates a random `f32` in range `0..1`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">f32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">f32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f32</span> {
         <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="number">32</span>;
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">std::f32::MANTISSA_DIGITS</span> <span class="op">-</span> <span class="number">1</span>;
         <span class="ident">f32::from_bits</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">b</span> <span class="op">-</span> <span class="number">2</span>)) <span class="op">-</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">f</span>) <span class="op">+</span> (<span class="self">self</span>.<span class="ident">u32</span>(..) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">b</span> <span class="op">-</span> <span class="ident">f</span>))) <span class="op">-</span> <span class="number">1.0</span>
     }
 
     <span class="doccomment">/// Generates a random `f64` in range `0..1`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f64</span> {
         <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="number">64</span>;
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">std::f64::MANTISSA_DIGITS</span> <span class="op">-</span> <span class="number">1</span>;
         <span class="ident">f64::from_bits</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">b</span> <span class="op">-</span> <span class="number">2</span>)) <span class="op">-</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">f</span>) <span class="op">+</span> (<span class="self">self</span>.<span class="ident">u64</span>(..) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">b</span> <span class="op">-</span> <span class="ident">f</span>))) <span class="op">-</span> <span class="number">1.0</span>
@@ -1020,7 +1020,7 @@
 
     <span class="doccomment">/// Generates a random `char` in range a-z.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lowercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lowercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">char</span> {
         <span class="kw">const</span> <span class="ident">CHARS</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;abcdefghijklmnopqrstuvwxyz&quot;</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">CHARS</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>;
         <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">u8</span>(..<span class="ident">len</span>);
@@ -1116,7 +1116,7 @@
 
     <span class="doccomment">/// Generates a random `char` in range A-Z.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uppercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uppercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">char</span> {
         <span class="kw">const</span> <span class="ident">CHARS</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">CHARS</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>;
         <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">u8</span>(..<span class="ident">len</span>);
@@ -1132,31 +1132,31 @@
 
 <span class="doccomment">/// Generates a random `bool`.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bool</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bool</span>() -&gt; <span class="ident">bool</span> {
     <span class="ident">RNG</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">rng</span><span class="op">|</span> <span class="ident">rng</span>.<span class="ident">bool</span>())
 }
 
 <span class="doccomment">/// Generates a random `char` in ranges a-z and A-Z.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alphabetic</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alphabetic</span>() -&gt; <span class="ident">char</span> {
     <span class="ident">RNG</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">rng</span><span class="op">|</span> <span class="ident">rng</span>.<span class="ident">alphabetic</span>())
 }
 
 <span class="doccomment">/// Generates a random `char` in ranges a-z, A-Z and 0-9.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alphanumeric</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alphanumeric</span>() -&gt; <span class="ident">char</span> {
     <span class="ident">RNG</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">rng</span><span class="op">|</span> <span class="ident">rng</span>.<span class="ident">alphanumeric</span>())
 }
 
 <span class="doccomment">/// Generates a random `char` in range a-z.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lowercase</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lowercase</span>() -&gt; <span class="ident">char</span> {
     <span class="ident">RNG</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">rng</span><span class="op">|</span> <span class="ident">rng</span>.<span class="ident">lowercase</span>())
 }
 
 <span class="doccomment">/// Generates a random `char` in range A-Z.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uppercase</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uppercase</span>() -&gt; <span class="ident">char</span> {
     <span class="ident">RNG</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">rng</span><span class="op">|</span> <span class="ident">rng</span>.<span class="ident">uppercase</span>())
 }
 
@@ -1166,7 +1166,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Panics if the base is zero or greater than 36.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digit</span>(<span class="ident">base</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">char</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digit</span>(<span class="ident">base</span>: <span class="ident">u32</span>) -&gt; <span class="ident">char</span> {
     <span class="ident">RNG</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">rng</span><span class="op">|</span> <span class="ident">rng</span>.<span class="ident">digit</span>(<span class="ident">base</span>))
 }
 
@@ -1177,12 +1177,12 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">integer</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">tt</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">tt</span>) =&gt; {
         <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// Panics if the range is empty.</span>
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>(<span class="ident">range</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>(<span class="ident">range</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
             <span class="ident">RNG</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">rng</span><span class="op">|</span> <span class="ident">rng</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>(<span class="ident">range</span>))
         }
     };
@@ -1202,12 +1202,12 @@
 <span class="macro">integer!</span>(<span class="ident">isize</span>, <span class="string">&quot;Generates a random `isize` in the given range.&quot;</span>);
 
 <span class="doccomment">/// Generates a random `f32` in range `0..1`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">f32</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f32</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">f32</span>() -&gt; <span class="ident">f32</span> {
     <span class="ident">RNG</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">rng</span><span class="op">|</span> <span class="ident">rng</span>.<span class="ident">f32</span>())
 }
 
 <span class="doccomment">/// Generates a random `f64` in range `0..1`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">f64</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">f64</span>() -&gt; <span class="ident">f64</span> {
     <span class="ident">RNG</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">rng</span><span class="op">|</span> <span class="ident">rng</span>.<span class="ident">f64</span>())
 }
 </code></pre></div>

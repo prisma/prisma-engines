@@ -511,7 +511,7 @@ fn with_value(value: impl Value) {
         {
             $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">without</span>:<span class="ident">tt</span>)<span class="op">*</span>
         }
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">with</span>)<span class="op">*</span>
     };
 }
@@ -529,7 +529,7 @@ fn with_value(value: impl Value) {
         {
             $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">without</span>:<span class="ident">tt</span>)<span class="op">*</span>
         }
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">without</span>)<span class="op">*</span>
     };
 }
@@ -547,7 +547,7 @@ fn with_value(value: impl Value) {
         {
             $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">without</span>:<span class="ident">tt</span>)<span class="op">*</span>
         }
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">with</span>)<span class="op">*</span>
     };
 }
@@ -565,7 +565,7 @@ fn with_value(value: impl Value) {
         {
             $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">without</span>:<span class="ident">tt</span>)<span class="op">*</span>
         }
-    ) <span class="op">=</span><span class="op">&gt;</span> {
+    ) =&gt; {
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">without</span>)<span class="op">*</span>
     };
 }
@@ -642,7 +642,7 @@ Stream the structure of a [`Value`] using the given [`Stream`].
 
 This method is a convenient way of calling [`OwnedStream::stream`](stream/struct.OwnedStream.html#method.stream).
 */</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">stream</span>: <span class="ident">S</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">stream</span>: <span class="ident">S</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">Stream</span>,
 {

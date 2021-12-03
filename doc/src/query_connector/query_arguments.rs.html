@@ -250,7 +250,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">QueryArguments</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">model</span>: <span class="ident">ModelRef</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">model</span>: <span class="ident">ModelRef</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">model</span>,
             <span class="ident">cursor</span>: <span class="prelude-val">None</span>,
@@ -264,7 +264,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">do_nothing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">do_nothing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_none</span>()
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">take</span>.<span class="ident">is_none</span>()
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">skip</span>.<span class="ident">is_none</span>()
@@ -277,22 +277,22 @@
     <span class="doccomment">/// This is a marker that generally expresses whether or not a set of records can be</span>
     <span class="doccomment">/// retrieved by the connector or if it requires the query engine to fetch a raw set</span>
     <span class="doccomment">/// of records and perform certain operations itself, in-memory.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">requires_inmemory_processing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">requires_inmemory_processing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">distinct</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">contains_unstable_cursor</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">contains_null_cursor</span>()
     }
 
     <span class="doccomment">/// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_unstable_cursor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_unstable_cursor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_stable_ordering</span>()
     }
 
     <span class="doccomment">/// A null cursor is a cursor that is used in conjunction with a nullable order by (i.e. a field is optional).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_null_cursor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_null_cursor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_some</span>()
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">o</span> {
-                <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">is_required</span>(),
-                <span class="ident">OrderBy::Aggregation</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-                <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+                <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) =&gt; <span class="op">!</span><span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">is_required</span>(),
+                <span class="ident">OrderBy::Aggregation</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+                <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
             })
     }
 
@@ -321,7 +321,7 @@
     <span class="doccomment">///      * source model contains a combination of fields that is marked as unique, or ...</span>
     <span class="doccomment">///      * a relation orderBy contains a unique and is done solely over 1:1 relations.</span>
     <span class="doccomment">/// - `false` otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_stable_ordering</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_stable_ordering</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="bool-val">true</span>;
         }
@@ -331,9 +331,9 @@
             .<span class="ident">order_by</span>
             .<span class="ident">iter</span>()
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">o</span> {
-                <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">o</span>),
-                <span class="ident">OrderBy::Aggregation</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">o</span>),
+                <span class="ident">OrderBy::Aggregation</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             })
             .<span class="ident">collect</span>();
 
@@ -347,7 +347,7 @@
             <span class="ident">index</span>
                 .<span class="ident">fields</span>()
                 .<span class="ident">into_iter</span>()
-                .<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">on_model</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">field</span> <span class="op">=</span><span class="op">=</span> <span class="ident">f</span>))
+                .<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">on_model</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">field</span> <span class="op">==</span> <span class="ident">f</span>))
         });
 
         <span class="kw">let</span> <span class="ident">source_contains_unique</span> <span class="op">=</span> <span class="ident">on_model</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">unique</span>());
@@ -358,26 +358,26 @@
         <span class="ident">source_contains_unique</span> <span class="op">|</span><span class="op">|</span> <span class="ident">order_by_contains_unique_index</span> <span class="op">|</span><span class="op">|</span> <span class="ident">relations_contain_1to1_unique</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">take</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="number">0</span> { <span class="op">-</span><span class="ident">t</span> } <span class="kw">else</span> { <span class="ident">t</span> })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_unbatchable_ordering</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_unbatchable_ordering</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">o</span> {
-            <span class="ident">OrderBy::Scalar</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">OrderBy::Aggregation</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">OrderBy::Scalar</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="ident">OrderBy::Aggregation</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_unbatchable_filters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_unbatchable_filters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">filter</span>.<span class="ident">can_batch</span>(),
+            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">filter</span>) =&gt; <span class="op">!</span><span class="ident">filter</span>.<span class="ident">can_batch</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">filter</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="ident">filter</span>.<span class="ident">should_batch</span>(<span class="ident">chunk_size</span>))
@@ -385,9 +385,9 @@
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_none</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">batched</span>(<span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">batched</span>(<span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">filter</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">filter</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>;
                 <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cursor</span>;
                 <span class="kw">let</span> <span class="ident">take</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">take</span>;
@@ -413,11 +413,11 @@
                     })
                     .<span class="ident">collect</span>()
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="self">self</span>],
+            <span class="kw">_</span> =&gt; <span class="macro">vec!</span>[<span class="self">self</span>],
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ModelRef</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ModelRef</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>
     }
 }
@@ -426,7 +426,7 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">model_filter</span>: (<span class="ident">ModelRef</span>, <span class="ident">T</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">model_filter</span>: (<span class="ident">ModelRef</span>, <span class="ident">T</span>)) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">query_arguments</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">model_filter</span>.<span class="number">0</span>);
         <span class="ident">query_arguments</span>.<span class="ident">filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">model_filter</span>.<span class="number">1</span>.<span class="ident">into</span>());
         <span class="ident">query_arguments</span>

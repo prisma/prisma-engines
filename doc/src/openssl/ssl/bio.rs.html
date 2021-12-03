@@ -315,7 +315,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BioMethod</span>(<span class="ident">BIO_METHOD</span>);
 
 <span class="kw">impl</span> <span class="ident">BioMethod</span> {
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BioMethod</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BioMethod</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
         <span class="ident">BIO_METHOD::new</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">BioMethod</span>)
     }
 }
@@ -323,7 +323,7 @@
 <span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">BioMethod</span> {}
 <span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">BioMethod</span> {}
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">stream</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>, <span class="ident">BioMethod</span>), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">stream</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>, <span class="ident">BioMethod</span>), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">BioMethod::new</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">StreamState</span> {
@@ -342,22 +342,22 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">take_error</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">take_error</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>);
     <span class="ident">state</span>.<span class="ident">error</span>.<span class="ident">take</span>()
 }
 
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">take_panic</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">take_panic</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>);
     <span class="ident">state</span>.<span class="ident">panic</span>.<span class="ident">take</span>()
 }
 
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">S</span> {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">S</span> {
     <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">BIO_get_data</span>(<span class="ident">bio</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">StreamState</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>);
     <span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">stream</span>
 }
 
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">S</span> {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">S</span> {
     <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>(<span class="ident">bio</span>).<span class="ident">stream</span>
 }
 
@@ -371,48 +371,48 @@
     <span class="ident">state</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>).<span class="ident">dtls_mtu_size</span> <span class="op">=</span> <span class="ident">mtu_size</span> <span class="kw">as</span> <span class="ident">c_long</span>;
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">state</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">StreamState</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">state</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">StreamState</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
     <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">BIO_get_data</span>(<span class="ident">bio</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>)
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">bwrite</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>, <span class="ident">buf</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>, <span class="ident">len</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">bwrite</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>, <span class="ident">buf</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>, <span class="ident">len</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span> {
     <span class="ident">BIO_clear_retry_flags</span>(<span class="ident">bio</span>);
 
     <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>);
     <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">buf</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>);
 
     <span class="kw">match</span> <span class="ident">catch_unwind</span>(<span class="ident">AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">stream</span>.<span class="ident">write</span>(<span class="ident">buf</span>))) {
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">len</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">c_int</span>,
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">len</span>)) =&gt; <span class="ident">len</span> <span class="kw">as</span> <span class="ident">c_int</span>,
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
             <span class="kw">if</span> <span class="ident">retriable_error</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>) {
                 <span class="ident">BIO_set_retry_write</span>(<span class="ident">bio</span>);
             }
             <span class="ident">state</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
             <span class="op">-</span><span class="number">1</span>
         }
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
             <span class="ident">state</span>.<span class="ident">panic</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
             <span class="op">-</span><span class="number">1</span>
         }
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">bread</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>, <span class="ident">buf</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_char</span>, <span class="ident">len</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">bread</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>, <span class="ident">buf</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_char</span>, <span class="ident">len</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span> {
     <span class="ident">BIO_clear_retry_flags</span>(<span class="ident">bio</span>);
 
     <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>);
     <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts_mut</span>(<span class="ident">buf</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>);
 
     <span class="kw">match</span> <span class="ident">catch_unwind</span>(<span class="ident">AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">stream</span>.<span class="ident">read</span>(<span class="ident">buf</span>))) {
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">len</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">c_int</span>,
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">len</span>)) =&gt; <span class="ident">len</span> <span class="kw">as</span> <span class="ident">c_int</span>,
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
             <span class="kw">if</span> <span class="ident">retriable_error</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>) {
                 <span class="ident">BIO_set_retry_read</span>(<span class="ident">bio</span>);
             }
             <span class="ident">state</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
             <span class="op">-</span><span class="number">1</span>
         }
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
             <span class="ident">state</span>.<span class="ident">panic</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
             <span class="op">-</span><span class="number">1</span>
         }
@@ -420,14 +420,14 @@
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::match_like_matches_macro</span>)]</span> <span class="comment">// matches macro requires rust 1.42.0</span>
-<span class="kw">fn</span> <span class="ident">retriable_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">retriable_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">io::Error</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">kind</span>() {
-        <span class="ident">io::ErrorKind::WouldBlock</span> <span class="op">|</span> <span class="ident">io::ErrorKind::NotConnected</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        <span class="ident">io::ErrorKind::WouldBlock</span> <span class="op">|</span> <span class="ident">io::ErrorKind::NotConnected</span> =&gt; <span class="bool-val">true</span>,
+        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">bputs</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>, <span class="ident">s</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">bputs</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>, <span class="ident">s</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>) -&gt; <span class="ident">c_int</span> {
     <span class="ident">bwrite</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>, <span class="ident">s</span>, <span class="ident">strlen</span>(<span class="ident">s</span>) <span class="kw">as</span> <span class="ident">c_int</span>)
 }
 
@@ -436,29 +436,29 @@
     <span class="ident">cmd</span>: <span class="ident">c_int</span>,
     <span class="ident">_num</span>: <span class="ident">c_long</span>,
     <span class="ident">_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_long</span> {
+) -&gt; <span class="ident">c_long</span> {
     <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>);
 
-    <span class="kw">if</span> <span class="ident">cmd</span> <span class="op">=</span><span class="op">=</span> <span class="ident">BIO_CTRL_FLUSH</span> {
+    <span class="kw">if</span> <span class="ident">cmd</span> <span class="op">==</span> <span class="ident">BIO_CTRL_FLUSH</span> {
         <span class="kw">match</span> <span class="ident">catch_unwind</span>(<span class="ident">AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">stream</span>.<span class="ident">flush</span>())) {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(())) =&gt; <span class="number">1</span>,
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
                 <span class="ident">state</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
                 <span class="number">0</span>
             }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                 <span class="ident">state</span>.<span class="ident">panic</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
                 <span class="number">0</span>
             }
         }
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">cmd</span> <span class="op">=</span><span class="op">=</span> <span class="ident">BIO_CTRL_DGRAM_QUERY_MTU</span> {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">cmd</span> <span class="op">==</span> <span class="ident">BIO_CTRL_DGRAM_QUERY_MTU</span> {
         <span class="ident">state</span>.<span class="ident">dtls_mtu_size</span>
     } <span class="kw">else</span> {
         <span class="number">0</span>
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) -&gt; <span class="ident">c_int</span> {
     <span class="ident">BIO_set_init</span>(<span class="ident">bio</span>, <span class="number">0</span>);
     <span class="ident">BIO_set_num</span>(<span class="ident">bio</span>, <span class="number">0</span>);
     <span class="ident">BIO_set_data</span>(<span class="ident">bio</span>, <span class="ident">ptr::null_mut</span>());
@@ -466,7 +466,7 @@
     <span class="number">1</span>
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">destroy</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">destroy</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BIO</span>) -&gt; <span class="ident">c_int</span> {
     <span class="kw">if</span> <span class="ident">bio</span>.<span class="ident">is_null</span>() {
         <span class="kw">return</span> <span class="number">0</span>;
     }
@@ -491,7 +491,7 @@
         <span class="kw">struct</span> <span class="ident">BIO_METHOD</span>(<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIO_METHOD</span>);
 
         <span class="kw">impl</span> <span class="ident">BIO_METHOD</span> {
-            <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BIO_METHOD</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BIO_METHOD</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
                 <span class="kw">unsafe</span> {
                     <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">cvt_p</span>(<span class="ident">ffi::BIO_meth_new</span>(<span class="ident">ffi::BIO_TYPE_NONE</span>, <span class="string">b&quot;rust\0&quot;</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>))<span class="question-mark">?</span>;
                     <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">BIO_METHOD</span>(<span class="ident">ptr</span>);
@@ -505,7 +505,7 @@
                 }
             }
 
-            <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIO_METHOD</span> {
+            <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIO_METHOD</span> {
                 <span class="self">self</span>.<span class="number">0</span>
             }
         }
@@ -522,7 +522,7 @@
         <span class="kw">struct</span> <span class="ident">BIO_METHOD</span>(<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIO_METHOD</span>);
 
         <span class="kw">impl</span> <span class="ident">BIO_METHOD</span> {
-            <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BIO_METHOD</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BIO_METHOD</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ffi::BIO_METHOD</span> {
                     <span class="ident">type_</span>: <span class="ident">ffi::BIO_TYPE_NONE</span>,
                     <span class="ident">name</span>: <span class="string">b&quot;rust\0&quot;</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>,
@@ -539,7 +539,7 @@
                 <span class="prelude-val">Ok</span>(<span class="ident">BIO_METHOD</span>(<span class="ident">Box::into_raw</span>(<span class="ident">ptr</span>)))
             }
 
-            <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIO_METHOD</span> {
+            <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIO_METHOD</span> {
                 <span class="self">self</span>.<span class="number">0</span>
             }
         }
@@ -563,7 +563,7 @@
         }
 
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">bad_style</span>)]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">BIO_get_data</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIO</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span> {
+        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">BIO_get_data</span>(<span class="ident">bio</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::BIO</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span> {
             (<span class="kw-2">*</span><span class="ident">bio</span>).<span class="ident">ptr</span>
         }
 

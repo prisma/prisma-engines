@@ -304,7 +304,7 @@
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.18.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Prefer `::from_bitslice`&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident"><span class="self">Self</span>::from_bitslice</span>(<span class="ident">x</span>)
 	}
 
@@ -321,7 +321,7 @@
 	<span class="doccomment">/// As with `::new`, this only exists on `Box` when `T` is not unsized. This</span>
 	<span class="doccomment">/// takes a slice reference, and pins the referent slice.</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pin</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pin</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
 	<span class="kw">where</span>
 		<span class="ident">O</span>: <span class="ident">Unpin</span>,
 		<span class="ident">T</span>: <span class="ident">Unpin</span>,
@@ -363,7 +363,7 @@
 	<span class="doccomment">/// [`Layout`]: https://doc.rust-lang.org/alloc/struct.Layout.html</span>
 	<span class="doccomment">/// [`BitBox::into_raw`]: #method.into_raw</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
 		<span class="ident">raw</span>.<span class="ident">pipe</span>(<span class="ident">BitPtr::from_bitslice_ptr_mut</span>)
 			.<span class="ident">to_nonnull</span>()
 			.<span class="ident">pipe</span>(<span class="op">|</span><span class="ident">pointer</span><span class="op">|</span> <span class="self">Self</span> { <span class="ident">pointer</span> })
@@ -403,7 +403,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// [`BitBox::from_raw`]: #method.from_raw</span>
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_raw</span>(<span class="ident">b</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_raw</span>(<span class="ident">b</span>: <span class="self">Self</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="ident"><span class="self">Self</span>::leak</span>(<span class="ident">b</span>)
 	}
 
@@ -442,7 +442,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// [`BitBox::from_raw`]: #method.from_raw</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">leak</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">b</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">leak</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">b</span>: <span class="self">Self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">T</span>: <span class="lifetime">&#39;a</span> {
 		<span class="ident">b</span>.<span class="ident">pipe</span>(<span class="ident">ManuallyDrop::new</span>).<span class="ident">bitptr</span>().<span class="ident">to_bitslice_mut</span>()
 	}
@@ -485,7 +485,7 @@
 	<span class="doccomment">/// assert_eq!(bv, bitvec![0, 1, 0, 1]);</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bitvec</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bitvec</span>(<span class="self">self</span>) -&gt; <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bitptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bitptr</span>();
 		<span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="self">self</span>
 			<span class="comment">//  Disarm the `self` destructor</span>

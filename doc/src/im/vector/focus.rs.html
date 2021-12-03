@@ -1018,43 +1018,43 @@
     <span class="doccomment">/// Construct a `Focus` for a [`Vector`][Vector].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Vector]: enum.Vector.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">vector</span> {
-            <span class="ident">Vector::Inline</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">Vector::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">Vector::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Focus::Full</span>(<span class="ident">TreeFocus::new</span>(<span class="ident">tree</span>)),
+            <span class="ident">Vector::Inline</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
+            <span class="ident">Vector::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
+            <span class="ident">Vector::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">Focus::Full</span>(<span class="ident">TreeFocus::new</span>(<span class="ident">tree</span>)),
         }
     }
 
     <span class="doccomment">/// Get the length of the focused [`Vector`][Vector].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Vector]: enum.Vector.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">chunk</span>.<span class="ident">len</span>(),
-            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tree</span>.<span class="ident">len</span>(),
+            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">chunk</span>.<span class="ident">len</span>(),
+            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">len</span>(),
         }
     }
 
     <span class="doccomment">/// Test if the focused [`Vector`][Vector] is empty.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Vector]: enum.Vector.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Get a reference to the value at a given index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">chunk</span>.<span class="ident">get</span>(<span class="ident">index</span>),
-            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tree</span>.<span class="ident">get</span>(<span class="ident">index</span>),
+            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">chunk</span>.<span class="ident">get</span>(<span class="ident">index</span>),
+            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">get</span>(<span class="ident">index</span>),
         }
     }
 
     <span class="doccomment">/// Get a reference to the value at a given index.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if the index is out of bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">A</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">A</span> {
         <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">index</span>).<span class="ident">expect</span>(<span class="string">&quot;index out of bounds&quot;</span>)
     }
 
@@ -1062,14 +1062,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This gives you a reference to the leaf node that contains the index,</span>
     <span class="doccomment">/// along with its start and end indices.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chunk_at</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span>[<span class="ident">A</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chunk_at</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span>[<span class="ident">A</span>]) {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
         <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">len</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::Focus::chunk_at: index out of bounds&quot;</span>);
         }
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="number">0</span>..<span class="ident">len</span>, <span class="ident">chunk</span>),
-            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tree</span>.<span class="ident">get_chunk</span>(<span class="ident">index</span>),
+            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) =&gt; (<span class="number">0</span>..<span class="ident">len</span>, <span class="ident">chunk</span>),
+            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">get_chunk</span>(<span class="ident">index</span>),
         }
     }
 
@@ -1096,7 +1096,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at</span>
     <span class="doccomment">/// [Vector::split_at]: enum.Vector.html#method.split_at</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">narrow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">range</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">narrow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">range</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     {
@@ -1105,8 +1105,8 @@
             <span class="macro">panic!</span>(<span class="string">&quot;vector::Focus::narrow: range out of bounds&quot;</span>);
         }
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Focus::Single</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>[<span class="ident">r</span>]),
-            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Focus::Full</span>(<span class="ident">tree</span>.<span class="ident">narrow</span>(<span class="ident">r</span>)),
+            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>[<span class="ident">r</span>]),
+            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">Focus::Full</span>(<span class="ident">tree</span>.<span class="ident">narrow</span>(<span class="ident">r</span>)),
         }
     }
 
@@ -1140,16 +1140,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at</span>
     <span class="doccomment">/// [Vector::split_at]: enum.Vector.html#method.split_at</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="self">Self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
         <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::Focus::split_at: index out of bounds&quot;</span>);
         }
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">split_at</span>(<span class="ident">index</span>);
                 (<span class="ident">Focus::Single</span>(<span class="ident">left</span>), <span class="ident">Focus::Single</span>(<span class="ident">right</span>))
             }
-            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">split_at</span>(<span class="ident">index</span>);
                 (<span class="ident">Focus::Full</span>(<span class="ident">left</span>), <span class="ident">Focus::Full</span>(<span class="ident">right</span>))
             }
@@ -1164,7 +1164,7 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">A</span>;
     <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="ident">Iter::from_focus</span>(<span class="self">self</span>)
     }
 }
@@ -1173,10 +1173,10 @@
 <span class="kw">where</span>
     <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Focus::Full</span>(<span class="ident">tree</span>.<span class="ident">clone</span>()),
+            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
+            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">Focus::Full</span>(<span class="ident">tree</span>.<span class="ident">clone</span>()),
         }
     }
 }
@@ -1190,7 +1190,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">tree</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tree</span>.<span class="ident">clone</span>();
         <span class="ident">TreeFocus</span> {
             <span class="ident">view</span>: <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">clone</span>(),
@@ -1210,7 +1210,7 @@
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {}
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Ord</span><span class="op">&gt;</span>(<span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Ord</span><span class="op">&gt;</span>(<span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw-2">*</span><span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">range</span>.<span class="ident">start</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">range</span>.<span class="ident">end</span>
 }
 
@@ -1218,7 +1218,7 @@
 <span class="kw">where</span>
     <span class="ident">A</span>: <span class="ident">Clone</span>,
 {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tree</span>: <span class="kw-2">&amp;</span><span class="ident">RRB</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tree</span>: <span class="kw-2">&amp;</span><span class="ident">RRB</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">middle_start</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">outer_f</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">inner_f</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">middle_end</span> <span class="op">=</span> <span class="ident">middle_start</span> <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">middle</span>.<span class="ident">len</span>();
         <span class="ident">TreeFocus</span> {
@@ -1230,11 +1230,11 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">narrow</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">view</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">narrow</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">view</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">view</span>.<span class="ident">start</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>;
         <span class="ident">view</span>.<span class="ident">end</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>;
         <span class="ident">TreeFocus</span> {
@@ -1246,19 +1246,19 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="self">Self</span>) {
+    <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">left</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">narrow</span>(<span class="number">0</span>..<span class="ident">index</span>);
         <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">narrow</span>(<span class="ident">index</span>..<span class="ident">len</span>);
         (<span class="ident">left</span>, <span class="ident">right</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">physical_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">physical_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
         <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">end</span>);
         <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span> <span class="op">+</span> <span class="ident">index</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">logical_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">logical_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         (<span class="ident">range</span>.<span class="ident">start</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>)..(<span class="ident">range</span>.<span class="ident">end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>)
     }
 
@@ -1294,11 +1294,11 @@
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">get_focus</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Chunk</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_focus</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Chunk</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">target_ptr</span> }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
@@ -1310,7 +1310,7 @@
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_focus</span>()[<span class="ident">target_phys_index</span>])
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span>[<span class="ident">A</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span>[<span class="ident">A</span>]) {
         <span class="kw">let</span> <span class="ident">phys_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">physical_index</span>(<span class="ident">index</span>);
         <span class="kw">if</span> <span class="op">!</span><span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target_range</span>, <span class="kw-2">&amp;</span><span class="ident">phys_index</span>) {
             <span class="self">self</span>.<span class="ident">set_focus</span>(<span class="ident">phys_index</span>);
@@ -1406,44 +1406,44 @@
     <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
 {
     <span class="doccomment">/// Construct a `FocusMut` for a `Vector`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">vector</span> {
-            <span class="ident">Vector::Inline</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">Vector::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FocusMut::Single</span>(<span class="ident">Ref::make_mut</span>(<span class="ident">chunk</span>).<span class="ident">as_mut_slice</span>()),
-            <span class="ident">Vector::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FocusMut::Full</span>(<span class="ident">TreeFocusMut::new</span>(<span class="ident">tree</span>)),
+            <span class="ident">Vector::Inline</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>),
+            <span class="ident">Vector::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">FocusMut::Single</span>(<span class="ident">Ref::make_mut</span>(<span class="ident">chunk</span>).<span class="ident">as_mut_slice</span>()),
+            <span class="ident">Vector::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">FocusMut::Full</span>(<span class="ident">TreeFocusMut::new</span>(<span class="ident">tree</span>)),
         }
     }
 
     <span class="doccomment">/// Get the length of the focused `Vector`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">chunk</span>.<span class="ident">len</span>(),
-            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tree</span>.<span class="ident">len</span>(),
+            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">chunk</span>.<span class="ident">len</span>(),
+            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">len</span>(),
         }
     }
 
     <span class="doccomment">/// Test if the focused `Vector` is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// Get a reference to the value at a given index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">r</span>)
     }
 
     <span class="doccomment">/// Get a mutable reference to the value at a given index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">chunk</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>),
-            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tree</span>.<span class="ident">get</span>(<span class="ident">index</span>),
+            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">chunk</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>),
+            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">get</span>(<span class="ident">index</span>),
         }
     }
 
     <span class="doccomment">/// Get a reference to the value at a given index.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if the index is out of bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">A</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">A</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">index_mut</span>(<span class="ident">index</span>)
     }
 
@@ -1451,7 +1451,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if the index is out of bounds.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::should_implement_trait</span>)]</span> <span class="comment">// would if I could</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span> {
         <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>).<span class="ident">expect</span>(<span class="string">&quot;index out of bounds&quot;</span>)
     }
 
@@ -1459,10 +1459,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `None` if the index is out of bounds, or the replaced value</span>
     <span class="doccomment">/// otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>) {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">pos</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">replace</span>(<span class="ident">pos</span>, <span class="ident">value</span>)),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">pos</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">replace</span>(<span class="ident">pos</span>, <span class="ident">value</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
@@ -1472,7 +1472,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the indices are equal, this function returns without doing anything.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>) {
-        <span class="kw">if</span> <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="ident">b</span> {
+        <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> {
             <span class="kw">return</span>;
         }
         <span class="self">self</span>.<span class="ident">pair</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="op">|</span><span class="ident">left</span>, <span class="ident">right</span><span class="op">|</span> <span class="ident">swap</span>(<span class="ident">left</span>, <span class="ident">right</span>));
@@ -1498,11 +1498,11 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pair</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">B</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pair</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">B</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">B</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span>) -&gt; <span class="ident">B</span>,
     {
-        <span class="kw">if</span> <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="ident">b</span> {
+        <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::pair: indices cannot be equal!&quot;</span>);
         }
         <span class="kw">let</span> <span class="ident">pa</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">A</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index_mut</span>(<span class="ident">a</span>);
@@ -1530,11 +1530,11 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">triplet</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>, <span class="ident">c</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">B</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">triplet</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>, <span class="ident">c</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">B</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">B</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span>) -&gt; <span class="ident">B</span>,
     {
-        <span class="kw">if</span> <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="ident">b</span> <span class="op">|</span><span class="op">|</span> <span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="ident">c</span> <span class="op">|</span><span class="op">|</span> <span class="ident">a</span> <span class="op">=</span><span class="op">=</span> <span class="ident">c</span> {
+        <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> <span class="op">|</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="ident">c</span> <span class="op">|</span><span class="op">|</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">c</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::triplet: indices cannot be equal!&quot;</span>);
         }
         <span class="kw">let</span> <span class="ident">pa</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">A</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index_mut</span>(<span class="ident">a</span>);
@@ -1547,14 +1547,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This gives you a reference to the leaf node that contains the index,</span>
     <span class="doccomment">/// along with its start and end indices.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chunk_at</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">A</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chunk_at</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">A</span>]) {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
         <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">len</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::chunk_at: index out of bounds&quot;</span>);
         }
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="number">0</span>..<span class="ident">len</span>, <span class="ident">chunk</span>),
-            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) =&gt; (<span class="number">0</span>..<span class="ident">len</span>, <span class="ident">chunk</span>),
+            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">range</span>, <span class="ident">chunk</span>) <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">get_chunk</span>(<span class="ident">index</span>);
                 (<span class="ident">range</span>, <span class="ident">chunk</span>)
             }
@@ -1584,7 +1584,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at</span>
     <span class="doccomment">/// [Vector::split_at]: enum.Vector.html#method.split_at</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">narrow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">range</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">narrow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">range</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">R</span>: <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     {
@@ -1593,8 +1593,8 @@
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::narrow: range out of bounds&quot;</span>);
         }
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FocusMut::Single</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">chunk</span>[<span class="ident">r</span>]),
-            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>.<span class="ident">narrow</span>(<span class="ident">r</span>)),
+            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">FocusMut::Single</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">chunk</span>[<span class="ident">r</span>]),
+            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>.<span class="ident">narrow</span>(<span class="ident">r</span>)),
         }
     }
 
@@ -1635,16 +1635,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at</span>
     <span class="doccomment">/// [Vector::split_at]: enum.Vector.html#method.split_at</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="self">Self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
         <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">len</span>() {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::split_at: index out of bounds&quot;</span>);
         }
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">split_at_mut</span>(<span class="ident">index</span>);
                 (<span class="ident">FocusMut::Single</span>(<span class="ident">left</span>), <span class="ident">FocusMut::Single</span>(<span class="ident">right</span>))
             }
-            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">FocusMut::Full</span>(<span class="ident">tree</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">split_at</span>(<span class="ident">index</span>);
                 (<span class="ident">FocusMut::Full</span>(<span class="ident">left</span>), <span class="ident">FocusMut::Full</span>(<span class="ident">right</span>))
             }
@@ -1652,10 +1652,10 @@
     }
 
     <span class="doccomment">/// Convert a `FocusMut` into a `Focus`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unmut</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unmut</span>(<span class="self">self</span>) -&gt; <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">FocusMut::Full</span>(<span class="kw-2">mut</span> <span class="ident">tree</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Focus::Full</span>(<span class="ident">TreeFocus</span> {
+            <span class="ident">FocusMut::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
+            <span class="ident">FocusMut::Full</span>(<span class="kw-2">mut</span> <span class="ident">tree</span>) =&gt; <span class="ident">Focus::Full</span>(<span class="ident">TreeFocus</span> {
                 <span class="ident">tree</span>: {
                     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">tree</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
                     (<span class="kw-2">*</span><span class="ident">t</span>).<span class="ident">clone</span>()
@@ -1676,7 +1676,7 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">A</span>;
     <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="ident">IterMut::from_focus</span>(<span class="self">self</span>)
     }
 }
@@ -1685,7 +1685,7 @@
 <span class="kw">where</span>
     <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">unmut</span>()
     }
 }
@@ -1705,7 +1705,7 @@
 <span class="kw">where</span>
     <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tree</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">RRB</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tree</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">RRB</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">middle_start</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">outer_f</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">inner_f</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">middle_end</span> <span class="op">=</span> <span class="ident">middle_start</span> <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">middle</span>.<span class="ident">len</span>();
         <span class="ident">TreeFocusMut</span> {
@@ -1717,11 +1717,11 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">narrow</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">view</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">narrow</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">view</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">view</span>.<span class="ident">start</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>;
         <span class="ident">view</span>.<span class="ident">end</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>;
         <span class="ident">TreeFocusMut</span> {
@@ -1733,7 +1733,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="self">Self</span>) {
+    <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
         <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">len</span>);
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
@@ -1754,12 +1754,12 @@
         (<span class="ident">left</span>, <span class="ident">right</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">physical_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">physical_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
         <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">end</span>);
         <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span> <span class="op">+</span> <span class="ident">index</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">logical_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">logical_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         (<span class="ident">range</span>.<span class="ident">start</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>)..(<span class="ident">range</span>.<span class="ident">end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>)
     }
 
@@ -1802,11 +1802,11 @@
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">get_focus</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Chunk</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_focus</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Chunk</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
@@ -1818,7 +1818,7 @@
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">get_focus</span>()[<span class="ident">target_phys_index</span>])
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">A</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">A</span>]) {
         <span class="kw">let</span> <span class="ident">phys_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">physical_index</span>(<span class="ident">index</span>);
         <span class="kw">if</span> <span class="op">!</span><span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target_range</span>, <span class="kw-2">&amp;</span><span class="ident">phys_index</span>) {
             <span class="self">self</span>.<span class="ident">set_focus</span>(<span class="ident">phys_index</span>);

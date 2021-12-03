@@ -412,17 +412,17 @@
     <span class="kw-2">mut</span> <span class="ident">input_map</span>: <span class="ident">ParsedInputMap</span>,
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>,
     <span class="ident">reverse</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">json_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">input_map</span>.<span class="ident">remove</span>(<span class="ident">filters::PATH</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">parse_json_path</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">parse_json_path</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     };
 
     <span class="kw">let</span> <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">input_map</span>
         .<span class="ident">into_iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">type_identifier</span> {
-            <span class="ident">TypeIdentifier::Json</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_internal_json</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>, <span class="ident">v</span>, <span class="ident">field</span>, <span class="ident">json_path</span>.<span class="ident">clone</span>(), <span class="ident">reverse</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">parse_internal_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>, <span class="ident">v</span>, <span class="ident">field</span>, <span class="ident">reverse</span>),
+            <span class="ident">TypeIdentifier::Json</span> =&gt; <span class="ident">parse_internal_json</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>, <span class="ident">v</span>, <span class="ident">field</span>, <span class="ident">json_path</span>.<span class="ident">clone</span>(), <span class="ident">reverse</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">parse_internal_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>, <span class="ident">v</span>, <span class="ident">field</span>, <span class="ident">reverse</span>),
         })
         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
         .<span class="ident">into_iter</span>()
@@ -444,18 +444,18 @@
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>,
     <span class="ident">json_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>,
     <span class="ident">reverse</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">filter_key</span> {
-        <span class="ident">filters::NOT_LOWERCASE</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::NOT_LOWERCASE</span> =&gt; {
             <span class="kw">match</span> <span class="ident">input</span> {
                 <span class="comment">// Support for syntax `{ scalarField: { not: &lt;value&gt; } }` and `{ scalarField: { not: &lt;value&gt; } }`</span>
-                <span class="ident">ParsedInputValue::Single</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ParsedInputValue::Single</span>(<span class="ident">value</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span>
                         <span class="ident">json_null_enum_filter</span>(<span class="ident">value</span>, <span class="ident">json_path</span>, <span class="op">|</span><span class="ident">val</span>, <span class="ident">path</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">json_not_equals</span>(<span class="ident">val</span>, <span class="ident">path</span>), <span class="bool-val">true</span>);
 
                     <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">inner_object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
                     <span class="ident">parse</span>(<span class="ident">inner_object</span>, <span class="ident">field</span>, <span class="op">!</span><span class="ident">reverse</span>)
@@ -463,7 +463,7 @@
             }
         }
 
-        <span class="ident">filters::EQUALS</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::EQUALS</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
             <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
                 <span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>,
                 <span class="ident">json_path</span>,
@@ -474,7 +474,7 @@
             <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
         }
 
-        <span class="ident">filters::EQUALS</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::EQUALS</span> =&gt; {
             <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
                 <span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>,
                 <span class="ident">json_path</span>,
@@ -485,35 +485,35 @@
             <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
         }
 
-        <span class="ident">filters::LOWER_THAN</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
+        <span class="ident">filters::LOWER_THAN</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
             <span class="ident">field</span>.<span class="ident">json_greater_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)
         ]),
 
-        <span class="ident">filters::GREATER_THAN</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::GREATER_THAN</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
             <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_less_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)])
         }
 
-        <span class="ident">filters::LOWER_THAN_OR_EQUAL</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::LOWER_THAN_OR_EQUAL</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
             <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_greater_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)])
         }
 
-        <span class="ident">filters::GREATER_THAN_OR_EQUAL</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_less_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)]),
-        <span class="ident">filters::LOWER_THAN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_less_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)]),
-        <span class="ident">filters::GREATER_THAN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_greater_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)]),
-        <span class="ident">filters::LOWER_THAN_OR_EQUAL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_less_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)]),
+        <span class="ident">filters::GREATER_THAN_OR_EQUAL</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_less_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)]),
+        <span class="ident">filters::LOWER_THAN</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_less_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)]),
+        <span class="ident">filters::GREATER_THAN</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_greater_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)]),
+        <span class="ident">filters::LOWER_THAN_OR_EQUAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_less_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)]),
 
-        <span class="ident">filters::GREATER_THAN_OR_EQUAL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
+        <span class="ident">filters::GREATER_THAN_OR_EQUAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
             <span class="ident">field</span>.<span class="ident">json_greater_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">json_path</span>)
         ]),
 
         <span class="comment">// List-specific filters</span>
-        <span class="ident">filters::HAS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_element</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::HAS_EVERY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_every_element</span>(<span class="ident">as_prisma_value_list</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::HAS_SOME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_some_element</span>(<span class="ident">as_prisma_value_list</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::IS_EMPTY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">is_empty_list</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)]),
+        <span class="ident">filters::HAS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_element</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::HAS_EVERY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_every_element</span>(<span class="ident">as_prisma_value_list</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::HAS_SOME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_some_element</span>(<span class="ident">as_prisma_value_list</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::IS_EMPTY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">is_empty_list</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)]),
 
         <span class="comment">// Json-specific filters</span>
-        <span class="ident">filters::ARRAY_CONTAINS</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::ARRAY_CONTAINS</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
             <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
                 <span class="ident">coerce_json_null</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>),
                 <span class="ident">json_path</span>,
@@ -524,7 +524,7 @@
             <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
         }
 
-        <span class="ident">filters::ARRAY_STARTS_WITH</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::ARRAY_STARTS_WITH</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
             <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
                 <span class="ident">coerce_json_null</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>),
                 <span class="ident">json_path</span>,
@@ -535,7 +535,7 @@
             <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
         }
 
-        <span class="ident">filters::ARRAY_ENDS_WITH</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::ARRAY_ENDS_WITH</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
             <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
                 <span class="ident">coerce_json_null</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>),
                 <span class="ident">json_path</span>,
@@ -546,25 +546,25 @@
             <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
         }
 
-        <span class="ident">filters::STRING_CONTAINS</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_not_contains</span>(
+        <span class="ident">filters::STRING_CONTAINS</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_not_contains</span>(
             <span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>,
             <span class="ident">json_path</span>,
             <span class="ident">JsonTargetType::String</span>,
         )]),
 
-        <span class="ident">filters::STRING_STARTS_WITH</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_not_starts_with</span>(
+        <span class="ident">filters::STRING_STARTS_WITH</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_not_starts_with</span>(
             <span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>,
             <span class="ident">json_path</span>,
             <span class="ident">JsonTargetType::String</span>,
         )]),
 
-        <span class="ident">filters::STRING_ENDS_WITH</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_not_ends_with</span>(
+        <span class="ident">filters::STRING_ENDS_WITH</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_not_ends_with</span>(
             <span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>,
             <span class="ident">json_path</span>,
             <span class="ident">JsonTargetType::String</span>,
         )]),
 
-        <span class="ident">filters::ARRAY_CONTAINS</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::ARRAY_CONTAINS</span> =&gt; {
             <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
                 <span class="ident">coerce_json_null</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>),
                 <span class="ident">json_path</span>,
@@ -575,7 +575,7 @@
             <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
         }
 
-        <span class="ident">filters::ARRAY_STARTS_WITH</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::ARRAY_STARTS_WITH</span> =&gt; {
             <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
                 <span class="ident">coerce_json_null</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>),
                 <span class="ident">json_path</span>,
@@ -586,7 +586,7 @@
             <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
         }
 
-        <span class="ident">filters::ARRAY_ENDS_WITH</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::ARRAY_ENDS_WITH</span> =&gt; {
             <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">json_null_enum_filter</span>(
                 <span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>,
                 <span class="ident">json_path</span>,
@@ -597,25 +597,25 @@
             <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
         }
 
-        <span class="ident">filters::STRING_CONTAINS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_contains</span>(
+        <span class="ident">filters::STRING_CONTAINS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_contains</span>(
             <span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>,
             <span class="ident">json_path</span>,
             <span class="ident">JsonTargetType::String</span>,
         )]),
 
-        <span class="ident">filters::STRING_STARTS_WITH</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_starts_with</span>(
+        <span class="ident">filters::STRING_STARTS_WITH</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_starts_with</span>(
             <span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>,
             <span class="ident">json_path</span>,
             <span class="ident">JsonTargetType::String</span>,
         )]),
 
-        <span class="ident">filters::STRING_ENDS_WITH</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_ends_with</span>(
+        <span class="ident">filters::STRING_ENDS_WITH</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">json_ends_with</span>(
             <span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>,
             <span class="ident">json_path</span>,
             <span class="ident">JsonTargetType::String</span>,
         )]),
 
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">_</span> =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;{} is not a valid scalar filter operation&quot;</span>,
                 <span class="ident">filter_key</span>
@@ -629,28 +629,28 @@
     <span class="ident">json_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>,
     <span class="ident">filter_fn</span>: <span class="ident">F</span>,
     <span class="ident">reverse</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+) -&gt; <span class="ident">Filter</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">PrismaValue</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">PrismaValue</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>,
 {
     <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">PrismaValue::Enum</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">as_str</span>() {
-            <span class="ident">json_null::DB_NULL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Null</span>, <span class="ident">json_path</span>),
-            <span class="ident">json_null::JSON_NULL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Json</span>(<span class="string">&quot;null&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">json_path</span>),
+        <span class="ident">PrismaValue::Enum</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">as_str</span>() {
+            <span class="ident">json_null::DB_NULL</span> =&gt; <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Null</span>, <span class="ident">json_path</span>),
+            <span class="ident">json_null::JSON_NULL</span> =&gt; <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Json</span>(<span class="string">&quot;null&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">json_path</span>),
 
-            <span class="ident">json_null::ANY_NULL</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Filter::And</span>(<span class="macro">vec!</span>[
+            <span class="ident">json_null::ANY_NULL</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="ident">Filter::And</span>(<span class="macro">vec!</span>[
                 <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Json</span>(<span class="string">&quot;null&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">json_path</span>.<span class="ident">clone</span>()),
                 <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Null</span>, <span class="ident">json_path</span>),
             ]),
 
-            <span class="ident">json_null::ANY_NULL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Filter::Or</span>(<span class="macro">vec!</span>[
+            <span class="ident">json_null::ANY_NULL</span> =&gt; <span class="ident">Filter::Or</span>(<span class="macro">vec!</span>[
                 <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Json</span>(<span class="string">&quot;null&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">json_path</span>.<span class="ident">clone</span>()),
                 <span class="ident">filter_fn</span>(<span class="ident">PrismaValue::Null</span>, <span class="ident">json_path</span>),
             ]),
 
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees correct enum values.</span>
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees correct enum values.</span>
         },
-        <span class="ident">val</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">filter_fn</span>(<span class="ident">val</span>, <span class="ident">json_path</span>),
+        <span class="ident">val</span> =&gt; <span class="ident">filter_fn</span>(<span class="ident">val</span>, <span class="ident">json_path</span>),
     };
 
     <span class="ident">filter</span>
@@ -661,13 +661,13 @@
     <span class="ident">input</span>: <span class="ident">ParsedInputValue</span>,
     <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>,
     <span class="ident">reverse</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">filter_key</span> {
-        <span class="ident">filters::NOT_LOWERCASE</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::NOT_LOWERCASE</span> =&gt; {
             <span class="kw">match</span> <span class="ident">input</span> {
                 <span class="comment">// Support for syntax `{ scalarField: { not: null } }` and `{ scalarField: { not: &lt;value&gt; } }`</span>
-                <span class="ident">ParsedInputValue::Single</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_equals</span>(<span class="ident">value</span>)]),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ParsedInputValue::Single</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_equals</span>(<span class="ident">value</span>)]),
+                <span class="kw">_</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">inner_object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
                     <span class="ident">parse</span>(<span class="ident">inner_object</span>, <span class="ident">field</span>, <span class="op">!</span><span class="ident">reverse</span>)
@@ -675,74 +675,74 @@
             }
         }
 
-        <span class="ident">filters::IN</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::IN</span> =&gt; {
             <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-                <span class="ident">PrismaValue::Null</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">field</span>.<span class="ident">not_equals</span>(<span class="ident">value</span>),
-                <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">field</span>.<span class="ident">not_in</span>(<span class="ident">values</span>),
+                <span class="ident">PrismaValue::Null</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="ident">field</span>.<span class="ident">not_equals</span>(<span class="ident">value</span>),
+                <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="ident">field</span>.<span class="ident">not_in</span>(<span class="ident">values</span>),
 
-                <span class="ident">PrismaValue::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">value</span>),
-                <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">field</span>.<span class="ident">is_in</span>(<span class="ident">values</span>),
+                <span class="ident">PrismaValue::Null</span> =&gt; <span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">value</span>),
+                <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) =&gt; <span class="ident">field</span>.<span class="ident">is_in</span>(<span class="ident">values</span>),
 
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees this.</span>
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees this.</span>
             };
 
             <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
         }
 
         <span class="comment">// Legacy operation</span>
-        <span class="ident">filters::NOT_IN</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">filters::NOT_IN</span> =&gt; {
             <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-                <span class="ident">PrismaValue::Null</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">value</span>), <span class="comment">// not not in null =&gt; in null</span>
-                <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">field</span>.<span class="ident">is_in</span>(<span class="ident">values</span>), <span class="comment">// not not in values =&gt; in values</span>
+                <span class="ident">PrismaValue::Null</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">value</span>), <span class="comment">// not not in null =&gt; in null</span>
+                <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="ident">field</span>.<span class="ident">is_in</span>(<span class="ident">values</span>), <span class="comment">// not not in values =&gt; in values</span>
 
-                <span class="ident">PrismaValue::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">field</span>.<span class="ident">not_equals</span>(<span class="ident">value</span>),
-                <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">field</span>.<span class="ident">not_in</span>(<span class="ident">values</span>),
+                <span class="ident">PrismaValue::Null</span> =&gt; <span class="ident">field</span>.<span class="ident">not_equals</span>(<span class="ident">value</span>),
+                <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) =&gt; <span class="ident">field</span>.<span class="ident">not_in</span>(<span class="ident">values</span>),
 
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees this.</span>
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees this.</span>
             };
 
             <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">filter</span>])
         }
 
-        <span class="ident">filters::EQUALS</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::CONTAINS</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_contains</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::STARTS_WITH</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_starts_with</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::ENDS_WITH</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_ends_with</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::EQUALS</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::CONTAINS</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_contains</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::STARTS_WITH</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_starts_with</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::ENDS_WITH</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_ends_with</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
 
-        <span class="ident">filters::EQUALS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::CONTAINS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::STARTS_WITH</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">starts_with</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::ENDS_WITH</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">ends_with</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::EQUALS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::CONTAINS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::STARTS_WITH</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">starts_with</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::ENDS_WITH</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">ends_with</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
 
-        <span class="ident">filters::LOWER_THAN</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">greater_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::GREATER_THAN</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">less_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::LOWER_THAN_OR_EQUAL</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">greater_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::GREATER_THAN_OR_EQUAL</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">less_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::LOWER_THAN</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">greater_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::GREATER_THAN</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">less_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::LOWER_THAN_OR_EQUAL</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">greater_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::GREATER_THAN_OR_EQUAL</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">less_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
 
-        <span class="ident">filters::LOWER_THAN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">less_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::GREATER_THAN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">greater_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::LOWER_THAN_OR_EQUAL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">less_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::GREATER_THAN_OR_EQUAL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">greater_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::LOWER_THAN</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">less_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::GREATER_THAN</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">greater_than</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::LOWER_THAN_OR_EQUAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">less_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::GREATER_THAN_OR_EQUAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">greater_than_or_equals</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
 
-        <span class="ident">filters::SEARCH</span> <span class="kw">if</span> <span class="ident">reverse</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_search</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::SEARCH</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">search</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::SEARCH</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">not_search</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::SEARCH</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">search</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
 
         <span class="comment">// List-specific filters</span>
-        <span class="ident">filters::HAS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_element</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::HAS_EVERY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_every_element</span>(<span class="ident">as_prisma_value_list</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::HAS_SOME</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_some_element</span>(<span class="ident">as_prisma_value_list</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
-        <span class="ident">filters::IS_EMPTY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">is_empty_list</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)]),
+        <span class="ident">filters::HAS</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_element</span>(<span class="ident">as_prisma_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::HAS_EVERY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_every_element</span>(<span class="ident">as_prisma_value_list</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::HAS_SOME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">contains_some_element</span>(<span class="ident">as_prisma_value_list</span>(<span class="ident">input</span>)<span class="question-mark">?</span>)]),
+        <span class="ident">filters::IS_EMPTY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">is_empty_list</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)]),
 
         <span class="comment">// Aggregation filters</span>
-        <span class="ident">aggregations::UNDERSCORE_COUNT</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aggregation_filter</span>(<span class="ident">field</span>, <span class="ident">input</span>, <span class="ident">reverse</span>, <span class="ident">Filter::count</span>),
-        <span class="ident">aggregations::UNDERSCORE_AVG</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aggregation_filter</span>(<span class="ident">field</span>, <span class="ident">input</span>, <span class="ident">reverse</span>, <span class="ident">Filter::average</span>),
-        <span class="ident">aggregations::UNDERSCORE_SUM</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aggregation_filter</span>(<span class="ident">field</span>, <span class="ident">input</span>, <span class="ident">reverse</span>, <span class="ident">Filter::sum</span>),
-        <span class="ident">aggregations::UNDERSCORE_MIN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aggregation_filter</span>(<span class="ident">field</span>, <span class="ident">input</span>, <span class="ident">reverse</span>, <span class="ident">Filter::min</span>),
-        <span class="ident">aggregations::UNDERSCORE_MAX</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">aggregation_filter</span>(<span class="ident">field</span>, <span class="ident">input</span>, <span class="ident">reverse</span>, <span class="ident">Filter::max</span>),
+        <span class="ident">aggregations::UNDERSCORE_COUNT</span> =&gt; <span class="ident">aggregation_filter</span>(<span class="ident">field</span>, <span class="ident">input</span>, <span class="ident">reverse</span>, <span class="ident">Filter::count</span>),
+        <span class="ident">aggregations::UNDERSCORE_AVG</span> =&gt; <span class="ident">aggregation_filter</span>(<span class="ident">field</span>, <span class="ident">input</span>, <span class="ident">reverse</span>, <span class="ident">Filter::average</span>),
+        <span class="ident">aggregations::UNDERSCORE_SUM</span> =&gt; <span class="ident">aggregation_filter</span>(<span class="ident">field</span>, <span class="ident">input</span>, <span class="ident">reverse</span>, <span class="ident">Filter::sum</span>),
+        <span class="ident">aggregations::UNDERSCORE_MIN</span> =&gt; <span class="ident">aggregation_filter</span>(<span class="ident">field</span>, <span class="ident">input</span>, <span class="ident">reverse</span>, <span class="ident">Filter::min</span>),
+        <span class="ident">aggregations::UNDERSCORE_MAX</span> =&gt; <span class="ident">aggregation_filter</span>(<span class="ident">field</span>, <span class="ident">input</span>, <span class="ident">reverse</span>, <span class="ident">Filter::max</span>),
 
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">_</span> =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;{} is not a valid scalar filter operation&quot;</span>,
                 <span class="ident">filter_key</span>
@@ -751,11 +751,11 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">as_prisma_value</span>(<span class="ident">input</span>: <span class="ident">ParsedInputValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">as_prisma_value</span>(<span class="ident">input</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">as_prisma_value_list</span>(<span class="ident">input</span>: <span class="ident">ParsedInputValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">as_prisma_value_list</span>(<span class="ident">input</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)
 }
 
@@ -764,22 +764,22 @@
     <span class="ident">input</span>: <span class="ident">ParsedInputValue</span>,
     <span class="ident">reverse</span>: <span class="ident">bool</span>,
     <span class="ident">func</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Filter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Filter</span>) -&gt; <span class="ident">Filter</span>,
 {
     <span class="kw">let</span> <span class="ident">inner_object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">inner_object</span>, <span class="ident">field</span>, <span class="ident">reverse</span>)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">filters</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="ident">func</span>(<span class="ident">filter</span>)).<span class="ident">collect</span>())
+    <span class="prelude-val">Ok</span>(<span class="ident">filters</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">func</span>).<span class="ident">collect</span>())
 }
 
-<span class="kw">fn</span> <span class="ident">parse_json_path</span>(<span class="ident">input</span>: <span class="ident">ParsedInputValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_json_path</span>(<span class="ident">input</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">JsonFilterPath</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">path</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
     <span class="kw">match</span> <span class="ident">path</span> {
-        <span class="ident">PrismaValue::String</span>(<span class="ident">str</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">JsonFilterPath::String</span>(<span class="ident">str</span>)),
-        <span class="ident">PrismaValue::List</span>(<span class="ident">list</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">PrismaValue::String</span>(<span class="ident">str</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">JsonFilterPath::String</span>(<span class="ident">str</span>)),
+        <span class="ident">PrismaValue::List</span>(<span class="ident">list</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">list</span>
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> {
@@ -790,14 +790,14 @@
 
             <span class="prelude-val">Ok</span>(<span class="ident">JsonFilterPath::Array</span>(<span class="ident">keys</span>))
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">coerce_json_null</span>(<span class="ident">value</span>: <span class="ident">PrismaValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrismaValue</span> {
+<span class="kw">fn</span> <span class="ident">coerce_json_null</span>(<span class="ident">value</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="ident">PrismaValue</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">PrismaValue::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Json</span>(<span class="string">&quot;null&quot;</span>.<span class="ident">to_owned</span>()),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>,
+        <span class="ident">PrismaValue::Null</span> =&gt; <span class="ident">PrismaValue::Json</span>(<span class="string">&quot;null&quot;</span>.<span class="ident">to_owned</span>()),
+        <span class="kw">_</span> =&gt; <span class="ident">value</span>,
     }
 }
 </code></pre></div>

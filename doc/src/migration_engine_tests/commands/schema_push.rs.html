@@ -180,7 +180,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SchemaPush</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>, <span class="ident">schema</span>: <span class="ident">String</span>, <span class="ident">rt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">tokio::runtime::Runtime</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>, <span class="ident">schema</span>: <span class="ident">String</span>, <span class="ident">rt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">tokio::runtime::Runtime</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SchemaPush</span> {
             <span class="ident">api</span>,
             <span class="ident">schema</span>,
@@ -190,17 +190,17 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">force</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">force</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">force</span> <span class="op">=</span> <span class="ident">force</span>;
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">migration_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">migration_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">migration_id</span> <span class="op">=</span> <span class="ident">migration_id</span>;
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">send_impl</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">send_impl</span>(<span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">SchemaPushInput</span> {
             <span class="ident">schema</span>: <span class="self">self</span>.<span class="ident">schema</span>,
             <span class="ident">force</span>: <span class="self">self</span>.<span class="ident">force</span>,
@@ -221,13 +221,13 @@
 
     <span class="doccomment">/// Execute the command and expect it to succeed.</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SchemaPushAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) -&gt; <span class="ident">SchemaPushAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">send_impl</span>().<span class="ident">unwrap</span>()
     }
 
     <span class="doccomment">/// Execute the command and expect it to fail, returning the error.</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_unwrap_err</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CoreError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_unwrap_err</span>(<span class="self">self</span>) -&gt; <span class="ident">CoreError</span> {
         <span class="self">self</span>.<span class="ident">send_impl</span>().<span class="ident">unwrap_err</span>()
     }
 }
@@ -238,7 +238,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">SchemaPushAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
@@ -246,11 +246,11 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SchemaPushAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Asserts that the command produced no warning and no unexecutable migration message.</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_green</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_green</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">assert_no_warning</span>().<span class="ident">assert_executable</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_no_warning</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_no_warning</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
             <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">warnings</span>.<span class="ident">is_empty</span>(),
             <span class="string">&quot;Assertion failed. Expected no warning, got {:?}&quot;</span>,
@@ -260,9 +260,9 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_warnings</span>(<span class="self">self</span>, <span class="ident">warnings</span>: <span class="kw-2">&amp;</span>[<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_warnings</span>(<span class="self">self</span>, <span class="ident">warnings</span>: <span class="kw-2">&amp;</span>[<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>]) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">warnings</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">warnings</span>.<span class="ident">len</span>(),
+            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">warnings</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">warnings</span>.<span class="ident">len</span>(),
             <span class="string">&quot;Expected {} warnings, got {}.\n{:#?}&quot;</span>,
             <span class="ident">warnings</span>.<span class="ident">len</span>(),
             <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">warnings</span>.<span class="ident">len</span>(),
@@ -280,16 +280,16 @@
     }
 
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_no_steps</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_no_steps</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">executed_steps</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>,
+            <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">executed_steps</span> <span class="op">==</span> <span class="number">0</span>,
             <span class="string">&quot;Assertion failed. Executed steps should be zero, but found {:#?}&quot;</span>,
             <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">executed_steps</span>,
         );
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_executed_steps</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_has_executed_steps</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
             <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">executed_steps</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
             <span class="string">&quot;Assertion failed. Executed steps should be not zero.&quot;</span>,
@@ -298,7 +298,7 @@
     }
 
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_executable</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_executable</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
             <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">unexecutable</span>.<span class="ident">is_empty</span>(),
             <span class="string">&quot;Expected an executable migration, got following: {:?}&quot;</span>,
@@ -308,7 +308,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_unexecutable</span>(<span class="self">self</span>, <span class="ident">expected_messages</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_unexecutable</span>(<span class="self">self</span>, <span class="ident">expected_messages</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_eq!</span>(
             <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">unexecutable</span>.<span class="ident">len</span>(),
             <span class="ident">expected_messages</span>.<span class="ident">len</span>(),

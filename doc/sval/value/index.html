@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A streamable value."><meta name="keywords" content="rust, rustlang, rust-lang, value"><title>sval::value - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../sval/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><h2 class="location">Module value</h2><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><div id="sidebar-vars" data-name="value" data-ty="mod" data-relpath="./"></div><script defer src="./sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../index.html">sval</a>::<wbr><a class="mod" href="#">value</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/sval/value/mod.rs.html#1-432" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A streamable value.</p>
-<h1 id="the-value-trait" class="section-header"><a href="#the-value-trait">The <code>Value</code> trait</a></h1>
+<h2 id="the-value-trait" class="section-header"><a href="#the-value-trait">The <code>Value</code> trait</a></h2>
 <p>A <a href="trait.Value.html" title="Value"><code>Value</code></a> is a type that has structure, like a number, string, map, or sequence.</p>
-<h2 id="deriving-value" class="section-header"><a href="#deriving-value">Deriving <code>Value</code></a></h2>
+<h3 id="deriving-value" class="section-header"><a href="#deriving-value">Deriving <code>Value</code></a></h3>
 <p>Use the <code>derive</code> Cargo feature to support automatic implementations of the <code>Value</code> trait:</p>
 <div class="example-wrap"><pre class="language-toml,ignore"><code>[dependencies.sval]
 features = [&quot;derive&quot;]</code></pre></div>
@@ -21,11 +21,11 @@ features = [&quot;derive&quot;]</code></pre></div>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Id</span>(<span class="ident">u64</span>);
 
 <span class="kw">impl</span> <span class="ident">Value</span> <span class="kw">for</span> <span class="ident">Id</span> {
-    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">value::Result</span> {
+    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
         <span class="ident">stream</span>.<span class="ident">u64</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
 }</code></pre></div>
-<h2 id="sequences" class="section-header"><a href="#sequences">Sequences</a></h2>
+<h3 id="sequences" class="section-header"><a href="#sequences">Sequences</a></h3>
 <p>A sequence can be visited by iterating over its elements:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">sval::value</span>::{<span class="self">self</span>, <span class="ident">Value</span>};
@@ -33,7 +33,7 @@ features = [&quot;derive&quot;]</code></pre></div>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Seq</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">Value</span> <span class="kw">for</span> <span class="ident">Seq</span> {
-    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">value::Result</span> {
+    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
         <span class="ident">stream</span>.<span class="ident">seq_begin</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
 
         <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
@@ -43,7 +43,7 @@ features = [&quot;derive&quot;]</code></pre></div>
         <span class="ident">stream</span>.<span class="ident">seq_end</span>()
     }
 }</code></pre></div>
-<h2 id="maps" class="section-header"><a href="#maps">Maps</a></h2>
+<h3 id="maps" class="section-header"><a href="#maps">Maps</a></h3>
 <p>A map can be visited by iterating over its key-value pairs:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
@@ -52,7 +52,7 @@ features = [&quot;derive&quot;]</code></pre></div>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Map</span>(<span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">u64</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">Value</span> <span class="kw">for</span> <span class="ident">Map</span> {
-    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">value::Result</span> {
+    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
         <span class="ident">stream</span>.<span class="ident">map_begin</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
 
         <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
@@ -63,7 +63,7 @@ features = [&quot;derive&quot;]</code></pre></div>
         <span class="ident">stream</span>.<span class="ident">map_end</span>()
     }
 }</code></pre></div>
-<h2 id="structure-that-isnt-known-upfront" class="section-header"><a href="#structure-that-isnt-known-upfront">Structure that isn’t known upfront</a></h2>
+<h3 id="structure-that-isnt-known-upfront" class="section-header"><a href="#structure-that-isnt-known-upfront">Structure that isn’t known upfront</a></h3>
 <p>Types can stream a structure that’s different than what they use internally.
 In the following example, the <code>Map</code> type doesn’t have any keys or values,
 but serializes a nested map like <code>{&quot;nested&quot;: {&quot;key&quot;: 42}}</code>:</p>
@@ -73,7 +73,7 @@ but serializes a nested map like <code>{&quot;nested&quot;: {&quot;key&quot;: 42
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Map</span>;
 
 <span class="kw">impl</span> <span class="ident">Value</span> <span class="kw">for</span> <span class="ident">Map</span> {
-    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">value::Result</span> {
+    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
         <span class="ident">stream</span>.<span class="ident">map_begin</span>(<span class="prelude-val">Some</span>(<span class="number">1</span>))<span class="question-mark">?</span>;
 
         <span class="ident">stream</span>.<span class="ident">map_key_begin</span>()<span class="question-mark">?</span>.<span class="ident">str</span>(<span class="string">&quot;nested&quot;</span>)<span class="question-mark">?</span>;
@@ -86,12 +86,12 @@ but serializes a nested map like <code>{&quot;nested&quot;: {&quot;key&quot;: 42
     }
 }</code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.OwnedValue.html" title="sval::value::OwnedValue struct">OwnedValue</a></div><div class="item-right docblock-short"><p>An owned, immutable value.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Stream.html" title="sval::value::Stream struct">Stream</a></div><div class="item-right docblock-short"><p>A borrowed stream wrapper.</p>
-</div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.Value.html" title="sval::value::Value trait">Value</a></div><div class="item-right docblock-short"><p>A value with a streamable structure.</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Result.html" title="sval::value::Result type">Result</a></div><div class="item-right docblock-short"><p>The type returned by streaming methods.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sval" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OwnedValue.html" title="sval::value::OwnedValue struct">OwnedValue</a></div><div class="item-right docblock-short"><p>An owned, immutable value.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Stream.html" title="sval::value::Stream struct">Stream</a></div><div class="item-right docblock-short"><p>A borrowed stream wrapper.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Value.html" title="sval::value::Value trait">Value</a></div><div class="item-right docblock-short"><p>A value with a streamable structure.</p>
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Result.html" title="sval::value::Result type">Result</a></div><div class="item-right docblock-short"><p>The type returned by streaming methods.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sval" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

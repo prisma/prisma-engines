@@ -7,7 +7,7 @@ only once, instead of it being done in every HMAC operation.</p>
 contiguous piece. In that case, the module-level <code>sign</code> function can be
 used. Otherwise, if the input is in multiple parts, <code>Context</code> should be
 used.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples:</a></h1><h2 id="signing-a-value-and-verifying-it-wasnt-tampered-with" class="section-header"><a href="#signing-a-value-and-verifying-it-wasnt-tampered-with">Signing a value and verifying it wasn’t tampered with</a></h2>
+<h2 id="examples" class="section-header"><a href="#examples">Examples:</a></h2><h3 id="signing-a-value-and-verifying-it-wasnt-tampered-with" class="section-header"><a href="#signing-a-value-and-verifying-it-wasnt-tampered-with">Signing a value and verifying it wasn’t tampered with</a></h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">ring</span>::{<span class="ident">hmac</span>, <span class="ident">rand</span>};
 
 <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::SystemRandom::new</span>();
@@ -22,7 +22,7 @@ used.</p>
 
 <span class="ident">hmac::verify</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">msg</span>.<span class="ident">as_bytes</span>(), <span class="ident">tag</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
 </code></pre></div>
-<h2 id="using-the-one-shot-api" class="section-header"><a href="#using-the-one-shot-api">Using the one-shot API:</a></h2>
+<h3 id="using-the-one-shot-api" class="section-header"><a href="#using-the-one-shot-api">Using the one-shot API:</a></h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">ring</span>::{<span class="ident">digest</span>, <span class="ident">hmac</span>, <span class="ident">rand</span>};
 <span class="kw">use</span> <span class="ident">ring::rand::SecureRandom</span>;
 
@@ -42,7 +42,7 @@ used.</p>
 <span class="kw">let</span> <span class="ident">v_key</span> <span class="op">=</span> <span class="ident">hmac::Key::new</span>(<span class="ident">hmac::HMAC_SHA256</span>, <span class="ident">key_value</span>.<span class="ident">as_ref</span>());
 <span class="ident">hmac::verify</span>(<span class="kw-2">&amp;</span><span class="ident">v_key</span>, <span class="ident">msg</span>.<span class="ident">as_bytes</span>(), <span class="ident">tag</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
 </code></pre></div>
-<h2 id="using-the-multi-part-api" class="section-header"><a href="#using-the-multi-part-api">Using the multi-part API:</a></h2>
+<h3 id="using-the-multi-part-api" class="section-header"><a href="#using-the-multi-part-api">Using the multi-part API:</a></h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">ring</span>::{<span class="ident">digest</span>, <span class="ident">hmac</span>, <span class="ident">rand</span>};
 <span class="kw">use</span> <span class="ident">ring::rand::SecureRandom</span>;
 
@@ -71,24 +71,24 @@ used.</p>
 <span class="ident">hmac::verify</span>(<span class="kw-2">&amp;</span><span class="ident">v_key</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">as_ref</span>(), <span class="ident">tag</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
 </code></pre></div>
 </div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Algorithm.html" title="ring::hmac::Algorithm struct">Algorithm</a></div><div class="item-right docblock-short"><p>An HMAC algorithm.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Context.html" title="ring::hmac::Context struct">Context</a></div><div class="item-right docblock-short"><p>A context for multi-step (Init-Update-Finish) HMAC signing.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Key.html" title="ring::hmac::Key struct">Key</a></div><div class="item-right docblock-short"><p>A key to use for HMAC signing.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Tag.html" title="ring::hmac::Tag struct">Tag</a></div><div class="item-right docblock-short"><p>An HMAC tag.</p>
-</div></div><h2 id="statics" class="section-header"><a href="#statics">Statics</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="static" href="static.HMAC_SHA1_FOR_LEGACY_USE_ONLY.html" title="ring::hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY static">HMAC_SHA1_FOR_LEGACY_USE_ONLY</a></div><div class="item-right docblock-short"><p>HMAC using SHA-1. Obsolete.</p>
-</div><div class="item-left module-item"><a class="static" href="static.HMAC_SHA256.html" title="ring::hmac::HMAC_SHA256 static">HMAC_SHA256</a></div><div class="item-right docblock-short"><p>HMAC using SHA-256.</p>
-</div><div class="item-left module-item"><a class="static" href="static.HMAC_SHA384.html" title="ring::hmac::HMAC_SHA384 static">HMAC_SHA384</a></div><div class="item-right docblock-short"><p>HMAC using SHA-384.</p>
-</div><div class="item-left module-item"><a class="static" href="static.HMAC_SHA512.html" title="ring::hmac::HMAC_SHA512 static">HMAC_SHA512</a></div><div class="item-right docblock-short"><p>HMAC using SHA-512.</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.sign.html" title="ring::hmac::sign fn">sign</a></div><div class="item-right docblock-short"><p>Calculates the HMAC of <code>data</code> using the key <code>key</code> in one step.</p>
-</div><div class="item-left module-item"><a class="fn" href="fn.verify.html" title="ring::hmac::verify fn">verify</a></div><div class="item-right docblock-short"><p>Calculates the HMAC of <code>data</code> using the signing key <code>key</code>, and verifies
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Algorithm.html" title="ring::hmac::Algorithm struct">Algorithm</a></div><div class="item-right docblock-short"><p>An HMAC algorithm.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Context.html" title="ring::hmac::Context struct">Context</a></div><div class="item-right docblock-short"><p>A context for multi-step (Init-Update-Finish) HMAC signing.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Key.html" title="ring::hmac::Key struct">Key</a></div><div class="item-right docblock-short"><p>A key to use for HMAC signing.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Tag.html" title="ring::hmac::Tag struct">Tag</a></div><div class="item-right docblock-short"><p>An HMAC tag.</p>
+</div></div></div><h2 id="statics" class="section-header"><a href="#statics">Statics</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="static" href="static.HMAC_SHA1_FOR_LEGACY_USE_ONLY.html" title="ring::hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY static">HMAC_SHA1_FOR_LEGACY_USE_ONLY</a></div><div class="item-right docblock-short"><p>HMAC using SHA-1. Obsolete.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="static" href="static.HMAC_SHA256.html" title="ring::hmac::HMAC_SHA256 static">HMAC_SHA256</a></div><div class="item-right docblock-short"><p>HMAC using SHA-256.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="static" href="static.HMAC_SHA384.html" title="ring::hmac::HMAC_SHA384 static">HMAC_SHA384</a></div><div class="item-right docblock-short"><p>HMAC using SHA-384.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="static" href="static.HMAC_SHA512.html" title="ring::hmac::HMAC_SHA512 static">HMAC_SHA512</a></div><div class="item-right docblock-short"><p>HMAC using SHA-512.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.sign.html" title="ring::hmac::sign fn">sign</a></div><div class="item-right docblock-short"><p>Calculates the HMAC of <code>data</code> using the key <code>key</code> in one step.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.verify.html" title="ring::hmac::verify fn">verify</a></div><div class="item-right docblock-short"><p>Calculates the HMAC of <code>data</code> using the signing key <code>key</code>, and verifies
 whether the resultant value equals <code>tag</code>, in one step.</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Signature.html" title="ring::hmac::Signature type">Signature</a><span class="stab deprecated" title="">Deprecated</span></div><div class="item-right docblock-short"><p>A deprecated alias for <code>Tag</code>.</p>
-</div><div class="item-left module-item"><a class="type" href="type.SigningContext.html" title="ring::hmac::SigningContext type">SigningContext</a><span class="stab deprecated" title="">Deprecated</span></div><div class="item-right docblock-short"><p><code>hmac::SigningContext</code> was renamed to <code>hmac::Context</code>.</p>
-</div><div class="item-left module-item"><a class="type" href="type.SigningKey.html" title="ring::hmac::SigningKey type">SigningKey</a><span class="stab deprecated" title="">Deprecated</span></div><div class="item-right docblock-short"><p><code>hmac::SigningKey</code> was renamed to <code>hmac::Key</code>.</p>
-</div><div class="item-left module-item"><a class="type" href="type.VerificationKey.html" title="ring::hmac::VerificationKey type">VerificationKey</a><span class="stab deprecated" title="">Deprecated</span></div><div class="item-right docblock-short"><p><code>hmac::VerificationKey</code> was merged into <code>hmac::Key</code>.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Signature.html" title="ring::hmac::Signature type">Signature</a><span class="stab deprecated" title="">Deprecated</span></div><div class="item-right docblock-short"><p>A deprecated alias for <code>Tag</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.SigningContext.html" title="ring::hmac::SigningContext type">SigningContext</a><span class="stab deprecated" title="">Deprecated</span></div><div class="item-right docblock-short"><p><code>hmac::SigningContext</code> was renamed to <code>hmac::Context</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.SigningKey.html" title="ring::hmac::SigningKey type">SigningKey</a><span class="stab deprecated" title="">Deprecated</span></div><div class="item-right docblock-short"><p><code>hmac::SigningKey</code> was renamed to <code>hmac::Key</code>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.VerificationKey.html" title="ring::hmac::VerificationKey type">VerificationKey</a><span class="stab deprecated" title="">Deprecated</span></div><div class="item-right docblock-short"><p><code>hmac::VerificationKey</code> was merged into <code>hmac::Key</code>.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script>
 </body></html>

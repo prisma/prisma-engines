@@ -362,7 +362,7 @@
 
 <span class="kw">impl</span> <span class="ident">ThreadData</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ThreadData</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">ThreadData</span> {
         <span class="macro">assert!</span>(<span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">ThreadData</span><span class="op">&gt;</span>() <span class="op">&gt;</span> <span class="op">!</span><span class="ident">QUEUE_MASK</span>);
         <span class="ident">ThreadData</span> {
             <span class="ident">parker</span>: <span class="ident">ThreadParker::new</span>(),
@@ -375,7 +375,7 @@
 
 <span class="comment">// Invokes the given closure with a reference to the current thread `ThreadData`.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">with_thread_data</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">ThreadData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+<span class="kw">fn</span> <span class="ident">with_thread_data</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">ThreadData</span>) -&gt; <span class="ident">T</span>) -&gt; <span class="ident">T</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread_data_ptr</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
     <span class="comment">// If ThreadData is expensive to construct, then we want to use a cached</span>
     <span class="comment">// version in thread-local storage if possible.</span>
@@ -406,7 +406,7 @@
 
 <span class="kw">impl</span> <span class="ident">WordLock</span> {
     <span class="doccomment">/// Returns a new, unlocked, WordLock.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">WordLock</span> {
             <span class="ident">state</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>),
         }
@@ -447,8 +447,8 @@
                     <span class="ident">Ordering::Acquire</span>,
                     <span class="ident">Ordering::Relaxed</span>,
                 ) {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">x</span>,
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
+                    <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">x</span>,
                 }
                 <span class="kw">continue</span>;
             }
@@ -519,8 +519,8 @@
                 <span class="ident">Ordering::Acquire</span>,
                 <span class="ident">Ordering::Relaxed</span>,
             ) {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">x</span>,
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">x</span>,
             }
         }
 
@@ -560,8 +560,8 @@
                     <span class="ident">Ordering::Release</span>,
                     <span class="ident">Ordering::Relaxed</span>,
                 ) {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">x</span>,
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
+                    <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">x</span>,
                 }
 
                 <span class="comment">// Need an acquire fence before reading the new queue</span>
@@ -579,8 +579,8 @@
                         <span class="ident">Ordering::Release</span>,
                         <span class="ident">Ordering::Relaxed</span>,
                     ) {
-                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                        <span class="prelude-val">Err</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">x</span>,
+                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
+                        <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">x</span>,
                     }
 
                     <span class="comment">// If the compare_exchange failed because a new thread was</span>
@@ -625,30 +625,30 @@
 }
 
 <span class="kw">trait</span> <span class="ident">LockState</span> {
-    <span class="kw">fn</span> <span class="ident">is_locked</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">is_queue_locked</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">queue_head</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ThreadData</span>;
-    <span class="kw">fn</span> <span class="ident">with_queue_head</span>(<span class="self">self</span>, <span class="ident">thread_data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ThreadData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">is_locked</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">is_queue_locked</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">queue_head</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ThreadData</span>;
+    <span class="kw">fn</span> <span class="ident">with_queue_head</span>(<span class="self">self</span>, <span class="ident">thread_data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ThreadData</span>) -&gt; <span class="self">Self</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">LockState</span> <span class="kw">for</span> <span class="ident">usize</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_locked</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_locked</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span> <span class="op">&amp;</span> <span class="ident">LOCKED_BIT</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_queue_locked</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_queue_locked</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span> <span class="op">&amp;</span> <span class="ident">QUEUE_LOCKED_BIT</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">queue_head</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ThreadData</span> {
+    <span class="kw">fn</span> <span class="ident">queue_head</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ThreadData</span> {
         (<span class="self">self</span> <span class="op">&amp;</span> <span class="ident">QUEUE_MASK</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ThreadData</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">with_queue_head</span>(<span class="self">self</span>, <span class="ident">thread_data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ThreadData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">with_queue_head</span>(<span class="self">self</span>, <span class="ident">thread_data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ThreadData</span>) -&gt; <span class="self">Self</span> {
         (<span class="self">self</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">QUEUE_MASK</span>) <span class="op">|</span> <span class="ident">thread_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
     }
 }

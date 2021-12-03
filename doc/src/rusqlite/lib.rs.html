@@ -2097,10 +2097,10 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">params</span> {
-    () <span class="op">=</span><span class="op">&gt;</span> {
+    () =&gt; {
         <span class="kw-2">&amp;</span>[] <span class="kw">as</span> <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::ToSql</span>]
     };
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="kw-2">&amp;</span>[$(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::ToSql</span>),<span class="op">+</span>] <span class="kw">as</span> <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::ToSql</span>]
     };
 }
@@ -2134,12 +2134,12 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">named_params</span> {
-    () <span class="op">=</span><span class="op">&gt;</span> {
+    () =&gt; {
         <span class="kw-2">&amp;</span>[] <span class="kw">as</span> <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::ToSql</span>)]
     };
     <span class="comment">// Note: It&#39;s a lot more work to support this as part of the same macro as</span>
     <span class="comment">// `params!`, unfortunately.</span>
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param_name</span>:<span class="ident">literal</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param_val</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param_name</span>:<span class="ident">literal</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">param_val</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="kw-2">&amp;</span>[$((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param_name</span>, <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">param_val</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::ToSql</span>)),<span class="op">+</span>] <span class="kw">as</span> <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::ToSql</span>)]
     };
 }
@@ -2154,25 +2154,25 @@
     <span class="doccomment">/// By default, Rusqlite treats 0 rows being returned from a query that is</span>
     <span class="doccomment">/// expected to return 1 row as an error. This method will</span>
     <span class="doccomment">/// handle that error, and give you back an `Option&lt;T&gt;` instead.</span>
-    <span class="kw">fn</span> <span class="ident">optional</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">optional</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">OptionalExtension</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">optional</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">optional</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">Error::QueryReturnedNoRows</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">Error::QueryReturnedNoRows</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
         }
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">errmsg_to_string</span>(<span class="ident">errmsg</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">errmsg_to_string</span>(<span class="ident">errmsg</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">c_slice</span> <span class="op">=</span> <span class="ident">CStr::from_ptr</span>(<span class="ident">errmsg</span>).<span class="ident">to_bytes</span>();
     <span class="ident">String::from_utf8_lossy</span>(<span class="ident">c_slice</span>).<span class="ident">into_owned</span>()
 }
 
-<span class="kw">fn</span> <span class="ident">str_to_cstring</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SmallCString</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">str_to_cstring</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SmallCString</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="ident">SmallCString::new</span>(<span class="ident">s</span>)<span class="question-mark">?</span>)
 }
 
@@ -2182,7 +2182,7 @@
 <span class="doccomment">/// The `sqlite3_destructor_type` item is always `SQLITE_TRANSIENT` unless</span>
 <span class="doccomment">/// the string was empty (in which case it&#39;s `SQLITE_STATIC`, and the ptr is</span>
 <span class="doccomment">/// static).</span>
-<span class="kw">fn</span> <span class="ident">str_for_sqlite</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>, <span class="ident">c_int</span>, <span class="ident">ffi::sqlite3_destructor_type</span>)<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">str_for_sqlite</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>, <span class="ident">c_int</span>, <span class="ident">ffi::sqlite3_destructor_type</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">len_as_c_int</span>(<span class="ident">s</span>.<span class="ident">len</span>())<span class="question-mark">?</span>;
     <span class="kw">let</span> (<span class="ident">ptr</span>, <span class="ident">dtor_info</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
         (<span class="ident">s</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>, <span class="ident">ffi::SQLITE_TRANSIENT</span>())
@@ -2195,7 +2195,7 @@
 
 <span class="comment">// Helper to cast to c_int safely, returning the correct error type if the cast</span>
 <span class="comment">// failed.</span>
-<span class="kw">fn</span> <span class="ident">len_as_c_int</span>(<span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">len_as_c_int</span>(<span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">c_int</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> (<span class="ident">c_int::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>) {
         <span class="prelude-val">Err</span>(<span class="ident">Error::SqliteFailure</span>(
             <span class="ident">ffi::Error::new</span>(<span class="ident">ffi::SQLITE_TOOBIG</span>),
@@ -2207,13 +2207,13 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">fn</span> <span class="ident">path_to_cstring</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CString</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">path_to_cstring</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CString</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">std::os::unix::ffi::OsStrExt</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">CString::new</span>(<span class="ident">p</span>.<span class="ident">as_os_str</span>().<span class="ident">as_bytes</span>())<span class="question-mark">?</span>)
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">unix</span>))]</span>
-<span class="kw">fn</span> <span class="ident">path_to_cstring</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CString</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">path_to_cstring</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CString</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">to_str</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::InvalidPath</span>(<span class="ident">p</span>.<span class="ident">to_owned</span>()))<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">CString::new</span>(<span class="ident">s</span>)<span class="question-mark">?</span>)
 }
@@ -2247,12 +2247,12 @@
 ))]</span>
 <span class="kw">impl</span> <span class="ident">DatabaseName</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_cstring</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">util::SmallCString</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">to_cstring</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">util::SmallCString</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::DatabaseName</span>::{<span class="ident">Attached</span>, <span class="ident">Main</span>, <span class="ident">Temp</span>};
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Main</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">str_to_cstring</span>(<span class="string">&quot;main&quot;</span>),
-            <span class="ident">Temp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">str_to_cstring</span>(<span class="string">&quot;temp&quot;</span>),
-            <span class="ident">Attached</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">str_to_cstring</span>(<span class="ident">s</span>),
+            <span class="ident">Main</span> =&gt; <span class="ident">str_to_cstring</span>(<span class="string">&quot;main&quot;</span>),
+            <span class="ident">Temp</span> =&gt; <span class="ident">str_to_cstring</span>(<span class="string">&quot;temp&quot;</span>),
+            <span class="ident">Attached</span>(<span class="ident">s</span>) =&gt; <span class="ident">str_to_cstring</span>(<span class="ident">s</span>),
         }
     }
 }
@@ -2296,7 +2296,7 @@
     <span class="doccomment">/// Will return `Err` if `path` cannot be converted to a C-compatible</span>
     <span class="doccomment">/// string or if the underlying SQLite open call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">OpenFlags::default</span>();
         <span class="ident">Connection::open_with_flags</span>(<span class="ident">path</span>, <span class="ident">flags</span>)
     }
@@ -2307,7 +2307,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if the underlying SQLite open call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_in_memory</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_in_memory</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">OpenFlags::default</span>();
         <span class="ident">Connection::open_in_memory_with_flags</span>(<span class="ident">flags</span>)
     }
@@ -2322,7 +2322,7 @@
     <span class="doccomment">/// Will return `Err` if `path` cannot be converted to a C-compatible</span>
     <span class="doccomment">/// string or if the underlying SQLite open call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_with_flags</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>, <span class="ident">flags</span>: <span class="ident">OpenFlags</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_with_flags</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>, <span class="ident">flags</span>: <span class="ident">OpenFlags</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">c_path</span> <span class="op">=</span> <span class="ident">path_to_cstring</span>(<span class="ident">path</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
         <span class="ident">InnerConnection::open_with_flags</span>(<span class="kw-2">&amp;</span><span class="ident">c_path</span>, <span class="ident">flags</span>, <span class="prelude-val">None</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">db</span><span class="op">|</span> <span class="ident">Connection</span> {
             <span class="ident">db</span>: <span class="ident">RefCell::new</span>(<span class="ident">db</span>),
@@ -2346,7 +2346,7 @@
         <span class="ident">path</span>: <span class="ident">P</span>,
         <span class="ident">flags</span>: <span class="ident">OpenFlags</span>,
         <span class="ident">vfs</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">c_path</span> <span class="op">=</span> <span class="ident">path_to_cstring</span>(<span class="ident">path</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">c_vfs</span> <span class="op">=</span> <span class="ident">str_to_cstring</span>(<span class="ident">vfs</span>)<span class="question-mark">?</span>;
         <span class="ident">InnerConnection::open_with_flags</span>(<span class="kw-2">&amp;</span><span class="ident">c_path</span>, <span class="ident">flags</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c_vfs</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">db</span><span class="op">|</span> <span class="ident">Connection</span> {
@@ -2365,7 +2365,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if the underlying SQLite open call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_in_memory_with_flags</span>(<span class="ident">flags</span>: <span class="ident">OpenFlags</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_in_memory_with_flags</span>(<span class="ident">flags</span>: <span class="ident">OpenFlags</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
         <span class="ident">Connection::open_with_flags</span>(<span class="string">&quot;:memory:&quot;</span>, <span class="ident">flags</span>)
     }
 
@@ -2380,7 +2380,7 @@
     <span class="doccomment">/// Will return `Err` if vfs` cannot be converted to a C-compatible</span>
     <span class="doccomment">/// string or if the underlying SQLite open call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_in_memory_with_flags_and_vfs</span>(<span class="ident">flags</span>: <span class="ident">OpenFlags</span>, <span class="ident">vfs</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_in_memory_with_flags_and_vfs</span>(<span class="ident">flags</span>: <span class="ident">OpenFlags</span>, <span class="ident">vfs</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
         <span class="ident">Connection::open_with_flags_and_vfs</span>(<span class="string">&quot;:memory:&quot;</span>, <span class="ident">flags</span>, <span class="ident">vfs</span>)
     }
 
@@ -2404,7 +2404,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if `sql` cannot be converted to a C-compatible string</span>
     <span class="doccomment">/// or if the underlying SQLite call fails.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql</span> <span class="op">=</span> <span class="ident">sql</span>;
         <span class="kw">while</span> <span class="op">!</span><span class="ident">sql</span>.<span class="ident">is_empty</span>() {
             <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">prepare</span>(<span class="ident">sql</span>)<span class="question-mark">?</span>;
@@ -2413,7 +2413,7 @@
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExecuteReturnedResults</span>);
             }
             <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">stmt</span>.<span class="ident">tail</span>();
-            <span class="kw">if</span> <span class="ident">tail</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">sql</span>.<span class="ident">len</span>() {
+            <span class="kw">if</span> <span class="ident">tail</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">sql</span>.<span class="ident">len</span>() {
                 <span class="kw">break</span>;
             }
             <span class="ident">sql</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sql</span>[<span class="ident">tail</span>..];
@@ -2469,7 +2469,7 @@
     <span class="doccomment">/// Will return `Err` if `sql` cannot be converted to a C-compatible string</span>
     <span class="doccomment">/// or if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Params</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Params</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">prepare</span>(<span class="ident">sql</span>)
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">stmt</span><span class="op">|</span> <span class="ident">stmt</span>.<span class="ident">check_no_tail</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">stmt</span>.<span class="ident">execute</span>(<span class="ident">params</span>)))
     }
@@ -2485,7 +2485,7 @@
     <span class="doccomment">/// Will return `Err` if `sql` cannot be converted to a C-compatible string</span>
     <span class="doccomment">/// or if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;You can use `execute` with named params now.&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute_named</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute_named</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="comment">// This function itself is deprecated, so it&#39;s fine</span>
         <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
         <span class="self">self</span>.<span class="ident">prepare</span>(<span class="ident">sql</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">stmt</span><span class="op">|</span> {
@@ -2499,7 +2499,7 @@
     <span class="doccomment">/// Uses [sqlite3_last_insert_rowid](https://www.sqlite.org/c3ref/last_insert_rowid.html) under</span>
     <span class="doccomment">/// the hood.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_insert_rowid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_insert_rowid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow_mut</span>().<span class="ident">last_insert_rowid</span>()
     }
 
@@ -2531,10 +2531,10 @@
     <span class="doccomment">/// Will return `Err` if `sql` cannot be converted to a C-compatible string</span>
     <span class="doccomment">/// or if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_row</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">P</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_row</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">P</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">P</span>: <span class="ident">Params</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">prepare</span>(<span class="ident">sql</span>)<span class="question-mark">?</span>;
         <span class="ident">stmt</span>.<span class="ident">check_no_tail</span>()<span class="question-mark">?</span>;
@@ -2556,9 +2556,9 @@
     <span class="doccomment">/// Will return `Err` if `sql` cannot be converted to a C-compatible string</span>
     <span class="doccomment">/// or if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;You can use `query_row` with named params now.&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_row_named</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)], <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_row_named</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)], <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">query_row</span>(<span class="ident">sql</span>, <span class="ident">params</span>, <span class="ident">f</span>)
     }
@@ -2589,10 +2589,10 @@
     <span class="doccomment">/// Will return `Err` if `sql` cannot be converted to a C-compatible string</span>
     <span class="doccomment">/// or if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_row_and_then</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">P</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_row_and_then</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">P</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">P</span>: <span class="ident">Params</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>,
         <span class="ident">E</span>: <span class="ident">convert::From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">prepare</span>(<span class="ident">sql</span>)<span class="question-mark">?</span>;
@@ -2621,7 +2621,7 @@
     <span class="doccomment">/// Will return `Err` if `sql` cannot be converted to a C-compatible string</span>
     <span class="doccomment">/// or if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prepare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prepare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow_mut</span>().<span class="ident">prepare</span>(<span class="self">self</span>, <span class="ident">sql</span>)
     }
 
@@ -2635,7 +2635,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), (<span class="ident">Connection</span>, <span class="ident">Error</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), (<span class="ident">Connection</span>, <span class="ident">Error</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">flush_prepared_statement_cache</span>();
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow_mut</span>().<span class="ident">close</span>();
         <span class="ident">r</span>.<span class="ident">map_err</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">err</span><span class="op">|</span> (<span class="self">self</span>, <span class="ident">err</span>))
@@ -2661,7 +2661,7 @@
     <span class="doccomment">/// Will return `Err` if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load_extension&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_extension_enable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_extension_enable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow_mut</span>().<span class="ident">enable_load_extension</span>(<span class="number">1</span>)
     }
 
@@ -2674,7 +2674,7 @@
     <span class="doccomment">/// Will return `Err` if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load_extension&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_extension_disable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_extension_disable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow_mut</span>().<span class="ident">enable_load_extension</span>(<span class="number">0</span>)
     }
 
@@ -2707,7 +2707,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">dylib_path</span>: <span class="ident">P</span>,
         <span class="ident">entry_point</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>
             .<span class="ident">borrow_mut</span>()
             .<span class="ident">load_extension</span>(<span class="ident">dylib_path</span>.<span class="ident">as_ref</span>(), <span class="ident">entry_point</span>)
@@ -2727,7 +2727,7 @@
     <span class="doccomment">/// to the SQLite connection, and what you do with it could impact the</span>
     <span class="doccomment">/// safety of this `Connection`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow</span>().<span class="ident">db</span>()
     }
 
@@ -2740,7 +2740,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function is unsafe because improper use may impact the Connection.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_handle</span>(<span class="ident">db</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_handle</span>(<span class="ident">db</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db_path</span> <span class="op">=</span> <span class="ident">db_filename</span>(<span class="ident">db</span>);
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">InnerConnection::new</span>(<span class="ident">db</span>, <span class="bool-val">false</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">Connection</span> {
@@ -2753,12 +2753,12 @@
     <span class="doccomment">/// Get access to a handle that can be used to interrupt long running</span>
     <span class="doccomment">/// queries from another thread.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_interrupt_handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InterruptHandle</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_interrupt_handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InterruptHandle</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow</span>().<span class="ident">get_interrupt_handle</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">decode_result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">code</span>: <span class="ident">c_int</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">decode_result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">code</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow_mut</span>().<span class="ident">decode_result</span>(<span class="ident">code</span>)
     }
 
@@ -2766,27 +2766,27 @@
     <span class="doccomment">/// recently completed INSERT, UPDATE or DELETE statement on the database</span>
     <span class="doccomment">/// connection.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow_mut</span>().<span class="ident">changes</span>()
     }
 
     <span class="doccomment">/// Test for auto-commit mode.</span>
     <span class="doccomment">/// Autocommit mode is on by default.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_autocommit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_autocommit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow</span>().<span class="ident">is_autocommit</span>()
     }
 
     <span class="doccomment">/// Determine if all associated prepared statements have been reset.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span> <span class="comment">// 3.8.6</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_busy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_busy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow</span>().<span class="ident">is_busy</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Connection</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Connection&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;path&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>)
             .<span class="ident">finish</span>()
@@ -2819,7 +2819,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="lifetime">&#39;sql</span><span class="op">&gt;</span> <span class="ident">Batch</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="lifetime">&#39;sql</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Constructor</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="ident">Connection</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;sql</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Batch</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="lifetime">&#39;sql</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="ident">Connection</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;sql</span> <span class="ident">str</span>) -&gt; <span class="ident">Batch</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="lifetime">&#39;sql</span><span class="op">&gt;</span> {
         <span class="ident">Batch</span> { <span class="ident">conn</span>, <span class="ident">sql</span>, <span class="ident">tail</span>: <span class="number">0</span> }
     }
 
@@ -2827,12 +2827,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `Ok(None)` when batch is completed.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::should_implement_trait</span>)]</span> <span class="comment">// fallible iterator</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">while</span> <span class="self">self</span>.<span class="ident">tail</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">sql</span>.<span class="ident">len</span>() {
             <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sql</span>[<span class="self">self</span>.<span class="ident">tail</span>..];
             <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">prepare</span>(<span class="ident">sql</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="ident">next</span>.<span class="ident">stmt</span>.<span class="ident">tail</span>();
-            <span class="kw">if</span> <span class="ident">tail</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">tail</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="self">self</span>.<span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sql</span>.<span class="ident">len</span>();
             } <span class="kw">else</span> {
                 <span class="self">self</span>.<span class="ident">tail</span> <span class="op">+</span><span class="op">=</span> <span class="ident">tail</span>;
@@ -2849,7 +2849,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Batch</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">next</span>().<span class="ident">transpose</span>()
     }
 }
@@ -2886,7 +2886,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">OpenFlags</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OpenFlags</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">OpenFlags</span> {
         <span class="ident">OpenFlags::SQLITE_OPEN_READ_WRITE</span>
             <span class="op">|</span> <span class="ident">OpenFlags::SQLITE_OPEN_CREATE</span>
             <span class="op">|</span> <span class="ident">OpenFlags::SQLITE_OPEN_NO_MUTEX</span>
@@ -2952,7 +2952,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span> <span class="comment">// 3.7.10</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">db_filename</span>(<span class="ident">db</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">db_filename</span>(<span class="ident">db</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">DatabaseName::Main</span>.<span class="ident">to_cstring</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">db_filename</span> <span class="op">=</span> <span class="ident">ffi::sqlite3_db_filename</span>(<span class="ident">db</span>, <span class="ident">db_name</span>.<span class="ident">as_ptr</span>());
     <span class="kw">if</span> <span class="ident">db_filename</span>.<span class="ident">is_null</span>() {
@@ -2962,7 +2962,7 @@
     }
 }
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>))]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">db_filename</span>(<span class="kw">_</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">db_filename</span>(<span class="kw">_</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> {
     <span class="prelude-val">None</span>
 }
 
@@ -2991,12 +2991,12 @@
         <span class="ident">ensure_sync</span>::<span class="op">&lt;</span><span class="ident">InterruptHandle</span><span class="op">&gt;</span>();
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_memory_handle</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connection</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_memory_handle</span>() -&gt; <span class="ident">Connection</span> {
         <span class="ident">Connection::open_in_memory</span>().<span class="ident">unwrap</span>()
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_concurrent_transactions_busy_commit</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_concurrent_transactions_busy_commit</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
         <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">tempfile::tempdir</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">tmp</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;transactions.db3&quot;</span>);
@@ -3038,7 +3038,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_persistence</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_persistence</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">temp_dir</span> <span class="op">=</span> <span class="ident">tempfile::tempdir</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">temp_dir</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;test.db3&quot;</span>);
 
@@ -3089,7 +3089,7 @@
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_unicode_file_names</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_invalid_unicode_file_names</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">std::ffi::OsStr</span>;
         <span class="kw">use</span> <span class="ident">std::fs::File</span>;
         <span class="kw">use</span> <span class="ident">std::os::unix::ffi::OsStrExt</span>;
@@ -3118,7 +3118,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_close_retry</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_close_retry</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
 
         <span class="comment">// force the DB to be busy by preparing a statement; this must be done at the</span>
@@ -3171,7 +3171,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_execute_batch</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_execute_batch</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;BEGIN;
                    CREATE TABLE foo(x INTEGER);
@@ -3189,7 +3189,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_execute</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_execute</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo(x INTEGER)&quot;</span>)<span class="question-mark">?</span>;
 
@@ -3224,13 +3224,13 @@
             )
             .<span class="ident">unwrap_err</span>();
         <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">Error::MultipleStatement</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error: {}&quot;</span>, <span class="ident">err</span>),
+            <span class="ident">Error::MultipleStatement</span> =&gt; (),
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error: {}&quot;</span>, <span class="ident">err</span>),
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_prepare_column_names</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_prepare_column_names</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo(x INTEGER);&quot;</span>)<span class="question-mark">?</span>;
 
@@ -3245,7 +3245,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_prepare_execute</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_prepare_execute</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo(x INTEGER);&quot;</span>)<span class="question-mark">?</span>;
 
@@ -3266,7 +3266,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_prepare_query</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_prepare_query</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo(x INTEGER);&quot;</span>)<span class="question-mark">?</span>;
 
@@ -3301,7 +3301,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_query_map</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_query_map</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;BEGIN;
                    CREATE TABLE foo(x INTEGER, y TEXT);
@@ -3320,7 +3320,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_query_row</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_query_row</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;BEGIN;
                    CREATE TABLE foo(x INTEGER);
@@ -3338,8 +3338,8 @@
 
         <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT x FROM foo WHERE x &gt; 5&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
         <span class="kw">match</span> <span class="ident">result</span>.<span class="ident">unwrap_err</span>() {
-            <span class="ident">Error::QueryReturnedNoRows</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
+            <span class="ident">Error::QueryReturnedNoRows</span> =&gt; (),
+            <span class="ident">err</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
         }
 
         <span class="kw">let</span> <span class="ident">bad_query_result</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;NOT A PROPER QUERY; test123&quot;</span>, [], <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(()));
@@ -3349,21 +3349,21 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_optional</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_optional</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
 
         <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT 1 WHERE 0 &lt;&gt; 0&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">optional</span>();
         <span class="kw">match</span> <span class="ident">result</span><span class="question-mark">?</span> {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result&quot;</span>),
+            <span class="prelude-val">None</span> =&gt; (),
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result&quot;</span>),
         }
 
         <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT 1 WHERE 0 == 0&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">optional</span>();
         <span class="kw">match</span> <span class="ident">result</span><span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="number">1</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result&quot;</span>),
+            <span class="prelude-val">Some</span>(<span class="number">1</span>) =&gt; (),
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result&quot;</span>),
         }
 
         <span class="kw">let</span> <span class="ident">bad_query_result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;NOT A PROPER QUERY&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
@@ -3373,7 +3373,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_pragma_query_row</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_pragma_query_row</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
 
         <span class="macro">assert_eq!</span>(
@@ -3388,7 +3388,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_prepare_failures</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_prepare_failures</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo(x INTEGER);&quot;</span>)<span class="question-mark">?</span>;
 
@@ -3398,7 +3398,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_last_insert_rowid</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_last_insert_rowid</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo(x INTEGER PRIMARY KEY)&quot;</span>)<span class="question-mark">?</span>;
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;INSERT INTO foo DEFAULT VALUES&quot;</span>)<span class="question-mark">?</span>;
@@ -3424,7 +3424,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_is_busy</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_is_busy</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">db</span>.<span class="ident">is_busy</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">prepare</span>(<span class="string">&quot;PRAGMA schema_version&quot;</span>)<span class="question-mark">?</span>;
@@ -3441,7 +3441,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_statement_debugging</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_statement_debugging</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="string">&quot;SELECT 12345&quot;</span>;
         <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">prepare</span>(<span class="ident">query</span>)<span class="question-mark">?</span>;
@@ -3451,7 +3451,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_notnull_constraint_error</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_notnull_constraint_error</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// extended error codes for constraints were added in SQLite 3.7.16; if we&#39;re</span>
         <span class="comment">// running on our bundled version, we know the extended error code exists.</span>
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span>
@@ -3468,11 +3468,11 @@
         <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_err</span>());
 
         <span class="kw">match</span> <span class="ident">result</span>.<span class="ident">unwrap_err</span>() {
-            <span class="ident">Error::SqliteFailure</span>(<span class="ident">err</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::SqliteFailure</span>(<span class="ident">err</span>, <span class="kw">_</span>) =&gt; {
                 <span class="macro">assert_eq!</span>(<span class="ident">err</span>.<span class="ident">code</span>, <span class="ident">ErrorCode::ConstraintViolation</span>);
                 <span class="ident">check_extended_code</span>(<span class="ident">err</span>.<span class="ident">extended_code</span>);
             }
-            <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
+            <span class="ident">err</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -3489,7 +3489,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_interrupt</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_interrupt</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
 
         <span class="kw">let</span> <span class="ident">interrupt_handle</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">get_interrupt_handle</span>();
@@ -3510,10 +3510,10 @@
         <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">query</span>([])<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>)).<span class="ident">collect</span>();
 
         <span class="kw">match</span> <span class="ident">result</span>.<span class="ident">unwrap_err</span>() {
-            <span class="ident">Error::SqliteFailure</span>(<span class="ident">err</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Error::SqliteFailure</span>(<span class="ident">err</span>, <span class="kw">_</span>) =&gt; {
                 <span class="macro">assert_eq!</span>(<span class="ident">err</span>.<span class="ident">code</span>, <span class="ident">ErrorCode::OperationInterrupted</span>);
             }
-            <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">err</span> =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>);
             }
         }
@@ -3537,7 +3537,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_get_raw</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_get_raw</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo(i, x);&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">vals</span> <span class="op">=</span> [<span class="string">&quot;foobar&quot;</span>, <span class="string">&quot;1234&quot;</span>, <span class="string">&quot;qwerty&quot;</span>];
@@ -3570,7 +3570,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_from_handle</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_from_handle</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">db</span>.<span class="ident">handle</span>() };
         {
@@ -3592,29 +3592,29 @@
         }
 
         <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">CustomError</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
                 <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                    <span class="ident">CustomError::SomeError</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;my custom error&quot;</span>),
-                    <span class="ident">CustomError::Sqlite</span>(<span class="kw-2">ref</span> <span class="ident">se</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;my custom error: {}&quot;</span>, <span class="ident">se</span>),
+                    <span class="ident">CustomError::SomeError</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;my custom error&quot;</span>),
+                    <span class="ident">CustomError::Sqlite</span>(<span class="kw-2">ref</span> <span class="ident">se</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;my custom error: {}&quot;</span>, <span class="ident">se</span>),
                 }
             }
         }
 
         <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">CustomError</span> {
-            <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+            <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
                 <span class="string">&quot;my custom error&quot;</span>
             }
 
-            <span class="kw">fn</span> <span class="ident">cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">StdError</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">StdError</span><span class="op">&gt;</span> {
                 <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                    <span class="ident">CustomError::SomeError</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                    <span class="ident">CustomError::Sqlite</span>(<span class="kw-2">ref</span> <span class="ident">se</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">se</span>),
+                    <span class="ident">CustomError::SomeError</span> =&gt; <span class="prelude-val">None</span>,
+                    <span class="ident">CustomError::Sqlite</span>(<span class="kw-2">ref</span> <span class="ident">se</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">se</span>),
                 }
             }
         }
 
         <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CustomError</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">se</span>: <span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CustomError</span> {
+            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">se</span>: <span class="ident">Error</span>) -&gt; <span class="ident">CustomError</span> {
                 <span class="ident">CustomError::Sqlite</span>(<span class="ident">se</span>)
             }
         }
@@ -3622,7 +3622,7 @@
         <span class="kw">type</span> <span class="ident">CustomResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">CustomError</span><span class="op">&gt;</span>;
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">test_query_and_then</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">test_query_and_then</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
             <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;BEGIN;
                        CREATE TABLE foo(x INTEGER, y TEXT);
@@ -3642,7 +3642,7 @@
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">test_query_and_then_fails</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">test_query_and_then_fails</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
             <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;BEGIN;
                        CREATE TABLE foo(x INTEGER, y TEXT);
@@ -3657,22 +3657,22 @@
             <span class="kw">let</span> <span class="ident">bad_type</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">query_and_then</span>([], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="number">1</span>))<span class="question-mark">?</span>.<span class="ident">collect</span>();
 
             <span class="kw">match</span> <span class="ident">bad_type</span>.<span class="ident">unwrap_err</span>() {
-                <span class="ident">Error::InvalidColumnType</span>(..) <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
+                <span class="ident">Error::InvalidColumnType</span>(..) =&gt; (),
+                <span class="ident">err</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
             }
 
             <span class="kw">let</span> <span class="ident">bad_idx</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
                 <span class="ident">query</span>.<span class="ident">query_and_then</span>([], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="number">3</span>))<span class="question-mark">?</span>.<span class="ident">collect</span>();
 
             <span class="kw">match</span> <span class="ident">bad_idx</span>.<span class="ident">unwrap_err</span>() {
-                <span class="ident">Error::InvalidColumnIndex</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
+                <span class="ident">Error::InvalidColumnIndex</span>(<span class="kw">_</span>) =&gt; (),
+                <span class="ident">err</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
             }
             <span class="prelude-val">Ok</span>(())
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">test_query_and_then_custom_error</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CustomResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">test_query_and_then_custom_error</span>() -&gt; <span class="ident">CustomResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
             <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;BEGIN;
                        CREATE TABLE foo(x INTEGER, y TEXT);
@@ -3693,7 +3693,7 @@
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">test_query_and_then_custom_error_fails</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">test_query_and_then_custom_error_fails</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
             <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;BEGIN;
                        CREATE TABLE foo(x INTEGER, y TEXT);
@@ -3710,8 +3710,8 @@
                 .<span class="ident">collect</span>();
 
             <span class="kw">match</span> <span class="ident">bad_type</span>.<span class="ident">unwrap_err</span>() {
-                <span class="ident">CustomError::Sqlite</span>(<span class="ident">Error::InvalidColumnType</span>(..)) <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
+                <span class="ident">CustomError::Sqlite</span>(<span class="ident">Error::InvalidColumnType</span>(..)) =&gt; (),
+                <span class="ident">err</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
             }
 
             <span class="kw">let</span> <span class="ident">bad_idx</span>: <span class="ident">CustomResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">query</span>
@@ -3719,8 +3719,8 @@
                 .<span class="ident">collect</span>();
 
             <span class="kw">match</span> <span class="ident">bad_idx</span>.<span class="ident">unwrap_err</span>() {
-                <span class="ident">CustomError::Sqlite</span>(<span class="ident">Error::InvalidColumnIndex</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
+                <span class="ident">CustomError::Sqlite</span>(<span class="ident">Error::InvalidColumnIndex</span>(<span class="kw">_</span>)) =&gt; (),
+                <span class="ident">err</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
             }
 
             <span class="kw">let</span> <span class="ident">non_sqlite_err</span>: <span class="ident">CustomResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">query</span>
@@ -3728,14 +3728,14 @@
                 .<span class="ident">collect</span>();
 
             <span class="kw">match</span> <span class="ident">non_sqlite_err</span>.<span class="ident">unwrap_err</span>() {
-                <span class="ident">CustomError::SomeError</span> <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
+                <span class="ident">CustomError::SomeError</span> =&gt; (),
+                <span class="ident">err</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
             }
             <span class="prelude-val">Ok</span>(())
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">test_query_row_and_then_custom_error</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CustomResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">test_query_row_and_then_custom_error</span>() -&gt; <span class="ident">CustomResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
             <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;BEGIN;
                        CREATE TABLE foo(x INTEGER, y TEXT);
@@ -3752,7 +3752,7 @@
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">test_query_row_and_then_custom_error_fails</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">test_query_row_and_then_custom_error_fails</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
             <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;BEGIN;
                        CREATE TABLE foo(x INTEGER, y TEXT);
@@ -3765,31 +3765,31 @@
                 <span class="ident">db</span>.<span class="ident">query_row_and_then</span>(<span class="ident">query</span>, [], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">map_err</span>(<span class="ident">CustomError::Sqlite</span>));
 
             <span class="kw">match</span> <span class="ident">bad_type</span>.<span class="ident">unwrap_err</span>() {
-                <span class="ident">CustomError::Sqlite</span>(<span class="ident">Error::InvalidColumnType</span>(..)) <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
+                <span class="ident">CustomError::Sqlite</span>(<span class="ident">Error::InvalidColumnType</span>(..)) =&gt; (),
+                <span class="ident">err</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
             }
 
             <span class="kw">let</span> <span class="ident">bad_idx</span>: <span class="ident">CustomResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span>
                 <span class="ident">db</span>.<span class="ident">query_row_and_then</span>(<span class="ident">query</span>, [], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="number">3</span>).<span class="ident">map_err</span>(<span class="ident">CustomError::Sqlite</span>));
 
             <span class="kw">match</span> <span class="ident">bad_idx</span>.<span class="ident">unwrap_err</span>() {
-                <span class="ident">CustomError::Sqlite</span>(<span class="ident">Error::InvalidColumnIndex</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
+                <span class="ident">CustomError::Sqlite</span>(<span class="ident">Error::InvalidColumnIndex</span>(<span class="kw">_</span>)) =&gt; (),
+                <span class="ident">err</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
             }
 
             <span class="kw">let</span> <span class="ident">non_sqlite_err</span>: <span class="ident">CustomResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span>
                 <span class="ident">db</span>.<span class="ident">query_row_and_then</span>(<span class="ident">query</span>, [], <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Err</span>(<span class="ident">CustomError::SomeError</span>));
 
             <span class="kw">match</span> <span class="ident">non_sqlite_err</span>.<span class="ident">unwrap_err</span>() {
-                <span class="ident">CustomError::SomeError</span> <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
+                <span class="ident">CustomError::SomeError</span> =&gt; (),
+                <span class="ident">err</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
             }
             <span class="prelude-val">Ok</span>(())
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_dynamic</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_dynamic</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">&quot;BEGIN;
                        CREATE TABLE foo(x INTEGER, y TEXT);
@@ -3803,7 +3803,7 @@
         })
     }
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_dyn_box</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_dyn_box</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo(x INTEGER);&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">b</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ToSql</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="number">5</span>);
@@ -3815,7 +3815,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_params</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_params</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="ident">db</span>.<span class="ident">query_row</span>(
             <span class="string">&quot;SELECT
@@ -3836,7 +3836,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extra_check&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">test_alter_table</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_alter_table</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE x(t);&quot;</span>)<span class="question-mark">?</span>;
         <span class="comment">// `execute_batch` should be used but `execute` should also work</span>
@@ -3845,7 +3845,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_batch</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_batch</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="string">r&quot;
              CREATE TABLE tbl1 (col);
@@ -3861,7 +3861,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bundled&quot;</span>)]</span> <span class="comment">// SQLite &gt;= 3.35.0</span>
-    <span class="kw">fn</span> <span class="ident">test_returning</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_returning</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>();
         <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo(x INTEGER PRIMARY KEY)&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">row_id</span> <span class="op">=</span>

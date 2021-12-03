@@ -591,7 +591,7 @@
     <span class="doccomment">/// return types that implement `Iterator`.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::should_implement_trait</span>)]</span> <span class="comment">// cannot implement Iterator</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">advance</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>((<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">get</span>())
     }
@@ -608,9 +608,9 @@
     <span class="doccomment">/// ```</span>
     <span class="comment">// FIXME Hide FallibleStreamingIterator::map</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Map</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span>, <span class="ident">F</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
     {
         <span class="ident">Map</span> { <span class="ident">rows</span>: <span class="self">self</span>, <span class="ident">f</span> }
     }
@@ -618,9 +618,9 @@
     <span class="doccomment">/// Map over this `Rows`, converting it to a [`MappedRows`], which</span>
     <span class="doccomment">/// implements `Iterator`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MappedRows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">MappedRows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span>, <span class="ident">F</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
     {
         <span class="ident">MappedRows</span> { <span class="ident">rows</span>: <span class="self">self</span>, <span class="ident">map</span>: <span class="ident">f</span> }
     }
@@ -629,9 +629,9 @@
     <span class="doccomment">/// [`AndThenRows`], which implements `Iterator` (instead of</span>
     <span class="doccomment">/// `FallibleStreamingIterator`).</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_then</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AndThenRows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_then</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">AndThenRows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span>, <span class="ident">F</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>,
     {
         <span class="ident">AndThenRows</span> { <span class="ident">rows</span>: <span class="self">self</span>, <span class="ident">map</span>: <span class="ident">f</span> }
     }
@@ -639,7 +639,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;stmt</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;stmt</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span>) -&gt; <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
         <span class="ident">Rows</span> {
             <span class="ident">stmt</span>: <span class="prelude-val">Some</span>(<span class="ident">stmt</span>),
             <span class="ident">row</span>: <span class="prelude-val">None</span>,
@@ -647,10 +647,10 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_expected_row</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_expected_row</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">row</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">row</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::QueryReturnedNoRows</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">row</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">row</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::QueryReturnedNoRows</span>),
         }
     }
 }
@@ -672,16 +672,16 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">FallibleIterator</span> <span class="kw">for</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">B</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rows</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="self">self</span>.<span class="ident">f</span>)(<span class="ident">v</span>)<span class="question-mark">?</span>)),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="self">self</span>.<span class="ident">f</span>)(<span class="ident">v</span>)<span class="question-mark">?</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
 }
@@ -698,12 +698,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">MappedRows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">map</span>;
         <span class="self">self</span>.<span class="ident">rows</span>
             .<span class="ident">next</span>()
@@ -723,12 +723,12 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">AndThenRows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">E</span>: <span class="ident">convert::From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">map</span>;
         <span class="self">self</span>.<span class="ident">rows</span>
             .<span class="ident">next</span>()
@@ -760,25 +760,25 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">stmt</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">stmt</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">stmt</span>.<span class="ident">step</span>() {
-                <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">stmt</span>) =&gt; <span class="kw">match</span> <span class="ident">stmt</span>.<span class="ident">step</span>() {
+                <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; {
                     <span class="self">self</span>.<span class="ident">row</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Row</span> { <span class="ident">stmt</span> });
                     <span class="prelude-val">Ok</span>(())
                 }
-                <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) =&gt; {
                     <span class="self">self</span>.<span class="ident">reset</span>();
                     <span class="self">self</span>.<span class="ident">row</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                     <span class="prelude-val">Ok</span>(())
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="self">self</span>.<span class="ident">reset</span>();
                     <span class="self">self</span>.<span class="ident">row</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                     <span class="prelude-val">Err</span>(<span class="ident">e</span>)
                 }
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">row</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                 <span class="prelude-val">Ok</span>(())
             }
@@ -786,7 +786,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">row</span>.<span class="ident">as_ref</span>()
     }
 }
@@ -809,7 +809,7 @@
     <span class="doccomment">/// * If the underlying SQLite integral value is outside the range</span>
     <span class="doccomment">///   representable by `T`</span>
     <span class="doccomment">/// * If `idx` is outside the range of columns in the returned query</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_unwrap</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span>, <span class="ident">T</span>: <span class="ident">FromSql</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_unwrap</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span>, <span class="ident">T</span>: <span class="ident">FromSql</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="ident">T</span> {
         <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">idx</span>).<span class="ident">unwrap</span>()
     }
 
@@ -829,27 +829,27 @@
     <span class="doccomment">/// If the result type is i128 (which requires the `i128_blob` feature to be</span>
     <span class="doccomment">/// enabled), and the underlying SQLite column is a blob whose size is not</span>
     <span class="doccomment">/// 16 bytes, `Error::InvalidColumnType` will also be returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span>, <span class="ident">T</span>: <span class="ident">FromSql</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span>, <span class="ident">T</span>: <span class="ident">FromSql</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">idx</span>.<span class="ident">idx</span>(<span class="self">self</span>.<span class="ident">stmt</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">value_ref</span>(<span class="ident">idx</span>);
         <span class="ident">FromSql::column_result</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">FromSqlError::InvalidType</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::InvalidColumnType</span>(
+            <span class="ident">FromSqlError::InvalidType</span> =&gt; <span class="ident">Error::InvalidColumnType</span>(
                 <span class="ident">idx</span>,
                 <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_name_unwrap</span>(<span class="ident">idx</span>).<span class="ident">into</span>(),
                 <span class="ident">value</span>.<span class="ident">data_type</span>(),
             ),
-            <span class="ident">FromSqlError::OutOfRange</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">idx</span>, <span class="ident">i</span>),
-            <span class="ident">FromSqlError::Other</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">FromSqlError::OutOfRange</span>(<span class="ident">i</span>) =&gt; <span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">idx</span>, <span class="ident">i</span>),
+            <span class="ident">FromSqlError::Other</span>(<span class="ident">err</span>) =&gt; {
                 <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">value</span>.<span class="ident">data_type</span>(), <span class="ident">err</span>)
             }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;i128_blob&quot;</span>)]</span>
-            <span class="ident">FromSqlError::InvalidI128Size</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::InvalidColumnType</span>(
+            <span class="ident">FromSqlError::InvalidI128Size</span>(<span class="kw">_</span>) =&gt; <span class="ident">Error::InvalidColumnType</span>(
                 <span class="ident">idx</span>,
                 <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_name_unwrap</span>(<span class="ident">idx</span>).<span class="ident">into</span>(),
                 <span class="ident">value</span>.<span class="ident">data_type</span>(),
             ),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-            <span class="ident">FromSqlError::InvalidUuidSize</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::InvalidColumnType</span>(
+            <span class="ident">FromSqlError::InvalidUuidSize</span>(<span class="kw">_</span>) =&gt; <span class="ident">Error::InvalidColumnType</span>(
                 <span class="ident">idx</span>,
                 <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_name_unwrap</span>(<span class="ident">idx</span>).<span class="ident">into</span>(),
                 <span class="ident">value</span>.<span class="ident">data_type</span>(),
@@ -872,7 +872,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an `Error::InvalidColumnName` if `idx` is not a valid column</span>
     <span class="doccomment">/// name for this row.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">idx</span>.<span class="ident">idx</span>(<span class="self">self</span>.<span class="ident">stmt</span>)<span class="question-mark">?</span>;
         <span class="comment">// Narrowing from `ValueRef&lt;&#39;stmt&gt;` (which `self.stmt.value_ref(idx)`</span>
         <span class="comment">// returns) to `ValueRef&lt;&#39;a&gt;` is needed because it&#39;s only valid until</span>
@@ -896,21 +896,21 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * If `idx` is outside the range of columns in the returned query.</span>
     <span class="doccomment">/// * If `idx` is not a valid column name for this row.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref_unwrap</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref_unwrap</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_ref</span>(<span class="ident">idx</span>).<span class="ident">unwrap</span>()
     }
 
     <span class="doccomment">/// Renamed to [`get_ref`](Row::get_ref).</span>
     <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Use [`get_ref`](Row::get_ref) instead.&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_raw_checked</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_raw_checked</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_ref</span>(<span class="ident">idx</span>)
     }
 
     <span class="doccomment">/// Renamed to [`get_ref_unwrap`](Row::get_ref_unwrap).</span>
     <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Use [`get_ref_unwrap`](Row::get_ref_unwrap) instead.&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_raw</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_raw</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_ref_unwrap</span>(<span class="ident">idx</span>)
     }
 }
@@ -929,12 +929,12 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RowIndex</span>: <span class="ident">sealed::Sealed</span> {
     <span class="doccomment">/// Returns the index of the appropriate column, or `None` if no such</span>
     <span class="doccomment">/// column exists.</span>
-    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">RowIndex</span> <span class="kw">for</span> <span class="ident">usize</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">column_count</span>() {
             <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidColumnIndex</span>(<span class="kw-2">*</span><span class="self">self</span>))
         } <span class="kw">else</span> {
@@ -945,20 +945,20 @@
 
 <span class="kw">impl</span> <span class="ident">RowIndex</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="ident">stmt</span>.<span class="ident">column_index</span>(<span class="kw-2">*</span><span class="self">self</span>)
     }
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">tuple_try_from_row</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">ident</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">ident</span>),<span class="kw-2">*</span>) =&gt; {
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>,)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">convert::TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>,)<span class="kw-2">*</span>) <span class="kw">where</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">FromSql</span>,)<span class="op">*</span> {
             <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
 
             <span class="comment">// we end with index += 1, which rustc warns about</span>
             <span class="comment">// unused_variables and unused_mut are allowed for ()</span>
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_assignments</span>, <span class="ident">unused_variables</span>, <span class="ident">unused_mut</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index</span> <span class="op">=</span> <span class="number">0</span>;
                 $(
                     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
@@ -972,11 +972,11 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">tuples_try_from_row</span> {
-    () <span class="op">=</span><span class="op">&gt;</span> {
+    () =&gt; {
         <span class="comment">// not very useful, but maybe some other macro users will find this helpful</span>
         <span class="macro">tuple_try_from_row!</span>();
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>:<span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>:<span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">tuple_try_from_row!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>)<span class="kw-2">*</span>);
         <span class="macro">tuples_try_from_row!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>),<span class="kw-2">*</span>);
     };
@@ -990,7 +990,7 @@
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Connection</span>, <span class="prelude-ty">Result</span>};
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_try_from_row_for_tuple_1</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_try_from_row_for_tuple_1</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ToSql</span>;
         <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
@@ -1008,7 +1008,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_try_from_row_for_tuple_2</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_try_from_row_for_tuple_2</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
@@ -1026,7 +1026,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_try_from_row_for_tuple_16</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_try_from_row_for_tuple_16</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
         <span class="kw">let</span> <span class="ident">create_table</span> <span class="op">=</span> <span class="string">&quot;CREATE TABLE test (

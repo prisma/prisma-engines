@@ -259,99 +259,99 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelationReference::SimpleChildId</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">render_simple_child_id</span>(<span class="ident">rf</span>),
-            <span class="ident">RelationReference::SimpleParentId</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">render_simple_parent_id</span>(<span class="ident">rf</span>),
-            <span class="ident">RelationReference::CompoundParentId</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">render_compound_parent_id</span>(<span class="ident">rf</span>),
-            <span class="ident">RelationReference::CompoundChildId</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">render_compound_child_id</span>(<span class="ident">rf</span>),
-            <span class="ident">RelationReference::ParentReference</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">render_parent_ref</span>(<span class="ident">rf</span>),
-            <span class="ident">RelationReference::CompoundParentReference</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">render_compound_parent_ref</span>(<span class="ident">rf</span>),
-            <span class="ident">RelationReference::ChildReference</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">render_child_ref</span>(<span class="ident">rf</span>),
-            <span class="ident">RelationReference::CompoundChildReference</span>(<span class="ident">rf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">render_compound_child_ref</span>(<span class="ident">rf</span>),
-            <span class="ident">RelationReference::NoRef</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">RelationReference::IdReference</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;@relation(references: [id])&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">RelationReference::SimpleChildId</span>(<span class="ident">rf</span>) =&gt; <span class="self">self</span>.<span class="ident">render_simple_child_id</span>(<span class="ident">rf</span>),
+            <span class="ident">RelationReference::SimpleParentId</span>(<span class="ident">rf</span>) =&gt; <span class="self">self</span>.<span class="ident">render_simple_parent_id</span>(<span class="ident">rf</span>),
+            <span class="ident">RelationReference::CompoundParentId</span>(<span class="ident">rf</span>) =&gt; <span class="self">self</span>.<span class="ident">render_compound_parent_id</span>(<span class="ident">rf</span>),
+            <span class="ident">RelationReference::CompoundChildId</span>(<span class="ident">rf</span>) =&gt; <span class="self">self</span>.<span class="ident">render_compound_child_id</span>(<span class="ident">rf</span>),
+            <span class="ident">RelationReference::ParentReference</span>(<span class="ident">rf</span>) =&gt; <span class="self">self</span>.<span class="ident">render_parent_ref</span>(<span class="ident">rf</span>),
+            <span class="ident">RelationReference::CompoundParentReference</span>(<span class="ident">rf</span>) =&gt; <span class="self">self</span>.<span class="ident">render_compound_parent_ref</span>(<span class="ident">rf</span>),
+            <span class="ident">RelationReference::ChildReference</span>(<span class="ident">rf</span>) =&gt; <span class="self">self</span>.<span class="ident">render_child_ref</span>(<span class="ident">rf</span>),
+            <span class="ident">RelationReference::CompoundChildReference</span>(<span class="ident">rf</span>) =&gt; <span class="self">self</span>.<span class="ident">render_compound_child_ref</span>(<span class="ident">rf</span>),
+            <span class="ident">RelationReference::NoRef</span> =&gt; <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">RelationReference::IdReference</span> =&gt; <span class="string">&quot;@relation(references: [id])&quot;</span>.<span class="ident">to_string</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_simple_child_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_simple_child_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;@relation(references: [id])&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
+            <span class="bool-val">true</span> =&gt; <span class="string">&quot;@relation(references: [id])&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="bool-val">false</span> =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;@relation(fields: [childId], references: [id]) \n childId String{}&quot;</span>,
                 <span class="ident">rf</span>.<span class="ident">optional_suffix</span>()
             ),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_simple_parent_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_simple_parent_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;@relation(references: [id])&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
+            <span class="bool-val">true</span> =&gt; <span class="string">&quot;@relation(references: [id])&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="bool-val">false</span> =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;@relation(fields: [parentId], references: [id]) \n parentId String{}&quot;</span>,
                 <span class="ident">rf</span>.<span class="ident">optional_suffix</span>()
             ),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_compound_parent_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_compound_parent_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;@relation(references: [id_1, id_2])&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;@relation(fields: [parent_id_1, parent_id_2], references: [id_1, id_2]) \n parent_id_1 String{}\n parent_id_2 String{}&quot;</span>, <span class="ident">rf</span>.<span class="ident">optional_suffix</span>(), <span class="ident">rf</span>.<span class="ident">optional_suffix</span>())
+            <span class="bool-val">true</span> =&gt; <span class="string">&quot;@relation(references: [id_1, id_2])&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="bool-val">false</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;@relation(fields: [parent_id_1, parent_id_2], references: [id_1, id_2]) \n parent_id_1 String{}\n parent_id_2 String{}&quot;</span>, <span class="ident">rf</span>.<span class="ident">optional_suffix</span>(), <span class="ident">rf</span>.<span class="ident">optional_suffix</span>())
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_compound_child_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_compound_child_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() {
-          <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;@relation(references: [id_1, id_2])&quot;</span>.<span class="ident">to_string</span>(),
-          <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;@relation(fields: [child_id_1, child_id_2], references: [id_1, id_2])\n child_id_1 String{}\n child_id_2 String{}&quot;</span>, <span class="ident">rf</span>.<span class="ident">optional_suffix</span>(), <span class="ident">rf</span>.<span class="ident">optional_suffix</span>()),
+          <span class="bool-val">true</span> =&gt; <span class="string">&quot;@relation(references: [id_1, id_2])&quot;</span>.<span class="ident">to_string</span>(),
+          <span class="bool-val">false</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;@relation(fields: [child_id_1, child_id_2], references: [id_1, id_2])\n child_id_1 String{}\n child_id_2 String{}&quot;</span>, <span class="ident">rf</span>.<span class="ident">optional_suffix</span>(), <span class="ident">rf</span>.<span class="ident">optional_suffix</span>()),
       }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_parent_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_parent_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;@relation(references: [p])&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
+            <span class="bool-val">true</span> =&gt; <span class="string">&quot;@relation(references: [p])&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="bool-val">false</span> =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;@relation(fields: [parentRef], references: [p]) \n parentRef String{}&quot;</span>,
                 <span class="ident">rf</span>.<span class="ident">optional_suffix</span>()
             ),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_compound_parent_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_compound_parent_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() {
-          <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;@relation(references: [p_1, p_2])&quot;</span>.<span class="ident">to_string</span>(),
-          <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;@relation(fields: [parent_p_1, parent_p_2], references: [p_1, p_2])\nparent_p_1 String{}\n parent_p_2 String{}&quot;</span>, <span class="ident">rf</span>.<span class="ident">optional_suffix</span>(), <span class="ident">rf</span>.<span class="ident">optional_suffix</span>()),
+          <span class="bool-val">true</span> =&gt; <span class="string">&quot;@relation(references: [p_1, p_2])&quot;</span>.<span class="ident">to_string</span>(),
+          <span class="bool-val">false</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;@relation(fields: [parent_p_1, parent_p_2], references: [p_1, p_2])\nparent_p_1 String{}\n parent_p_2 String{}&quot;</span>, <span class="ident">rf</span>.<span class="ident">optional_suffix</span>(), <span class="ident">rf</span>.<span class="ident">optional_suffix</span>()),
       }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_child_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_child_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;@relation(references: [c])&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
+            <span class="bool-val">true</span> =&gt; <span class="string">&quot;@relation(references: [c])&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="bool-val">false</span> =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;@relation(fields:[parent_c], references: [c])\nparent_c String{}&quot;</span>,
                 <span class="ident">rf</span>.<span class="ident">optional_suffix</span>()
             ),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_compound_child_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">render_compound_child_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="ident">String</span> {
         <span class="comment">//&quot;@relation(references: [c_1, c_2]) @map([\&quot;child_c_1\&quot;, \&quot;child_c_2\&quot;])&quot;</span>
         <span class="kw">match</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() {
-          <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;@relation(references: [c_1, c_2])&quot;</span>.<span class="ident">to_string</span>(),
-          <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;@relation(fields: [child_c_1, child_c_2], references: [c_1, c_2])\n child_c_1 String{}\n child_c_2 String{}&quot;</span>, <span class="ident">rf</span>.<span class="ident">optional_suffix</span>(), <span class="ident">rf</span>.<span class="ident">optional_suffix</span>()),
+          <span class="bool-val">true</span> =&gt; <span class="string">&quot;@relation(references: [c_1, c_2])&quot;</span>.<span class="ident">to_string</span>(),
+          <span class="bool-val">false</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;@relation(fields: [child_c_1, child_c_2], references: [c_1, c_2])\n child_c_1 String{}\n child_c_2 String{}&quot;</span>, <span class="ident">rf</span>.<span class="ident">optional_suffix</span>(), <span class="ident">rf</span>.<span class="ident">optional_suffix</span>()),
       }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_parent_references</span>(<span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_parent_references</span>(<span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&gt;</span> {
     <span class="macro">vec!</span>[
         <span class="ident">RelationReference::ParentReference</span>(<span class="ident">rf</span>),
         <span class="ident">RelationReference::CompoundParentReference</span>(<span class="ident">rf</span>),
     ]
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_child_references</span>(<span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">common_child_references</span>(<span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationField</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&gt;</span> {
     <span class="macro">vec!</span>[
         <span class="ident">RelationReference::ChildReference</span>(<span class="ident">rf</span>),
         <span class="ident">RelationReference::CompoundChildReference</span>(<span class="ident">rf</span>),
@@ -363,7 +363,7 @@
     <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">Identifier</span>,
     <span class="ident">on_parent</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span>,
     <span class="ident">on_child</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">simple</span> {
         <span class="ident">simple_child_references</span>(<span class="ident">parent_id</span>, <span class="ident">on_parent</span>, <span class="ident">on_child</span>)
     } <span class="kw">else</span> {
@@ -375,12 +375,12 @@
     <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">Identifier</span>,
     <span class="ident">on_parent</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span>,
     <span class="ident">on_child</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">parent_id</span> {
-        <span class="kw">_</span> <span class="kw">if</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[(<span class="ident">RelationReference::NoRef</span>)],
-        <span class="ident">Identifier::Simple</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::SimpleParentId</span>(<span class="ident">on_child</span>)],
-        <span class="ident">Identifier::Compound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundParentId</span>(<span class="ident">on_child</span>)],
-        <span class="ident">Identifier::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::ParentReference</span>(<span class="ident">on_child</span>)],
+        <span class="kw">_</span> <span class="kw">if</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">on_parent</span>.<span class="ident">is_list</span>() =&gt; <span class="macro">vec!</span>[(<span class="ident">RelationReference::NoRef</span>)],
+        <span class="ident">Identifier::Simple</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::SimpleParentId</span>(<span class="ident">on_child</span>)],
+        <span class="ident">Identifier::Compound</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundParentId</span>(<span class="ident">on_child</span>)],
+        <span class="ident">Identifier::None</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::ParentReference</span>(<span class="ident">on_child</span>)],
     }
 }
 
@@ -388,24 +388,24 @@
     <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">Identifier</span>,
     <span class="ident">on_parent</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span>,
     <span class="ident">on_child</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">is_m2m</span> <span class="op">=</span> <span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>();
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">is_m2m</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">parent_id</span> {
-            <span class="kw">_</span> <span class="kw">if</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::NoRef</span>],
-            <span class="ident">Identifier::Simple</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> <span class="kw">if</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">on_parent</span>.<span class="ident">is_list</span>() =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::NoRef</span>],
+            <span class="ident">Identifier::Simple</span> =&gt; {
                 <span class="macro">vec!</span>[<span class="ident">RelationReference::SimpleParentId</span>(<span class="ident">on_child</span>)].<span class="ident">clone_append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">common_parent_references</span>(<span class="ident">on_child</span>))
             }
-            <span class="ident">Identifier::Compound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundParentId</span>(<span class="ident">on_child</span>)]
+            <span class="ident">Identifier::Compound</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundParentId</span>(<span class="ident">on_child</span>)]
                 .<span class="ident">clone_append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">common_parent_references</span>(<span class="ident">on_child</span>)),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">common_parent_references</span>(<span class="ident">on_child</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">common_parent_references</span>(<span class="ident">on_child</span>),
         }
     } <span class="kw">else</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">parent_id</span> {
-            <span class="ident">Identifier::Simple</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::SimpleParentId</span>(<span class="ident">on_child</span>)],
-            <span class="ident">Identifier::Compound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundParentId</span>(<span class="ident">on_child</span>)],
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::ParentReference</span>(<span class="ident">on_child</span>)],
+            <span class="ident">Identifier::Simple</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::SimpleParentId</span>(<span class="ident">on_child</span>)],
+            <span class="ident">Identifier::Compound</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundParentId</span>(<span class="ident">on_child</span>)],
+            <span class="kw">_</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::ParentReference</span>(<span class="ident">on_child</span>)],
         }
     }
 }
@@ -416,7 +416,7 @@
     <span class="ident">child_reference</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationReference</span>,
     <span class="ident">on_parent</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span>,
     <span class="ident">on_child</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">simple</span> {
         <span class="ident">simple_parent_references</span>(<span class="ident">child_id</span>, <span class="ident">child_reference</span>, <span class="ident">on_parent</span>, <span class="ident">on_child</span>)
     } <span class="kw">else</span> {
@@ -429,14 +429,14 @@
     <span class="ident">child_reference</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationReference</span>,
     <span class="ident">on_parent</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span>,
     <span class="ident">on_child</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">is_m2m</span> <span class="op">=</span> <span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>();
 
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">child_id</span> {
-        <span class="kw">_</span> <span class="kw">if</span> <span class="ident">child_reference</span>.<span class="ident">render</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">RelationReference::NoRef</span>.<span class="ident">render</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_m2m</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::NoRef</span>],
-        <span class="ident">Identifier::Simple</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::SimpleChildId</span>(<span class="ident">on_parent</span>)],
-        <span class="ident">Identifier::Compound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundChildId</span>(<span class="ident">on_parent</span>)],
-        <span class="ident">Identifier::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::ChildReference</span>(<span class="ident">on_parent</span>)],
+        <span class="kw">_</span> <span class="kw">if</span> <span class="ident">child_reference</span>.<span class="ident">render</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">RelationReference::NoRef</span>.<span class="ident">render</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_m2m</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::NoRef</span>],
+        <span class="ident">Identifier::Simple</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::SimpleChildId</span>(<span class="ident">on_parent</span>)],
+        <span class="ident">Identifier::Compound</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundChildId</span>(<span class="ident">on_parent</span>)],
+        <span class="ident">Identifier::None</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::ChildReference</span>(<span class="ident">on_parent</span>)],
     }
 }
 
@@ -445,44 +445,44 @@
     <span class="ident">child_reference</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationReference</span>,
     <span class="ident">on_parent</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span>,
     <span class="ident">on_child</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RelationField</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">is_m2m</span> <span class="op">=</span> <span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>();
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">is_m2m</span> {
         <span class="kw">match</span> (<span class="ident">child_id</span>, <span class="ident">child_reference</span>) {
-            (<span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">on_child</span>.<span class="ident">is_list</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::NoRef</span>],
-            (<span class="kw-2">&amp;</span><span class="ident">Identifier::Simple</span>, <span class="ident">RelationReference::NoRef</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">on_child</span>.<span class="ident">is_list</span>() =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::NoRef</span>],
+            (<span class="kw-2">&amp;</span><span class="ident">Identifier::Simple</span>, <span class="ident">RelationReference::NoRef</span>) =&gt; {
                 <span class="macro">vec!</span>[<span class="ident">RelationReference::SimpleChildId</span>(<span class="ident">on_parent</span>)].<span class="ident">clone_append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">common_child_references</span>(<span class="ident">on_parent</span>))
             }
-            (<span class="kw-2">&amp;</span><span class="ident">Identifier::Simple</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="kw-2">&amp;</span><span class="ident">Identifier::Simple</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>() =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">refs</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::SimpleChildId</span>(<span class="ident">on_parent</span>)]
                     .<span class="ident">clone_append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">common_child_references</span>(<span class="ident">on_parent</span>));
                 <span class="ident">refs</span>.<span class="ident">push</span>(<span class="ident">RelationReference::NoRef</span>);
 
                 <span class="ident">refs</span>
             }
-            (<span class="kw-2">&amp;</span><span class="ident">Identifier::Simple</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::NoRef</span>],
-            (<span class="kw-2">&amp;</span><span class="ident">Identifier::Compound</span>, <span class="ident">RelationReference::NoRef</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundChildId</span>(<span class="ident">on_parent</span>)]
+            (<span class="kw-2">&amp;</span><span class="ident">Identifier::Simple</span>, <span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::NoRef</span>],
+            (<span class="kw-2">&amp;</span><span class="ident">Identifier::Compound</span>, <span class="ident">RelationReference::NoRef</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundChildId</span>(<span class="ident">on_parent</span>)]
                 .<span class="ident">clone_append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">common_child_references</span>(<span class="ident">on_parent</span>)),
-            (<span class="kw-2">&amp;</span><span class="ident">Identifier::Compound</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="kw-2">&amp;</span><span class="ident">Identifier::Compound</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>() =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">refs</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundChildId</span>(<span class="ident">on_parent</span>)]
                     .<span class="ident">clone_append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">common_child_references</span>(<span class="ident">on_parent</span>));
                 <span class="ident">refs</span>.<span class="ident">push</span>(<span class="ident">RelationReference::NoRef</span>);
 
                 <span class="ident">refs</span>
             }
-            (<span class="kw-2">&amp;</span><span class="ident">Identifier::Compound</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::NoRef</span>],
-            (<span class="kw-2">&amp;</span><span class="ident">Identifier::None</span>, <span class="kw-2">&amp;</span><span class="ident">RelationReference::NoRef</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">common_child_references</span>(<span class="ident">on_parent</span>),
-            (<span class="kw-2">&amp;</span><span class="ident">Identifier::None</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="kw-2">&amp;</span><span class="ident">Identifier::Compound</span>, <span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::NoRef</span>],
+            (<span class="kw-2">&amp;</span><span class="ident">Identifier::None</span>, <span class="kw-2">&amp;</span><span class="ident">RelationReference::NoRef</span>) =&gt; <span class="ident">common_child_references</span>(<span class="ident">on_parent</span>),
+            (<span class="kw-2">&amp;</span><span class="ident">Identifier::None</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">on_parent</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">on_child</span>.<span class="ident">is_list</span>() =&gt; {
                 <span class="ident">common_child_references</span>(<span class="ident">on_parent</span>).<span class="ident">clone_push</span>(<span class="kw-2">&amp;</span><span class="ident">RelationReference::NoRef</span>)
             }
-            (<span class="kw-2">&amp;</span><span class="ident">Identifier::None</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::NoRef</span>],
+            (<span class="kw-2">&amp;</span><span class="ident">Identifier::None</span>, <span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::NoRef</span>],
         }
     } <span class="kw">else</span> {
         <span class="kw">match</span> <span class="ident">child_id</span> {
-            <span class="ident">Identifier::Simple</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::SimpleChildId</span>(<span class="ident">on_parent</span>)],
-            <span class="ident">Identifier::Compound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundChildId</span>(<span class="ident">on_parent</span>)],
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">RelationReference::ChildReference</span>(<span class="ident">on_parent</span>)],
+            <span class="ident">Identifier::Simple</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::SimpleChildId</span>(<span class="ident">on_parent</span>)],
+            <span class="ident">Identifier::Compound</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::CompoundChildId</span>(<span class="ident">on_parent</span>)],
+            <span class="kw">_</span> =&gt; <span class="macro">vec!</span>[<span class="ident">RelationReference::ChildReference</span>(<span class="ident">on_parent</span>)],
         }
     }
 }

@@ -361,7 +361,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Key</span>(<span class="ident">HTable</span>);
 
 <span class="kw">impl</span> <span class="ident">Key</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">h_be</span>: <span class="ident">Block</span>, <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">h_be</span>: <span class="ident">Block</span>, <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">h_be</span>.<span class="ident">u64s_be_to_native</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="self">Self</span>(<span class="ident">HTable</span> {
@@ -371,7 +371,7 @@
 
         <span class="kw">match</span> <span class="ident">detect_implementation</span>(<span class="ident">cpu_features</span>) {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-            <span class="ident">Implementation::CLMUL</span> <span class="kw">if</span> <span class="ident">has_avx_movbe</span>(<span class="ident">cpu_features</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Implementation::CLMUL</span> <span class="kw">if</span> <span class="ident">has_avx_movbe</span>(<span class="ident">cpu_features</span>) =&gt; {
                 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
                     <span class="kw">fn</span> <span class="ident">GFp_gcm_init_avx</span>(<span class="ident">HTable</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HTable</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>]);
                 }
@@ -386,7 +386,7 @@
                 <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
                 <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
             ))]</span>
-            <span class="ident">Implementation::CLMUL</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Implementation::CLMUL</span> =&gt; {
                 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
                     <span class="kw">fn</span> <span class="ident">GFp_gcm_init_clmul</span>(<span class="ident">Htable</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HTable</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>]);
                 }
@@ -396,7 +396,7 @@
             }
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>))]</span>
-            <span class="ident">Implementation::NEON</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Implementation::NEON</span> =&gt; {
                 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
                     <span class="kw">fn</span> <span class="ident">GFp_gcm_init_neon</span>(<span class="ident">Htable</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HTable</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>]);
                 }
@@ -406,7 +406,7 @@
             }
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-            <span class="ident">Implementation::Fallback</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Implementation::Fallback</span> =&gt; {
                 <span class="ident">h_table</span>.<span class="ident">Htable</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">gcm_nohw::init</span>(<span class="ident">h</span>);
             }
         }
@@ -421,7 +421,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Context</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>, <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>, <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context</span> {
             <span class="ident">inner</span>: <span class="ident">ContextInner</span> {
                 <span class="ident">Xi</span>: <span class="ident">Xi</span>(<span class="ident">Block::zero</span>()),
@@ -443,7 +443,7 @@
     <span class="doccomment">/// Access to `inner` for the integrated AES-GCM implementations only.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ContextInner</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ContextInner</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inner</span>
     }
 
@@ -459,7 +459,7 @@
 
         <span class="kw">match</span> <span class="ident">detect_implementation</span>(<span class="self">self</span>.<span class="ident">cpu_features</span>) {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-            <span class="ident">Implementation::CLMUL</span> <span class="kw">if</span> <span class="ident">has_avx_movbe</span>(<span class="self">self</span>.<span class="ident">cpu_features</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Implementation::CLMUL</span> <span class="kw">if</span> <span class="ident">has_avx_movbe</span>(<span class="self">self</span>.<span class="ident">cpu_features</span>) =&gt; {
                 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
                     <span class="kw">fn</span> <span class="ident">GFp_gcm_ghash_avx</span>(
                         <span class="ident">xi</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Xi</span>,
@@ -479,7 +479,7 @@
                 <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
                 <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
             ))]</span>
-            <span class="ident">Implementation::CLMUL</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Implementation::CLMUL</span> =&gt; {
                 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
                     <span class="kw">fn</span> <span class="ident">GFp_gcm_ghash_clmul</span>(
                         <span class="ident">xi</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Xi</span>,
@@ -494,7 +494,7 @@
             }
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>))]</span>
-            <span class="ident">Implementation::NEON</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Implementation::NEON</span> =&gt; {
                 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
                     <span class="kw">fn</span> <span class="ident">GFp_gcm_ghash_neon</span>(
                         <span class="ident">xi</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Xi</span>,
@@ -509,7 +509,7 @@
             }
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-            <span class="ident">Implementation::Fallback</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Implementation::Fallback</span> =&gt; {
                 <span class="ident">gcm_nohw::ghash</span>(<span class="ident">xi</span>, <span class="ident">h_table</span>.<span class="ident">Htable</span>[<span class="number">0</span>], <span class="ident">input</span>);
             }
         }
@@ -531,7 +531,7 @@
                 <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
                 <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
             ))]</span>
-            <span class="ident">Implementation::CLMUL</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Implementation::CLMUL</span> =&gt; {
                 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
                     <span class="kw">fn</span> <span class="ident">GFp_gcm_gmult_clmul</span>(<span class="ident">xi</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Xi</span>, <span class="ident">Htable</span>: <span class="kw-2">&amp;</span><span class="ident">HTable</span>);
                 }
@@ -541,7 +541,7 @@
             }
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>))]</span>
-            <span class="ident">Implementation::NEON</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Implementation::NEON</span> =&gt; {
                 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
                     <span class="kw">fn</span> <span class="ident">GFp_gcm_gmult_neon</span>(<span class="ident">xi</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Xi</span>, <span class="ident">Htable</span>: <span class="kw-2">&amp;</span><span class="ident">HTable</span>);
                 }
@@ -551,24 +551,24 @@
             }
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span>
-            <span class="ident">Implementation::Fallback</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Implementation::Fallback</span> =&gt; {
                 <span class="ident">gcm_nohw::gmult</span>(<span class="ident">xi</span>, <span class="ident">h_table</span>.<span class="ident">Htable</span>[<span class="number">0</span>]);
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">pre_finish</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::Tag</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">pre_finish</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident"><span class="kw">super</span>::Tag</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Xi</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">super</span>::Tag</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Xi</span>) -&gt; <span class="ident"><span class="kw">super</span>::Tag</span>,
     {
         <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">Xi</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_avx2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_avx2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="ident">detect_implementation</span>(<span class="ident">cpu_features</span>) {
-            <span class="ident">Implementation::CLMUL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">has_avx_movbe</span>(<span class="self">self</span>.<span class="ident">cpu_features</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">Implementation::CLMUL</span> =&gt; <span class="ident">has_avx_movbe</span>(<span class="self">self</span>.<span class="ident">cpu_features</span>),
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
 }
@@ -601,7 +601,7 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Xi</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Block</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">Xi</span>(<span class="ident">block</span>): <span class="ident">Xi</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">Xi</span>(<span class="ident">block</span>): <span class="ident">Xi</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">block</span>
     }
 }
@@ -633,7 +633,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">detect_implementation</span>(<span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Implementation</span> {
+<span class="kw">fn</span> <span class="ident">detect_implementation</span>(<span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="ident">Implementation</span> {
     <span class="comment">// `cpu_features` is only used for specific platforms.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
         <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
@@ -675,7 +675,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">has_avx_movbe</span>(<span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">has_avx_movbe</span>(<span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="ident">bool</span> {
     <span class="ident">cpu::intel::AVX</span>.<span class="ident">available</span>(<span class="ident">cpu_features</span>) <span class="op">&amp;&amp;</span> <span class="ident">cpu::intel::MOVBE</span>.<span class="ident">available</span>(<span class="ident">cpu_features</span>)
 }
 </code></pre></div>

@@ -89,7 +89,7 @@
     <span class="doccomment">/// This method can be used to connect to SQL Server named instances</span>
     <span class="doccomment">/// when on a Windows paltform with the `sql-browser-tokio` feature</span>
     <span class="doccomment">/// enabled. Please see the crate examples for more detailed examples.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_named</span>(<span class="ident">builder</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_named</span>(<span class="ident">builder</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="ident">net::lookup_host</span>(<span class="ident">builder</span>.<span class="ident">get_addr</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">for</span> <span class="kw-2">mut</span> <span class="ident">addr</span> <span class="kw">in</span> <span class="ident">addrs</span> {

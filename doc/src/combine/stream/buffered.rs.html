@@ -168,7 +168,7 @@
     <span class="ident">I</span>: <span class="ident">Positioned</span>,
 {
     <span class="kw">type</span> <span class="ident">Checkpoint</span> <span class="op">=</span> <span class="ident">usize</span>;
-    <span class="kw">fn</span> <span class="ident">checkpoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Checkpoint</span> {
+    <span class="kw">fn</span> <span class="ident">checkpoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Checkpoint</span> {
         <span class="self">self</span>.<span class="ident">offset</span>
     }
     <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">checkpoint</span>: <span class="ident"><span class="self">Self</span>::Checkpoint</span>) {
@@ -184,7 +184,7 @@
 {
     <span class="doccomment">/// Constructs a new `BufferedStream` from a `StreamOnce` instance with a `lookahead`</span>
     <span class="doccomment">/// number of elements that can be stored in the buffer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">lookahead</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BufferedStream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">lookahead</span>: <span class="ident">usize</span>) -&gt; <span class="ident">BufferedStream</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
         <span class="ident">BufferedStream</span> {
             <span class="ident">offset</span>: <span class="number">0</span>,
             <span class="ident">iter</span>: <span class="ident">iter</span>,
@@ -199,7 +199,7 @@
     <span class="ident">I</span>: <span class="ident">StreamOnce</span> <span class="op">+</span> <span class="ident">Positioned</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Position</span> {
+    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Position</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer_offset</span> {
             <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">position</span>()
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buffer_offset</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() {
@@ -227,14 +227,14 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">I::Error</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer_offset</span> {
             <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">position</span>();
             <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="macro">try!</span>(<span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">uncons</span>());
             <span class="self">self</span>.<span class="ident">buffer_offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             <span class="comment">// We want the VecDeque to only keep the last .capacity() elements so we need to remove</span>
             <span class="comment">// an element if it gets to large</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">capacity</span>() {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">capacity</span>() {
                 <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">pop_front</span>();
             }
             <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">push_back</span>((<span class="ident">item</span>.<span class="ident">clone</span>(), <span class="ident">position</span>.<span class="ident">clone</span>()));
@@ -254,7 +254,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">is_partial</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_partial</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">is_partial</span>()
     }
 }

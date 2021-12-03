@@ -124,7 +124,7 @@
 
 <span class="kw">use</span> <span class="ident">libc</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> {
     <span class="comment">// According to the POSIX specification,</span>
     <span class="comment">// host names are limited to `HOST_NAME_MAX` bytes</span>
     <span class="comment">//</span>
@@ -145,13 +145,13 @@
     <span class="prelude-val">Ok</span>(<span class="ident">wrap_buffer</span>(<span class="ident">buffer</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">wrap_buffer</span>(<span class="kw-2">mut</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OsString</span> {
+<span class="kw">fn</span> <span class="ident">wrap_buffer</span>(<span class="kw-2">mut</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">OsString</span> {
     <span class="comment">// Returned name might be truncated if it does not fit</span>
     <span class="comment">// and `buffer` will not contain the trailing \0 in that case.</span>
     <span class="comment">// Manually capping the buffer length here.</span>
     <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">bytes</span>
         .<span class="ident">iter</span>()
-        .<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">byte</span><span class="op">|</span> <span class="ident">byte</span> <span class="op">=</span><span class="op">=</span> <span class="number">0x00</span>)
+        .<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">byte</span><span class="op">|</span> <span class="ident">byte</span> <span class="op">==</span> <span class="number">0x00</span>)
         .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">bytes</span>.<span class="ident">len</span>());
     <span class="ident">bytes</span>.<span class="ident">resize</span>(<span class="ident">end</span>, <span class="number">0x00</span>);
 
@@ -159,7 +159,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;set&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="ident">hostname</span>: <span class="kw-2">&amp;</span><span class="ident">OsStr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="ident">hostname</span>: <span class="kw-2">&amp;</span><span class="ident">OsStr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;dragonfly&quot;</span>,
                      <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>,
                      <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;ios&quot;</span>,

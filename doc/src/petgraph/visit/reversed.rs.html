@@ -175,7 +175,7 @@
     <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighborsDirected</span>
 {
     <span class="kw">type</span> <span class="ident">Neighbors</span> <span class="op">=</span> <span class="ident">G::NeighborsDirected</span>;
-    <span class="kw">fn</span> <span class="ident">neighbors</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">G::NodeId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">G::NeighborsDirected</span>
+    <span class="kw">fn</span> <span class="ident">neighbors</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">G::NodeId</span>) -&gt; <span class="ident">G::NeighborsDirected</span>
     {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">neighbors_directed</span>(<span class="ident">n</span>, <span class="ident">Incoming</span>)
     }
@@ -186,7 +186,7 @@
 {
     <span class="kw">type</span> <span class="ident">NeighborsDirected</span> <span class="op">=</span> <span class="ident">G::NeighborsDirected</span>;
     <span class="kw">fn</span> <span class="ident">neighbors_directed</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">G::NodeId</span>, <span class="ident">d</span>: <span class="ident">Direction</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">G::NeighborsDirected</span>
+        -&gt; <span class="ident">G::NeighborsDirected</span>
     {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">neighbors_directed</span>(<span class="ident">n</span>, <span class="ident">d</span>.<span class="ident">opposite</span>())
     }
@@ -195,7 +195,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Visitable</span><span class="op">&gt;</span> <span class="ident">Visitable</span> <span class="kw">for</span> <span class="ident">Reversed</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>
 {
     <span class="kw">type</span> <span class="ident">Map</span> <span class="op">=</span> <span class="ident">G::Map</span>;
-    <span class="kw">fn</span> <span class="ident">visit_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">G::Map</span> {
+    <span class="kw">fn</span> <span class="ident">visit_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">G::Map</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">visit_map</span>()
     }
     <span class="kw">fn</span> <span class="ident">reset_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Map</span>) {
@@ -215,16 +215,16 @@
     <span class="kw">type</span> <span class="ident">NodeId</span> <span class="op">=</span> <span class="ident">R::NodeId</span>;
     <span class="kw">type</span> <span class="ident">EdgeId</span> <span class="op">=</span> <span class="ident">R::EdgeId</span>;
     <span class="kw">type</span> <span class="ident">Weight</span> <span class="op">=</span> <span class="ident">R::Weight</span>;
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NodeId</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">target</span>()
     }
-    <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NodeId</span> {
+    <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">source</span>()
     }
-    <span class="kw">fn</span> <span class="ident">weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Weight</span> {
+    <span class="kw">fn</span> <span class="ident">weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Weight</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">weight</span>()
     }
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::EdgeId</span> {
+    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeId</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">id</span>()
     }
 }
@@ -234,7 +234,7 @@
 {
     <span class="kw">type</span> <span class="ident">EdgeRef</span> <span class="op">=</span> <span class="ident">ReversedEdgeReference</span><span class="op">&lt;</span><span class="ident">G::EdgeRef</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">EdgeReferences</span> <span class="op">=</span> <span class="ident">ReversedEdgeReferences</span><span class="op">&lt;</span><span class="ident">G::EdgeReferences</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edge_references</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::EdgeReferences</span> {
+    <span class="kw">fn</span> <span class="ident">edge_references</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeReferences</span> {
         <span class="ident">ReversedEdgeReferences</span> {
             <span class="ident">iter</span>: <span class="self">self</span>.<span class="number">0</span>.<span class="ident">edge_references</span>(),
         }
@@ -251,13 +251,13 @@
           <span class="ident">I::Item</span>: <span class="ident">EdgeRef</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">ReversedEdgeReference</span><span class="op">&lt;</span><span class="ident">I::Item</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="ident">ReversedEdgeReference</span>)
     }
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">access0</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>.<span class="number">0</span>)
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>.<span class="number">0</span>)
 }
 
 <span class="macro">NodeIndexable!</span>{<span class="ident">delegate_impl</span> [[<span class="ident">G</span>], <span class="ident">G</span>, <span class="ident">Reversed</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>, <span class="ident">access0</span>]}

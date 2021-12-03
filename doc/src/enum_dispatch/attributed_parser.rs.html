@@ -35,7 +35,7 @@
 
 <span class="doccomment">/// Parses any syntax item that was annotated with the `enum_dispatch` attribute and returns its</span>
 <span class="doccomment">/// itemized results.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_attributed</span>(<span class="ident">item</span>: <span class="ident">proc_macro::TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParsedItem</span>, ()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_attributed</span>(<span class="ident">item</span>: <span class="ident">proc_macro::TokenStream</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParsedItem</span>, ()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">enumdef</span>) <span class="op">=</span> <span class="ident">syn::parse</span>(<span class="ident">item</span>.<span class="ident">clone</span>()) {
         <span class="prelude-val">Ok</span>(<span class="ident">ParsedItem::EnumDispatch</span>(<span class="ident">enumdef</span>))
     } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">traitdef</span>) <span class="op">=</span> <span class="ident">syn::parse</span>(<span class="ident">item</span>) {

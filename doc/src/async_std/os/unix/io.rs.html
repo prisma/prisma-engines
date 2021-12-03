@@ -74,7 +74,7 @@
         <span class="doccomment">/// This method does **not** pass ownership of the raw file descriptor</span>
         <span class="doccomment">/// to the caller. The descriptor is only guaranteed to be valid while</span>
         <span class="doccomment">/// the original object has not yet been destroyed.</span>
-        <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawFd</span>;
+        <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span>;
     }
 
     <span class="doccomment">/// A trait to express the ability to construct an object from a raw file</span>
@@ -92,7 +92,7 @@
         <span class="doccomment">/// descriptor they are wrapping. Usage of this function could</span>
         <span class="doccomment">/// accidentally allow violating this contract which can cause memory</span>
         <span class="doccomment">/// unsafety in code that relies on it being true.</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_fd</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_fd</span>(<span class="ident">fd</span>: <span class="ident">RawFd</span>) -&gt; <span class="self">Self</span>;
     }
 
     <span class="doccomment">/// A trait to express the ability to consume an object and acquire ownership of</span>
@@ -103,7 +103,7 @@
         <span class="doccomment">/// This function **transfers ownership** of the underlying file descriptor</span>
         <span class="doccomment">/// to the caller. Callers are then the unique owners of the file descriptor</span>
         <span class="doccomment">/// and must close the descriptor once it&#39;s no longer needed.</span>
-        <span class="kw">fn</span> <span class="ident">into_raw_fd</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RawFd</span>;
+        <span class="kw">fn</span> <span class="ident">into_raw_fd</span>(<span class="self">self</span>) -&gt; <span class="ident">RawFd</span>;
     }
 }
 </code></pre></div>

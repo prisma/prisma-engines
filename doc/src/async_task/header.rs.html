@@ -205,12 +205,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If there is no awaiter or if it is the same as the current waker, returns `None`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Waker</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Waker</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span> {
         <span class="comment">// Set the bit indicating that the task is notifying its awaiter.</span>
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">fetch_or</span>(<span class="ident">NOTIFYING</span>, <span class="ident">Ordering::AcqRel</span>);
 
         <span class="comment">// If the task was not notifying or registering an awaiter...</span>
-        <span class="kw">if</span> <span class="ident">state</span> <span class="op">&amp;</span> (<span class="ident">NOTIFYING</span> <span class="op">|</span> <span class="ident">REGISTERING</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">state</span> <span class="op">&amp;</span> (<span class="ident">NOTIFYING</span> <span class="op">|</span> <span class="ident">REGISTERING</span>) <span class="op">==</span> <span class="number">0</span> {
             <span class="comment">// Take the waker out.</span>
             <span class="kw">let</span> <span class="ident">waker</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">awaiter</span>.<span class="ident">get</span>()).<span class="ident">take</span>() };
 
@@ -221,9 +221,9 @@
             <span class="comment">// Finally, notify the waker if it&#39;s different from the current waker.</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">w</span>) <span class="op">=</span> <span class="ident">waker</span> {
                 <span class="kw">match</span> <span class="ident">current</span> {
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">w</span>),
-                    <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">w</span>.<span class="ident">will_wake</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">w</span>),
-                    <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">abort_on_panic</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">drop</span>(<span class="ident">w</span>)),
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">w</span>),
+                    <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">w</span>.<span class="ident">will_wake</span>(<span class="ident">c</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">w</span>),
+                    <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="ident">abort_on_panic</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">drop</span>(<span class="ident">w</span>)),
                 }
             }
         }
@@ -242,7 +242,7 @@
         <span class="kw">loop</span> {
             <span class="comment">// There can&#39;t be two concurrent registrations because `Task` can only be polled</span>
             <span class="comment">// by a unique pinned reference.</span>
-            <span class="macro">debug_assert!</span>(<span class="ident">state</span> <span class="op">&amp;</span> <span class="ident">REGISTERING</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>);
+            <span class="macro">debug_assert!</span>(<span class="ident">state</span> <span class="op">&amp;</span> <span class="ident">REGISTERING</span> <span class="op">==</span> <span class="number">0</span>);
 
             <span class="comment">// If we&#39;re in the notifying state at this moment, just wake and return without</span>
             <span class="comment">// registering.</span>
@@ -258,11 +258,11 @@
                 <span class="ident">Ordering::AcqRel</span>,
                 <span class="ident">Ordering::Acquire</span>,
             ) {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
                     <span class="ident">state</span> <span class="op">|</span><span class="op">=</span> <span class="ident">REGISTERING</span>;
                     <span class="kw">break</span>;
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">s</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">s</span>) =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">s</span>,
             }
         }
 
@@ -295,8 +295,8 @@
                 .<span class="ident">state</span>
                 .<span class="ident">compare_exchange_weak</span>(<span class="ident">state</span>, <span class="ident">new</span>, <span class="ident">Ordering::AcqRel</span>, <span class="ident">Ordering::Acquire</span>)
             {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">s</span>,
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">s</span>) =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">s</span>,
             }
         }
 
@@ -308,7 +308,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Header</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
 
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Header&quot;</span>)

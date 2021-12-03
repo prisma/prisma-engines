@@ -526,7 +526,7 @@
     <span class="ident">MS</span>: <span class="ident">MakeService</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>,
     <span class="ident">Target</span>: <span class="ident">fmt::Debug</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;PoolDiscoverer&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;maker&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">maker</span>)
             .<span class="ident">field</span>(<span class="string">&quot;making&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">making</span>.<span class="ident">is_some</span>())
@@ -547,7 +547,7 @@
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Change</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">DropNotifyService</span><span class="op">&lt;</span><span class="ident">MS::Service</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">MS::MakeError</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
 
         <span class="kw">while</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">sid</span>)) <span class="op">=</span> <span class="ident">this</span>.<span class="ident">died_rx</span>.<span class="ident">as_mut</span>().<span class="ident">poll_recv</span>(<span class="ident">cx</span>) {
@@ -606,12 +606,12 @@
         }
 
         <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">load</span> {
-            <span class="ident">Level::High</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Level::High</span> =&gt; {
                 <span class="macro">unreachable!</span>(<span class="string">&quot;found high load but no Service being made&quot;</span>);
             }
-            <span class="ident">Level::Normal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Pending</span>,
-            <span class="ident">Level::Low</span> <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Poll::Pending</span>,
-            <span class="ident">Level::Low</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Level::Normal</span> =&gt; <span class="ident">Poll::Pending</span>,
+            <span class="ident">Level::Low</span> <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> =&gt; <span class="ident">Poll::Pending</span>,
+            <span class="ident">Level::Low</span> =&gt; {
                 <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">load</span> <span class="op">=</span> <span class="ident">Level::Normal</span>;
                 <span class="comment">// NOTE: this is a little sad -- we&#39;d prefer to kill short-living services</span>
                 <span class="kw">let</span> <span class="ident">rm</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">services</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="number">0</span>;
@@ -642,7 +642,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Builder</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Builder</span> {
             <span class="ident">init</span>: <span class="number">0.1</span>,
             <span class="ident">low</span>: <span class="number">0.00001</span>,
@@ -657,7 +657,7 @@
     <span class="doccomment">/// Create a new builder with default values for all load settings.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If you just want to use the defaults, you can just use [`Pool::new`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::default</span>()
     }
 
@@ -666,7 +666,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The default value is 0.01. That is, when one in every 100 `poll_ready` calls return</span>
     <span class="doccomment">/// `Pending`, then the underlying service is considered underutilized.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underutilized_below</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">low</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underutilized_below</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">low</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">low</span> <span class="op">=</span> <span class="ident">low</span>;
         <span class="self">self</span>
     }
@@ -677,7 +677,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The default value is 0.5. That is, when every other call to `poll_ready` returns</span>
     <span class="doccomment">/// `Pending`, then the underlying service is considered highly loaded.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">loaded_above</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">high</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">loaded_above</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">high</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">high</span> <span class="op">=</span> <span class="ident">high</span>;
         <span class="self">self</span>
     }
@@ -688,7 +688,7 @@
     <span class="doccomment">/// or removed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The default value is 0.1.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">init</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">init</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">init</span> <span class="op">=</span> <span class="ident">init</span>;
         <span class="self">self</span>
     }
@@ -706,7 +706,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The default value is 0.05, meaning, in very approximate terms, that each new load sample</span>
     <span class="doccomment">/// affects the estimated load by 5%.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">urgency</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">urgency</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alpha</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">alpha</span> <span class="op">=</span> <span class="ident">alpha</span>.<span class="ident">max</span>(<span class="number">0.0</span>).<span class="ident">min</span>(<span class="number">1.0</span>);
         <span class="self">self</span>
     }
@@ -717,7 +717,7 @@
     <span class="doccomment">/// new service is spawned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// No maximum limit is imposed by default.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_services</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_services</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">limit</span> <span class="op">=</span> <span class="ident">limit</span>;
         <span class="self">self</span>
     }
@@ -727,7 +727,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">make_service</span>: <span class="ident">MS</span>,
         <span class="ident">target</span>: <span class="ident">Target</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">MS</span>: <span class="ident">MakeService</span><span class="op">&lt;</span><span class="ident">Target</span>, <span class="ident">Request</span><span class="op">&gt;</span>,
         <span class="ident">MS::Service</span>: <span class="ident">Load</span>,
@@ -778,7 +778,7 @@
     <span class="ident">Target</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>,
     <span class="ident">MS::Service</span>: <span class="ident">fmt::Debug</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Pool&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;balance&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">balance</span>)
             .<span class="ident">field</span>(<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>)
@@ -802,7 +802,7 @@
     <span class="doccomment">/// construct another `Service` that is then added to the load-balanced pool.</span>
     <span class="doccomment">/// If many calls to `poll_ready` succeed, the most recently added `Service`</span>
     <span class="doccomment">/// is dropped from the pool.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">make_service</span>: <span class="ident">MS</span>, <span class="ident">target</span>: <span class="ident">Target</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">make_service</span>: <span class="ident">MS</span>, <span class="ident">target</span>: <span class="ident">Target</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Builder::new</span>().<span class="ident">build</span>(<span class="ident">make_service</span>, <span class="ident">target</span>)
     }
 }
@@ -822,7 +822,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">PinBalance</span><span class="op">&lt;</span><span class="ident">PoolDiscoverer</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Req</span><span class="op">&gt;</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">PinBalance</span><span class="op">&lt;</span><span class="ident">PoolDiscoverer</span><span class="op">&lt;</span><span class="ident">MS</span>, <span class="ident">Target</span>, <span class="ident">Req</span><span class="op">&gt;</span>, <span class="ident">Req</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Future</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(()) <span class="op">=</span> <span class="self">self</span>.<span class="ident">balance</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)<span class="question-mark">?</span> {
             <span class="comment">// services was ready -- there are enough services</span>
             <span class="comment">// update ewma with a 0 sample</span>
@@ -877,7 +877,7 @@
         <span class="ident">Poll::Pending</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Req</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Req</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="self">self</span>.<span class="ident">balance</span>.<span class="ident">call</span>(<span class="ident">req</span>)
     }
 }
@@ -898,7 +898,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Svc</span>: <span class="ident">Load</span><span class="op">&gt;</span> <span class="ident">Load</span> <span class="kw">for</span> <span class="ident">DropNotifyService</span><span class="op">&lt;</span><span class="ident">Svc</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Metric</span> <span class="op">=</span> <span class="ident">Svc::Metric</span>;
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Metric</span> {
+    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Metric</span> {
         <span class="self">self</span>.<span class="ident">svc</span>.<span class="ident">load</span>()
     }
 }
@@ -908,11 +908,11 @@
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">Svc::Future</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Svc::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">svc</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="self">self</span>.<span class="ident">svc</span>.<span class="ident">call</span>(<span class="ident">req</span>)
     }
 }

@@ -725,10 +725,10 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">choice</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span> : <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span> : <span class="ident">expr</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span> : <span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span> : <span class="ident">expr</span>),<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span> : <span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span> : <span class="ident">expr</span>),<span class="op">+</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>.<span class="ident">or</span>(<span class="macro">choice!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>),<span class="op">+</span>))
     }
 }
@@ -736,12 +736,12 @@
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">parse_mode_choice</span> {
-    () <span class="op">=</span><span class="op">&gt;</span> {
+    () =&gt; {
         <span class="kw">fn</span> <span class="ident">parse_partial</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
             <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
             <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">parse_mode_choice</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::parser::PartialMode::default</span>(), <span class="ident">input</span>, <span class="ident">state</span>)
         }
 
@@ -749,7 +749,7 @@
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
             <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
             <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+        ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">parse_mode_choice</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::parser::FirstMode</span>, <span class="ident">input</span>, <span class="ident">state</span>)
         }
     }
@@ -768,20 +768,20 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">parse_partial</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">parse_mode_choice</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
         <span class="self">Self</span>: <span class="ident">Sized</span>;
@@ -804,7 +804,7 @@
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
     {
@@ -821,10 +821,10 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">merge</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>: <span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>: <span class="ident">ident</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>.<span class="ident">error</span>
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>: <span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>: <span class="ident">ident</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>: <span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>: <span class="ident">ident</span>)<span class="op">+</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>.<span class="ident">error</span>.<span class="ident">merge</span>(<span class="macro">merge!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="op">+</span>))
     };
 }
@@ -838,7 +838,7 @@
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>: <span class="ident">ident</span>
         ( )
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>: <span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span>: <span class="ident">ident</span>)<span class="op">+</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> { {
+    ) =&gt; { {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">Tracked::from</span>(<span class="macro">merge!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span>)<span class="op">+</span>));
         <span class="comment">// If offset != 1 then the nested parser is a sequence of parsers where 1 or</span>
         <span class="comment">// more parsers returned `EmptyOk` before the parser finally failed with</span>
@@ -864,13 +864,13 @@
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>: <span class="ident">ident</span>
         ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>: <span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>: <span class="ident">ident</span>)<span class="op">*</span> )
         $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">all</span>: <span class="ident">ident</span>)<span class="op">*</span>
-    ) <span class="op">=</span><span class="op">&gt;</span> { {
+    ) =&gt; { {
         <span class="kw">let</span> <span class="ident">parser</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">head::PartialState::default</span>();
         <span class="kw">match</span> <span class="ident">parser</span>.<span class="ident">parse_mode</span>(<span class="ident">::parser::FirstMode</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>) {
-            <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConsumedOk</span>(<span class="ident">x</span>),
-            <span class="ident">EmptyOk</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EmptyOk</span>(<span class="ident">x</span>),
-            <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) =&gt; <span class="ident">ConsumedOk</span>(<span class="ident">x</span>),
+            <span class="ident">EmptyOk</span>(<span class="ident">x</span>) =&gt; <span class="ident">EmptyOk</span>(<span class="ident">x</span>),
+            <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; {
                 <span class="comment">// If we get `ConsumedErr` but the input is the same this is a partial parse we</span>
                 <span class="comment">// cannot commit to so leave the state as `Empty` to retry all the parsers</span>
                 <span class="comment">// on the next call to  `parse_partial`</span>
@@ -879,7 +879,7 @@
                 }
                 <span class="ident">ConsumedErr</span>(<span class="ident">err</span>)
             }
-            <span class="ident">EmptyErr</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">EmptyErr</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>) =&gt; {
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>.<span class="ident">reset</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">before</span>.<span class="ident">clone</span>());
                 <span class="macro">do_choice!</span>(
                     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>
@@ -898,17 +898,17 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">tuple_choice_parser</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>: <span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>: <span class="ident">ident</span>) =&gt; {
         <span class="macro">tuple_choice_parser_inner!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>);
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>: <span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="ident">ident</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>: <span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="ident">ident</span>)<span class="op">+</span>) =&gt; {
         <span class="macro">tuple_choice_parser_inner!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>)<span class="op">+</span>);
         <span class="macro">tuple_choice_parser!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>)<span class="op">+</span>);
     };
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">tuple_choice_parser_inner</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>: <span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="ident">ident</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>: <span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="ident">ident</span>)<span class="op">+</span>) =&gt; {
         <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
         <span class="kw">pub</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>),<span class="op">+</span><span class="op">&gt;</span> {
             <span class="ident">Empty</span>,
@@ -918,7 +918,7 @@
         }
 
         <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>),<span class="op">+</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>),<span class="op">+</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+            <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
                 <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state::Empty</span>
             }
         }
@@ -940,14 +940,14 @@
                 <span class="ident">mode</span>: <span class="ident">Mode</span>,
                 <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
                 <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-            ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+            ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">Mode</span>: <span class="ident">ParseMode</span>,
             {
                 <span class="kw">let</span> ($(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>,)<span class="op">+</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
                 <span class="kw">let</span> <span class="ident">empty</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">state</span> {
-                    <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+                    <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state::Empty</span> =&gt; <span class="bool-val">true</span>,
+                    <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
                 };
                 <span class="kw">if</span> <span class="ident">mode</span>.<span class="ident">is_first</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">empty</span> {
                     <span class="kw">let</span> <span class="ident">before_position</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">position</span>();
@@ -955,14 +955,14 @@
                     <span class="macro">do_choice!</span>(<span class="ident">input</span> <span class="ident">before_position</span> <span class="ident">before</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span> <span class="ident">state</span> ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>)<span class="op">+</span> ) )
                 } <span class="kw">else</span> {
                     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">state</span> {
-                        <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+                        <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state::Empty</span> =&gt; <span class="macro">unreachable!</span>(),
                         $(
-                            <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>(<span class="kw">_</span>) =&gt; {
                                 <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">state</span> {
-                                    <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">state</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">state</span>) =&gt; {
                                         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">state</span>)
                                     }
-                                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>()
+                                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>()
                                 };
                                 <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() {
                                     <span class="kw-2">*</span><span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">partial_state::Empty</span>;
@@ -996,7 +996,7 @@
 <span class="macro">tuple_choice_parser!</span>(<span class="ident">A</span> <span class="ident">B</span> <span class="ident">C</span> <span class="ident">D</span> <span class="ident">E</span> <span class="ident">F</span> <span class="ident">G</span> <span class="ident">H</span> <span class="ident">I</span> <span class="ident">J</span> <span class="ident">K</span> <span class="ident">L</span> <span class="ident">M</span> <span class="ident">N</span> <span class="ident">O</span> <span class="ident">P</span> <span class="ident">Q</span> <span class="ident">R</span> <span class="ident">S</span> <span class="ident">T</span> <span class="ident">U</span> <span class="ident">V</span> <span class="ident">X</span> <span class="ident">Y</span> <span class="ident">Z</span>);
 
 <span class="macro">macro_rules!</span> <span class="ident">array_choice_parser</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>: <span class="ident">tt</span>)<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>: <span class="ident">tt</span>)<span class="op">+</span>) =&gt; {
         $(
         <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="ident">ChoiceParser</span> <span class="kw">for</span> [<span class="ident">P</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>]
         <span class="kw">where</span>
@@ -1013,7 +1013,7 @@
                 <span class="ident">mode</span>: <span class="ident">M</span>,
                 <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
                 <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-            ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+            ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">M</span>: <span class="ident">ParseMode</span>,
             {
@@ -1059,7 +1059,7 @@
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
     {
@@ -1078,7 +1078,7 @@
     <span class="ident">mode</span>: <span class="ident">M</span>,
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">P::Input</span>,
     <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="ident">usize</span>, <span class="ident">P::PartialState</span>),
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">P::Output</span>, <span class="ident">P::Input</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">P::Output</span>, <span class="ident">P::Input</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>,
     <span class="ident">I</span>: <span class="ident">Stream</span>,
@@ -1102,14 +1102,14 @@
         <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>.<span class="ident">clone</span>());
 
         <span class="kw">match</span> <span class="ident">self_</span>[<span class="ident">i</span>].<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">child_state</span>) {
-            <span class="ident">consumed_err</span> @ <span class="ident">ConsumedErr</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">consumed_err</span> @ <span class="ident">ConsumedErr</span>(<span class="kw">_</span>) =&gt; {
                 <span class="kw-2">*</span><span class="ident">index_state</span> <span class="op">=</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>;
                 <span class="kw">return</span> <span class="ident">consumed_err</span>;
             }
-            <span class="ident">EmptyErr</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; {
                 <span class="ident">prev_err</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">prev_err</span> {
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-                    <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">prev_err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">prev_err</span>) =&gt; {
                         <span class="kw">if</span> <span class="ident">prev_err</span>.<span class="ident">offset</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ErrorOffset</span>(<span class="number">1</span>) {
                             <span class="comment">// First add the errors of all the preceding parsers which did not</span>
                             <span class="comment">// have a sequence of parsers returning `EmptyOk` before failing</span>
@@ -1131,19 +1131,19 @@
                     }
                 };
             }
-            <span class="ident">ok</span> @ <span class="ident">ConsumedOk</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">ok</span> @ <span class="ident">EmptyOk</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ok</span> @ <span class="ident">ConsumedOk</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">ok</span> @ <span class="ident">EmptyOk</span>(<span class="kw">_</span>) =&gt; {
                 <span class="kw-2">*</span><span class="ident">index_state</span> <span class="op">=</span> <span class="number">0</span>;
                 <span class="kw">return</span> <span class="ident">ok</span>;
             }
         }
     }
     <span class="ident">EmptyErr</span>(<span class="kw">match</span> <span class="ident">prev_err</span> {
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">I::Error::from_error</span>(
+        <span class="prelude-val">None</span> =&gt; <span class="ident">I::Error::from_error</span>(
             <span class="ident">input</span>.<span class="ident">position</span>(),
             <span class="ident">StreamError::message_static_message</span>(<span class="string">&quot;parser choice is empty&quot;</span>),
         )
         .<span class="ident">into</span>(),
-        <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">prev_err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">prev_err</span>) =&gt; {
             <span class="kw">if</span> <span class="ident">prev_err</span>.<span class="ident">offset</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ErrorOffset</span>(<span class="number">1</span>) {
                 <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">prev_err</span>.<span class="ident">offset</span>;
                 <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">self_</span>.<span class="ident">len</span>();
@@ -1174,7 +1174,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="ident">slice_parse_mode</span>(<span class="self">self</span>, <span class="ident">::parser::PartialMode::default</span>(), <span class="ident">input</span>, <span class="ident">state</span>)
     }
 
@@ -1183,7 +1183,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
         <span class="ident">slice_parse_mode</span>(<span class="self">self</span>, <span class="ident">::parser::FirstMode</span>, <span class="ident">input</span>, <span class="ident">state</span>)
     }
 
@@ -1193,7 +1193,7 @@
         <span class="ident">_mode</span>: <span class="ident">M</span>,
         <span class="ident">_input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">_state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
     {
@@ -1242,7 +1242,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">choice</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">ps</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Choice</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">choice</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">ps</span>: <span class="ident">P</span>) -&gt; <span class="ident">Choice</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">ChoiceParser</span>,
 {
@@ -1271,7 +1271,7 @@
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
     {
@@ -1318,7 +1318,7 @@
 <span class="doccomment">/// [`choice!`]: ../macro.choice.html</span>
 <span class="doccomment">/// [`p1.or(p2)`]: ../parser/trait.Parser.html#method.or</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or</span><span class="op">&lt;</span><span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span>(<span class="ident">p1</span>: <span class="ident">P1</span>, <span class="ident">p2</span>: <span class="ident">P2</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Or</span><span class="op">&lt;</span><span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or</span><span class="op">&lt;</span><span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span>(<span class="ident">p1</span>: <span class="ident">P1</span>, <span class="ident">p2</span>: <span class="ident">P2</span>) -&gt; <span class="ident">Or</span><span class="op">&lt;</span><span class="ident">P1</span>, <span class="ident">P2</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">P1</span>: <span class="ident">Parser</span>,
     <span class="ident">P2</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Input</span> <span class="op">=</span> <span class="ident">P1::Input</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">P1::Output</span><span class="op">&gt;</span>,
@@ -1343,16 +1343,16 @@
         <span class="ident">mode</span>: <span class="ident">M</span>,
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
         <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">ParseMode</span>,
     {
         <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">state</span>) {
-            <span class="ident">EmptyOk</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EmptyOk</span>(<span class="prelude-val">Some</span>(<span class="ident">x</span>)),
-            <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConsumedOk</span>(<span class="prelude-val">Some</span>(<span class="ident">x</span>)),
-            <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConsumedErr</span>(<span class="ident">err</span>),
-            <span class="ident">EmptyErr</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">EmptyOk</span>(<span class="ident">x</span>) =&gt; <span class="ident">EmptyOk</span>(<span class="prelude-val">Some</span>(<span class="ident">x</span>)),
+            <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) =&gt; <span class="ident">ConsumedOk</span>(<span class="prelude-val">Some</span>(<span class="ident">x</span>)),
+            <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConsumedErr</span>(<span class="ident">err</span>),
+            <span class="ident">EmptyErr</span>(<span class="kw">_</span>) =&gt; {
                 <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
                 <span class="ident">EmptyOk</span>(<span class="prelude-val">None</span>)
             }
@@ -1377,7 +1377,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">optional</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">parser</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Optional</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">optional</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">parser</span>: <span class="ident">P</span>) -&gt; <span class="ident">Optional</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">Parser</span>,
 {

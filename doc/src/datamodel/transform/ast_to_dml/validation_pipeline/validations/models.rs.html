@@ -275,8 +275,8 @@
         .<span class="ident">primary_key</span>()
         .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">final_database_name</span>(<span class="ident">ctx</span>.<span class="ident">connector</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> (<span class="ident">pk</span>, <span class="ident">name</span>)))
     {
-        <span class="prelude-val">Some</span>((<span class="ident">pk</span>, <span class="ident">name</span>)) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">pk</span>, <span class="ident">name</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
+        <span class="prelude-val">Some</span>((<span class="ident">pk</span>, <span class="ident">name</span>)) =&gt; (<span class="ident">pk</span>, <span class="ident">name</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
     };
 
     <span class="ident">validate_db_name</span>(

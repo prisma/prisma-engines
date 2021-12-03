@@ -2014,7 +2014,7 @@
         <span class="doccomment">/// by the `tracing` macros, but it is not part of the stable versioned API.</span>
         <span class="doccomment">/// Breaking changes to this module may occur in small-numbered versions</span>
         <span class="doccomment">/// without warning.</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
             <span class="self">Self</span> {
                 <span class="ident">interest</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0xDEADFACED</span>),
                 <span class="ident">meta</span>,
@@ -2035,13 +2035,13 @@
         <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
         <span class="comment">// This only happens once (or if the cached interest value was corrupted).</span>
         <span class="attribute">#[<span class="ident">cold</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="self">self</span>) -&gt; <span class="ident">Interest</span> {
             <span class="self">self</span>.<span class="ident">registration</span>
                 .<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::callsite::register</span>(<span class="self">self</span>));
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">interest</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) {
-                <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Interest::never</span>(),
-                <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Interest::always</span>(),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Interest::sometimes</span>(),
+                <span class="number">0</span> =&gt; <span class="ident">Interest::never</span>(),
+                <span class="number">2</span> =&gt; <span class="ident">Interest::always</span>(),
+                <span class="kw">_</span> =&gt; <span class="ident">Interest::sometimes</span>(),
             }
         }
 
@@ -2055,29 +2055,29 @@
         <span class="doccomment">/// Breaking changes to this module may occur in small-numbered versions</span>
         <span class="doccomment">/// without warning.</span>
         <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interest</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Interest</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interest</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="self">self</span>) -&gt; <span class="ident">Interest</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">interest</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) {
-                <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Interest::never</span>(),
-                <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Interest::sometimes</span>(),
-                <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Interest::always</span>(),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">register</span>(),
+                <span class="number">0</span> =&gt; <span class="ident">Interest::never</span>(),
+                <span class="number">1</span> =&gt; <span class="ident">Interest::sometimes</span>(),
+                <span class="number">2</span> =&gt; <span class="ident">Interest::always</span>(),
+                <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">register</span>(),
             }
         }
 
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">interest</span>: <span class="ident">Interest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">interest</span>: <span class="ident">Interest</span>) -&gt; <span class="ident">bool</span> {
             <span class="ident">interest</span>.<span class="ident">is_always</span>()
                 <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::dispatcher::get_default</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="ident">default</span>.<span class="ident">enabled</span>(<span class="self">self</span>.<span class="ident">meta</span>))
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Span</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Span</span> {
             <span class="ident"><span class="kw">crate</span>::Span::new_disabled</span>(<span class="self">self</span>.<span class="ident">meta</span>)
         }
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>))]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Span</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Span</span> {
             <span class="ident"><span class="kw">crate</span>::Span::none</span>()
         }
     }
@@ -2085,21 +2085,21 @@
     <span class="kw">impl</span> <span class="ident">Callsite</span> <span class="kw">for</span> <span class="ident">MacroCallsite</span> {
         <span class="kw">fn</span> <span class="ident">set_interest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">interest</span>: <span class="ident">Interest</span>) {
             <span class="kw">let</span> <span class="ident">interest</span> <span class="op">=</span> <span class="kw">match</span> () {
-                <span class="kw">_</span> <span class="kw">if</span> <span class="ident">interest</span>.<span class="ident">is_never</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-                <span class="kw">_</span> <span class="kw">if</span> <span class="ident">interest</span>.<span class="ident">is_always</span>() <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
+                <span class="kw">_</span> <span class="kw">if</span> <span class="ident">interest</span>.<span class="ident">is_never</span>() =&gt; <span class="number">0</span>,
+                <span class="kw">_</span> <span class="kw">if</span> <span class="ident">interest</span>.<span class="ident">is_always</span>() =&gt; <span class="number">2</span>,
+                <span class="kw">_</span> =&gt; <span class="number">1</span>,
             };
             <span class="self">self</span>.<span class="ident">interest</span>.<span class="ident">store</span>(<span class="ident">interest</span>, <span class="ident">Ordering::SeqCst</span>);
         }
 
         <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
             <span class="self">self</span>.<span class="ident">meta</span>
         }
     }
 
     <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">MacroCallsite</span> {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
             <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;MacroCallsite&quot;</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;interest&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">interest</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;meta&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">meta</span>)

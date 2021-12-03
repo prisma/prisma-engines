@@ -336,7 +336,7 @@
 <span class="doccomment">/// Transforms a `PrismaValue` of a specific field into the BSON mapping as prescribed by the native types</span>
 <span class="doccomment">/// or as defined by the default `TypeIdentifier` to BSON mapping.</span>
 <span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>) {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">field</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>;
 
         <span class="comment">// This is _insanely_ inefficient, but we have no real choice with the current interface.</span>
@@ -345,20 +345,20 @@
         <span class="comment">// If we have a native type, use that one as source of truth for mapping, else use the type ident for defaults.</span>
         <span class="kw">match</span> (<span class="ident">mongo_type</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">type_identifier</span>, <span class="ident">value</span>) {
             <span class="comment">// We assume this is always valid if it arrives here.</span>
-            (<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">PrismaValue::Null</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Bson::Null</span>),
-            (<span class="prelude-val">Some</span>(<span class="ident">mt</span>), <span class="kw">_</span>, <span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">mt</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>(),
-            (<span class="kw">_</span>, <span class="ident">field_type</span>, <span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">field_type</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>(),
+            (<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">PrismaValue::Null</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Bson::Null</span>),
+            (<span class="prelude-val">Some</span>(<span class="ident">mt</span>), <span class="kw">_</span>, <span class="ident">value</span>) =&gt; (<span class="ident">mt</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>(),
+            (<span class="kw">_</span>, <span class="ident">field_type</span>, <span class="ident">value</span>) =&gt; (<span class="ident">field_type</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>(),
         }
     }
 }
 
 <span class="doccomment">/// Conversion using an explicit native type.</span>
 <span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> (<span class="ident">MongoDbType</span>, <span class="ident">PrismaValue</span>) {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span> {
             <span class="comment">// ObjectId</span>
-            (<span class="ident">MongoDbType::ObjectId</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::ObjectId</span>(<span class="ident">ObjectId::parse_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)<span class="question-mark">?</span>),
-            (<span class="ident">MongoDbType::ObjectId</span>, <span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">MongoDbType::ObjectId</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::ObjectId</span>(<span class="ident">ObjectId::parse_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)<span class="question-mark">?</span>),
+            (<span class="ident">MongoDbType::ObjectId</span>, <span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>)) =&gt; {
                 <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">12</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::MalformedObjectId</span>(<span class="macro">format!</span>(
                         <span class="string">&quot;ObjectIDs require exactly 12 bytes, got: {}&quot;</span>,
@@ -373,29 +373,29 @@
             }
 
             <span class="comment">// String</span>
-            (<span class="ident">MongoDbType::String</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::String</span>(<span class="ident">s</span>),
-            (<span class="ident">MongoDbType::String</span>, <span class="ident">PrismaValue::Uuid</span>(<span class="ident">u</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::String</span>(<span class="ident">u</span>.<span class="ident">to_string</span>()),
+            (<span class="ident">MongoDbType::String</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>),
+            (<span class="ident">MongoDbType::String</span>, <span class="ident">PrismaValue::Uuid</span>(<span class="ident">u</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">u</span>.<span class="ident">to_string</span>()),
 
             <span class="comment">// Double</span>
-            (<span class="ident">MongoDbType::Double</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Double</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span>),
-            (<span class="ident">MongoDbType::Double</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Double</span>(<span class="ident">f</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
-            (<span class="ident">MongoDbType::Double</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Double</span>(<span class="ident">b</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
+            (<span class="ident">MongoDbType::Double</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span>),
+            (<span class="ident">MongoDbType::Double</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">f</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
+            (<span class="ident">MongoDbType::Double</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">b</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
 
             <span class="comment">// Decimal</span>
-            (<span class="ident">MongoDbType::Decimal</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(<span class="string">&quot;Mongo decimals.&quot;</span>),
+            (<span class="ident">MongoDbType::Decimal</span>, <span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;Mongo decimals.&quot;</span>),
 
             <span class="comment">// Int</span>
-            (<span class="ident">MongoDbType::Int</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int32</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">i32</span>),
-            (<span class="ident">MongoDbType::Int</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int32</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">i32</span>),
-            (<span class="ident">MongoDbType::Int</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int32</span>(<span class="ident">b</span>.<span class="ident">to_i32</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I32</span>)<span class="question-mark">?</span>),
+            (<span class="ident">MongoDbType::Int</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Int32</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">i32</span>),
+            (<span class="ident">MongoDbType::Int</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Int32</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">i32</span>),
+            (<span class="ident">MongoDbType::Int</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Int32</span>(<span class="ident">b</span>.<span class="ident">to_i32</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I32</span>)<span class="question-mark">?</span>),
 
             <span class="comment">// Long</span>
-            (<span class="ident">MongoDbType::Long</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int64</span>(<span class="ident">b</span>),
-            (<span class="ident">MongoDbType::Long</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int64</span>(<span class="ident">b</span>),
-            (<span class="ident">MongoDbType::Long</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">d</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int64</span>(<span class="ident">d</span>.<span class="ident">to_i64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I64</span>)<span class="question-mark">?</span>),
+            (<span class="ident">MongoDbType::Long</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">b</span>),
+            (<span class="ident">MongoDbType::Long</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">b</span>),
+            (<span class="ident">MongoDbType::Long</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">d</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">d</span>.<span class="ident">to_i64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I64</span>)<span class="question-mark">?</span>),
 
             <span class="comment">// Array</span>
-            (<span class="ident">MongoDbType::Array</span>(<span class="ident">inner</span>), <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">MongoDbType::Array</span>(<span class="ident">inner</span>), <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">inner</span>;
                 <span class="ident">Bson::Array</span>(
                     <span class="ident">vals</span>.<span class="ident">into_iter</span>()
@@ -403,32 +403,32 @@
                         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
                 )
             }
-            (<span class="ident">MongoDbType::Array</span>(<span class="ident">inner</span>), <span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Array</span>(<span class="macro">vec!</span>[(<span class="kw-2">*</span><span class="ident">inner</span>, <span class="ident">val</span>).<span class="ident">into_bson</span>()<span class="question-mark">?</span>]),
-            (<span class="ident">typ</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Array</span>(
+            (<span class="ident">MongoDbType::Array</span>(<span class="ident">inner</span>), <span class="ident">val</span>) =&gt; <span class="ident">Bson::Array</span>(<span class="macro">vec!</span>[(<span class="kw-2">*</span><span class="ident">inner</span>, <span class="ident">val</span>).<span class="ident">into_bson</span>()<span class="question-mark">?</span>]),
+            (<span class="ident">typ</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)) =&gt; <span class="ident">Bson::Array</span>(
                 <span class="ident">vals</span>.<span class="ident">into_iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> (<span class="ident">typ</span>.<span class="ident">clone</span>(), <span class="ident">val</span>).<span class="ident">into_bson</span>())
                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
             ),
 
             <span class="comment">// BinData</span>
-            (<span class="ident">MongoDbType::BinData</span>, <span class="ident">PrismaValue::Bytes</span>(<span class="ident">bytes</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Binary</span>(<span class="ident">Binary</span> {
+            (<span class="ident">MongoDbType::BinData</span>, <span class="ident">PrismaValue::Bytes</span>(<span class="ident">bytes</span>)) =&gt; <span class="ident">Bson::Binary</span>(<span class="ident">Binary</span> {
                 <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Generic</span>,
                 <span class="ident">bytes</span>,
             }),
 
             <span class="comment">// Bool</span>
-            (<span class="ident">MongoDbType::Bool</span>, <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>),
+            (<span class="ident">MongoDbType::Bool</span>, <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>),
 
             <span class="comment">// Date / Timestamp</span>
-            (<span class="ident">MongoDbType::Date</span>, <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::DateTime</span>(<span class="ident">dt</span>.<span class="ident">into</span>()),
-            (<span class="ident">MongoDbType::Timestamp</span>, <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Timestamp</span>(<span class="ident">Timestamp</span> {
+            (<span class="ident">MongoDbType::Date</span>, <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>)) =&gt; <span class="ident">Bson::DateTime</span>(<span class="ident">dt</span>.<span class="ident">into</span>()),
+            (<span class="ident">MongoDbType::Timestamp</span>, <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>)) =&gt; <span class="ident">Bson::Timestamp</span>(<span class="ident">Timestamp</span> {
                 <span class="comment">// We might not want to offer timestamp as a type, it&#39;s internal and mapping is weird.</span>
                 <span class="ident">time</span>: <span class="ident">dt</span>.<span class="ident">timestamp</span>() <span class="kw">as</span> <span class="ident">u32</span>,
                 <span class="ident">increment</span>: <span class="number">0</span>,
             }),
 
             <span class="comment">// Unhandled conversions</span>
-            (<span class="ident">mdb_type</span>, <span class="ident">p_val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">mdb_type</span>, <span class="ident">p_val</span>) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::ConversionError</span> {
                     <span class="ident">from</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">p_val</span>),
                     <span class="ident">to</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">mdb_type</span>),
@@ -440,54 +440,54 @@
 
 <span class="doccomment">/// Convert the `PrismaValue` into Bson using the type hint given by `TypeIdentifier`.</span>
 <span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">TypeIdentifier</span>, <span class="ident">PrismaValue</span>) {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span> {
             <span class="comment">// String &amp; UUID</span>
-            (<span class="ident">TypeIdentifier::String</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::String</span>(<span class="ident">s</span>),
-            (<span class="ident">TypeIdentifier::String</span>, <span class="ident">PrismaValue::Uuid</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::String</span>(<span class="ident">s</span>.<span class="ident">to_string</span>()),
-            (<span class="ident">TypeIdentifier::UUID</span>, <span class="ident">PrismaValue::Uuid</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::String</span>(<span class="ident">s</span>.<span class="ident">to_string</span>()),
-            (<span class="ident">TypeIdentifier::UUID</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::String</span>(<span class="ident">s</span>),
+            (<span class="ident">TypeIdentifier::String</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>),
+            (<span class="ident">TypeIdentifier::String</span>, <span class="ident">PrismaValue::Uuid</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>.<span class="ident">to_string</span>()),
+            (<span class="ident">TypeIdentifier::UUID</span>, <span class="ident">PrismaValue::Uuid</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>.<span class="ident">to_string</span>()),
+            (<span class="ident">TypeIdentifier::UUID</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>),
 
             <span class="comment">// Enums</span>
-            (<span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>), <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::String</span>(<span class="ident">s</span>),
-            (<span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>), <span class="ident">PrismaValue::Enum</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::String</span>(<span class="ident">s</span>),
+            (<span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>), <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>),
+            (<span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>), <span class="ident">PrismaValue::Enum</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>),
 
             <span class="comment">// Bool</span>
-            (<span class="ident">TypeIdentifier::Boolean</span>, <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>),
+            (<span class="ident">TypeIdentifier::Boolean</span>, <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>),
 
             <span class="comment">// DateTime</span>
-            (<span class="ident">TypeIdentifier::DateTime</span>, <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::DateTime</span>(<span class="ident">dt</span>.<span class="ident">into</span>()),
+            (<span class="ident">TypeIdentifier::DateTime</span>, <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>)) =&gt; <span class="ident">Bson::DateTime</span>(<span class="ident">dt</span>.<span class="ident">into</span>()),
 
             <span class="comment">// Int</span>
-            (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int64</span>(<span class="ident">i</span>),
-            (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int64</span>(<span class="ident">i</span>),
-            (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int64</span>(<span class="ident">dec</span>.<span class="ident">to_i64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I64</span>)<span class="question-mark">?</span>),
+            (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">i</span>),
+            (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">i</span>),
+            (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">dec</span>.<span class="ident">to_i64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I64</span>)<span class="question-mark">?</span>),
 
             <span class="comment">// BigInt</span>
-            (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int64</span>(<span class="ident">i</span>),
-            (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int64</span>(<span class="ident">i</span>),
-            (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Int64</span>(<span class="ident">dec</span>.<span class="ident">to_i64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I64</span>)<span class="question-mark">?</span>),
+            (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">i</span>),
+            (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">i</span>),
+            (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">dec</span>.<span class="ident">to_i64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I64</span>)<span class="question-mark">?</span>),
 
             <span class="comment">// Float</span>
-            (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Double</span>(<span class="ident">dec</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
-            (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
-            (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
+            (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">dec</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
+            (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
+            (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
 
             <span class="comment">// Decimal (todo properly when the driver supports dec128)</span>
-            (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) =&gt; {
                 <span class="ident">Bson::Double</span>(<span class="ident">dec</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>)
             }
-            (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
-            (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
+            (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
+            (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
 
             <span class="comment">// Bytes</span>
-            (<span class="ident">TypeIdentifier::Bytes</span>, <span class="ident">PrismaValue::Bytes</span>(<span class="ident">bytes</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Binary</span>(<span class="ident">Binary</span> {
+            (<span class="ident">TypeIdentifier::Bytes</span>, <span class="ident">PrismaValue::Bytes</span>(<span class="ident">bytes</span>)) =&gt; <span class="ident">Bson::Binary</span>(<span class="ident">Binary</span> {
                 <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Generic</span>,
                 <span class="ident">bytes</span>,
             }),
 
             <span class="comment">// Json</span>
-            (<span class="ident">TypeIdentifier::Json</span>, <span class="ident">PrismaValue::Json</span>(<span class="ident">json</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">TypeIdentifier::Json</span>, <span class="ident">PrismaValue::Json</span>(<span class="ident">json</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">json</span>)<span class="question-mark">?</span>;
                 <span class="ident">Bson::try_from</span>(<span class="ident">val</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">MongoError::ConversionError</span> {
                     <span class="ident">from</span>: <span class="string">&quot;Stringified JSON&quot;</span>.<span class="ident">to_owned</span>(),
@@ -496,17 +496,17 @@
             }
 
             <span class="comment">// List values</span>
-            (<span class="ident">typ</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Bson::Array</span>(
+            (<span class="ident">typ</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)) =&gt; <span class="ident">Bson::Array</span>(
                 <span class="ident">vals</span>.<span class="ident">into_iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> (<span class="ident">typ</span>, <span class="ident">val</span>).<span class="ident">into_bson</span>())
                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
             ),
 
             <span class="comment">// Unhandled mappings</span>
-            (<span class="ident">TypeIdentifier::Xml</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(<span class="string">&quot;Mongo doesn&#39;t support XML.&quot;</span>.<span class="ident">to_owned</span>())),
-            (<span class="ident">TypeIdentifier::Unsupported</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;Unsupported types should never hit the connector.&quot;</span>),
+            (<span class="ident">TypeIdentifier::Xml</span>, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(<span class="string">&quot;Mongo doesn&#39;t support XML.&quot;</span>.<span class="ident">to_owned</span>())),
+            (<span class="ident">TypeIdentifier::Unsupported</span>, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unsupported types should never hit the connector.&quot;</span>),
 
-            (<span class="ident">ident</span>, <span class="ident">val</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="ident">ident</span>, <span class="ident">val</span>) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(<span class="macro">format!</span>(
                     <span class="string">&quot;Unhandled and unsupported value mapping for MongoDB: {} as {:?}.&quot;</span>,
                     <span class="ident">val</span>, <span class="ident">ident</span>,
@@ -517,19 +517,19 @@
 }
 
 <span class="comment">// Parsing of values coming from MongoDB back to the connector / core.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value_from_bson</span>(<span class="ident">bson</span>: <span class="ident">Bson</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">OutputMeta</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value_from_bson</span>(<span class="ident">bson</span>: <span class="ident">Bson</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">OutputMeta</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">meta</span>.<span class="ident">ident</span>, <span class="ident">bson</span>) {
         <span class="comment">// We expect a list to be returned.</span>
-        (<span class="ident">type_identifier</span>, <span class="ident">bson</span>) <span class="kw">if</span> <span class="ident">meta</span>.<span class="ident">list</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">bson</span> {
-            <span class="ident">Bson::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::List</span>(<span class="ident">Vec::new</span>()),
+        (<span class="ident">type_identifier</span>, <span class="ident">bson</span>) <span class="kw">if</span> <span class="ident">meta</span>.<span class="ident">list</span> =&gt; <span class="kw">match</span> <span class="ident">bson</span> {
+            <span class="ident">Bson::Null</span> =&gt; <span class="ident">PrismaValue::List</span>(<span class="ident">Vec::new</span>()),
 
-            <span class="ident">Bson::Array</span>(<span class="ident">list</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::List</span>(
+            <span class="ident">Bson::Array</span>(<span class="ident">list</span>) =&gt; <span class="ident">PrismaValue::List</span>(
                 <span class="ident">list</span>.<span class="ident">into_iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">list_val</span><span class="op">|</span> <span class="ident">value_from_bson</span>(<span class="ident">list_val</span>, <span class="kw-2">&amp;</span><span class="ident">meta</span>.<span class="ident">strip_list</span>()))
                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
             ),
 
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::ConversionError</span> {
                     <span class="ident">from</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">bson</span>),
                     <span class="ident">to</span>: <span class="macro">format!</span>(<span class="string">&quot;List of {:?}&quot;</span>, <span class="ident">type_identifier</span>),
@@ -538,7 +538,7 @@
         },
 
         <span class="comment">// Null catch-all.</span>
-        (<span class="kw">_</span>, <span class="ident">Bson::Null</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="kw">_</span>, <span class="ident">Bson::Null</span>) =&gt; {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">dv</span>) <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">default</span> {
                 <span class="ident">dv</span>.<span class="ident">clone</span>()
             } <span class="kw">else</span> {
@@ -547,59 +547,59 @@
         }
 
         <span class="comment">// String + UUID + Enum</span>
-        (<span class="ident">TypeIdentifier::String</span>, <span class="ident">Bson::String</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>),
-        (<span class="ident">TypeIdentifier::String</span>, <span class="ident">Bson::ObjectId</span>(<span class="ident">oid</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::String</span>(<span class="ident">oid</span>.<span class="ident">to_string</span>()),
-        (<span class="ident">TypeIdentifier::UUID</span>, <span class="ident">Bson::String</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Uuid</span>(<span class="ident">uuid::Uuid::parse_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)<span class="question-mark">?</span>),
-        (<span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>), <span class="ident">Bson::String</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Enum</span>(<span class="ident">s</span>),
+        (<span class="ident">TypeIdentifier::String</span>, <span class="ident">Bson::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>),
+        (<span class="ident">TypeIdentifier::String</span>, <span class="ident">Bson::ObjectId</span>(<span class="ident">oid</span>)) =&gt; <span class="ident">PrismaValue::String</span>(<span class="ident">oid</span>.<span class="ident">to_string</span>()),
+        (<span class="ident">TypeIdentifier::UUID</span>, <span class="ident">Bson::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::Uuid</span>(<span class="ident">uuid::Uuid::parse_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)<span class="question-mark">?</span>),
+        (<span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>), <span class="ident">Bson::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::Enum</span>(<span class="ident">s</span>),
 
         <span class="comment">// Bool</span>
-        (<span class="ident">TypeIdentifier::Boolean</span>, <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>),
+        (<span class="ident">TypeIdentifier::Boolean</span>, <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>)) =&gt; <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>),
 
         <span class="comment">// Int</span>
-        (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>),
-        (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>),
-        (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">Bson::Double</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>),
+        (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>),
+        (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>),
+        (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">Bson::Double</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>),
 
         <span class="comment">// BigInt</span>
-        (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>),
-        (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>),
+        (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>),
+        (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>),
 
         <span class="comment">// Floats</span>
-        (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">Bson::Double</span>(<span class="ident">f</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">Bson::Double</span>(<span class="ident">f</span>)) =&gt; {
             <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_f64</span>(<span class="ident">f</span>).<span class="ident">convert</span>(<span class="ident">expl::PRISMA_FLOAT</span>)<span class="question-mark">?</span>.<span class="ident">normalized</span>())
         }
-        (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)) =&gt; {
             <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_i64</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>).<span class="ident">convert</span>(<span class="ident">expl::PRISMA_FLOAT</span>)<span class="question-mark">?</span>.<span class="ident">normalized</span>())
         }
-        (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)) =&gt; {
             <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_i64</span>(<span class="ident">i</span>).<span class="ident">convert</span>(<span class="ident">expl::PRISMA_FLOAT</span>)<span class="question-mark">?</span>.<span class="ident">normalized</span>())
         }
 
         <span class="comment">// Decimals</span>
-        (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">Bson::Double</span>(<span class="ident">f</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">Bson::Double</span>(<span class="ident">f</span>)) =&gt; {
             <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_f64</span>(<span class="ident">f</span>).<span class="ident">convert</span>(<span class="ident">expl::PRISMA_FLOAT</span>)<span class="question-mark">?</span>.<span class="ident">normalized</span>())
         }
-        (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)) =&gt; {
             <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_i64</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>).<span class="ident">convert</span>(<span class="ident">expl::PRISMA_FLOAT</span>)<span class="question-mark">?</span>.<span class="ident">normalized</span>())
         }
-        (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)) =&gt; {
             <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_i64</span>(<span class="ident">i</span>).<span class="ident">convert</span>(<span class="ident">expl::PRISMA_FLOAT</span>)<span class="question-mark">?</span>.<span class="ident">normalized</span>())
         }
 
         <span class="comment">// DateTime</span>
-        (<span class="ident">TypeIdentifier::DateTime</span>, <span class="ident">Bson::DateTime</span>(<span class="ident">dt</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>.<span class="ident">to_chrono</span>().<span class="ident">into</span>()),
-        (<span class="ident">TypeIdentifier::DateTime</span>, <span class="ident">Bson::Timestamp</span>(<span class="ident">ts</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="ident">TypeIdentifier::DateTime</span>, <span class="ident">Bson::DateTime</span>(<span class="ident">dt</span>)) =&gt; <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>.<span class="ident">to_chrono</span>().<span class="ident">into</span>()),
+        (<span class="ident">TypeIdentifier::DateTime</span>, <span class="ident">Bson::Timestamp</span>(<span class="ident">ts</span>)) =&gt; {
             <span class="ident">PrismaValue::DateTime</span>(<span class="ident">Utc</span>.<span class="ident">timestamp</span>(<span class="ident">ts</span>.<span class="ident">time</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>).<span class="ident">into</span>())
         }
 
         <span class="comment">// Bytes</span>
-        (<span class="ident">TypeIdentifier::Bytes</span>, <span class="ident">Bson::Binary</span>(<span class="ident">bin</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Bytes</span>(<span class="ident">bin</span>.<span class="ident">bytes</span>),
-        (<span class="ident">TypeIdentifier::Bytes</span>, <span class="ident">Bson::ObjectId</span>(<span class="ident">oid</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Bytes</span>(<span class="ident">oid</span>.<span class="ident">bytes</span>().<span class="ident">to_vec</span>()),
+        (<span class="ident">TypeIdentifier::Bytes</span>, <span class="ident">Bson::Binary</span>(<span class="ident">bin</span>)) =&gt; <span class="ident">PrismaValue::Bytes</span>(<span class="ident">bin</span>.<span class="ident">bytes</span>),
+        (<span class="ident">TypeIdentifier::Bytes</span>, <span class="ident">Bson::ObjectId</span>(<span class="ident">oid</span>)) =&gt; <span class="ident">PrismaValue::Bytes</span>(<span class="ident">oid</span>.<span class="ident">bytes</span>().<span class="ident">to_vec</span>()),
 
         <span class="comment">// Json</span>
-        (<span class="ident">TypeIdentifier::Json</span>, <span class="ident">bson</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PrismaValue::Json</span>(<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">bson</span>.<span class="ident">into_relaxed_extjson</span>())<span class="question-mark">?</span>),
+        (<span class="ident">TypeIdentifier::Json</span>, <span class="ident">bson</span>) =&gt; <span class="ident">PrismaValue::Json</span>(<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">bson</span>.<span class="ident">into_relaxed_extjson</span>())<span class="question-mark">?</span>),
 
-        (<span class="ident">ident</span>, <span class="ident">bson</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        (<span class="ident">ident</span>, <span class="ident">bson</span>) =&gt; {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::UnhandledError</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;Converting BSON to type {:?}. Data: {:?}&quot;</span>,
                 <span class="ident">ident</span>, <span class="ident">bson</span>
@@ -611,17 +611,17 @@
 }
 
 <span class="kw">trait</span> <span class="ident">UnwrapConversion</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Display</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">convert</span>(<span class="self">self</span>, <span class="ident">to_type_explanation</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">convert</span>(<span class="self">self</span>, <span class="ident">to_type_explanation</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">UnwrapConversion</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Display</span>,
 {
-    <span class="kw">fn</span> <span class="ident">convert</span>(<span class="self">self</span>, <span class="ident">to_type_explanation</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">convert</span>(<span class="self">self</span>, <span class="ident">to_type_explanation</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::ConversionError</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">i</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">MongoError::ConversionError</span> {
                 <span class="ident">from</span>: <span class="ident">format_opt</span>(<span class="self">self</span>),
                 <span class="ident">to</span>: <span class="ident">to_type_explanation</span>.<span class="ident">to_owned</span>(),
             }),
@@ -629,10 +629,10 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">format_opt</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">format_opt</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">match</span> <span class="ident">opt</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">t</span>),
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;None&quot;</span>.<span class="ident">to_owned</span>(),
+        <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">t</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="string">&quot;None&quot;</span>.<span class="ident">to_owned</span>(),
     }
 }
 

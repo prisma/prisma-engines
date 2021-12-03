@@ -276,7 +276,7 @@
     <span class="ident">T</span>: <span class="ident">Stream</span>,
     <span class="ident">U</span>: <span class="ident">FromStream</span><span class="op">&lt;</span><span class="ident">T::Item</span><span class="op">&gt;</span>,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Collect</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">T</span>) -&gt; <span class="ident">Collect</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">lower</span>, <span class="ident">upper</span>) <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">size_hint</span>();
         <span class="kw">let</span> <span class="ident">collection</span> <span class="op">=</span> <span class="ident">U::initialize</span>(<span class="ident">sealed::Internal</span>, <span class="ident">lower</span>, <span class="ident">upper</span>);
 
@@ -295,15 +295,15 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">U</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">Poll::Ready</span>;
 
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>();
 
             <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">me</span>.<span class="ident">stream</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">item</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">item</span>) =&gt; <span class="ident">item</span>,
+                <span class="prelude-val">None</span> =&gt; {
                     <span class="kw">return</span> <span class="ident">Ready</span>(<span class="ident">U::finalize</span>(<span class="ident">sealed::Internal</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">me</span>.<span class="ident">collection</span>));
                 }
             };
@@ -324,7 +324,7 @@
 
     <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">_lower</span>: <span class="ident">usize</span>, <span class="ident">_upper</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {}
 
-    <span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">_collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (), <span class="ident">_item</span>: ()) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">_collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (), <span class="ident">_item</span>: ()) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">true</span>
     }
 
@@ -336,16 +336,16 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">sealed::FromStreamPriv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">String</span> {
     <span class="kw">type</span> <span class="ident">InternalCollection</span> <span class="op">=</span> <span class="ident">String</span>;
 
-    <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">_lower</span>: <span class="ident">usize</span>, <span class="ident">_upper</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">_lower</span>: <span class="ident">usize</span>, <span class="ident">_upper</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="ident">String::new</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>, <span class="ident">item</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">collection</span>.<span class="ident">push_str</span>(<span class="ident">item</span>.<span class="ident">as_ref</span>());
         <span class="bool-val">true</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
         <span class="ident">mem::take</span>(<span class="ident">collection</span>)
     }
 }
@@ -355,16 +355,16 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">sealed::FromStreamPriv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">InternalCollection</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">lower</span>: <span class="ident">usize</span>, <span class="ident">_upper</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">lower</span>: <span class="ident">usize</span>, <span class="ident">_upper</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Vec::with_capacity</span>(<span class="ident">lower</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">item</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">collection</span>.<span class="ident">push</span>(<span class="ident">item</span>);
         <span class="bool-val">true</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">mem::take</span>(<span class="ident">collection</span>)
     }
 }
@@ -374,15 +374,15 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">sealed::FromStreamPriv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">InternalCollection</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">lower</span>: <span class="ident">usize</span>, <span class="ident">upper</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">lower</span>: <span class="ident">usize</span>, <span class="ident">upper</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">sealed::FromStreamPriv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::initialize</span>(<span class="ident">sealed::Internal</span>, <span class="ident">lower</span>, <span class="ident">upper</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">item</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">sealed::FromStreamPriv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::extend</span>(<span class="ident">sealed::Internal</span>, <span class="ident">collection</span>, <span class="ident">item</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> {
         <span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">sealed::FromStreamPriv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::finalize</span>(<span class="ident">sealed::Internal</span>, <span class="ident">collection</span>)
             .<span class="ident">into_boxed_slice</span>()
     }
@@ -400,7 +400,7 @@
         <span class="kw">_</span>: <span class="ident">sealed::Internal</span>,
         <span class="ident">lower</span>: <span class="ident">usize</span>,
         <span class="ident">upper</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">U::InternalCollection</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">U::InternalCollection</span>, <span class="ident">E</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">U::initialize</span>(<span class="ident">sealed::Internal</span>, <span class="ident">lower</span>, <span class="ident">upper</span>))
     }
 
@@ -408,21 +408,21 @@
         <span class="kw">_</span>: <span class="ident">sealed::Internal</span>,
         <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::InternalCollection</span>,
         <span class="ident">item</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    ) -&gt; <span class="ident">bool</span> {
         <span class="macro">assert!</span>(<span class="ident">collection</span>.<span class="ident">is_ok</span>());
         <span class="kw">match</span> <span class="ident">item</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">item</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">item</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">collection</span> <span class="op">=</span> <span class="ident">collection</span>.<span class="ident">as_mut</span>().<span class="ident">ok</span>().<span class="ident">expect</span>(<span class="string">&quot;invalid state&quot;</span>);
                 <span class="ident">U::extend</span>(<span class="ident">sealed::Internal</span>, <span class="ident">collection</span>, <span class="ident">item</span>)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                 <span class="kw-2">*</span><span class="ident">collection</span> <span class="op">=</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
                 <span class="bool-val">false</span>
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::InternalCollection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw">_</span>: <span class="ident">sealed::Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::InternalCollection</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">U</span>, <span class="ident">E</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">collection</span>) <span class="op">=</span> <span class="ident">collection</span>.<span class="ident">as_mut</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">U::finalize</span>(<span class="ident">sealed::Internal</span>, <span class="ident">collection</span>))
         } <span class="kw">else</span> {
@@ -450,15 +450,15 @@
             <span class="ident">internal</span>: <span class="ident">Internal</span>,
             <span class="ident">lower</span>: <span class="ident">usize</span>,
             <span class="ident">upper</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-        ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::InternalCollection</span>;
+        ) -&gt; <span class="ident"><span class="self">Self</span>::InternalCollection</span>;
 
         <span class="doccomment">/// Extend the collection with the received item</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// Return `true` to continue streaming, `false` complete collection.</span>
-        <span class="kw">fn</span> <span class="ident">extend</span>(<span class="ident">internal</span>: <span class="ident">Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::InternalCollection</span>, <span class="ident">item</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+        <span class="kw">fn</span> <span class="ident">extend</span>(<span class="ident">internal</span>: <span class="ident">Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::InternalCollection</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="ident">bool</span>;
 
         <span class="doccomment">/// Finalize collection into target type.</span>
-        <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="ident">internal</span>: <span class="ident">Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::InternalCollection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+        <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="ident">internal</span>: <span class="ident">Internal</span>, <span class="ident">collection</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::InternalCollection</span>) -&gt; <span class="self">Self</span>;
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>

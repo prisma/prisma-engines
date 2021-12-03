@@ -591,10 +591,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ScalarProjection</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScalarProjection::Single</span>(<span class="ident">sf</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">sf</span>],
-            <span class="ident">ScalarProjection::Compound</span>(<span class="ident">sfs</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sfs</span>.<span class="ident">iter</span>().<span class="ident">collect</span>(),
+            <span class="ident">ScalarProjection::Single</span>(<span class="ident">sf</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">sf</span>],
+            <span class="ident">ScalarProjection::Compound</span>(<span class="ident">sfs</span>) =&gt; <span class="ident">sfs</span>.<span class="ident">iter</span>().<span class="ident">collect</span>(),
         }
     }
 }
@@ -624,26 +624,26 @@
 <span class="kw">impl</span> <span class="ident">ScalarFilter</span> {
     <span class="doccomment">/// The number of values in the filter. `IN` and `NOT IN` may contain more</span>
     <span class="doccomment">/// than one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">condition</span> {
-            <span class="ident">ScalarCondition::In</span>(<span class="kw-2">ref</span> <span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l</span>.<span class="ident">len</span>(),
-            <span class="ident">ScalarCondition::NotIn</span>(<span class="kw-2">ref</span> <span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l</span>.<span class="ident">len</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
+            <span class="ident">ScalarCondition::In</span>(<span class="kw-2">ref</span> <span class="ident">l</span>) =&gt; <span class="ident">l</span>.<span class="ident">len</span>(),
+            <span class="ident">ScalarCondition::NotIn</span>(<span class="kw-2">ref</span> <span class="ident">l</span>) =&gt; <span class="ident">l</span>.<span class="ident">len</span>(),
+            <span class="kw">_</span> =&gt; <span class="number">1</span>,
         }
     }
 
     <span class="doccomment">/// Returns `true` if the number of values in the filter is 0.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
     }
 
     <span class="doccomment">/// If `true`, the filter should be split into smaller filters executed in</span>
     <span class="doccomment">/// separate queries.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">chunk_size</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="macro">matches!</span>(
             <span class="self">self</span>.<span class="ident">condition</span>,
             <span class="ident">ScalarCondition::NotContains</span>(<span class="kw">_</span>)
@@ -656,15 +656,15 @@
     }
 
     <span class="doccomment">/// If possible, converts the filter into multiple smaller filters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">batched</span>(<span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFilter</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">mut</span> <span class="ident">list</span>: <span class="ident">PrismaListValue</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaListValue</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">batched</span>(<span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFilter</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">mut</span> <span class="ident">list</span>: <span class="ident">PrismaListValue</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaListValue</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">dedup_list</span>: <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">list</span>.<span class="ident">drain</span>(..).<span class="ident">collect</span>();
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batches</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">list</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="ident">chunk_size</span> <span class="op">+</span> <span class="number">1</span>);
             <span class="ident">batches</span>.<span class="ident">push</span>(<span class="ident">Vec::with_capacity</span>(<span class="ident">chunk_size</span>));
 
             <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">item</span>) <span class="kw">in</span> <span class="ident">dedup_list</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-                <span class="kw">if</span> <span class="ident">idx</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">idx</span> <span class="op">%</span> <span class="ident">chunk_size</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">idx</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">idx</span> <span class="op">%</span> <span class="ident">chunk_size</span> <span class="op">==</span> <span class="number">0</span> {
                     <span class="ident">batches</span>.<span class="ident">push</span>(<span class="ident">Vec::with_capacity</span>(<span class="ident">chunk_size</span>));
                 }
 
@@ -677,7 +677,7 @@
         <span class="kw">let</span> <span class="ident">mode</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mode</span>.<span class="ident">clone</span>();
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">condition</span> {
-            <span class="ident">ScalarCondition::In</span>(<span class="ident">list</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ScalarCondition::In</span>(<span class="ident">list</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">projection</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">projection</span>;
 
                 <span class="ident">inner</span>(<span class="ident">list</span>, <span class="ident">chunk_size</span>)
@@ -690,7 +690,7 @@
                     .<span class="ident">collect</span>()
             }
 
-            <span class="ident">ScalarCondition::NotIn</span>(<span class="ident">list</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ScalarCondition::NotIn</span>(<span class="ident">list</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">projection</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">projection</span>;
 
                 <span class="ident">inner</span>(<span class="ident">list</span>, <span class="ident">chunk_size</span>)
@@ -702,7 +702,7 @@
                     })
                     .<span class="ident">collect</span>()
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="self">self</span>],
+            <span class="kw">_</span> =&gt; <span class="macro">vec!</span>[<span class="self">self</span>],
         }
     }
 }
@@ -736,24 +736,24 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ScalarCondition</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert</span>(<span class="self">self</span>, <span class="ident">condition</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert</span>(<span class="self">self</span>, <span class="ident">condition</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="ident">condition</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                <span class="ident"><span class="self">Self</span>::Equals</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NotEquals</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::NotEquals</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Equals</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::Contains</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NotContains</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::NotContains</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Contains</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::StartsWith</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NotStartsWith</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::NotStartsWith</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::StartsWith</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::EndsWith</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NotEndsWith</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::NotEndsWith</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::EndsWith</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::LessThan</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::GreaterThanOrEquals</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::LessThanOrEquals</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::GreaterThan</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::GreaterThan</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::LessThanOrEquals</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::GreaterThanOrEquals</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::LessThan</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::In</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NotIn</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::NotIn</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::In</span>(<span class="ident">v</span>),
-                <span class="ident"><span class="self">Self</span>::JsonCompare</span>(<span class="ident">json_compare</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident"><span class="self">Self</span>::Equals</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::NotEquals</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::NotEquals</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::Equals</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::Contains</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::NotContains</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::NotContains</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::Contains</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::StartsWith</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::NotStartsWith</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::NotStartsWith</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::StartsWith</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::EndsWith</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::NotEndsWith</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::NotEndsWith</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::EndsWith</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::LessThan</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::GreaterThanOrEquals</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::LessThanOrEquals</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::GreaterThan</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::GreaterThan</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::LessThanOrEquals</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::GreaterThanOrEquals</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::LessThan</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::In</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::NotIn</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::NotIn</span>(<span class="ident">v</span>) =&gt; <span class="ident"><span class="self">Self</span>::In</span>(<span class="ident">v</span>),
+                <span class="ident"><span class="self">Self</span>::JsonCompare</span>(<span class="ident">json_compare</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">inverted_cond</span> <span class="op">=</span> <span class="ident">json_compare</span>.<span class="ident">condition</span>.<span class="ident">invert</span>(<span class="bool-val">true</span>);
 
                     <span class="ident"><span class="self">Self</span>::JsonCompare</span>(<span class="ident">JsonCondition</span> {
@@ -762,8 +762,8 @@
                         <span class="ident">target_type</span>: <span class="ident">json_compare</span>.<span class="ident">target_type</span>,
                     })
                 }
-                <span class="ident"><span class="self">Self</span>::Search</span>(<span class="ident">v</span>, <span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::NotSearch</span>(<span class="ident">v</span>, <span class="ident">fields</span>),
-                <span class="ident"><span class="self">Self</span>::NotSearch</span>(<span class="ident">v</span>, <span class="ident">fields</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Search</span>(<span class="ident">v</span>, <span class="ident">fields</span>),
+                <span class="ident"><span class="self">Self</span>::Search</span>(<span class="ident">v</span>, <span class="ident">fields</span>) =&gt; <span class="ident"><span class="self">Self</span>::NotSearch</span>(<span class="ident">v</span>, <span class="ident">fields</span>),
+                <span class="ident"><span class="self">Self</span>::NotSearch</span>(<span class="ident">v</span>, <span class="ident">fields</span>) =&gt; <span class="ident"><span class="self">Self</span>::Search</span>(<span class="ident">v</span>, <span class="ident">fields</span>),
             }
         } <span class="kw">else</span> {
             <span class="self">self</span>
@@ -773,7 +773,7 @@
 
 <span class="kw">impl</span> <span class="ident">ScalarCompare</span> <span class="kw">for</span> <span class="ident">ScalarFieldRef</span> {
     <span class="doccomment">/// Field is in a given value</span>
-    <span class="kw">fn</span> <span class="ident">is_in</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">is_in</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -785,7 +785,7 @@
     }
 
     <span class="doccomment">/// Field is not in a given value</span>
-    <span class="kw">fn</span> <span class="ident">not_in</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">not_in</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -797,7 +797,7 @@
     }
 
     <span class="doccomment">/// Field equals the given value.</span>
-    <span class="kw">fn</span> <span class="ident">equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -809,7 +809,7 @@
     }
 
     <span class="doccomment">/// Field does not equal the given value.</span>
-    <span class="kw">fn</span> <span class="ident">not_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">not_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -821,7 +821,7 @@
     }
 
     <span class="doccomment">/// Field contains the given value.</span>
-    <span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -833,7 +833,7 @@
     }
 
     <span class="doccomment">/// Field does not contain the given value.</span>
-    <span class="kw">fn</span> <span class="ident">not_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">not_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -845,7 +845,7 @@
     }
 
     <span class="doccomment">/// Field starts with the given value.</span>
-    <span class="kw">fn</span> <span class="ident">starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -857,7 +857,7 @@
     }
 
     <span class="doccomment">/// Field does not start with the given value.</span>
-    <span class="kw">fn</span> <span class="ident">not_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">not_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -869,7 +869,7 @@
     }
 
     <span class="doccomment">/// Field ends with the given value.</span>
-    <span class="kw">fn</span> <span class="ident">ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -881,7 +881,7 @@
     }
 
     <span class="doccomment">/// Field does not end with the given value.</span>
-    <span class="kw">fn</span> <span class="ident">not_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">not_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -893,7 +893,7 @@
     }
 
     <span class="doccomment">/// Field is less than the given value.</span>
-    <span class="kw">fn</span> <span class="ident">less_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">less_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -905,7 +905,7 @@
     }
 
     <span class="doccomment">/// Field is less than or equals the given value.</span>
-    <span class="kw">fn</span> <span class="ident">less_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">less_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -917,7 +917,7 @@
     }
 
     <span class="doccomment">/// Field is greater than the given value.</span>
-    <span class="kw">fn</span> <span class="ident">greater_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">greater_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -929,7 +929,7 @@
     }
 
     <span class="doccomment">/// Field is greater than or equals the given value.</span>
-    <span class="kw">fn</span> <span class="ident">greater_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">greater_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -940,7 +940,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">search</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">search</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -951,7 +951,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">not_search</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">not_search</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -965,7 +965,7 @@
 
 <span class="kw">impl</span> <span class="ident">ScalarCompare</span> <span class="kw">for</span> <span class="ident">ModelProjection</span> {
     <span class="doccomment">/// Field is in a given value</span>
-    <span class="kw">fn</span> <span class="ident">is_in</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">is_in</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -977,7 +977,7 @@
     }
 
     <span class="doccomment">/// Field is not in a given value</span>
-    <span class="kw">fn</span> <span class="ident">not_in</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">not_in</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -989,7 +989,7 @@
     }
 
     <span class="doccomment">/// Field equals the given value.</span>
-    <span class="kw">fn</span> <span class="ident">equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1001,7 +1001,7 @@
     }
 
     <span class="doccomment">/// Field does not equal the given value.</span>
-    <span class="kw">fn</span> <span class="ident">not_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">not_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1013,7 +1013,7 @@
     }
 
     <span class="doccomment">/// Field contains the given value.</span>
-    <span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1025,7 +1025,7 @@
     }
 
     <span class="doccomment">/// Field does not contain the given value.</span>
-    <span class="kw">fn</span> <span class="ident">not_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">not_contains</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1037,7 +1037,7 @@
     }
 
     <span class="doccomment">/// Field starts with the given value.</span>
-    <span class="kw">fn</span> <span class="ident">starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1049,7 +1049,7 @@
     }
 
     <span class="doccomment">/// Field does not start with the given value.</span>
-    <span class="kw">fn</span> <span class="ident">not_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">not_starts_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1061,7 +1061,7 @@
     }
 
     <span class="doccomment">/// Field ends with the given value.</span>
-    <span class="kw">fn</span> <span class="ident">ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1073,7 +1073,7 @@
     }
 
     <span class="doccomment">/// Field does not end with the given value.</span>
-    <span class="kw">fn</span> <span class="ident">not_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">not_ends_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1085,7 +1085,7 @@
     }
 
     <span class="doccomment">/// Field is less than the given value.</span>
-    <span class="kw">fn</span> <span class="ident">less_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">less_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1097,7 +1097,7 @@
     }
 
     <span class="doccomment">/// Field is less than or equals the given value.</span>
-    <span class="kw">fn</span> <span class="ident">less_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">less_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1109,7 +1109,7 @@
     }
 
     <span class="doccomment">/// Field is greater than the given value.</span>
-    <span class="kw">fn</span> <span class="ident">greater_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">greater_than</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1121,7 +1121,7 @@
     }
 
     <span class="doccomment">/// Field is greater than or equals the given value.</span>
-    <span class="kw">fn</span> <span class="ident">greater_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">greater_than_or_equals</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1132,7 +1132,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">search</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">search</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {
@@ -1143,7 +1143,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">not_search</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Filter</span>
+    <span class="kw">fn</span> <span class="ident">not_search</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) -&gt; <span class="ident">Filter</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
     {

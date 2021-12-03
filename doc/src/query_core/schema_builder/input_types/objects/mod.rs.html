@@ -39,7 +39,7 @@
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">RelationFieldRef</span>, <span class="ident">ScalarFieldRef</span>};
 
-<span class="kw">fn</span> <span class="ident">json_null_input_enum</span>(<span class="ident">nullable</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EnumTypeRef</span> {
+<span class="kw">fn</span> <span class="ident">json_null_input_enum</span>(<span class="ident">nullable</span>: <span class="ident">bool</span>) -&gt; <span class="ident">EnumTypeRef</span> {
     <span class="kw">if</span> <span class="ident">nullable</span> {
         <span class="ident">Arc::new</span>(<span class="ident">string_enum_type</span>(
             <span class="ident">json_null::NULLABLE_INPUT_ENUM_NAME</span>,

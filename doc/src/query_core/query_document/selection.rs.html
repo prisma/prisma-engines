@@ -354,40 +354,40 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SelectionBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alias</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alias</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">alias</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arguments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[(<span class="ident">String</span>, <span class="ident">QueryValue</span>)] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arguments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[(<span class="ident">String</span>, <span class="ident">QueryValue</span>)] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">arguments</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_arguments</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">QueryValue</span>)<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_arguments</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">QueryValue</span>)<span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">arguments</span> <span class="op">=</span> <span class="ident">value</span>;
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_argument</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">arg</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">QueryValue</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_argument</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">arg</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">QueryValue</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">arguments</span>.<span class="ident">push</span>((<span class="ident">key</span>.<span class="ident">into</span>(), <span class="ident">arg</span>.<span class="ident">into</span>()));
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested_selections</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Selection</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested_selections</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Selection</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">nested_selections</span> <span class="op">=</span> <span class="ident">sels</span>;
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_nested_selection</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">selection</span>: <span class="ident">Selection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_nested_selection</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">selection</span>: <span class="ident">Selection</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">nested_selections</span>.<span class="ident">push</span>(<span class="ident">selection</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_nested_selection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">nested_selections</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">sel</span><span class="op">|</span> <span class="ident">sel</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_nested_selection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">nested_selections</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">sel</span><span class="op">|</span> <span class="ident">sel</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Selection</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">Selection</span> {
         <span class="ident">Selection</span> {
             <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>,
             <span class="ident">alias</span>: <span class="self">self</span>.<span class="ident">alias</span>,
@@ -406,11 +406,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Selection</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">name</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">alias</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">alias</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">arguments</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">arguments</span>.<span class="ident">len</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">nested_selections</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">nested_selections</span>.<span class="ident">len</span>()
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">alias</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">alias</span>
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">arguments</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">arguments</span>.<span class="ident">len</span>()
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">nested_selections</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">nested_selections</span>.<span class="ident">len</span>()
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">arguments</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">other</span>.<span class="ident">arguments</span>.<span class="ident">contains</span>(<span class="ident">arg</span>))
             <span class="op">&amp;&amp;</span> <span class="self">self</span>
                 .<span class="ident">nested_selections</span>
@@ -420,7 +420,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Selection</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SelectionBuilder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">SelectionBuilder</span> {
         <span class="ident">SelectionBuilder</span> {
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="ident">alias</span>: <span class="prelude-val">None</span>,
@@ -429,7 +429,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dedup</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dedup</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">nested_selections</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">nested_selections</span>
             .<span class="ident">into_iter</span>()
@@ -439,27 +439,27 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_find_unique</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_find_unique</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;findUnique&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arguments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[(<span class="ident">String</span>, <span class="ident">QueryValue</span>)] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arguments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[(<span class="ident">String</span>, <span class="ident">QueryValue</span>)] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">arguments</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_argument</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">QueryValue</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_argument</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">QueryValue</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">arguments</span>.<span class="ident">pop</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested_selections</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="self">Self</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested_selections</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="self">Self</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">nested_selections</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alias</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alias</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">alias</span>
     }
 }
@@ -472,35 +472,35 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SelectionSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Empty</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SelectionSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::default</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="self">self</span>, <span class="ident">column</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">QueryValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="self">self</span>, <span class="ident">column</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">QueryValue</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">into</span>();
 
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">key</span>, <span class="kw-2">mut</span> <span class="ident">vals</span>) <span class="kw">if</span> <span class="ident">key</span> <span class="op">=</span><span class="op">=</span> <span class="ident">column</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">key</span>, <span class="kw-2">mut</span> <span class="ident">vals</span>) <span class="kw">if</span> <span class="ident">key</span> <span class="op">==</span> <span class="ident">column</span> =&gt; {
                 <span class="ident">vals</span>.<span class="ident">push</span>(<span class="ident">value</span>);
                 <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">key</span>, <span class="ident">vals</span>)
             }
-            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">key</span>, <span class="kw-2">mut</span> <span class="ident">vals</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">key</span>, <span class="kw-2">mut</span> <span class="ident">vals</span>) =&gt; {
                 <span class="ident">vals</span>.<span class="ident">push</span>(<span class="ident">value</span>);
                 <span class="ident"><span class="self">Self</span>::Multi</span>(<span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="ident">key</span>, <span class="ident">column</span>]], <span class="macro">vec!</span>[<span class="ident">vals</span>])
             }
-            <span class="ident"><span class="self">Self</span>::Multi</span>(<span class="kw-2">mut</span> <span class="ident">keys</span>, <span class="kw-2">mut</span> <span class="ident">vals</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Multi</span>(<span class="kw-2">mut</span> <span class="ident">keys</span>, <span class="kw-2">mut</span> <span class="ident">vals</span>) =&gt; {
                 <span class="kw">match</span> (<span class="ident">keys</span>.<span class="ident">last_mut</span>(), <span class="ident">vals</span>.<span class="ident">last_mut</span>()) {
-                    (<span class="prelude-val">Some</span>(<span class="ident">keys</span>), <span class="prelude-val">Some</span>(<span class="ident">vals</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">keys</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    (<span class="prelude-val">Some</span>(<span class="ident">keys</span>), <span class="prelude-val">Some</span>(<span class="ident">vals</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">keys</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>) =&gt; {
                         <span class="ident">keys</span>.<span class="ident">push</span>(<span class="ident">column</span>);
                         <span class="ident">vals</span>.<span class="ident">push</span>(<span class="ident">value</span>);
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">_</span> =&gt; {
                         <span class="ident">keys</span>.<span class="ident">push</span>(<span class="macro">vec!</span>[<span class="ident">column</span>]);
                         <span class="ident">vals</span>.<span class="ident">push</span>(<span class="macro">vec!</span>[<span class="ident">value</span>]);
                     }
@@ -508,38 +508,38 @@
 
                 <span class="ident"><span class="self">Self</span>::Multi</span>(<span class="ident">keys</span>, <span class="ident">vals</span>)
             }
-            <span class="ident"><span class="self">Self</span>::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">column</span>, <span class="macro">vec!</span>[<span class="ident">value</span>]),
+            <span class="ident"><span class="self">Self</span>::Empty</span> =&gt; <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">column</span>, <span class="macro">vec!</span>[<span class="ident">value</span>]),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident"><span class="self">Self</span>::Multi</span>(<span class="ident">v</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">len</span>(),
-            <span class="ident"><span class="self">Self</span>::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
+            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="number">1</span>,
+            <span class="ident"><span class="self">Self</span>::Multi</span>(<span class="ident">v</span>, <span class="kw">_</span>) =&gt; <span class="ident">v</span>.<span class="ident">len</span>(),
+            <span class="ident"><span class="self">Self</span>::Empty</span> =&gt; <span class="number">0</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_single</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_single</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Single</span>(<span class="kw">_</span>, <span class="kw">_</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_multi</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_multi</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Multi</span>(<span class="kw">_</span>, <span class="kw">_</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">key</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[<span class="ident">key</span>.<span class="ident">as_ref</span>()],
-            <span class="ident"><span class="self">Self</span>::Multi</span>(<span class="ident">keys</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">keys</span>.<span class="ident">first</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">keys</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keys</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">key</span>.<span class="ident">as_ref</span>()).<span class="ident">collect</span>(),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Vec::new</span>(),
+            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">key</span>, <span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">key</span>.<span class="ident">as_ref</span>()],
+            <span class="ident"><span class="self">Self</span>::Multi</span>(<span class="ident">keys</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">keys</span>.<span class="ident">first</span>() {
+                <span class="prelude-val">Some</span>(<span class="ident">keys</span>) =&gt; <span class="ident">keys</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">key</span>.<span class="ident">as_ref</span>()).<span class="ident">collect</span>(),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">Vec::new</span>(),
             },
-            <span class="ident"><span class="self">Self</span>::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Vec::new</span>(),
+            <span class="ident"><span class="self">Self</span>::Empty</span> =&gt; <span class="ident">Vec::new</span>(),
         }
     }
 }
@@ -549,15 +549,15 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">In</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">selection_set</span>: <span class="ident">SelectionSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">selection_set</span>: <span class="ident">SelectionSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">selection_set</span> }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">In</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QueryValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">In</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">In</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">selection_set</span> {
-            <span class="ident">SelectionSet::Multi</span>(<span class="ident">key_sets</span>, <span class="ident">val_sets</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SelectionSet::Multi</span>(<span class="ident">key_sets</span>, <span class="ident">val_sets</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">key_vals</span> <span class="op">=</span> <span class="ident">key_sets</span>.<span class="ident">into_iter</span>().<span class="ident">zip</span>(<span class="ident">val_sets</span>.<span class="ident">into_iter</span>());
 
                 <span class="kw">let</span> <span class="ident">conjuctive</span> <span class="op">=</span> <span class="ident">key_vals</span>.<span class="ident">fold</span>(<span class="ident">Conjuctive::new</span>(), <span class="op">|</span><span class="ident">acc</span>, (<span class="ident">keys</span>, <span class="ident">vals</span>)<span class="op">|</span> {
@@ -576,7 +576,7 @@
 
                 <span class="ident">QueryValue::from</span>(<span class="ident">conjuctive</span>)
             }
-            <span class="ident">SelectionSet::Single</span>(<span class="ident">key</span>, <span class="ident">vals</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SelectionSet::Single</span>(<span class="ident">key</span>, <span class="ident">vals</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">argument</span> <span class="op">=</span> <span class="ident">IndexMap::new</span>();
                 <span class="ident">argument</span>.<span class="ident">insert</span>(
                     <span class="ident">key</span>.<span class="ident">to_string</span>(),
@@ -589,7 +589,7 @@
 
                 <span class="ident">QueryValue::Object</span>(<span class="ident">argument</span>)
             }
-            <span class="ident">SelectionSet::Empty</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">QueryValue::Null</span>,
+            <span class="ident">SelectionSet::Empty</span> =&gt; <span class="ident">QueryValue::Null</span>,
         }
     }
 }
@@ -603,51 +603,51 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">QueryValue</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Conjuctive</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">map</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">QueryValue</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">map</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">QueryValue</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">map</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Conjuctive</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::None</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Conjuctive</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::default</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">operation</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Conjuctive</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">operation</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Conjuctive</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Or</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">operations</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Or</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">operations</span>) =&gt; {
                 <span class="ident">operations</span>.<span class="ident">push</span>(<span class="ident">operation</span>.<span class="ident">into</span>());
                 <span class="self">self</span>
             }
-            <span class="ident"><span class="self">Self</span>::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">operation</span>.<span class="ident">into</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Or</span>(<span class="macro">vec!</span>[<span class="self">self</span>, <span class="ident">operation</span>.<span class="ident">into</span>()]),
+            <span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="ident">operation</span>.<span class="ident">into</span>(),
+            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Or</span>(<span class="macro">vec!</span>[<span class="self">self</span>, <span class="ident">operation</span>.<span class="ident">into</span>()]),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">operation</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Conjuctive</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">operation</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Conjuctive</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::And</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">operations</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::And</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">operations</span>) =&gt; {
                 <span class="ident">operations</span>.<span class="ident">push</span>(<span class="ident">operation</span>.<span class="ident">into</span>());
                 <span class="self">self</span>
             }
-            <span class="ident"><span class="self">Self</span>::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">operation</span>.<span class="ident">into</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::And</span>(<span class="macro">vec!</span>[<span class="self">self</span>, <span class="ident">operation</span>.<span class="ident">into</span>()]),
+            <span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="ident">operation</span>.<span class="ident">into</span>(),
+            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::And</span>(<span class="macro">vec!</span>[<span class="self">self</span>, <span class="ident">operation</span>.<span class="ident">into</span>()]),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Conjuctive</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QueryValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">conjuctive</span>: <span class="ident">Conjuctive</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">conjuctive</span>: <span class="ident">Conjuctive</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">conjuctive</span> {
-            <span class="ident">Conjuctive::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Null</span>,
-            <span class="ident">Conjuctive::Single</span>(<span class="ident">obj</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">QueryValue::Object</span>(<span class="ident">single_to_multi_filter</span>(<span class="ident">obj</span>)), <span class="comment">// QueryValue::Object(obj),</span>
-            <span class="ident">Conjuctive::Or</span>(<span class="ident">conjuctives</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Conjuctive::None</span> =&gt; <span class="ident"><span class="self">Self</span>::Null</span>,
+            <span class="ident">Conjuctive::Single</span>(<span class="ident">obj</span>) =&gt; <span class="ident">QueryValue::Object</span>(<span class="ident">single_to_multi_filter</span>(<span class="ident">obj</span>)), <span class="comment">// QueryValue::Object(obj),</span>
+            <span class="ident">Conjuctive::Or</span>(<span class="ident">conjuctives</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">conditions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">conjuctives</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">QueryValue::from</span>).<span class="ident">collect</span>();
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">IndexMap::new</span>();
@@ -655,7 +655,7 @@
 
                 <span class="ident">QueryValue::Object</span>(<span class="ident">map</span>)
             }
-            <span class="ident">Conjuctive::And</span>(<span class="ident">conjuctives</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Conjuctive::And</span>(<span class="ident">conjuctives</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">conditions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">conjuctives</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">QueryValue::from</span>).<span class="ident">collect</span>();
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">IndexMap::new</span>();
@@ -668,7 +668,7 @@
 }
 
 <span class="doccomment">/// Syntax for single-record and multi-record queries</span>
-<span class="kw">fn</span> <span class="ident">single_to_multi_filter</span>(<span class="ident">obj</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">QueryValue</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">QueryValue</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">single_to_multi_filter</span>(<span class="ident">obj</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">QueryValue</span><span class="op">&gt;</span>) -&gt; <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">QueryValue</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_obj</span> <span class="op">=</span> <span class="ident">IndexMap::new</span>();
 
     <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">obj</span> {

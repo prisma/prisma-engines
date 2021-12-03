@@ -9,15 +9,15 @@ polynomial x^128 + x^127 + x^126 + x^121 + 1.”</p>
 <p>By multiplying (in the finite field sense) a sequence of 128-bit blocks of
 input data data by a field element <code>H</code>, POLYVAL can be used to authenticate
 the message sequence as powers (in the finite field sense) of <code>H</code>.</p>
-<h2 id="minimum-supported-rust-version" class="section-header"><a href="#minimum-supported-rust-version">Minimum Supported Rust Version</a></h2>
+<h3 id="minimum-supported-rust-version" class="section-header"><a href="#minimum-supported-rust-version">Minimum Supported Rust Version</a></h3>
 <p>Rust <em>1.41</em> or higher.</p>
 <p>In the future the minimum supported Rust version may be changed, but it
 be will be accompanied with a minor version bump.</p>
-<h2 id="performance-notes" class="section-header"><a href="#performance-notes">Performance Notes</a></h2>
+<h3 id="performance-notes" class="section-header"><a href="#performance-notes">Performance Notes</a></h3>
 <p>On x86(-64) platforms, set <code>target-cpu</code> in <code>RUSTFLAGS</code> to <code>sandybridge</code> or
 newer for optimum performance:</p>
 <p>Example:</p>
-<div class="example-wrap"><pre class="language-text"><code>$ RUSTFLAGS=&quot;-Ctarget-cpu=sandybridge&quot; cargo bench</code></pre></div><h2 id="relationship-to-ghash" class="section-header"><a href="#relationship-to-ghash">Relationship to GHASH</a></h2>
+<div class="example-wrap"><pre class="language-text"><code>$ RUSTFLAGS=&quot;-Ctarget-cpu=sandybridge&quot; cargo bench</code></pre></div><h3 id="relationship-to-ghash" class="section-header"><a href="#relationship-to-ghash">Relationship to GHASH</a></h3>
 <p>POLYVAL can be thought of as the little endian equivalent of GHASH, which
 affords it a small performance advantage over GHASH when used on little
 endian architectures.</p>
@@ -31,17 +31,17 @@ x^121 + 1 and GHASH works modulo x^128 + x^7 + x^2 + x + 1.  Note
 that these irreducible polynomials are the ‘reverse’ of each other.”</p>
 </blockquote>
 </div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
-<div class="item-table"><div class="item-left import-item"><code>pub use <a class="mod" href="../universal_hash/index.html" title="mod universal_hash">universal_hash</a>;</code></div><div class="item-right docblock-short"></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Polyval.html" title="polyval::Polyval struct">Polyval</a></div><div class="item-right docblock-short"><p><strong>POLYVAL</strong>: GHASH-like universal hash over GF(2^128).</p>
-</div></div><h2 id="constants" class="section-header"><a href="#constants">Constants</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="constant" href="constant.BLOCK_SIZE.html" title="polyval::BLOCK_SIZE constant">BLOCK_SIZE</a></div><div class="item-right docblock-short"><p>Size of a POLYVAL block in bytes</p>
-</div><div class="item-left module-item"><a class="constant" href="constant.KEY_SIZE.html" title="polyval::KEY_SIZE constant">KEY_SIZE</a></div><div class="item-right docblock-short"><p>Size of a POLYVAL key in bytes</p>
-</div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="fn" href="fn.mulx.html" title="polyval::mulx fn">mulx</a></div><div class="item-right docblock-short"><p>The <code>mulX_POLYVAL()</code> function as defined in <a href="https://tools.ietf.org/html/rfc8452#appendix-A">RFC 8452 Appendix A</a>.</p>
-</div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="type" href="type.Block.html" title="polyval::Block type">Block</a></div><div class="item-right docblock-short"><p>POLYVAL blocks (16-bytes)</p>
-</div><div class="item-left module-item"><a class="type" href="type.Key.html" title="polyval::Key type">Key</a></div><div class="item-right docblock-short"><p>POLYVAL keys (16-bytes)</p>
-</div><div class="item-left module-item"><a class="type" href="type.Tag.html" title="polyval::Tag type">Tag</a></div><div class="item-right docblock-short"><p>POLYVAL tags (16-bytes)</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="polyval" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+<div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use <a class="mod" href="../universal_hash/index.html" title="mod universal_hash">universal_hash</a>;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Polyval.html" title="polyval::Polyval struct">Polyval</a></div><div class="item-right docblock-short"><p><strong>POLYVAL</strong>: GHASH-like universal hash over GF(2^128).</p>
+</div></div></div><h2 id="constants" class="section-header"><a href="#constants">Constants</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BLOCK_SIZE.html" title="polyval::BLOCK_SIZE constant">BLOCK_SIZE</a></div><div class="item-right docblock-short"><p>Size of a POLYVAL block in bytes</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.KEY_SIZE.html" title="polyval::KEY_SIZE constant">KEY_SIZE</a></div><div class="item-right docblock-short"><p>Size of a POLYVAL key in bytes</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.mulx.html" title="polyval::mulx fn">mulx</a></div><div class="item-right docblock-short"><p>The <code>mulX_POLYVAL()</code> function as defined in <a href="https://tools.ietf.org/html/rfc8452#appendix-A">RFC 8452 Appendix A</a>.</p>
+</div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Block.html" title="polyval::Block type">Block</a></div><div class="item-right docblock-short"><p>POLYVAL blocks (16-bytes)</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Key.html" title="polyval::Key type">Key</a></div><div class="item-right docblock-short"><p>POLYVAL keys (16-bytes)</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Tag.html" title="polyval::Tag type">Tag</a></div><div class="item-right docblock-short"><p>POLYVAL tags (16-bytes)</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="polyval" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>
 </body></html>
